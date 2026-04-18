@@ -1,0 +1,31 @@
+---
+import { render } from 'astro:content';
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+    const notes = await getCollection("notes");
+    return notes.map((note) => ({
+        params: { slug: note.data.slug },
+        props: { note },
+    }));
+}
+
+const { slug } = Astro.params;
+const notesEntry = await getEntry("notes", slug);
+
+if (!notesEntry) {
+    return new Response(null, {
+        status: 404,
+        statusText: "Not Found",
+    });
+}
+
+const { Content } = await render(notesEntry);
+---
+
+<Layout>
+    <h1>{notesEntry.data.title}</h1>
+    <Content />
+</Layout>

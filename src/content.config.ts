@@ -7,10 +7,10 @@ const notes = defineCollection({
     schema: z.object({
         title: z.string(),
         slug: z.string(),
-        sidebar: z.object({
-            label: z.string(),
-            order: z.number(),
-        }),
+        sidebar: z.optional(z.object({
+            label: z.optional(z.string()),
+            order: z.optional(z.number()),
+        })),
         prev: z.boolean().optional(),
         next: z.boolean().optional(),
     }),
