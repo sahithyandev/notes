@@ -1,11 +1,354 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import SemesterCard from "../components/SemesterCard.astro";
+import NotePreview from "../components/NotePreview.astro";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+interface SemesterInfo {
+  number: number;
+  modulesCount: number;
+}
+
+async function getSemestersData(): Promise<SemesterInfo[]> {
+  const docsPath = path.join(process.cwd(), 'docs');
+  
+  try {
+    // Read all items in docs directory
+    const items = await fs.readdir(docsPath);
+    
+    // Filter for semester directories (s1, s2, etc.)
+    const semesterDirs = items.filter((item: string) => /^s\d+$/.test(item));
+    
+    const semestersData: SemesterInfo[] = [];
+    
+    for (const dir of semesterDirs) {
+      const semesterPath = path.join(docsPath, dir);
+      const semesterNumber = parseInt(dir.substring(1));
+      
+      try {
+        // Read all items in semester directory
+        const semesterItems = await fs.readdir(semesterPath);
+        
+        // Count modules (subdirectories) in the semester directory
+        const moduleCount = await Promise.all(
+          semesterItems.map(async (item: string) => {
+            const itemPath = path.join(semesterPath, item);
+            try {
+              const stat = await fs.stat(itemPath);
+              return stat.isDirectory() ? 1 : 0;
+            } catch {
+              return 0;
+            }
+          })
+        ).then((counts) => counts.reduce((sum: number, count: number) => sum + count, 0));
+        
+        semestersData.push({
+          number: semesterNumber,
+          modulesCount: moduleCount
+        });
+      } catch (error) {
+        console.error(`Error reading semester ${dir}:`, error);
+      }
+    }
+    
+    // Sort by semester number
+    return semestersData.sort((a, b) => a.number - b.number);
+    
+  } catch (error) {
+    console.error('Error reading semesters data:', error);
+    return [];
+  }
+}
+
+const semestersData: SemesterInfo[] = await getSemestersData();
+
+const recentNotes = [
+  {
+    title: "Introduction to Binary Trees",
+    semester: 3,
+    module: "Data Structures",
+    preview:
+      "Binary trees are hierarchical data structures with at most two children per node. Learn about tree traversal algorithms, balancing techniques, and practical applications in computer science.",
+    lastUpdated: "2 days ago",
+  },
+  {
+    title: "Neural Network Fundamentals",
+    semester: 4,
+    module: "Artificial Intelligence",
+    preview:
+      "Explore the basics of neural networks, including perceptrons, activation functions, backpropagation, and how these models mimic human learning processes.",
+    lastUpdated: "1 week ago",
+  },
+  {
+    title: "Database Normalization",
+    semester: 3,
+    module: "Database Systems",
+    preview:
+      "Understanding database normalization forms (1NF, 2NF, 3NF, BCNF) to eliminate data redundancy and improve data integrity in relational databases.",
+    lastUpdated: "3 days ago",
+  },
+];
+
+const popularNotes = [
+  {
+    title: "Time Complexity Analysis",
+    semester: 3,
+    module: "Algorithms",
+    preview:
+      "Master Big O notation and analyze algorithm efficiency. Learn to identify time and space complexity for common algorithms and data structures.",
+    isPopular: true,
+  },
+  {
+    title: "React Hooks Deep Dive",
+    semester: 3,
+    module: "Web Development",
+    preview:
+      "Comprehensive guide to React Hooks including useState, useEffect, useContext, and custom hooks for building modern web applications.",
+    isPopular: true,
+  },
+  {
+    title: "TCP/IP Protocol Suite",
+    semester: 4,
+    module: "Computer Networks",
+    preview:
+      "Detailed explanation of TCP/IP layers, protocols, and how data travels across networks. Includes practical examples and troubleshooting tips.",
+    isPopular: true,
+  },
+  {
+    title: "Calculus for Engineers",
+    semester: 1,
+    module: "Mathematics I",
+    preview:
+      "Essential calculus concepts including limits, derivatives, integrals, and their applications in engineering problem-solving.",
+    isPopular: true,
+  },
+];
 ---
 
 <Layout>
-	<Welcome />
+  <div class="landing-page">
+    <Hero />
+
+    <!-- Semesters Section -->
+    <section class="semesters-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="gradient-text">Explore Semesters</span>
+        </h2>
+        <p class="section-subtitle">
+          Navigate through 8 semesters of comprehensive academic content
+        </p>
+      </div>
+
+      <div class="semesters-grid">
+        {
+          semestersData.map((semester) => (
+            <SemesterCard
+              semesterNumber={semester.number}
+              modulesCount={semester.modulesCount}
+            />
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Recent Notes Section -->
+    <section class="recent-notes-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="gradient-text">Recent Notes</span>
+        </h2>
+        <p class="section-subtitle">Latest additions to your study materials</p>
+      </div>
+
+      <div class="notes-scroll">
+        {
+          recentNotes.map((note) => (
+            <NotePreview
+              title={note.title}
+              semester={note.semester}
+              module={note.module}
+              preview={note.preview}
+              lastUpdated={note.lastUpdated}
+            />
+          ))
+        }
+      </div>
+    </section>
+  </div>
 </Layout>
+
+<style>
+  .landing-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
+  }
+
+  [data-theme="dark"] .landing-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .semesters-section,
+  .recent-notes-section,
+  .popular-notes-section,
+  .features-section {
+    padding: 4rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-subtitle {
+    font-size: 1.125rem;
+    color: #718096;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  [data-theme="dark"] .section-subtitle {
+    color: #a0aec0;
+  }
+
+  .semesters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .notes-scroll {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-behavior: smooth;
+  }
+
+  .notes-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .notes-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+
+  .notes-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border-radius: 4px;
+  }
+
+  .notes-scroll .note-preview {
+    min-width: 350px;
+    flex-shrink: 0;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="dark"] .feature-card {
+    background: #2d3748;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+
+  [data-theme="dark"] .feature-title {
+    color: #e2e8f0;
+  }
+
+  .feature-description {
+    color: #718096;
+    line-height: 1.6;
+  }
+
+  [data-theme="dark"] .feature-description {
+    color: #a0aec0;
+  }
+
+  @media (max-width: 768px) {
+    .semesters-section,
+    .recent-notes-section,
+    .popular-notes-section,
+    .features-section {
+      padding: 2rem 1rem;
+    }
+
+    .semesters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .notes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .notes-scroll .note-preview {
+      min-width: 280px;
+    }
+  }
+</style>

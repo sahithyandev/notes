@@ -1,0 +1,225 @@
+---
+interface Props {
+  title: string;
+  semester: number;
+  module: string;
+  preview: string;
+  isPopular?: boolean;
+  lastUpdated?: string;
+}
+
+const { title, semester, module, preview, isPopular = false, lastUpdated } = Astro.props;
+import { Star, ArrowRight } from '@lucide/astro';
+
+const semesterColors = [
+  '#FF6B6B', '#A8E6CF', '#FF8CC8', '#4E80F6',
+  '#FFB347', '#95E1D3', '#F38181', '#667EEA'
+];
+
+const semesterColor = semesterColors[semester - 1] || semesterColors[0];
+---
+
+<div class="note-preview">
+  <div class="note-header">
+    <div class="note-meta">
+      <span class="semester-badge" style={`background: ${semesterColor}20; color: ${semesterColor};`}>
+        S{semester}
+      </span>
+      <span class="module-name">{module}</span>
+    </div>
+    {isPopular && (
+      <div class="popular-badge">
+        <Star class="popular-icon" />
+        <span class="popular-text">Popular</span>
+      </div>
+    )}
+  </div>
+  
+  <div class="note-content">
+    <h3 class="note-title">{title}</h3>
+    <p class="note-preview-text">{preview}</p>
+  </div>
+  
+  <div class="note-footer">
+    <a href={`/notes/${title.toLowerCase().replace(/\s+/g, '-')}`} class="read-more">
+      Read More
+      <ArrowRight class="arrow" />
+    </a>
+    {lastUpdated && (
+      <span class="last-updated">{lastUpdated}</span>
+    )}
+  </div>
+</div>
+
+<style>
+  .note-preview {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  [data-theme="dark"] .note-preview {
+    background: #2d3748;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .note-preview:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .note-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .semester-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .module-name {
+    font-size: 0.875rem;
+    color: #718096;
+    font-weight: 500;
+  }
+
+  [data-theme="dark"] .module-name {
+    color: #a0aec0;
+  }
+
+  .popular-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .popular-icon {
+    font-size: 0.875rem;
+  }
+
+  .note-content {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  .note-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  [data-theme="dark"] .note-title {
+    color: #e2e8f0;
+  }
+
+  .note-preview-text {
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  [data-theme="dark"] .note-preview-text {
+    color: #cbd5e0;
+  }
+
+  .note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="dark"] .note-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .read-more {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #3182ce;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: gap 0.2s ease;
+  }
+
+  [data-theme="dark"] .read-more {
+    color: #63b3ed;
+  }
+
+  .read-more:hover {
+    gap: 0.75rem;
+  }
+
+  .arrow {
+    font-size: 0.875rem;
+    transition: transform 0.2s ease;
+  }
+
+  .read-more:hover .arrow {
+    transform: translateX(2px);
+  }
+
+  .last-updated {
+    font-size: 0.75rem;
+    color: #a0aec0;
+  }
+
+  [data-theme="dark"] .last-updated {
+    color: #718096;
+  }
+
+  @media (max-width: 640px) {
+    .note-preview {
+      padding: 1rem;
+    }
+
+    .note-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .note-title {
+      font-size: 1rem;
+    }
+
+    .note-preview-text {
+      font-size: 0.8125rem;
+    }
+  }
+</style>
