@@ -23,7 +23,7 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
     // Extract semester and module from the slug
     // slug format: "theory-of-electricity/introduction" or "dimensions-and-units"
     const slugParts = note.data.slug.split("/");
-    
+
     let semesterNumber: number;
     let moduleName: string;
 
@@ -136,68 +136,25 @@ const popularNotes = [
   <Hero />
   <StatsBand />
 
-  <!-- SEMESTER GRID -->
-  <div id="semesters" style="background: var(--bg);">
-    <div class="section">
-      <div class="section-hd">
-        <div class="section-hd-left">
-          <span class="section-counter">01 /</span>
-          <div class="section-rule"></div>
-          <h2 class="section-title">All Semesters</h2>
-        </div>
-        <span class="section-sub">8 semesters · 32 subjects · 200+ notes</span>
-      </div>
-      <div class="sem-grid">
-        <SemesterCard 
-          number={1} 
-          subjects={["Calculus & Linear Algebra", "Engineering Physics", "C Programming", "Engineering Drawing"]} 
-          notesCount="22" 
-        />
-        <SemesterCard 
-          number={2} 
-          subjects={["Discrete Mathematics", "Data Structures", "Digital Logic Design", "Chemistry"]} 
-          notesCount="28" 
-        />
-        <SemesterCard 
-          number={3} 
-          subjects={["Theory of Computing", "Operating Systems", "Database Systems", "Computer Networks"]} 
-          notesCount="40" 
-          href="Short Notes.html"
-        />
-        <SemesterCard 
-          number={4} 
-          subjects={["Compiler Design", "Algorithm Analysis", "Computer Architecture", "ML Fundamentals"]} 
-          notesCount="36" 
-        />
-        <SemesterCard 
-          number={5} 
-          subjects={["Cryptography", "Cloud Computing", "Deep Learning", "Software Engineering"]} 
-          notesCount="30" 
-        />
-        <SemesterCard 
-          number={6} 
-          subjects={["Embedded Systems", "Natural Language Processing", "Graph Theory", "Parallel Computing"]} 
-          notesCount="28" 
-        />
-        <SemesterCard 
-          number={7} 
-          subjects={["Quantum Information", "Computer Vision", "Distributed Systems", "Research Thesis"]} 
-          notesCount="24" 
-        />
-        <SemesterCard 
-          number={8} 
-          subjects={["Final Year Project", "Technical Seminar", "Elective III", "Industrial Training"]} 
-          notesCount="16" 
-        />
-      </div>
-    </div>
-  </div>
+  <section>
+    <h2 class="section-title">All Semesters</h2>
 
-  <div class="page-rule"></div>
+    <div class="sem-grid">
+      {
+        semestersData.map((semester) => (
+          <SemesterCard
+            number={semester.number}
+            subjects={semester.modules}
+            notesCount={semester.notesCount.toString()}
+          />
+        ))
+      }
+    </div>
+  </section>
 
   <!-- RECENT NOTES -->
-  <div id="recent">
-    <div class="section">
+  <section>
+    <div id="recent">
       <div class="section-hd">
         <div class="section-hd-left">
           <span class="section-counter">02 /</span>
@@ -264,7 +221,7 @@ const popularNotes = [
         </a>
       </div>
     </div>
-  </div>
+  </section>
 
   <script>
     const nav = document.querySelector(".nav");
@@ -303,6 +260,15 @@ const popularNotes = [
 </Layout>
 
 <style>
+  @import "../styles/global.css";
+
+  section {
+    padding: 64px 36px;
+    max-width: 1272px;
+    margin: 0 auto;
+  }
+
+  /* From template */
   :root {
     --font-ui: "Manrope", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
@@ -356,25 +322,6 @@ const popularNotes = [
   }
 
   /* ── SECTION WRAPPER ──────────────────────────────────────────── */
-  .section {
-    padding: 64px 36px;
-    max-width: 1272px;
-    margin: 0 auto;
-  }
-
-  .section-hd {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 32px;
-  }
-
-  .section-hd-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
   .section-counter {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -390,6 +337,7 @@ const popularNotes = [
   }
 
   .section-title {
+    @apply mb-8;
     font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
@@ -423,7 +371,7 @@ const popularNotes = [
   /* ── SEMESTER GRID ────────────────────────────────────────────── */
   .sem-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
 
