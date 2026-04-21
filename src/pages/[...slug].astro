@@ -25,7 +25,7 @@ if (!notesEntry) {
   });
 }
 
-const { Content } = await render(notesEntry);
+const { Content, headings } = await render(notesEntry);
 
 // Helper functions to generate sidebar data
 function getSemesterInfo(slugParts: string[]) {
@@ -87,12 +87,15 @@ async function getSidebarData(currentSlug: string) {
 }
 
 const sidebarData = await getSidebarData(slug);
+
+// Filter headings for TOC (h2 and h3 only)
+const tocHeadings = headings.filter(heading => heading.depth === 2 || heading.depth === 3);
 ---
 
 <Layout>
   <Nav />
 
-  <main class="grid grid-cols-[auto_1fr] gap-x-5">
+  <main class="grid grid-cols-[auto_1fr_auto] gap-x-5">
     <aside class="sidebar">
       <div class="sb-sem">
         <div class="sb-sem-pip"></div>
@@ -147,6 +150,23 @@ const sidebarData = await getSidebarData(slug);
       </h1>
       <Content />
     </article>
+
+    {
+      tocHeadings.length > 0 && (
+        <aside class="toc-rail">
+          <div class="toc-title">On this page</div>
+          {tocHeadings.map((heading, index) => (
+            <a
+              href={`#${heading.slug}`}
+              class={`toc-item ${heading.depth === 3 ? "toc-sub" : ""} ${index === 0 ? "active" : ""}`}
+            >
+              {heading.text}
+            </a>
+          ))}
+          {tocHeadings.length > 5 && <div class="toc-rule" />}
+        </aside>
+      )
+    }
   </main>
 
   <script>
@@ -173,25 +193,47 @@ const sidebarData = await getSidebarData(slug);
     // TOC active state on scroll
     const headings = [...document.querySelectorAll(".prose h2, .prose h3")];
     const tocLinks = [...document.querySelectorAll(".toc-item")];
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const i = headings.indexOf(e.target);
-          if (i < 0) return;
-          tocLinks.forEach((t) => t.classList.remove("active"));
-          if (tocLinks[i + 1]) tocLinks[i + 1].classList.add("active");
+
+    if (headings.length > 0 && tocLinks.length > 0) {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const i = headings.indexOf(e.target);
+            if (i < 0) return;
+            tocLinks.forEach((t) => t.classList.remove("active"));
+            if (tocLinks[i]) tocLinks[i].classList.add("active");
+          });
+        },
+        { rootMargin: "-10% 0px -75% 0px" },
+      );
+      headings.forEach((h) => obs.observe(h));
+
+      // Smooth scroll for TOC links
+      tocLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const href = link.getAttribute("href");
+          if (href) {
+            const targetId = href.substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              targetElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          }
         });
-      },
-      { rootMargin: "-10% 0px -75% 0px" },
-    );
-    headings.forEach((h) => obs.observe(h));
+      });
+    }
   </script>
 </Layout>
 
 <style>
   :root {
     --sidebar-w: 260px;
+    --toc-w: 200px;
   }
 
   article {
