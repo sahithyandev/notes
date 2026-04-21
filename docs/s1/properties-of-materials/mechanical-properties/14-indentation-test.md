@@ -1,6 +1,6 @@
 ---
 title: Indentation Test
-slug: s1/properties-of-materials/mechanical-properties/14-indentation-test
+slug: s1/properties-of-materials/mechanical-properties/indentation-test
 sidebar:
   order: 14
 next: false

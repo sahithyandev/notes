@@ -1,6 +1,6 @@
 ---
 title: Alternating Series
-slug: s1/mathematics/real-analysis/27-alternating-series
+slug: s1/mathematics/real-analysis/alternating-series
 sidebar:
   order: 27
 prev: true

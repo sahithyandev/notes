@@ -1,6 +1,6 @@
 ---
 title: Taylor's Theorem
-slug: s1/mathematics/real-analysis/20-taylor-theorem
+slug: s1/mathematics/real-analysis/taylor-theorem
 sidebar:
   order: 20
 next: true

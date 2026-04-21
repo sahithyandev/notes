@@ -1,6 +1,6 @@
 ---
 title: Countability
-slug: s1/mathematics/real-analysis/11-countability
+slug: s1/mathematics/real-analysis/countability
 sidebar:
   order: 11
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Generation of Electricity
-slug: s1/electrical-fundamentals/basics/02-generation-of-electricity
+slug: s1/electrical-fundamentals/basics/generation-of-electricity
 sidebar:
   order: 2
 prev: true

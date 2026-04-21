@@ -1,6 +1,6 @@
 ---
 title: Matrix Multiplication
-slug: s1/mathematics/matrices/02-matrix-multiplication
+slug: s1/mathematics/matrices/matrix-multiplication
 sidebar:
   order: 2
 prev: true

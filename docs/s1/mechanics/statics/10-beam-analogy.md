@@ -1,6 +1,6 @@
 ---
 title: Beam Analogy
-slug: s1/mechanics/statics/10-beam-analogy
+slug: s1/mechanics/statics/beam-analogy
 sidebar:
   order: 10
 prev: true

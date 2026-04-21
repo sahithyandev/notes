@@ -1,6 +1,6 @@
 ---
 title: Taylor Series
-slug: s1/mathematics/real-analysis/30-taylor-series
+slug: s1/mathematics/real-analysis/taylor-series
 sidebar:
   order: 30
 prev: true

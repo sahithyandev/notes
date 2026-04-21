@@ -1,6 +1,6 @@
 ---
 title: Section Formula
-slug: s1/mathematics/vectors/02-section-formula
+slug: s1/mathematics/vectors/section-formula
 sidebar:
   order: 2
 prev: true

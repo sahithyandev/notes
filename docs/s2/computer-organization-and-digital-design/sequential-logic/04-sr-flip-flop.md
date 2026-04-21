@@ -2,7 +2,7 @@
 title: SR Flip-flop
 sidebar:
   order: 4
-slug: s2/computer-organization-and-digital-design/sequential-logic/04-sr-flip-flop
+slug: s2/computer-organization-and-digital-design/sequential-logic/sr-flip-flop
 prev: true
 next: true
 ---

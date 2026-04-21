@@ -1,6 +1,6 @@
 ---
 title: Analytic Functions
-slug: s1/mathematics/complex-analysis/07-analytic-functions
+slug: s1/mathematics/complex-analysis/analytic-functions
 sidebar:
   order: 7
 next: true

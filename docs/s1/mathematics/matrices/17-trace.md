@@ -1,6 +1,6 @@
 ---
 title: Trace
-slug: s1/mathematics/matrices/17-trace
+slug: s1/mathematics/matrices/trace
 sidebar:
   order: 17
 prev: true

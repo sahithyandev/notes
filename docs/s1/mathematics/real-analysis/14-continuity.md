@@ -1,6 +1,6 @@
 ---
 title: Continuity
-slug: s1/mathematics/real-analysis/14-continuity
+slug: s1/mathematics/real-analysis/continuity
 sidebar:
   order: 14
 prev: true

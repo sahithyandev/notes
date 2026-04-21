@@ -2,7 +2,7 @@
 title: Transient Analysis
 sidebar:
   order: 11
-slug: s2/theory-of-electricity/11-transient-analysis
+slug: s2/theory-of-electricity/transient-analysis
 prev: true
 next: true
 ---

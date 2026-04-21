@@ -3,7 +3,7 @@ import { writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 
-const PATTERN_TITLE_PREFIX = /\/(\d+)-/;
+const PATTERN_TITLE_PREFIX = /(\d+)-/;
 
 function safeParseInt(value: string | undefined, defaultValue: number | undefined = undefined) {
 	if (typeof value === "undefined") return defaultValue;

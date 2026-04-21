@@ -3,7 +3,7 @@ title: Solving First Order Ordinary Differential Equations
 sidebar:
   label: Solving First Order ODE
   order: 2
-slug: s1/mathematics/ode/02-first-order-ode
+slug: s1/mathematics/ode/first-order-ode
 prev: true
 next: true
 ---

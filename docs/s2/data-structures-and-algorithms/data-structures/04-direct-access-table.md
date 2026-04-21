@@ -2,7 +2,7 @@
 title: Direct Access Table
 sidebar:
   order: 4
-slug: s2/data-structures-and-algorithms/data-structures/04-direct-access-table
+slug: s2/data-structures-and-algorithms/data-structures/direct-access-table
 prev: true
 next: true
 ---

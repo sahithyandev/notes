@@ -1,6 +1,6 @@
 ---
 title: Strategy for Series
-slug: s1/mathematics/real-analysis/28-strategy-for-series
+slug: s1/mathematics/real-analysis/strategy-for-series
 sidebar:
   order: 28
 prev: true

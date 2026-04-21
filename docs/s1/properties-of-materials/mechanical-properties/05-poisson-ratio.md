@@ -1,6 +1,6 @@
 ---
 title: Poisson's ratio
-slug: s1/properties-of-materials/mechanical-properties/05-poisson-ratio
+slug: s1/properties-of-materials/mechanical-properties/poisson-ratio
 sidebar:
   order: 5
 prev: true

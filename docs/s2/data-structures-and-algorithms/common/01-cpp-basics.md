@@ -2,7 +2,7 @@
 title: C++ Basics
 sidebar:
   order: 1
-slug: s2/data-structures-and-algorithms/common/01-cpp-basics
+slug: s2/data-structures-and-algorithms/common/cpp-basics
 prev: false
 next: false
 ---

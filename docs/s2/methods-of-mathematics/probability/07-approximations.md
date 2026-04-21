@@ -2,7 +2,7 @@
 title: Approximations
 sidebar:
   order: 7
-slug: s2/methods-of-mathematics/probability/07-approximations
+slug: s2/methods-of-mathematics/probability/approximations
 prev: true
 next: false
 ---

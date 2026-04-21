@@ -2,7 +2,7 @@
 title: Types of Trusses
 sidebar:
   order: 11
-slug: s1/mechanics/statics/11-types-of-trusses
+slug: s1/mechanics/statics/types-of-trusses
 prev: true
 next: false
 ---

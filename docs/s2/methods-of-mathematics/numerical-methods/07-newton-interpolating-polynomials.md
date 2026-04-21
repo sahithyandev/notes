@@ -2,8 +2,7 @@
 title: Newton's Interpolating Polynomials
 sidebar:
   order: 7
-slug: >-
-  s2/methods-of-mathematics/numerical-methods/07-newton-interpolating-polynomials
+slug: s2/methods-of-mathematics/numerical-methods/newton-interpolating-polynomials
 prev: true
 next: true
 ---

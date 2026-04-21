@@ -1,6 +1,6 @@
 ---
 title: Determinant
-slug: s1/mathematics/matrices/05-determinant
+slug: s1/mathematics/matrices/determinant
 sidebar:
   order: 5
 prev: true

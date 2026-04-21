@@ -2,7 +2,7 @@
 title: Counting Outcomes
 sidebar:
   order: 2
-slug: s2/methods-of-mathematics/probability/02-counting-outcomes
+slug: s2/methods-of-mathematics/probability/counting-outcomes
 prev: true
 next: true
 ---

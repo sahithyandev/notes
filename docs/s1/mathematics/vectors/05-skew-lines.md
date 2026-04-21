@@ -1,6 +1,6 @@
 ---
 title: Skew Lines
-slug: s1/mathematics/vectors/05-skew-lines
+slug: s1/mathematics/vectors/skew-lines
 sidebar:
   order: 5
 next: false

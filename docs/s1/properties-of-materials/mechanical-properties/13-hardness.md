@@ -1,6 +1,6 @@
 ---
 title: Hardness
-slug: s1/properties-of-materials/mechanical-properties/13-hardness
+slug: s1/properties-of-materials/mechanical-properties/hardness
 sidebar:
   order: 13
 prev: true

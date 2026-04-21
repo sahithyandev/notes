@@ -1,6 +1,6 @@
 ---
 title: Other Theorems
-slug: s1/mathematics/real-analysis/18-other-theorems
+slug: s1/mathematics/real-analysis/other-theorems
 sidebar:
   order: 18
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Number Systems
-slug: s1/programming-fundamentals/b-book/02-number-systems
+slug: s1/programming-fundamentals/b-book/number-systems
 sidebar:
   order: 2
 prev: true

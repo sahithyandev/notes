@@ -2,7 +2,7 @@
 title: Buffers
 sidebar:
   order: 11
-slug: s2/computer-organization-and-digital-design/combinational-logic/11-buffers
+slug: s2/computer-organization-and-digital-design/combinational-logic/buffers
 prev: true
 next: true
 ---

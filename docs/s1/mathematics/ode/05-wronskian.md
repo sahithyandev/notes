@@ -1,6 +1,6 @@
 ---
 title: Wronskian
-slug: s1/mathematics/ode/05-wronskian
+slug: s1/mathematics/ode/wronskian
 sidebar:
   order: 5
 prev: true

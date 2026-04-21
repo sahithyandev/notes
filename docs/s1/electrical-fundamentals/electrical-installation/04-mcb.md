@@ -2,7 +2,7 @@
 title: MCB
 sidebar:
   order: 4
-slug: s1/electrical-fundamentals/electrical-installation/04-mcb
+slug: s1/electrical-fundamentals/electrical-installation/mcb
 prev: true
 next: true
 ---

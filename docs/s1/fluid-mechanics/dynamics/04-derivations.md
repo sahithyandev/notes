@@ -1,6 +1,6 @@
 ---
 title: Derivations
-slug: s1/fluid-mechanics/dynamics/04-derivations
+slug: s1/fluid-mechanics/dynamics/derivations
 sidebar:
   order: 4
 prev: true

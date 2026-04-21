@@ -2,7 +2,7 @@
 title: Discrete Distribution
 sidebar:
   order: 3
-slug: s2/methods-of-mathematics/statistics/03-discrete-distribution
+slug: s2/methods-of-mathematics/statistics/discrete-distribution
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Von Neumann Architecture
-slug: s1/programming-fundamentals/c-book/06-von-neumann-architecture
+slug: s1/programming-fundamentals/c-book/von-neumann-architecture
 sidebar:
   order: 6
 prev: true

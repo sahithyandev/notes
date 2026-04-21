@@ -2,7 +2,7 @@
 title: Central Limit Theorem
 sidebar:
   order: 9
-slug: s2/methods-of-mathematics/statistics/09-central-limit-theorem
+slug: s2/methods-of-mathematics/statistics/central-limit-theorem
 prev: true
 next: false
 ---

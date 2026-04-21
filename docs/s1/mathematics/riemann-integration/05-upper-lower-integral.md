@@ -1,6 +1,6 @@
 ---
 title: Upper & Lower integral
-slug: s1/mathematics/riemann-integration/05-upper-lower-integral
+slug: s1/mathematics/riemann-integration/upper-lower-integral
 sidebar:
   order: 5
 prev: true

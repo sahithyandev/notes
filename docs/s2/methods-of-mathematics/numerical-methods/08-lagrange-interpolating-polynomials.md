@@ -2,8 +2,7 @@
 title: Lagrange Interpolating Polynomials
 sidebar:
   order: 8
-slug: >-
-  s2/methods-of-mathematics/numerical-methods/08-lagrange-interpolating-polynomials
+slug: s2/methods-of-mathematics/numerical-methods/lagrange-interpolating-polynomials
 prev: true
 next: true
 ---

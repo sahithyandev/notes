@@ -2,7 +2,7 @@
 title: Numerical Integration
 sidebar:
   order: 12
-slug: s2/methods-of-mathematics/numerical-methods/12-numerical-integration
+slug: s2/methods-of-mathematics/numerical-methods/numerical-integration
 prev: true
 next: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: Properties of Integrals
-slug: s1/mathematics/riemann-integration/09-properties-of-integrals
+slug: s1/mathematics/riemann-integration/properties-of-integrals
 sidebar:
   order: 9
 prev: true

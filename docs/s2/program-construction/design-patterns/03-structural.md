@@ -3,7 +3,7 @@ title: Structural Design Patterns
 sidebar:
   order: 3
   label: Structural
-slug: s2/program-construction/design-patterns/03-structural
+slug: s2/program-construction/design-patterns/structural
 prev: true
 next: true
 ---

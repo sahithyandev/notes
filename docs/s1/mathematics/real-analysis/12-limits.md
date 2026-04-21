@@ -1,6 +1,6 @@
 ---
 title: Limits
-slug: s1/mathematics/real-analysis/12-limits
+slug: s1/mathematics/real-analysis/limits
 sidebar:
   order: 12
 prev: true

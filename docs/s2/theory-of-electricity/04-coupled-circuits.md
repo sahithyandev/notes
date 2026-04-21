@@ -2,7 +2,7 @@
 title: Coupled Circuits
 sidebar:
   order: 4
-slug: s2/theory-of-electricity/04-coupled-circuits
+slug: s2/theory-of-electricity/coupled-circuits
 prev: true
 next: true
 ---

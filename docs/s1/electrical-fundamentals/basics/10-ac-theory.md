@@ -1,6 +1,6 @@
 ---
 title: AC Theory
-slug: s1/electrical-fundamentals/basics/10-ac-theory
+slug: s1/electrical-fundamentals/basics/ac-theory
 sidebar:
   order: 10
 prev: true

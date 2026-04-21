@@ -2,7 +2,7 @@
 title: Partial Derivative
 sidebar:
   order: 5
-slug: s2/methods-of-mathematics/multivariable-calculus/05-partial-derivative
+slug: s2/methods-of-mathematics/multivariable-calculus/partial-derivative
 prev: true
 next: true
 ---

@@ -3,7 +3,7 @@ title: Introduction to Probability
 sidebar:
   label: Introduction
   order: 1
-slug: s2/methods-of-mathematics/probability/01-introduction
+slug: s2/methods-of-mathematics/probability/introduction
 prev: false
 next: true
 ---

@@ -3,7 +3,7 @@ title: A-book
 sidebar:
   label: Introduction
   order: 1
-slug: s1/programming-fundamentals/a-book/01-introduction
+slug: s1/programming-fundamentals/a-book/introduction
 prev: false
 next: true
 ---

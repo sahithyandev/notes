@@ -1,6 +1,6 @@
 ---
 title: Data Representation
-slug: s1/programming-fundamentals/b-book/03-data-representation
+slug: s1/programming-fundamentals/b-book/data-representation
 sidebar:
   order: 3
 prev: true

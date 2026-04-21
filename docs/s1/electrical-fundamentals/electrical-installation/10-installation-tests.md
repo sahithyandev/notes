@@ -1,6 +1,6 @@
 ---
 title: Installation Tests
-slug: s1/electrical-fundamentals/electrical-installation/10-installation-tests
+slug: s1/electrical-fundamentals/electrical-installation/installation-tests
 sidebar:
   order: 10
 prev: true

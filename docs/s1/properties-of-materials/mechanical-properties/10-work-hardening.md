@@ -1,6 +1,6 @@
 ---
 title: Work Hardening
-slug: s1/properties-of-materials/mechanical-properties/10-work-hardening
+slug: s1/properties-of-materials/mechanical-properties/work-hardening
 sidebar:
   order: 10
 prev: true

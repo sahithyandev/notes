@@ -1,6 +1,6 @@
 ---
 title: Waves
-slug: s1/electrical-fundamentals/basics/09-waves
+slug: s1/electrical-fundamentals/basics/waves
 sidebar:
   order: 9
 next: true

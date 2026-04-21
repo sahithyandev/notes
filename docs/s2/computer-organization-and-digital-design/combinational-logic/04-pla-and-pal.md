@@ -2,7 +2,7 @@
 title: PLA and PAL
 sidebar:
   order: 4
-slug: s2/computer-organization-and-digital-design/combinational-logic/04-pla-and-pal
+slug: s2/computer-organization-and-digital-design/combinational-logic/pla-and-pal
 prev: true
 next: true
 ---

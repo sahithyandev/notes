@@ -3,7 +3,7 @@ title: Electrical Properties
 sidebar:
   label: Introduction
   order: 1
-slug: s1/properties-of-materials/electrical-properties/01-introduction
+slug: s1/properties-of-materials/electrical-properties/introduction
 prev: false
 next: true
 ---

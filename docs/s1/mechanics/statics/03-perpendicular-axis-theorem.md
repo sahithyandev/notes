@@ -1,6 +1,6 @@
 ---
 title: Perpendicular Axis Theorem
-slug: s1/mechanics/statics/03-perpendicular-axis-theorem
+slug: s1/mechanics/statics/perpendicular-axis-theorem
 sidebar:
   order: 3
 prev: true

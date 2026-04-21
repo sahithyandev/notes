@@ -2,7 +2,7 @@
 title: Lab Apparatus
 sidebar:
   order: 16
-slug: s1/electrical-fundamentals/basics/16-lab-apparatus
+slug: s1/electrical-fundamentals/basics/lab-apparatus
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Fluid Dynamics
-slug: s1/fluid-mechanics/dynamics/01-introduction
+slug: s1/fluid-mechanics/dynamics/introduction
 sidebar:
   label: Introduction
   order: 1

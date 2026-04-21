@@ -1,6 +1,6 @@
 ---
 title: Conductive Polymers
-slug: s1/properties-of-materials/electrical-properties/06-conductive-polymers
+slug: s1/properties-of-materials/electrical-properties/conductive-polymers
 sidebar:
   order: 6
 next: false

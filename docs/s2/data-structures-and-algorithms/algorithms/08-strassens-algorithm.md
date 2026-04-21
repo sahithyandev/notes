@@ -2,7 +2,7 @@
 title: Strassen's Algorithm
 sidebar:
   order: 8
-slug: s2/data-structures-and-algorithms/algorithms/08-strassens-algorithm
+slug: s2/data-structures-and-algorithms/algorithms/strassens-algorithm
 prev: true
 next: true
 ---

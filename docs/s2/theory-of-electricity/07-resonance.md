@@ -1,6 +1,6 @@
 ---
 title: Resonance
-slug: s2/theory-of-electricity/07-resonance
+slug: s2/theory-of-electricity/resonance
 sidebar:
   order: 7
 prev: true

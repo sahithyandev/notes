@@ -2,7 +2,7 @@
 title: Theorems
 sidebar:
   order: 7
-slug: s2/methods-of-mathematics/multivariable-calculus/07-theorems
+slug: s2/methods-of-mathematics/multivariable-calculus/theorems
 prev: true
 next: true
 ---

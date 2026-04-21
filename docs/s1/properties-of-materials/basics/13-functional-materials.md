@@ -1,6 +1,6 @@
 ---
 title: Functional Materials
-slug: s1/properties-of-materials/basics/13-functional-materials
+slug: s1/properties-of-materials/basics/functional-materials
 sidebar:
   order: 13
 prev: true

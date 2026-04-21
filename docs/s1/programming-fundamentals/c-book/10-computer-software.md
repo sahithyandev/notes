@@ -1,6 +1,6 @@
 ---
 title: Computer Software
-slug: s1/programming-fundamentals/c-book/10-computer-software
+slug: s1/programming-fundamentals/c-book/computer-software
 sidebar:
   order: 10
 prev: true

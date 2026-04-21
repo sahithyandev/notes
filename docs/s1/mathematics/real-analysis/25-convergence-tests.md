@@ -1,6 +1,6 @@
 ---
 title: Convergence Tests
-slug: s1/mathematics/real-analysis/25-convergence-tests
+slug: s1/mathematics/real-analysis/convergence-tests
 sidebar:
   order: 25
 prev: true

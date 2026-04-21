@@ -2,7 +2,7 @@
 title: Laplace Transform
 sidebar:
   order: 12
-slug: s2/theory-of-electricity/12-laplace-transform
+slug: s2/theory-of-electricity/laplace-transform
 prev: true
 next: true
 ---

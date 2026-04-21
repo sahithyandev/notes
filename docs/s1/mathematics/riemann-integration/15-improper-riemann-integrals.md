@@ -1,6 +1,6 @@
 ---
 title: Improper Riemann Integrals
-slug: s1/mathematics/riemann-integration/15-improper-riemann-integrals
+slug: s1/mathematics/riemann-integration/improper-riemann-integrals
 sidebar:
   order: 15
 prev: true

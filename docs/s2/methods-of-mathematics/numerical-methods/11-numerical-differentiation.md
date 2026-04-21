@@ -2,7 +2,7 @@
 title: Numerical Differentiation
 sidebar:
   order: 11
-slug: s2/methods-of-mathematics/numerical-methods/11-numerical-differentiation
+slug: s2/methods-of-mathematics/numerical-methods/numerical-differentiation
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Flexural Test
-slug: s1/properties-of-materials/mechanical-properties/08-flexural-test
+slug: s1/properties-of-materials/mechanical-properties/flexural-test
 sidebar:
   order: 8
 prev: true

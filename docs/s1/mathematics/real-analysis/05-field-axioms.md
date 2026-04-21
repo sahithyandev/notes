@@ -1,6 +1,6 @@
 ---
 title: Field Axioms
-slug: s1/mathematics/real-analysis/05-field-axioms
+slug: s1/mathematics/real-analysis/field-axioms
 sidebar:
   order: 5
 prev: true

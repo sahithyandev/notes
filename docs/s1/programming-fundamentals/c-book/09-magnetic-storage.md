@@ -1,6 +1,6 @@
 ---
 title: Magnetic Storage
-slug: s1/programming-fundamentals/c-book/09-magnetic-storage
+slug: s1/programming-fundamentals/c-book/magnetic-storage
 sidebar:
   order: 9
 prev: true

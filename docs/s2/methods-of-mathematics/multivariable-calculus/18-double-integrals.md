@@ -2,7 +2,7 @@
 title: Double Integrals
 sidebar:
   order: 18
-slug: s2/methods-of-mathematics/multivariable-calculus/18-double-integrals
+slug: s2/methods-of-mathematics/multivariable-calculus/double-integrals
 prev: true
 next: true
 ---

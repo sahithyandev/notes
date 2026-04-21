@@ -1,7 +1,7 @@
 ---
 title: Basics
 prev: false
-slug: s1/properties-of-materials/basics/01-introduction
+slug: s1/properties-of-materials/basics/introduction
 sidebar:
   label: Introduction
   order: 1

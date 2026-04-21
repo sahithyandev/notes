@@ -1,6 +1,6 @@
 ---
 title: Kinetic Analysis
-slug: s1/mechanics/dynamics/08-kinetic-analysis
+slug: s1/mechanics/dynamics/kinetic-analysis
 sidebar:
   order: 8
 prev: true

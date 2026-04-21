@@ -2,7 +2,7 @@
 title: First Order ODE
 sidebar:
   order: 19
-slug: s2/methods-of-mathematics/multivariable-calculus/19-first-order-ode
+slug: s2/methods-of-mathematics/multivariable-calculus/first-order-ode
 prev: true
 next: true
 ---

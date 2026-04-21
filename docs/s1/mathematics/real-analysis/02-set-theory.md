@@ -1,6 +1,6 @@
 ---
 title: Set theory
-slug: s1/mathematics/real-analysis/02-set-theory
+slug: s1/mathematics/real-analysis/set-theory
 sidebar:
   order: 2
 prev: true

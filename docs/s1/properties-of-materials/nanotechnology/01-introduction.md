@@ -1,6 +1,6 @@
 ---
 title: Nanotechnology
-slug: s1/properties-of-materials/nanotechnology/01-introduction
+slug: s1/properties-of-materials/nanotechnology/introduction
 sidebar:
   label: Introduction
   order: 1

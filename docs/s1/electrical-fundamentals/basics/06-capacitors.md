@@ -1,6 +1,6 @@
 ---
 title: Capacitors
-slug: s1/electrical-fundamentals/basics/06-capacitors
+slug: s1/electrical-fundamentals/basics/capacitors
 sidebar:
   order: 6
 prev: true

@@ -3,7 +3,7 @@ title: Introduction to Statistics
 sidebar:
   label: Introduction
   order: 1
-slug: s2/methods-of-mathematics/statistics/01-introduction
+slug: s2/methods-of-mathematics/statistics/introduction
 prev: false
 next: true
 ---

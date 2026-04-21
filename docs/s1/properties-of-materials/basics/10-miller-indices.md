@@ -1,6 +1,6 @@
 ---
 title: Miller Indices
-slug: s1/properties-of-materials/basics/10-miller-indices
+slug: s1/properties-of-materials/basics/miller-indices
 sidebar:
   order: 10
 prev: true

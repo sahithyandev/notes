@@ -2,7 +2,7 @@
 title: Laws
 sidebar:
   order: 3
-slug: s2/methods-of-mathematics/probability/03-laws
+slug: s2/methods-of-mathematics/probability/laws
 prev: true
 next: true
 ---

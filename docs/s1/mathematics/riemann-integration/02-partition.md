@@ -1,6 +1,6 @@
 ---
 title: Partition
-slug: s1/mathematics/riemann-integration/02-partition
+slug: s1/mathematics/riemann-integration/partition
 sidebar:
   order: 2
 prev: true

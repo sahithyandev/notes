@@ -2,7 +2,7 @@
 title: Newton's Method
 sidebar:
   order: 4
-slug: s2/methods-of-mathematics/numerical-methods/04-newtons-method
+slug: s2/methods-of-mathematics/numerical-methods/newtons-method
 prev: true
 next: true
 ---

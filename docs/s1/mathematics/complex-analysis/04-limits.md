@@ -1,6 +1,6 @@
 ---
 title: Limits
-slug: s1/mathematics/complex-analysis/04-limits
+slug: s1/mathematics/complex-analysis/limits
 sidebar:
   order: 4
 prev: true

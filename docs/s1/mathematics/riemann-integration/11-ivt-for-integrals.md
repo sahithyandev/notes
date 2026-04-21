@@ -1,6 +1,6 @@
 ---
 title: Intermediate Value Theorem for Integrals
-slug: s1/mathematics/riemann-integration/11-ivt-for-integrals
+slug: s1/mathematics/riemann-integration/ivt-for-integrals
 sidebar:
   label: IVT for Integrals
   order: 11

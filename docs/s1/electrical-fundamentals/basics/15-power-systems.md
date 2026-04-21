@@ -1,6 +1,6 @@
 ---
 title: Power systems
-slug: s1/electrical-fundamentals/basics/15-power-systems
+slug: s1/electrical-fundamentals/basics/power-systems
 sidebar:
   order: 15
 prev: true

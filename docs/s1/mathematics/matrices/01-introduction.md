@@ -1,6 +1,6 @@
 ---
 title: Matrices
-slug: s1/mathematics/matrices/01-introduction
+slug: s1/mathematics/matrices/introduction
 sidebar:
   label: Introduction
   order: 1

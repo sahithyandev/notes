@@ -1,6 +1,6 @@
 ---
 title: Generlized IVT
-slug: s1/mathematics/riemann-integration/12-generalized-ivt
+slug: s1/mathematics/riemann-integration/generalized-ivt
 sidebar:
   order: 12
 prev: true

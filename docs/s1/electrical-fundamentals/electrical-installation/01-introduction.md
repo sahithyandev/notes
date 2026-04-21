@@ -1,6 +1,6 @@
 ---
 title: Electrical Installations
-slug: s1/electrical-fundamentals/electrical-installation/01-introduction
+slug: s1/electrical-fundamentals/electrical-installation/introduction
 sidebar:
   label: Introduction
   order: 1

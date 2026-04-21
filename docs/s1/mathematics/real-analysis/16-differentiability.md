@@ -1,6 +1,6 @@
 ---
 title: Differentiability
-slug: s1/mathematics/real-analysis/16-differentiability
+slug: s1/mathematics/real-analysis/differentiability
 sidebar:
   order: 16
 prev: true

@@ -3,7 +3,7 @@ title: Introduction to Multivariable Calculus
 sidebar:
   label: Introduction
   order: 1
-slug: s2/methods-of-mathematics/multivariable-calculus/01-introduction
+slug: s2/methods-of-mathematics/multivariable-calculus/introduction
 prev: false
 next: true
 ---

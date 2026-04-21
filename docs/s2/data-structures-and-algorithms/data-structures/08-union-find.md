@@ -2,7 +2,7 @@
 title: Union Find
 sidebar:
   order: 8
-slug: s2/data-structures-and-algorithms/data-structures/08-union-find
+slug: s2/data-structures-and-algorithms/data-structures/union-find
 prev: true
 next: false
 ---

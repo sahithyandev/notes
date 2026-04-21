@@ -1,6 +1,6 @@
 ---
 title: Trusses
-slug: s1/mechanics/statics/08-trusses
+slug: s1/mechanics/statics/trusses
 sidebar:
   order: 8
 prev: true

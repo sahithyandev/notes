@@ -3,7 +3,7 @@ title: Introduction to Algorithms
 sidebar:
   label: Introduction
   order: 1
-slug: s2/data-structures-and-algorithms/algorithms/01-introduction
+slug: s2/data-structures-and-algorithms/algorithms/introduction
 prev: false
 next: true
 ---

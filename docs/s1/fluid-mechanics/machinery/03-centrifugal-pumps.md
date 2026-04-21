@@ -1,6 +1,6 @@
 ---
 title: Centrifugal Pumps
-slug: s1/fluid-mechanics/machinery/03-centrifugal-pumps
+slug: s1/fluid-mechanics/machinery/centrifugal-pumps
 sidebar:
   order: 3
 prev: true

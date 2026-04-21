@@ -2,7 +2,7 @@
 title: Multipliers
 sidebar:
   order: 12
-slug: s2/computer-organization-and-digital-design/combinational-logic/12-multipliers
+slug: s2/computer-organization-and-digital-design/combinational-logic/multipliers
 prev: true
 next: true
 ---

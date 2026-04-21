@@ -1,6 +1,6 @@
 ---
 title: Velocity & Acceleration Diagram
-slug: s1/mechanics/dynamics/06-velocity-acceleration-diagram
+slug: s1/mechanics/dynamics/velocity-acceleration-diagram
 sidebar:
   order: 6
 prev: true

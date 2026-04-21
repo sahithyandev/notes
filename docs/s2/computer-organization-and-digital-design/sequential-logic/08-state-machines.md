@@ -2,7 +2,7 @@
 title: State Machines
 sidebar:
   order: 8
-slug: s2/computer-organization-and-digital-design/sequential-logic/08-state-machines
+slug: s2/computer-organization-and-digital-design/sequential-logic/state-machines
 prev: true
 next: false
 ---

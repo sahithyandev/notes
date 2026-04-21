@@ -1,6 +1,6 @@
 ---
 title: Roots of Unity
-slug: s1/mathematics/complex-analysis/02-roots-of-unity
+slug: s1/mathematics/complex-analysis/roots-of-unity
 sidebar:
   order: 2
 prev: true

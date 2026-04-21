@@ -2,8 +2,7 @@
 title: Timing Hazards
 sidebar:
   order: 3
-slug: >-
-  s2/computer-organization-and-digital-design/combinational-logic/03-timing-hazards
+slug: s2/computer-organization-and-digital-design/combinational-logic/timing-hazards
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: String formatting
-slug: s1/programming-fundamentals/a-book/05-string-formatting
+slug: s1/programming-fundamentals/a-book/string-formatting
 sidebar:
   order: 5
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Household Wiring
-slug: s1/electrical-fundamentals/electrical-installation/09-household-wiring
+slug: s1/electrical-fundamentals/electrical-installation/household-wiring
 sidebar:
   order: 9
 prev: true

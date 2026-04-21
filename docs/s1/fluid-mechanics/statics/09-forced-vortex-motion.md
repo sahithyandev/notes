@@ -1,6 +1,6 @@
 ---
 title: Forced Vortex Motion
-slug: s1/fluid-mechanics/statics/09-forced-vortex-motion
+slug: s1/fluid-mechanics/statics/forced-vortex-motion
 sidebar:
   order: 9
 next: false

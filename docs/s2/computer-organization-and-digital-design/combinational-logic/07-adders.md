@@ -2,7 +2,7 @@
 title: Adders
 sidebar:
   order: 7
-slug: s2/computer-organization-and-digital-design/combinational-logic/07-adders
+slug: s2/computer-organization-and-digital-design/combinational-logic/adders
 prev: true
 next: true
 ---

@@ -2,7 +2,7 @@
 title: Exception Handling
 sidebar:
   order: 14
-slug: s2/program-construction/basics/14-exception-handling
+slug: s2/program-construction/basics/exception-handling
 prev: true
 next: true
 ---

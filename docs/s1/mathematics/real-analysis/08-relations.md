@@ -1,6 +1,6 @@
 ---
 title: Relations
-slug: s1/mathematics/real-analysis/08-relations
+slug: s1/mathematics/real-analysis/relations
 sidebar:
   order: 8
 prev: true

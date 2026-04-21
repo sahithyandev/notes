@@ -1,6 +1,6 @@
 ---
 title: Stress Strain Plot
-slug: s1/properties-of-materials/mechanical-properties/07-stress-strain-plot
+slug: s1/properties-of-materials/mechanical-properties/stress-strain-plot
 sidebar:
   order: 7
 prev: true

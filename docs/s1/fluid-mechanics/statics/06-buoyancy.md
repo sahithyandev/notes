@@ -1,7 +1,7 @@
 ---
 title: Buoyancy
 description: Thrust exerted on a submerged object in a liquid
-slug: s1/fluid-mechanics/statics/06-buoyancy
+slug: s1/fluid-mechanics/statics/buoyancy
 sidebar:
   order: 6
 prev: true

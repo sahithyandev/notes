@@ -1,6 +1,6 @@
 ---
 title: More Types of Matrices
-slug: s1/mathematics/matrices/04-more-types
+slug: s1/mathematics/matrices/more-types
 sidebar:
   order: 4
 prev: true

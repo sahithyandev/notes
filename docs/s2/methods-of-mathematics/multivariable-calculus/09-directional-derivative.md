@@ -2,7 +2,7 @@
 title: Directional Derivative
 sidebar:
   order: 9
-slug: s2/methods-of-mathematics/multivariable-calculus/09-directional-derivative
+slug: s2/methods-of-mathematics/multivariable-calculus/directional-derivative
 prev: true
 next: true
 ---

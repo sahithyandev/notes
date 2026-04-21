@@ -2,7 +2,7 @@
 title: Differentiability
 sidebar:
   order: 6
-slug: s2/methods-of-mathematics/multivariable-calculus/06-differentiability
+slug: s2/methods-of-mathematics/multivariable-calculus/differentiability
 prev: true
 next: true
 ---

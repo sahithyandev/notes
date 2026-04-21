@@ -1,6 +1,6 @@
 ---
 title: Series of Functions
-slug: s1/mathematics/real-analysis/33-series-of-functions
+slug: s1/mathematics/real-analysis/series-of-functions
 sidebar:
   order: 33
 prev: true

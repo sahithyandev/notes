@@ -1,6 +1,6 @@
 ---
 title: Semiconductivity
-slug: s1/properties-of-materials/electrical-properties/03-semiconductivity
+slug: s1/properties-of-materials/electrical-properties/semiconductivity
 sidebar:
   order: 3
 prev: true

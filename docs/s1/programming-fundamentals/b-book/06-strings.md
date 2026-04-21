@@ -1,6 +1,6 @@
 ---
 title: Strings
-slug: s1/programming-fundamentals/b-book/06-strings
+slug: s1/programming-fundamentals/b-book/strings
 sidebar:
   order: 6
 prev: true

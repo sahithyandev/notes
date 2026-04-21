@@ -1,6 +1,6 @@
 ---
 title: Sequential Characterization of Integrability
-slug: s1/mathematics/riemann-integration/10-sequential-characterization
+slug: s1/mathematics/riemann-integration/sequential-characterization
 sidebar:
   order: 10
 prev: true

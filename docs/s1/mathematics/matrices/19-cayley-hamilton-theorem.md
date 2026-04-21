@@ -1,6 +1,6 @@
 ---
 title: Cayley-Hamilton Theorem
-slug: s1/mathematics/matrices/19-cayley-hamilton-theorem
+slug: s1/mathematics/matrices/cayley-hamilton-theorem
 sidebar:
   order: 19
 prev: true

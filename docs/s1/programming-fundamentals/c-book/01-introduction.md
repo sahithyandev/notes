@@ -1,6 +1,6 @@
 ---
 title: C-book
-slug: s1/programming-fundamentals/c-book/01-introduction
+slug: s1/programming-fundamentals/c-book/introduction
 sidebar:
   label: Introduction
   order: 1

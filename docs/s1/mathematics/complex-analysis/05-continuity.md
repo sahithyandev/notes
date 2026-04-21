@@ -1,6 +1,6 @@
 ---
 title: Continuity
-slug: s1/mathematics/complex-analysis/05-continuity
+slug: s1/mathematics/complex-analysis/continuity
 sidebar:
   order: 5
 prev: true

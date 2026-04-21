@@ -1,6 +1,6 @@
 ---
 title: Solutions of Homogenous Systems
-slug: s1/mathematics/matrices/12-homogenous-systems
+slug: s1/mathematics/matrices/homogenous-systems
 sidebar:
   order: 12
 prev: true

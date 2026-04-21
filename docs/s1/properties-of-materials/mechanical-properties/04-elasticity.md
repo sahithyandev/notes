@@ -2,7 +2,7 @@
 title: Elasticity
 sidebar:
   order: 4
-slug: s1/properties-of-materials/mechanical-properties/04-elasticity
+slug: s1/properties-of-materials/mechanical-properties/elasticity
 prev: true
 next: true
 ---

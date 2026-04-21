@@ -1,6 +1,6 @@
 ---
 title: 2D kinematics of a rigid body
-slug: s1/mechanics/dynamics/02-2d-kinematics-of-rigid-body
+slug: s1/mechanics/dynamics/2d-kinematics-of-rigid-body
 sidebar:
   order: 2
 prev: true

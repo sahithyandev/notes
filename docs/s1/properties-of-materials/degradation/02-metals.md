@@ -2,7 +2,7 @@
 title: Degradation of Metals
 sidebar:
   order: 2
-slug: s1/properties-of-materials/degradation/02-metals
+slug: s1/properties-of-materials/degradation/metals
 prev: true
 next: true
 ---

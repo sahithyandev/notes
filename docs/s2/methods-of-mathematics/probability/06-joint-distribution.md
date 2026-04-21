@@ -2,7 +2,7 @@
 title: Joint Distribution
 sidebar:
   order: 6
-slug: s2/methods-of-mathematics/probability/06-joint-distribution
+slug: s2/methods-of-mathematics/probability/joint-distribution
 prev: true
 next: true
 ---

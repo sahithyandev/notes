@@ -3,7 +3,7 @@ title: Introduction to Theory of Electricity
 sidebar:
   label: Introduction
   order: 1
-slug: s2/theory-of-electricity/01-introduction
+slug: s2/theory-of-electricity/introduction
 prev: false
 next: true
 ---

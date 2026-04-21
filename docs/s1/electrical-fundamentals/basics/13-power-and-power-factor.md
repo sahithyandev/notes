@@ -1,6 +1,6 @@
 ---
 title: Power and Power factor
-slug: s1/electrical-fundamentals/basics/13-power-and-power-factor
+slug: s1/electrical-fundamentals/basics/power-and-power-factor
 sidebar:
   order: 13
 prev: true

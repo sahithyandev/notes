@@ -3,7 +3,7 @@ title: Mechanical Properties
 sidebar:
   label: Introduction
   order: 1
-slug: s1/properties-of-materials/mechanical-properties/01-introduction
+slug: s1/properties-of-materials/mechanical-properties/introduction
 prev: false
 next: true
 ---

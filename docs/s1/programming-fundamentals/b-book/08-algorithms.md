@@ -1,6 +1,6 @@
 ---
 title: Algorithms
-slug: s1/programming-fundamentals/b-book/08-algorithms
+slug: s1/programming-fundamentals/b-book/algorithms
 sidebar:
   order: 8
 prev: true

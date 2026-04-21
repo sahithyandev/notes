@@ -1,6 +1,6 @@
 ---
 title: Conservation Laws
-slug: s1/fluid-mechanics/dynamics/03-conservation-laws
+slug: s1/fluid-mechanics/dynamics/conservation-laws
 sidebar:
   order: 3
 prev: true

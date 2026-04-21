@@ -2,7 +2,7 @@
 title: Graph
 sidebar:
   order: 6
-slug: s2/data-structures-and-algorithms/data-structures/06-graph
+slug: s2/data-structures-and-algorithms/data-structures/graph
 prev: true
 next: true
 ---

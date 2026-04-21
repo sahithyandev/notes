@@ -2,7 +2,7 @@
 title: Selection of Materials
 sidebar:
   order: 14
-slug: s1/properties-of-materials/basics/14-selection-of-materials
+slug: s1/properties-of-materials/basics/selection-of-materials
 next: false
 prev: true
 ---

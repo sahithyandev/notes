@@ -1,6 +1,6 @@
 ---
 title: Rank
-slug: s1/mathematics/matrices/11-rank
+slug: s1/mathematics/matrices/rank
 sidebar:
   order: 11
 prev: true

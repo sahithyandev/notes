@@ -2,7 +2,7 @@
 title: Statecharts
 sidebar:
   order: 16
-slug: s2/program-construction/basics/16-statecharts
+slug: s2/program-construction/basics/statecharts
 prev: true
 next: false
 ---

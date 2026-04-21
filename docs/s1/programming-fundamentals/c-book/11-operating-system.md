@@ -1,6 +1,6 @@
 ---
 title: Operating System
-slug: s1/programming-fundamentals/c-book/11-operating-system
+slug: s1/programming-fundamentals/c-book/operating-system
 sidebar:
   order: 11
 prev: true

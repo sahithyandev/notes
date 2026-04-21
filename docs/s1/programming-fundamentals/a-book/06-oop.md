@@ -3,7 +3,7 @@ title: Object-Oriented Programming
 sidebar:
   label: OOP
   order: 6
-slug: s1/programming-fundamentals/a-book/06-oop
+slug: s1/programming-fundamentals/a-book/oop
 prev: true
 next: true
 ---

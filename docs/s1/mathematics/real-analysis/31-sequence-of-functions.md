@@ -1,6 +1,6 @@
 ---
 title: Sequence of Functions
-slug: s1/mathematics/real-analysis/31-sequence-of-functions
+slug: s1/mathematics/real-analysis/sequence-of-functions
 sidebar:
   order: 31
 prev: true

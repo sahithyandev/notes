@@ -2,7 +2,7 @@
 title: JK Flip-flop
 sidebar:
   order: 6
-slug: s2/computer-organization-and-digital-design/sequential-logic/06-jk-flip-flop
+slug: s2/computer-organization-and-digital-design/sequential-logic/jk-flip-flop
 prev: true
 next: true
 ---

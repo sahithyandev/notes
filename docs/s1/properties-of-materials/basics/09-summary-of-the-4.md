@@ -1,6 +1,6 @@
 ---
 title: Summary of the 4
-slug: s1/properties-of-materials/basics/09-summary-of-the-4
+slug: s1/properties-of-materials/basics/summary-of-the-4
 sidebar:
   order: 9
 prev: true

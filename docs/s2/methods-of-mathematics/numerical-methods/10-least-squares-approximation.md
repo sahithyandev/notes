@@ -2,7 +2,7 @@
 title: Least Squares Approximation
 sidebar:
   order: 10
-slug: s2/methods-of-mathematics/numerical-methods/10-least-squares-approximation
+slug: s2/methods-of-mathematics/numerical-methods/least-squares-approximation
 prev: true
 next: true
 ---

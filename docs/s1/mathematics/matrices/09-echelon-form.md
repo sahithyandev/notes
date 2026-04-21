@@ -1,6 +1,6 @@
 ---
 title: Echelon Form
-slug: s1/mathematics/matrices/09-echelon-form
+slug: s1/mathematics/matrices/echelon-form
 sidebar:
   order: 9
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Fracture
-slug: s1/properties-of-materials/mechanical-properties/03-fracture
+slug: s1/properties-of-materials/mechanical-properties/fracture
 sidebar:
   order: 3
 prev: true

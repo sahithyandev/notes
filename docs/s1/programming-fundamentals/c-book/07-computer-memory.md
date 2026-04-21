@@ -1,6 +1,6 @@
 ---
 title: Computer Memory
-slug: s1/programming-fundamentals/c-book/07-computer-memory
+slug: s1/programming-fundamentals/c-book/computer-memory
 sidebar:
   order: 7
 prev: true

@@ -2,7 +2,7 @@
 title: Estimators
 sidebar:
   order: 8
-slug: s2/methods-of-mathematics/statistics/08-estimators
+slug: s2/methods-of-mathematics/statistics/estimators
 prev: true
 next: true
 ---

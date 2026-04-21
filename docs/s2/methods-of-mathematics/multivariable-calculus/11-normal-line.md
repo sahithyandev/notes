@@ -2,7 +2,7 @@
 title: Normal Line
 sidebar:
   order: 11
-slug: s2/methods-of-mathematics/multivariable-calculus/11-normal-line
+slug: s2/methods-of-mathematics/multivariable-calculus/normal-line
 prev: true
 next: true
 ---

@@ -2,7 +2,7 @@
 title: Searching
 sidebar:
   order: 4
-slug: s2/data-structures-and-algorithms/algorithms/04-searching
+slug: s2/data-structures-and-algorithms/algorithms/searching
 prev: true
 next: true
 ---

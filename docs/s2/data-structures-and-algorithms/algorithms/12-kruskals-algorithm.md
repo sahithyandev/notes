@@ -2,7 +2,7 @@
 title: Kruskal's Algorithm
 sidebar:
   order: 12
-slug: s2/data-structures-and-algorithms/algorithms/12-kruskals-algorithm
+slug: s2/data-structures-and-algorithms/algorithms/kruskals-algorithm
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Planes
-slug: s1/mathematics/vectors/04-planes
+slug: s1/mathematics/vectors/planes
 sidebar:
   order: 4
 prev: true

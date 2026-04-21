@@ -2,7 +2,7 @@
 title: Non Sinusoidal Waveforms
 sidebar:
   order: 13
-slug: s2/theory-of-electricity/13-non-sinusoidal-waveforms
+slug: s2/theory-of-electricity/non-sinusoidal-waveforms
 prev: true
 next: true
 ---

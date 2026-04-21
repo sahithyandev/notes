@@ -1,6 +1,6 @@
 ---
 title: Circuit Breaker
-slug: s1/electrical-fundamentals/electrical-installation/03-circuit-breakers
+slug: s1/electrical-fundamentals/electrical-installation/circuit-breakers
 sidebar:
   order: 3
 prev: true

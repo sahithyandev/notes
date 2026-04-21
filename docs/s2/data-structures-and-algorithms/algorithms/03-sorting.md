@@ -2,7 +2,7 @@
 title: Sorting
 sidebar:
   order: 3
-slug: s2/data-structures-and-algorithms/algorithms/03-sorting
+slug: s2/data-structures-and-algorithms/algorithms/sorting
 prev: true
 next: true
 ---

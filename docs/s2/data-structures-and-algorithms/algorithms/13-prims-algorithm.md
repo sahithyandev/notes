@@ -2,7 +2,7 @@
 title: Prim's Algorithm
 sidebar:
   order: 13
-slug: s2/data-structures-and-algorithms/algorithms/13-prims-algorithm
+slug: s2/data-structures-and-algorithms/algorithms/prims-algorithm
 prev: true
 next: true
 ---

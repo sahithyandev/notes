@@ -1,6 +1,6 @@
 ---
 title: Integers
-slug: s1/programming-fundamentals/b-book/04-integers
+slug: s1/programming-fundamentals/b-book/integers
 sidebar:
   order: 4
 prev: true

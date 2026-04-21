@@ -1,6 +1,6 @@
 ---
 title: Charpy Impact Test
-slug: s1/properties-of-materials/mechanical-properties/12-impact-test
+slug: s1/properties-of-materials/mechanical-properties/impact-test
 sidebar:
   order: 12
 prev: true

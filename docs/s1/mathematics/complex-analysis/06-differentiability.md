@@ -1,6 +1,6 @@
 ---
 title: Differentiability
-slug: s1/mathematics/complex-analysis/06-differentiability
+slug: s1/mathematics/complex-analysis/differentiability
 sidebar:
   order: 6
 prev: true

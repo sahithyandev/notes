@@ -2,7 +2,7 @@
 title: Bisection Method
 sidebar:
   order: 2
-slug: s2/methods-of-mathematics/numerical-methods/02-bisection-method
+slug: s2/methods-of-mathematics/numerical-methods/bisection-method
 prev: true
 next: true
 ---

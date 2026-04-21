@@ -2,7 +2,7 @@
 title: Object Oriented Paradigm
 sidebar:
   order: 10
-slug: s2/program-construction/basics/10-object-oriented-paradigm
+slug: s2/program-construction/basics/object-oriented-paradigm
 prev: true
 next: true
 ---

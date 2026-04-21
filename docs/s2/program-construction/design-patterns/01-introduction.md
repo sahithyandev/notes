@@ -3,7 +3,7 @@ title: Introduction to Design Patterns
 sidebar:
   order: 1
   label: Introduction
-slug: s2/program-construction/design-patterns/01-introduction
+slug: s2/program-construction/design-patterns/introduction
 prev: false
 next: true
 ---

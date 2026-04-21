@@ -3,7 +3,7 @@ title: Arithmetic Logic Unit
 sidebar:
   order: 13
 slug: >-
-  s2/computer-organization-and-digital-design/combinational-logic/13-arithmetic-logic-unit
+  s2/computer-organization-and-digital-design/combinational-logic/arithmetic-logic-unit
 prev: true
 next: false
 ---

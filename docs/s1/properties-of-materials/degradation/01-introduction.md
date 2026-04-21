@@ -4,7 +4,7 @@ sidebar:
   label: Introduction
   order: 1
 prev: false
-slug: s1/properties-of-materials/degradation/01-introduction
+slug: s1/properties-of-materials/degradation/introduction
 next: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Cauchy Criterion
-slug: s1/mathematics/riemann-integration/07-cauchy-criterion
+slug: s1/mathematics/riemann-integration/cauchy-criterion
 sidebar:
   order: 7
 next: true

@@ -2,7 +2,7 @@
 title: Taylor's Theorem
 sidebar:
   order: 16
-slug: s2/methods-of-mathematics/multivariable-calculus/16-taylors-theorem
+slug: s2/methods-of-mathematics/multivariable-calculus/taylors-theorem
 prev: true
 next: true
 ---

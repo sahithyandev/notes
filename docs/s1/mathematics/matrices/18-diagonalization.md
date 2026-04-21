@@ -1,6 +1,6 @@
 ---
 title: Diagonalization
-slug: s1/mathematics/matrices/18-diagonalization
+slug: s1/mathematics/matrices/diagonalization
 sidebar:
   order: 18
 prev: true

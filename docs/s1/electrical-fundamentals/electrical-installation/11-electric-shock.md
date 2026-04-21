@@ -1,6 +1,6 @@
 ---
 title: Electric Shock
-slug: s1/electrical-fundamentals/electrical-installation/11-electric-shock
+slug: s1/electrical-fundamentals/electrical-installation/electric-shock
 sidebar:
   order: 11
 next: false

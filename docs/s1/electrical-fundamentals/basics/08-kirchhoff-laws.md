@@ -1,6 +1,6 @@
 ---
 title: Kirchhoff Laws
-slug: s1/electrical-fundamentals/basics/08-kirchhoff-laws
+slug: s1/electrical-fundamentals/basics/kirchhoff-laws
 sidebar:
   order: 8
 prev: true

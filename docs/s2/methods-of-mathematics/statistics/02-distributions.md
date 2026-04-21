@@ -2,7 +2,7 @@
 title: Distributions
 sidebar:
   order: 2
-slug: s2/methods-of-mathematics/statistics/02-distributions
+slug: s2/methods-of-mathematics/statistics/distributions
 prev: true
 next: true
 ---

@@ -2,7 +2,7 @@
 title: Continuous Distribution
 sidebar:
   order: 4
-slug: s2/methods-of-mathematics/statistics/04-continuous-distribution
+slug: s2/methods-of-mathematics/statistics/continuous-distribution
 prev: true
 next: true
 ---

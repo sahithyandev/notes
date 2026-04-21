@@ -2,7 +2,7 @@
 title: Continuity
 sidebar:
   order: 4
-slug: s2/methods-of-mathematics/multivariable-calculus/04-continuity
+slug: s2/methods-of-mathematics/multivariable-calculus/continuity
 prev: true
 next: true
 ---

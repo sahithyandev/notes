@@ -2,7 +2,7 @@
 title: Two Port Networks
 sidebar:
   order: 3
-slug: s2/theory-of-electricity/03-two-port-networks
+slug: s2/theory-of-electricity/two-port-networks
 prev: true
 next: true
 ---

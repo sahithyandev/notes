@@ -2,7 +2,7 @@
 title: Interpolation
 sidebar:
   order: 6
-slug: s2/methods-of-mathematics/numerical-methods/06-interpolation
+slug: s2/methods-of-mathematics/numerical-methods/interpolation
 prev: true
 next: true
 ---

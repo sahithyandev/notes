@@ -2,7 +2,7 @@
 title: Logic Gates
 sidebar:
   order: 4
-slug: s2/computer-organization-and-digital-design/basics/04-logic-gates
+slug: s2/computer-organization-and-digital-design/basics/logic-gates
 prev: true
 next: false
 ---
