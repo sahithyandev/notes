@@ -1,67 +1,69 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import fs from "node:fs/promises";
-import path from "node:path";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
 import StatsBand from "../components/stats-band.astro";
 import SemesterCard from "../components/semester-card.astro";
+import { getCollection } from "astro:content";
 
 interface SemesterInfo {
   number: number;
-  modulesCount: number;
+  modules: Array<string>;
+  notesCount: number;
 }
 
 async function getSemestersData(): Promise<SemesterInfo[]> {
-  const docsPath = path.join(process.cwd(), "docs");
+  const notes = await getCollection("notes");
+  const semestersMap = new Map<
+    number,
+    { modules: Set<string>; notesCount: number }
+  >();
 
-  try {
-    // Read all items in docs directory
-    const items = await fs.readdir(docsPath);
+  for (const note of notes) {
+    // Extract semester and module from the slug
+    // slug format: "theory-of-electricity/introduction" or "dimensions-and-units"
+    const slugParts = note.data.slug.split("/");
+    
+    let semesterNumber: number;
+    let moduleName: string;
 
-    // Filter for semester directories (s1, s2, etc.)
-    const semesterDirs = items.filter((item: string) => /^s\d+$/.test(item));
-
-    const semestersData: SemesterInfo[] = [];
-
-    for (const dir of semesterDirs) {
-      const semesterPath = path.join(docsPath, dir);
-      const semesterNumber = parseInt(dir.substring(1));
-
-      try {
-        // Read all items in semester directory
-        const semesterItems = await fs.readdir(semesterPath);
-
-        // Count modules (subdirectories) in the semester directory
-        const moduleCount = await Promise.all(
-          semesterItems.map(async (item: string) => {
-            const itemPath = path.join(semesterPath, item);
-            try {
-              const stat = await fs.stat(itemPath);
-              return stat.isDirectory() ? 1 : 0;
-            } catch {
-              return 0;
-            }
-          }),
-        ).then((counts) =>
-          counts.reduce((sum: number, count: number) => sum + count, 0),
-        );
-
-        semestersData.push({
-          number: semesterNumber,
-          modulesCount: moduleCount,
-        });
-      } catch (error) {
-        console.error(`Error reading semester ${dir}:`, error);
-      }
+    if (slugParts[0].match(/s(\d)/g)) {
+      semesterNumber = parseInt(slugParts[0][1]);
+      moduleName = slugParts[1];
+    } else {
+      semesterNumber = 0;
+      moduleName = "General";
     }
 
-    // Sort by semester number
-    return semestersData.sort((a, b) => a.number - b.number);
-  } catch (error) {
-    console.error("Error reading semesters data:", error);
-    return [];
+    // Format module name (capitalize each word, replace hyphens with spaces)
+    const formattedModuleName = moduleName
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    // Initialize semester entry if it doesn't exist
+    if (!semestersMap.has(semesterNumber)) {
+      semestersMap.set(semesterNumber, {
+        modules: new Set<string>(),
+        notesCount: 0,
+      });
+    }
+
+    const semesterData = semestersMap.get(semesterNumber)!;
+    semesterData.modules.add(formattedModuleName);
+    semesterData.notesCount++;
   }
+
+  // Convert Map to array and sort by semester number
+  const semestersData: SemesterInfo[] = Array.from(semestersMap.entries())
+    .map(([number, data]) => ({
+      number,
+      modules: Array.from(data.modules),
+      notesCount: data.notesCount,
+    }))
+    .sort((a, b) => a.number - b.number);
+
+  return semestersData;
 }
 
 const semestersData: SemesterInfo[] = await getSemestersData();
