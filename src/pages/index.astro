@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
+import StatsBand from "../components/stats-band.astro";
 
 interface SemesterInfo {
   number: number;
@@ -130,26 +131,7 @@ const popularNotes = [
 <Layout>
   <Nav />
   <Hero />
-
-  <!-- STATS BAND -->
-  <div class="stats-band">
-    <div class="stat">
-      <div class="stat-val">8</div>
-      <div class="stat-label">Semesters</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">32</div>
-      <div class="stat-label">Subjects</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">200+</div>
-      <div class="stat-label">Notes</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">1,400+</div>
-      <div class="stat-label">Pages</div>
-    </div>
-  </div>
+  <StatsBand />
 
   <!-- SEMESTER GRID -->
   <div id="semesters" style="background: var(--bg);">
@@ -444,14 +426,6 @@ const popularNotes = [
 </Layout>
 
 <style>
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
   :root {
     --font-ui: "Manrope", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
@@ -502,40 +476,6 @@ const popularNotes = [
     color: var(--text-primary);
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
-  }
-
-  /* ── STATS BAND ───────────────────────────────────────────────── */
-  .stats-band {
-    background: #090a12;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    justify-content: center;
-  }
-
-  .stat {
-    padding: 32px 60px;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-    text-align: center;
-  }
-
-  .stat:last-child {
-    border-right: none;
-  }
-
-  .stat-val {
-    font-size: 38px;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    color: #edf0fa;
-    line-height: 1;
-    margin-bottom: 5px;
-  }
-
-  .stat-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.35);
-    letter-spacing: 0.3px;
   }
 
   /* ── SECTION WRAPPER ──────────────────────────────────────────── */

@@ -1,0 +1,39 @@
+---
+interface Props {
+    value: string;
+    label: string;
+}
+
+const { value, label } = Astro.props;
+---
+
+<div class="stat-card">
+    <div class="value">{value}</div>
+    <div class="label">{label}</div>
+</div>
+
+<style>
+    @import "tailwindcss";
+
+    .stat-card {
+        padding: 32px 60px;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        text-align: center;
+    }
+
+    .value {
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        color: #edf0fa;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .label {
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.3px;
+    }
+</style>
