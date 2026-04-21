@@ -5,6 +5,7 @@ import path from "node:path";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
 import StatsBand from "../components/stats-band.astro";
+import SemesterCard from "../components/semester-card.astro";
 
 interface SemesterInfo {
   number: number;
@@ -145,173 +146,47 @@ const popularNotes = [
         <span class="section-sub">8 semesters · 32 subjects · 200+ notes</span>
       </div>
       <div class="sem-grid">
-        <a href="#" class="sem-card" data-s="1">
-          <div class="sem-card-top" style="background:var(--s1)"></div>
-          <div class="sem-card-wm" style="color:var(--s1)">01</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s1)">
-              <div class="sem-card-num-dot" style="background:var(--s1)"></div>
-              Semester 1
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Calculus &amp; Linear Algebra</li>
-              <li>Engineering Physics</li>
-              <li>C Programming</li>
-              <li>Engineering Drawing</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">22 notes</span>
-            <span class="sem-open" style="color:var(--s1)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="2">
-          <div class="sem-card-top" style="background:var(--s2)"></div>
-          <div class="sem-card-wm" style="color:var(--s2)">02</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s2)">
-              <div class="sem-card-num-dot" style="background:var(--s2)"></div>
-              Semester 2
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Discrete Mathematics</li>
-              <li>Data Structures</li>
-              <li>Digital Logic Design</li>
-              <li>Chemistry</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">28 notes</span>
-            <span class="sem-open" style="color:var(--s2)">Open →</span>
-          </div>
-        </a>
-
-        <a href="Short Notes.html" class="sem-card" data-s="3">
-          <div class="sem-card-top" style="background:var(--s3)"></div>
-          <div class="sem-card-wm" style="color:var(--s3)">03</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s3)">
-              <div class="sem-card-num-dot" style="background:var(--s3)"></div>
-              Semester 3
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Theory of Computing</li>
-              <li>Operating Systems</li>
-              <li>Database Systems</li>
-              <li>Computer Networks</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">40 notes</span>
-            <span class="sem-open" style="color:var(--s3)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="4">
-          <div class="sem-card-top" style="background:var(--s4)"></div>
-          <div class="sem-card-wm" style="color:var(--s4)">04</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s4)">
-              <div class="sem-card-num-dot" style="background:var(--s4)"></div>
-              Semester 4
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Compiler Design</li>
-              <li>Algorithm Analysis</li>
-              <li>Computer Architecture</li>
-              <li>ML Fundamentals</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">36 notes</span>
-            <span class="sem-open" style="color:var(--s4)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="5">
-          <div class="sem-card-top" style="background:var(--s5)"></div>
-          <div class="sem-card-wm" style="color:var(--s5)">05</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s5)">
-              <div class="sem-card-num-dot" style="background:var(--s5)"></div>
-              Semester 5
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Cryptography</li>
-              <li>Cloud Computing</li>
-              <li>Deep Learning</li>
-              <li>Software Engineering</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">30 notes</span>
-            <span class="sem-open" style="color:var(--s5)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="6">
-          <div class="sem-card-top" style="background:var(--s6)"></div>
-          <div class="sem-card-wm" style="color:var(--s6)">06</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s6)">
-              <div class="sem-card-num-dot" style="background:var(--s6)"></div>
-              Semester 6
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Embedded Systems</li>
-              <li>Natural Language Processing</li>
-              <li>Graph Theory</li>
-              <li>Parallel Computing</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">28 notes</span>
-            <span class="sem-open" style="color:var(--s6)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="7">
-          <div class="sem-card-top" style="background:var(--s7)"></div>
-          <div class="sem-card-wm" style="color:var(--s7)">07</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s7)">
-              <div class="sem-card-num-dot" style="background:var(--s7)"></div>
-              Semester 7
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Quantum Information</li>
-              <li>Computer Vision</li>
-              <li>Distributed Systems</li>
-              <li>Research Thesis</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">24 notes</span>
-            <span class="sem-open" style="color:var(--s7)">Open →</span>
-          </div>
-        </a>
-
-        <a href="#" class="sem-card" data-s="8">
-          <div class="sem-card-top" style="background:var(--s8)"></div>
-          <div class="sem-card-wm" style="color:var(--s8)">08</div>
-          <div class="sem-card-body">
-            <div class="sem-card-num" style="color:var(--s8)">
-              <div class="sem-card-num-dot" style="background:var(--s8)"></div>
-              Semester 8
-            </div>
-            <ul class="sem-card-subjects">
-              <li>Final Year Project</li>
-              <li>Technical Seminar</li>
-              <li>Elective III</li>
-              <li>Industrial Training</li>
-            </ul>
-          </div>
-          <div class="sem-card-footer">
-            <span class="sem-card-count">16 notes</span>
-            <span class="sem-open" style="color:var(--s8)">Open →</span>
-          </div>
-        </a>
+        <SemesterCard 
+          number={1} 
+          subjects={["Calculus & Linear Algebra", "Engineering Physics", "C Programming", "Engineering Drawing"]} 
+          notesCount="22" 
+        />
+        <SemesterCard 
+          number={2} 
+          subjects={["Discrete Mathematics", "Data Structures", "Digital Logic Design", "Chemistry"]} 
+          notesCount="28" 
+        />
+        <SemesterCard 
+          number={3} 
+          subjects={["Theory of Computing", "Operating Systems", "Database Systems", "Computer Networks"]} 
+          notesCount="40" 
+          href="Short Notes.html"
+        />
+        <SemesterCard 
+          number={4} 
+          subjects={["Compiler Design", "Algorithm Analysis", "Computer Architecture", "ML Fundamentals"]} 
+          notesCount="36" 
+        />
+        <SemesterCard 
+          number={5} 
+          subjects={["Cryptography", "Cloud Computing", "Deep Learning", "Software Engineering"]} 
+          notesCount="30" 
+        />
+        <SemesterCard 
+          number={6} 
+          subjects={["Embedded Systems", "Natural Language Processing", "Graph Theory", "Parallel Computing"]} 
+          notesCount="28" 
+        />
+        <SemesterCard 
+          number={7} 
+          subjects={["Quantum Information", "Computer Vision", "Distributed Systems", "Research Thesis"]} 
+          notesCount="24" 
+        />
+        <SemesterCard 
+          number={8} 
+          subjects={["Final Year Project", "Technical Seminar", "Elective III", "Industrial Training"]} 
+          notesCount="16" 
+        />
       </div>
     </div>
   </div>
@@ -548,155 +423,6 @@ const popularNotes = [
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 14px;
-  }
-
-  .sem-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    transition:
-      border-color 0.16s,
-      box-shadow 0.16s,
-      transform 0.14s;
-  }
-
-  .sem-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-  }
-
-  /* Watermark number */
-  .sem-card-wm {
-    position: absolute;
-    right: -8px;
-    top: -10px;
-    font-size: 96px;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -4px;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.055;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .sem-card-top {
-    height: 4px;
-    flex-shrink: 0;
-  }
-
-  .sem-card-body {
-    padding: 18px 20px 14px;
-    flex: 1;
-    position: relative;
-    z-index: 1;
-  }
-
-  .sem-card-num {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  .sem-card-num-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-
-  .sem-card-subjects {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 10px;
-  }
-
-  .sem-card-subjects li {
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    line-height: 1.3;
-  }
-
-  .sem-card-subjects li::before {
-    content: "";
-    width: 3px;
-    height: 3px;
-    border-radius: 1.5px;
-    background: currentColor;
-    opacity: 0.4;
-    flex-shrink: 0;
-  }
-
-  .sem-card-footer {
-    padding: 10px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .sem-card-count {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 500;
-    font-family: var(--font-mono);
-  }
-
-  .sem-open {
-    font-size: 11.5px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  /* Per-semester hover shadows */
-  .sem-card[data-s="1"]:hover {
-    box-shadow: 0 8px 28px rgba(51, 72, 200, 0.12);
-  }
-
-  .sem-card[data-s="2"]:hover {
-    box-shadow: 0 8px 28px rgba(107, 56, 160, 0.12);
-  }
-
-  .sem-card[data-s="3"]:hover {
-    box-shadow: 0 8px 28px rgba(26, 122, 74, 0.12);
-  }
-
-  .sem-card[data-s="4"]:hover {
-    box-shadow: 0 8px 28px rgba(138, 90, 24, 0.12);
-  }
-
-  .sem-card[data-s="5"]:hover {
-    box-shadow: 0 8px 28px rgba(79, 58, 192, 0.12);
-  }
-
-  .sem-card[data-s="6"]:hover {
-    box-shadow: 0 8px 28px rgba(160, 36, 90, 0.12);
-  }
-
-  .sem-card[data-s="7"]:hover {
-    box-shadow: 0 8px 28px rgba(14, 122, 150, 0.12);
-  }
-
-  .sem-card[data-s="8"]:hover {
-    box-shadow: 0 8px 28px rgba(148, 64, 24, 0.12);
   }
 
   /* ── RECENT NOTES ─────────────────────────────────────────────── */
