@@ -2,7 +2,7 @@
 title: D Latch
 sidebar:
   order: 3
-slug: computer-organization-and-digital-design/sequential-logic/d-latch
+slug: s2/computer-organization-and-digital-design/sequential-logic/03-d-latch
 prev: true
 next: true
 ---

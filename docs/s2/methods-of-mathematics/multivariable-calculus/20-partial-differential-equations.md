@@ -2,7 +2,8 @@
 title: Partial Differential Equations
 sidebar:
   order: 20
-slug: methods-of-mathematics/multivariable-calculus/partial-differential-equations
+slug: >-
+  s2/methods-of-mathematics/multivariable-calculus/20-partial-differential-equations
 prev: true
 next: false
 ---

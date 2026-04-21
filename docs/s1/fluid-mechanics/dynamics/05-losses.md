@@ -1,6 +1,6 @@
 ---
 title: Losses
-slug: fluid-mechanics/dynamics/losses
+slug: s1/fluid-mechanics/dynamics/05-losses
 sidebar:
   order: 5
 next: false

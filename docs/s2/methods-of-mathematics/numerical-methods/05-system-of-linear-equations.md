@@ -2,7 +2,7 @@
 title: System of Linear Equations
 sidebar:
   order: 5
-slug: methods-of-mathematics/numerical-methods/system-of-linear-equations
+slug: s2/methods-of-mathematics/numerical-methods/05-system-of-linear-equations
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Phasor Representation
-slug: electrical-fundamentals/basics/phasor-representation
+slug: s1/electrical-fundamentals/basics/11-phasor-representation
 sidebar:
   order: 11
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Structural Elements
-slug: mechanics/statics/structural-elements
+slug: s1/mechanics/statics/07-structural-elements
 sidebar:
   order: 7
 prev: true

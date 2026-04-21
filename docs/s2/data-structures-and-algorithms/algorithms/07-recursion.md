@@ -2,7 +2,7 @@
 title: Recursion
 sidebar:
   order: 7
-slug: data-structures-and-algorithms/algorithms/recursion
+slug: s2/data-structures-and-algorithms/algorithms/07-recursion
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Transpose
-slug: mathematics/matrices/transpose
+slug: s1/mathematics/matrices/03-transpose
 sidebar:
   order: 3
 prev: true

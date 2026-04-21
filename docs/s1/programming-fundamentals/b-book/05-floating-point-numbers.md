@@ -1,6 +1,6 @@
 ---
 title: Floating-point Numbers
-slug: programming-fundamentals/b-book/floating-point-numbers
+slug: s1/programming-fundamentals/b-book/05-floating-point-numbers
 sidebar:
   order: 5
 prev: true

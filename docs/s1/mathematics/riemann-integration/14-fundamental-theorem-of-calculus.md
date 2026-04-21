@@ -1,6 +1,6 @@
 ---
 title: Fundamental Theorem of Calculus
-slug: mathematics/riemann-integration/fundamental-theorem-of-calculus
+slug: s1/mathematics/riemann-integration/14-fundamental-theorem-of-calculus
 sidebar:
   order: 14
 prev: true

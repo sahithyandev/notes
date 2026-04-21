@@ -1,6 +1,6 @@
 ---
 title: Degradation of Polymers
-slug: properties-of-materials/degradation/polymers
+slug: s1/properties-of-materials/degradation/05-polymers
 sidebar:
   order: 5
 next: false

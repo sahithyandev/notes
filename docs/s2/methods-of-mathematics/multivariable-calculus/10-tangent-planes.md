@@ -2,7 +2,7 @@
 title: Tangent Planes
 sidebar:
   order: 10
-slug: methods-of-mathematics/multivariable-calculus/tangent-planes
+slug: s2/methods-of-mathematics/multivariable-calculus/10-tangent-planes
 prev: true
 next: true
 ---

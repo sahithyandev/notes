@@ -1,6 +1,6 @@
 ---
 title: Complex Functions
-slug: mathematics/complex-analysis/complex-functions
+slug: s1/mathematics/complex-analysis/03-complex-functions
 sidebar:
   order: 3
 prev: true

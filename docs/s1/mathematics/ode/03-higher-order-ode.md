@@ -3,7 +3,7 @@ title: Higher Order Ordinary Differential Equations
 sidebar:
   label: Higher Order ODE
   order: 3
-slug: mathematics/ode/higher-order-ode
+slug: s1/mathematics/ode/03-higher-order-ode
 next: true
 prev: true
 ---

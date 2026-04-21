@@ -1,6 +1,6 @@
 ---
 title: Orthogonal
-slug: mathematics/matrices/orthogonal
+slug: s1/mathematics/matrices/15-orthogonal
 sidebar:
   order: 15
 prev: true

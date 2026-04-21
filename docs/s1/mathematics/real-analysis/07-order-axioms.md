@@ -1,6 +1,6 @@
 ---
 title: Order Axioms
-slug: mathematics/real-analysis/order-axioms
+slug: s1/mathematics/real-analysis/07-order-axioms
 sidebar:
   order: 7
 prev: true

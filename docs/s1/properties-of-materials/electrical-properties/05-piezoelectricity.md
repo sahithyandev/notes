@@ -1,6 +1,6 @@
 ---
 title: Piezoelectricity
-slug: properties-of-materials/electrical-properties/piezoelectricity
+slug: s1/properties-of-materials/electrical-properties/05-piezoelectricity
 sidebar:
   order: 5
 prev: true

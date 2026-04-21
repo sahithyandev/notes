@@ -1,6 +1,6 @@
 ---
 title: Riemann Sum
-slug: mathematics/riemann-integration/riemann-sum
+slug: s1/mathematics/riemann-integration/03-riemann-sum
 sidebar:
   order: 3
 prev: true

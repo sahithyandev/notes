@@ -1,6 +1,6 @@
 ---
 title: Power Series
-slug: mathematics/real-analysis/power-series
+slug: s1/mathematics/real-analysis/29-power-series
 sidebar:
   order: 29
 prev: true

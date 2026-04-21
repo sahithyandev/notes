@@ -2,7 +2,7 @@
 title: Empirical Rule
 sidebar:
   order: 7
-slug: methods-of-mathematics/statistics/empirical-rule
+slug: s2/methods-of-mathematics/statistics/07-empirical-rule
 prev: true
 next: true
 ---

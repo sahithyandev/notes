@@ -1,6 +1,6 @@
 ---
 title: Subsequence
-slug: mathematics/real-analysis/subsequence
+slug: s1/mathematics/real-analysis/23-subsequence
 sidebar:
   order: 23
 prev: true

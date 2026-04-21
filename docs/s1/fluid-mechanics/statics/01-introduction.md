@@ -1,6 +1,6 @@
 ---
 title: Statics
-slug: fluid-mechanics/statics/introduction
+slug: s1/fluid-mechanics/statics/01-introduction
 sidebar:
   label: Introduction
   order: 1

@@ -1,6 +1,6 @@
 ---
 title: Resistors
-slug: electrical-fundamentals/basics/resistors
+slug: s1/electrical-fundamentals/basics/05-resistors
 sidebar:
   order: 5
 prev: true

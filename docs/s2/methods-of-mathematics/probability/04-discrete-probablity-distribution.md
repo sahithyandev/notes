@@ -2,7 +2,7 @@
 title: Discrete Probability Distribution
 sidebar:
   order: 4
-slug: methods-of-mathematics/probability/discrete-probablity-distribution
+slug: s2/methods-of-mathematics/probability/04-discrete-probablity-distribution
 prev: true
 next: true
 ---

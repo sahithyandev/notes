@@ -1,6 +1,6 @@
 ---
 title: Forms of Corrosion
-slug: properties-of-materials/degradation/forms-of-corrosion
+slug: s1/properties-of-materials/degradation/03-forms-of-corrosion
 sidebar:
   order: 3
 prev: true

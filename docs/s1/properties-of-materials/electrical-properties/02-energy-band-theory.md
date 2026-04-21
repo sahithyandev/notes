@@ -1,6 +1,6 @@
 ---
 title: Energy Band Theory
-slug: properties-of-materials/electrical-properties/energy-band-theory
+slug: s1/properties-of-materials/electrical-properties/02-energy-band-theory
 sidebar:
   order: 2
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Ductile-Brittle Transition
-slug: properties-of-materials/mechanical-properties/ductile-brittle-transition
+slug: s1/properties-of-materials/mechanical-properties/09-ductile-brittle-transition
 sidebar:
   order: 9
 prev: true

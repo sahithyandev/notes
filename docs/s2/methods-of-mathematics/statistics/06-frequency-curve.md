@@ -2,7 +2,7 @@
 title: Frequency Curve
 sidebar:
   order: 6
-slug: methods-of-mathematics/statistics/frequency-curve
+slug: s2/methods-of-mathematics/statistics/06-frequency-curve
 prev: true
 next: true
 ---

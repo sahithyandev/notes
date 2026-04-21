@@ -2,7 +2,8 @@
 title: Lookup Tables
 sidebar:
   order: 5
-slug: computer-organization-and-digital-design/combinational-logic/lookup-tables
+slug: >-
+  s2/computer-organization-and-digital-design/combinational-logic/05-lookup-tables
 prev: true
 next: true
 ---

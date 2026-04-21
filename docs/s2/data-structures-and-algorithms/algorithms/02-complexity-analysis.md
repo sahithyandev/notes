@@ -2,7 +2,7 @@
 title: Complexity Analysis
 sidebar:
   order: 2
-slug: data-structures-and-algorithms/algorithms/complexity-analysis
+slug: s2/data-structures-and-algorithms/algorithms/02-complexity-analysis
 prev: true
 next: true
 ---

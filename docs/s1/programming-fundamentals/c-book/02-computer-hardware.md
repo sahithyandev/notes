@@ -1,6 +1,6 @@
 ---
 title: Computer Hardware
-slug: programming-fundamentals/c-book/computer-hardware
+slug: s1/programming-fundamentals/c-book/02-computer-hardware
 sidebar:
   order: 2
 prev: true

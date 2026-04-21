@@ -1,6 +1,6 @@
 ---
 title: Ceramics
-slug: properties-of-materials/basics/ceramics
+slug: s1/properties-of-materials/basics/04-ceramics
 sidebar:
   order: 4
 prev: true

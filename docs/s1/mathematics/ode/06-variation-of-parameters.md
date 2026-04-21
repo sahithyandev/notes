@@ -1,6 +1,6 @@
 ---
 title: Variation of parameters
-slug: mathematics/ode/variation-of-parameters
+slug: s1/mathematics/ode/06-variation-of-parameters
 sidebar:
   order: 6
 next: false

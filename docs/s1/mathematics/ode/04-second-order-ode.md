@@ -3,7 +3,7 @@ title: Solving Second Order Ordinary Differential Equations
 sidebar:
   label: Solving Second Order ODE
   order: 4
-slug: mathematics/ode/second-order-ode
+slug: s1/mathematics/ode/04-second-order-ode
 prev: true
 next: true
 ---

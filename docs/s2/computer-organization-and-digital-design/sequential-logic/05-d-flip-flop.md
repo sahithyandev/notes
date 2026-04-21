@@ -2,7 +2,7 @@
 title: D Flip-flop
 sidebar:
   order: 5
-slug: computer-organization-and-digital-design/sequential-logic/d-flip-flop
+slug: s2/computer-organization-and-digital-design/sequential-logic/05-d-flip-flop
 prev: true
 next: true
 ---

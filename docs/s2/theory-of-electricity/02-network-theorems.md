@@ -2,7 +2,7 @@
 title: Network Theorems
 sidebar:
   order: 2
-slug: theory-of-electricity/network-theorems
+slug: s2/theory-of-electricity/02-network-theorems
 prev: true
 next: true
 ---

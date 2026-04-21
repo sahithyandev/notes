@@ -1,6 +1,6 @@
 ---
 title: Mechanisms
-slug: mechanics/dynamics/mechanisms
+slug: s1/mechanics/dynamics/03-mechanisms
 sidebar:
   order: 3
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Inductors
-slug: electrical-fundamentals/basics/inductors
+slug: s1/electrical-fundamentals/basics/07-inductors
 sidebar:
   order: 7
 prev: true

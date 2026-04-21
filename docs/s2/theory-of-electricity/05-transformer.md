@@ -2,7 +2,7 @@
 title: Transformer
 sidebar:
   order: 5
-slug: theory-of-electricity/transformer
+slug: s2/theory-of-electricity/05-transformer
 prev: true
 next: true
 ---

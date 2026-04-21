@@ -1,6 +1,6 @@
 ---
 title: 3-Phased System
-slug: electrical-fundamentals/basics/3-phase-system
+slug: s1/electrical-fundamentals/basics/17-3-phase-system
 sidebar:
   order: 17
 prev: true

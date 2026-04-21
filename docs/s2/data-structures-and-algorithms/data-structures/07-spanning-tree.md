@@ -2,7 +2,7 @@
 title: Spanning Tree
 sidebar:
   order: 7
-slug: data-structures-and-algorithms/data-structures/spanning-tree
+slug: s2/data-structures-and-algorithms/data-structures/07-spanning-tree
 prev: true
 next: true
 ---

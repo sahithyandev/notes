@@ -1,6 +1,6 @@
 ---
 title: Eigenvalues & Eigenvectors
-slug: mathematics/matrices/eigenvalues-eigenvectors
+slug: s1/mathematics/matrices/14-eigenvalues-eigenvectors
 sidebar:
   order: 14
 prev: true

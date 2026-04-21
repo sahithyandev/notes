@@ -1,6 +1,6 @@
 ---
 title: Transformation Law
-slug: mechanics/statics/transformation-law
+slug: s1/mechanics/statics/04-transformation-law
 sidebar:
   order: 4
 prev: true

@@ -2,7 +2,7 @@
 title: Three Phase Systems
 sidebar:
   order: 9
-slug: theory-of-electricity/three-phase-systems
+slug: s2/theory-of-electricity/09-three-phase-systems
 prev: true
 next: true
 ---

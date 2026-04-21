@@ -1,6 +1,6 @@
 ---
 title: Turbines
-slug: fluid-mechanics/machinery/turbines
+slug: s1/fluid-mechanics/machinery/04-turbines
 sidebar:
   order: 4
 next: false

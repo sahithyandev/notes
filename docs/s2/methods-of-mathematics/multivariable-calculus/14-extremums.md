@@ -2,7 +2,7 @@
 title: Extremums
 sidebar:
   order: 14
-slug: methods-of-mathematics/multivariable-calculus/extremums
+slug: s2/methods-of-mathematics/multivariable-calculus/14-extremums
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Ductility
-slug: properties-of-materials/mechanical-properties/ductility
+slug: s1/properties-of-materials/mechanical-properties/02-ductility
 sidebar:
   order: 2
 prev: true

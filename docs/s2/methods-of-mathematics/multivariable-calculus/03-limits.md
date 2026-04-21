@@ -2,7 +2,7 @@
 title: Limits
 sidebar:
   order: 3
-slug: methods-of-mathematics/multivariable-calculus/limits
+slug: s2/methods-of-mathematics/multivariable-calculus/03-limits
 prev: true
 next: true
 ---

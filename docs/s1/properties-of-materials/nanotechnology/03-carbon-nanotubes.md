@@ -1,6 +1,6 @@
 ---
 title: Carbon Nanotubes
-slug: properties-of-materials/nanotechnology/carbon-nanotubes
+slug: s1/properties-of-materials/nanotechnology/03-carbon-nanotubes
 sidebar:
   order: 3
 next: false

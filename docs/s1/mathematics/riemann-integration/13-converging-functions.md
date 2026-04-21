@@ -1,6 +1,6 @@
 ---
 title: Converging Functions
-slug: mathematics/riemann-integration/converging-functions
+slug: s1/mathematics/riemann-integration/13-converging-functions
 sidebar:
   order: 13
 prev: true

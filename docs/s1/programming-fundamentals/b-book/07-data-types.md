@@ -1,6 +1,6 @@
 ---
 title: Data Types
-slug: programming-fundamentals/b-book/data-types
+slug: s1/programming-fundamentals/b-book/07-data-types
 sidebar:
   order: 7
 prev: true

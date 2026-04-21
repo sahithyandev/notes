@@ -2,7 +2,7 @@
 title: Memory Management
 sidebar:
   order: 2
-slug: program-construction/basics/memory-management
+slug: s2/program-construction/basics/02-memory-management
 prev: true
 next: true
 ---

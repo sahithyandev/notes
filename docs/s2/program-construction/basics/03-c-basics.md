@@ -2,7 +2,7 @@
 title: C Basics
 sidebar:
   order: 3
-slug: program-construction/basics/c-basics
+slug: s2/program-construction/basics/03-c-basics
 prev: true
 next: true
 ---

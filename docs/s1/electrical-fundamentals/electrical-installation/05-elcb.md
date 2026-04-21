@@ -2,7 +2,7 @@
 title: ELCB
 sidebar:
   order: 5
-slug: electrical-fundamentals/electrical-installation/elcb
+slug: s1/electrical-fundamentals/electrical-installation/05-elcb
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Structure of Atoms
-slug: properties-of-materials/basics/structure-of-atoms
+slug: s1/properties-of-materials/basics/02-structure-of-atoms
 sidebar:
   order: 2
 prev: true

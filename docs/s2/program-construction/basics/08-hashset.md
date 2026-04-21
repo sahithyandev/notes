@@ -2,7 +2,7 @@
 title: HashSet
 sidebar:
   order: 8
-slug: program-construction/basics/hashset
+slug: s2/program-construction/basics/08-hashset
 prev: true
 next: true
 ---

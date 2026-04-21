@@ -1,6 +1,6 @@
 ---
 title: Set of Numbers
-slug: mathematics/real-analysis/set-of-numbers
+slug: s1/mathematics/real-analysis/03-set-of-numbers
 sidebar:
   order: 3
 prev: true

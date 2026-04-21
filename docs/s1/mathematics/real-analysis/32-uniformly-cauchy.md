@@ -1,6 +1,6 @@
 ---
 title: Uniformly Cauchy
-slug: mathematics/real-analysis/uniformly-cauchy
+slug: s1/mathematics/real-analysis/32-uniformly-cauchy
 sidebar:
   order: 32
 prev: true

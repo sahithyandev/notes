@@ -1,6 +1,6 @@
 ---
 title: Graphene
-slug: properties-of-materials/nanotechnology/graphene
+slug: s1/properties-of-materials/nanotechnology/02-graphene
 sidebar:
   order: 2
 prev: true

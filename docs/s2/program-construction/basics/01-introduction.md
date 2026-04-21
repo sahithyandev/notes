@@ -3,7 +3,7 @@ title: Introduction to Program Construction
 sidebar:
   label: Introduction
   order: 1
-slug: program-construction/basics/introduction
+slug: s2/program-construction/basics/01-introduction
 prev: false
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Orthonormal
-slug: mathematics/matrices/orthonormal
+slug: s1/mathematics/matrices/16-orthonormal
 sidebar:
   order: 16
 prev: true

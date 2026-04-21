@@ -1,6 +1,6 @@
 ---
 title: RCD
-slug: electrical-fundamentals/electrical-installation/rcd
+slug: s1/electrical-fundamentals/electrical-installation/06-rcd
 sidebar:
   order: 6
 prev: true

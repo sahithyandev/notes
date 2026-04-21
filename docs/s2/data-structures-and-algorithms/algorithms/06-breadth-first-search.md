@@ -2,7 +2,7 @@
 title: Breadth First Search
 sidebar:
   order: 6
-slug: data-structures-and-algorithms/algorithms/breadth-first-search
+slug: s2/data-structures-and-algorithms/algorithms/06-breadth-first-search
 prev: true
 next: true
 ---

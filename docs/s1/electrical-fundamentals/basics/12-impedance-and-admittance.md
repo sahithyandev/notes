@@ -1,6 +1,6 @@
 ---
 title: Impedance & Admittance
-slug: electrical-fundamentals/basics/impedance-and-admittance
+slug: s1/electrical-fundamentals/basics/12-impedance-and-admittance
 sidebar:
   order: 12
 prev: true

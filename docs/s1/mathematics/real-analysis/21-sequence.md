@@ -1,6 +1,6 @@
 ---
 title: Sequence
-slug: mathematics/real-analysis/sequence
+slug: s1/mathematics/real-analysis/21-sequence
 sidebar:
   order: 21
 prev: true

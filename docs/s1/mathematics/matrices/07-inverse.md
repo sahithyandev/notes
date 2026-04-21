@@ -1,6 +1,6 @@
 ---
 title: Inverse
-slug: mathematics/matrices/inverse
+slug: s1/mathematics/matrices/07-inverse
 sidebar:
   order: 7
 prev: true

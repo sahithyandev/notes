@@ -1,6 +1,6 @@
 ---
 title: Statics
-slug: mechanics/statics/introduction
+slug: s1/mechanics/statics/01-introduction
 sidebar:
   label: Introduction
   order: 1

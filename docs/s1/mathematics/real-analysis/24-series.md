@@ -1,6 +1,6 @@
 ---
 title: Series
-slug: mathematics/real-analysis/series
+slug: s1/mathematics/real-analysis/24-series
 sidebar:
   order: 24
 prev: true

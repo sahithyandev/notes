@@ -1,6 +1,6 @@
 ---
 title: Tensile Test
-slug: properties-of-materials/mechanical-properties/tensile-test
+slug: s1/properties-of-materials/mechanical-properties/06-tensile-test
 sidebar:
   order: 6
 prev: true

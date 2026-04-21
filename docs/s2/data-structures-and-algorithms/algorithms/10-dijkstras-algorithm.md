@@ -2,7 +2,7 @@
 title: Dijkstra's Algorithm
 sidebar:
   order: 10
-slug: data-structures-and-algorithms/algorithms/dijkstras-algorithm
+slug: s2/data-structures-and-algorithms/algorithms/10-dijkstras-algorithm
 prev: true
 next: true
 ---

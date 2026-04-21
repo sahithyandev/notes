@@ -1,6 +1,6 @@
 ---
 title: Riemann Zeta Function
-slug: mathematics/real-analysis/riemann-zeta-function
+slug: s1/mathematics/real-analysis/34-riemann-zeta-function
 sidebar:
   order: 34
 next: false

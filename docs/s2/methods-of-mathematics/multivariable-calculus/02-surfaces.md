@@ -2,7 +2,7 @@
 title: Surfaces
 sidebar:
   order: 2
-slug: methods-of-mathematics/multivariable-calculus/surfaces
+slug: s2/methods-of-mathematics/multivariable-calculus/02-surfaces
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Straight Lines
-slug: mathematics/vectors/straight-lines
+slug: s1/mathematics/vectors/03-straight-lines
 sidebar:
   order: 3
 prev: true

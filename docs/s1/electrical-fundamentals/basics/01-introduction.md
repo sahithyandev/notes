@@ -1,6 +1,6 @@
 ---
 title: Basics
-slug: electrical-fundamentals/basics/introduction
+slug: s1/electrical-fundamentals/basics/01-introduction
 sidebar:
   label: Introduction
   order: 1

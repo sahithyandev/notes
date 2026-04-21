@@ -2,7 +2,7 @@
 title: Comparators
 sidebar:
   order: 6
-slug: computer-organization-and-digital-design/combinational-logic/comparators
+slug: s2/computer-organization-and-digital-design/combinational-logic/06-comparators
 prev: true
 next: true
 ---

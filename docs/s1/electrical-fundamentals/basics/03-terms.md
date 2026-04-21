@@ -1,6 +1,6 @@
 ---
 title: Common Terms
-slug: electrical-fundamentals/basics/terms
+slug: s1/electrical-fundamentals/basics/03-terms
 sidebar:
   order: 3
 prev: true

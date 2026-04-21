@@ -1,6 +1,6 @@
 ---
 title: Parallel Axis Theorem
-slug: mechanics/statics/parallel-axis-theorem
+slug: s1/mechanics/statics/02-parallel-axis-theorem
 sidebar:
   order: 2
 prev: true

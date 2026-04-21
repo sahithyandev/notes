@@ -2,7 +2,7 @@
 title: Fourier Transform
 sidebar:
   order: 15
-slug: theory-of-electricity/fourier-transform
+slug: s2/theory-of-electricity/15-fourier-transform
 prev: true
 next: false
 ---

@@ -3,7 +3,7 @@ title: B-book
 sidebar:
   label: Introduction
   order: 1
-slug: programming-fundamentals/b-book/introduction
+slug: s1/programming-fundamentals/b-book/01-introduction
 prev: false
 next: true
 ---

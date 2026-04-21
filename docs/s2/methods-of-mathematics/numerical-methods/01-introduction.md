@@ -3,7 +3,7 @@ title: Introduction to Numerical Methods
 sidebar:
   label: Introduction
   order: 1
-slug: methods-of-mathematics/numerical-methods/introduction
+slug: s2/methods-of-mathematics/numerical-methods/01-introduction
 prev: false
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Polymers
-slug: properties-of-materials/basics/polymers
+slug: s1/properties-of-materials/basics/05-polymers
 sidebar:
   order: 5
 prev: true

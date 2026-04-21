@@ -2,7 +2,7 @@
 title: Classification of Fluid Flow
 sidebar:
   order: 2
-slug: fluid-mechanics/dynamics/classification-of-fluid-flow
+slug: s1/fluid-mechanics/dynamics/02-classification-of-fluid-flow
 prev: true
 next: true
 ---

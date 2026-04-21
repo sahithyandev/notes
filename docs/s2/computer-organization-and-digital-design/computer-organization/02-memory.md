@@ -2,7 +2,7 @@
 title: Memory
 sidebar:
   order: 2
-slug: computer-organization-and-digital-design/computer-organization/memory
+slug: s2/computer-organization-and-digital-design/computer-organization/02-memory
 prev: true
 next: true
 ---

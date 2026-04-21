@@ -1,6 +1,6 @@
 ---
 title: Entire Functions
-slug: mathematics/complex-analysis/entire-functions
+slug: s1/mathematics/complex-analysis/09-entire-functions
 sidebar:
   order: 9
 next: false

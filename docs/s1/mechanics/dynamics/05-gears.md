@@ -1,6 +1,6 @@
 ---
 title: Gears
-slug: mechanics/dynamics/gears
+slug: s1/mechanics/dynamics/05-gears
 sidebar:
   order: 5
 prev: true

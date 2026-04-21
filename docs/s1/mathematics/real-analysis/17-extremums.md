@@ -1,6 +1,6 @@
 ---
 title: Extremums
-slug: mathematics/real-analysis/extremums
+slug: s1/mathematics/real-analysis/17-extremums
 sidebar:
   order: 17
 prev: true

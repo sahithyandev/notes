@@ -1,6 +1,6 @@
 ---
 title: Built-in Functions
-slug: programming-fundamentals/a-book/built-in-functions
+slug: s1/programming-fundamentals/a-book/04-built-in-functions
 sidebar:
   order: 4
 prev: true

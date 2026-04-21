@@ -1,6 +1,6 @@
 ---
 title: Relative Equilibrium
-slug: fluid-mechanics/statics/relative-equilibrium
+slug: s1/fluid-mechanics/statics/08-relative-equilibrium
 sidebar:
   order: 8
 prev: true

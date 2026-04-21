@@ -1,6 +1,6 @@
 ---
 title: Crystal Structure
-slug: properties-of-materials/basics/crystal-secture
+slug: s1/properties-of-materials/basics/07-crystal-secture
 sidebar:
   order: 7
 prev: true

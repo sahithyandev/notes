@@ -2,7 +2,7 @@
 title: Filters
 sidebar:
   order: 8
-slug: theory-of-electricity/filters
+slug: s2/theory-of-electricity/08-filters
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Trends in Computing
-slug: programming-fundamentals/c-book/trends-in-computing
+slug: s1/programming-fundamentals/c-book/14-trends-in-computing
 sidebar:
   order: 14
 next: false

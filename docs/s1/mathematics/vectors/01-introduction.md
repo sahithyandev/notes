@@ -1,6 +1,6 @@
 ---
 title: Vectors
-slug: mathematics/vectors/introduction
+slug: s1/mathematics/vectors/01-introduction
 sidebar:
   label: Introduction
   order: 1

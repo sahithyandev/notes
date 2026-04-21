@@ -1,6 +1,6 @@
 ---
 title: Pumps
-slug: fluid-mechanics/machinery/pumps
+slug: s1/fluid-mechanics/machinery/02-pumps
 sidebar:
   order: 2
 prev: true

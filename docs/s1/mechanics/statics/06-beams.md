@@ -1,6 +1,6 @@
 ---
 title: Beams
-slug: mechanics/statics/beams
+slug: s1/mechanics/statics/06-beams
 sidebar:
   order: 6
 prev: true

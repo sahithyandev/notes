@@ -1,6 +1,6 @@
 ---
 title: Analysis of Trusses
-slug: mechanics/statics/analysis-of-trusses
+slug: s1/mechanics/statics/09-analysis-of-trusses
 sidebar:
   order: 9
 prev: true

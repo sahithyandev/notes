@@ -2,7 +2,7 @@
 title: RCCB
 sidebar:
   order: 7
-slug: electrical-fundamentals/electrical-installation/rccb
+slug: s1/electrical-fundamentals/electrical-installation/07-rccb
 prev: true
 next: true
 ---

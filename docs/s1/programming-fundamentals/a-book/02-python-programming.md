@@ -1,6 +1,6 @@
 ---
 title: Python Programming
-slug: programming-fundamentals/a-book/python-programming
+slug: s1/programming-fundamentals/a-book/02-python-programming
 sidebar:
   order: 2
 prev: true

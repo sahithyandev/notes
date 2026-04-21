@@ -2,7 +2,7 @@
 title: Lagrange Multipliers
 sidebar:
   order: 15
-slug: methods-of-mathematics/multivariable-calculus/lagrange-multipliers
+slug: s2/methods-of-mathematics/multivariable-calculus/15-lagrange-multipliers
 prev: true
 next: true
 ---

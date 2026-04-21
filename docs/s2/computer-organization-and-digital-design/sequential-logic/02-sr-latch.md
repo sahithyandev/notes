@@ -2,7 +2,7 @@
 title: SR Latch
 sidebar:
   order: 2
-slug: computer-organization-and-digital-design/sequential-logic/sr-latch
+slug: s2/computer-organization-and-digital-design/sequential-logic/02-sr-latch
 prev: true
 next: true
 ---

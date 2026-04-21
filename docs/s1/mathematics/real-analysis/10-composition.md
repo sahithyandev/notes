@@ -1,6 +1,6 @@
 ---
 title: Composition
-slug: mathematics/real-analysis/composition
+slug: s1/mathematics/real-analysis/10-composition
 sidebar:
   order: 10
 prev: true

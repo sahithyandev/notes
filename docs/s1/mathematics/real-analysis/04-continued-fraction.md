@@ -1,6 +1,6 @@
 ---
 title: Continued Fraction Expansion
-slug: mathematics/real-analysis/continued-fraction
+slug: s1/mathematics/real-analysis/04-continued-fraction
 sidebar:
   order: 4
 prev: true

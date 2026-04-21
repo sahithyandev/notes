@@ -1,6 +1,6 @@
 ---
 title: Known Limits
-slug: mathematics/real-analysis/known-limits
+slug: s1/mathematics/real-analysis/13-known-limits
 sidebar:
   order: 13
 prev: true

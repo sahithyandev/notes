@@ -1,6 +1,6 @@
 ---
 title: Elementary Transformations
-slug: mathematics/matrices/elementary-transformations
+slug: s1/mathematics/matrices/08-elementary-transformations
 sidebar:
   order: 8
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Functions
-slug: mathematics/real-analysis/functions
+slug: s1/mathematics/real-analysis/09-functions
 sidebar:
   order: 9
 prev: true

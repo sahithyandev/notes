@@ -1,6 +1,6 @@
 ---
 title: Riemann Integrable
-slug: mathematics/riemann-integration/riemann-integrable
+slug: s1/mathematics/riemann-integration/06-riemann-integrable
 sidebar:
   order: 6
 prev: true

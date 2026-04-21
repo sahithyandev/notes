@@ -1,6 +1,6 @@
 ---
 title: Composites
-slug: properties-of-materials/basics/composites
+slug: s1/properties-of-materials/basics/06-composites
 sidebar:
   order: 6
 prev: true

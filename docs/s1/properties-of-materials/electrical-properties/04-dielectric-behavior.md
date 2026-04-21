@@ -1,6 +1,6 @@
 ---
 title: Dielectric behavior
-slug: properties-of-materials/electrical-properties/dielectric-behavior
+slug: s1/properties-of-materials/electrical-properties/04-dielectric-behavior
 sidebar:
   order: 4
 prev: true

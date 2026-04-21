@@ -1,6 +1,6 @@
 ---
 title: Dimensions & Units
-slug: dimensions-and-units
+slug: s1/dimensions-and-units
 next: true
 prev: true
 sidebar: {}

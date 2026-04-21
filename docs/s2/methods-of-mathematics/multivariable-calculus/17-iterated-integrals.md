@@ -2,7 +2,7 @@
 title: Iterated Integrals
 sidebar:
   order: 17
-slug: methods-of-mathematics/multivariable-calculus/iterated-integrals
+slug: s2/methods-of-mathematics/multivariable-calculus/17-iterated-integrals
 prev: true
 next: true
 ---

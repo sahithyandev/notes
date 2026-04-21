@@ -1,6 +1,6 @@
 ---
 title: Circuit elements
-slug: electrical-fundamentals/basics/circuit-elements
+slug: s1/electrical-fundamentals/basics/04-circuit-elements
 sidebar:
   order: 4
 prev: true

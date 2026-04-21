@@ -3,7 +3,7 @@ title: Behavioral Design Patterns
 sidebar:
   order: 4
   label: Behavioral
-slug: program-construction/design-patterns/behavioral
+slug: s2/program-construction/design-patterns/04-behavioral
 prev: true
 next: false
 ---

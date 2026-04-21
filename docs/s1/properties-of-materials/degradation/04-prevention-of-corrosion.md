@@ -1,6 +1,6 @@
 ---
 title: Prevention of Corrosion
-slug: properties-of-materials/degradation/prevention-of-corrosion
+slug: s1/properties-of-materials/degradation/04-prevention-of-corrosion
 sidebar:
   order: 4
 prev: true

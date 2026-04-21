@@ -1,6 +1,6 @@
 ---
 title: Four-bar Mechanism
-slug: mechanics/dynamics/four-bar-mechanism
+slug: s1/mechanics/dynamics/04-four-bar-mechanism
 sidebar:
   order: 4
 prev: true

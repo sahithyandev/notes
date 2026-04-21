@@ -1,6 +1,6 @@
 ---
 title: Theorems on Integrability
-slug: mathematics/riemann-integration/theorems-on-integrability
+slug: s1/mathematics/riemann-integration/08-theorems-on-integrability
 sidebar:
   order: 8
 prev: true

@@ -1,6 +1,6 @@
 ---
 title: Real Analysis
-slug: mathematics/real-analysis/introduction
+slug: s1/mathematics/real-analysis/01-introduction
 sidebar:
   label: Introduction
   order: 1

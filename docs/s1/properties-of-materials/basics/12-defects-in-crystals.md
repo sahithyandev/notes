@@ -1,6 +1,6 @@
 ---
 title: Defects in Crystals
-slug: properties-of-materials/basics/defects-in-crystals
+slug: s1/properties-of-materials/basics/12-defects-in-crystals
 sidebar:
   order: 12
 prev: true

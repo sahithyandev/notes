@@ -2,7 +2,7 @@
 title: HashMap
 sidebar:
   order: 7
-slug: program-construction/basics/hashmap
+slug: s2/program-construction/basics/07-hashmap
 prev: true
 next: true
 ---

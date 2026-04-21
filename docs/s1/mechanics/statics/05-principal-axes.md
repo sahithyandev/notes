@@ -1,6 +1,6 @@
 ---
 title: Principal Axes
-slug: mechanics/statics/principal-axes
+slug: s1/mechanics/statics/05-principal-axes
 sidebar:
   order: 5
 prev: true

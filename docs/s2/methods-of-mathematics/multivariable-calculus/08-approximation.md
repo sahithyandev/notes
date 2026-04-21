@@ -2,7 +2,7 @@
 title: Approximation
 sidebar:
   order: 8
-slug: methods-of-mathematics/multivariable-calculus/approximation
+slug: s2/methods-of-mathematics/multivariable-calculus/08-approximation
 prev: true
 next: true
 ---

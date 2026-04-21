@@ -1,6 +1,6 @@
 ---
 title: Gamma function
-slug: mathematics/riemann-integration/gamma-function
+slug: s1/mathematics/riemann-integration/16-gamma-function
 sidebar:
   order: 16
 next: true

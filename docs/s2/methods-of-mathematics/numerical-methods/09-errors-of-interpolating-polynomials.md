@@ -2,7 +2,8 @@
 title: Errors of Interpolating Polynomials
 sidebar:
   order: 9
-slug: methods-of-mathematics/numerical-methods/errors-of-interpolating-polynomials
+slug: >-
+  s2/methods-of-mathematics/numerical-methods/09-errors-of-interpolating-polynomials
 prev: true
 next: true
 ---

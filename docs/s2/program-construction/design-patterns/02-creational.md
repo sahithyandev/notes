@@ -3,7 +3,7 @@ title: Creational Design Patterns
 sidebar:
   order: 2
   label: Creational
-slug: program-construction/design-patterns/creational
+slug: s2/program-construction/design-patterns/02-creational
 prev: true
 next: true
 ---

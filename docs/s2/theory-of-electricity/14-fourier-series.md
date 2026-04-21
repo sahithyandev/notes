@@ -2,7 +2,7 @@
 title: Fourier Series
 sidebar:
   order: 14
-slug: theory-of-electricity/fourier-series
+slug: s2/theory-of-electricity/14-fourier-series
 prev: true
 next: true
 ---

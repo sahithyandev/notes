@@ -2,7 +2,7 @@
 title: Map
 sidebar:
   order: 6
-slug: program-construction/basics/map
+slug: s2/program-construction/basics/06-map
 prev: true
 next: true
 ---

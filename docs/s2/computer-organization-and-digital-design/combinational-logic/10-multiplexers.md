@@ -2,7 +2,8 @@
 title: Multiplexers
 sidebar:
   order: 10
-slug: computer-organization-and-digital-design/combinational-logic/multiplexers
+slug: >-
+  s2/computer-organization-and-digital-design/combinational-logic/10-multiplexers
 prev: true
 next: true
 ---

@@ -1,6 +1,6 @@
 ---
 title: Differential Equations
-slug: mathematics/ode/introduction
+slug: s1/mathematics/ode/01-introduction
 sidebar:
   label: Introduction
   order: 1

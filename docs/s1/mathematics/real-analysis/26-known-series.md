@@ -1,6 +1,6 @@
 ---
 title: Known Series
-slug: mathematics/real-analysis/known-series
+slug: s1/mathematics/real-analysis/26-known-series
 sidebar:
   order: 26
 prev: true

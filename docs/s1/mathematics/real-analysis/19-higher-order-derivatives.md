@@ -1,6 +1,6 @@
 ---
 title: Higher Order Derivatives
-slug: mathematics/real-analysis/higher-order-derivatives
+slug: s1/mathematics/real-analysis/19-higher-order-derivatives
 sidebar:
   order: 19
 prev: true

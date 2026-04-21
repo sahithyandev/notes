@@ -1,6 +1,6 @@
 ---
 title: Cauchy Sequence
-slug: mathematics/real-analysis/cauchy-sequence
+slug: s1/mathematics/real-analysis/22-cauchy-sequence
 sidebar:
   order: 22
 prev: true

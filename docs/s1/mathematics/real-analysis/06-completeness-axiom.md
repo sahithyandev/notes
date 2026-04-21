@@ -1,6 +1,6 @@
 ---
 title: Completeness Axiom
-slug: mathematics/real-analysis/completeness-axiom
+slug: s1/mathematics/real-analysis/06-completeness-axiom
 sidebar:
   order: 6
 prev: true

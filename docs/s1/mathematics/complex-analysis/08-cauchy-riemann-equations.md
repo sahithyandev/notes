@@ -1,6 +1,6 @@
 ---
 title: Cauchy-Riemann Equations
-slug: mathematics/complex-analysis/cauchy-riemann-equations
+slug: s1/mathematics/complex-analysis/08-cauchy-riemann-equations
 sidebar:
   order: 8
 next: true

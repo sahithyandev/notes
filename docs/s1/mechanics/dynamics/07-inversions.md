@@ -1,6 +1,6 @@
 ---
 title: Inversions of a mechanism
-slug: mechanics/dynamics/inversions
+slug: s1/mechanics/dynamics/07-inversions
 sidebar:
   order: 7
 next: true

@@ -1,6 +1,6 @@
 ---
 title: Complex Numbers
-slug: mathematics/complex-analysis/introduction
+slug: s1/mathematics/complex-analysis/01-introduction
 sidebar:
   label: Introduction
   order: 1

@@ -1,6 +1,6 @@
 ---
 title: Digital Logic Signals
-slug: computer-organization-and-digital-design/basics/digital-logic-signals
+slug: s2/computer-organization-and-digital-design/basics/02-digital-logic-signals
 sidebar:
   order: 2
 prev: true

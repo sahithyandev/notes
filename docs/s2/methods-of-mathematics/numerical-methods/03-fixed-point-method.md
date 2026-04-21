@@ -2,7 +2,7 @@
 title: Fixed Point Method
 sidebar:
   order: 3
-slug: methods-of-mathematics/numerical-methods/fixed-point-method
+slug: s2/methods-of-mathematics/numerical-methods/03-fixed-point-method
 prev: true
 next: true
 ---

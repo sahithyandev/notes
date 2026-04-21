@@ -1,6 +1,6 @@
 ---
 title: Interning
-slug: programming-fundamentals/a-book/interning
+slug: s1/programming-fundamentals/a-book/03-interning
 sidebar:
   order: 3
 prev: true

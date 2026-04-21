@@ -2,7 +2,7 @@
 title: Java Basics
 sidebar:
   order: 4
-slug: program-construction/basics/java-basics
+slug: s2/program-construction/basics/04-java-basics
 prev: true
 next: true
 ---

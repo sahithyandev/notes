@@ -1,6 +1,6 @@
 ---
 title: Beta function
-slug: mathematics/riemann-integration/beta-function
+slug: s1/mathematics/riemann-integration/17-beta-function
 sidebar:
   order: 17
 next: false

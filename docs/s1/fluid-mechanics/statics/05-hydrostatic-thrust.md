@@ -1,6 +1,6 @@
 ---
 title: Hydrostatic Thrust
-slug: fluid-mechanics/statics/hydrostatic-thrust
+slug: s1/fluid-mechanics/statics/05-hydrostatic-thrust
 sidebar:
   order: 5
 prev: true

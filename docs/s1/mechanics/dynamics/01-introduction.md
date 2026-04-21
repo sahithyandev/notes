@@ -1,6 +1,6 @@
 ---
 title: Dynamics
-slug: mechanics/dynamics/introduction
+slug: s1/mechanics/dynamics/01-introduction
 sidebar:
   label: Introduction
   order: 1

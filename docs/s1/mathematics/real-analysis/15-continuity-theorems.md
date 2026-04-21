@@ -1,6 +1,6 @@
 ---
 title: Continuity Theorems
-slug: mathematics/real-analysis/continuity-theorems
+slug: s1/mathematics/real-analysis/15-continuity-theorems
 sidebar:
   order: 15
 prev: true

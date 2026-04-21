@@ -3,7 +3,7 @@ title: Hydraulic Machinery
 sidebar:
   label: Introduction
   order: 1
-slug: fluid-mechanics/machinery/introduction
+slug: s1/fluid-mechanics/machinery/01-introduction
 prev: false
 next: true
 ---

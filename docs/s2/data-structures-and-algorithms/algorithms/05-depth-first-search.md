@@ -2,7 +2,7 @@
 title: Depth First Search
 sidebar:
   order: 5
-slug: data-structures-and-algorithms/algorithms/depth-first-search
+slug: s2/data-structures-and-algorithms/algorithms/05-depth-first-search
 prev: true
 next: true
 ---

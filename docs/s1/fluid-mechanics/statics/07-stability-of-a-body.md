@@ -2,7 +2,7 @@
 title: Stability of a Body
 sidebar:
   order: 7
-slug: fluid-mechanics/statics/stability-of-a-body
+slug: s1/fluid-mechanics/statics/07-stability-of-a-body
 prev: true
 next: true
 ---

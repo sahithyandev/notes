@@ -2,7 +2,7 @@
 title: DC Circuit Analysis
 sidebar:
   order: 10
-slug: theory-of-electricity/dc-circuit-analysis
+slug: s2/theory-of-electricity/10-dc-circuit-analysis
 prev: true
 next: true
 ---

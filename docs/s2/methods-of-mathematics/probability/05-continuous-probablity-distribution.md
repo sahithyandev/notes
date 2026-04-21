@@ -2,7 +2,7 @@
 title: Continuous Probability Distribution
 sidebar:
   order: 5
-slug: methods-of-mathematics/probability/continuous-probablity-distribution
+slug: s2/methods-of-mathematics/probability/05-continuous-probablity-distribution
 prev: true
 next: true
 ---

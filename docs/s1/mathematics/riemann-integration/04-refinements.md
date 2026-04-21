@@ -1,6 +1,6 @@
 ---
 title: Refinements
-slug: mathematics/riemann-integration/refinements
+slug: s1/mathematics/riemann-integration/04-refinements
 sidebar:
   order: 4
 prev: true

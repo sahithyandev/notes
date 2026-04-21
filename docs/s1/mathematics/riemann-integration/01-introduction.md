@@ -3,7 +3,7 @@ title: Riemann Integration
 sidebar:
   label: Introduction
   order: 1
-slug: mathematics/riemann-integration/introduction
+slug: s1/mathematics/riemann-integration/01-introduction
 prev: false
 next: true
 ---
