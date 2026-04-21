@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import { getEntry } from "astro:content";
 import Nav from "../components/Nav.astro";
+import Breadcrumb from "../components/breadcrumb.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -15,6 +16,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const notesEntry = await getEntry("notes", slug);
+const slugParts = slug.split("/");
 
 if (!notesEntry) {
   return new Response(null, {
@@ -31,6 +33,7 @@ const { Content } = await render(notesEntry);
   <div class="grid grid-cols-[auto_1fr]">
     <section></section>
     <article>
+      <Breadcrumb slug={slug} />
       <h1 class="note-title">
         {notesEntry.data.title}
       </h1>
