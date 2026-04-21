@@ -29,20 +29,20 @@ const { Content } = await render(notesEntry);
 
 // Helper functions to generate sidebar data
 function getSemesterInfo(slugParts: string[]) {
-  if (slugParts[0] === 's1') {
+  if (slugParts[0] === "s1") {
     return {
-      label: 'Semester 1',
-      color: '#1a7a4a'
+      label: "Semester 1",
+      color: "#1a7a4a",
     };
-  } else if (slugParts[0] === 's2') {
+  } else if (slugParts[0] === "s2") {
     return {
-      label: 'Semester 2', 
-      color: '#1a7a4a'
+      label: "Semester 2",
+      color: "#1a7a4a",
     };
   }
   return {
-    label: 'Unknown',
-    color: '#1a7a4a'
+    label: "Unknown",
+    color: "#1a7a4a",
   };
 }
 
@@ -51,38 +51,38 @@ async function getSidebarData(currentSlug: string) {
   const currentSlugParts = currentSlug.split("/");
   const currentSemester = currentSlugParts[0];
   const currentSubject = currentSlugParts[1];
-  
+
   // Group notes by semester and subject
   const grouped: Record<string, Record<string, any[]>> = {};
-  
-  allNotes.forEach(note => {
+
+  allNotes.forEach((note) => {
     const parts = note.data.slug.split("/");
     const sem = parts[0];
     const subj = parts[1];
-    
+
     if (!grouped[sem]) grouped[sem] = {};
     if (!grouped[sem][subj]) grouped[sem][subj] = [];
-    
+
     grouped[sem][subj].push({
       slug: note.data.slug,
       title: note.data.title,
       label: note.data.sidebar?.label || note.data.title,
-      order: note.data.sidebar?.order || 999
+      order: note.data.sidebar?.order || 999,
     });
   });
-  
+
   // Sort each subject's notes by order
-  Object.keys(grouped).forEach(sem => {
-    Object.keys(grouped[sem]).forEach(subj => {
+  Object.keys(grouped).forEach((sem) => {
+    Object.keys(grouped[sem]).forEach((subj) => {
       grouped[sem][subj].sort((a, b) => a.order - b.order);
     });
   });
-  
+
   return {
     currentSemester,
     currentSubject,
     grouped,
-    currentNotes: grouped[currentSemester]?.[currentSubject] || []
+    currentNotes: grouped[currentSemester]?.[currentSubject] || [],
   };
 }
 
@@ -91,7 +91,8 @@ const sidebarData = await getSidebarData(slug);
 
 <Layout>
   <Nav />
-  <div class="shell">
+
+  <main class="grid grid-cols-[auto_1fr] gap-x-5">
     <aside class="sidebar">
       <div class="sb-sem">
         <div class="sb-sem-pip"></div>
@@ -101,38 +102,52 @@ const sidebarData = await getSidebarData(slug);
       </div>
 
       <div class="sb-group-title">Subjects</div>
-      {Object.entries(sidebarData.grouped[sidebarData.currentSemester] || {}).map(([subject, notes]) => (
-        <a href={`/${subject}`} class={`sb-item ${subject === sidebarData.currentSubject ? 'active' : ''}`}>
-          {subject.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} 
-          <span class="sb-item-count">{notes.length}</span>
-        </a>
-      ))}
+      {
+        Object.entries(
+          sidebarData.grouped[sidebarData.currentSemester] || {},
+        ).map(([subject, notes]) => (
+          <a
+            href={`/${subject}`}
+            class={`sb-item ${subject === sidebarData.currentSubject ? "active" : ""}`}
+          >
+            {subject
+              .replace(/-/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase())}
+            <span class="sb-item-count">{notes.length}</span>
+          </a>
+        ))
+      }
 
-      {sidebarData.currentNotes.length > 0 && (
-        <>
-          <div class="sb-rule"></div>
-          <div class="sb-group-title">{sidebarData.currentSubject.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-          {sidebarData.currentNotes.map((note) => (
-            <a href={`/${note.slug}`} class={`sb-item sb-item-sub ${note.slug === slug ? 'active' : ''}`}>
-              {note.label}
-            </a>
-          ))}
-        </>
-      )}
+      {
+        sidebarData.currentNotes.length > 0 && (
+          <>
+            <div class="sb-rule" />
+            <div class="sb-group-title">
+              {sidebarData.currentSubject
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase())}
+            </div>
+            {sidebarData.currentNotes.map((note) => (
+              <a
+                href={`/${note.slug}`}
+                class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
+              >
+                {note.label}
+              </a>
+            ))}
+          </>
+        )
+      }
     </aside>
 
-    <main class="main">
-      <div class="content">
-        <article>
-          <Breadcrumb slug={slug} />
-          <h1 class="note-title">
-            {notesEntry.data.title}
-          </h1>
-          <Content />
-        </article>
-      </div>
-    </main>
-  </div>
+    <article>
+      <Breadcrumb slug={slug} />
+      <h1 class="note-title">
+        {notesEntry.data.title}
+      </h1>
+      <Content />
+    </article>
+  </main>
 
   <script>
     // Theme toggle
@@ -177,6 +192,10 @@ const sidebarData = await getSidebarData(slug);
 <style>
   :root {
     --sidebar-w: 260px;
+  }
+
+  article {
+    padding-top: 1rem;
   }
 
   /* ── LEFT SIDEBAR ─────────────────────────────────────────────── */
