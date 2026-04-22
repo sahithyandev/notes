@@ -172,26 +172,6 @@ const tocHeadings = headings.filter(
   </main>
 
   <script>
-    // Theme toggle
-    const html = document.documentElement;
-    const toggle = document.getElementById("themeToggle");
-    const iconSun = document.getElementById("iconSun");
-    const iconMoon = document.getElementById("iconMoon");
-    const saved = localStorage.getItem("sn-theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    function applyTheme(dark) {
-      html.setAttribute("data-theme", dark ? "dark" : "light");
-      iconSun.style.display = dark ? "block" : "none";
-      iconMoon.style.display = dark ? "none" : "block";
-      localStorage.setItem("sn-theme", dark ? "dark" : "light");
-    }
-    applyTheme(saved ? saved === "dark" : prefersDark);
-    toggle.addEventListener("click", () =>
-      applyTheme(html.dataset.theme !== "dark"),
-    );
-
     // TOC active state on scroll
     const headings = [...document.querySelectorAll(".prose h2, .prose h3")];
     const tocLinks = [...document.querySelectorAll(".toc-item")];
@@ -807,26 +787,4 @@ const tocHeadings = headings.filter(
     border-left-color: var(--sem);
   }
 
-  /* Theme toggle */
-  .theme-toggle {
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.06);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.55);
-    transition:
-      background 0.12s,
-      color 0.12s;
-    flex-shrink: 0;
-  }
-
-  .theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.11);
-    color: rgba(255, 255, 255, 0.9);
-  }
 </style>

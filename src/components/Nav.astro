@@ -1,9 +1,9 @@
 ---
-
+import { Monitor, Sun, Moon } from "@lucide/astro";
 ---
 
 <nav class="nav">
-    <a href="index.html" class="nav-logo">
+    <a href="/" class="nav-logo">
         <span class="nav-name">Sahithyan's Notes</span>
     </a>
 
@@ -27,41 +27,52 @@
         <button
             class="theme-toggle"
             id="themeToggle"
-            title="Toggle dark mode"
-            aria-label="Toggle dark mode"
+            title="Theme: auto"
+            aria-label="Change theme"
         >
-            <svg
-                id="iconSun"
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                display="none"
-            >
-                <circle cx="12" cy="12" r="4"></circle>
-                <path
-                    d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
-                ></path>
-            </svg>
-            <svg
-                id="iconMoon"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-            >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-                ></path>
-            </svg>
+            <span class="theme-icon" data-pref="auto"><Monitor size={15} /></span>
+            <span class="theme-icon" data-pref="light"><Sun size={15} /></span>
+            <span class="theme-icon" data-pref="dark"><Moon size={14} /></span>
         </button>
     </div>
 </nav>
+
+<script>
+    const root = document.documentElement;
+    const btn = document.getElementById("themeToggle");
+    const order = ["auto", "light", "dark"] as const;
+    type Pref = (typeof order)[number];
+
+    function syncUI(pref: Pref) {
+        document.querySelectorAll<HTMLElement>(".theme-icon").forEach((el) => {
+            el.style.display = el.dataset.pref === pref ? "flex" : "none";
+        });
+        if (btn) {
+            const nextIndex = (order.indexOf(pref) + 1) % order.length;
+            const next = order[nextIndex];
+            btn.setAttribute("title", `Theme: ${pref} (click for ${next})`);
+            btn.setAttribute("aria-label", `Theme: ${pref}. Click to switch to ${next}.`);
+        }
+    }
+
+    function apply(pref: Pref) {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const resolved = pref === "auto" ? (prefersDark ? "dark" : "light") : pref;
+        root.setAttribute("data-theme", resolved);
+        root.dataset.themePref = pref;
+        localStorage.setItem("sn-theme", pref);
+        syncUI(pref);
+    }
+
+    const initial = ((root.dataset.themePref as Pref) || "auto");
+    syncUI(initial);
+
+    btn?.addEventListener("click", () => {
+        const current = (root.dataset.themePref as Pref) || "auto";
+        const next = order[(order.indexOf(current) + 1) % order.length];
+        apply(next);
+    });
+</script>
 
 <style>
     .nav {
@@ -72,9 +83,9 @@
         display: flex;
         align-items: center;
         padding: 0 36px;
-        background: rgba(9, 10, 18, 0.78);
+        background: color-mix(in oklab, var(--bg) 78%, transparent);
         backdrop-filter: blur(20px) saturate(1.8);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: 1px solid var(--border);
         gap: 0;
     }
 
@@ -85,57 +96,11 @@
         text-decoration: none;
     }
 
-    .nav-logomark {
-        width: 30px;
-        height: 30px;
-        border-radius: 7px;
-        flex-shrink: 0;
-        background: linear-gradient(135deg, #3348c8 0%, #6b38a0 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: var(--font-mono);
-        font-size: 12px;
-        font-weight: 500;
-        color: #fff;
-        letter-spacing: -1px;
-    }
-
     .nav-name {
         font-size: 14.5px;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
         letter-spacing: -0.3px;
-    }
-
-    .nav-slash {
-        color: rgba(255, 255, 255, 0.2);
-        margin: 0 4px;
-        font-weight: 300;
-    }
-
-    .nav-links {
-        display: flex;
-        margin-left: 28px;
-        gap: 2px;
-    }
-
-    .nav-link {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.5);
-        text-decoration: none;
-        transition:
-            color 0.12s,
-            background 0.12s;
-        letter-spacing: 0.05px;
-    }
-
-    .nav-link:hover {
-        color: rgba(255, 255, 255, 0.9);
-        background: rgba(255, 255, 255, 0.06);
     }
 
     .nav-right {
@@ -151,26 +116,59 @@
         gap: 8px;
         padding: 6px 14px;
         border-radius: 7px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
         font-size: 12.5px;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--text-muted);
         cursor: text;
         font-family: var(--font-ui);
         transition: border-color 0.12s;
     }
 
     .nav-search:hover {
-        border-color: rgba(255, 255, 255, 0.16);
+        border-color: var(--border-strong);
     }
 
     .nav-search kbd {
         font-family: var(--font-mono);
         font-size: 10px;
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 3px;
         padding: 1px 5px;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--text-muted);
         margin-left: 4px;
+    }
+
+    .theme-toggle {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition:
+            background 0.12s,
+            color 0.12s,
+            border-color 0.12s;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    .theme-toggle:hover {
+        background: var(--surface);
+        color: var(--text-primary);
+        border-color: var(--border-strong);
+    }
+
+    .theme-icon {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
     }
 </style>

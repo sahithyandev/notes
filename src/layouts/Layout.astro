@@ -16,6 +16,26 @@ import "../styles/global.css";
 			rel="stylesheet"
 		/>
 		<link href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" rel="stylesheet" />
+		<script is:inline>
+			(function () {
+				try {
+					var pref = localStorage.getItem("sn-theme");
+					if (pref !== "light" && pref !== "dark" && pref !== "auto") {
+						pref = "auto";
+					}
+					var mql = window.matchMedia("(prefers-color-scheme: dark)");
+					var resolved = pref === "auto" ? (mql.matches ? "dark" : "light") : pref;
+					var root = document.documentElement;
+					root.setAttribute("data-theme", resolved);
+					root.dataset.themePref = pref;
+					mql.addEventListener("change", function (e) {
+						if (root.dataset.themePref === "auto") {
+							root.setAttribute("data-theme", e.matches ? "dark" : "light");
+						}
+					});
+				} catch (_) {}
+			})();
+		</script>
 	</head>
 	<body>
 		<slot />
