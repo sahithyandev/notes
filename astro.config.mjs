@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,7 +11,14 @@ export default defineConfig({
     rehypePlugins: [rehypeKatex],
     remarkPlugins: [remarkMath],
   },
+
   vite: {
-    plugins: [tailwindcss()]
-  }
+    plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        external: ['/_pagefind/pagefind.js'],
+      },
+    },
+  },
+  adapter: vercel()
 });
