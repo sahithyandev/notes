@@ -17,15 +17,19 @@ const { value, label } = Astro.props;
 
     .stat-card {
         padding: 32px 60px;
-        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        border-right: 1px solid var(--border);
         text-align: center;
+    }
+
+    .stat-card:last-child {
+        border-right: none;
     }
 
     .value {
         font-size: 38px;
         font-weight: 800;
         letter-spacing: -1.5px;
-        color: #edf0fa;
+        color: var(--text-primary);
         line-height: 1;
         margin-bottom: 5px;
     }
@@ -33,7 +37,7 @@ const { value, label } = Astro.props;
     .label {
         font-size: 12px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--text-muted);
         letter-spacing: 0.3px;
     }
 </style>

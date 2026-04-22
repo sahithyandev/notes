@@ -82,7 +82,7 @@
   .hero {
     position: relative;
     overflow: hidden;
-    background: #090a12;
+    background: var(--surface-2);
     padding: 88px 36px 0;
   }
 
@@ -94,7 +94,7 @@
     pointer-events: none;
     background-image: radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.12) 1px,
+      var(--border-strong) 1px,
       transparent 1px
     );
     background-size: 28px 28px;
@@ -143,11 +143,11 @@
     margin-bottom: 30px;
     padding: 4px 12px 4px 8px;
     border-radius: 99px;
-    background: rgba(51, 72, 200, 0.15);
-    border: 1px solid rgba(51, 72, 200, 0.28);
+    background: var(--accent-subtle);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
     font-size: 11.5px;
     font-weight: 600;
-    color: #8fa4f0;
+    color: var(--accent);
     letter-spacing: 0.2px;
   }
 
@@ -161,7 +161,7 @@
   .hero-title {
     font-size: clamp(40px, 4.8vw, 60px);
     font-weight: 800;
-    color: #edf0fa;
+    color: var(--text-primary);
     line-height: 1.02;
     letter-spacing: -2px;
     margin-bottom: 22px;
@@ -170,14 +170,14 @@
 
   .hero-title em {
     font-style: normal;
-    color: #7f98f8;
+    color: var(--accent);
   }
 
   .hero-sub {
     font-size: 16.5px;
     line-height: 1.7;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.42);
+    color: var(--text-secondary);
     max-width: 500px;
     margin-bottom: 38px;
   }
@@ -222,12 +222,12 @@
     padding: 10px 20px;
     border-radius: 8px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
     cursor: pointer;
     font-family: var(--font-ui);
     font-size: 13.5px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
     text-decoration: none;
     transition:
       border-color 0.14s,
@@ -235,8 +235,8 @@
   }
 
   .btn-ghost:hover {
-    border-color: rgba(255, 255, 255, 0.26);
-    color: #fff;
+    border-color: var(--border-strong);
+    color: var(--text-primary);
   }
 
   /* Semester scroll strip */
@@ -263,8 +263,8 @@
     flex-shrink: 0;
     padding: 7px 16px;
     border-radius: 7px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: var(--surface);
+    border: 1px solid var(--border);
     cursor: pointer;
     text-decoration: none;
     transition:
@@ -276,8 +276,8 @@
   }
 
   .sem-chip:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: var(--surface-2);
+    border-color: var(--border-strong);
   }
 
   .sem-chip-dot {
@@ -290,6 +290,6 @@
   .sem-chip-name {
     font-size: 12.5px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
   }
 </style>
