@@ -1,0 +1,90 @@
+---
+title: Gas Power Cycle
+sidebar:
+  order: 20
+slug: s3/engineering-thermodynamics/gas-power-cycle
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.704Z
+lastUpdatedOn: 2026-04-22T07:15:36.799Z
+---
+
+Working fluid stays in gas phase throughout the cycle. Used in IC engines and gas turbines using the air-standard assumption.
+
+## Air Standard Assumptions
+
+Used to simplify real IC engine analysis.
+
+- Working fluid = air behaving as an ideal gas.
+- Air circulates in a closed loop.
+- Combustion = external heat addition.
+- Exhaust = heat rejection.
+- All processes internally reversible.
+
+### Cold Air Standard Assumption
+
+$\gamma$ is assumed to be constant.
+
+## Reciprocating Engine
+
+An engine where a piston reciprocates (moves back and forth) inside a cylinder, and that linear motion is converted into rotary motion using a crankshaft.
+
+### Intake Valve
+
+A valve that opens to admit the fresh charge (air or air-fuel mixture).
+
+### Exhaust Valve
+
+A valve that opens to release combustion products from the cylinder during the exhaust stroke.
+
+### Top Dead Centre
+
+Aka. TDC. Minimum volume inside chamber.
+
+### Bottom Dead Centre
+
+Aka. BDC. Maximum volume inside chamber.
+
+### Stroke
+
+Maximum distance the piston can move. Distance between TDC and BDC.
+
+### Displacement Volume
+
+$ \text{Displacement Volume} = \text{Piston Area} \times \text{Stroke} $
+
+### Clearance Volume
+
+Volume at TDC.
+
+### Swept Volume
+
+Volume displaced by the piston as it moves from TDC to BDC.
+
+### Compression Ratio
+
+Denoted by $r$.
+
+```math
+r = \frac{V_{max}}{V_{min}}
+```
+
+### Mean Effective Pressure
+
+Aka. MEP. A fictitious uniform pressure that gives the same net work as real cycle.
+
+```math
+\text{MEP} = \frac{w_\text{net}}{v_\text{max} - v_\text{min}}
+```
+
+## Analysis
+
+P-V diagram is used.
+
+### Thermal Efficiency
+
+```math
+\eta = 1 - \frac{1}{r^\gamma -1}
+```
+
+Here: $\gamma=C_p/C_v$.

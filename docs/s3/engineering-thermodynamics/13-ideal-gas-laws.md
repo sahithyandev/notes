@@ -1,0 +1,174 @@
+---
+title: Ideal Gas Laws
+sidebar:
+  order: 13
+slug: s3/engineering-thermodynamics/ideal-gas-laws
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.704Z
+lastUpdatedOn: 2026-04-22T07:15:36.798Z
+---
+
+Ideal gases follow simple relations between $P$, $V$, and $T$. Can be applied to [ideal gases](/engineering-thermodynamics/introduction#ideal-gases).
+
+### Properties of Fluids
+
+Fluid properties describe measurable characteristics such as pressure, temperature, and volume.
+
+- Density: $ \rho = \frac{m}{V} $.
+- Specific volume: $ v = \frac{V}{m} = \frac{1}{\rho} $.
+- Specific gravity: ratio of fluid density to reference density (water for liquids, air for gases).
+
+## Boyle’s Law
+
+At constant temperature, $ PV = \text{constant} $.
+
+## Charles’ Law
+
+### At Constant Pressure
+
+At constant pressure, $V \propto T$.
+
+### At Constant Volume
+
+At constant volume, $P \propto T$.
+
+## Combined Gas Law
+
+Derived using Boyle's and Charles' laws.
+
+```math
+\frac{P_1 V_1}{T_1} = \frac{P_2 V_2}{T_2}
+```
+
+## Ideal Gas Law
+
+Relates all three variables:
+
+```math
+PV = mRT = \frac{RT}{v}
+```
+
+Here:
+
+- $P$ - pressure
+- $V$ - pressure
+- $m$ - mass
+- $R$ - specific gas constant
+- $T$ - absolute temperature
+- $v$ - specific volume
+
+### Universal Gas Constant
+
+$R_u = C_p - C_v = 8.314 \;\text{J}\,\text{K}^{-1}\,\text{mol}^{-1}$.
+
+### Gas Constant
+
+Denoted by $R$. Defined for each gas.
+
+```math
+R = \frac{R_u}{M}
+```
+
+Here $M$ is the molar mass of the gas.
+
+Example: $R_\text{air} = 0.287\;\text{kJ}\,\text{kg}^{-1}\,\text{K}^{-1}$.
+
+## Compressibility Factor
+
+Denoted by $Z$. Real gases deviate from ideal behavior, especially near saturation and the critical point.
+
+```math
+Z = \frac{Pv}{RT} = \frac{v_\text{real}}{v_\text{ideal}}
+```
+
+$Z = 1$ for an ideal gas. $Z$ close to 1 means the gas behaves similar to ideal gas.
+
+$Z \gt 1$ means the gas is hard to be compressed. $Z \lt 1$ means the gas is easy to be compressed.
+
+### When deviations matter
+
+- High pressure
+- Low temperature
+- Near critical region
+
+## Generalized Compressibility Chart
+
+Different gases behave similarly when compared using normalized variables.
+
+### Reduced Pressure
+
+```math
+P_R = \frac{P}{P_c}
+```
+
+When $P_R \ll 1$, the gas shows ideal gas behavior.
+
+### Reduced Temperature
+
+```math
+T_R = \frac{T}{T_c}
+```
+
+When $T_R \gt 2$, the gas shows ideal gas behavior.
+
+### Principle of Corresponding States
+
+At the same $P_R$ and $T_R$, different gases have nearly the same $Z$. Deviations largest near critical point.
+
+Charts allow estimation of $Z$ without equations.
+
+## Real-Gas Equations of State
+
+Real-gas equations include molecular attraction and finite molecular volume.
+
+### Van der Waals Equation
+
+```math
+\left(P + \frac{a}{v^2}\right)(v - b)=RT
+```
+
+Due to intermolecular forces, measured pressure would be less than ideal pressure. Thus $\frac{a}{v^2}$ is added.
+
+Due to finite non-zero molecular size, ideal volume would be less than measured volume. Thus $b$ is subtracted.
+
+```math
+a = \frac{27R^2T_\text{cr}^2}{64 P_\text{cr}}
+\quad
+\text{and}
+\quad
+b = \frac{RT_\text{cr}}{8 P_\text{cr}}
+```
+
+Accuracy limited but conceptually useful.
+
+### Beattie–Bridgeman Equation
+
+Based on five empirical constants. Accurate for densities up to about $0.8\rho_{cr}$.
+
+```math
+P = \frac{R_u T}{\bar{v}^2} \left( 1 - \frac{c}{\bar{v} T^3} \right)(\bar{v} + B) - \frac{A}{\bar{v}^2}
+```
+
+Here:
+```math
+A = A_0 \left(1 - \frac{a}{\bar{v}}\right)
+\quad
+\text{and}
+\quad
+B = B_0 \left(1 - \frac{b}{\bar{v}}\right)
+```
+
+### Benedict–Webb–Rubin Equation
+
+Aka. BWR equation. Eight constants. Accurate up to $2.5\rho_{cr}$.
+
+$ P = \frac{R_u T}{\bar{v}} + \left( B_0 R_u T - A_0 - \frac{C_0}{T^2} \right)\frac{1}{\bar{v}^2} + \frac{b R_u T - a}{\bar{v}^3} + \frac{a \alpha}{\bar{v}^6} + \frac{c}{\bar{v}^3 T^2}\left(1 + \frac{\gamma}{\bar{v}^2}\right)e^{-\gamma/\bar{v}^2} $
+
+### Virial Equation
+
+```math
+Pv = RT[1 + B(T)/v + C(T)/v^2 + \ldots]
+```
+
+$B(T)$, $C(T)$ are virial coefficients. Derived from statistical mechanics.

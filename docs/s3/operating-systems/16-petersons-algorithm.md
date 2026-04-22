@@ -1,0 +1,58 @@
+---
+title: Peterson's Algorithm
+sidebar:
+  order: 16
+slug: s3/operating-systems/petersons-algorithm
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.707Z
+lastUpdatedOn: 2026-04-22T07:15:36.801Z
+---
+
+An algorithm for solving critical section problem. Satisfies mutual exclusion, progress and bounded waiting.
+
+Only works for 2 processes. Depends on strict ordering of memory operations.
+
+Uses 2 shared variables:
+
+- `flag` array   
+  To indicate if a process wants to enter the critical section.
+- `turn` variable   
+  To indicate whose turn it is to enter.
+
+Assumes `load` and `store` operations are atomic.
+
+Algorithm for $P_i$ where $i,j \in \set{0,1} \land j \neq i$:
+
+```c
+// entry section
+flag[i] = true;
+turn = j;
+while(flag[j] && turn == j); // waiting
+
+// ... critical section
+
+// exit section
+flag[i] = false;
+
+// ... remainder section
+```
+
+## Issues
+
+May break due to instruction reordering on modern systems. Memory barriers can be used in this case.
+
+### Memory model
+
+Guarantees about memory that a computer architecture makes to application programs.
+
+May be either:
+
+- Strongly ordered   
+  Limited memory instruction reordering. Memory modification of a processor is immediately visible to all other processors.
+- Weakly ordered   
+  CPU reorders memory instructions as much as possible. Increases performance. Memory modification may not be immediately visible to all other processors.
+
+### Memory Barrier
+
+Aka. memory fence. A CPU instruction that prevents certain type of reorderings of reads and writes. A CPU instruction that forces any change in memory to be propagated to all other processors. Memory-accessing instructions cannot be reordered across memory barriers. When a memory barrier instruction is encountered, all loads and stores are completed before any subsequent load or store operations are performed.

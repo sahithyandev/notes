@@ -1,0 +1,83 @@
+---
+title: Instruction Level Parallelism
+sidebar:
+  order: 13
+slug: s3/computer-architecture/instruction-level-parallelism
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.688Z
+lastUpdatedOn: 2026-04-22T07:15:36.790Z
+---
+
+The ability of a processor to execute multiple independent instructions simultaneously rather than strictly one after another.
+Degree to which instructions of a program can be overlapped in execution. Goal is to maximize CPI.
+
+ILP comes from pipelining and multiple execution units.
+
+2 approaches to exploit ILP:
+
+- Hardware-based dynamic approaches: Used in servers and desktop processors.
+- Compiler-based static approaches: Common in scientific applications, less successful outside this scope.
+
+## Limits
+
+ILP is limited by data, name and control dependences.
+
+### Data Dependence
+
+Occurs when instruction $j$ uses a result produced by instruction $i$. Transitive. Memory-based dependences are harder to detect.
+
+Causes RAW hazards. Restricts reordering. Limits maximum ILP.
+
+### Name Dependence
+
+Instructions use same register/memory name but no actual data flow.
+
+Types:
+
+- Anti-dependence (WAR): $j$ writes, $i$ reads.
+- Output dependence (WAW): Both write same name.
+
+Solution is register renaming.
+
+### Control Dependence
+
+An instruction’s execution depends on the outcome of a branch. Instructions cannot be moved across branches.
+
+## Register Renaming
+
+Renaming registers with temporary ones. To avoid name dependences (antidependence and output dependence). Removes WAR and WAW hazards.
+
+Can be done [dynamically](/computer-architecture/dynamic-scheduling) or [statically](/computer-architecture/compiler-optimizations#static-scheduling).
+
+### Modern Register Renaming
+
+Use a physical register file:
+
+- Many more physical registers than architectural ones.
+- Map table updated on commit.
+- Old physical registers freed later.
+
+## Multi Issue Architecture
+
+A computer architecture designed to achieve CPI less than 1.
+
+### Static Superscalar
+
+Compiler schedules.
+
+### VLIW
+
+One long instruction with many operations. High throughput.
+
+But:
+
+- Only useful if there is enough ILP in code to fill available slots.
+- Difficult to find parallelism statically
+- Code size growth
+- No hazard detection hardware
+- Poor binary compatibility
+
+### Dynamic Superscalar
+
+Hardware schedules and speculation.

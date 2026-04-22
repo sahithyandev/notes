@@ -1,0 +1,64 @@
+---
+title: OTTO Cycle
+sidebar:
+  order: 21
+slug: s3/engineering-thermodynamics/otto-cycle
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.705Z
+lastUpdatedOn: 2026-04-22T07:15:36.799Z
+---
+
+Used in four stroke engines. Cycle is completed in 4 strokes. Models petrol engines. Ignition with spark plug. Heat addition at constant volume.
+
+Named after Nikolaus August Otto.
+
+## Four Stroke Engine
+
+### Intake Stroke
+
+Aka. suction stroke. Piston moves from TDC to BDC. Intake valve open. Air–fuel mixture is drawn into the cylinder due to pressure difference. Pressure inside cylinder ≈ atmospheric. Very small work input needed (piston pulling down).
+
+Ideally an isobaric process.
+
+### Compression Stroke
+
+Piston moves from BDC to TDC. Both valves closed. The trapped mixture is compressed. Pressure and temperature rise sharply. This prepares mixture to burn faster and give higher efficiency.
+
+Ideally an isentropic compression process.
+
+### Power Stroke
+
+Aka. working stroke or expansion stroke. The piston moves from TDC to BDC.
+
+Spark plug ignites the compressed mixture at TDC. Rapid combustion causes sudden pressure rise at (almost) constant volume. High-pressure gas pushes piston downward, which is they work output.
+
+Ideally an isentropic expansion process. Heat addition is constant-volume.
+
+## Exhaust Stroke
+
+The piston moves from BDC to TDC. Exhaust valve opens. Burnt gases are forced out of the cylinder. Cylinder is cleared for the next cycle.
+
+Work is required to push out the gases, but it is small compared to power stroke.
+
+:::note
+
+Two stroke engine has only two strokes: compression and power. Intake and exhaust occur simultaneously through ports in the cylinder wall. More power strokes per revolution, but less efficient and more pollution.
+
+:::
+
+### Thermal Efficiency
+
+Depends only on compression ratio $r$ and specific heat ratio $\gamma$.
+
+For cold-air assumption:
+
+```math
+\eta_{otto} = 1 - \frac{1}{r^{k-1}}
+```
+
+### Knocking
+
+Autoignition means fuel-air mixture ignites spontaneously due to high temperature and pressure, without spark plug. And it causes knocking (pinging) sound.
+
+High $r$ increases $T_2$, which causes autoignition. Octane rating indicates resistance to knock. Engine knock can be reduced by using fuels with higher octane ratings, retarding ignition timing, or using exhaust gas recirculation (EGR) to lower combustion temperatures.

@@ -1,0 +1,94 @@
+---
+title: HDD Scheduling
+sidebar:
+  order: 30
+slug: s3/operating-systems/hdd-scheduling
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.709Z
+lastUpdatedOn: 2026-04-22T07:15:36.802Z
+---
+
+When HDDs are used, disk scheduling is done by OS to minimize seek time and maximize thoroughput. Disk scheduling must be done by OS because only the OS knows about all pending I/O requests.
+
+An I/O request includes:
+
+- Mode: Either input or output
+- Disk address
+- Memory address
+- Number of sectors to transfer
+
+OS maintains a queue of I/O requests per disk/device.
+
+In earlier systems, OS scheduled I/O requests according to the physical geometry of the disk. However, modern systems offload the scheduling to the device controller. OS collects a few I/O requests and send them in a batch to the device controller. It shedules the requests and responds accordingly. SATA allows 32 outstanding commands, and NVMs allow more than 1000 outstanding commands.
+
+### Disk Bandwidth
+
+Number of bits transferred in a unit amount of time.
+
+```math
+\text{Bandwidth} = \frac{\text{# of bits}}{Total time}
+```
+
+## Algorithms
+
+Many different algorithms are available for HDD scheduling. Modern operating systems use a mix of these, sometimes withdeadlines or priorities.
+
+### FCFS
+
+Short for first come first served. Disk requests are serviced in the order they arrive.
+
+Simple and fair. Inefficient if requests are far apart. Long average seek time.
+
+### SSTF
+
+short for shortest seek time first. Closest request to the current head position is serviced next. Most common one.
+
+Most performant. Minimal average seek time. Starvation might be caused for distant requests.
+
+### SCAN
+
+Aka. elevator algorithm. Sweeps both directions in turn. Move the head in one direction, servicing all requests along the way; then reverse direction.
+
+Uniform wait time. Reduces variance. Either ends may wait longer.
+
+### C-SCAN
+
+Circular SCAN. Head moves in one direction only; when it reaches the end, it jumps back to the start.
+
+More uniform wait time and fairer compared to SCAN. Slight overhead for jumping to start.
+
+## Choosing an algorithm
+
+SCAN and C-SCAN perform better for systems that place a heavy load on the disk
+
+### Deadline Scheduler
+
+Implements 4 queues: 2 for read and 2 for write. Gives read priority because read operation is most likely to block program exeuction; write operation can be buffered. Combines FCFS and a version of C-SCAN.
+
+- 2 queues (1 for read and 1 for write) are sorted by LBA. C-SCAN is used for these 2.
+- 2 queues (1 for read and 1 for write) are sorted by arrival time. Used to detect old requests.
+- Scheduler selects a batch of I/O requests from LBA-sorted queues to be serviced.
+- Then FCFS queues are checked for old requests (based on configured time limit).
+- If any, those old requests are serviced next. This is done to ensure fairness.
+
+Avoids starvation.
+
+Implemented in Linux. In RHEL 7 also NOOP and completely fair queueing scheduler (CFQ) also
+available, defaults vary by storage device
+
+### NOOP
+
+An extension of FCFS. Basic optimizations are included. One of the optimizations is merging adjacent LBAs for efficiency.
+
+Implemented in Linux. 
+
+### CFQ
+
+Short for Completely Fair Queueing. Each process has its own I/O queue. These queues are serviced in round-robin, giving each a small _time slice_. Within each queue, requests are sorted by LBA for efficiency. Reads get higher priority than writes.
+
+Prevents any single process from monopolizing the disk. Balances fairness and performance well for HDDs.
+
+Best for:
+- Desktop and multitasking systems using HDDs
+- Environments where many apps access the disk concurrently.

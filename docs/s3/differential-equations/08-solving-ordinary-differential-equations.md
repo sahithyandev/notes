@@ -1,0 +1,38 @@
+---
+title: Solving Ordinary Differential Equations
+sidebar:
+  order: 8
+  label: Solving ODEs
+slug: s3/differential-equations/solving-ordinary-differential-equations
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.701Z
+lastUpdatedOn: 2026-04-22T07:15:36.797Z
+---
+
+ODEs Can be solved algebraically by using Laplace transform.
+
+### Steps
+
+1. Laplace transform each term using derivative rules.
+2. Substitute initial conditions directly.
+3. Solve algebraic equation in $s$-domain.
+4. Apply inverse Laplace transform.
+
+The above steps can be applied for a system of ODEs as well.
+
+## Real-World Applications
+
+### LCR Circuits
+
+Differential equation:
+
+```math
+L \frac{di}{dt} + Ri(t) + \frac{1}{C}\int_0^t i(x)dx = v(t)
+```
+
+Laplace converts it into an algebraic relation involving ( I(s) ) and ( V(s) ).
+
+### LTI Systems
+
+Impulse response $h(t)$, transfer function $H(s) = L{h(t)}$.

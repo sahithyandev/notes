@@ -1,0 +1,30 @@
+---
+title: Information Representation
+sidebar:
+  order: 3
+slug: s3/data-communication-and-networking/information-representation
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.690Z
+lastUpdatedOn: 2026-04-22T07:15:36.792Z
+---
+
+### Bit
+
+Smallest unit of information a computer can store. 1 or 0.
+
+### Code
+
+Association of sequence of bits with information.
+
+To make sure everyone interprets the code in the same way, standards such as ISO, IEEE are created. Different standards are defined for different data types.
+
+## Common standards
+
+### ASCII
+
+Uses 7 bits for a code. Unique combination for per English character. Includes both printable and unprintable characters.
+
+### Unicode
+
+Uses 32 bits for a code. Designed as the superset of ASCII.

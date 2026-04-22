@@ -1,0 +1,112 @@
+---
+title: Storage File Structure
+sidebar:
+  order: 14
+slug: s3/database-systems/basics/storage-file-structure
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.696Z
+lastUpdatedOn: 2026-04-22T07:15:36.795Z
+---
+
+Explains how data is stored and managed at the physical level in a DBMS. It introduces the types of storage media, performance measures, disk organization, and techniques for efficient data access.
+
+Revise [Mass Storage Systems - Operating Systems](/operating-systems/mass-storage-systems/) for the basics and classification of storage systems. Also [RAID](/operating-systems/raid) is covered in the lectures. They are not repeated here for the sake of brevity.
+
+## Storage Hierarchy
+
+Data is stored in a hierarchy of storage types with varying speed, cost, and volatility.
+
+## Disk Block Access Optimization
+
+Sequential blocks can be read/written faster than random blocks. Data must be organized to minimize seek and rotation delays. Fragmentation causes scattered blocks, increasing access time. Some systems periodically defragment files.
+
+### Non-Volatile Write Buffers
+
+Non-volatile RAM is a battery-backed RAM or flash. Acts as safe temporary storage. Speeds up writes and allows reordering to reduce arm movement.
+
+### Log disk
+
+Dedicated disk for sequential log writes of block updates. Write time is predictable as arm movement is minimal.
+
+## Record Organiziation
+
+Records can be stored in 2 ways:
+- 1 file per relation
+  - Heap   
+    Records can be placed anywhere in the file where there is space.
+  - Sequential   
+    Store records in sequential order, based on the value of the search key of each record. Pointer chains used to efficiently implement insertion and deletion.
+  - Hashing   
+    Hashed value of some attribute specifies in which block of the file the record should be placed
+- 1 file for multiple relations
+  - Multitable clustering file organization   
+    Records of the same relation can be linked using pointer chains. Good for cross join queries.
+
+### Fixed-Length Records
+
+Suppose records of fixed size ($n$) are stored in a file. Then record $i$ can be stored from $n(i-1)$.
+
+#### Insertion
+
+When a new record is inserted:
+
+- Append it to the end of the file.
+- Shift subsequent records down by one slot to make space; Expensive operation.
+- Find a deleted record slot and reuse it.
+
+#### Deletion
+
+When a record is deleted:
+
+- Move all subsequent records up by one slot; Physically removes the record.
+- Moves the last record into the deleted record's slot; Reduces movement but changes record order.
+- Mark it as deleted; Add the record slot to a free list for reuse.
+
+### Variable-Length Records
+
+Variable-length records are more common in DBMSs due to variable length fields and multiple record types in a single file.
+
+Attributes are stored in order. Variable length attributes are represented using an offset and length. The actual values would be placed after all fixed-length attributes. Null values are represented by null-value bitmap.
+
+#### Slotted Page Structure
+
+A way to organize variable-length records inside a single disk block. Allows database efficiently insert, delete, and move records without breaking references.
+
+Each page has two main parts:
+
+- Header — contains:
+  - Number of records.
+  - Pointer to end of free space.
+  - Table of _slots_ — each slot stores the _offset and length_ of a record.
+
+- Data area — where actual records are stored, packed from the end of the page backward.
+
+New records are added at the end of free space; a new slot entry is created in the header.
+When a record is deleted, its slot is marked empty; space may be reused later.
+If a record moves (e.g., due to compaction), only the slot’s pointer changes, not any external references. so record IDs remain valid.
+
+## Buffer
+Portion of main memory available to store copies of disk blocks.
+
+### Buffer Manager
+
+Subsystem responsible for allocating buffer space in main memory.
+
+Programs call on the buffer manager when they need a block
+from disk. If the block is already in the buffer, buffer manager returns its address in main memory. If not, buffer manager:
+- Allocates space in the buffer for the block.   
+  If space is not available, another block is written to disk and evicted.
+- Reads the block from the disk to the buffer, and returns the address of the block in main memory to requester.
+
+### Buffer Replacement Policies
+
+Most operating systems replace the block using Least Recently Used (LRU) strategy. But in RDBMSs, LRU other strategies are also used:
+- Pinned block – memory block that is not allowed to be written
+back to disk.
+- Toss-immediate strategy – frees the space occupied by a block
+as soon as the final tuple of that block has been processed
+- Most recently used (MRU) strategy – system must pin the
+block currently being processed. After the final tuple of that block
+has been processed, the block is unpinned, and it becomes the
+most recently used block.

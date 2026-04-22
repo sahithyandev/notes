@@ -1,0 +1,73 @@
+---
+title: Heat Engine
+sidebar:
+  order: 8
+slug: s3/engineering-thermodynamics/heat-engine
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.703Z
+lastUpdatedOn: 2026-04-22T07:15:36.798Z
+---
+
+A device that takes heat from a high-temperature source, converts part of that heat into useful work, and rejects the remaining heat to a low-temperature sink.
+
+### Carnot Heat Engine
+
+Aka. reversible heat engine. All processes are reversible.
+
+All carnot engines working with the same two thermal reservoirs have the same efficiency.
+
+```math
+\frac{Q_H}{Q_L} = \frac{T_H}{T_L}
+```
+
+Here:
+- $T_H$ - temperature of hot reservoir in Kelvin
+- $T_L$ - temperature of cold reservoir in Kelvin
+- $Q_H$ - heat taken from hot reservoir
+- $Q_L$ - heat rejected to cold reservoir
+
+
+### Internal Combustion Heat Engine
+
+Combustion inside cylinder (SI, CI engines).
+
+### External combustion
+
+Heat supplied externally (Brayton closed cycle).
+
+## Carnot Principle
+
+The efficiency of a reversible heat engine operating between two thermal reservoirs is always greater than the
+the efficiency of an irreversible heat engine operating between the same reservoirs.
+
+## Reverse Heat Engine
+
+Heat Pumps and refrigerators. Transfers heat from a cooler body to a hotter body, with the aid of work input. Reversed heat machines. Air conditioners work similarly to refrigerators.
+
+Technically not heat engines. Opposite operation of heat engines.
+
+| Machine      | Objective                                                               |
+| ------------ | ----------------------------------------------------------------------- |
+| Heat Pump    | Heat up an environment by pumping heat into the concerned environment.  |
+| Refrigerator | Cool an environment by pumping heat out from the concerned environment. |
+
+### Coefficient of Performance
+
+Alternative to thermal efficiency. Used in analysis of heat pumps and refrigerators. Always greater than or equal to 1.
+
+```math
+\begin{equation}
+\nonumber
+\begin{split}
+\text{COP}_\text{heat pump} & = \frac{Q_{\text{H}}}{W_\text{in}} = \frac{1}{1 - \frac{Q_L}{Q_H}} \\
+\text{COP}_\text{ref} & = \frac{Q_{\text{L}}}{W_\text{in}} = \frac{1}{\frac{Q_H}{Q_L} - 1}
+\end{split}
+\end{equation}
+```
+
+Relationship between the 2:
+
+```math
+\text{COP}_\text{heat pump} - \text{COP}_\text{ref} = 1
+```

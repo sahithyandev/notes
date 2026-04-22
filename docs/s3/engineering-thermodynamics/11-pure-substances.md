@@ -1,0 +1,165 @@
+---
+title: Pure Substances
+sidebar:
+  order: 11
+slug: s3/engineering-thermodynamics/pure-substances
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.704Z
+lastUpdatedOn: 2026-04-22T07:15:36.798Z
+---
+
+A substance is any form of matter that has a definite chemical composition and identifiable thermodynamic properties.
+
+### Definition
+
+A substance that has a fixed chemical composition throughout its mass. A mixture of 2 or more phases of a pure substance is also a pure substance. Homogenous mixture of 2 or more chemical substances is also a pure substance.
+
+## Phases
+
+There are 3 principle phases:
+
+- Solid
+- Liquid
+- Gas
+
+There can be multiple phases available within a principle phase.
+
+### Solid
+
+Molecules are arranged in 3-dimensional pattern; stay at fixed positions; cannot move relative to each another; oscillate continually. Molecular attraction is strong.
+
+### Liquid
+
+Molecules rotate and translate freely. Intermolecular forces are weaker relative to solids.
+
+### Gas
+
+Molecules move at random; have higher energy level compared to the other 2. Intermolecular distances are high. Intermolecular forces are very weak.
+
+## Phase Transition
+
+Happens due to changes in temperature and/or pressure. In a phase transition, temperature of the substance remains constant. Because the substance absorbs or releases energy as latent heat. The amount of energy required for a phase change depends on the substance and the specific process and its pressure.
+
+### Melting
+
+Aka. fusion. Transition from solid to liquid when heat is added at constant pressure.
+
+### Freezing
+
+Transition from liquid to solid when heat is removed.
+
+### Vaporization
+
+Aka. boiling or evaporation. Transition from liquid to gas when heat is added.
+
+### Condensation
+
+Transition from gas to liquid when heat is removed.
+
+### Sublimation
+
+Direct transition from solid to gas without passing through the liquid phase.
+
+### Deposition
+
+Direct transition from gas to solid.
+
+### Saturation Temperature
+
+At a given pressure, the temperature at which a pure substance changes phase. Denoted by $T_\text{sat}$. $ $
+
+### Saturation Pressure
+
+At a given temperature, the pressure at which a pure substance changes phase. Denoted by $P_\text{sat}$. $ $
+
+## Terminology
+
+### Subcooled Liquid
+
+Aka. compressed liquid. Only liquid present. Behaves almost incompressibly.
+
+Condition: $T < T_\text{sat}(P)$.
+
+### Saturated Liquid
+
+A liquid just ready to vaporize. Any heat addition initiates phase change.
+
+Condition: $T = T_\text{sat}(P)$.
+
+Specific enthalpy and specific entropy of saturated liquid are denoted by $h_f$ and $s_f$ respectively.
+
+### Liquid–Vapour Mixture
+
+Aka. boiling region. Liquid and vapour coexist in equilibrium. Occurs when heat is added at constant pressure and the temperature remains constant.
+
+Temperature stays at $T_\text{sat}(P)$ during phase change.
+
+#### Dryness Fraction
+
+Aka. quality factor. Defines vapour proportion:
+
+```math
+X = \frac{\text{mass of vapour}}{\text{total mass}} \quad \in (0, 1)
+```
+
+$X=0$ means it's saturated liquid. $X=1$ means it's saturated vapour.
+
+Specific enthalpy, or specific volume, or specific entropy of the mixture can be found using:
+
+```math
+h = h_f + X \, h_{fg}
+```
+
+### Saturated Vapour
+
+A vapour just ready to condense if heat is removed. No liquid remains; any cooling starts condensation.
+
+Condition: $T = T_\text{sat}(P)$ and $x = 1$.
+
+Specific enthalpy and specific entropy of saturated liquid are denoted by $h_g$ and $s_g$ respectively.
+
+### Superheated Vapour
+
+A vapour heated beyond the saturated vapour state. Temperature rises with heat addition (unlike in boiling region). No liquid present.
+
+Condition: $T > T_\text{sat}(P)$.
+
+At high superheat, behaves more like an ideal gas.
+
+### Supercritical Fluid
+
+No distinction between liquid and vapour phases.
+
+Condition: $T > T_c$ and $P > P_c$.
+
+## Property tables
+
+Thermodynamic properties are often represented in the form of tables called property tables. Because they are too complex to be expressed by simple equations.
+
+Includes values for specific volume, pressure, temperature, specific enthalpy and specific entropy.
+
+### Saturated Water Table
+
+Used when the substance is at the saturation condition. Include values for $T$, $P$, $v_f$, $v_g$, $h_f$, $h_g$, $h_{fg}$, $s_f$, $s_g$.
+
+- $h_f, s_f$ - properties of a saturated liquid
+- $h_g, s_g$ - properties of saturated vapor
+- $h_{fg}, s_{fg}$ - difference between the saturated vapor and saturated liquid value
+
+Liquid-vapour mixture properties can be found using quality factor $X$.
+
+### Superheated Vapour Table
+
+Used when vapour temperature is above the saturation temperature at given pressure. Organised by pressure, then by temperature. Includes $v$, $h$, $s$.
+
+### Subcooled Liquid Table
+
+Used when liquid temperature is below the saturation temperature at given pressure. Often sparse; liquid properties change slowly with pressure.
+
+Approximated by saturated liquid values at same temperature:
+  $h(T,P) \approx h_f(T)$.
+
+### Table for Refrigerants and Other Fluids
+
+Refrigerants and gases have similar formats. Saturated and superheated sections. Used in refrigeration and heat pump calculations.

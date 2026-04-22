@@ -1,0 +1,151 @@
+---
+title: Sampling Techniques
+sidebar:
+  order: 9
+slug: s3/applied-statistics/sampling-techniques
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.680Z
+lastUpdatedOn: 2026-04-22T07:15:36.785Z
+---
+
+Sampling is the process of selecting a subset of individuals or items from a population to make statistical inferences about the whole. It helps researchers study large populations efficiently without examining every individual.
+
+### Advantages
+
+- Feasibility – Studying an entire population is often impossible due to size or accessibility.
+- Economy – Sampling reduces cost by limiting the number of observations.
+- Speed – Results can be obtained faster than a census.
+- Accuracy – Quick collection helps maintain data relevance and reliability.
+- Conservation of Resources – Prevents exhausting data sources during measurement.
+
+### Disadvantages
+
+- If sampling is biased, or not representative, or too
+  small, the conclusion may not be valid and reliable.
+- In research, the respondents to a study must have a
+  common characteristics which is the basis of the
+  study.
+- If the population is very large and there are many
+  sections and subsections, the sampling procedure
+  becomes very complicated.
+- If the researcher does not possess the necessary skill
+  and technical knowhow in sampling procedure.
+
+### A Good Sample
+
+A good sample must ensure both:
+
+- accuracy: no bias
+- precision: sample represents the population
+
+## Population
+
+### Hetrogenous
+
+A population with diverse characteristics or attributes among its members.
+
+## Hidden
+
+For groups difficult to access:
+
+- Use mixed sampling methods (snowball + purposive).
+- Maintain confidentiality and anonymity.
+- Gain community trust before data collection.
+
+## Types
+
+## Probability Sampling Methods
+
+Every unit in the population has a known, non-zero chance of being selected.
+
+### Simple Random Sampling
+
+Equal chance for all elements. With or without replacement.
+
+### Systematic Sampling
+
+From a population of $N$ and a sample size of $n$, select an item randomly in the first $n$ items, and then every $k$th item after it.
+
+Here $k=\frac{N}{n}$ is the sampling interval.
+
+Simple to execute. Evenly spread samples.
+
+Can be biased if hidden periodicity exists.
+
+### Stratified Sampling
+
+Population is divided into _strata_ (groups) based on shared characteristics. Inside each stratum, simple random sampling is performed and the results are combined.
+
+Ensures representation of all groups. Provides greater accuracy when population is heterogeneous.
+
+### Cluster Sampling
+
+Population divided into _clusters_. Each represnets a mini-population. Randomly select some clusters, and include all members within selected clusters.
+
+Cost-effective for large geographic areas.
+
+Less precise; may require larger sample to maintain accuracy.
+
+## Non-Probability Sampling Methods
+
+Units are chosen based on subjective judgment, convenience, or accessibility.
+
+### Quota Sampling
+
+Population divided into categories. Fixed number of elements of each category is surveyed.
+
+May introduce bias.
+
+### Judgement Sampling
+
+Aka. Purposive Sampling. Researcher selects sample based on knowledge or purpose. Used when expert choice is justified.
+
+### Convenience Sampling
+
+Sample selected from easily available respondents. Quick but highly biased.
+
+### Snowball Sampling
+
+Existing study subjects recruit future subjects from among their acquaintances. Useful for hidden populations.
+
+### Self-Selection Sampling
+
+Individuals voluntarily participate. Not diverse. Biased.
+
+## Advanced / Repeated Sampling Designs
+
+### Theoretical Sampling
+
+Drawn to test specific hypotheses or theoretical ideas. Common in grounded theory research.
+
+### Repeat Sampling
+
+Entire sampling process repeated at intervals (e.g., periodic surveys). Different samples at each iteration. Allows observation of changes over time but requires large samples.
+
+### Panel Surveys
+
+Aka. Cohort Surveys. Same group studied repeatedly over long periods (_longitudinal studies_). Issues: fatigue, attrition, and order effects.
+
+### Rotating Survey
+
+Sample is split into rotation groups. In each iteration, one rotation group is replaced with another. Mix of repeat and panel survey.
+
+## Sampling Design Process
+
+Below components must be defined before sampling:
+
+- Target Population
+- Parameter of Interest
+- Sampling Frame: list or source of all population elements.
+- Sampling Method
+- Sample Size
+
+## Nonresponse Issues
+
+Nonresponse occurs when selected subjects do not provide data.
+
+Can be caused by:
+- Refusal to respond
+- Ineligibility
+- Inability to locate respondent or contact

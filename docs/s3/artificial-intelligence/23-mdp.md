@@ -1,0 +1,454 @@
+---
+title: Markov Decision Process
+sidebar:
+  order: 23
+slug: s3/artificial-intelligence/mdp
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.686Z
+lastUpdatedOn: 2026-04-22T07:15:36.789Z
+---
+
+Aka. MDP. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
+
+Here:
+
+- $S$ is the set of states
+- $A$ is the set of actions
+- $T: S \times A \times S \rightarrow \mathbb{R}_{\ge 0}$ is the [transition function](#transition-function)
+- $R: S \times A \rightarrow \mathbb{R}_{\ge 0}$ is the [reward function](#reward-function)
+
+The objective is to maximize the sum of future rewards. A policy will be calculated to determine how to act.
+
+_Markov_ means the future states depends only on the current state and action; not on the history of states.
+
+### Stochastic Domain
+
+An environment in which outcomes are governed by probabilistic rules rather than being fully deterministic.
+
+The result of an agent's action is not always predictable; instead, each action can lead to multiple possible outcomes, each with a certain probability. This uncertainty requires agents to reason about the likelihood of different future states and to make decisions that account for risk and variability.
+
+Stochastic domains are commonly modeled using frameworks like MDPs.
+
+## Transition function
+
+Describes the probability of moving from one state to another given an action. Denoted using $T(s,a,s')$. The probability is denoted as $P(s'|s,a)$. Here:
+
+- $s$: current state
+- $a$: action taken
+- $s'$: next state
+
+## Reward function
+
+Assigns a numerical value to each state-action pair, indicating the immediate reward received by the agent when transitioning from a state $s$ to a state $s'$ by taking action $a$. Denoted using $R(s,a,s')$. Here:
+
+- $s$: current state
+- $a$: action taken
+- $s'$: next state
+
+## Policy
+
+A function that maps states to actions. Denoted by $\pi(s): S \to A$. Determines the best action to be taken in a given state.
+
+### Optimal Policy
+
+A policy that maximizes the expected sum of future rewards. Denoted using $\pi^*(s)$.
+
+### Explicit Policy
+
+A policy that exhaustively defines the action for all the states. Results in a reflex agent.
+
+### Policy Evaluation
+
+The process of computing the state-value function $V_\pi$ for a given policy $\pi$.
+
+```math
+V_\pi (s) = \sum_{s'} T\left(s,\pi(s),s'\right) \Big[ R\left(s,\pi(s),s'\right) + \gamma V_\pi(s') \Big]
+```
+
+### Discounting rewards
+
+It's reasonable to prefer rewards sooner. A solution for incorporating discounting rewards is to use a discount factor $\gamma \in (0,1]$ that reduces the importance of future rewards. The discounted reward is denoted as:
+
+```math
+G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+```
+
+Here:
+
+- $t$ is the current time step
+- $R_{t+k+1}$ is the reward received at time step $t+k+1$
+
+## Solving MDPs
+
+### Bellman Optimality Equation
+
+States that the optimal value of a state equals the maximum expected return obtainable by choosing the best action now and then behaving optimally thereafter. Recursively defined.
+
+```math
+\begin{equation}
+\nonumber
+\begin{split}
+Q^*(s,a) & = \sum_{s'} T(s, a, s') \Big[ R(s,a,s') + \gamma V^*(s') \Big] \\
+V^*(s) \quad & =  \max_a Q^*(s,a)
+\end{split}
+\end{equation}
+```
+
+Here:
+
+- $V^*(s)$ is the optimal value of $s$.
+- $Q^*(s,a)$ is the optimal action-value of $a$ at $s$.  
+  Represents the maximum reward for taking an action $a$ in state $s$.
+
+## Algorithms
+
+### Expectimax
+
+A decision-making algorithm that extends [minimax](https://en.wikipedia.org/wiki/Minimax) to environments with randomness.
+
+#### Max Node: Player’s Turn
+
+Represents the decision point where the agent chooses the action that maximizes expected utility. Agent assumes that the opponent will act optimally and that chance outcomes will occur according to their probabilities.
+
+#### Min Node: Opponent’s Turn
+
+Represents the decision point where the opponent chooses an action that minimizes the agent’s expected utility. The algorithm assumes rational adversarial play.
+
+#### Chance Node: Random Event
+
+Represents uncertainty such as dice rolls or card draws. The value of a chance node is the expected value over all possible outcomes:
+
+```math
+V = \sum_i P(i) \times V_i
+```
+
+Here:
+
+- $P(i)$ - probability of outcome $i$
+- $V_i$ - value resulting from that outcome
+
+#### Computation Process
+
+- Start from the terminal nodes (end states) and assign them utility values.
+- Move upward through the tree:
+  - At max nodes, take the maximum of child values.
+  - At min nodes, take the minimum.
+  - At chance nodes, take the weighted average (expected value).
+- The root’s value represents the expected outcome of optimal play with chance considered.
+
+### Value Iteration
+
+A fixed point method. Computes the optimal state-value function $V*$ by iteratively applying the [Bellman Optimality Equation](#bellman-optimality-equation) until convergence.
+
+Initial states:
+
+```math
+\begin{aligned}
+V_0(s) &= 0, &\forall s \in S,\\
+Q_0(s,a) &= 0, &\forall s \in S,\; a \in A.
+\end{aligned}
+```
+
+For all $s \in S$, the below updates are performed, until maximum change across states is below a small threshold $\theta$:
+
+```math
+\begin{equation}
+\nonumber
+\begin{split}
+Q_{k+1}(s,a) & = \sum_{s'} T(s, a, s') \Big[ R(s,a,s') + \gamma V_k(s') \Big] \\
+V_{k+1}(s) \quad & = \max_a Q_{k+1}(s)
+\end{split}
+\end{equation}
+```
+
+Here:
+
+- $\gamma$: [discount factor](#discount-factor)
+- $\theta$: small threshold for stopping
+
+Once the threshold is reached, the algorithm terminates. $\pi^*(s)$ can be found by the latest iteration's results.
+
+```math
+\pi^*(s) = \arg\max_a Q^*(s,a)
+```
+
+Requirements for convergence:
+
+- No zero cost loops
+- Goal state must be reachable from any state with probability 1.
+
+Analysis:
+
+- Time complexity: $O(S^2A)$ per iteration.
+- Space complexity: $O(S)$.
+
+```python
+from typing import Dict, List, Tuple, Any
+
+def value_iteration(states: List[Any],
+                    actions: Dict[Any, List[Any]],
+                    P: Dict[Any, Dict[Any, List[Tuple[float, Any, float]]]],
+                    gamma: float = 0.99,
+                    theta: float = 1e-6):
+    """
+    Perform value iteration.
+
+    Args:
+        states: list of states
+        actions: dict mapping state -> list of possible actions in that state
+        P: transition model:
+           P[s][a] = list of (prob, next_state, reward) tuples
+        gamma: discount factor
+        theta: threshold for convergence
+
+    Returns:
+        V: dict mapping state -> value
+        policy: dict mapping state -> best action (one of actions[state])
+    """
+    V = {s: 0.0 for s in states}
+
+    while True:
+        delta = 0.0
+        for s in states:
+            v_old = V[s]
+            best_value = float('-inf')
+            # If no actions available, value remains 0 (or could be terminal)
+            if not actions.get(s):
+                best_value = 0.0
+            else:
+                for a in actions[s]:
+                    q = 0.0
+                    for prob, s_next, r in P[s][a]:
+                        q += prob * (r + gamma * V[s_next])
+                    if q > best_value:
+                        best_value = q
+            V[s] = best_value
+            delta = max(delta, abs(v_old - V[s]))
+        if delta < theta:
+            break
+
+    # Extract greedy policy
+    policy = {}
+    for s in states:
+        if not actions.get(s):
+            policy[s] = None
+            continue
+        best_a = None
+        best_q = float('-inf')
+        for a in actions[s]:
+            q = 0.0
+            for prob, s_next, r in P[s][a]:
+                q += prob * (r + gamma * V[s_next])
+            if q > best_q:
+                best_q = q
+                best_a = a
+        policy[s] = best_a
+
+    return V, policy
+
+states = ["s0", "s1"]
+actions = {
+    "s0": ["stay", "go"],
+    "s1": ["stay"]
+}
+# P[state][action] = list of (probability, next_state, reward)
+P = {
+    "s0": {
+        "stay": [(1.0, "s0", 0.0)],
+        "go":   [(1.0, "s1", 1.0)]
+    },
+    "s1": {
+        "stay": [(1.0, "s1", 0.0)]
+    }
+}
+
+V, policy = value_iteration(states, actions, P, gamma=0.9, theta=1e-6)
+print("Value function:", V)
+print("Policy:", policy)
+```
+
+### Q-Value Iteration
+
+Similar to value iteration. Calculates q-values instead of state-values. Approximately equivalent in computation with value iteration.
+
+Initially $Q_0(s,a) = 0, \forall s \in S,\; a \in A$.
+
+```math
+Q_{k+1}(s,a) = \sum_{s'} T(s,a,s') \Big[ R(s,a,s') + \gamma \max_{a'} Q_k(s',a') \Big]
+```
+
+Here:
+- $Q_k(s,a)$: estimate at iteration $k$,
+- $T(s,a,s')$: transition probability,
+- $R(s,a,s')$: immediate reward,
+- $\gamma$: discount factor.
+
+### Policy Iteration
+
+:::tip
+
+Not covered in the lectures, but is included here for completeness.
+
+:::
+
+Alternates between two steps until convergence:
+
+- Policy evaluation: given a (fixed) policy π, compute its state-value function V^π (exactly or approximately).
+- Policy improvement: produce a new greedy policy π' by acting greedily with respect to V^π.
+
+For a deterministic policy $\pi$, the Bellman equation for $V^\pi$ is:
+
+```math
+V^\pi(s) = sum\_{s'} T(s,\pi(s),s*) [ R(s,\pi(s),s') + \gamma V^\pi(s') ]
+```
+
+Policy iteration typically converges in a finite number of policy improvements for finite MDPs to an optimal policy π\*.
+
+```python
+from typing import Dict, List, Tuple, Any, Optional
+import copy
+
+def policy_evaluation(states: List[Any],
+                      actions: Dict[Any, List[Any]],
+                      P: Dict[Any, Dict[Any, List[Tuple[float, Any, float]]]],
+                      policy: Dict[Any, Optional[Any]],
+                      gamma: float = 0.99,
+                      theta: float
+ = 1e-6,
+                      max_iterations: int = 1000) -> Dict[Any, float]:
+    """
+    Evaluate a given policy by iterative policy evaluation (synchronous updates).
+
+    Args:
+        states: list of states
+        actions: dict mapping state -> list of possible actions
+        P: transition model P[s][a] = list of (prob, next_state, reward)
+        policy: dict mapping state -> action (or None for terminal / no-op)
+        gamma: discount factor
+        theta: threshold for stopping
+        max_iterations: max number of sweeps
+
+    Returns:
+        V: dict mapping state -> value under the policy
+    """
+    V = {s: 0.0 for s in states}
+    for i in range(max_iterations):
+        delta = 0.0
+        V_new = V.copy()
+        for s in states:
+            a = policy.get(s)
+            # If policy prescribes no action (terminal), value is 0 (or unchanged)
+            if a is None or not actions.get(s):
+                v = 0.0
+            else:
+                v = 0.0
+                for prob, s_next, r in P[s][a]:
+                    v += prob * (r + gamma * V[s_next])
+            V_new[s] = v
+            delta = max(delta, abs(V[s] - V_new[s]))
+        V = V_new
+        if delta < theta:
+            break
+    return V
+
+def policy_improvement(states: List[Any],
+                       actions: Dict[Any, List[Any]],
+                       P: Dict[Any, Dict[Any, List[Tuple[float, Any, float]]]],
+                       V: Dict[Any, float],
+                       gamma: float = 0.99) -> Dict[Any, Optional[Any]]:
+    """
+    Given a value function V, return a greedy policy.
+
+    Args:
+        states, actions, P: MDP specification (same as above)
+        V: dict mapping state -> value estimate
+        gamma: discount factor
+
+    Returns:
+        policy: dict mapping state -> best action (or None)
+    """
+    policy = {}
+    for s in states:
+        if not actions.get(s):
+            policy[s] = None
+            continue
+        best_a = None
+        best_q = float('-inf')
+        for a in actions[s]:
+            q = 0.0
+            for prob, s_next, r in P[s][a]:
+                q += prob * (r + gamma * V[s_next])
+            if q > best_q:
+                best_q = q
+                best_a = a
+        policy[s] = best_a
+    return policy
+
+def policy_iteration(states: List[Any],
+                     actions: Dict[Any, List[Any]],
+                     P: Dict[Any, Dict[Any, List[Tuple[float, Any, float]]]],
+                     gamma: float = 0.99,
+                     theta: float = 1e-6,
+                     max_eval_iterations: int = 1000,
+                     max_policy_iters: int = 1000) -> Tuple[Dict[Any, float], Dict[Any, Optional[Any]]]:
+    """
+    Perform policy iteration.
+
+    Args:
+        states: list of states
+        actions: dict mapping state -> list of possible actions
+        P: transition model
+        gamma: discount factor
+        theta: threshold for policy evaluation stopping
+        max_eval_iterations: max sweeps for policy evaluation
+        max_policy_iters: max number of policy improvement iterations
+
+    Returns:
+        V: dict mapping state -> value (for final policy)
+        policy: dict mapping state -> action
+    """
+    # Initialize a random (or arbitrary) policy: pick first available action
+    policy = {}
+    for s in states:
+        if not actions.get(s):
+            policy[s] = None
+        else:
+            policy[s] = actions[s][0]
+
+    for i in range(max_policy_iters):
+        # Policy evaluation (compute V^pi)
+        V = policy_evaluation(states, actions, P, policy, gamma, theta, max_eval_iterations)
+
+        # Policy improvement (greedy w.r.t. V)
+        new_policy = policy_improvement(states, actions, P, V, gamma)
+
+        # Check for convergence (policy stable)
+        if new_policy == policy:
+            break
+        policy = new_policy
+
+    # Final evaluation to return V consistent with final policy
+    V = policy_evaluation(states, actions, P, policy, gamma, theta, max_eval_iterations)
+    return V, policy
+
+# Example usage: a tiny MDP (same setup as in value iteration section)
+states = ["s0", "s1"]
+actions = {
+    "s0": ["stay", "go"],
+    "s1": ["stay"]
+}
+P = {
+    "s0": {
+        "stay": [(1.0, "s0", 0.0)],
+        "go":   [(1.0, "s1", 1.0)]
+    },
+    "s1": {
+        "stay": [(1.0, "s1", 0.0)]
+    }
+}
+
+V, policy = policy_iteration(states, actions, P, gamma=0.9, theta=1e-6)
+print("Value function:", V)
+print("Policy:", policy)
+```

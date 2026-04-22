@@ -1,0 +1,124 @@
+---
+title: Banker's Algorithm
+sidebar:
+  order: 22
+slug: s3/operating-systems/bankers-algorithm
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.708Z
+lastUpdatedOn: 2026-04-22T07:15:36.801Z
+---
+
+An algorithm to avoid deadlocks when multiple-instance resources are allowed.
+
+Works only if maximum resource claims are known. Compute intensive. Rarely used in practice due to low resource utilzation.
+
+### Maximum claim
+
+Each process must declare the maximum number of resource type `j` it may ever need.
+
+## Data Structures
+
+Implemented using matrices and vectors.
+
+Let:
+
+- $P$ - number of processes
+- $R$ - number of resource types
+
+Uses the following data structures:
+
+- `Available[R]`  
+  Number of free instances per resource type.
+- `Max[P][R]`  
+  Maximum claim matrix. Each row corresponds to a process. Each column corresponds to a resource type.
+- `Allocation[P][M]`  
+  Current allocation matrix. Each row corresponds to a process. Each column corresponds to a resource type.
+- `Need[P][M]`  
+  Remaining resource need matrix. Difference between Max and Allocation.
+
+## Algorithm
+
+### Safety Algorithm
+
+Used to check whether the system is in a safe state.
+
+```py
+def is_safe(Available, Allocation, Max):
+    P = len(Allocation)
+    R = len(Available)
+
+    # Need = Max - Allocation
+    Need = [[Max[i][j] - Allocation[i][j] for j in range(R)]
+            for i in range(P)]
+
+    Work = Available[:]          # copy
+    Finish = [False] * P # whether all processes can finish their task
+
+
+    while True:
+        made_progress = False
+
+        for i in range(P):
+            if Finish[i]:
+                continue
+            # check Need[i] <= Work
+            is_enough_resources_available = all(Need[i][j] <= Work[j] for j in range(R))
+            if not is_enough_resources_available:
+                continue
+            # simulate current process to completition
+            Finish[i] = True
+            made_progress = True
+
+            for j in range(R):
+                # Upon completion the process releases all of its currently allocated resources.
+                Work[j] += Allocation[i][j]
+
+
+        if not made_progress:
+            break
+
+    return all(Finish)
+```
+
+### Resource Request Algorithm
+
+```py
+def request_resources(i, Request, Available, Allocation, Max):
+    P = len(Allocation)
+    R = len(Available)
+
+    # Compute Need
+    Need = [[Max[p][r] - Allocation[p][r] for r in range(R)]
+            for p in range(P)]
+
+    # 1. Check Request[i] ≤ Need[i]
+    if any(Request[r] > Need[i][r] for r in range(R)):
+        return False, "Error: exceeds declared maximum"
+
+    # 2. Check Request[i] ≤ Available
+    if any(Request[r] > Available[r] for r in range(R)):
+        return False, "Wait: not enough available resources"
+
+    # Save old state for rollback
+    old_Available = Available[:]
+    old_Allocation = [row[:] for row in Allocation]
+    old_Need = [row[:] for row in Need]
+
+    # 3. Pretend allocation
+    for r in range(R):
+        Available[r] -= Request[r]
+        Allocation[i][r] += Request[r]
+        Need[i][r] -= Request[r]
+
+    # 4. Safety check
+    if is_safe(Available, Allocation, Max):
+        return True, "Request granted"
+    else:
+        # Rollback
+        Available[:] = old_Available
+        for p in range(P):
+            Allocation[p] = old_Allocation[p][:]
+            Need[p] = old_Need[p][:]
+        return False, "Unsafe: request rolled back"
+```

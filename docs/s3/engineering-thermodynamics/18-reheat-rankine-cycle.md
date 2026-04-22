@@ -1,0 +1,69 @@
+---
+title: Reheat Rankine Cycle
+sidebar:
+  order: 18
+slug: s3/engineering-thermodynamics/reheat-rankine-cycle
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.704Z
+lastUpdatedOn: 2026-04-22T07:15:36.799Z
+---
+
+Reheating improves turbine durability and efficiency by reducing moisture content in later turbine stages.
+
+## Reheating
+
+The process of heating the steam output of one turbine, and feeding it to another. Steam is reheated at constant pressure.
+
+Allows multiple turbines. Increases thermal efficiency, turbine work output. Reduces wetness at turbine exit.
+
+Steps:
+- Steam generated in boiler and superheated.
+- Expanded through high-pressure turbine to an intermediate pressure.
+- Returned to boiler/reheater and superheated again.
+- Expanded through next turbine stages (IP/LP).
+- Condensed to saturated liquid.
+- Pumped back to boiler.
+
+## T–S Diagram Features
+
+The T–S diagram for reheat cycles shows repeated constant-pressure heating segments.
+
+If 2 turbines are installed:
+- First expansion from superheated region to intermediate pressure.
+- Reheat back to high temperature at constant pressure.
+- Second expansion down to condenser pressure.
+
+## Performance
+
+Efficiency is evaluated through turbine work, pump work, and heat addition in two stages.
+
+Suppose 2 turbines and 1 pump are in the setup.
+
+### Net Work
+
+Two turbines. One pump.
+
+```math
+w_\text{net} = (h_3 - h_4) + (h_5 - h_6) - w_\text{pump}
+```
+
+### Heat Input
+
+Two heating processes: boiler + reheat.
+
+```math
+q_\text{in} = (h_3 - h_2) + (h_5 - h_4)
+```
+
+### Mass Flow Rate
+
+For power output $P$:
+
+```math
+\dot{m} = \frac{P}{w_\text{net}}
+```
+
+### Summary
+
+Reheat increases numerator (work) more than denominator (heat input), raising efficiency.

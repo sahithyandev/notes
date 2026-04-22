@@ -1,0 +1,53 @@
+---
+title: Real-Time CPU Scheduling
+sidebar:
+  order: 25
+slug: s3/operating-systems/real-time-cpu-scheduling
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.709Z
+lastUpdatedOn: 2026-04-22T07:15:36.802Z
+---
+
+Systems that require results within deadlines. Focuses on deadlines, latency, and periodic tasks. Scheduler must support preemptive, priority-based scheduling.
+
+### Safety-Critical System
+
+A real-time system with catastrophic results in case of failure.
+
+### Periodic Real-Time Task
+
+Each task has:
+
+- Processing time $t$
+- Deadline $d$
+- Period $p$
+- Must satisfy:
+  $0 \le t \le d \le p$
+- Rate = $1/p$
+
+## Types
+
+### Hard Real-Time
+
+Where deadlines must never be missed. Single missed deadline implies system failure. Scheduler must have the ability to meet deadlines.
+
+### Soft Real-Time
+
+Where deadlines are important but not critical. Occasional misses are acceptable.
+
+## Algorithms
+
+### Rate Monotonic Scheduling
+
+Aka. RMS. Priority = inverse of period.
+
+Works only if CPU load is below schedulable limit. Can still miss deadlines.
+
+### Earliest Deadline First
+
+Aka. EDF. Earlier deadline means higher priority.
+
+### Proportional-Share Scheduling
+
+System has total $T$ shares. Each task gets $N$ shares. Each task is ensured to get $N/T$ fraction of CPU time.

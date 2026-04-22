@@ -1,0 +1,55 @@
+---
+title: 1st Law
+sidebar:
+  order: 5
+slug: s3/engineering-thermodynamics/1st-law
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.703Z
+lastUpdatedOn: 2026-04-22T07:15:36.798Z
+---
+
+Aka. Law of Conservation of Energy. States that energy can neither be created or destroyed; can only converted from one form to another.
+
+Originally observed for closed systems undergoing thermodynamic cycles by James Joule. And expressed as:
+
+> When a system (closed) undergoes a thermodynamic cycle, sum of the net heat supplied to the system from its surrounding and the net work input to the system from its surroundings must equal 0
+
+```math
+\sum Q_\text{supplied} + \sum W_\text{input} = 0
+```
+
+## Sign convention
+
+Any sign convention can be used in the analysis. It must be mentioned clearly in the context. The final answers must not use the sign; and explicitly mention the flow of direction.
+
+Here is the sign convention used in the lectures:
+For $Q$:
+- Positive - Heat input. Supplied to the system
+- Negative - Heat output. Rejected by the system
+
+For $W$:
+- Positive - Work output. Done by the system
+- Negative - Work input. Done on the system
+
+This convention is used in the equation: $\Delta Q - \Delta W = 0$.
+
+## Corollary 1
+
+There exists a property of a closed system that a change in that property is equal to the sum of the net heat transfer and the work transfer during a state change. And this property is called _the internal energy_.
+
+```math
+\Delta U = \Delta Q - \Delta W
+```
+
+Can be mathematically proven by contradiction using 1st law.
+
+## Corollary 2
+
+The internal energy of an isolated system remain unchanged.
+
+## Corollary 3
+
+Perpetual motion machines of the first kind are impossible.
+
+A perpetual motion of first kind is a machine that continuously produce work without any heat input while undergoing a thermodynamic cycle.
