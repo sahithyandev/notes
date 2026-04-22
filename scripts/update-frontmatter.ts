@@ -1,11 +1,15 @@
 import { writeFile } from "node:fs/promises";
-import matter from "gray-matter";
+import * as matter from "gray-matter";
 
 // updates the frontmatter of mdx files
 // and format with prettier
 (async () => {
 	const mdxFilePaths = process.argv.slice(2);
 	for (const filepath of mdxFilePaths) {
+		if (!filepath.endsWith('.md') && !filepath.endsWith('.mdx')) {
+			continue;
+		}
+		console.log("filePath", filepath);
 		const file = matter.read(filepath);
 		const { data: currentFrontMatter } = file;
 
