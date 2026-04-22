@@ -5,6 +5,8 @@ sidebar:
 slug: s1/fluid-mechanics/statics/stability-of-a-body
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.555Z
+lastUpdatedOn: 2026-04-22T07:07:47.479Z
 ---
 
 ## Fully submerged bodies

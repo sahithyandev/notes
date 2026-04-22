@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/sequential-logic/state-machines
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.587Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 Aka. finite state machines (FSMs). Used to model systems that move through a

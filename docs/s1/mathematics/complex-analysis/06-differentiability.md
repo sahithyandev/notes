@@ -5,6 +5,8 @@ sidebar:
   order: 6
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.557Z
+lastUpdatedOn: 2026-04-22T07:07:47.480Z
 ---
 
 A complex function $f$ is differentiable at $z_0$ **iff**:

@@ -5,6 +5,8 @@ sidebar:
   order: 3
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.556Z
+lastUpdatedOn: 2026-04-22T07:07:47.480Z
 ---
 
 Suppose $w=f(z)$ where $z,w \in \mathbb{C}$. Input and output points are marked

@@ -5,6 +5,8 @@ sidebar:
   order: 2
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.551Z
+lastUpdatedOn: 2026-04-22T07:07:47.477Z
 ---
 
 A device for opening a circuit by means of a conductor designed to melt when an

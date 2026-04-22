@@ -5,6 +5,8 @@ sidebar:
   order: 9
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.557Z
+lastUpdatedOn: 2026-04-22T07:07:47.480Z
 ---
 
 A complex function that is differentiable everywhere. Which implies that they

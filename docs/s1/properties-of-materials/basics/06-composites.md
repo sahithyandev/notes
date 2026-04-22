@@ -5,6 +5,8 @@ sidebar:
   order: 6
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.576Z
+lastUpdatedOn: 2026-04-22T07:07:47.490Z
 ---
 
 Materials that are a mixture of 2 different-typed materials. Materials are

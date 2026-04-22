@@ -5,6 +5,8 @@ sidebar:
   order: 20
 next: true
 prev: true
+dateCreated: 2026-04-22T07:07:02.564Z
+lastUpdatedOn: 2026-04-22T07:07:47.484Z
 ---
 
 Let $f$ is $n+1$ differentiable on $(a,b)$. Let $c,x \in (a,b)$. Then

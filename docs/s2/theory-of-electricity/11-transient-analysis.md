@@ -5,6 +5,8 @@ sidebar:
 slug: s2/theory-of-electricity/transient-analysis
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.603Z
+lastUpdatedOn: 2026-04-22T07:07:47.504Z
 ---
 
 In AC circuit theory, time and frequency domains are 2 fundamental ways by which signals can be represented and analyzed.

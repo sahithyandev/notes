@@ -5,6 +5,8 @@ sidebar:
   order: 9
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.552Z
+lastUpdatedOn: 2026-04-22T07:07:47.477Z
 ---
 
 Most domestic installations in Sri Lanka use single phase. For higher loads,

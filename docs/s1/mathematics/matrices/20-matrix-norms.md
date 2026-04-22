@@ -5,6 +5,8 @@ sidebar:
   order: 20
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.560Z
+lastUpdatedOn: 2026-04-22T07:07:47.482Z
 ---
 
 Let $A_{n\times n}$. A norm of $A$ is denoted by $||A||$.

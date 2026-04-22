@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/numerical-methods/numerical-integration
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.594Z
+lastUpdatedOn: 2026-04-22T07:07:47.500Z
 ---
 
 Based on the strategy of replacing a complicated

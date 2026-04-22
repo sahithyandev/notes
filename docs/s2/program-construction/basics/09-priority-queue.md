@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/priority-queue
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.599Z
+lastUpdatedOn: 2026-04-22T07:07:47.502Z
 ---
 
 A special type of queue where elements are processed based on their priority

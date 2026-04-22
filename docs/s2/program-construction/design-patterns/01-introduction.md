@@ -6,6 +6,8 @@ sidebar:
 slug: s2/program-construction/design-patterns/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.600Z
+lastUpdatedOn: 2026-04-22T07:07:47.503Z
 ---
 
 Design patterns are reusable solutions to common software design and development problems. They provide a template to common scenarios. 23 design patterns were introduced in the Design Patterns: Elements of Reusable Object-Oriented Software book.

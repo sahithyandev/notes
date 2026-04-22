@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/hash-table
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 A data structure that implements an associative array, a structure that can map

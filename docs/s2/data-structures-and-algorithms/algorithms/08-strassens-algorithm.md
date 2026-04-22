@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/strassens-algorithm
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.588Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 An efficient algorithm for matrix multiplication that reduces the time complexity compared to the standard matrix multiplication method. The algorithm works by dividing each matrix into smaller submatrices and recursively performing multiplications and additions.

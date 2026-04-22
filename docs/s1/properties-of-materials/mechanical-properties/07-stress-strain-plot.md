@@ -5,6 +5,8 @@ sidebar:
   order: 7
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.580Z
+lastUpdatedOn: 2026-04-22T07:07:47.492Z
 ---
 
 The below properties can be observed in a stress-strain plot.

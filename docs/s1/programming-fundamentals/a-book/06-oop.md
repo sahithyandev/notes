@@ -6,6 +6,8 @@ sidebar:
 slug: s1/programming-fundamentals/a-book/oop
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.572Z
+lastUpdatedOn: 2026-04-22T07:07:47.488Z
 ---
 
 Object-Oriented Programming (OOP) is a programming paradigm based on the concept

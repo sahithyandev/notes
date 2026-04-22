@@ -6,6 +6,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/basics/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.581Z
+lastUpdatedOn: 2026-04-22T07:07:47.493Z
 ---
 
 Recording of my CODD module kuppy session, covering from basics to combinational

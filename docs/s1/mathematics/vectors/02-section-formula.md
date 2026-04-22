@@ -5,6 +5,8 @@ sidebar:
   order: 2
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.568Z
+lastUpdatedOn: 2026-04-22T07:07:47.486Z
 ---
 
 Suppose $\text{R}$ divides the line segment $\text{PQ}$ in the ratio $m:n$ (both

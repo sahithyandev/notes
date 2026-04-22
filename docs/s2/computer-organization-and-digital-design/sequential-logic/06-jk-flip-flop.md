@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/sequential-logic/jk-flip-flop
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.586Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 Has 2 inputs: $J$ and $K$, and 1 output: $Q$. Extension of SR flip-flop.

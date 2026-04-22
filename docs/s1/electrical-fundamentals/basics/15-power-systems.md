@@ -5,6 +5,8 @@ sidebar:
   order: 15
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.550Z
+lastUpdatedOn: 2026-04-22T07:07:47.476Z
 ---
 
 An electric power system consists of 3 principle sections.

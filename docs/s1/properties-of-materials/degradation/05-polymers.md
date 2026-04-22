@@ -5,6 +5,8 @@ sidebar:
   order: 5
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.578Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 Change in the chemical and/or physical structure of the polymer chain.

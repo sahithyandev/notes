@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/combinational-logic/subtractors
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.583Z
+lastUpdatedOn: 2026-04-22T07:07:47.494Z
 ---
 
 A digital circuit that does the operation $A-B$. The operation can be done by

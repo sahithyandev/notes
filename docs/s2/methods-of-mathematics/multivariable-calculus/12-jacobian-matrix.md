@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/multivariable-calculus/jacobian-matrix
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.592Z
+lastUpdatedOn: 2026-04-22T07:07:47.498Z
 ---
 
 A generalization of the derivative for vector-valued functions.

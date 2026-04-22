@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/common/cpp-basics
 prev: false
 next: false
+dateCreated: 2026-04-22T07:07:02.589Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 ### Header files

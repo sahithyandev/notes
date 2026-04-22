@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/sequential-logic/d-latch
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.586Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 Aka. data or delay latch. Has 2 inputs: $D$ and $En$. Has 1 output: $Q$. An

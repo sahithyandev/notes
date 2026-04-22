@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/file-processing
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.600Z
+lastUpdatedOn: 2026-04-22T07:07:47.502Z
 ---
 
 In Java, reading from files and writing to files are handled using streams. Any

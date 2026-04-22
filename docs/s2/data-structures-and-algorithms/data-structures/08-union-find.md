@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/union-find
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.498Z
 ---
 
 Aka. Disjoint Set Union (DSU). Keeps track of a partition of a set into disjoint subsets.

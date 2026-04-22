@@ -5,6 +5,8 @@ sidebar:
   order: 10
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.571Z
+lastUpdatedOn: 2026-04-22T07:07:47.487Z
 ---
 
 In this method, the internal forces are found assuming the elongated truss is a

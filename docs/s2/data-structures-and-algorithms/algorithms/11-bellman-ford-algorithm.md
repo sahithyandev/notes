@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/bellman-ford-algorithm
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.588Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 A dynamic algorithm to find the shortest paths from a source node to all other node in a weighted graph. Can handle graphs with negative weight edges. Fails for graphs with negative weight cycle.

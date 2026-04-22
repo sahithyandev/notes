@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/numerical-methods/numerical-differentiation
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.594Z
+lastUpdatedOn: 2026-04-22T07:07:47.500Z
 ---
 
 Approximate numerical formulae can be derived using [Taylor series](https://s1.sahithyan.dev/mathematics/real-analysis/taylor-series/).

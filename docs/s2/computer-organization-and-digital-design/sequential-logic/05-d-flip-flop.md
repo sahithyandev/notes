@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/sequential-logic/d-flip-flop
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.586Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 Aka. data or delay flip-flop. Input is captured at rising edges of clock. Has 2

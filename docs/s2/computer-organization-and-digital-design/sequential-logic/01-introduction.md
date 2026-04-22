@@ -6,6 +6,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/sequential-logic/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.585Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 Output is determined by the current state and the input. The output is fed back

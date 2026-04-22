@@ -5,6 +5,8 @@ sidebar:
   order: 6
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.579Z
+lastUpdatedOn: 2026-04-22T07:07:47.492Z
 ---
 
 A class of polymers that conduct electricity. aka. intrinsically conducting

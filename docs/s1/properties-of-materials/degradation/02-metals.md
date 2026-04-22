@@ -5,6 +5,8 @@ sidebar:
 slug: s1/properties-of-materials/degradation/metals
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.578Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 ## Corrosion

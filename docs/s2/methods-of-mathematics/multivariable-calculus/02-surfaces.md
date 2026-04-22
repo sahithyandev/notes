@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/multivariable-calculus/surfaces
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.498Z
 ---
 
 Graph of the set of all points such that $(x,y,f(x,y)) \in \mathbb{R}^3$ where

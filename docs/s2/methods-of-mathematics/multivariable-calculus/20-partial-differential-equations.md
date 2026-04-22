@@ -6,6 +6,8 @@ slug: >-
   s2/methods-of-mathematics/multivariable-calculus/partial-differential-equations
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.593Z
+lastUpdatedOn: 2026-04-22T07:07:47.499Z
 ---
 
 Introduced in [Semester 1](https://s1.sahithyan.dev/mathematics/ode/introduction/#partial-differential-equations).

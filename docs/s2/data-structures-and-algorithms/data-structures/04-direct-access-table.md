@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/direct-access-table
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 Items are stored in an array and can be accessed directly using their indices. Access time complexity is $O(1)$. The index for an item is derived from the item itself. $ $

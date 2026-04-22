@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/numerical-methods/lagrange-interpolating-polynomials
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.594Z
+lastUpdatedOn: 2026-04-22T07:07:47.500Z
 ---
 
 A rearranged version of Newton's Divided Difference Interpolating Polynomial.

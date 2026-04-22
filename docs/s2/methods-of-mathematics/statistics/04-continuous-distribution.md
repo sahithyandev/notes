@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/statistics/continuous-distribution
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.597Z
+lastUpdatedOn: 2026-04-22T07:07:47.501Z
 ---
 
 A model used to describe data that can take any value within a range, often with decimal precision.

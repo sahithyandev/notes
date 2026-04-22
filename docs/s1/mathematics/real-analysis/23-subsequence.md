@@ -5,6 +5,8 @@ sidebar:
   order: 23
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.564Z
+lastUpdatedOn: 2026-04-22T07:07:47.484Z
 ---
 
 Suppose $u:\mathbb{Z}^+\rightarrow \mathbb{R}$ be a sequence and

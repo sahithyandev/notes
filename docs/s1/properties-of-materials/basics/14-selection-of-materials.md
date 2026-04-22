@@ -5,6 +5,8 @@ sidebar:
 slug: s1/properties-of-materials/basics/selection-of-materials
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.578Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 :::note

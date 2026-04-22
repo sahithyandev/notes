@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/spanning-tree
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.498Z
 ---
 
 A connected, acyclic subgraph that includes all the vertices of the original graph. Undefined for disconnected graphs.

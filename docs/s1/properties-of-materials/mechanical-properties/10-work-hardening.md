@@ -5,6 +5,8 @@ sidebar:
   order: 10
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.580Z
+lastUpdatedOn: 2026-04-22T07:07:47.492Z
 ---
 
 Strength and hardness of a metal increases as a result of plastic deformation.

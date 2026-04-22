@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/statistics/distributions
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.597Z
+lastUpdatedOn: 2026-04-22T07:07:47.501Z
 ---
 
 A distribution describes how the values of a random variable are spread out. It provides a mathematical function that gives the probability of a random variable taking on each possible value.

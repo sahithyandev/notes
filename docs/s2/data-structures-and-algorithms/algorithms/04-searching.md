@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/searching
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.587Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 Used to retrieve information stored within some data structure. Below is an explanation of common searching algorithms along with their time and space complexities.

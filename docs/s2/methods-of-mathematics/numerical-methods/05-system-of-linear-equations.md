@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/numerical-methods/system-of-linear-equations
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.593Z
+lastUpdatedOn: 2026-04-22T07:07:47.499Z
 ---
 
 A linear equation is an equation that may be put in the form:

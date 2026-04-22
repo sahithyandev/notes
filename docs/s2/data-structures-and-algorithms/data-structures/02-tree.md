@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/tree
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.589Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 A widely used abstract data type that simulates a hierarchical tree structure

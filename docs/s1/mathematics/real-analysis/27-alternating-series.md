@@ -5,6 +5,8 @@ sidebar:
   order: 27
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.564Z
+lastUpdatedOn: 2026-04-22T07:07:47.484Z
 ---
 
 Suppose $u_k>0$. An alternating series is:$ $

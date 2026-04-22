@@ -5,6 +5,8 @@ sidebar:
 slug: s2/theory-of-electricity/transformer
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.602Z
+lastUpdatedOn: 2026-04-22T07:07:47.503Z
 ---
 
 ![Transformer](./images/transformer.jpg)

@@ -5,6 +5,8 @@ sidebar:
   order: 5
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.569Z
+lastUpdatedOn: 2026-04-22T07:07:47.486Z
 ---
 
 Two non-parallel lines in 3D-space that do not intersect.

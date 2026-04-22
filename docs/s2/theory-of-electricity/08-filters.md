@@ -5,6 +5,8 @@ sidebar:
 slug: s2/theory-of-electricity/filters
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.602Z
+lastUpdatedOn: 2026-04-22T07:07:47.504Z
 ---
 
 In electronic circuits, filters are components or systems designed to attenuate (reduce) certain frequencies while allowing others to pass through. They process signals based on their frequency content, making them essential for applications like audio systems, radio communications, power supplies, and signal processing.

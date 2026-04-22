@@ -5,6 +5,8 @@ sidebar:
   order: 2
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.580Z
+lastUpdatedOn: 2026-04-22T07:07:47.493Z
 ---
 
 $\ce{C}$ atoms arranged to a hexagonal network. 2D crystal based. Has $3$ fold

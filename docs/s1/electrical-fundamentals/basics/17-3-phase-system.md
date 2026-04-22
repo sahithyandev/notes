@@ -5,6 +5,8 @@ sidebar:
   order: 17
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.550Z
+lastUpdatedOn: 2026-04-22T07:07:47.476Z
 ---
 
 The phases are denoted by $\text{R},\text{Y},\text{B}$ in that order. $ $

@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.592Z
+lastUpdatedOn: 2026-04-22T07:07:47.499Z
 ---
 
 Suppose $f$ is defined on $R = [a,b] \times [c,d]$ such that $\forall x \in [a,b]$, $\int_c^d f(x,y)\,\text{d}y$ exists.

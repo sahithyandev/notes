@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/statistics/estimators
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.598Z
+lastUpdatedOn: 2026-04-22T07:07:47.501Z
 ---
 
 Due to obvious reasons, it is not possible to find parameters of a population. In that case, a "good enough" value/range must be guessed/computed for the true values of the parameter to make conclusions (inferences) on the population based on

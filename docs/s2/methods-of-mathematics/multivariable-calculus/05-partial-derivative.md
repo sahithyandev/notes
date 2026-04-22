@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/multivariable-calculus/partial-derivative
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.591Z
+lastUpdatedOn: 2026-04-22T07:07:47.498Z
 ---
 
 Suppose $f: (x,y) \rightarrow \mathbb{R}$. $f_x$ is the partial derivative of

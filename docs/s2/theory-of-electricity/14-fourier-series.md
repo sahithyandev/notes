@@ -5,6 +5,8 @@ sidebar:
 slug: s2/theory-of-electricity/fourier-series
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.603Z
+lastUpdatedOn: 2026-04-22T07:07:47.504Z
 ---
 
 Used for periodic non-sinusoidal waveforms. Suppose the periodic time is $T$. The waveform can be represented as a sum of sine wave. The sine waves have integer multiple of the original frequency $f_0 = 2\pi / T$. $ $

@@ -5,6 +5,8 @@ sidebar:
   order: 4
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.554Z
+lastUpdatedOn: 2026-04-22T07:07:47.479Z
 ---
 
 Used to generate electricity.

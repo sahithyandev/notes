@@ -6,6 +6,8 @@ sidebar:
 slug: s1/properties-of-materials/electrical-properties/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.578Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 Electrical properties include the response of a material for an applied electric

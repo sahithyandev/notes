@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/dynamic-programming
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.589Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 Dynamic programming is a method for solving complex problems by breaking them down into simpler subproblems. It is particularly useful for optimization problems where the solution can be constructed from solutions to overlapping subproblems.

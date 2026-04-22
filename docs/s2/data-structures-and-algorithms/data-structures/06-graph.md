@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/data-structures/graph
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.590Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 Consists of a set of nodes and a set of edges that connect

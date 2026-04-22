@@ -5,6 +5,8 @@ sidebar:
   order: 13
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.550Z
+lastUpdatedOn: 2026-04-22T07:07:47.476Z
 ---
 
 - In a purely resistive AC circuit, the energy delivered by the source will be

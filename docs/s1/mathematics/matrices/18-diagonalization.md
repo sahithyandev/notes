@@ -5,6 +5,8 @@ sidebar:
   order: 18
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.560Z
+lastUpdatedOn: 2026-04-22T07:07:47.482Z
 ---
 
 ### Similar matrices

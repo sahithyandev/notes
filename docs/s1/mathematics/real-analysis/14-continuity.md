@@ -5,6 +5,8 @@ sidebar:
   order: 14
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.563Z
+lastUpdatedOn: 2026-04-22T07:07:47.483Z
 ---
 
 A function $f$ is continuous at $a$ **iff**:

@@ -6,6 +6,8 @@ slug: >-
   s2/computer-organization-and-digital-design/combinational-logic/logic-circuit-simplification
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.581Z
+lastUpdatedOn: 2026-04-22T07:07:47.494Z
 ---
 
 Digital logic circuits can be simplified using boolean algebra.

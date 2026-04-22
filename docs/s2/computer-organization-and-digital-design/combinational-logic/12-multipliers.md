@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/combinational-logic/multipliers
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.583Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 Used to perform multiplication of binary numbers. Essential in various

@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/multivariable-calculus/first-order-ode
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.592Z
+lastUpdatedOn: 2026-04-22T07:07:47.499Z
 ---
 
 [Solving first order ODE](https://s1.sahithyan.dev/mathematics/ode/first-order-ode/) was introduced in 1st semester. This section extends upon it.

@@ -5,6 +5,8 @@ sidebar:
   order: 3
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.553Z
+lastUpdatedOn: 2026-04-22T07:07:47.478Z
 ---
 
 In fluid dynamics, 4 laws are used to analyse the fluid flow.

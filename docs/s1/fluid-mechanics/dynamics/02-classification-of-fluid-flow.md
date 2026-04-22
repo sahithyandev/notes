@@ -5,6 +5,8 @@ sidebar:
 slug: s1/fluid-mechanics/dynamics/classification-of-fluid-flow
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.553Z
+lastUpdatedOn: 2026-04-22T07:07:47.478Z
 ---
 
 ## Density

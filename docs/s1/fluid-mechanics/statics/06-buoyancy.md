@@ -6,6 +6,8 @@ sidebar:
   order: 6
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.555Z
+lastUpdatedOn: 2026-04-22T07:07:47.479Z
 ---
 
 Thrust exerted on a submerged object in a liquid. Direction is vertically

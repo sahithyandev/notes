@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/streams
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.600Z
+lastUpdatedOn: 2026-04-22T07:07:47.502Z
 ---
 
 Stream means a continuous flow of data. Stream is an object that reads from

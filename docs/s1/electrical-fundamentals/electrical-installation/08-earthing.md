@@ -5,6 +5,8 @@ sidebar:
   order: 8
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.552Z
+lastUpdatedOn: 2026-04-22T07:07:47.477Z
 ---
 
 Earthing of equipment refers to the connection of non-current carrying parts of

@@ -5,6 +5,8 @@ sidebar:
   order: 12
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.577Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 There won't be a crystal with 100% of perfect arrangement. Defects are

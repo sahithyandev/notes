@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/probability/joint-distribution
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.596Z
+lastUpdatedOn: 2026-04-22T07:07:47.500Z
 ---
 
 Specifies the probability of observing a combination of values for two or more random variables. Characterizes the relationship between multiple random variables, including their dependencies and correlations.

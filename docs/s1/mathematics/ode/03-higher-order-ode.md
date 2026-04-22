@@ -6,6 +6,8 @@ sidebar:
 slug: s1/mathematics/ode/higher-order-ode
 next: true
 prev: true
+dateCreated: 2026-04-22T07:07:02.560Z
+lastUpdatedOn: 2026-04-22T07:07:47.482Z
 ---
 
 ## Linear Differential Equations

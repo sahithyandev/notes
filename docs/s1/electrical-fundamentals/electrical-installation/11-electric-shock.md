@@ -5,6 +5,8 @@ sidebar:
   order: 11
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.552Z
+lastUpdatedOn: 2026-04-22T07:07:47.478Z
 ---
 
 Occurs when current flows through the human body.

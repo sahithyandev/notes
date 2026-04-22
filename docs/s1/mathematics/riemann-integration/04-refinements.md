@@ -5,6 +5,8 @@ sidebar:
   order: 4
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.567Z
+lastUpdatedOn: 2026-04-22T07:07:47.485Z
 ---
 
 $Q$ is called a refinement of $P \iff $ $P$ and $Q$ are partitions of $[a,b]$

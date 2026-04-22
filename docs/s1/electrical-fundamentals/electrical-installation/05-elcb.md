@@ -5,6 +5,8 @@ sidebar:
 slug: s1/electrical-fundamentals/electrical-installation/elcb
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.551Z
+lastUpdatedOn: 2026-04-22T07:07:47.477Z
 ---
 
 Short for Earth Leakage Current Breaker. Detects earth leakage.

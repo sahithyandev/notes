@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/kruskals-algorithm
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.588Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 A [greedy algorithm](/data-structures-and-algorithms/algorithms/introduction#greedy-algorithm) to find [MST](/data-structures-and-algorithms/data-structures/minimum-spanning-tree/) of a [graph](/data-structures-and-algorithms/data-structures/graph/). Sorts all edges by increasing weights and adds them one by one to the MST, ensuring that no cycles are formed.

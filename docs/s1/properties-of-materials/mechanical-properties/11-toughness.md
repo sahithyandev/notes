@@ -5,6 +5,8 @@ sidebar:
   order: 11
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.580Z
+lastUpdatedOn: 2026-04-22T07:07:47.492Z
 ---
 
 Maximum strain energy, a material can absorb upto fracture. Area under the

@@ -6,6 +6,8 @@ sidebar:
 slug: s2/program-construction/basics/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.598Z
+lastUpdatedOn: 2026-04-22T07:07:47.501Z
 ---
 
 Program construction is a methodological process that starts from a user's

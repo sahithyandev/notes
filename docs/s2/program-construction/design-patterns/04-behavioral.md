@@ -6,6 +6,8 @@ sidebar:
 slug: s2/program-construction/design-patterns/behavioral
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.601Z
+lastUpdatedOn: 2026-04-22T07:07:47.503Z
 ---
 
 Deals with how different kinds of objects interact with each other.

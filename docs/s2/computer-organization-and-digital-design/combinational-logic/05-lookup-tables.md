@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/combinational-logic/lookup-tables
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.582Z
+lastUpdatedOn: 2026-04-22T07:07:47.494Z
 ---
 
 A technique for implementing combinational logic digital circuits instead of

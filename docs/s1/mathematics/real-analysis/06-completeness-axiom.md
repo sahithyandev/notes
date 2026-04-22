@@ -5,6 +5,8 @@ sidebar:
   order: 6
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.562Z
+lastUpdatedOn: 2026-04-22T07:07:47.483Z
 ---
 
 Let $A$ be a non empty subset of $\mathbb{R}$.

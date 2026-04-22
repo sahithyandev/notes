@@ -6,6 +6,8 @@ sidebar:
 description: Small programs and other platforms to practice programming
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.572Z
+lastUpdatedOn: 2026-04-22T07:07:47.488Z
 ---
 
 ## Programs

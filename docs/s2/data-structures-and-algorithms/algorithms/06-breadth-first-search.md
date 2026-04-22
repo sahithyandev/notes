@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/breadth-first-search
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.587Z
+lastUpdatedOn: 2026-04-22T07:07:47.496Z
 ---
 
 Aka. level order searching. Another algorithm for traversing or searching tree or graph data structures. It starts at the root node and explores all neighbors at the present depth before moving on to nodes at the next depth level. Queue is usually used to store the discovered nodes.

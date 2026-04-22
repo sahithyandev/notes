@@ -6,6 +6,8 @@ slug: >-
   s2/computer-organization-and-digital-design/combinational-logic/arithmetic-logic-unit
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.583Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 A component inside a CPU. Does arithmetic and logical operations. Combines

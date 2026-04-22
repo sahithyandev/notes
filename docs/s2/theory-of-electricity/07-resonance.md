@@ -5,6 +5,8 @@ sidebar:
   order: 7
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.602Z
+lastUpdatedOn: 2026-04-22T07:07:47.504Z
 ---
 
 A circuit is said to be "at resonance" when its power factor becomes 1.

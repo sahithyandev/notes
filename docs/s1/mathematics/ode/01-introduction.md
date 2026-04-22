@@ -6,6 +6,8 @@ sidebar:
   order: 1
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.560Z
+lastUpdatedOn: 2026-04-22T07:07:47.482Z
 ---
 
 Equations which are composed of an unknown function and its derivatives.

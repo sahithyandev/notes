@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/object-oriented-paradigm
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.599Z
+lastUpdatedOn: 2026-04-22T07:07:47.502Z
 ---
 
 A way of developing software where the components of the system are designed and

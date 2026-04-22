@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/arraylist
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.598Z
+lastUpdatedOn: 2026-04-22T07:07:47.502Z
 ---
 
 A resizable array implementation of the `List` interface from the Java

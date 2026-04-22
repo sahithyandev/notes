@@ -5,6 +5,8 @@ sidebar:
   order: 10
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.577Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 ![Miller Indices in Simple Cubic](./images/miller-indices.jpg)

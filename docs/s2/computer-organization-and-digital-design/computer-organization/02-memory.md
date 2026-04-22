@@ -5,6 +5,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/computer-organization/memory
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.585Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 Consists of RAM and secondary memory.

@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.588Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 A greedy algorithm to find the shortest path from a single source vertex to all other nodes. Widely used in network routing and other optimization problems.

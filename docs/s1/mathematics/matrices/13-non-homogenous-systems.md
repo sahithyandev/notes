@@ -5,6 +5,8 @@ sidebar:
   order: 13
 next: true
 prev: true
+dateCreated: 2026-04-22T07:07:02.559Z
+lastUpdatedOn: 2026-04-22T07:07:47.481Z
 ---
 
 Consider the system: $A_{n\times n}X_{n\times 1}=B_{n\times 1}$. $ $

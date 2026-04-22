@@ -5,6 +5,8 @@ sidebar:
   order: 4
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.569Z
+lastUpdatedOn: 2026-04-22T07:07:47.486Z
 ---
 
 Four bar-shaped members connected to each other in one plane.

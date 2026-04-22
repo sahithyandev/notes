@@ -5,6 +5,8 @@ sidebar:
   order: 11
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.559Z
+lastUpdatedOn: 2026-04-22T07:07:47.481Z
 ---
 
 Number of non-zero rows of row echelon form of a matrix $A$. Denoted by

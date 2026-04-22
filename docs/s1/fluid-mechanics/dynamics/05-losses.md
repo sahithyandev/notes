@@ -5,6 +5,8 @@ sidebar:
   order: 5
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.553Z
+lastUpdatedOn: 2026-04-22T07:07:47.478Z
 ---
 
 Energy loss in fluid motion is directly proportional to $v^2$ where $v$ is the

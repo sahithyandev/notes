@@ -5,6 +5,8 @@ sidebar:
 slug: s2/program-construction/basics/concurrency
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.600Z
+lastUpdatedOn: 2026-04-22T07:07:47.503Z
 ---
 
 Concurrency refers to the ability of different parts of a program to be executed

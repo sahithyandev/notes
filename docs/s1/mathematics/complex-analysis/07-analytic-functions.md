@@ -5,6 +5,8 @@ sidebar:
   order: 7
 next: true
 prev: true
+dateCreated: 2026-04-22T07:07:02.557Z
+lastUpdatedOn: 2026-04-22T07:07:47.480Z
 ---
 
 A function $f$ is said to be analytic at $z_0$ **iff** it is differentiable

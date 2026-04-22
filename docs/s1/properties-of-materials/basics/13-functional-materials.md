@@ -5,6 +5,8 @@ sidebar:
   order: 13
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.577Z
+lastUpdatedOn: 2026-04-22T07:07:47.491Z
 ---
 
 Classification of materials based on whether most important function they

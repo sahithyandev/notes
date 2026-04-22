@@ -5,6 +5,8 @@ sidebar:
   order: 2
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.558Z
+lastUpdatedOn: 2026-04-22T07:07:47.480Z
 ---
 
 Suppose $A=(a_{ij})_{m\times{p}}$ and $B=(b_{ij})_{q\times{n}}$. Matrix

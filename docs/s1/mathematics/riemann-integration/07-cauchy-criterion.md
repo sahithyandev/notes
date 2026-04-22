@@ -5,6 +5,8 @@ sidebar:
   order: 7
 next: true
 prev: true
+dateCreated: 2026-04-22T07:07:02.567Z
+lastUpdatedOn: 2026-04-22T07:07:47.485Z
 ---
 
 ## Theorem

@@ -5,6 +5,8 @@ sidebar:
   order: 5
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.574Z
+lastUpdatedOn: 2026-04-22T07:07:47.489Z
 ---
 
 Carries out tasks on behalf of the CPU.

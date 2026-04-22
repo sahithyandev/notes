@@ -6,6 +6,8 @@ sidebar:
   order: 11
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.568Z
+lastUpdatedOn: 2026-04-22T07:07:47.486Z
 ---
 
 Suppose $f$ is a continuous function on $[a,b]$. Then $\exists x \in (a,b)$:

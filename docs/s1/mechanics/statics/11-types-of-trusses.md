@@ -5,6 +5,8 @@ sidebar:
 slug: s1/mechanics/statics/types-of-trusses
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.571Z
+lastUpdatedOn: 2026-04-22T07:07:47.487Z
 ---
 
 ## Pratt type

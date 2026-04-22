@@ -5,6 +5,8 @@ sidebar:
 slug: s2/methods-of-mathematics/probability/approximations
 prev: true
 next: false
+dateCreated: 2026-04-22T07:07:02.596Z
+lastUpdatedOn: 2026-04-22T07:07:47.501Z
 ---
 
 ### Continuity Correction

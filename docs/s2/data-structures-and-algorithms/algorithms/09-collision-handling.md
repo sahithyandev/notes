@@ -5,6 +5,8 @@ sidebar:
 slug: s2/data-structures-and-algorithms/algorithms/collision-handling
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.588Z
+lastUpdatedOn: 2026-04-22T07:07:47.497Z
 ---
 
 When a collision occurs in a [hash table](/data-structures-and-algorithms/data-structures/hash-table), it must be handled using one of the available methods.

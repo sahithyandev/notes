@@ -6,6 +6,8 @@ sidebar:
 slug: s2/computer-organization-and-digital-design/computer-organization/introduction
 prev: false
 next: true
+dateCreated: 2026-04-22T07:07:02.584Z
+lastUpdatedOn: 2026-04-22T07:07:47.495Z
 ---
 
 Computer organization defines the internal details of operational units, their interconnection, & control. Defined by the internal registers, timing and control structures, and the set of instructions.

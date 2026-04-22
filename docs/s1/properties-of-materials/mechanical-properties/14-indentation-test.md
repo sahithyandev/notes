@@ -5,6 +5,8 @@ sidebar:
   order: 14
 next: false
 prev: true
+dateCreated: 2026-04-22T07:07:02.580Z
+lastUpdatedOn: 2026-04-22T07:07:47.493Z
 ---
 
 Metal is subjected to indentation with a hard indenter. Depth of the indent is a

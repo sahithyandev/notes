@@ -5,6 +5,8 @@ sidebar:
 slug: s2/theory-of-electricity/laplace-transform
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.603Z
+lastUpdatedOn: 2026-04-22T07:07:47.504Z
 ---
 
 A mathematical operation that transforms a function of time $f(t)$, into a function of a complex variable, denoted as $F(s)$. Mathematically, the Laplace Transform of a function $f(t)$ is defined as:

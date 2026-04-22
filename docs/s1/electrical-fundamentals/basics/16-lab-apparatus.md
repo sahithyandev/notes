@@ -5,6 +5,8 @@ sidebar:
 slug: s1/electrical-fundamentals/basics/lab-apparatus
 prev: true
 next: true
+dateCreated: 2026-04-22T07:07:02.550Z
+lastUpdatedOn: 2026-04-22T07:07:47.476Z
 ---
 
 ## Variac
