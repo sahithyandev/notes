@@ -143,12 +143,13 @@ const recentNotes = await getRecentNotes();
   <Nav />
   <Hero />
 
-  <section>
+  <section id="semesters">
     <h2 class="section-title">All Semesters</h2>
     <div class="sem-grid">
       {
         semestersData.map((semester) => (
           <SemesterCard
+            href={`/s${semester.number}`}
             number={semester.number}
             subjects={semester.modules}
             notesCount={semester.notesCount.toString()}
@@ -158,7 +159,6 @@ const recentNotes = await getRecentNotes();
     </div>
   </section>
 
-  <!-- RECENT NOTES -->
   <section>
     <h2 class="section-title">Recent Notes</h2>
     <div id="recent">
@@ -186,7 +186,7 @@ const recentNotes = await getRecentNotes();
 
 <style>
   section {
-    padding: 64px 36px;
+    padding: 40px 36px 24px;
     max-width: 1272px;
     margin: 0 auto;
   }
