@@ -51,8 +51,8 @@ export async function getStaticPaths() {
       order: note.data.sidebar?.order ?? 999,
     };
 
-    // If there are more parts beyond module, it's a sub-module
-    if (parts.length > 2) {
+    // If slug has 4+ parts (sem/module/submodule/note), it's a sub-module
+    if (parts.length > 3) {
       // The immediate next part is the sub-module name
       const subModuleKey = parts[2];
       if (!moduleData.subModules.has(subModuleKey)) {
