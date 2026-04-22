@@ -1,11 +1,36 @@
 ---
 import StatCard from "./stat-card.astro";
+import { getCollection } from "astro:content";
+
+// Get all notes from the collection
+const allNotes = await getCollection("notes");
+
+// Calculate semesters (unique top-level directories)
+const semesters = new Set();
+allNotes.forEach(note => {
+  const pathParts = note.id.split("/");
+  if (pathParts.length > 0) {
+    semesters.add(pathParts[0]);
+  }
+});
+
+// Calculate modules (unique second-level directories)
+const modules = new Set();
+allNotes.forEach(note => {
+  const pathParts = note.id.split("/");
+  if (pathParts.length > 1) {
+    modules.add(pathParts.slice(0, 2).join("/"));
+  }
+});
+
+// Total notes count
+const totalNotes = allNotes.length;
 ---
 
 <div class="stats-band">
-    <StatCard value="8" label="Semesters" />
-    <StatCard value="32" label="Modules" />
-    <StatCard value="200+" label="Notes" />
+    <StatCard value={semesters.size.toString()} label="Semesters" />
+    <StatCard value={modules.size.toString()} label="Modules" />
+    <StatCard value={totalNotes.toString()} label="Notes" />
 </div>
 
 <style>
