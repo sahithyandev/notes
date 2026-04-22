@@ -29,20 +29,15 @@ const { Content, headings } = await render(notesEntry);
 
 // Helper functions to generate sidebar data
 function getSemesterInfo(slugParts: string[]) {
-  if (slugParts[0] === "s1") {
+  const match = slugParts[0].match(/^s(\d)$/);
+  if (match) {
+    const n = match[1];
     return {
-      label: "Semester 1",
-      color: "#1a7a4a",
-    };
-  } else if (slugParts[0] === "s2") {
-    return {
-      label: "Semester 2",
-      color: "#1a7a4a",
+      label: `Semester ${n}`,
     };
   }
   return {
     label: "Unknown",
-    color: "#1a7a4a",
   };
 }
 
@@ -78,11 +73,41 @@ async function getSidebarData(currentSlug: string) {
     });
   });
 
+  // Build current subject tree with nested modules
+  const currentSubjectNotes = grouped[currentSemester]?.[currentSubject] || [];
+  const currentSubjectTree = {
+    direct: [] as any[],
+    modules: {} as Record<string, any[]>
+  };
+
+  currentSubjectNotes.forEach((note) => {
+    const parts = note.slug.split("/");
+    if (parts.length === 3) {
+      // s1/subject/note - direct note under subject
+      currentSubjectTree.direct.push(note);
+    } else if (parts.length >= 4) {
+      // s1/subject/module/... - nested under module
+      const module = parts[2];
+      if (!currentSubjectTree.modules[module]) {
+        currentSubjectTree.modules[module] = [];
+      }
+      currentSubjectTree.modules[module].push(note);
+    }
+  });
+
+  // Sort modules alphabetically by key
+  const sortedModules = Object.keys(currentSubjectTree.modules).sort();
+
   return {
     currentSemester,
     currentSubject,
     grouped,
-    currentNotes: grouped[currentSemester]?.[currentSubject] || [],
+    currentSubjectTree: {
+      ...currentSubjectTree,
+      modules: Object.fromEntries(
+        sortedModules.map(key => [key, currentSubjectTree.modules[key]])
+      )
+    },
   };
 }
 
@@ -97,7 +122,7 @@ const tocHeadings = headings.filter(
 <Layout>
   <Nav />
 
-  <main class="grid grid-cols-[auto_1fr_auto] gap-x-5">
+  <main class="grid grid-cols-[auto_1fr_auto] gap-x-5" style={`--sem: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || '1'}); --sem-bg: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || '1'}-bg); --sem-border: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || '1'}-border); --sem-text: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || '1'}); --sem-dim: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || '1'}-bg);`}>
     <aside class="sidebar">
       <div class="sb-sem">
         <div class="sb-sem-pip"></div>
@@ -124,7 +149,7 @@ const tocHeadings = headings.filter(
       }
 
       {
-        sidebarData.currentNotes.length > 0 && (
+        (sidebarData.currentSubjectTree.direct.length > 0 || Object.keys(sidebarData.currentSubjectTree.modules).length > 0) && (
           <>
             <div class="sb-rule" />
             <div class="sb-group-title">
@@ -132,13 +157,34 @@ const tocHeadings = headings.filter(
                 .replace(/-/g, " ")
                 .replace(/\b\w/g, (l) => l.toUpperCase())}
             </div>
-            {sidebarData.currentNotes.map((note) => (
+            
+            {/* Direct notes under subject */}
+            {sidebarData.currentSubjectTree.direct.map((note: any) => (
               <a
                 href={`/${note.slug}`}
                 class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
               >
                 {note.label}
               </a>
+            ))}
+            
+            {/* Nested modules */}
+            {Object.entries(sidebarData.currentSubjectTree.modules).map(([moduleKey, moduleNotes]) => (
+              <>
+                <div class="sb-module-title">
+                  {moduleKey
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </div>
+                {moduleNotes.map((note: any) => (
+                  <a
+                    href={`/${note.slug}`}
+                    class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
+                  >
+                    {note.label}
+                  </a>
+                ))}
+              </>
             ))}
           </>
         )
@@ -518,6 +564,16 @@ const tocHeadings = headings.filter(
     color: var(--text-muted);
     letter-spacing: 0.8px;
     text-transform: uppercase;
+  }
+
+  .sb-module-title {
+    padding: 8px 16px 2px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.8;
   }
 
   .sb-item {
