@@ -9,7 +9,6 @@ import * as matter from "gray-matter";
 		if (!filepath.endsWith('.md') && !filepath.endsWith('.mdx')) {
 			continue;
 		}
-		console.log("filePath", filepath);
 		const file = matter.read(filepath);
 		const { data: currentFrontMatter } = file;
 
