@@ -1,5 +1,6 @@
 ---
 import { Monitor, Sun, Moon } from "@lucide/astro";
+import SearchModal from "./SearchModal.astro";
 ---
 
 <nav class="nav">
@@ -7,8 +8,10 @@ import { Monitor, Sun, Moon } from "@lucide/astro";
         <span class="nav-name">Sahithyan's Notes</span>
     </a>
 
+    <SearchModal />
+
     <div class="nav-right">
-        <div class="nav-search">
+        <button class="nav-search" id="search-trigger" type="button" aria-label="Open search">
             <svg
                 width="13"
                 height="13"
@@ -17,13 +20,14 @@ import { Monitor, Sun, Moon } from "@lucide/astro";
                 stroke="currentColor"
                 stroke-width="1.8"
                 stroke-linecap="round"
+                aria-hidden="true"
             >
                 <circle cx="6.5" cy="6.5" r="5"></circle>
                 <path d="M10.5 10.5l4 4"></path>
             </svg>
             Search notes…
             <kbd>⌘K</kbd>
-        </div>
+        </button>
         <button
             class="theme-toggle"
             id="themeToggle"
@@ -120,7 +124,8 @@ import { Monitor, Sun, Moon } from "@lucide/astro";
         border: 1px solid var(--border);
         font-size: 12.5px;
         color: var(--text-muted);
-        cursor: text;
+        cursor: pointer;
+        appearance: none;
         font-family: var(--font-ui);
         transition: border-color 0.12s;
     }
