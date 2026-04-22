@@ -1,0 +1,309 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import SemesterHero from "../components/semester-hero.astro";
+import { titleize } from "../utils";
+
+interface NoteRef {
+  title: string;
+  slug: string;
+  order: number;
+}
+
+interface ModuleInfo {
+  key: string;
+  name: string;
+  notes: NoteRef[];
+}
+
+interface SemesterData {
+  number: number;
+  modules: ModuleInfo[];
+  noteCount: number;
+}
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  const bySem = new Map<number, Map<string, NoteRef[]>>();
+
+  for (const note of notes) {
+    const parts = note.data.slug.split("/");
+    if (!parts[0].match(/^s(\d)$/)) continue;
+    const n = parseInt(parts[0][1]);
+    const moduleKey = parts[1] ?? "general";
+
+    if (!bySem.has(n)) bySem.set(n, new Map());
+    const modMap = bySem.get(n)!;
+    if (!modMap.has(moduleKey)) modMap.set(moduleKey, []);
+    modMap.get(moduleKey)!.push({
+      title: note.data.title,
+      slug: note.data.slug,
+      order: note.data.sidebar?.order ?? 999,
+    });
+  }
+
+  return Array.from(bySem.entries()).map(([number, modMap]) => {
+    const modules: ModuleInfo[] = Array.from(modMap.entries())
+      .map(([key, list]) => ({
+        key,
+        name: titleize(key),
+        notes: [...list].sort((a, b) => a.order - b.order),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    const noteCount = modules.reduce((sum, m) => sum + m.notes.length, 0);
+    const data: SemesterData = { number, modules, noteCount };
+
+    return {
+      params: { sem: `s${number}` },
+      props: { data },
+    };
+  });
+}
+
+interface Props {
+  data: SemesterData;
+}
+
+const { data } = Astro.props;
+const { number, modules, noteCount } = data;
+const activeColor = `var(--s${number})`;
+
+const COLUMN_COUNT = 3;
+const columns: ModuleInfo[][] = Array.from({ length: COLUMN_COUNT }, () => []);
+const weights = new Array(COLUMN_COUNT).fill(0);
+for (const mod of modules) {
+  let idx = 0;
+  for (let i = 1; i < COLUMN_COUNT; i++) {
+    if (weights[i] < weights[idx]) idx = i;
+  }
+  columns[idx].push(mod);
+  weights[idx] += mod.notes.length + 2;
+}
+---
+
+<Layout>
+  <Nav />
+  <SemesterHero
+    number={number}
+    title={`Semester ${number}`}
+    moduleCount={modules.length}
+    noteCount={noteCount}
+  />
+
+  <div class="page-body" style={`--sem: ${activeColor};`}>
+    <h2 class="sec-title">Modules</h2>
+    <div class="module-grid">
+      {
+        columns.map((col) => (
+          <div class="module-col">
+            {col.map((mod) => (
+              <div class="module-card">
+                <div class="module-card-bar" />
+                <div class="module-card-body">
+                  <div class="module-name">{mod.name}</div>
+                  <div class="module-topics">
+                    {mod.notes.map((note, i) => (
+                      <a href={`/${note.slug}`} class="module-topic">
+                        <span class="topic-idx">
+                          {(i + 1).toString().padStart(2, "0")}
+                        </span>
+                        <span class="topic-dot" />
+                        <span class="topic-title">{note.title}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                <div class="module-card-footer">
+                  <span class="module-footer-stat">
+                    {mod.notes.length} notes
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-body {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 48px 0 96px;
+  }
+
+  .sec-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+  }
+
+  /* Module masonry */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .module-grid {
+      grid-template-columns: 1fr;
+    }
+    .module-col {
+      display: contents;
+    }
+  }
+  .module-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition:
+      border-color 0.16s,
+      box-shadow 0.16s,
+      transform 0.14s;
+    position: relative;
+  }
+  .module-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: 0 6px 28px color-mix(in oklab, var(--sem) 16%, transparent);
+  }
+  .module-card-bar {
+    height: 3px;
+    background: var(--sem);
+    flex-shrink: 0;
+  }
+
+  .module-card-body {
+    padding: 22px 24px 18px;
+    flex: 1;
+  }
+  .module-name {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .module-topics {
+    display: flex;
+    flex-direction: column;
+  }
+  .module-topic {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 0.1s;
+  }
+  .module-topic:last-child {
+    border-bottom: none;
+  }
+  .module-topic:hover .topic-title {
+    color: var(--sem);
+  }
+  .module-topic:hover .topic-dot {
+    background: var(--sem);
+  }
+  .topic-idx {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .topic-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-strong);
+    flex-shrink: 0;
+    transition: background 0.1s;
+  }
+  .topic-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    flex: 1;
+    line-height: 1.3;
+    transition: color 0.12s;
+  }
+
+  .module-card-footer {
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .module-footer-stat {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Semester switcher */
+  .sem-switcher-wrap {
+    margin-bottom: 40px;
+  }
+  .sem-switcher {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .sem-pill {
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    text-decoration: none;
+    transition:
+      border-color 0.13s,
+      color 0.13s,
+      background 0.13s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .sem-pill:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+  .sem-pill.active {
+    background: var(--pill-bg);
+    border-color: var(--pill-border);
+    color: var(--pill);
+  }
+  .sem-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--pill);
+  }
+</style>
