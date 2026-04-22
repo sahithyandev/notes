@@ -9,7 +9,14 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "prepare": "husky",
+    "script:update-frontmatter": "bun scripts/update-frontmatter.ts"
+  },
+  "lint-staged": {
+    "docs/**/*.{md,mdx}": [
+      "bun run script:update-frontmatter"
+    ]
   },
   "dependencies": {
     "@lucide/astro": "^1.8.0",
@@ -20,6 +27,8 @@
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
   }

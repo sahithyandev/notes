@@ -13,6 +13,8 @@ const notes = defineCollection({
         })),
         prev: z.boolean().optional(),
         next: z.boolean().optional(),
+        dateCreated: z.date().optional(),
+        lastUpdatedOn: z.date().optional(),
     }),
 });
 
