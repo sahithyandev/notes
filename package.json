@@ -7,7 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "bun build:astro && bun build:pagefind",
+    "build:astro": "astro build",
+    "build:pagefind": "pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "husky",
