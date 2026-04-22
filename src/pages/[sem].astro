@@ -11,10 +11,17 @@ interface NoteRef {
   order: number;
 }
 
-interface ModuleInfo {
+interface SubModuleInfo {
   key: string;
   name: string;
   notes: NoteRef[];
+}
+
+interface ModuleInfo {
+  key: string;
+  name: string;
+  subModules: SubModuleInfo[];
+  directNotes: NoteRef[];
 }
 
 interface SemesterData {
@@ -25,7 +32,7 @@ interface SemesterData {
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
-  const bySem = new Map<number, Map<string, NoteRef[]>>();
+  const bySem = new Map<number, Map<string, { subModules: Map<string, NoteRef[]>, directNotes: NoteRef[] }>>();
 
   for (const note of notes) {
     const parts = note.data.slug.split("/");
@@ -35,24 +42,48 @@ export async function getStaticPaths() {
 
     if (!bySem.has(n)) bySem.set(n, new Map());
     const modMap = bySem.get(n)!;
-    if (!modMap.has(moduleKey)) modMap.set(moduleKey, []);
-    modMap.get(moduleKey)!.push({
+    if (!modMap.has(moduleKey)) modMap.set(moduleKey, { subModules: new Map(), directNotes: [] });
+    const moduleData = modMap.get(moduleKey)!;
+
+    const noteRef: NoteRef = {
       title: note.data.title,
       slug: note.data.slug,
       order: note.data.sidebar?.order ?? 999,
-    });
+    };
+
+    // If there are more parts beyond module, it's a sub-module
+    if (parts.length > 2) {
+      // The immediate next part is the sub-module name
+      const subModuleKey = parts[2];
+      if (!moduleData.subModules.has(subModuleKey)) {
+        moduleData.subModules.set(subModuleKey, []);
+      }
+      moduleData.subModules.get(subModuleKey)!.push(noteRef);
+    } else {
+      // Direct note under module
+      moduleData.directNotes.push(noteRef);
+    }
   }
 
   return Array.from(bySem.entries()).map(([number, modMap]) => {
     const modules: ModuleInfo[] = Array.from(modMap.entries())
-      .map(([key, list]) => ({
+      .map(([key, moduleData]) => ({
         key,
         name: titleize(key),
-        notes: [...list].sort((a, b) => a.order - b.order),
+        subModules: Array.from(moduleData.subModules.entries())
+          .map(([subKey, notes]) => ({
+            key: subKey,
+            name: titleize(subKey),
+            notes: [...notes].sort((a, b) => a.order - b.order),
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+        directNotes: [...moduleData.directNotes].sort((a, b) => a.order - b.order),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    const noteCount = modules.reduce((sum, m) => sum + m.notes.length, 0);
+    const noteCount = modules.reduce((sum, m) => 
+      sum + m.directNotes.length + m.subModules.reduce((subSum, sm) => subSum + sm.notes.length, 0), 0
+    );
     const data: SemesterData = { number, modules, noteCount };
 
     return {
@@ -79,7 +110,8 @@ for (const mod of modules) {
     if (weights[i] < weights[idx]) idx = i;
   }
   columns[idx].push(mod);
-  weights[idx] += mod.notes.length + 2;
+  const totalNotes = mod.directNotes.length + mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0);
+  weights[idx] += totalNotes + 2;
 }
 ---
 
@@ -104,7 +136,8 @@ for (const mod of modules) {
                 <div class="module-card-body">
                   <div class="module-name">{mod.name}</div>
                   <div class="module-topics">
-                    {mod.notes.map((note, i) => (
+                    {/* Direct notes under module */}
+                    {mod.directNotes.map((note: NoteRef, i: number) => (
                       <a href={`/${note.slug}`} class="module-topic">
                         <span class="topic-idx">
                           {(i + 1).toString().padStart(2, "0")}
@@ -113,11 +146,31 @@ for (const mod of modules) {
                         <span class="topic-title">{note.title}</span>
                       </a>
                     ))}
+                    
+                    {/* Sub-modules with their notes */}
+                    {mod.subModules.map((subModule) => (
+                      <div class="sub-module-section">
+                        <div class="sub-module-header">
+                          <span class="sub-module-name">{subModule.name}</span>
+                        </div>
+                        <div class="sub-module-topics">
+                          {subModule.notes.map((note: NoteRef, i: number) => (
+                            <a href={`/${note.slug}`} class="module-topic sub-module-topic">
+                              <span class="topic-idx">
+                                {(i + 1).toString().padStart(2, "0")}
+                              </span>
+                              <span class="topic-dot" />
+                              <span class="topic-title">{note.title}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div class="module-card-footer">
                   <span class="module-footer-stat">
-                    {mod.notes.length} notes
+                    {mod.directNotes.length + mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0)} notes
                   </span>
                 </div>
               </div>
@@ -263,46 +316,50 @@ for (const mod of modules) {
     color: var(--text-muted);
   }
 
-  /* Semester switcher */
-  .sem-switcher-wrap {
-    margin-bottom: 40px;
+  /* Sub-module hierarchy */
+  .sub-module-section {
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
   }
-  .sem-switcher {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+  .sub-module-section:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
   }
-  .sem-pill {
-    padding: 6px 14px;
-    border-radius: 99px;
+  .sub-module-header {
+    margin-bottom: 8px;
+  }
+  .sub-module-name {
     font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.1px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-muted);
-    text-decoration: none;
-    transition:
-      border-color 0.13s,
-      color 0.13s,
-      background 0.13s;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
   }
-  .sem-pill:hover {
-    border-color: var(--border-strong);
-    color: var(--text-primary);
+  .sub-module-name::before {
+    content: '';
+    width: 8px;
+    height: 1px;
+    background: var(--border-strong);
   }
-  .sem-pill.active {
-    background: var(--pill-bg);
-    border-color: var(--pill-border);
-    color: var(--pill);
+  .sub-module-topics {
+    display: flex;
+    flex-direction: column;
+    margin-left: 14px;
   }
-  .sem-pill-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
-    background: var(--pill);
+  .sub-module-topic {
+    padding: 6px 0;
+    font-size: 12px;
+  }
+  .sub-module-topic .topic-idx {
+    font-size: 9px;
+    opacity: 0.8;
+  }
+  .sub-module-topic .topic-title {
+    font-size: 12px;
   }
 </style>
