@@ -55,7 +55,7 @@ function generateBreadcrumb(slug: string): BreadcrumbItem[] {
 const breadcrumbItems = generateBreadcrumb(slug);
 ---
 
-<nav class="breadcrumb" aria-label="Breadcrumb">
+<div class="breadcrumb" aria-label="Breadcrumb">
   {breadcrumbItems.map((item, index) => (
     <>
       {index > 0 && <span class="breadcrumb-sep">/</span>}
@@ -66,7 +66,7 @@ const breadcrumbItems = generateBreadcrumb(slug);
       )}
     </>
   ))}
-</nav>
+</div>
 
 <style>
   .breadcrumb {
@@ -75,6 +75,7 @@ const breadcrumbItems = generateBreadcrumb(slug);
     gap: 8px;
     font-size: 13px;
     color: var(--text-muted);
+    margin-top: 16px;
     margin-bottom: 16px;
     flex-wrap: wrap;
   }
