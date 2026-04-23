@@ -65,10 +65,10 @@ export const {getStaticPaths, GET} = await OGImageRoute({
       title: page.data.title,
       description: description,
       bgGradient: [colors.bg],
-      // logo: {
-      //   path: "./public/logo.png",
-      //   size: [170],
-      // },
+      logo: {
+        path: "./public/android-chrome-192x192.png",
+        size: [170],
+      },
       // fonts: ["./public/fonts/DMSans_36pt-Regular.ttf"],
       font: {
         title: {
