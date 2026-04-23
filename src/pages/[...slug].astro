@@ -357,13 +357,13 @@ const description = generateDescription(notesEntry.body || "");
 
   article {
     font-family: var(--font-body);
-    font-size: 15.5px;
+    font-size: 1rem;
     line-height: 1.75;
     color: var(--text-secondary);
 
     h2 {
       font-family: var(--font-ui);
-      font-size: 18px;
+      font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: -0.4px;
       color: var(--text-primary);
@@ -379,15 +379,24 @@ const description = generateDescription(notesEntry.body || "");
 
     h3 {
       font-family: var(--font-ui);
-      font-size: 14.5px;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.1px;
       color: var(--text-primary);
       margin: 30px 0 10px;
     }
 
+    h4 {
+      font-family: var(--font-ui);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 24px 0 8px;
+    }
+
     p {
       margin-bottom: 16px;
+      font-size: 1.06rem;
       text-wrap: pretty;
     }
 
@@ -436,7 +445,7 @@ const description = generateDescription(notesEntry.body || "");
     /* Inline code */
     code {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 0.875rem;
       background: var(--surface-2);
       border: 1px solid var(--border);
       padding: 1px 6px;
@@ -460,7 +469,7 @@ const description = generateDescription(notesEntry.body || "");
       background: none;
       border: none;
       padding: 0;
-      font-size: 13px;
+      font-size: 0.875rem;
       line-height: 1.7;
       color: #b0bdd8;
       font-weight: 400;
@@ -498,7 +507,7 @@ const description = generateDescription(notesEntry.body || "");
       top: 10px;
       right: 14px;
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 0.625rem;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.18);
       letter-spacing: 0.5px;
@@ -513,14 +522,14 @@ const description = generateDescription(notesEntry.body || "");
       background: var(--sem-bg);
       padding: 14px 18px;
       margin: 20px 0;
-      font-size: 14.5px;
+      font-size: 0.9375rem;
       color: var(--sem-text);
       line-height: 1.6;
     }
 
     .callout-title {
       font-family: var(--font-ui);
-      font-size: 12px;
+      font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 0.4px;
       text-transform: uppercase;
@@ -539,7 +548,7 @@ const description = generateDescription(notesEntry.body || "");
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13.5px;
+      font-size: 0.875rem;
       margin: 20px 0;
       font-family: var(--font-ui);
     }
@@ -549,7 +558,7 @@ const description = generateDescription(notesEntry.body || "");
     }
 
     th {
-      font-size: 11px;
+      font-size: 0.6875rem;
       font-weight: 700;
       color: var(--text-muted);
       letter-spacing: 0.5px;
@@ -583,7 +592,7 @@ const description = generateDescription(notesEntry.body || "");
 
     /* Additional article content styles */
     p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       line-height: 1.6;
 
       &:not(:has(.MathJax:only-of-type)):not(:has(img:only-of-type)) {
@@ -608,7 +617,7 @@ const description = generateDescription(notesEntry.body || "");
     }
 
     li {
-      font-size: 1.15rem;
+      font-size: 1rem;
       line-height: 1.6;
 
       .MathJax {
@@ -681,7 +690,7 @@ const description = generateDescription(notesEntry.body || "");
     }
 
     blockquote {
-      font-size: 1.125rem;
+      font-size: 1rem;
       font-weight: 500;
       padding: 0.5rem;
       background-color: var(--accent-subtle);
@@ -699,7 +708,7 @@ const description = generateDescription(notesEntry.body || "");
 
         p {
           display: contents;
-          font-size: 1rem;
+          font-size: 0.875rem;
         }
       }
     }
@@ -748,7 +757,7 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   .sb-sem-label {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: 0.8px;
@@ -758,7 +767,7 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   .sb-sem-name {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.2px;
@@ -766,7 +775,7 @@ const description = generateDescription(notesEntry.body || "");
 
   .sb-group-title {
     padding: 10px 16px 4px;
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: 0.8px;
@@ -775,7 +784,7 @@ const description = generateDescription(notesEntry.body || "");
 
   .sb-module-title {
     padding: 8px 16px 2px;
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 600;
     color: var(--text-muted);
     letter-spacing: 0.6px;
@@ -787,7 +796,7 @@ const description = generateDescription(notesEntry.body || "");
     display: flex;
     align-items: center;
     padding: 5px 16px;
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     font-weight: 500;
     color: var(--text-secondary);
     border-left: 2px solid transparent;
@@ -813,13 +822,13 @@ const description = generateDescription(notesEntry.body || "");
 
   .sb-item-sub {
     padding-left: 28px;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 
   .sb-item-count {
     margin-left: auto;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     color: var(--text-muted);
   }
 
@@ -857,7 +866,7 @@ const description = generateDescription(notesEntry.body || "");
     color: var(--sem-text);
     border-radius: 5px;
     padding: 3px 10px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.3px;
     margin-bottom: 16px;
@@ -873,7 +882,7 @@ const description = generateDescription(notesEntry.body || "");
 
   .note-title {
     font-family: var(--font-ui);
-    font-size: 28px;
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: -0.8px;
     line-height: 1.08;
@@ -886,7 +895,7 @@ const description = generateDescription(notesEntry.body || "");
     display: flex;
     align-items: center;
     gap: 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--text-muted);
     font-family: var(--font-mono);
   }
@@ -912,7 +921,7 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   .toc-title {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: 0.8px;
@@ -924,7 +933,7 @@ const description = generateDescription(notesEntry.body || "");
   .toc-item {
     display: block;
     padding: 4px 14px;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--text-muted);
     text-decoration: none;
@@ -947,7 +956,7 @@ const description = generateDescription(notesEntry.body || "");
 
   .toc-sub {
     padding-left: 24px;
-    font-size: 11.5px;
+    font-size: 0.71875rem;
   }
 
   .toc-rule {
@@ -990,7 +999,7 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   .note-nav-dir {
-    font-size: 10.5px;
+    font-size: 0.65625rem;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: 0.4px;
@@ -998,7 +1007,7 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   .note-nav-title {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.3;
