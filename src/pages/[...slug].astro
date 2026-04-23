@@ -147,17 +147,17 @@ function calculateReadTime(content: string): number {
 
 // Generate description from first paragraph
 function generateDescription(content: string): string {
-  const firstParagraph = content.split('\n\n')[0];
+  const firstParagraph = content.split("\n\n")[0];
   // Remove markdown formatting
   const cleanText = firstParagraph
-    .replace(/[#*`_\[\]]/g, '')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // Remove images
+    .replace(/[#*`_\[\]]/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove markdown links
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "") // Remove images
     .trim();
-  
+
   // Truncate to ~160 characters
-  return cleanText.length > 160 
-    ? cleanText.substring(0, 157) + "..." 
+  return cleanText.length > 160
+    ? cleanText.substring(0, 157) + "..."
     : cleanText;
 }
 
@@ -176,7 +176,7 @@ const description = generateDescription(notesEntry.body || "");
 
   <main
     data-pagefind-body
-    class="grid grid-cols-[auto_1fr_auto] gap-x-5"
+    class="grid grid-cols-[auto_1fr_auto]"
     style={`--sem: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-bg: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg); --sem-border: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-border); --sem-text: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-dim: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg);`}
   >
     <aside class="sidebar">
@@ -250,7 +250,7 @@ const description = generateDescription(notesEntry.body || "");
       }
     </aside>
 
-    <div>
+    <section>
       <Breadcrumb slug={slug} />
       <h1 class="note-title">
         {notesEntry.data.title}
@@ -272,7 +272,7 @@ const description = generateDescription(notesEntry.body || "");
       <article data-pagefind-body>
         <Content />
       </article>
-    </div>
+    </section>
 
     {
       tocHeadings.length > 0 && (
@@ -337,6 +337,18 @@ const description = generateDescription(notesEntry.body || "");
   :root {
     --sidebar-w: 280px;
     --toc-w: 200px;
+    --nav-h: 54px;
+  }
+
+  main {
+    height: calc(100dvh - var(--nav-h));
+    overflow: hidden;
+  }
+
+  section:has(article) {
+    padding: 0 calc(5 * var(--spacing));
+    overflow: scroll;
+    scroll-behavior: smooth;
   }
 
   article {
@@ -697,9 +709,6 @@ const description = generateDescription(notesEntry.body || "");
   .sidebar {
     width: var(--sidebar-w);
     flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
     overflow-y: auto;
     background: var(--surface);
     border-right: 1px solid var(--border);
@@ -897,13 +906,9 @@ const description = generateDescription(notesEntry.body || "");
   .toc-rail {
     width: var(--toc-w);
     flex-shrink: 0;
-    position: sticky;
-    top: var(--nav-h);
-    height: calc(100vh - var(--nav-h));
-    overflow-y: auto;
+    overflow: hidden;
     padding: 32px 16px 32px 0;
     border-left: 1px solid var(--border);
-    scrollbar-width: none;
   }
 
   .toc-title {
