@@ -1,0 +1,144 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
+---
+
+<Layout
+  title={`License | ${SITE_NAME}`}
+  description="License information for Sahithyan's Notes"
+  image={`${SITE_DOMAIN}/og/default`}
+  canonical={`${SITE_DOMAIN}/license`}
+>
+  <Nav />
+
+  <main class="license-page">
+    <section class="license-content">
+      <h1>License</h1>
+      
+      <p>Your use of the content is licensed by
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 4.0</a>.</p>
+
+      <h2>You are free to</h2>
+
+      <ul>
+        <li><strong>Share</strong> — copy and redistribute the material in any medium or format</li>
+      </ul>
+
+      <h2>Under the following terms:</h2>
+
+      <ul>
+        <li><strong>Attribution</strong> — You must give appropriate credit, provide a link to the
+          license, and indicate if changes were made. You may do so in any reasonable
+          manner, but not in any way that suggests the licensor endorses you or your
+          use.</li>
+        <li><strong>NonCommercial</strong> — You may not use the material for commercial purposes.</li>
+        <li><strong>NoDerivatives</strong> — If you remix, transform, or build upon the material, you
+          may not distribute the modified material.</li>
+      </ul>
+
+      <p class="disclaimer"><strong>In no event shall the owner of this website be liable for any damages,
+      including but not limited to direct, indirect, incidental, special,
+      consequential, or punitive damages, arising out of your use of the content on
+      this website.</strong></p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  :root {
+    --nav-h: 54px;
+  }
+
+  .license-page {
+    min-height: calc(100dvh - var(--nav-h));
+    width: var(--body-width);
+    margin: calc(8 * var(--spacing)) auto 0;
+  }
+
+  .license-content {
+    max-width: 680px;
+    width: 100%;
+  }
+
+  .license-content h1 {
+    font-family: var(--font-ui);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+  }
+
+  .license-content h2 {
+    font-family: var(--font-ui);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.1px;
+    color: var(--text-primary);
+    margin: 32px 0 12px;
+  }
+
+  .license-content p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .license-content a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.12s;
+  }
+
+  .license-content a:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  .license-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .license-content ul li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .license-content ul li::before {
+    content: "";
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 2.5px;
+    background: var(--accent);
+    margin-top: 0.62em;
+  }
+
+  .license-content strong {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .disclaimer {
+    margin-top: 32px;
+    padding: 16px 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+  }
+</style>
