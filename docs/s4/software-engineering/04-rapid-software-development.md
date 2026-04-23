@@ -1,0 +1,228 @@
+---
+title: Rapid Software Development
+sidebar:
+  order: 4
+slug: s4/software-engineering/rapid-software-development
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.631Z
+lastUpdatedOn: 2026-04-23T17:39:39.631Z
+---
+
+Rapid development and delivery are critical because business requirements change frequently.
+
+### Key Ideas
+
+- Specification, design, and implementation are interleaved.
+- System developed in increments (aka. versions).
+- Stakeholders evaluate each version.
+- UI often built using IDE tools.
+
+## Agile Development
+
+Agile is one of the most popular rapid development approaches. Reduces process overhead and focuses on delivering working software.
+
+### The Agile Manifesto
+
+A short declaration of priorities for lightweight software development. Created in February 2001 by 17 software practitioners.
+
+Values focused in the manifesto:
+
+- Individuals and interactions > processes and tools
+- Working software > comprehensive documentation
+- Customer collaboration > contract negotiation
+- Responding to change > following a plan
+
+### Agile Principles
+
+- Customer involvement (continuous feedback)
+- Incremental delivery
+- People over process
+- Embrace change
+- Maintain simplicity  
+  Avoid unnecessary complexity in both code and process.
+
+:::note
+
+The manifesto is accompanied by 12 principles:
+
+1. Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.
+2. Welcome changing requirements, even late in development. Agile processes harness change for the customer's competitive advantage.
+3. Deliver working software frequently, from a couple of weeks to a couple of months, with a preference to the shorter timescale.
+4. Business people and developers must work together daily throughout the project.
+5. Build projects around motivated individuals. Give them the environment and support they need, and trust them to get the job done.
+6. The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.
+7. Working software is the primary measure of progress.
+8. Agile processes promote sustainable development. The sponsors, developers, and users should be able to maintain a constant pace indefinitely.
+9. Continuous attention to technical excellence and good design enhances agility.
+10. Simplicity—the art of maximizing the amount of work not done—is essential.
+11. The best architectures, requirements, and designs emerge from self-organizing teams.
+12. At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly.
+
+:::
+
+## Agile vs Plan-Driven Development
+
+### Plan-Driven
+
+- Separate stages (requirements → design → implementation).
+- Detailed specification before coding.
+- Suitable for regulated, large, safety-critical systems.
+
+### Agile
+
+- Activities interleaved.
+- Requirements evolve during development.
+- Suitable for small/medium systems with active customers.
+
+Whether to choose agile or plan-driven depends on several decision factors:
+
+- System size
+- Regulatory requirements
+- Team skill level
+- Expected system lifetime
+- Organizational culture
+
+## Extreme Programming
+
+Aka. XP. A well-known agile method that pushes agile principles to the extreme.
+
+Characteristics:
+
+- Multiple builds per day.
+- Releases every ~2 weeks.
+- All tests must pass before accepting build.
+
+XP Practices:
+
+- Incremental planning (story cards).
+- Small releases.
+- Simple design.
+- Test-first development.
+- Refactoring.
+- Pair programming.
+- Collective ownership.
+- Continuous integration.
+- Sustainable pace.
+- On-site customer.
+
+## User Stories & Tasks
+
+- Requirements written as short scenarios in a user's perspective.
+- Developers break stories into tasks.
+- Customer selects stories based on priority.
+
+Cost and schedule are estimated from tasks, not vague requirements.
+
+## XP and Change
+
+Traditional View
+Design for change early to reduce later cost.
+
+XP View
+Future changes cannot be predicted reliably.
+Instead → continuously refactor code.
+
+### Refactoring
+
+Improving structure without changing functionality such as removing duplicate code, renaming methods.
+
+Keeps system clean and maintainable. But architectural refactoring is expensive.
+
+### Testing in XP
+
+Testing is central in XP.
+
+XP Testing Features
+
+- Test-first development (TDD).
+- Automated test framework (e.g., JUnit).
+- All tests rerun after every change.
+- Customer helps define acceptance tests.
+
+#### Test-First Development
+
+Write test before writing code. Then implement code to pass the new tests. The tests becomes the specification.
+
+Clarifies requirements. Prevents regression errors.
+
+Hard to test UI-heavy systems. Hard to measure and ensure full coverage. Developers may write weak tests.
+
+## Pair Programming
+
+Two programmers at one workstation. Proved to be more productive than 2 programmers working independently.
+
+Benefits:
+
+- Continuous code review.
+- Knowledge sharing.
+- Supports refactoring.
+- Reduces project risk if someone leaves.
+
+## Scrum (Agile Project Management)
+
+Scrum focuses on management, not coding practices.
+
+Includes 3 phases:
+
+- Outline planning & architecture design
+- Sprint cycles
+- Project closure
+
+Scrum is best for:
+
+- Handles unstable requirements.
+- Improves visibility.
+- Builds customer trust.
+
+Each sprint is of fixed length (2–4 weeks) and produces a working increment of the system. Based on product backlog (prioritized list of features).
+
+In daily meetings, each member answers:
+
+- What did I do?
+- What will I do?
+- Any problems?
+
+### Scrum Master
+
+Facilitator. Removes obstacles. Protects team from distractions.
+
+## Scaling Agile
+
+Agile works best for small, co-located teams. But not ideal for large systems that includes:
+
+- Multiple teams.
+- Distributed locations.
+- External regulations.
+- Long system lifetime.
+- Many stakeholders.
+- Brownfield integration with existing systems.
+
+### Scaling Up
+
+Applying agile for bigger teams.
+
+Requires:
+
+- More up-front design.
+- More documentation.
+- Cross-team communication mechanisms.
+- Frequent system builds (full CI may not be practical).
+
+### Scaling Out
+
+Applying agile for bigger organizations (with multiple teams).
+
+Difficult due to:
+
+- Bureaucracy
+- Cultural resistance
+- Skill variation
+- Traditional management mindset
+
+## 12. Final Key Points (Highly Exam Important)
+
+- XP emphasizes test-first development and refactoring.
+- Scrum provides agile project management structure.
+- Agile vs plan-driven depends on system type and context.
+- Scaling agile is difficult for large regulated systems.

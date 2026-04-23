@@ -1,0 +1,38 @@
+---
+title: Normal Form of CFG
+sidebar:
+  order: 20
+slug: s4/theory-of-computing/normal-form-of-cfg
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.635Z
+lastUpdatedOn: 2026-04-23T17:39:39.635Z
+---
+
+CFGs with standardized production rules.
+
+## Chomsky Normal Form
+
+Aka. CNF. Named after Noam Chomsky.
+
+A CFG $G$ is in CNF **iff** all productions of $G$ has either 1 terminal or 2 non-terminals in RHS.
+- $A \rightarrow BC$ or
+- $A \rightarrow a$
+
+### CFG to CNF Converstion
+
+- If start symbol $S$ occurs in the RHS of some production rule,
+  - add $S'$ as the start symbol
+  - add a production rule $S'\rightarrow S$
+- Remove Λ-productions
+- Remove unit productions
+- Remove long productions by using new non-terminals   
+  For a production rule $A\rightarrow B_1B_2B_3\dots B_n$, replace it with $A\rightarrow B_1C$ and $C\rightarrow B_2B_3\dots B_n$. Do this repeatedly until all long productions are removed.
+- For production rules of the form $A\rightarrow aB$   
+- Replace it with $A\rightarrow XB$ and a new production rule $X\rightarrow a$
+
+## Greibach's Normal Form
+
+Aka. GNF. Named after Sheila Greibach.
+
+A CFG $G$ is in GNF **iff** all productions are of the form: $A\to aA_{1}A_{2}\cdots A_{n}$

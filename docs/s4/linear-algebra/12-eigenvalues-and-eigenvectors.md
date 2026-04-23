@@ -1,0 +1,32 @@
+---
+title: Eigenvalues and Eigenvectors
+sidebar:
+  order: 12
+slug: s4/linear-algebra/eigenvalues-and-eigenvectors
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.627Z
+lastUpdatedOn: 2026-04-23T17:39:39.627Z
+---
+
+Let $T: V\rightarrow V$ over $F$. $\lambda \in F$ and $v \in V$ satisfying $T(v)=\lambda v$ are called an eigenvalue and a corresponding eigenvector of $T$ respectively.
+
+Here for any $\lambda$, $v=\underline{0}$ is a trivial solution. Usually only non-trivial solutions are mentioned.
+
+## Eigenspace
+
+For a given $\lambda \in F$, the set of corresponding eigenvectors.
+
+```math
+V_\lambda = \set{ v\in V | T(v)=\lambda v }
+```
+
+An eigenspace is a subspace of $V$.
+
+:::note[Proof Hint]
+
+- $V_\lambda$ is non-empty (includes $\underline{0}$)
+- $V_\lambda \subseteq V$ 
+- $V_\lambda$ is closed under vector addition and scalar multiplication
+
+:::

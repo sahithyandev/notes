@@ -1,0 +1,23 @@
+---
+title: Pumping Lemma for CFL
+sidebar:
+  order: 23
+slug: s4/theory-of-computing/pumping-lemma-for-cfl
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.635Z
+lastUpdatedOn: 2026-04-23T17:39:39.635Z
+---
+
+
+Let $L$ be a CFL. Then $\exists n \in \mathbb{N}$ such that $\forall u \in L$ satisfying $|u| \ge n$, there are strings $v, w, x, y$ and $z$ satisfying:
+
+- $u = vwxyz$
+- $|wy| \gt 0$
+- $|wxy| \le n$
+- For any $m \ge 0$, $vw^mxy^mz$ is in $L$
+
+## Ogden’s Lemma
+
+A generalization of the pumping lemma for CFL. Can designate “distinguished” positions of $u$. Can guarantee pumped up portions include at least some of
+these distinguished positions. Sometimes more convenient to use; can also use when the pumping lemma fails.

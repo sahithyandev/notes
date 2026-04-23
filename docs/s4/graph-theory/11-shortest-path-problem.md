@@ -1,0 +1,61 @@
+---
+title: Shortest Path Problem
+sidebar:
+  order: 11
+slug: s4/graph-theory/shortest-path-problem
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.623Z
+lastUpdatedOn: 2026-04-23T17:39:39.623Z
+---
+
+The task of finding a path between 2 vertices such that the sum of edge weights is minimized. There might multiple shortest path trees for a given graph and a source vertex.
+
+Used in routing in computer networks, GPS navigation and resource optimization.
+
+## Shortest Path Tree
+
+A tree that represents shortest paths from a source to all vertices. Source vertex is the root. Edges correspond to shortest paths.
+
+### Relaxation
+
+Relaxation updates distances when a shorter path is found:
+
+```math
+\text{dist}(v) = \text{dist}(u) + w(u,v)
+```
+
+## Dijkstra’s Algorithm
+
+A greedy method for finding shortest paths from a single source in graphs with non-negative weights. Guaranteed optimal solution. Efficient for sparse graphs. High memory usage for large grahps. Does not support negative weights.
+
+1. Initialize:
+   - $S = \emptyset$
+   - $\text{dist}[\text{source}] = 0$
+   - $\text{dist}[\text{others}] = \infty$
+
+2. Repeat until all vertices processed:
+   - pick vertex with minimum distance not in $S$
+   - add it to $S$
+   - update (relax) distances of neighbors
+   
+[Dijkstra's Algorithm was covered in S2](https://s2.sahithyan.dev/data-structures-and-algorithms/algorithms/dijkstras-algorithm/) as well.
+
+## Bellman–Ford Algorithm
+
+A dynamic programming algorithm for single-source shortest paths. Repeatedly relax all edges to progressively improve distance estimates.
+
+Supports negative weights. Detects negative cycles. Guaranteed to be optimal. Slower than Dijkstra.
+
+A negative cycle is a cycle whose total edge weight is negative. A negative cycle causes the shortest path to be undefined.
+
+1. Initialize:
+   - $\text{dist}[\text{source}] = 0$
+   - $\text{dist}[\text{others}] = \infty$
+
+2. Repeat relaxation:  
+   For each edge $(u,v)$, if $\text{dist}(u) + w(u,v) < \text{dist}(v)$, update the distance to be the smaller one.
+
+$n-1$ iterations are enough for bellman-form to become stable, where $n$ is the number of vertices. If $n$-th iteration causes distance changes, it means there are negative cycles.
+
+[Bellman-Ford Algorithm was covered in S2](https://s2.sahithyan.dev/data-structures-and-algorithms/algorithms/bellman-ford-algorithm/) as well.

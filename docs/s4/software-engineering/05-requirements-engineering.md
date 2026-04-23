@@ -1,0 +1,175 @@
+---
+title: Requirements Engineering
+sidebar:
+  order: 5
+slug: s4/software-engineering/requirements-engineering
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.631Z
+lastUpdatedOn: 2026-04-23T17:39:39.631Z
+---
+
+The process of identifying, analyzing, documenting, validating and managing system requirements.
+
+Requirement
+A description of:
+
+- System services
+- Operational constraints
+
+Key Idea
+Requirements define WHAT the system should do, not HOW.
+
+## Types of Requirements
+
+### User Requirements
+
+High-level descriptions. Written in natural language, often with diagrams. From user's (or customer's) perspectives. Mostly ambiguous.
+
+### System Requirements
+
+Detailed. Structured. Technical. Basis for contract. Must be precise. Intended to be used by engineers.
+
+### Functional Requirements
+
+Describes system services and behavior. Must be precise, testable and non-conflicting. Ambiguity leads to misinterpretation.
+
+### Non-Functional Requirements
+
+Constraints on system properties. Often more critical than functional requirements. Affect system architecture. Should be measurable.
+
+Types:
+
+- Product requirements (speed, availability)
+- Organizational requirements (standards, tools)
+- External requirements (laws, interoperability)
+
+### Domain Requirements
+
+Come from application domain. Implicit. Hard to understand.
+
+:::note[Goals vs. Requirements]
+
+Goals are general and high-level intentions. Requirements are measurable statements.
+
+:::
+
+## Software Requirements Specification
+
+Aka. SRS. Official statement of requirements. Includes user and system requirements. Not a design document. Focuses on WHAT the system should do.
+
+Intended to be used by:
+
+- Customers
+- Managers
+- Engineers
+- Test engineers
+- Maintenance engineers
+
+Typically a SRS document includes:
+
+1. Preface
+2. Introduction
+3. Glossary
+4. User requirements
+5. System architecture
+6. System requirements specification
+7. System models
+8. System evolution
+9. Appendices
+10. Index
+
+Requirements can be documented in various ways:
+
+- Natural language
+- Lacks clarity. Ambiguous. Difficult to analyze.
+- Structured natural language
+- Graphical models (UML)
+- Mathematical specification
+- Tabular specification
+
+## Structured Specification
+
+Form-based structure includes:
+
+- Function
+- Inputs
+- Outputs
+- Source
+- Action
+- Pre-condition
+- Post-condition
+- Side effects
+
+Used heavily in embedded systems.
+
+## Requirements Engineering Process
+
+An iterative process of 4 main activities.
+
+### Requirements Elicitation
+
+Discover requirements from stakeholders. And filter out irrelevant information.
+
+Stakeholders are the people who have an interest in the system. They can be users, managers, domain experts, regulators, IT staff, etc.
+
+Techniques:
+
+- Interviews (open/closed)
+- Scenarios
+- Use cases
+- Ethnography
+- Study of how humans (or users) work
+- Prototyping
+
+### Requirements Analysis
+
+The activity of examining elicited requirements to produce a clear, complete, consistent and feasible set of specifications. Transforms high-level, ambiguous stakeholder statements into precise, structured requirements and models.
+
+Key tasks:
+
+- Organize and classify requirements
+- Refine and decompose high-level requirements into detailed, implementable requirements and sub-requirements.
+- Resolve ambiguities and conflicts between stakeholder requests through negotiation and prioritization.
+- Check feasibility and realism against technical, budgetary and schedule constraints.
+- Define interfaces, data and control flows, and interactions (use cases, scenarios, sequence diagrams).
+- Identify and specify acceptance criteria and measurable quality attributes (performance, reliability, security).
+- Produce models and representations (UML, state machines, data models, formal specs) to reduce misunderstanding.
+- Establish traceability links to stakeholders, design artifacts and test cases to support change management.
+
+### Requirements Validation
+
+Ensure system matches customer needs. Fixing requirement errors after delivery is extremely expensive.
+
+Checks:
+
+- Validity
+- Consistency
+- Completeness
+- Realism
+- Verifiability
+
+Done through reviews, prototyping and test case generation.
+
+### Requirements Management
+
+Managing requirement changes during development.
+
+Requiments changes due to:
+
+- Business changes
+- Technical changes
+- Legal changes
+- User feedback
+
+Changes must be traceable (maybe using unique requirement IDs and version control tools).
+
+## Requirements Change Process
+
+Steps:
+
+1. Problem analysis
+2. Change analysis and costing
+3. Change implementation
+
+Must assess impact before accepting change.

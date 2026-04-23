@@ -1,0 +1,204 @@
+---
+title: Application Domains
+sidebar:
+  order: 9
+slug: s4/iot/applications
+prev: true
+next: false
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-04-23T17:39:39.625Z
+---
+
+## Application Types
+
+### Data-Driven Applications
+
+Where most processing is performed on data already stored in memory.
+
+- Large memory containing pre-loaded data
+- Complex instruction sets for intensive computation
+- Data is accessed synchronously when instructions require it
+- System responses mostly triggered by internal program events
+- Suitable for stored-program serial processing
+
+In these systems, algorithms operate on large datasets stored in memory. The processor spends most of its time executing calculations and logical operations on stored data.
+
+- Database processing
+- Scientific computation
+- Data analytics systems
+
+### I/O-Driven Applications
+
+Where most data originates from the external environment through sensors or input devices.
+
+- Minimal internal memory requirements
+- Data arrives asynchronously from external sources
+- Requires fast response to external events
+- Simpler but faster instruction sets
+- Must handle multiple external events simultaneously
+
+The processor reacts to real-world events rather than processing pre-stored data. Timing and responsiveness are more critical than computational complexity.
+
+Examples:
+- Embedded controllers
+- IoT devices
+- Industrial automation systems
+
+## IoT Ecosystem
+
+Consists of various domains where connected devices are used to automate processes, collect data, and improve efficiency.
+
+Major domains:
+- Smart Home
+- Smart Grid
+- Wearables
+- Smart City
+- Connected Vehicles
+- Connected Healthcare
+- Smart Retail
+- Smart Supply Chain
+- Smart Farming
+- Industrial Internet
+
+## IoT Sub-Domains
+
+### Consumer IoT
+
+Devices used in personal environments.
+
+Examples:
+
+- Smart thermostat
+- Smart watch
+- Smart TV
+- Smart refrigerator
+- Smart air conditioner
+- Smart lights
+- Home security systems / CCTV
+- Connected cars
+
+### Commercial IoT
+
+Applications used by businesses and service providers.
+
+Examples:
+
+- Vehicle fleet tracking
+- Remote patient monitoring
+- Smart ID tags
+- Smart shopping carts
+- Targeted advertising
+- Smart transportation systems
+- Inventory and stock management
+
+### Industrial IoT
+
+Aka. IIoT. IoT systems used in manufacturing and industrial automation.
+
+Examples:
+
+- Factory automation
+- Smart utility grids
+- Smart manufacturing
+- Remote monitoring and maintenance
+- Security and access control
+- HR and time attendance systems
+- Supply chain management
+
+## Application Areas
+
+### Energy Systems
+
+- Smart meters
+- Distribution automation
+- EV charging management
+- Solar power monitoring
+- Battery storage management
+
+### Automotive Systems
+
+- Navigation systems
+- Electronic tolling
+- Traffic management
+- Parking management
+- Driver assistance systems
+
+### Cities and Communities
+
+- Smart public transport
+- Smart buildings
+- Smart government services
+- Utility monitoring
+- Emergency healthcare services
+
+### Healthcare
+
+- Medical implants
+- Vital sign monitoring
+- Telemedicine
+- Remote diagnostics
+- Equipment tracking
+
+### Industrial Systems
+
+- Asset utilization monitoring
+- Just-in-time manufacturing
+- Production monitoring
+- Smart valves and pumps
+- Energy management
+
+### Security
+
+- Surveillance and tracking
+- Access control
+- Disaster management
+- Environmental monitoring
+
+### Retail and Finance
+
+- Smart fuel stations
+- Supermarkets
+- Smart vending machines
+- ATMs and self-service checkout systems
+
+## Examples
+
+### Smart Traffic Management System
+
+Uses IoT sensors, cameras, and communication networks to optimize road traffic.
+
+Benefits:
+- Reduced traffic congestion
+- Fewer accidents
+- Optimized road usage
+- Reduced travel time
+- Enhanced security
+- Reduced pollution
+
+### Smart Railway System
+
+IoT-enabled railway systems monitor trains, tracks, and passenger services in real time.
+
+Benefits:
+
+- Shorter waiting times
+- Safer journeys
+- Reduced energy consumption
+- Increased security
+- Higher operational efficiency
+- Better passenger convenience
+
+### Smart Home
+
+Integrates IoT devices to automate household operations.
+
+Example devices:
+
+- Smart door locks
+- Smart security systems
+- Smart air conditioners
+- Lighting control systems
+- Energy management systems
+- Smart thermostats
+- Smart garage doors
+- Smart appliances

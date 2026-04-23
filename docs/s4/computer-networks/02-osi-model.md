@@ -1,0 +1,88 @@
+---
+title: OSI Model
+sidebar:
+  order: 2
+slug: s4/computer-networks/osi-model
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.619Z
+lastUpdatedOn: 2026-04-23T17:39:39.619Z
+---
+
+Introduced by ISO. Defines a framework for building and understanding networks. Describe the pieces needed to construct a network. Introduced to serve as a basis for standardization.
+
+## 7 Layers
+
+The model is organized into 7 layers.
+
+The OSI model is organized into seven layers, from lowest to highest:
+
+- Physical
+- Data Link
+- Network
+- Transport
+- Session
+- Presentation
+- Application
+
+### Physical Layer
+
+Accepts a raw string of bits and delivers it across a link. Key concerns include connection establishment and termination, encoding of bits, transmission of bits, and repeating or amplifying signals to extend range.
+
+### Data Link Layer
+
+Provides error-free transmission across a single link. Handles framing, error detection and correction, and flow control.
+
+### Network Layer
+
+Delivers packets from the sending computer to the receiving computer across a network (host-to-host). Shields higher layers from the details of how data reaches its destination. Key issues include addressing, routing, congestion control, and quality of service.
+
+### Transport Layer
+
+Provides end-to-end delivery between two hosts across a network. Handles connection establishment and termination, flow control, error detection and correction, quality of service, and multiplexing. Performs many of the same functions as the data link layer, but the two endpoints are across a network rather than just across a wire.
+
+### Session Layer
+
+Controls the dialog between two end-user applications. Deals with dialogue management (half- vs. full-duplex) and synchronization and recovery. In practice, the session layer is not often used in modern systems.
+
+### Presentation Layer
+
+Formats data for transmission, accounting for the fact that different systems may represent data differently. Today, presentation-layer functions are generally handled by application protocols.
+
+### Application Layer
+
+Provides general-purpose network-based functions such as file transfer, electronic mail, directory lookup, virtual terminal, network management, and the World Wide Web. Commonly used services have been standardized.
+
+## Real World Implementations
+
+Real world implementations of networking architectures/protocols may or may not conform to the OSI model.
+
+### TCP/IP
+
+The actual set of protocols that powers the modern internet. Developed around the same time as OSI. fewer layers, easier to implement. It won out in practice because it was already running on the internet before OSI-based systems could gain traction.
+
+Popular because:
+
+- Was already running on the internet before OSI was standardized
+- Runs on virtually everything (supercomputers, PCs, phones)
+- Has consistent APIs
+- Has a strong track record
+- Is less complex than OSI
+- Underpins the Internet and World Wide Web
+
+Has 4 layers:
+
+- Data Link / Physical
+- Internet
+- Transport
+- Application
+
+The physical layer is provided outside TCP/IP. Session and presentation functions are absorbed into other layers.
+
+### SNA
+
+Aka. Systems Network Architecture. IBM's proprietary networking architecture, developed in the 1970s for connecting IBM mainframes and terminals. It was widely used in corporate environments but was largely displaced by TCP/IP over time.
+
+### WAP
+
+Aka. Wireless Application Protocol. A standard developed in the late 1990s to allow early mobile phones to access internet-like content. It predated smartphones and was designed for the very limited screens and slow connections of phones at the time. It became mostly obsolete once modern smartphones with full browsers arrived.

@@ -1,0 +1,68 @@
+---
+title: Representations
+sidebar:
+  order: 4
+slug: s4/graph-theory/representations
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.622Z
+lastUpdatedOn: 2026-04-23T17:39:39.622Z
+---
+
+A graph can be represented in multiple ways.
+
+## Diagrammatic Representation
+
+Vertices are denoted by points, edges are denoted by lines. Intuitive. Not practical for big graphs.
+
+## Set-theoretic Representation
+
+A graph $G$ is represented as an ordered pair $(V, E)$ where:
+- $V$ is the set of vertices
+- $E$ is the set of edges (2-element subsets of $V$ for simple graphs; multi-sets for multigraphs)
+
+## Adjacency Matrix
+
+An adjacency matrix records how many edges connect each pair of vertices. Shows vertex-vertex relationships.
+
+Suppose a graph $G$ has $n$ vertices. $G$'s adjacency matrix representation is defined as:
+
+```math
+A(G) = (a_{ij})_{n\times n}
+```
+
+Where $a_{ij}$ is the number of edges between $v_i$ and $v_j$.
+
+For undirected graphs, $A(G)$ is a symmetric matrix.
+
+For simple graphs:
+- entries are 0 or 1
+- diagonal entries are 0
+
+## Incidence Matrix
+
+Shows vertex-edge relationships. 
+
+For a graph $G$ with $n$ vertices and $m$ edges. Its incidence matrix representation is defined as:
+
+```math
+I(G) = (a_{ij})_{n\times m}
+```
+is defined as:
+
+- $a_{ij} = 1$ **if** vertex $v_i$ is incident with edge $e_j$ and the edge joins two distinct vertices
+- $a_{ij} = 2$ **if** $e_j$ is a loop at $v_i$
+- $a_{ij} = 0$ otherwise
+
+Rows correspond to vertices. Columns correspond to edges.
+
+Useful for edge-based algorithms. Useful when the graph is sparse.
+
+### For Directed Graphs
+
+Let $e_j$ be an edge from tail $u$ to head $v$. Then:
+
+- $a_{ij} = 1$ if $v_i$ is the tail of $e_j$
+- $a_{ij} = -1$ if $v_i$ is the head of $e_j$
+- $a_{ij} = 2$ if $e_j$ is a loop at $v_i$
+- $a_{ij} = 0$ otherwise

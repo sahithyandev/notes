@@ -1,0 +1,118 @@
+---
+title: Vertex Coloring
+sidebar:
+  order: 9
+slug: s4/graph-theory/vertex-coloring
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.623Z
+lastUpdatedOn: 2026-04-23T17:39:39.623Z
+---
+
+Aka. proper vertex coloring. The assignment of colors to vertices such that no two adjacent vertices have the same color. If a maximum of $m$ colors are used, then referred to as $m$-coloring.
+
+## Chromatic Number
+
+The minimum number of colors required for a proper vertex coloring. Denoted by $\chi(G)$.
+
+Equal for all isomorphic graphs. $\chi(K_n) = n$.
+
+For $n \gt 2$,
+
+```math
+\chi(C_n) = \begin{cases}
+2 & \text{if }n\text{ is even} \\
+3 & \text{if }n\text{ is odd}
+\end{cases}
+```
+
+## Chromatic Polynomial
+
+A polynomial representing the number of proper vertex colorings of a graph for $x$ number of colors. Denoted as $P(G, x)$. Depends on graph structure.
+
+For [$K_n$](/graph-theory/types-of-graphs/#complete-graph),
+
+```math
+P(G,x) = \prod_{i=0}^{n-1} {x - i}
+```
+
+For a [null graph](/graph-theory/types-of-graphs/#null-graph) with $n$ vertices,
+
+```math
+P(G,x) = x^n
+```
+
+For a graph with multiple connected components $\set{ G_1, G_2, \dots, G_k }$,
+
+```math
+P(G, x) = \prod_{i=1}^{k} P(G_i, x)
+```
+
+In the polynomial, absolut  value of the coeffecient of $x^{n-1}$ gives the number of edges in the graph where $n$ is the number of vertices.
+
+### Deletion–Contraction Method
+
+A recursive method to compute the chromatic polynomial.
+
+```math
+P(G, x) = P(G - e, x) - P(G/e, x)
+```
+
+Here:
+
+- $e$: an edge
+- $(G-e)$: resulting graph when $e$ is removed from $G$
+- $(G/e)$: resulting graph when ednpoints of $e$ is merged
+
+Explanation:
+
+- counts colorings excluding conflicts (via subtraction)
+- reduces complex graphs step-by-step
+
+Key properties:
+• parallel edges after contraction can be treated as one
+• loops result in zero colorings
+
+## Algorithms
+
+### Greedy Coloring Algorithm
+
+Assigns colors sequentially based on a chosen vertex order.
+
+Steps:
+
+- Initialize empty coloring
+- Choose an order of vertices
+- For each vertex:
+  - assign smallest available color not used by neighbors
+  - create new color if needed
+- repeat until all vertices are colored
+
+Simple. Efficient. Not optimal. Depends on vertex ordering.
+
+### Other algorithms
+
+Several algorithms aim to improve solution quality.
+
+- Welsh–Powell algorithm
+- DSatur algorithm
+
+## Applications
+
+### Map Coloring
+
+Assign colors to regions such that adjacent regions differ.
+
+Regions are modelled as vertices and shared boundaries are modelled as edges.
+
+### Timetable Scheduling
+
+Assign time slots to exams such that no student has overlapping exams.
+
+Exams are modelled as vertices. Shared students are edges. Time slots are colors. Minimum number of required time slots is the chromatic number.
+
+### Other Applications
+
+- Register allocation in compilers
+- Mobile frequency assignment
+- Sudoku solving

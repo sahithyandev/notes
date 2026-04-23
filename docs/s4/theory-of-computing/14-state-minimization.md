@@ -1,0 +1,97 @@
+---
+title: State Minimization
+sidebar:
+  order: 14
+slug: s4/theory-of-computing/state-minimization
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.634Z
+lastUpdatedOn: 2026-04-23T17:39:39.634Z
+---
+
+The process of reducing the number of states in a DFA. The equivalent DFA with the minimum number of states is called the minimal DFA. For a regular language, its minimal DFA is unique up to state renaming.
+
+A DFA may contain unnecessary states due to:
+
+- unreachable states
+- states that behave identically for all input strings
+
+### Properties of Minimal DFA
+
+- Has the minimum number of states among all equivalent DFAs.
+- No two states are equivalent.
+- All states are reachable.
+- Unique up to renaming of states.
+
+## Types of States
+
+### Unreachable State
+
+A state that cannot be reached from the start state for any input string. Does not affect the language recognized by the DFA. Must be removed before checking for state equivalence.
+
+If a state is never visited during computation, it plays no role in determining whether a string is accepted.
+
+### Equivalent States
+
+Aka. indistinguishable states. 2 states are equivalent or indistinguishable **iff** for every possible input string they lead to the same acceptance result (whether accepted or not).
+
+Equivalent states cannot be distinguished by any input string. Therefore, they can be merged into a single state without affecting the language.
+
+### Distinguishable States
+
+Two states are distinguishable **iff** there exists at least one input string that leads one state to acceptance and the other to rejection.
+
+Such states must remain separate because merging them would change the language recognized by the DFA.
+
+## Myhill-Nerode Theorem
+
+A language $L$ is regular **iff** the number of equivalence classes of the Myhill–Nerode relation for $L$ is finite.
+
+Two strings are considered equivalent if appending any string to them always produces the same acceptance result.
+
+Implies that for all language $L$ there exists a unique minimal DFA with a number of states equal to the number of equivalence classes under the Myhill-Nerode relation.
+
+### Myhill-Nerode Relation
+
+Two strings $x$ and $y$ are equivalent with respect to a language $L$ **iff**:
+```math
+\forall z \ in L, xz \in L \iff yz \in L
+```
+
+## Table Filling Algorithm
+
+A systematic procedure used to identify distinguishable states and determine equivalent states.
+
+### Step 1 — Construct the State Pair Table
+
+List all unordered pairs of states.
+
+Example:
+
+| Pair    |
+| ------- |
+| (q0,q1) |
+| (q0,q2) |
+| (q1,q2) |
+
+### Step 2 — Mark Final vs. Non-Final Pairs
+
+Mark pairs where one state is final and the other is non-final. These states are immediately distinguishable.
+
+### Step 3 — Check Transitions
+
+For each unmarked pair $(p,q)$, examine transitions for every input symbol
+
+```math
+\delta(p, a) = r \text{ and } \delta(q, a) = s
+```
+
+If pair $(r,s)$ is already marked, then $(p,q)$ must also be marked.
+
+### Step 4 — Repeat Until Stable
+
+Continue marking pairs until no new pairs can be marked.
+
+### Step 5 — Identify Equivalent States
+
+All unmarked pairs represent equivalent states. Merge these states and adjust transitions accordingly to obtain the minimal DFA.

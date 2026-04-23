@@ -1,0 +1,53 @@
+---
+title: Encryption
+sidebar:
+  order: 6
+slug: s4/operating-systems-security/encryption
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.628Z
+lastUpdatedOn: 2026-04-23T17:39:39.628Z
+---
+
+Protects confidentiality and integrity of data during transmission or storage.
+
+Plain data is converted to ciphertext in the process of encryption. A key is used in the process. Similarly, decryption converts the ciphertext back to the original data using a (same or different) key. Security depends on the secracy of the keys, and not the algorithms.
+
+### Terminology
+
+Ciphertext means the encrypted message.
+- sender: origin of message
+- recipient: intended receiver
+- plaintext: original message
+- ciphertext: encrypted message
+- encryption: converting plaintext to ciphertext
+- decryption: reverse process
+- cryptosystem: overall system of algorithms and keys
+
+## Symmetric Encryption
+
+Uses a single key for both encryption and decryption. Key must remain secret between sender and receiver.
+
+Fast to generate. Efficient for large data. Difficult to safely share the key.
+
+## Asymmetric Encryption
+
+Uses a pair of keys: public and private. Public key is shared publicly. Private key is not shared. Messages encrypted with one key, can only be decrypted by the other.
+
+Easy key distribution. No shared secrets required. Slower than symmetric.
+
+## Digital Signature
+
+Authenticity and integrity of a message. Created using sender's private key. Verified using sender's public key.
+
+• created using sender’s private key
+• verified using sender’s public key
+• properties:
+
+- authentic
+- unforgeable
+- bound to document
+
+## Digital Certificates
+
+A digital certificate binds a public key to an identity. Issued and signed by a Certificate Authority. They verify the identity before issuing certificates. Enables trust in public key systems.

@@ -1,0 +1,51 @@
+---
+title: Connectedness
+sidebar:
+  order: 7
+slug: s4/graph-theory/connectedness
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.623Z
+lastUpdatedOn: 2026-04-23T17:39:39.623Z
+---
+
+An undirected graph is called a connected graph when any pair of vertices can be connected by a path. Otherwise, it's a disconnected path. For directed graphs, there are no simple explanations. Use the definition below.
+
+## Connected Graphs
+
+A graph is connected **iff** every pair of vertices has a path between them. Otherwise the graph is disconnected.
+
+### Condition 1
+
+A graph is disconnected **iff** its vertex set can be split into 2 disjoint non-empty sets with no edges between them.
+
+### Condition 2
+
+A graph is connected **iff** every entry of $A + A^2 + \dots + A^{n-1}$ is non-zero.
+
+## Connected Components
+
+A maximal connected subgraph. Every pair of vertices inside are connected. No connection to outside vertices. Each component is an isolated piece of a graph.
+
+A connected graph has exactly 1 connected component which is itself. A disconnected graph has more than 2 components.
+
+## Distance
+
+Length of the shortest path between two vertices. Denoted as $\text{dist}(u, v)$. if no path exists, $dist(u, v) = \infty$
+
+Properties:
+
+- Non-negativity: $\text{dist}(u, v) \ge 0$
+- Identity: $\text{dist}(u, v) = 0 ⇔ u = v$
+- Symmetry: $\text{dist}(u, v) = \text{dist}(v, u)$
+- Triangle inequality: $\text{dist}(u, w) \le \text{dist}(u, v) + \text{dist}(v, w)$
+
+## Diameter
+
+Maximum distance between any two vertices. Denoted as $\text{diam}(G)$.
+
+```math
+\text{diam}(G) = \text{max} \set{\text{dist}(u, v) | \forall u, v \in V(G)}
+```
+
+Measures the _largest shortest path_ in the graph.

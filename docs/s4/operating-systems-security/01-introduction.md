@@ -1,0 +1,87 @@
+---
+title: Introduction to Operating Systems Security
+sidebar:
+  order: 1
+  label: Introduction
+slug: s4/operating-systems-security/introduction
+prev: false
+next: true
+dateCreated: 2026-04-23T17:39:39.627Z
+lastUpdatedOn: 2026-04-23T17:39:39.627Z
+---
+
+Computer Security is the study of protecting the assets of a computer system (hardware, software, data, and people).
+
+## Assets
+
+### Hardware
+
+Computers, devices, network gear.
+
+### Software
+
+Operating systems, utilities, applications.
+
+### Data
+
+Documents, emails, media files.
+
+### People
+
+System admins, users, customers.
+
+:::note
+
+Hardware and software off-the-shelf replaceable in most cases. People and data are irreplaceable at all cases.
+
+:::
+
+## Identity
+
+A digital identity includes all the information about an individual, organization, or device that exists online, such as names, email addresses, or medical history.
+
+## Vulnerability
+
+A weakness in the security system.
+
+## CIA Triad
+
+A fundamental model in information security that defines the core objectives required to protect information systems.
+
+Stands for:
+
+- Confidentiality  
+  Ensures unauthorized parties cannot access information.
+- Integrity  
+  Protects information from being modified or deleted.
+- Availability  
+  Ensures information is accessible for authorized parties.
+
+When all the objectives are met, the system is said to be secure.
+
+Sometimes additional objectives are included as well.
+
+- [Authentication](/operating-system-security/authentication)  
+  Proving that the identity of a person or device they are claiming to be. Can be thought of as integrity of identity.
+- Nonrepudiation  
+  Assurance that actions or messages cannot be denied.
+
+## Types of Harm
+
+- Modification  
+  Unauthorized changes to data.
+- Fabrication  
+  Creation of counterfeit data or objects.
+- Interception  
+  Unauthorized access to data.
+- Interruption  
+  Making data unavailable or unusable.
+
+## Security Goals
+
+- Prevention  
+  Stop attacks before they happen.
+- Detection  
+  Identify violations as they occur.
+- Recovery  
+  Respond and restore after an attack.

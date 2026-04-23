@@ -1,0 +1,159 @@
+---
+title: Thing
+sidebar:
+  order: 2
+slug: s4/iot/thing
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.624Z
+lastUpdatedOn: 2026-04-23T17:39:39.624Z
+---
+
+A physical device. Collects surrounding information through sensors. Interacts with the physical environment using actuators. Connected to similar devices, and/or to the internet for communication. Requires little to no human intervention. Interacts with each other, external systems and with humans. Often operates with limited power and resources. Optionally performs local computation and control.
+
+## Components
+
+### Sensors
+
+Devices that measure physical properties from the environment. Enables IoT devices to perceive their surroundings. May meausre one or more parameters.
+
+Examples:
+
+- Temperature sensors
+- Humidity sensors
+- Heart-rate monitors
+- GPS receivers
+- Oxygen (SpO₂) sensors
+
+### Actuators
+
+Devices that perform actions in the physical world based on control signals. Allows IoT devices to interact with and modify their environment. Can be mechanical, electrical, or electronic.
+
+Examples:
+
+- Motors
+- Relays
+- Valves
+- Speakers
+- Displays
+
+### Interfaces
+
+Mechanisms that connect the IoT device with external devices or systems. Allows communication and data exchange between the IoT device and other components. Can be wired or wireless.
+
+Common interfaces:
+
+- GPIO
+- SPI
+- I²C
+- UART
+- USB
+
+### Local Computation
+
+Refers to processing performed inside the IoT device. Performed using microcontrollers or embedded processors. Processes sensor data locally.
+
+Local computing reduces the need to send all data to remote servers, reduces latency, and ensure data privacy.
+
+### Communication
+
+The process of exchanging information with other devices or cloud platforms.
+
+#### Local communication
+
+Communication between nearby devices using M2M wireless protocols such as:
+
+- MQTT  
+  Lightweight, fast and popular.
+- Bluetooth  
+  Short range.
+- Zigbee  
+  Uses very low power. Not so famous.
+- Wi-Fi  
+  High speed.
+
+#### Remote communication
+
+Communication with distant systems or cloud platforms using the internet. Used to send data for analysis, receive commands, or update firmware.
+
+### Power Management
+
+Refers to efficient energy usage within IoT devices. Common power sources are batteries, solar power, or energy harvesting.
+
+Power management is critical for battery-powered devices, as they often operate in environments where frequent charging is not feasible.
+
+## Operational Requirements
+
+IoT devices operate under constraints that differ from general-purpose computers. These include:
+
+- Real-time response  
+  Required for control systems.
+- Low power operation  
+  Most IoT devices run on batteries, so energy efficiency is crucial. Otherwise devices would require frequent charging or battery replacement.
+- Harsh environment tolerance  
+  Must operate in outdoor or industrial environments where there may be extreme temperatures, humidity, dust, vibrations or EM radiations.
+- Limited resources  
+  Memory and processing power are often limited.
+- Fail-safe operation  
+  Must remain safe even when failures occur. Must handle errors gracefully and avoid causing harm to users or the environment. Must be able to recover from failures or enter a safe state when necessary.
+- Unreliablity  
+  May experience power or network interruptions or fluctuations.
+- Self-configuration  
+  Should configure themselves automatically when connected to networks.
+
+## IoT Devices vs Traditional Computers
+
+| Aspect            | Traditional Computers     | IoT Devices            |
+| ----------------- | ------------------------- | ---------------------- |
+| Purpose           | General-purpose computing | Real-world interaction |
+| Power consumption | High                      | Low                    |
+| Storage           | Large                     | Limited                |
+| Processing power  | High                      | Limited                |
+| Power input       | Stable electrical power   | Often battery-powered  |
+| Computing model   | Data-driven               | Event-driven           |
+| I/O Devices       | Less                      | High                   |
+
+## Software
+
+IoT devices are event-driven. Input is asynchronous. Output must be real-time. Memory and processing power are limited. Software written for IoT devices must be efficient and optimized for these constraints.
+
+## Developing an IoT Thing
+
+### Hardware requirements
+
+- [Development board](/iot/development-board)
+- [Microcontroller](/iot/microcontrollers)
+- Programming interface (USB)
+- Sensors and actuators
+- Analog and digital I/O modules
+- Power and reset circuitry
+
+### Software requirements
+
+• Development framework
+• Programming language
+• Embedded operating system or firmware
+• IDE (Integrated Development Environment)
+• Compilers and debuggers
+• Device interface libraries
+• Communication libraries.
+
+## Example
+
+Smartwatch is a typical IoT device combining multiple sensors, computation, and communication capabilities.
+
+Includes sensors such as:
+
+- Heart rate monitor
+- Blood oxygen sensor (SpO₂)
+- Temperature sensor
+- GPS receiver
+- Accelerometer
+- Microphone
+
+And includes actuators such as:
+
+- Display
+- Speaker
+
+Uses Wi-Fi or Bluetooth for communication with smartphones (functions as the fog processing environemnt). Connection to cloud is handled by the smartphone. Performs local processing to provide real-time feedback to users.

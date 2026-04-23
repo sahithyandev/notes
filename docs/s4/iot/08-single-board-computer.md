@@ -1,0 +1,20 @@
+---
+title: Single Board Computer
+sidebar:
+  order: 8
+slug: s4/iot/single-board-computer
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-04-23T17:39:39.625Z
+---
+
+For complex IoT applications, instead of a 
+
+## Examples
+
+### Raspberry Pi
+
+Used for more complex IoT applications.
+
+Runs Linux operating system. High processing power. Supports cameras, image processing, displays, and networking.

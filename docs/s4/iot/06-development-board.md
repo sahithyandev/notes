@@ -1,0 +1,106 @@
+---
+title: Development Board
+sidebar:
+  order: 6
+slug: s4/iot/development-board
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-04-23T17:39:39.625Z
+---
+
+A hardware platform that contains a microcontroller or microprocessor along with supporting components required for prototyping embedded or IoT systems.
+
+Includes:
+- Integrated microcontroller or processor
+- Built-in power regulation and clock circuitry
+- I/O pins for sensors and actuators
+- Communication interfaces (USB, UART, I²C, SPI, Wi-Fi, Bluetooth)
+- Easy connection to a computer for programming
+
+## Advantages
+
+- Reduced development time
+- Reduced hardware complexity
+- Lower prototyping cost
+- Easy testing and debugging
+- Large community support
+
+Instead of designing custom electronics for each project, developers can prototype systems quickly using development boards and later move to specialized hardware for production.
+
+Development boards simplify hardware design by providing a ready-to-use platform where developers can write, test, and debug programs without building circuits from scratch. They are widely used for rapid prototyping of IoT systems.
+
+## Components
+
+### Microcontroller or Microprocessor
+
+The central computing unit that executes the program and controls peripherals.
+
+### Memory
+
+Memory stores program code and runtime data.
+
+- Flash memory – program storage
+- SRAM – temporary data storage
+- EEPROM – non-volatile storage
+
+### Input/Output Interfaces
+
+Pins and ports used to connect sensors, actuators, and other electronic components.
+
+Types:
+
+- Digital I/O pins
+- Analog input pins
+- PWM output pins
+
+### Communication Interfaces
+
+Interfaces that allow the board to communicate with other devices or networks.
+
+Examples:
+- UART (Serial communication)
+- SPI (Serial Peripheral Interface)
+- I²C (Inter-Integrated Circuit)
+- Wi-Fi
+- Bluetooth
+- Ethernet
+
+### Power Management
+
+Power circuits regulate voltage and supply power to the board and connected devices.
+
+Development board includes voltage regulators, USB power input and battery support
+
+### Programming and Debugging Interface
+
+Interfaces used to upload programs and debug the device.
+
+Examples:
+- USB programming interface
+- In-Circuit Serial Programming (ICSP)
+- Debugging ports
+
+
+## Examples
+
+### Arduino
+
+A popular microcontroller development board used for prototyping and by beginners. Contains an ATmega328 microcontroller and supports various I/O interfaces.
+
+Has:
+
+- Digital I/O pins
+- Analog input pins
+- PWM outputs
+- I²C communication pins (SCL/SDA)
+- USB interface for programming
+- Power supply pins (5V, 3.3V, GND)
+
+Has a large ecosystem of compatible sensors, shields, and libraries that simplify development.
+
+### ESP8266 / ESP32
+
+Another popular microcontroller developer board. Has built-in wireless connectivity. More powerful microcontroller compared to ATmega328.
+
+Used in smart home devices, wireless sensors.

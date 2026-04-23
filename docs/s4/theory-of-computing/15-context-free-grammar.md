@@ -1,0 +1,84 @@
+---
+title: Context-Free Grammar
+sidebar:
+  order: 15
+slug: s4/theory-of-computing/context-free-grammar
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.634Z
+lastUpdatedOn: 2026-04-23T17:39:39.634Z
+---
+
+A formal system used to generate strings of a language using production rules. Denoted as CFG. Defined as a 4-tuple $(V, \Sigma, S, P)$ where:
+
+- $V$ - finite set of variables (non-terminals)
+- $\Sigma$ - finite set of terminal symbols
+- $S \in V $ - start symbol
+- $P$ - finite set of productions
+
+$V$ and $\Sigma$ are disjoint.
+
+### Production Rule
+
+A production has the form $A \rightarrow \alpha$ where:
+
+- $A \in V$ (a non-terminal)
+- $\alpha \in (V \cup \Sigma)^*$
+
+This means a non-terminal (regardless of the surrounding) can be replaced by a string of terminals and/or non-terminals.
+
+Example: $S → Λ\;|\;Sa\;|\;Sb$
+
+### Derivations
+
+The process of generating strings from the start symbol using production rules.
+
+#### Single-step derivation
+
+Denoted as $\alpha \Rightarrow \beta$. Means $\beta$ is obtained from $\alpha$ using a production.
+
+#### Multi-step derivation
+
+Denoted as $\alpha \Rightarrow^* \beta$. Means $\beta$ is derived from $\alpha$ in zero or more steps.
+
+## Nullable Variable
+
+A non-terminal symbol $A$ is a nullable variable **iff** there is a production $A \Rightarrow* \epsilon$.
+
+### FindNull Algorithm
+
+- Start with $N_0$, a set of variables directly producing $\Lambda$
+- Define $N_{i+1} = N_i \cup \set {\text{non-terminals which produce elements of } N_i}$ 
+- Repeatedly calculate $N_{i+1}$ until $N_i \neq N_{i+1}$
+- $N_i$ is the set of all nullable non-terminals
+
+## Regular Grammar
+
+A restricted CFG where productions have one of the forms:
+
+- $B → aC$
+- $B → a$
+
+where:
+
+- $B, C$ are non-terminals
+- $a$ is a terminal
+
+
+## CFG for a Regular Expression
+
+Example regular language: $(011|1)^*(01)^*$
+
+Equivalent CFG:
+
+```
+A → 011 | 1
+B → AB | Λ
+D → 01
+C → DC | Λ
+S → BC
+```
+
+## CFG for a Finite Automata
+
+For each transition `P --a--> Q` in the FA, add production $P \rightarrow aQ$. If state $Q$ is an accepting state, add $P \rightarrow a$.

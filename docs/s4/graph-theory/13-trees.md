@@ -1,0 +1,77 @@
+---
+title: Trees
+sidebar:
+  order: 13
+slug: s4/graph-theory/trees
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.624Z
+lastUpdatedOn: 2026-04-23T17:39:39.624Z
+---
+
+A graph is a tree **iff** it's connected and acyclic.
+
+### Forest
+
+A graph is a forest **iff** it's all connected components are trees. All acyclic graphs are forests. All subgraphs of a forest is also a forest.
+
+Subgraphs of a tree is a
+
+### Subtree
+
+If a subgraph of a tree is also a tree, it's a subtree.
+
+## Theorem
+
+All 4 below statements are equivalent:
+
+1. $T$ is a tree
+2. Any two vertices of $T$ are joined by a unique path
+3. $T$ is connected and $|E(T)|= |V(T)|−1$
+4. $T$ is acyclic and $|E(T)|= |V(T)|−1$
+
+:::note[Proof Hint]
+
+First prove: $(1) => (2)$
+- A tree is connected (and acyclic) and assume it has more than 1 vertex
+- A connected graph implies any 2 vertices are connected by a path
+- Assume there are 2 distinct paths between 2 vertices, which means there is a cycle and it's a contradiction
+
+Then prove: $(1) => (3)$
+- Suppose any 2 vertices are joined by a unique path in a graph $T$
+- $T$ is connected
+- Unique path implies no cycles
+- Using induction on vertex count, prove $|E(T)|= |V(T)|−1$
+
+Then prove: $(3) => (4)$
+- Assume the condition and $T$ is cyclic.
+- Then there exists a cycle of length $k \le n$
+- Case 1: $k=n$ which implies $|E(T)\ge n$
+- Case 2: $k \lt n$
+
+Then prove: $(4) => (1)$
+- Assume the condition and $T$ is not connected.
+- Acyclic means it's a forest which is a composition of trees.
+
+Then prove: $(1) => |E(T)| = |V(T)|-1$
+- Start with a graph with a single vertex and no edges. Obviously a tree.
+- 
+
+:::
+
+## Leaf
+
+A vertex with degree 1, in a tree.
+
+Any tree with 2 or more vertices, contains at least 2 leaves.
+
+:::note[Proof Hint]
+
+- There is only 1 tree with 2 vertices. And it contains 2 leaves.
+- Suppose a tree $T$ has more than 2 vertices. And assume $T$ has 0 or 1 leaves.
+- Case 1: there are 0 leaves. Then all vertices have 0 or more than 1 degree.
+- Case 1.1: all vertices have 0 degree. which means disconnected graph. That's a contradiction.
+- Case 1.2: all vertices have more than 1 degree. then $\sum \text{deg}(v) = 2 |E(T)| = |V(T)| -1 \ge 2 |V(T)|$. That's a contradiction.
+- Case 2: only 1 leaf. Then $\sum \text{deg}(v) = 2 |E(T)| \ge 2 (|V(T)| - 1) + 1$. That's also a contradiction.
+
+:::

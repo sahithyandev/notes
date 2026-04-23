@@ -1,0 +1,82 @@
+---
+title: Authentication
+sidebar:
+  order: 7
+slug: s4/operating-systems-security/authentication
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.629Z
+lastUpdatedOn: 2026-04-23T17:39:39.629Z
+---
+
+The process of proving that the identity of a person or device they are claiming to be.
+
+## Types
+
+### Something you know
+
+Aka. knowledge factor. Passwords, security questions, PINs, etc. Most common and weakest factor.
+
+Informed attackers can easily exploit them using techniques like dictionary or brute-force attack.
+
+Time required to crack passwords depends on length and complexity. Must be long and complex to be safe from quick brute-force hacks. Must be stored securely (salted and hashed) to prevent unauthorized access in case of a data breach.
+
+### Something you have
+
+Aka. possession factor. Devices like smart cards, tokens, or a phone with SMS codes.
+
+#### Active Tokens
+
+Require server-side validation which involves a database lookup.
+
+Example: OTP.
+
+Instantly revocable. Can be updated without reissuing. Not good for scalable and distributed environments.
+
+#### Passive Tokens
+
+Self-contained. Stateless. Do nothing. Server checks for integrity of the token (using no external information).
+
+Example: Photo IDs.
+
+Works well in scalable and distributed environments. However, they can be lost, stolen, or duplicated. Can be instantly revocable (through specific techniques).
+
+#### Hybrid Tokens
+
+Combine active and passive token features. They are self-contained but also require server-side validation.
+
+### Something you are
+
+Aka. characteristic factor or biometric authentication.
+
+While biometrics are increasingly used for convenience, they remain unsuitable for highly sensitive applications. Advances in smartphones have made them cheaper and more accessible.
+
+Expensive, intrusive, false readings (false positives/negatives), and potential forgery.
+
+High chance of false positives (incorrectly accepting an unauthorized user) and false negatives (incorrectly rejecting an authorized user). This can lead to security breaches or user frustration.
+
+Examples: fingerprints, retina scans, or facial recognition.
+
+## Multi-Factor Authentication (MFA)
+
+Combines 2 or more authentication factors to enhance security.
+
+Examples: password + SMS code, or password + fingerprint.
+
+## Federated Identity Management
+
+Aka. FIM. Allows users to use a single set of credentials across multiple systems or organizations. It relies on trust relationships between identity providers (IdPs) and service providers (SPs) to enable seamless access.
+
+### Single Sign-On
+
+Aka. SSO. Lets users log in once and access multiple applications without re-authenticating. Works with federated identity management systems to unify authentication across different platforms.
+
+## Computer-Computer Authentication
+
+Computers do not _remember_. They store information. Stored authentication credentials could be stolen by malware and reused by attackers.
+
+### Continuous Authentication
+
+The process of continuously monitoring ongoing communication session to ensure the communication entity remains the same. In computer-computer authentication, even after authentication succeeds, systems must continuously verify the connection.
+
+Prevents attacks such as session hijacking and communication interception.

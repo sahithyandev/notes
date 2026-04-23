@@ -1,0 +1,102 @@
+---
+title: Introduction to Linear Algebra
+sidebar:
+  order: 1
+  label: Introduction
+slug: s4/linear-algebra/introduction
+prev: false
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-04-23T17:39:39.625Z
+---
+
+## Group
+
+$(G,*)$ is a group **iff** $*$ is a binary operation on set $G$ satisfying:
+
+- Non-empty  
+  $G \neq \emptyset$.
+- Closed  
+  $\forall a,b \in G, a * b \in G$.
+- Associateive  
+  $\forall a,b,c \in G, (a * b) * c = a * (b * c)$.
+- Identity exists  
+  $\exists e \in G$ such that $\forall a \in G, e * a = a * e = a$.
+- Inverse exists  
+  $\forall a \in G, \exists a^{-1} \in G$ such that $a * a^{-1} = a^{-1} * a = e$.
+
+Can either be finite or infinite.
+
+Properties:
+
+- Identity is unique.
+- Inverse is unique for each element.
+- $\forall a \in G, \bar{\bar{a}} = a$.
+
+Examples:
+
+- $(\mathbb{Z}, +)$
+- $(\mathbb{R}, +)$
+- $(\mathbb{R}\setminus{0}, \cdot)$
+- [Monster Group](https://en.wikipedia.org/wiki/Monster_group)  
+  A finite group with roughly $8 \times 10^{53}$ elements.
+
+:::note
+
+For any prime number $p$, there exists a group $(G_p, \cdot \mod p)$, where $G_p = \set{1,2,3,\dots,p-1}$.
+
+:::
+
+## Abelian Group
+
+A group where the binary operation is commutative.
+
+$(G,*)$ is abelian **iff**:
+
+- $(G,*)$ is a group **and**
+- $\forall a,b \in G, a * b = b * a$.
+
+## Ring
+
+$(R,+,\cdot)$ is a ring **iff**:
+- $(R,+)$ is an abelian group
+- $\cdot$ is associative and distributive over addition
+- $\cdot$ has a multiplicative identity element
+
+Not studied in this module.
+
+:::note
+
+Rings are close to fields, except rings do not have a multiplicative inverse.
+
+:::
+
+## Field
+
+$(F,+,*)$ is a field **iff** 2 operations $+$ and $\cdot$ on $F$ satisfying:
+
+- $(F,+)$ is an abelian group
+- $(F\setminus{0},\cdot)$ is an abelian group ($0$ is additive identity)
+- $\forall a,b \in F, a\cdot b \in F$ ($1$ is multiplicative identity)
+- multiplication is closed and distributive over addition  
+  $\forall a,b,c \in F, a\cdot(b+c) = a\cdot b + a\cdot c$
+
+Additive identity ($0$) is excluded for multiplication ($*$) operatin because it doesn't have an inverse.
+
+Properties:
+
+- $0$ and $1$ are unique.
+- $F$ has atleast 2 elements: $0$ and $1$.
+
+Examples:
+
+- $(\mathbb{R}, +, \cdot)$
+- $(\set{0,1,2}, +\mod 3, \cdot\mod 3)$
+
+## Finite Fields
+
+A field with a finite number of elements.
+
+For a prime number $p$, $\mathbb{F}_p = (\set{0,1,2,\dots,p-1},+\mod p, \cdot\mod p)$ is a field.
+
+Every finite field has size $p^k$ for some prime $p$ and an some integer $k$. And, for any prime $p$ and for any integer $k$, there exists a field with size $p^k$. **BUT** not every set with $p^k$ number of elements are a field.

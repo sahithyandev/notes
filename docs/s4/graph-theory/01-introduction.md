@@ -1,0 +1,362 @@
+---
+title: Introduction to Graph Theory
+sidebar:
+  order: 1
+  label: Introduction
+slug: s4/graph-theory/introduction
+prev: false
+next: true
+dateCreated: 2026-04-23T17:39:39.622Z
+lastUpdatedOn: 2026-04-23T17:39:39.622Z
+---
+
+For all the definitions below, consider a graph $G$ with vertex set $V$ and edge set $E$.
+
+## Vertex
+
+Denoted by a point.
+
+### Degree
+
+The number of edges incident on a vertex. Denoted by $\text{deg}(v)$. A loop contributes 2 to the degree of a vertex.
+
+### Isolated Vertex
+
+When a vertex's degree is 0.
+
+### Pendant Vertex
+
+When a vertex's degree is 1.
+
+## Degree Sequence
+
+The list of its vertex degrees sorted in non-increasing order.
+
+## Edge
+
+Denoted by a line.
+
+### Loop
+
+An edge that connects a vertex to itself.
+
+## Adjacency
+
+Two vertices are said to be adjacent **iff** they are connected by an edge.
+
+Two edges are said to be adjacent **iff** they share a common vertex.
+
+## Incidence
+
+An edge is said to be incident to a vertex **iff** the vertex is one of the endpoints of the edge.
+
+A vertex is said to be incident to an edge **iff** the edge is one of the edges connected to the vertex.
+
+## Subgraph
+
+Suppose $G' = (V', E')$ and $G = (V, E)$.
+
+**If** $V' \subseteq V$ **and** $E' \subseteq E$ **then** $G'$ is a subgraph of $G$.
+
+## Supergraph
+
+In the above example, $G$ is a supergraph of $G'$.
+
+## Complement
+
+Aka. inverse. For a simple graph $G$, its complement graph has:
+
+- The same vertex set
+- An edge between two vertices **iff** they are **not** adjacent in $G$.
+
+Denoted by $G^c$.
+
+## Preliminary Definitions
+
+### Walk
+
+A finite alternating sequence of vertices and edges, which begins and ends with a vertex, so that each edge is incident with the vertices preceding and following it, and any vertex or edge can appear more than once.
+
+If $A$ is the adjacency matrix of $G$, entry (i, j) of Aᵐ = number of walks of length m from vᵢ to vⱼ
+
+Explanation:
+Matrix multiplication accumulates all possible paths step by step. 
+
+### Trail
+
+A walk with no repeating edges. Vertices may repeat.
+
+### Circuit
+
+Aka. closed trail. A trial with the same starting and ending vertices. No repeating edges.
+
+### Path
+
+A trail with no repeating vertices (except the starting and ending pair). No repeating edges.
+
+In a connected graph with $n$ vertices, any two vertices are connected by a path of length $\le n − 1$.
+
+### Cycle
+
+A closed path. Starts and ends in the same vertex. No repeating vertices and no repeating edges.
+
+All cycles with the same number of vertices, edges, are considered a single cycle, even if written in a different order.
+
+### Euler Path
+
+A trail that traverses every edge. No repeating edges.
+
+:::caution[Euler "Path"?]
+
+_Euler Path_ is a misnomer. It should have been called Euler "Trail" since vertices can repeat. Refer to [the Venn diagram below](#walks-venn) for more clarity.
+
+:::
+
+### Euler Circuit
+
+A closed Euler path. Starts and ends in the same vertex.
+
+### Hamiltonian Path
+
+Aka. traceable path. A path that contains every vertex of the graph. No repeating edges and no repeating vertices.
+
+### Hamiltonian Cycle
+
+Aka. Hamiltonian Circuit. A closed Hamiltonian path.
+
+### Comparison
+
+<svg id="walks-venn" viewBox="0 0 584 584" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto max-w-[660px] mx-auto my-8">
+    <title>Venn Diagram of Walks, Trails, Paths, Cycles and so on.</title>
+    <g data-hover="walk">
+        <title>Walk</title>
+        <circle class="shape" cx="292" cy="292" r="281.129" transform="rotate(0.0755464 292 292)" />
+        <text class="label" x="302.401" y="36.114">Walk</text>
+        <text class="definition" x="292" y="56" text-anchor="middle">sequence of vertices &amp; edges</text>
+    </g>
+    <g data-hover="trail">
+        <title>Trail</title>
+        <circle class="shape" cx="292" cy="292.002" r="240.805" transform="rotate(0.0755464 292 292.002)" />
+        <text class="label" x="298.849" y="93.6088">Trail</text>
+        <text class="definition" x="292" y="113" text-anchor="middle">walk with no repeated edges</text>
+    </g>
+    <g data-hover="path">
+        <title>Path</title>
+        <circle class="shape" cx="223.29" cy="273.29" r="144.75" />
+        <text class="label" x="94.4091" y="259">Path</text>
+        <text class="definition" x="94" y="279" text-anchor="start">
+            <tspan x="94" dy="0">walk with no repeated</tspan>
+            <tspan x="94" dy="14">vertices</tspan>
+        </text>
+    </g>
+    <g data-hover="circuit">
+        <title>Circuit</title>
+        <circle class="shape" cx="294.266" cy="365.266" r="120.423" />
+        <text class="label" x="280.773" y="439">Circuit</text>
+        <text class="definition" x="294" y="456" text-anchor="middle">closed trail</text>
+    </g>
+    <g data-hover="euler-path">
+        <title>Euler Path</title>
+        <circle class="shape" cx="399.924" cy="304.267" r="120.423" />
+        <text class="label" x="417.409" y="288">Euler Path</text>
+        <text class="definition" x="400" y="308" text-anchor="middle">trail visiting every edge</text>
+    </g>
+    <g data-hover="euler-circuit">
+        <title>Euler Circuit</title>
+        <path class="shape" d="M294.929 244C350.157 244.241 399.856 282.538 412.337 338.725C419.124 369.278 413.699 399.699 399.309 424.892C344.081 424.65 294.384 386.354 281.903 330.168C275.117 299.614 280.539 269.193 294.929 244Z" />
+        <text class="label" x="353" y="369">Euler</text>
+        <text class="label" x="353" y="384">Circuit</text>
+        <text class="definition" x="330" y="400" text-anchor="start">
+            <tspan x="330" dy="0">closed trail visiting</tspan>
+            <tspan x="330" dy="14">every edge</tspan>
+        </text>
+    </g>
+    <g data-hover="cycle">
+        <title>Cycle</title>
+        <path class="shape" d="M267.727 247.903C304.331 239.772 340.744 249.167 368.205 270.508C369.901 338.525 323.39 400.457 254.467 415.766C229.887 421.226 205.378 420.106 182.779 413.578C179.879 406.789 177.562 399.638 175.903 392.169C161.422 326.975 202.533 262.384 267.727 247.903Z" />
+        <text class="label" x="203" y="382">Cycle</text>
+        <text class="definition" x="218" y="398" text-anchor="start">closed path</text>
+    </g>
+    <g data-hover="hamiltonian-path">
+        <title>Hamiltonian Path</title>
+        <circle class="shape" cx="261.381" cy="263.381" r="92.8581" />
+        <text class="label" x="200" y="205">Hamiltonian</text>
+        <text class="label" x="200" y="225">Path</text>
+        <text class="definition" x="251" y="255" text-anchor="middle">path visiting every vertex</text>
+    </g>
+    <g data-hover="hamiltonian-circuit">
+        <title>Hamiltonian Circuit</title>
+        <path class="shape" d="M269.058 246.903C299.813 240.071 330.433 245.613 355.723 260.217C357.112 304.177 327.144 344.312 282.636 354.199C244.1 362.758 205.837 346.161 185 315.321C200.135 281.759 230.352 255.5 269.058 246.903Z" />
+        <text class="label" x="226" y="287">Hamiltonian</text>
+        <text class="label" x="226" y="304">Circuit</text>
+        <text class="definition" x="275" y="320" text-anchor="middle">
+            <tspan x="275" dy="0">closed path visiting</tspan>
+            <tspan x="275" dy="14">every vertex</tspan>
+        </text>
+    </g>
+</svg>
+
+| -                                                         | Repeating Vertices | Repeating Edges | Same Start and End |
+| --------------------------------------------------------- | ------------------ | --------------- | ------------------ |
+| Walk                                                      | Yes                | Yes             | No                 |
+| Closed Walk                                               | Yes                | Yes             | Yes                |
+| Trail / Euler Path<strong>\*</strong>                     | Yes                | No              | No                 |
+| Circuit (Closed Trail) / Euler Circuit<strong>\*</strong> | Yes                | No              | Yes                |
+| Path / Hamiltonian Path<strong>\*\*</strong>              | No                 | No              | No                 |
+| Closed Path / Hamiltonian Circuit<strong>\*\*</strong>    | No                 | No              | Yes                |
+
+<strong>\*</strong>must traverse every edge. <strong>\*\*</strong>must traverse every vertex.
+
+:::note
+
+There's no such thing where repeating vertices are not allowed but repeating edges are allowed. If edges repeat, then vertices must repeat as well.
+
+:::
+
+<style>
+  #walks-venn {
+    --walks-venn-label: #132238;
+    --walks-venn-hover-label: #0b1220;
+    --walks-venn-walk-fill: rgb(245 158 11 / 0.11);
+    --walks-venn-walk-stroke: rgb(180 83 9 / 0.38);
+    --walks-venn-trail-fill: rgb(248 113 113 / 0.12);
+    --walks-venn-trail-stroke: rgb(220 38 38 / 0.4);
+    --walks-venn-path-fill: rgb(59 130 246 / 0.2);
+    --walks-venn-path-stroke: rgb(37 99 235 / 0.5);
+    --walks-venn-circuit-fill: rgb(34 197 94 / 0.2);
+    --walks-venn-circuit-stroke: rgb(22 163 74 / 0.5);
+    --walks-venn-euler-path-fill: rgb(168 85 247 / 0.2);
+    --walks-venn-euler-path-stroke: rgb(147 51 234 / 0.52);
+    --walks-venn-cycle-fill: rgb(22 163 74 / 0.32);
+    --walks-venn-cycle-stroke: rgb(21 128 61 / 0.6);
+    --walks-venn-euler-circuit-fill: rgb(147 51 234 / 0.34);
+    --walks-venn-euler-circuit-stroke: rgb(126 34 206 / 0.62);
+    --walks-venn-hamiltonian-path-fill: rgb(20 184 166 / 0.22);
+    --walks-venn-hamiltonian-path-stroke: rgb(13 148 136 / 0.54);
+    --walks-venn-hamiltonian-circuit-fill: rgb(13 148 136 / 0.34);
+    --walks-venn-hamiltonian-circuit-stroke: rgb(15 118 110 / 0.64);
+    color: var(--walks-venn-label);
+  }
+
+  :root[data-theme='dark'] #walks-venn {
+    --walks-venn-label: #eef4ff;
+    --walks-venn-hover-label: #ffffff;
+    --walks-venn-walk-fill: rgb(251 191 36 / 0.12);
+    --walks-venn-walk-stroke: rgb(252 211 77 / 0.42);
+    --walks-venn-trail-fill: rgb(251 113 133 / 0.15);
+    --walks-venn-trail-stroke: rgb(253 164 175 / 0.5);
+    --walks-venn-path-fill: rgb(96 165 250 / 0.24);
+    --walks-venn-path-stroke: rgb(147 197 253 / 0.58);
+    --walks-venn-circuit-fill: rgb(74 222 128 / 0.22);
+    --walks-venn-circuit-stroke: rgb(134 239 172 / 0.56);
+    --walks-venn-euler-path-fill: rgb(192 132 252 / 0.24);
+    --walks-venn-euler-path-stroke: rgb(216 180 254 / 0.58);
+    --walks-venn-cycle-fill: rgb(34 197 94 / 0.34);
+    --walks-venn-cycle-stroke: rgb(134 239 172 / 0.68);
+    --walks-venn-euler-circuit-fill: rgb(168 85 247 / 0.36);
+    --walks-venn-euler-circuit-stroke: rgb(216 180 254 / 0.72);
+    --walks-venn-hamiltonian-path-fill: rgb(45 212 191 / 0.24);
+    --walks-venn-hamiltonian-path-stroke: rgb(153 246 228 / 0.58);
+    --walks-venn-hamiltonian-circuit-fill: rgb(20 184 166 / 0.36);
+    --walks-venn-hamiltonian-circuit-stroke: rgb(153 246 228 / 0.72);
+  }
+
+  #walks-venn g[data-hover] {
+    cursor: pointer;
+  }
+
+  #walks-venn g[data-hover] * {
+    transition: fill 180ms ease, stroke 180ms ease, filter 180ms ease, transform 180ms ease, stroke-width 180ms ease, fill-opacity 180ms ease, opacity 180ms ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  #walks-venn .shape {
+    fill: var(--walks-venn-region-fill);
+    stroke: var(--walks-venn-region-stroke);
+    fill-opacity: 0.2;
+    stroke-width: 1.5px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  #walks-venn .label {
+    fill: var(--walks-venn-label);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  #walks-venn .definition {
+    fill: var(--walks-venn-label);
+    font-size: 11px;
+    font-style: italic;
+    font-weight: 400;
+    opacity: 0;
+  }
+
+  #walks-venn .definition tspan {
+    font-style: italic;
+  }
+
+  #walks-venn g[data-hover]:hover .definition {
+    opacity: 1;
+  }
+
+  #walks-venn g[data-hover='walk'] {
+    --walks-venn-region-fill: var(--walks-venn-walk-fill);
+    --walks-venn-region-stroke: var(--walks-venn-walk-stroke);
+  }
+
+  #walks-venn g[data-hover='trail'] {
+    --walks-venn-region-fill: var(--walks-venn-trail-fill);
+    --walks-venn-region-stroke: var(--walks-venn-trail-stroke);
+  }
+
+  #walks-venn g[data-hover='path'] {
+    --walks-venn-region-fill: var(--walks-venn-path-fill);
+    --walks-venn-region-stroke: var(--walks-venn-path-stroke);
+  }
+
+  #walks-venn g[data-hover='circuit'] {
+    --walks-venn-region-fill: var(--walks-venn-circuit-fill);
+    --walks-venn-region-stroke: var(--walks-venn-circuit-stroke);
+  }
+
+  #walks-venn g[data-hover='euler-path'] {
+    --walks-venn-region-fill: var(--walks-venn-euler-path-fill);
+    --walks-venn-region-stroke: var(--walks-venn-euler-path-stroke);
+  }
+
+  #walks-venn g[data-hover='cycle'] {
+    --walks-venn-region-fill: var(--walks-venn-cycle-fill);
+    --walks-venn-region-stroke: var(--walks-venn-cycle-stroke);
+  }
+
+  #walks-venn g[data-hover='euler-circuit'] {
+    --walks-venn-region-fill: var(--walks-venn-euler-circuit-fill);
+    --walks-venn-region-stroke: var(--walks-venn-euler-circuit-stroke);
+  }
+
+  #walks-venn g[data-hover='hamiltonian-path'] {
+    --walks-venn-region-fill: var(--walks-venn-hamiltonian-path-fill);
+    --walks-venn-region-stroke: var(--walks-venn-hamiltonian-path-stroke);
+  }
+
+  #walks-venn g[data-hover='hamiltonian-circuit'] {
+    --walks-venn-region-fill: var(--walks-venn-hamiltonian-circuit-fill);
+    --walks-venn-region-stroke: var(--walks-venn-hamiltonian-circuit-stroke);
+  }
+
+  #walks-venn g[data-hover]:hover .shape {
+    stroke-width: 2.2px;
+    filter: saturate(1.12) brightness(1.04);
+    fill-opacity: 0.9;
+  }
+  
+  #walks-venn:has(g[data-hover]:hover) g[data-hover]:not(:hover) {
+    opacity: 0.2;
+  }
+
+  #walks-venn g[data-hover]:hover .label {
+    fill: var(--walks-venn-hover-label);
+  }
+</style>
