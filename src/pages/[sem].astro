@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav.astro";
 import SemesterHero from "../components/semester-hero.astro";
 import { titleize } from "../utils";
+import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
 
 interface NoteRef {
   title: string;
@@ -113,9 +114,16 @@ for (const mod of modules) {
   const totalNotes = mod.directNotes.length + mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0);
   weights[idx] += totalNotes + 2;
 }
+
+const semDescription = `Browse ${noteCount} notes across ${modules.length} modules in Semester ${number}.`;
 ---
 
-<Layout>
+<Layout
+  title={`Semester ${number} | ${SITE_NAME}`}
+  description={semDescription}
+  image={`${SITE_DOMAIN}/og/s${number}`}
+  canonical={`${SITE_DOMAIN}/s${number}`}
+>
   <Nav />
   <SemesterHero
     number={number}

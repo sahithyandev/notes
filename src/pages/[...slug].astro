@@ -5,6 +5,7 @@ import { getCollection } from "astro:content";
 import { getEntry } from "astro:content";
 import Nav from "../components/Nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
+import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -144,11 +145,33 @@ function calculateReadTime(content: string): number {
   return Math.ceil(words / wordsPerMinute);
 }
 
+// Generate description from first paragraph
+function generateDescription(content: string): string {
+  const firstParagraph = content.split('\n\n')[0];
+  // Remove markdown formatting
+  const cleanText = firstParagraph
+    .replace(/[#*`_\[\]]/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // Remove images
+    .trim();
+  
+  // Truncate to ~160 characters
+  return cleanText.length > 160 
+    ? cleanText.substring(0, 157) + "..." 
+    : cleanText;
+}
+
 const lastUpdated = formatLastUpdated(notesEntry.data.lastUpdatedOn);
 const readTime = calculateReadTime(notesEntry.body || "");
+const description = generateDescription(notesEntry.body || "");
 ---
 
-<Layout>
+<Layout
+  title={`${notesEntry.data.title} | ${SITE_NAME}`}
+  description={description}
+  image={`${SITE_DOMAIN}/og/${slug}`}
+  canonical={`${SITE_DOMAIN}/notes/${slug}`}
+>
   <Nav />
 
   <main

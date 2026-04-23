@@ -1,5 +1,20 @@
 ---
 import "../styles/global.css";
+import { SITE_NAME, SITE_DOMAIN, SITE_DESCRIPTION } from "../utils/values";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	canonical?: string;
+}
+
+const {
+	title = SITE_NAME,
+	description = SITE_DESCRIPTION,
+	image = `${SITE_DOMAIN}/og/default`,
+	canonical = SITE_DOMAIN,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -8,7 +23,26 @@ import "../styles/global.css";
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<title>Sahithyan's Notes</title>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		
+		<!-- Open Graph -->
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={SITE_NAME} />
+		
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@sahithyandev" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={image} />
+		
+		<!-- Canonical -->
+		<link rel="canonical" href={canonical} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
