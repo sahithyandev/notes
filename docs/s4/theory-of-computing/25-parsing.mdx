@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/parsing
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-04-24T03:19:45.190Z
+lastUpdatedOn: 2026-04-24T07:36:29.651Z
 ---
 
 Two major parsing strategies are top-down parsing (LL) and bottom-up parsing (LR).
@@ -52,7 +52,6 @@ For $\text{LL}(k)$ grammar, columns of the parsing table are every combination o
 
 Aka. shift-reduce parsing. Builds the parse tree starting from the leaves (the input tokens) and works upward toward the root. It traces a rightmost derivation in reverse by repeatedly identifying a substring on the right-hand side of a production and reducing it to the corresponding left-hand side non-terminal.
 
-
 ### Shift-Reduce Mechanism
 
 The parser uses a stack and an input buffer. It performs one of 4 actions at each step:
@@ -61,12 +60,12 @@ The parser uses a stack and an input buffer. It performs one of 4 actions at eac
 - Reduce: replace a _handle_ (a matched RHS) on top of the stack with the corresponding LHS non-terminal
 - Accept: parsing is complete when the start symbol is on the stack and input is empty
 - Error: a syntax error is detected
- 
+
 #### Conflicts
 
-- Shift-reduce conflict   
+- Shift-reduce conflict  
   Unclear whether to shift or reduce. Resolved by preferring shift.
-- Reduce-reduce conflict   
+- Reduce-reduce conflict  
   Multiple valid reductions available. Resolved by choosing the earlier production in the grammar
 
 ### LR Grammar

@@ -6,9 +6,8 @@ slug: s3/database-systems/sql/commands
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.697Z
-lastUpdatedOn: 2026-04-24T03:46:02.227Z
+lastUpdatedOn: 2026-04-24T07:36:29.644Z
 ---
-
 
 Conventionally, used in capitalized forms.
 
@@ -78,13 +77,13 @@ Most DBMS systems did not allow dropping columns, as explained in [the previous 
 Retrieves data from one or more tables. Feature of DML.
 
 ```sql
-SELECT first_name, last_name 
-FROM employees 
+SELECT first_name, last_name
+FROM employees
 WHERE salary > 50000
 ORDER BY last_name;
 ```
 
-"*" will fetch all the columns. But have performance impacts on large tables. Post-processing can be done on the selected fields as well, although generally not recommended.
+"\*" will fetch all the columns. But have performance impacts on large tables. Post-processing can be done on the selected fields as well, although generally not recommended.
 
 ### DISTINCT
 
@@ -118,7 +117,7 @@ If ORDER BY is not specified, the order of the result set is undefined, and rand
 
 ## LIMIT
 
-Specifies the maximum number of rows to return. Feature of DML. No limits by default. If used without `ORDER BY`, the result is non-deterministic. 
+Specifies the maximum number of rows to return. Feature of DML. No limits by default. If used without `ORDER BY`, the result is non-deterministic.
 
 ## FROM
 
@@ -189,7 +188,7 @@ FROM employees
 GROUP BY department_id;
 ```
 
-All non-aggregated values specified in the SELECT clause must appear in the GROUP BY clause. 
+All non-aggregated values specified in the SELECT clause must appear in the GROUP BY clause.
 
 ## HAVING
 

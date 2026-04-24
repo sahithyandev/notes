@@ -6,7 +6,7 @@ slug: s2/theory-of-electricity/fourier-series
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-04-24T03:46:02.226Z
+lastUpdatedOn: 2026-04-24T07:36:29.636Z
 ---
 
 Used for periodic non-sinusoidal waveforms. Suppose the periodic time is $T$. The waveform can be represented as a sum of sine wave. The sine waves have integer multiple of the original frequency $f_0 = 2\pi / T$. $ $
@@ -61,6 +61,7 @@ For any waveform, subtracting the DC offset results in a symmetrical waveform.
 ### Even Symmetry
 
 When a wave is symmetric about the vertical axis.
+
 ```math
 f(t) = f(-t)
 ```
@@ -76,6 +77,7 @@ b_n = 0
 ### Odd Symmetry
 
 When a wave is symmetric about the origin.
+
 ```math
 f(t) = -f(-t)
 ```
@@ -91,6 +93,7 @@ b_n = \frac{4}{T} \int_{\tau}^{\tau + T/2} f(t)\sin(nf_0t) \, \text{d}t
 ### Half-Wave Symmetry
 
 When a wave repeats itself with a reversal of sign after half a period.
+
 ```math
 f(t) = -f(t + \frac{T}{2})
 = -f(t - \frac{T}{2})
@@ -116,7 +119,7 @@ b_n =
 
 <Note>
 
-For odd and half-wave symmetry, the Fourier series does not contain a DC offset. Thus, $a_0=0$. $ $ 
+For odd and half-wave symmetry, the Fourier series does not contain a DC offset. Thus, $a_0=0$. $ $
 
 </Note>
 
@@ -137,7 +140,6 @@ b_n =
 0 & \text{if } n \text{ is even}
 \end{cases}
 ```
-
 
 ## Frequency spectrum
 
@@ -164,7 +166,7 @@ y_{\text{rms}}^2 = a_0^2 + \sum_{i=0}^\infty \Big[ a_{i,\text{rms}}^2 + b_{i,\te
 A measurement of the distortion present in the waveform compared to the original waveform.
 
 ```math
-y_{\text{THD}} = \frac{1}{h_1} \sqrt{\sum_{i=2}^\infty h_i^2} 
+y_{\text{THD}} = \frac{1}{h_1} \sqrt{\sum_{i=2}^\infty h_i^2}
 ```
 
 Here $h_i$ is the rms of $i$th harmonic. DC offset is ignored. Usually given as a percentage.

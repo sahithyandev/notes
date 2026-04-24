@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/data-structures/spanning-tree
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.590Z
-lastUpdatedOn: 2026-04-24T03:19:45.145Z
+lastUpdatedOn: 2026-04-24T07:36:29.632Z
 ---
 
 A connected, acyclic subgraph that includes all the vertices of the original graph. Undefined for disconnected graphs.
@@ -30,15 +30,19 @@ A Steiner spanning tree that has the minimum weight. Finding a minimum Steiner t
 ## Definitions
 
 ### Cut
+
 A partition of the vertices of a graph into 2 disjoint subsets.
 
 ### Crossing Cut
-An edge that has one endpoint in each subset of a cut is said to cross the cut. 
+
+An edge that has one endpoint in each subset of a cut is said to cross the cut.
 
 ### Respecting Cut
+
 Given a subset $A$ of edges, a cut respects $A$ **iff** no edge in $A$ crosses the cut.
 
 ### Light Edge
+
 For a given cut, the edge with the minimum weight among all edges crossing the cut. Prime candidates in MST algorithms.
 
 ### MST property
@@ -48,6 +52,7 @@ For any cut in a graph, the light edge crossing the cut is always part of a mini
 Used in [Kruskal's algorithm](/data-structures-and-algorithms/algorithms/kruskals-algorithm/) and [Prim's algorithm](/data-structures-and-algorithms/algorithms/prims-algorithm/).
 
 ### Safe Edge
+
 An edge that can be safely included in the growing MST subset without violating the MST property.
 
 #### Finding a Safe Edge
@@ -65,6 +70,7 @@ The general idea is to:
 - Keep adding until an MST is found
 
 Commonly used algorithms to find MST are:
+
 - [Kruskal's algorithm](/data-structures-and-algorithms/algorithms/kruskals-algorithm)
 - [Prim's algorithm](/data-structures-and-algorithms/algorithms/prims-algorithm)
 

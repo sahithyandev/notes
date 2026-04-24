@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/probability/joint-distribution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.596Z
-lastUpdatedOn: 2026-04-24T03:19:45.148Z
+lastUpdatedOn: 2026-04-24T07:36:29.634Z
 ---
 
 Specifies the probability of observing a combination of values for two or more random variables. Characterizes the relationship between multiple random variables, including their dependencies and correlations.
@@ -29,13 +29,14 @@ Denoted by $\text{Cov}(X,Y)$ or $\sigma_{XY}$. Measures the linear relationship 
 ```
 
 - Positive covariance: Indicates that higher than mean values of one variable tend to be
-paired with higher than mean values of other variable.
+  paired with higher than mean values of other variable.
 - Negative covariance: Indicates that higher than mean values of one variable tend to be
-paired with lower than mean values of other variable.
+  paired with lower than mean values of other variable.
 - If the two random variables are independent then the covariance will
-be zero.
+  be zero.
 
 Properties:
+
 - $\text{Cov}(X,Y) = E\Big[\big(X-E(X)\big)\big(Y-E(Y)\big)\Big]$
 - $\text{Cov}(X,Y) = E(XY) - E(X)E(Y)$
 - $\text{Cov}(X,a) = 0$
@@ -74,25 +75,30 @@ r = \frac{\sum (x_i y_i) - n \bar{x} \bar{y}}{\sqrt{\left( \sum x_i^2 - n \bar{x
 - Continuous case: $\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy \, dx = 1$
 
 ### Marginal distributions
+
 The distribution of an individual variable can be derived from the joint distribution:
-  - Discrete case: $P(X = x) = \sum_y P(X = x, Y = y)$
-  - Continuous case: $f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy$
+
+- Discrete case: $P(X = x) = \sum_y P(X = x, Y = y)$
+- Continuous case: $f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy$
 
 ### Conditional distributions
 
 The distribution of one variable given a specific value of the other:
-  - Discrete case: $P(X = x | Y = y) = \frac{P(X = x, Y = y)}{P(Y = y)}$
-  - Continuous case: $f_{X|Y}(x|y) = \frac{f_{X,Y}(x, y)}{f_Y(y)}$
-   
+
+- Discrete case: $P(X = x | Y = y) = \frac{P(X = x, Y = y)}{P(Y = y)}$
+- Continuous case: $f_{X|Y}(x|y) = \frac{f_{X,Y}(x, y)}{f_Y(y)}$
+
 ### Independence
 
 Random variables $X$ and $Y$ are independent **iff**:
-  - Discrete case: $\forall x,y\;\; P(X = x, Y = y) = P(X = x) \cdot P(Y = y)$
-  - Continuous case: $\forall x,y\;\; f_{X,Y}(x, y) = f_X(x) \cdot f_Y(y)$
+
+- Discrete case: $\forall x,y\;\; P(X = x, Y = y) = P(X = x) \cdot P(Y = y)$
+- Continuous case: $\forall x,y\;\; f_{X,Y}(x, y) = f_X(x) \cdot f_Y(y)$
 
 ## Representation
 
 Joint distributions can be represented in various ways:
+
 - For discrete variables: probability mass tables or matrices
 - For continuous variables: joint density functions or contour plots
 - Copulas: functions that describe the dependence structure between variables
@@ -103,7 +109,8 @@ Joint distributions can be represented in various ways:
 
 For joint probability mass function, if $x,y$ are independent, $P(x,y)=P(x)P(y)$.
 
-Cumulative probability: 
+Cumulative probability:
+
 ```math
 P(X \le x, Y \le y) = \sum_{x}\sum_{y} P(x,y)
 ```

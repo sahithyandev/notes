@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/numerical-methods/numerical-differentiation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.594Z
-lastUpdatedOn: 2026-04-24T03:46:02.225Z
+lastUpdatedOn: 2026-04-24T07:36:29.634Z
 ---
 
 Approximate numerical formulae can be derived using [Taylor series](https://s1.sahithyan.dev/mathematics/real-analysis/taylor-series/).
@@ -65,7 +65,7 @@ Error is in order of $O(h^2)$ which is better than $O(h)$.
 
 ## Second Order Derivatives
 
-### Second forward difference formula 
+### Second forward difference formula
 
 ```math
 f^{(2)}(x_0) =
@@ -73,7 +73,7 @@ f^{(2)}(x_0) =
 + O(h)
 ```
 
-### Second backward difference formula 
+### Second backward difference formula
 
 ```math
 f^{(2)}(x_0) =
@@ -92,7 +92,6 @@ f^{(2)}(x_0) =
 ## Higher Order Derivatives
 
 For $n$-th derivative, Taylor series is truncated after $n^{\text{th}}$ derivative. $ $
-
 
 ### n-th forward difference formula
 
@@ -127,12 +126,12 @@ f^{(n)}(x)=
 The accuracy of these divided difference formulas can be increased by including additional terms in the Taylor series. In each step the accuracy is improved by a power of $h$. $ $
 
 ```math
-f'(x_0) = 
+f'(x_0) =
 
 \frac{1}{h} \left[
 -\frac{3}{2}
 f(x_0)
-+2f(x_0+h) 
++2f(x_0+h)
 -\frac{1}{2}f(x_0+2h)
 \right]
 +O(h^2)

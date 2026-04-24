@@ -6,7 +6,7 @@ slug: s3/operating-systems/io-system
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.710Z
-lastUpdatedOn: 2026-04-24T03:19:45.180Z
+lastUpdatedOn: 2026-04-24T07:36:29.647Z
 ---
 
 A subsystem that manages communication between the system and external devices. OS abstracts hardware details, coordinates access, and ensures controlled sharing of I/O resources among users and applications.
@@ -104,7 +104,7 @@ Steps:
 
 ### Interrupt-Driven
 
-Explained on [its own page](/operating-systems/interrupt-driven-io). 
+Explained on [its own page](/operating-systems/interrupt-driven-io).
 
 ### Direct Memory Access
 
@@ -191,12 +191,11 @@ Balance CPU, memory, and I/O performance.
 | I/O Hardware Interface | Built using ports, busses, and controllers with device registers.                  |
 | System Call Types      | Blocking, Nonblocking, Asynchronous, and Vectored I/O.                             |
 
-
-- Programmed I/O   
+- Programmed I/O  
   The CPU is responsible for checking the status of an I/O device and transferring data. This method is simple but inefficient, as the CPU spends time waiting for the device to be ready.
-- Interrupt-driven I/O   
+- Interrupt-driven I/O  
   The CPU initiates an I/O operation and continues executing other instructions. When the I/O device is ready, it sends an interrupt signal to the CPU, which temporarily halts its current task to handle the I/O operation. This improves efficiency by allowing the CPU to perform other work instead of waiting.
-- Direct Memory Access (DMA)   
+- Direct Memory Access (DMA)  
   A special controller manages data transfer between memory and I/O devices, freeing the CPU from involvement in the actual data transfer.
 
 Operating systems are interrupt-driven. Because this approach allows the CPU to respond quickly to important events (such as I/O completion, hardware failures, or user actions) without constantly checking the status of devices.

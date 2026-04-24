@@ -15,6 +15,7 @@ bun preview    # preview production build
 No test or lint commands are configured.
 
 **Slug maintenance script** — must be run manually whenever `.md` files are added or renamed:
+
 ```bash
 bun scripts/auto-slug.ts <path/to/file.md> [...]
 bun scripts/auto-slug.ts --dry-run <path/to/file.md>
@@ -25,6 +26,7 @@ bun scripts/auto-slug.ts --dry-run <path/to/file.md>
 Astro 6 static site. All notes are Markdown files in `docs/`, loaded via Astro's content collections and rendered by two page files.
 
 **Routing — two files handle everything:**
+
 - `src/pages/index.astro` — Homepage; groups all notes by semester and renders `SemesterCard` components.
 - `src/pages/[...slug].astro` — Individual note pages; three-column layout (left sidebar / article / TOC rail). Uses `getStaticPaths()` over all notes.
 

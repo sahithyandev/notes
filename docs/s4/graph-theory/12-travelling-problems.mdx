@@ -6,7 +6,7 @@ slug: s4/graph-theory/travelling-problems
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-04-24T03:19:45.183Z
+lastUpdatedOn: 2026-04-24T07:36:29.648Z
 ---
 
 Modeled using graphs to formalize routes and distances.
@@ -90,6 +90,7 @@ Time complexity is $O(n^2 \cdot 2^n)$. Much better than $O(n!)$. Space complexit
 Aka. Route Inspection Problem. The problem of finding the shortest closed path that traverses every edge of a graph at least once. Defined on undirected connected graph.
 
 Used in:
+
 - postal delivery routes
 - garbage collection
 - street cleaning
@@ -98,6 +99,7 @@ Used in:
 The goal is to find/produce a minimal Eulerian circuit. Duplicate edges are added to the graph to produce a minimal Eulerian circuit.
 
 Steps:
+
 - Check if graph is connected
 - find all vertices with odd degree (must be even numbered by [the handshaking lemma](/graph-theory/handshaking-lemma#corollary))
 - if none: Eulerian circuit exists and find it.
@@ -110,9 +112,9 @@ Time complexity is $O(n^k)$ (efficient compared to TSP). Space complexity is.
 
 ### Types of CPP
 
-- Undirected CPP   
+- Undirected CPP  
   On undirected graph. Solved using degree parity and matching.
-- Directed CPP   
+- Directed CPP
 - On directed graph. Requires balancing in and out degrees.
-- Mixed CPP   
+- Mixed CPP  
   Contains both directed and undirected graphs.

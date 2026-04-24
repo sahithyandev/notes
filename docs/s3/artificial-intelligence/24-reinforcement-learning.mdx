@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/reinforcement-learning
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-04-24T03:19:45.160Z
+lastUpdatedOn: 2026-04-24T07:36:29.639Z
 ---
 
 The process of _learning_ to maximize expected rewards by trial and error. Feedback is given in the form of _rewards_. Agent's utility is defined by the reward function. All learning is based on observed samples of outcomes.
@@ -40,6 +40,7 @@ V_{\pi}(s) \approx \dfrac{1}{N(s)} \sum_{i=1}^{N(s)} G_i(s)
 ```
 
 Here:
+
 - $G_i(s)$ be the discounted sum of rewards from a visit to $s$
 - $N(s)$ be the number of samples for $s$
 
@@ -144,7 +145,7 @@ Or:
 V_\pi(s) \leftarrow V_\pi(s) + \alpha \Big[ R(s,a,s') + \gamma V(s') − V(s) \Big]
 ```
 
-Here $\alpha$ is the  learning rate. Larger $\alpha$ provides faster but noisier learning. Decreasing $\alpha$ gives convergent average.
+Here $\alpha$ is the learning rate. Larger $\alpha$ provides faster but noisier learning. Decreasing $\alpha$ gives convergent average.
 
 ### Q-Learning
 
@@ -159,6 +160,7 @@ Q_s (s,a) = R(s,a,s') + \gamma \max_{a'} Q(s',a')
 ```
 
 The update rule is:
+
 ```math
 Q (s,a) \leftarrow (1-\alpha)Q(s,a) + \alpha Q_s(s)
 ```
@@ -169,4 +171,4 @@ Or:
 Q(s, a) \leftarrow Q(s, a) + \alpha \Big[ R(s,a,s') + \gamma \max_a Q(s', a') − Q(s, a) \Big]
 ```
 
-The  optimal policy can be extracted using $\pi^*(s) = \arg\max_a Q(s,a)$.
+The optimal policy can be extracted using $\pi^*(s) = \arg\max_a Q(s,a)$.

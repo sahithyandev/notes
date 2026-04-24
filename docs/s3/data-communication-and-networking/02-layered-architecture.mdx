@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/layered-architecture
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.690Z
-lastUpdatedOn: 2026-04-24T03:19:45.162Z
+lastUpdatedOn: 2026-04-24T07:36:29.640Z
 ---
 
 Functionality of communication through the network is split into separate layers.
@@ -35,6 +35,7 @@ Short for Open Systems Interconnection Model. A conceptual framework used to des
 Provide network-based services to applications. Protocols used by the applications come under the application layer.
 
 Examples:
+
 - File transfer (FTP)
 - Email (SMTP)
 - Web browsing (HTTP)
@@ -42,18 +43,22 @@ Examples:
 - Real-time communication (WebRTC)
 
 ### Presentation Layer
+
 Prepares data for transmission, and the application layer. Translates the data from and to a standard format.
 
 Handles:
+
 - Formatting
 - Encryption
 - Compression
 
 Usually in real systems, not implemented as a separate layer:
+
 - Data formatting, encryption and compression are usually handled, and required at the application layer.
 - Integrated protocols handle presentation tasks without requiring a separate layer.
 
 Examples:
+
 - JPEG (Joint Photographic Experts Group)
 - MPEG (Moving Picture Experts Group)
 - ASCII (American Standard Code for Information Interchange)
@@ -63,6 +68,7 @@ Examples:
 Provide a means of controlling the dialogue between two users (applications).
 
 Handles:
+
 - Session management: starts and ends communication sessions
 - Dialog control (full vs half duplex): who can send data and when. prevents data collisions. ensures proper ordering of data packets.
 - Token management
@@ -72,6 +78,7 @@ Handles:
 Not often implemented separately in real systems, because it is usually integrated into the transport layer or application layer. Modern applications handle sessions by their own standards.
 
 Examples:
+
 - HTTP (Hypertext Transfer Protocol)
 - FTP (File Transfer Protocol)
 
@@ -80,18 +87,20 @@ Examples:
 Transmits segments between 2 hosts. A host is a device that is running applications and using transport protocols to send or receive data over a network.
 
 Handles:
+
 - Connection establishment and termination
-- Multiplexing and demultiplexing   
+- Multiplexing and demultiplexing  
   Allows multiple applications to share a single connection using different ports.
-- Segmentation and reassembly   
+- Segmentation and reassembly  
   Breaks larger data into smaller segments, and reassembles them at the destination
-- Error detection and correction   
+- Error detection and correction  
   Detects errors in data transmission and corrects them.
-- Flow control   
+- Flow control  
   Manages the data transfer rate to prevent congestion and ensure reliable delivery.
 - Congestion control
 
 Examples:
+
 - TCP (Transmission Control Protocol)
 - UDP (User Datagram Protocol)
 
@@ -106,6 +115,7 @@ Handles:
 - Datagram encapsulation
 
 Examples:
+
 - IPv4 (Internet Protocol version 4)
 - IPv6 (Internet Protocol version 6)
 - ICMP (Internet Control Message Protocol)
@@ -119,7 +129,7 @@ Handles:
 
 - data framing: dividing a data stream into manageable chunks
 - error detection and correction
-- flow control   
+- flow control  
   Manages frame flow rate to prevent overflow
 - addressing and routing
 
@@ -134,6 +144,7 @@ A method used to control how devices share and access the communication medium. 
 Transmits a raw string of bits over a physical medium. Can either be wired or wireless.
 
 Handles:
+
 - Bit rate: how fast the bits are sent
 - Encoding
 - Signaling

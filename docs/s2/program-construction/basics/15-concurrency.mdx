@@ -6,7 +6,7 @@ slug: s2/program-construction/basics/concurrency
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.600Z
-lastUpdatedOn: 2026-04-24T03:19:45.150Z
+lastUpdatedOn: 2026-04-24T07:36:29.635Z
 ---
 
 Concurrency refers to the ability of different parts of a program to be executed
@@ -72,7 +72,6 @@ Because a class can only extend 1 class in Java. Additionally, Runnable-based
 classes keeps the code more flexible as the task can be executed by different
 executor services and thread pools, not just in a Thread. It also follows the
 principle of composition over inheritance.
-
 
 ### Thread scheduler
 
@@ -260,7 +259,6 @@ Locks can also be used to control access to shared resources, and avoid race con
 
 The `ReentrantLock` is a common lock implementation. Allows threads to acquire the same lock multiple times, as long as they release it the same number of times.
 
-
 ```java
 // Using AtomicInteger
 class AtomicCounter {
@@ -281,7 +279,7 @@ Occurs when two or more threads are blocked forever, waiting for each other.
 ```java
 // Potential deadlock
 
-// thread 1 
+// thread 1
 synchronized(lockA) {
     // Do something
     synchronized(lockB) {
@@ -289,7 +287,7 @@ synchronized(lockA) {
     }
 }
 
-// thread 2 
+// thread 2
 synchronized(lockB) {
     synchronized(lockA) {
         // This creates a circular wait condition

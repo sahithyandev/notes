@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/strassens-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-04-24T03:19:45.144Z
+lastUpdatedOn: 2026-04-24T07:36:29.631Z
 ---
 
 An efficient algorithm for matrix multiplication that reduces the time complexity compared to the standard matrix multiplication method. The algorithm works by dividing each matrix into smaller submatrices and recursively performing multiplications and additions.
@@ -16,11 +16,14 @@ An efficient algorithm for matrix multiplication that reduces the time complexit
 Suppose 2 $n \times n$ matrices $A$ and $B$ are given. $C = A \cdot B$ is to be calculated. $A$ and $B$ are broken into smaller square submatrices, and the multiplication is performed recursively.
 
 1. Divide the matrices $A$ and $B$ into four $n/2 \times n/2$ submatrices:
-  ```math
-  A = \begin{bmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{bmatrix} \quad
-  B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix}
-  ```
+
+```math
+A = \begin{bmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{bmatrix} \quad
+B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix}
+```
+
 2. Compute the following 7 products (Strassen's formulas):
+
    ```math
    \begin{aligned}[c]
    M_1 &= (A_{11} + A_{22})(B_{11} + B_{22})
@@ -39,6 +42,7 @@ Suppose 2 $n \times n$ matrices $A$ and $B$ are given. $C = A \cdot B$ is to be 
    & \\
    \end{aligned}
    ```
+
 3. Combine the results to compute the submatrices of $C$:
    ```math
    \begin{aligned}

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/storage-file-structure
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-04-24T03:19:45.170Z
+lastUpdatedOn: 2026-04-24T07:36:29.644Z
 ---
 
 Explains how data is stored and managed at the physical level in a DBMS. It introduces the types of storage media, performance measures, disk organization, and techniques for efficient data access.
@@ -32,15 +32,16 @@ Dedicated disk for sequential log writes of block updates. Write time is predict
 ## Record Organiziation
 
 Records can be stored in 2 ways:
+
 - 1 file per relation
-  - Heap   
+  - Heap  
     Records can be placed anywhere in the file where there is space.
-  - Sequential   
+  - Sequential  
     Store records in sequential order, based on the value of the search key of each record. Pointer chains used to efficiently implement insertion and deletion.
-  - Hashing   
+  - Hashing  
     Hashed value of some attribute specifies in which block of the file the record should be placed
 - 1 file for multiple relations
-  - Multitable clustering file organization   
+  - Multitable clustering file organization  
     Records of the same relation can be linked using pointer chains. Good for cross join queries.
 
 ### Fixed-Length Records
@@ -87,6 +88,7 @@ When a record is deleted, its slot is marked empty; space may be reused later.
 If a record moves (e.g., due to compaction), only the slot’s pointer changes, not any external references. so record IDs remain valid.
 
 ## Buffer
+
 Portion of main memory available to store copies of disk blocks.
 
 ### Buffer Manager
@@ -95,18 +97,20 @@ Subsystem responsible for allocating buffer space in main memory.
 
 Programs call on the buffer manager when they need a block
 from disk. If the block is already in the buffer, buffer manager returns its address in main memory. If not, buffer manager:
-- Allocates space in the buffer for the block.   
+
+- Allocates space in the buffer for the block.  
   If space is not available, another block is written to disk and evicted.
 - Reads the block from the disk to the buffer, and returns the address of the block in main memory to requester.
 
 ### Buffer Replacement Policies
 
 Most operating systems replace the block using Least Recently Used (LRU) strategy. But in RDBMSs, LRU other strategies are also used:
+
 - Pinned block – memory block that is not allowed to be written
-back to disk.
+  back to disk.
 - Toss-immediate strategy – frees the space occupied by a block
-as soon as the final tuple of that block has been processed
+  as soon as the final tuple of that block has been processed
 - Most recently used (MRU) strategy – system must pin the
-block currently being processed. After the final tuple of that block
-has been processed, the block is unpinned, and it becomes the
-most recently used block.
+  block currently being processed. After the final tuple of that block
+  has been processed, the block is unpinned, and it becomes the
+  most recently used block.

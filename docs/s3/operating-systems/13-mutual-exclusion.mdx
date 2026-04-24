@@ -6,7 +6,7 @@ slug: s3/operating-systems/mutual-exclusion
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-04-24T03:19:45.178Z
+lastUpdatedOn: 2026-04-24T07:36:29.646Z
 ---
 
 Ensuring that only one thread (per a shared resource) at a time can run its critical section.
@@ -40,7 +40,7 @@ while (true) {
 - No starvation: Satisfied
 - Starvation in absence of contention: fails  
   If a process halts in its non-critical section, the other may be permanently blocked.
-  
+
 Even if both processes are guaranteed to not halt in their non-critical sections, unnecessary waiting may occur. For example, if P1 is in its critical section and P2 is in its non-critical section, P2 must wait for P1 to finish even if P1 has no intention of re-entering its critical section.
 
 ### Flag Variables
@@ -48,6 +48,7 @@ Even if both processes are guaranteed to not halt in their non-critical sections
 Each process $P_i$ has `ci`. 0 indicates wants to enter CS, 1 indicates not interested. The flag is set after checking the other process.
 
 For P1:
+
 ```c
 while (true) {
   // remainder
@@ -66,6 +67,7 @@ Fails mutual exclusion if both processes to see the other’s flag as 1, which i
 Move `ci=0` before checking the other’s flag.
 
 For P1:
+
 ```c
 while (true) {
     // remainder section
@@ -76,7 +78,7 @@ while (true) {
 }
 ```
 
-- Mutual exclusion: Satisfied   
+- Mutual exclusion: Satisfied  
   `c1` can only become 1 if P1 finishes its critical section.
-- No Deadlock: Not satisfied   
+- No Deadlock: Not satisfied  
   If both `c1` and `c2` is set to 0.

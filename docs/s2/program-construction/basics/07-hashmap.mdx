@@ -6,7 +6,7 @@ slug: s2/program-construction/basics/hashmap
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.599Z
-lastUpdatedOn: 2026-04-24T03:19:45.149Z
+lastUpdatedOn: 2026-04-24T07:36:29.635Z
 ---
 
 A basic implementation of the [Map](/program-construction/map) interface in
@@ -15,7 +15,8 @@ not allowed. Existing value will be overridden when a key is reused.
 
 HashMaps are not ordered and not thread safe.
 
-Hashmap object has 48 bytes overhead. And an array overhead for storing the storage buckets. Each entry in the hashmap  has an overhead of 36 bytes to store:
+Hashmap object has 48 bytes overhead. And an array overhead for storing the storage buckets. Each entry in the hashmap has an overhead of 36 bytes to store:
+
 - Key
 - Value
 - Hashcode of the key
@@ -29,7 +30,7 @@ Hashmap object has 48 bytes overhead. And an array overhead for storing the stor
 HashMap <K,V> hm = new HashMap<>(int capacity, float loadFactor);
 ```
 
-Here `K` is type of key and `V` is type of value. The constructor optionally accepts 2 parameters. `capacity` is the number of storage buckets. The `capacity` is increased when `loadFactor` * `capacity` number of buckets are used. Once this threshold is reached, the `capacity` is doubled.
+Here `K` is type of key and `V` is type of value. The constructor optionally accepts 2 parameters. `capacity` is the number of storage buckets. The `capacity` is increased when `loadFactor` \* `capacity` number of buckets are used. Once this threshold is reached, the `capacity` is doubled.
 
 ### Adding elements to the HashMap
 

@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/mac-protocols
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.692Z
-lastUpdatedOn: 2026-04-24T03:19:45.164Z
+lastUpdatedOn: 2026-04-24T07:36:29.641Z
 ---
 
 ## Link
@@ -14,6 +14,7 @@ lastUpdatedOn: 2026-04-24T03:19:45.164Z
 A physical (wires, wireless) or logical (established over multiple links) connection between two devices, which carries data.
 
 2 types:
+
 - Point to Point (aka. P2P) - Direct connection between two devices.
 - Broadcast - Connection between multiple devices using a shared link.
 
@@ -26,10 +27,11 @@ When a node receives more than 1 signal at the same time.
 A distributed algorithm that determines how nodes share a channel. Channel control communication must use the channel itself.
 
 An ideal multiple access protocol has the following properties, given a broadcast channel of rate $R\,\text{bps}$:
+
 - when one node wants to transmit, it can send at rate $R$.
 - when $M$ nodes want to transmit, each can send at average rate $R/M$.
 - fully decentralized
-  - no special node to coordinate transmissions   
+  - no special node to coordinate transmissions
   - no synchronization of clocks, slots
 - simple
 
@@ -57,13 +59,15 @@ Used in 1G cellular networks.
 
 Devices transmit when they have data. Collisions are possible. Requires recovery.
 
-When a node has packets to send   
+When a node has packets to send
+
 - transmit at full channel data rate $R$
 - no a priori coordination among nodes
 
 High chance for collisions. Collision detection and recovery are essential.
 
 Examples:
+
 - ALOHA
 - slotted ALOHA
 - CSMA, CSMA/CD, CSMA/CA
@@ -96,7 +100,7 @@ Collision detection is easy in wired LANs: measure transmitted, received signal 
 Nodes take turns to access the medium. Nodes with more to send can take longer turns.
 
 #### Polling
- 
+
 _Master node_ polls _slave nodes_ to transmit in turn. Only the currently polled station can transmit. Simple. No collisions. Good for small networks with predictable traffic.
 
 Even when a station is idle, it will be polled, causing additional delays. Has single point of failure (master).
@@ -104,6 +108,7 @@ Even when a station is idle, it will be polled, causing additional delays. Has s
 Typically used with _dumb_ slave devices.
 
 Concerns:
+
 - polling overhead
 - latency
 

@@ -1,24 +1,24 @@
 // @ts-check
-import { readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
-import rehypeKatex from 'rehype-katex';
-import remarkMath from 'remark-math';
-import mdx from '@astrojs/mdx';
-import vercel from '@astrojs/vercel';
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { defineConfig } from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+import mdx from "@astrojs/mdx";
+import vercel from "@astrojs/vercel";
 
 // Only note files carry a numeric prefix; semester / module / submodule
 // directory names do not.
 const FILE_PREFIX = /^(\d+)-(.+)\.mdx?$/;
-const EXCLUDED = new Set(['images', 'summary']);
+const EXCLUDED = new Set(["images", "summary"]);
 
 /**
  * Recursively find the note (.mdx/.md) under `dir` with the lowest numeric
  * prefix anywhere in the tree. Returns { order, slugTail } where slugTail is
  * the path from `dir` to the file with prefixes stripped, or null if none.
- * 
- * @param {string} dir 
+ *
+ * @param {string} dir
  * @returns {{ order: number, slugTail: string } | null}
  */
 function firstNote(dir) {
@@ -45,7 +45,7 @@ function firstNote(dir) {
 }
 
 function buildModuleRedirects() {
-  const docsRoot = join(process.cwd(), 'docs');
+  const docsRoot = join(process.cwd(), "docs");
   /**
    * @type {Record<string, import('astro').RedirectConfig>}
    */
@@ -60,7 +60,8 @@ function buildModuleRedirects() {
 
       const modFirst = firstNote(moduleDir);
       if (modFirst) {
-        redirects[`/${sem}/${moduleName}`] = `/${sem}/${moduleName}/${modFirst.slugTail}`;
+        redirects[`/${sem}/${moduleName}`] =
+          `/${sem}/${moduleName}/${modFirst.slugTail}`;
       }
 
       for (const sub of readdirSync(moduleDir)) {
@@ -69,7 +70,8 @@ function buildModuleRedirects() {
         if (!statSync(subDir).isDirectory()) continue;
         const subFirst = firstNote(subDir);
         if (subFirst) {
-          redirects[`/${sem}/${moduleName}/${sub}`] = `/${sem}/${moduleName}/${sub}/${subFirst.slugTail}`;
+          redirects[`/${sem}/${moduleName}/${sub}`] =
+            `/${sem}/${moduleName}/${sub}/${subFirst.slugTail}`;
         }
       }
     }
@@ -90,9 +92,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       rollupOptions: {
-        external: ['/pagefind/pagefind.js'],
+        external: ["/pagefind/pagefind.js"],
       },
     },
   },
-  adapter: vercel()
+  adapter: vercel(),
 });

@@ -6,7 +6,7 @@ slug: s3/operating-systems/hdd-scheduling
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-04-24T03:19:45.180Z
+lastUpdatedOn: 2026-04-24T07:36:29.647Z
 ---
 
 When HDDs are used, disk scheduling is done by OS to minimize seek time and maximize thoroughput. Disk scheduling must be done by OS because only the OS knows about all pending I/O requests.
@@ -81,7 +81,7 @@ available, defaults vary by storage device
 
 An extension of FCFS. Basic optimizations are included. One of the optimizations is merging adjacent LBAs for efficiency.
 
-Implemented in Linux. 
+Implemented in Linux.
 
 ### CFQ
 
@@ -90,5 +90,6 @@ Short for Completely Fair Queueing. Each process has its own I/O queue. These qu
 Prevents any single process from monopolizing the disk. Balances fairness and performance well for HDDs.
 
 Best for:
+
 - Desktop and multitasking systems using HDDs
 - Environments where many apps access the disk concurrently.

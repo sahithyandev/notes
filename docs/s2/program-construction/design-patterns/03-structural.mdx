@@ -7,7 +7,7 @@ slug: s2/program-construction/design-patterns/structural
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.601Z
-lastUpdatedOn: 2026-04-24T03:19:45.153Z
+lastUpdatedOn: 2026-04-24T07:36:29.635Z
 ---
 
 Deals with how classes are designed.
@@ -288,7 +288,7 @@ class MiddlewareDecorator {
     constructor(handler) {
         this.handler = handler;
     }
-    
+
     handle(request, response) {
         this.handler.handle(request, response);
     }
@@ -392,7 +392,7 @@ Used in HTTP server frameworks, preview UIs.
 class FileProxy implements File {
     private RealFile real;
     private String filename;
-    
+
     public FileProxy(String filename) {
         this.filename = filename;
     }

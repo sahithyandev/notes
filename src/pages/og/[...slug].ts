@@ -25,9 +25,13 @@ function parseSlug(slug: string) {
 }
 
 // Format module/submodule for display
-function formatModuleInfo(semester: string, module: string, submodule?: string) {
+function formatModuleInfo(
+  semester: string,
+  module: string,
+  submodule?: string,
+) {
   const semesterNum = semester.replace("s", "");
-  
+
   if (submodule) {
     return `Semester ${semesterNum}: ${titleize(module)} - ${titleize(submodule)}`;
   }
@@ -48,7 +52,7 @@ pages["default"] = {
   data: {
     title: SITE_NAME,
     slug: "default",
-  }
+  },
 };
 
 const semesters = new Set<string>();
@@ -68,11 +72,11 @@ for (const semester of semesters) {
     data: {
       title: `Semester ${semester.slice(1)}`,
       slug: semester,
-    }
+    },
   };
 }
 
-export const {getStaticPaths, GET} = await OGImageRoute({
+export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
   param: "slug",
   getImageOptions: (_path, page: (typeof pages)[number]) => {
@@ -126,7 +130,7 @@ export const {getStaticPaths, GET} = await OGImageRoute({
     const { semester, module, submodule } = parseSlug(page.data.slug);
     const colors = semesterColors[semester] || semesterColors.s1; // Default to s1 if not found
     const description = formatModuleInfo(semester, module, submodule);
-    
+
     return {
       title: page.data.title,
       description: description,

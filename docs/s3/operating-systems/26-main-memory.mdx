@@ -6,7 +6,7 @@ slug: s3/operating-systems/main-memory
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-04-24T03:19:45.180Z
+lastUpdatedOn: 2026-04-24T07:36:29.647Z
 ---
 
 Stores both the operating system and user processes for execution. Efficient memory management ensures protection, fast access, and flexible allocation. Usually implemented using DRAM.
@@ -59,11 +59,12 @@ Variable paritions are created dynamically as required by processes. Allows more
 Holes (free blocks) of varying sizes are created as processes load/unload. Leads to fragmentation.
 
 Allocation strategies:
-- First-fit   
+
+- First-fit  
   The first free hole large enough to accommodate the process is selected. Fast. Simple to implement. Causes external fragmentation because of small holes.
-- Best-fit   
+- Best-fit  
   The smallest free block that is large enough to accommodate the process is chosen. Wastes less space compred to first-fit. Slower. Causes external fragmentation because of small holes.
-- Worst-fit   
+- Worst-fit  
   The largest free block that is used. Minimizes many small holes. Slow. Wasteful.
 
 ### Compaction
@@ -80,11 +81,11 @@ If a process is currently doing an I/O operation, its memory block cannot be mov
 
 Reduced by [compaction](#compaction).
 
-- External fragmentation   
+- External fragmentation  
   When memory is free, but non-contiguous gaps are scattered. Makes it hard to allocate memory for large processes.
-- Internal fragmentation   
+- Internal fragmentation  
   When more memory is allocated to a process than requested. Common in fixed-size partitioning.
-  
+
 ### 50% Rule
 
 First fit analysis reveals that for every 2 usuable blocks, 1 block would be lost to fragmentation. 1/3 of the total size may be unusable.

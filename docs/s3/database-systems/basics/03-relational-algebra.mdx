@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/relational-algebra
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.694Z
-lastUpdatedOn: 2026-04-24T03:19:45.167Z
+lastUpdatedOn: 2026-04-24T07:36:29.642Z
 ---
 
 ## Attribute
@@ -40,6 +40,7 @@ t = (a_1, a_2, \ldots, a_n)\;\text{where} a_i \in D_i
 ```
 
 ## Relation Instance
+
 Current values of a relation. Represented by a table.
 
 ## Keys
@@ -61,7 +62,8 @@ No two different tuples have the same values for attributes in $K$.
 ### Candidate Key
 
 A minimal superkey. $K$ is a candidate key **iff**:
-- $K\,\text{is a superkey}$ <b>AND</b> 
+
+- $K\,\text{is a superkey}$ <b>AND</b>
 - $\nexists\, K' \subset K, K'\,\text{is a superkey}$
 
 ### Primary Key
@@ -90,7 +92,7 @@ Extracts specific attributes (columns) from a relation. Denoted by $π$.
 
 ```math
 π_{\text{attribute list}}(R)
-````
+```
 
 Duplicates are removed by default, as it is a set. Useful for narrowing down the output to required columns.
 

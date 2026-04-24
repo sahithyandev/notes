@@ -6,7 +6,7 @@ slug: s3/operating-systems/process
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-04-24T03:19:45.178Z
+lastUpdatedOn: 2026-04-24T07:36:29.646Z
 ---
 
 OS manages user-level and kernel-level processes, which includes creating, managing, scheduling and terminating.
@@ -35,9 +35,10 @@ Programs that provide services to the user and the OS. Shipped with the OS. Not 
 
 ## Context
 
-Complete set of information about a process, that is required to pause, and later resume it exactly where it left off. 
+Complete set of information about a process, that is required to pause, and later resume it exactly where it left off.
 
-Includes: 
+Includes:
+
 - process id, state
 - parent process id
 - program counter
@@ -127,16 +128,17 @@ A parent creates a child, forms a process tree. Parent and child may or may not 
 
 In UNIX:
 
-- `fork()`   
+- `fork()`  
   Duplicates current process. Returns 0 to child, child's PID to parent.
-- `exec()`    
+- `exec()`  
   Loads new program into process
-- `wait()`   
+- `wait()`  
   Parent waits for child to finish, retrieves exit status
 
 ## Process Termination
 
 Mobile OS often have to terminate processes to reclaim system resources such as memory. From most to least important:
+
 - Foreground process
 - Visible process
 - Service process

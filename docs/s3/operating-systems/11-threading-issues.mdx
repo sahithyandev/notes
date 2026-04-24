@@ -6,7 +6,7 @@ slug: s3/operating-systems/threading-issues
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-04-24T03:19:45.178Z
+lastUpdatedOn: 2026-04-24T07:36:29.646Z
 ---
 
 ## Semantics of Syscalls
@@ -35,6 +35,7 @@ In most systesm, all threads except the calling one are destroyed. Any thread-he
 In UNIX, signal is a construct for notifying processes about events. Signals are handled by either in kernel (by default) or in the process (if overridden by user). When multiple threads are there, the problem is the destination thread of a signal.
 
 Possible destinations:
+
 - Deliver the signal to the thread to which the signal applies
 - Deliver the signal to every thread in the process
 - Deliver the signal to certain threads in the process

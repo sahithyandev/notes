@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/equivalence-of-fa
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.633Z
-lastUpdatedOn: 2026-04-24T03:19:45.188Z
+lastUpdatedOn: 2026-04-24T07:36:29.650Z
 ---
 
 If 2 automata models (regardless of their types: DFA, NFA, NFA-Λ) are equivalent **iff** they recognize the same language.
@@ -48,8 +48,9 @@ A & \text{otherwise}
 If $\Lambda(q_0)$ contains an accepting state, $q_0$ must be included in the accepting states of the NFA.
 
 Steps:
+
 1. Find $\Lambda$-closure of every state
-2. Build new transitions using the closure   
+2. Build new transitions using the closure  
    For all states $q$ and input symbols $a$, take the $\Lambda$-closure. Follow $a$-transitions. Take the $\Lambda$-closure again. Build new transitions from $q$ to the final set of states.
-3. Remove all $\Lambda$ transitions 
+3. Remove all $\Lambda$ transitions
 4. If $\Lambda(q_0)$ includes an accepting state, make $q_0$ an accepting state in the new NFA.

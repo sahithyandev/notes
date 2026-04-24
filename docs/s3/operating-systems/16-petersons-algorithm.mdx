@@ -6,7 +6,7 @@ slug: s3/operating-systems/petersons-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-04-24T03:19:45.179Z
+lastUpdatedOn: 2026-04-24T07:36:29.647Z
 ---
 
 An algorithm for solving critical section problem. Satisfies mutual exclusion, progress and bounded waiting.
@@ -15,9 +15,9 @@ Only works for 2 processes. Depends on strict ordering of memory operations.
 
 Uses 2 shared variables:
 
-- `flag` array   
+- `flag` array  
   To indicate if a process wants to enter the critical section.
-- `turn` variable   
+- `turn` variable  
   To indicate whose turn it is to enter.
 
 Assumes `load` and `store` operations are atomic.
@@ -48,9 +48,9 @@ Guarantees about memory that a computer architecture makes to application progra
 
 May be either:
 
-- Strongly ordered   
+- Strongly ordered  
   Limited memory instruction reordering. Memory modification of a processor is immediately visible to all other processors.
-- Weakly ordered   
+- Weakly ordered  
   CPU reorders memory instructions as much as possible. Increases performance. Memory modification may not be immediately visible to all other processors.
 
 ### Memory Barrier

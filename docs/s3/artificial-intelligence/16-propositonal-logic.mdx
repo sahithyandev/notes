@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/propositonal-logic
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.685Z
-lastUpdatedOn: 2026-04-24T03:19:45.159Z
+lastUpdatedOn: 2026-04-24T07:36:29.639Z
 ---
 
 Less ontological commitment. Weak epistemological commitment.
@@ -30,24 +30,25 @@ Example: $m1 = \set{P = \text{true}, Q = \text{true}, R = \text{false}}$
 Aka. CNF. A standard way of writing logical formulas so that they can be easily processed by reasoning algorithms like resolution.
 
 A formula is in CNF **iff**:
+
 - it’s a conjunction ($\land$) **and**
 - each clause inside the conjunction is a disjunction ($\lor$) of literals
 
 ### Steps
 
-- Eliminate biconditionals ($\iff$)   
+- Eliminate biconditionals ($\iff$)  
    Replace: $(A \iff B) \to  (A \implies B) \land (B \implies A)$
 
-- Eliminate implications ($\implies$)   
+- Eliminate implications ($\implies$)  
    Replace: $(A \implies B)  \to  \lnot A \lor B$
 
-- Move lnot inwards using De Morgan’s laws   
-   - $\lnot(A \land B) \to (\lnot A \lor \lnot B)$
-   - $\lnot(A \lor B) \to (\lnot A \land \lnot B)$
-   - $\lnot(\lnot A) \to A$
+- Move lnot inwards using De Morgan’s laws
+  - $\lnot(A \land B) \to (\lnot A \lor \lnot B)$
+  - $\lnot(A \lor B) \to (\lnot A \land \lnot B)$
+  - $\lnot(\lnot A) \to A$
 
-- Apply distributive law to get a conjunction of disjunctions    
+- Apply distributive law to get a conjunction of disjunctions  
    $(A \lor (B \land C)) \to (A \lor B) \land (A \lor C)$
 
-- Simplify   
+- Simplify  
    Remove duplicate literals or clauses if possible.

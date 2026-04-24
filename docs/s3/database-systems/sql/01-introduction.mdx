@@ -7,7 +7,7 @@ slug: s3/database-systems/sql/introduction
 prev: false
 next: true
 dateCreated: 2026-04-22T07:09:10.697Z
-lastUpdatedOn: 2026-04-24T03:19:45.170Z
+lastUpdatedOn: 2026-04-24T07:36:29.644Z
 ---
 
 A declarative [DML](/database-systems/introduction/#dml) and [DDL](/database-systems/introduction/#ddl). Case insensitive. Became the industry standard in the 1980s.
@@ -64,7 +64,7 @@ SQL supports several built-in data types as well as user-defined data types.
 - Binary Types:
   - `BLOB`: Binary Large Object for storing binary data
   - `BINARY` / `VARBINARY`: Fixed and variable-length binary data
-  
+
 Users can define additional data types using [`CREATE TYPE`](/database-systesm/sql-commands#create-type).
 
 ### Domains
@@ -75,7 +75,7 @@ Allow defining custom data types with constraints. They are useful for enforcing
 
 ### ADD COLUMN vs DROP COLUMN
 
-Most early database systems allowed adding new columns but not dropping existing ones.  
+Most early database systems allowed adding new columns but not dropping existing ones.
 
 Adding a column is a non-destructive change. The DBMS appends metadata for the new column, which can be quickly done. And treats missing values in old rows as `NULL` or default. Backward compatibility is maintained when a new column is added.
 
@@ -94,8 +94,9 @@ Instead of removing the data instantly, the process is deferred. Avoids long tab
 #### Background Table Rewriting
 
 Modern engines maintain system catalogs that track all dependencies. To ensure a consistent schema, when dropping a column:
+
 - The DBMS checks for dependent objects.
-- Either rejects the operation or performs a cascade delete of references.  
+- Either rejects the operation or performs a cascade delete of references.
 
 ## Joins
 
@@ -117,6 +118,7 @@ Can be nested, but have performance implications.
 A nested subquery is a query inside another query. Allows one SQL statement to use the result of another as input, enabling complex filtering and comparison logic. Cannot use outer row values.
 
 A subquery (inner query) is enclosed in parentheses and used within:
+
 - `WHERE`
 - `FROM`
 - `HAVING`

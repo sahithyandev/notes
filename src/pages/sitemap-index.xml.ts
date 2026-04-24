@@ -11,7 +11,7 @@ export async function GET() {
     if (parts[0].match(/^s\d$/)) {
       const sem = parts[0];
       const noteDate = note.data.lastUpdatedOn || new Date();
-      
+
       if (!semesters.has(sem) || noteDate > semesters.get(sem)!) {
         semesters.set(sem, noteDate);
       }
@@ -33,17 +33,21 @@ export async function GET() {
     <loc>${SITE_DOMAIN}/</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </sitemap>
-  ${sortedSemesters.map(([sem, lastmod]) => `
+  ${sortedSemesters
+    .map(
+      ([sem, lastmod]) => `
   <sitemap>
     <loc>${SITE_DOMAIN}/sitemaps/${sem}.xml</loc>
     <lastmod>${lastmod.toISOString()}</lastmod>
-  </sitemap>`).join('')}
+  </sitemap>`,
+    )
+    .join("")}
 </sitemapindex>`;
 
   return new Response(xml, {
     headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=3600',
+      "Content-Type": "application/xml",
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
