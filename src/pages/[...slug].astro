@@ -195,7 +195,7 @@ const description = generateDescription(notesEntry.body || "");
           sidebarData.grouped[sidebarData.currentSemester] || {},
         ).map(([subject, notes]) => (
           <a
-            href={`/${subject}`}
+            href={`/${sidebarData.currentSemester}/${subject}`}
             class={`sb-item ${subject === sidebarData.currentSubject ? "active" : ""}`}
           >
             {subject
@@ -220,7 +220,7 @@ const description = generateDescription(notesEntry.body || "");
             {/* Direct notes under subject */}
             {sidebarData.currentSubjectTree.direct.map((note: any) => (
               <a
-                href={`/${note.slug}`}
+                href={`/notes/${note.slug}`}
                 class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
               >
                 {note.label}
@@ -238,7 +238,7 @@ const description = generateDescription(notesEntry.body || "");
                   </div>
                   {moduleNotes.map((note: any) => (
                     <a
-                      href={`/${note.slug}`}
+                      href={`/notes/${note.slug}`}
                       class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
                     >
                       {note.label}
