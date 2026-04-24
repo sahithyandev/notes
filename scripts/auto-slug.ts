@@ -1,5 +1,5 @@
 import { readdirSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
+import { rename, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 
@@ -16,24 +16,30 @@ function safeParseInt(value: string | undefined, defaultValue: number | undefine
 }
 
 export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
-  // remove images and summary from the file
-  // do it in-place so that it is more performant
-  mdFilePaths = mdFilePaths.filter((filePath) => {
-    if (!filePath.endsWith(".md") || filePath.includes("/summary/") || filePath.includes("/images/")) {
-      return false;
-    }
-    return true;
-  });
-  
+
 	for (let i = 0; i < mdFilePaths.length; i++) {
 		const filePath = mdFilePaths[i];
-		const file = matter.read(filePath);
+		if (filePath.includes("/summary/") || filePath.includes("/images/")) continue;
+		if (!filePath.endsWith(".md") && !filePath.endsWith(".mdx")) continue;
+
+		const newFilePath = filePath.replace(/.md$/, ".mdx");
+
+		// Rename file from .md to .mdx
+		if (newFilePath !== filePath) {
+			if (dryRun) {
+				console.log(`renaming: ${filePath} -> ${newFilePath}`);
+			} else {
+				await rename(filePath, newFilePath);
+			}
+		}
+
+		const file = matter.read(dryRun ? filePath : newFilePath);
 		const { data: currentFrontMatter } = file;
 
 		if (!currentFrontMatter.title) {
 			return;
 		}
-		const relativeFromDocsDirectory = relative("docs", filePath);
+		const relativeFromDocsDirectory = relative("docs", newFilePath);
 		const parts = relativeFromDocsDirectory.split("/");
 		parts.pop();
 		const section = parts.join("/");
@@ -42,12 +48,12 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
 			...currentFrontMatter,
 		};
 
-		const slugSection = relativeFromDocsDirectory.replace(".md", "");
+		const slugSection = relativeFromDocsDirectory.replace(".mdx", "");
 		const pathParts = slugSection.split("/");
-		
+
 		// Remove numeric prefix from all parts
 		const cleanedParts = pathParts.map(part => part.replace(PATTERN_TITLE_PREFIX, ""));
-		
+
 		// Reconstruct slug with semester at the beginning
 		const newSlug = cleanedParts.join("/");
 		file.data.slug = newSlug;
@@ -90,14 +96,13 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
 			file.data.next = true;
 			console.log(">>> next true");
 		}
-		
+
 		if (dryRun) {
-			console.log(`[DRY RUN] Would update: ${filePath}`);
 			console.log(`[DRY RUN] New slug: ${file.data.slug}`);
 			console.log(`[DRY RUN] Prev: ${file.data.prev}, Next: ${file.data.next}`);
 		} else {
 			const updatedFileContent = matter.stringify(file, {});
-			writeFile(filePath, updatedFileContent);
+			writeFile(newFilePath, updatedFileContent);
 		}
 	}
 }
@@ -106,7 +111,7 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
 if (require.main === module) {
 	const directories: Array<string> = [];
 	const filePaths: Array<string> = [];
-	
+
 	// Check for --dry-run flag
 	const dryRun = process.argv.includes("--dry-run");
 	const argsToProcess = dryRun ? process.argv.slice(2, -1) : process.argv.slice(2);
@@ -123,10 +128,10 @@ if (require.main === module) {
 		}
 	}
 	filePaths.sort();
-	
+
 	if (dryRun) {
 		console.log("=== DRY RUN MODE - No files will be modified ===");
 	}
-	
+
 	autoSlug(filePaths, dryRun);
 }
