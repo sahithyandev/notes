@@ -23,14 +23,38 @@ bun scripts/auto-slug.ts --dry-run <path/to/file.md>
 
 ## Architecture
 
-Astro 6 static site. All notes are Markdown files in `docs/`, loaded via Astro's content collections and rendered by two page files.
+Astro 6 static site. All notes are Markdown files in `docs/`, loaded via Astro's content collections and rendered by page files.
 
-**Routing — two files handle everything:**
+**Routing:**
 
 - `src/pages/index.astro` — Homepage; groups all notes by semester and renders `SemesterCard` components.
+- `src/pages/[sem].astro` — Semester overview page; lists modules and notes for a given semester.
 - `src/pages/[...slug].astro` — Individual note pages; three-column layout (left sidebar / article / TOC rail). Uses `getStaticPaths()` over all notes.
+- `src/pages/og/[...slug].ts` — Generates Open Graph images per note.
+- `src/pages/sitemap-index.xml.ts` and `src/pages/sitemaps/[sem].xml.ts` — Sitemap generation split by semester.
+- `src/pages/license.astro` — License page.
 
-**Content collection** (`src/content.config.ts`): globs `./docs/**/*.{md,mdx}`. Required frontmatter: `title`, `slug`. Optional: `sidebar.label`, `sidebar.order`, `prev`, `next`.
+**Content collection** (`src/content.config.ts`): globs `./docs/**/*.{md,mdx}`.
+
+Required frontmatter: `title`, `slug`. Optional: `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords`.
+
+**Components** (`src/components/`):
+
+- `nav.astro` — Top navigation bar.
+- `hero.astro` — Homepage hero section.
+- `semester-card.astro` — Card shown per semester on the homepage.
+- `semester-hero.astro` — Hero section on semester overview pages.
+- `note.astro` — Note layout used inside `[...slug].astro`.
+- `note-preview.astro` — Note preview card.
+- `breadcrumb.astro` — Breadcrumb navigation.
+- `search-modal.astro` — Search modal.
+- `stats-band.astro` / `stat-card.astro` — Stats display.
+- `walks-venn-diagram.astro` — One-off diagram component.
+
+**Utilities** (`src/utils/`):
+
+- `index.ts` — Shared helper functions (e.g. `titleize`).
+- `values.ts` — Site-wide constants (`SITE_NAME`, `SITE_DOMAIN`, `SITE_DESCRIPTION`).
 
 ## Slug & File Naming Convention
 
