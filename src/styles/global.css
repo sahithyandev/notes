@@ -119,3 +119,31 @@ html,
 body {
   scroll-behavior: smooth;
 }
+
+/* Standard anchor style — applied to anchors in articles, the footer, and
+   other "plain text" surfaces. Semester-scoped pages set --link to the
+   semester accent; everywhere else falls back to --accent. */
+:where(article, .footer, .license-content) a {
+  color: var(--link, var(--accent));
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(
+    in oklab,
+    currentColor 35%,
+    transparent
+  );
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 0.12s ease,
+    color 0.12s ease;
+}
+
+:where(article, .footer, .license-content) a:hover {
+  text-decoration-color: currentColor;
+}
+
+:where(article, .footer, .license-content) a:focus-visible {
+  outline: 2px solid var(--link, var(--accent));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
