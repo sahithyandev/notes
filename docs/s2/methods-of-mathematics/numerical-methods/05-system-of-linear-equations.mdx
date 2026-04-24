@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/numerical-methods/system-of-linear-equations
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.593Z
-lastUpdatedOn: 2026-04-24T03:19:45.147Z
+lastUpdatedOn: 2026-04-24T03:46:02.225Z
 ---
 
 A linear equation is an equation that may be put in the form:
@@ -82,7 +82,7 @@ x_i^{(k)} = \frac{1}{a_{ii}} \left[ -\sum_{j=1, j \neq i}^{n} a_{ij}x_j^{(k-1)} 
 
 Cannot be used for singular matrix.
 
-:::note[Diagonally dominant matrix]
+<Note title="Diagonally dominant matrix">
 
 $A_{n\times n}$ is diagonally dominant **when** $\forall i \in \{1, 2, \ldots, n\}$:
 
@@ -95,7 +95,7 @@ $A_{n\times n}$ is strictly diagonally dominant **when** $\forall i \in \{1, 2, 
 \lvert a_{ii} \rvert \gt \sum_{j=1,j\neq i}^{n} \lvert a_{ij} \rvert
 ```
 
-:::
+</Note>
 
 Relative error is given by:
 ```math
@@ -118,7 +118,7 @@ l_\infty =
 \bigg\}
 ```
 
-:::note
+<Note>
 The equation $A \vec{X} + \vec{B}$ can be converted to the form $\vec{X} = T\vec{X} + \vec{C}$.
 
 ```math
@@ -132,7 +132,7 @@ Here:
 - $-L$ is the strictly lower-triangular part of $A$.
 - $-U$ is the strictly upper-triangular part of $A$.
 
-:::
+</Note>
 
 ### Gauss-Seidel Method
 
@@ -144,7 +144,7 @@ When computing $x_i^{(k)}$, the components $x_1^{(k)}, \ldots, x_{i-1}^{(k)}$ wo
 x_i^{(k)} = \frac{1}{a_{ii}} \left[ b_i -\sum_{j=1}^{i-1} a_{ij}x_j^{(k)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k-1)} \right]
 ```
 
-:::note
+<Note>
 
 The equation $A \vec{X} + \vec{B}$ can be converted to the form: $\vec{X} = T\vec{X} + \vec{C}$.
 
@@ -160,7 +160,7 @@ Here:
 - $-L$ is the strictly lower-triangular part of $A$.
 - $-U$ is the strictly upper-triangular part of $A$.
 
-:::
+</Note>
 
 ## Convergence of iterative methods
 

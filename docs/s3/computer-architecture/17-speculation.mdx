@@ -6,7 +6,7 @@ slug: s3/computer-architecture/speculation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-04-24T03:19:45.161Z
+lastUpdatedOn: 2026-04-24T03:46:02.227Z
 ---
 
 Execute instructions along predicted path. Commit only if prediction correct. Otherwise throw away ROB entries. Requires branch prediction. Handled by hardware.
@@ -53,8 +53,8 @@ When the instruction reaches the head of the ROB and its ready:
 
 If the committing instruction is a mispredicted branch, speculated entries are discarded. The pipeline is flushed and execution restarts from the correct path.
 
-:::note
+<Note>
 
 Modern processors use speculation, dynamic scheduling, and multiple issue architectures for maximum ILP.
 
-:::
+</Note>

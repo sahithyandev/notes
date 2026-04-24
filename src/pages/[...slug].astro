@@ -6,6 +6,8 @@ import { getEntry } from "astro:content";
 import Nav from "../components/Nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
 import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
+import Note from "../components/Note.astro";
+import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -249,10 +251,8 @@ const description = generateDescription(notesEntry.body || "");
         )
       }
 
-      <div class="sb-rule" />
-      <a href="/license" class="sb-item sb-license-link">
-        License
-      </a>
+      <div class="sb-rule"></div>
+      <a href="/license" class="sb-item sb-license-link"> License </a>
     </aside>
 
     <section>
@@ -275,7 +275,7 @@ const description = generateDescription(notesEntry.body || "");
       }
 
       <article data-pagefind-body>
-        <Content />
+        <Content components={{ Note, WalksVennDiagram }} />
       </article>
     </section>
 
@@ -364,7 +364,8 @@ const description = generateDescription(notesEntry.body || "");
           // Check if heading is visible in section viewport
           if (relativeBottom > viewportTop && relativeTop < viewportBottom) {
             if (tocLinks[index]) tocLinks[index].classList.add("active");
-            if (trailSegments[index]) trailSegments[index].classList.add("active");
+            if (trailSegments[index])
+              trailSegments[index].classList.add("active");
           }
         });
       };
@@ -585,36 +586,6 @@ const description = generateDescription(notesEntry.body || "");
       color: rgba(255, 255, 255, 0.18);
       letter-spacing: 0.5px;
       text-transform: uppercase;
-    }
-
-    /* Callout */
-    .callout {
-      border-radius: 0 8px 8px 0;
-      border: 1px solid var(--sem-border);
-      border-left: 3px solid var(--sem);
-      background: var(--sem-bg);
-      padding: 14px 18px;
-      margin: 20px 0;
-      font-size: 0.9375rem;
-      color: var(--sem-text);
-      line-height: 1.6;
-    }
-
-    .callout-title {
-      font-family: var(--font-ui);
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      color: var(--sem);
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .callout p {
-      margin: 0;
-      font-family: var(--font-body);
-      color: var(--sem-text);
     }
 
     /* Table */
@@ -1075,8 +1046,10 @@ const description = generateDescription(notesEntry.body || "");
 
   /* Diagonal connector between levels — bridges the 10px horizontal
      gap between the h2 column (left:5) and the h3 column (left:15). */
-  .toc-trail-segment[data-depth="2"] + .toc-trail-segment[data-depth="3"]::before,
-  .toc-trail-segment[data-depth="3"] + .toc-trail-segment[data-depth="2"]::before {
+  .toc-trail-segment[data-depth="2"]
+    + .toc-trail-segment[data-depth="3"]::before,
+  .toc-trail-segment[data-depth="3"]
+    + .toc-trail-segment[data-depth="2"]::before {
     border-radius: 1px;
     content: "";
     position: absolute;
@@ -1087,14 +1060,16 @@ const description = generateDescription(notesEntry.body || "");
   }
 
   /* h2 above → h3 below: ::before on h3, bridges from h2 bottom-center to h3 top-center */
-  .toc-trail-segment[data-depth="2"] + .toc-trail-segment[data-depth="3"]::before {
+  .toc-trail-segment[data-depth="2"]
+    + .toc-trail-segment[data-depth="3"]::before {
     left: -9.6px;
     top: -12px;
     transform: rotate(45deg);
   }
 
   /* h3 above → h2 below: ::before on h2, bridges from h3 bottom-center to h2 top-center */
-  .toc-trail-segment[data-depth="3"] + .toc-trail-segment[data-depth="2"]::before {
+  .toc-trail-segment[data-depth="3"]
+    + .toc-trail-segment[data-depth="2"]::before {
     left: 11.5px;
     top: -12px;
     transform: rotate(135deg);
@@ -1174,11 +1149,5 @@ const description = generateDescription(notesEntry.body || "");
 
   [data-theme="dark"] .note-nav-btn:hover {
     box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
-  }
-
-  [data-theme="dark"] .callout {
-    background: var(--sem-bg);
-    border-color: var(--sem-border);
-    border-left-color: var(--sem);
   }
 </style>

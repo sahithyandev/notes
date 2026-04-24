@@ -6,7 +6,7 @@ slug: s4/linear-algebra/span-and-basis
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.626Z
-lastUpdatedOn: 2026-04-24T03:19:45.184Z
+lastUpdatedOn: 2026-04-24T03:46:02.230Z
 ---
 
 For all the definitions below, consider $B$ to be a non-empty subset of the vector space $V\;\text{over}\;F$.
@@ -37,23 +37,23 @@ As $B \subseteq V$ and $V$ is closed over vector addition and scalar multiplicat
 \text{Span}\;B \text{ is a subspace of } V
 ```
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - If $B$ is a non-empty subset of $V$, $\text{Span}\;B$ is also a non-empty subset of $V$.
 - As $\text{Span}\;B$ is a subset of $V$, it's enough to show that the span is closed under vector addition and scalar multiplication.
 
-:::
+</Note>
 
 ### Smallest subspace
 
 $\text{Span}\;B$ is the smallest subspace of $V$, containing $B$.
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - Assume $C$ is a subspace of $V$ containing $B$.
 - Any element of $\text{Span}\;B$, is a linear combination of elements of $B$. Which means it's an element of $C$. Hence subset.
 
-:::
+</Note>
 
 ## Linear Independence
 
@@ -71,12 +71,12 @@ If $B$ is a singleton set $\{x\}$, it is linearly independent **iff** $x \neq \u
 
 Any subset of a linear independent set is also linear independent. Any superset of a linear dependent set is also linear dependent.
 
-:::note
+<Note>
 
 - $B = \set{ \underline{0} }$ is **not** linearly independent.
 - $B = \emptyset$ is linearly independent (vacuous truth).
 
-:::
+</Note>
 
 ### Theorem 1
 
@@ -98,55 +98,55 @@ Suppose a basis of $V$ has $n$ elements. Any subset of $V$ with:
 - more than $n$ vectors is linearly dependent
 - fewer than $n$ vectors cannot span $V$
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - Assume another basis with $m$ ($\gt n$) vectors
 - 2 cases: $m \gt n$ and $m \lt n$
 - Consider the $n$ number of equations and $m$ number of unknowns.
 
-:::
+</Note>
 
 If a set spans but no proper subset spans, it is a basis. Any linearly independent set can be extended to a basis.
 
 Any element in a vector space can be uniquely expressed as a linear combination of its basis vectors.
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - Suppose an element has 2 different expressions using linear combination of the basis vectors
 - Subtract them to get a relation in the format: $\sum_{i=1}^n (a_i - b_i)x_i = 0$
 - As $x_i$'s are linearly independent, $a_i = b_i$
 
-:::
+</Note>
 
 Every spanning non-empty subset of a vector space contains a basis.
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - Suppose a spanning subset $B$ of $V$
 - If $B$ is linearly independent, $B$ is a basis and $B \subseteq B$.
 - If $B$ is not linearly indepedent, an element can be written as a linear combination of the other. Remove that element, and do the steps again.
 - Once no. of elements in $B$ becomes $\text{dim}{V}$, it becomes a basis.
 
-:::
+</Note>
 
 **If** $B$ is a finite, non-empty subset of $V$ and linearly independent, and $x \not\in \text{Span}\;B$,  **then** $B\cup\set{x}$ is linearly independent.
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - Start with: $ax + \sum_{i=1}^n a_i x_i = 0$
 - Assume $a\neq 0$
 - Subject $x$
 
-:::
+</Note>
 
 Any linearly independent subset $B$ of $V$ can be extended to a basis.
 
-:::note[Proof Hint]
+<Note title="Proof Hint">
 
 - If $B$ is spanning, then it's a basis
 - If not, repeatedly add $x$ to $B$ such that $x\not\in \text{Span}\;B$.
 
-:::
+</Note>
 
 If $B$ is maximally linearly independent (no superset of $B$ is linearly independent), it is a basis. If $B$ is minimally spanning, it is a basis.
 
@@ -160,8 +160,8 @@ Number of elements in the basis of a vector space $V\;\text{over}\;F$. Denoted a
 
 If $\dim V = n$ **then** any linearly independent set of $n$ vectors in $V$ is a basis of $V$. If $\dim V = n$ **then** any spanning set of $n$ vectors in $V$ is a basis of $V$.
 
-:::note
+<Note>
 
 $\text{dim}\set{\underline{0}} = 0$.
 
-:::
+</Note>

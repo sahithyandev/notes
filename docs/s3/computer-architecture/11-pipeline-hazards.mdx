@@ -6,7 +6,7 @@ slug: s3/computer-architecture/pipeline-hazards
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.688Z
-lastUpdatedOn: 2026-04-24T03:19:45.161Z
+lastUpdatedOn: 2026-04-24T03:46:02.227Z
 ---
 
 Situations preventing next instruction from executing in designated clock cycle. Causes the pipeline to [stall](/computer-architecture/pipelining#pipeline-stall).
@@ -48,11 +48,11 @@ Suppose when unpipelined, instruction $i$ runs before $j$ and both use the same 
 - Write after write (WAW)  
   $j$ writes only after $i$ writes. Impossible in 5-stage pipeline. Occurs when instructions are reordered.
   
-:::note
+<Note>
 
 Read after read (RAR) is not a hazard because read operation is idempotent.
 
-:::
+</Note>
 
 ### Register Half-Cycle Timing
 
@@ -102,11 +102,11 @@ More performant. Slightly more complex.
 
 Treat all branches are taken. Requires an early adder and immediate decoder in ID. No branch penalty for taken branches. If the branch is not taken, 1 or 2 cycles branch penalty.
 
-:::note
+<Note>
 
 In either assume taken or untaken, the order of instructions can be rearranged to match the hardware's choice.
 
-:::
+</Note>
 
 ### Delayed branch
 

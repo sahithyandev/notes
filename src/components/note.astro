@@ -1,0 +1,113 @@
+---
+type CalloutType = "note" | "caution" | "danger" | "tip";
+
+interface Props {
+  title?: string;
+  type?: CalloutType;
+}
+
+const { title, type = "note" } = Astro.props;
+---
+
+<aside class="callout" data-type={type}>
+  {title && <strong class="callout-title">{title}</strong>}
+  <slot />
+</aside>
+
+<style is:global>
+  .callout {
+    --cal-accent: var(--sem);
+    --cal-bg: var(--sem-bg);
+    --cal-border: var(--sem-border);
+    --cal-text: var(--sem-text);
+
+    border-radius: 0 8px 8px 0;
+    border: 1px solid var(--cal-border);
+    border-left: 3px solid var(--cal-accent);
+    background: var(--cal-bg);
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.9375rem;
+    color: var(--cal-text);
+    line-height: 1.6;
+  }
+
+  .callout-title {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--cal-accent);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .callout p {
+    margin-bottom: 0 !important;
+    font-family: var(--font-body);
+    color: var(--cal-text);
+  }
+
+  .callout ul li::before {
+    background: var(--cal-accent);
+  }
+
+  .callout[data-type="note"] {
+    --cal-accent: #2563eb;
+    --cal-bg: #eff4ff;
+    --cal-border: #c4d5ff;
+    --cal-text: #1e3a8a;
+  }
+
+  .callout[data-type="tip"] {
+    --cal-accent: #16a34a;
+    --cal-bg: #ecfdf3;
+    --cal-border: #b8e6c9;
+    --cal-text: #15803d;
+  }
+
+  .callout[data-type="caution"] {
+    --cal-accent: #d97706;
+    --cal-bg: #fef6e7;
+    --cal-border: #f5d79e;
+    --cal-text: #92400e;
+  }
+
+  .callout[data-type="danger"] {
+    --cal-accent: #dc2626;
+    --cal-bg: #fef2f2;
+    --cal-border: #fcc5c5;
+    --cal-text: #991b1b;
+  }
+
+  [data-theme="dark"] {
+    .callout-note {
+      --cal-accent: #60a5fa;
+      --cal-bg: #0f1a2e;
+      --cal-border: #1e3a5f;
+      --cal-text: #bfd4f7;
+    }
+
+    .callout-tip {
+      --cal-accent: #4ade80;
+      --cal-bg: #0d1f14;
+      --cal-border: #1a3d26;
+      --cal-text: #bce8c9;
+    }
+
+    .callout-caution {
+      --cal-accent: #fbbf24;
+      --cal-bg: #201504;
+      --cal-border: #3d2e0a;
+      --cal-text: #f0d7a3;
+    }
+
+    .callout-danger {
+      --cal-accent: #f87171;
+      --cal-bg: #1f0d0d;
+      --cal-border: #3d1515;
+      --cal-text: #f0b8b8;
+    }
+  }
+</style>

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/normalization
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-04-24T03:19:45.168Z
+lastUpdatedOn: 2026-04-24T03:46:02.227Z
 ---
 
 A systematic approach to decide whether a particular relation is in good form. Helps ensure correctness and maintainability. But might degrade query performance. 
@@ -108,11 +108,11 @@ If all the below conditions are met, the relation is in BCNF:
 - It's in 3NF
 - All key attributes must dependent on and only on the entire primary key.
 
-:::note
+<Note>
 
 **If** none of the dependencies in $F$ causes a violation of BCNF, **then** none of the dependencies in $F^+$ will cause a violation of BCNF either.
 
-:::
+</Note>
 
 ### Fix for BCNF Violation
 
@@ -122,7 +122,7 @@ $R$ is decomposed into:
 - $(A \cup B)$
 - $R - (B - A)$
 
-:::note
+<Note>
 
 Usually the goal in a relational database design is:
 - BCNF
@@ -131,7 +131,7 @@ Usually the goal in a relational database design is:
 
 If that's not achievable, either dependency preservation is left or 3NF is used.
 
-:::
+</Note>
 
 ## 4th Normal Form (4NF)
 
