@@ -3,8 +3,27 @@ import { OGImageRoute } from "astro-og-canvas";
 import { titleize } from "../../utils/index";
 import { SITE_NAME, SITE_DESCRIPTION } from "../../utils/values";
 
+type RGBColor = [r: number, g: number, b: number];
+
+const LOGO_PATH = "./public/android-chrome-192x192.png";
+const LOGO_SIZE = 192;
+const LOGO_CONFIG: {
+  /** Path to the logo image file, e.g. `'./src/logo.png'` */
+  path: string;
+  /**
+   * Size to display logo at.
+   * - `undefined` — Use original image file dimensions. (Default)
+   * - `[width]` — Resize to the specified width, height will be resize proportionally.
+   * - `[width, height]` — Resized to the specified width and height.
+   */
+  size?: [width?: number, height?: number];
+} = {
+  path: LOGO_PATH,
+  size: [LOGO_SIZE],
+};
+
 // Semester color mapping (RGB arrays from CSS variables)
-const semesterColors: Record<string, { primary: number[]; bg: number[] }> = {
+const semesterColors: Record<string, { primary: RGBColor; bg: RGBColor }> = {
   s1: { primary: [51, 72, 200], bg: [235, 237, 250] },
   s2: { primary: [107, 56, 160], bg: [241, 235, 248] },
   s3: { primary: [26, 122, 74], bg: [232, 243, 237] },
@@ -25,17 +44,8 @@ function parseSlug(slug: string) {
 }
 
 // Format module/submodule for display
-function formatModuleInfo(
-  semester: string,
-  module: string,
-  submodule?: string,
-) {
-  const semesterNum = semester.replace("s", "");
-
-  if (submodule) {
-    return `Semester ${semesterNum}: ${titleize(module)} - ${titleize(submodule)}`;
-  }
-  return `Semester ${semesterNum}: ${titleize(module)}`;
+function formatModuleInfo(semester: string, module: string) {
+  return `Semester ${semester.slice(1)}: ${titleize(module)}`;
 }
 
 const entries = await getCollection("notes");
@@ -85,7 +95,8 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       return {
         title: SITE_NAME,
         description: SITE_DESCRIPTION,
-        bgGradient: [[235, 237, 250]],
+        bgGradient: [[235, 237, 250]] as RGBColor[],
+        logo: LOGO_CONFIG,
         font: {
           title: {
             color: [51, 72, 200],
@@ -110,6 +121,7 @@ export const { getStaticPaths, GET } = await OGImageRoute({
         title: `Semester ${semesterNum}`,
         description: SITE_DESCRIPTION,
         bgGradient: [colors.bg],
+        logo: LOGO_CONFIG,
         font: {
           title: {
             color: colors.primary,
@@ -127,14 +139,15 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     }
 
     // Handle note pages
-    const { semester, module, submodule } = parseSlug(page.data.slug);
+    const { semester, module } = parseSlug(page.data.slug);
     const colors = semesterColors[semester] || semesterColors.s1; // Default to s1 if not found
-    const description = formatModuleInfo(semester, module, submodule);
+    const description = formatModuleInfo(semester, module);
 
     return {
       title: page.data.title,
       description: description,
       bgGradient: [colors.bg],
+      logo: LOGO_CONFIG,
       font: {
         title: {
           color: colors.primary,

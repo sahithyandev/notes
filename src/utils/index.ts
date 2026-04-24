@@ -1,4 +1,15 @@
-const LOWERCASE = new Set(["and", "or", "the", "a", "an", "of", "in", "on", "for", "to"]);
+const LOWERCASE = new Set([
+  "and",
+  "or",
+  "the",
+  "a",
+  "an",
+  "of",
+  "in",
+  "on",
+  "for",
+  "to",
+]);
 
 const ABBREVIATIONS: Record<string, string> = {
   iot: "Internet of Things",
