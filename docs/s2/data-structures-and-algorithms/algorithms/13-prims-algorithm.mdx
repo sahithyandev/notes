@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/prims-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.589Z
-lastUpdatedOn: 2026-04-24T07:36:29.631Z
+lastUpdatedOn: 2026-04-24T10:47:23.938Z
 ---
 
 A [greedy algorithm](/data-structures-and-algorithms/algorithms/introduction#greedy-algorithm) to find [MST](/data-structures-and-algorithms/data-structures/minimum-spanning-tree/) of a [graph](/data-structures-and-algorithms/data-structures/graph/). Starts with a single vertex. Discovered edges are stored in a priority queue. In each turn, MST grows by 1 edge which is the smallest in the discovered edgegs and would not cause a cycle.
@@ -106,100 +106,9 @@ int main() {
 
 ## Example
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="600" height="400" class="mx-auto">
-  <style>
-    .vertex {
-      fill: lightblue;
-      stroke: black;
-      stroke-width: 1px;
-    }
-    .edge {
-      stroke: currentColor;
-      stroke-width: 2px;
-    }
-    .label {
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .weight {
-      font-size: .7rem;
-      fill: currentColor;
-      font-weight: bold;
-    }
-  </style>
+import PrimsAlgorithmExample from "./images/prims-algorithm-example.svg";
 
-  <!-- Edges -->
-
-<line x1="50" y1="50" x2="150" y2="50" class="edge" />
-<text x="100" y="45" class="weight" text-anchor="middle">
-  1
-</text>
-
-<line x1="150" y1="50" x2="250" y2="50" class="edge" />
-<text x="200" y="45" class="weight" text-anchor="middle">
-  2
-</text>
-
-<line x1="50" y1="50" x2="50" y2="150" class="edge" />
-<text x="40" y="100" class="weight" text-anchor="middle">
-  4
-</text>
-
-<line x1="50" y1="50" x2="150" y2="150" class="edge" />
-<text x="90" y="108" class="weight" text-anchor="middle">
-  3
-</text>
-
-<line x1="150" y1="50" x2="150" y2="150" class="edge" />
-<text x="160" y="100" class="weight" text-anchor="middle">
-  5
-</text>
-
-<line x1="250" y1="50" x2="250" y2="150" class="edge" />
-<text x="260" y="100" class="weight" text-anchor="middle">
-  6
-</text>
-
-<line x1="50" y1="150" x2="150" y2="150" class="edge" />
-<text x="100" y="145" class="weight" text-anchor="middle">
-  7
-</text>
-
-<line x1="150" y1="150" x2="250" y2="150" class="edge" />
-<text x="200" y="145" class="weight" text-anchor="middle">
-  8
-</text>
-
-  <!-- Vertices -->
-
-<circle cx="50" cy="50" r="20" class="vertex" />
-<text x="50" y="55" class="label" text-anchor="middle">
-  A
-</text>
-
-<circle cx="150" cy="50" r="20" class="vertex" />
-<text x="150" y="55" class="label" text-anchor="middle">
-  B
-</text>
-
-<circle cx="250" cy="50" r="20" class="vertex" />
-<text x="250" y="55" class="label" text-anchor="middle">
-  C
-</text>
-
-<circle cx="50" cy="150" r="20" class="vertex" />
-<text x="50" y="155" class="label" text-anchor="middle">
-  D
-</text>
-
-<circle cx="150" cy="150" r="20" class="vertex" />
-<text x="150" y="155" class="label" text-anchor="middle">
-  E
-</text>
-
-  <circle cx="250" cy="150" r="20" class="vertex" />
-  <text x="250" y="155" class="label" text-anchor="middle">F</text>
-</svg>
+<PrimsAlgorithmExample />
 
 1. Start with vertex A (arbitrary starting point):
    - Include A in the MST
