@@ -254,15 +254,39 @@ const recentNotes = await getRecentNotes();
   /* ── SEMESTER GRID ────────────────────────────────────────────── */
   .sem-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 14px;
+  }
+
+  @media (width >= var(--breakpoint-sm)) {
+    .sem-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= var(--breakpoint-md)) {
+    .sem-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   /* ── RECENT NOTES ─────────────────────────────────────────────── */
   .notes-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  @media (width >= var(--breakpoint-sm)) {
+    .notes-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= var(--breakpoint-lg)) {
+    .notes-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   .note-card {

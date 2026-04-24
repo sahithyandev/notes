@@ -99,17 +99,21 @@ import LiveUsersCount from "./live-users-count.astro";
     height: 54px;
     display: flex;
     align-items: center;
-    padding: 0 36px;
+    padding: 0 14px;
     background: color-mix(in oklab, var(--bg) 78%, transparent);
     backdrop-filter: blur(20px) saturate(1.8);
     border-bottom: 1px solid var(--border);
-    gap: 0;
+    gap: 8px;
+  }
+
+  @media (width >= var(--breakpoint-md)) {
+    .nav {
+      padding: 0 36px;
+      gap: 0;
+    }
   }
 
   .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     text-decoration: none;
   }
 
@@ -131,7 +135,7 @@ import LiveUsersCount from "./live-users-count.astro";
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 14px;
+    padding: 6px 10px;
     border-radius: 7px;
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -143,11 +147,18 @@ import LiveUsersCount from "./live-users-count.astro";
     transition: border-color 0.12s;
   }
 
+  @media (width >= var(--breakpoint-md)) {
+    .nav-search {
+      padding: 6px 14px;
+    }
+  }
+
   .nav-search:hover {
     border-color: var(--border-strong);
   }
 
   .nav-search kbd {
+    display: none;
     font-family: var(--font-mono);
     font-size: 10px;
     background: var(--surface);
@@ -156,6 +167,12 @@ import LiveUsersCount from "./live-users-count.astro";
     padding: 1px 5px;
     color: var(--text-muted);
     margin-left: 4px;
+  }
+
+  @media (width >= var(--breakpoint-md)) {
+    .nav-search kbd {
+      display: inline-block;
+    }
   }
 
   .theme-toggle {
