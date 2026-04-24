@@ -1,16 +1,42 @@
 ---
 import StatsBand from "./stats-band.astro";
+
+interface Props {
+  semestersCount: number;
+}
+
+const { semestersCount } = Astro.props;
+
+function numberToWords(num: number): string {
+  const ones = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+  ];
+  if (num === 0) return "Zero";
+  if (num <= 8) return ones[num];
+  return num.toString();
+}
+
+const semestersCountLabel = numberToWords(semestersCount);
 ---
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <h1 class="hero-title">
-      Navigate your degree,<br /><em>one concept at a time.</em>
+      <a href="https://sahithyan.dev" target="_blank">An engineering student</a
+      >'s personal notes.
     </h1>
     <p class="hero-sub">
-      Structured university notes from foundations through capstone - organized
-      by semester, searchable by topic.
+      {semestersCountLabel} semesters into my Computer Science & Engineering degree. All of it
+      organized, searchable, and public. Use it however it helps.
     </p>
     <div class="hero-cta">
       <a href="#semesters" class="btn-primary">
@@ -115,6 +141,18 @@ import StatsBand from "./stats-band.astro";
     letter-spacing: -2px;
     margin-bottom: 22px;
     max-width: 700px;
+  }
+
+  .hero-title a {
+    text-decoration: underline;
+    font-style: italic;
+    transition: color 0.1s ease-in-out;
+    min-width: 16ch;
+    display: inline-block;
+  }
+
+  .hero-title a:hover {
+    color: #ff006e;
   }
 
   .hero-title em {
