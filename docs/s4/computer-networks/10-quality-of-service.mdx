@@ -1,0 +1,68 @@
+---
+title: Quality of Service
+sidebar:
+  order: 10
+slug: s4/computer-networks/quality-of-service
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.621Z
+lastUpdatedOn: 2026-04-24T03:19:45.181Z
+---
+
+Ensures network performance meets the requirements of different applications.
+
+Parameters:
+
+- Reliability
+- Delay
+- Jitter
+- Bandwidth
+
+Different type of applications have different QoS requirements.
+
+| Application     | Delay        | Jitter        | Bandwidth |
+| --------------- | ------------ | ------------- | --------- |
+| Email           | Not critical | Not important | Low       |
+| Web             | < 2 s        | Not important | Medium    |
+| Video streaming | Not critical | Significant   | High      |
+| Telephony       | < 0.2 s      | Critical      | Low       |
+
+## QoS Techniques
+
+Methods used to achieve QoS:
+
+- Overprovisioning  
+  Increase network capacity to more than the expected traffic load
+- Buffering  
+  Store packets temporarily to smooth out traffic bursts
+- Traffic shaping  
+  Control traffic rate
+
+## QoS Technologies
+
+### Integrated Services
+
+Aka. IntServ. Resources reserved per individual flow. Guarantees QoS for each flow. Does not scale in large networks.
+
+Example:
+
+- Resource Reservation Protocol (RSVP)
+
+Used in applications requiring strict performance guarantees:
+
+- Real-time video conferencing
+- VoIP calls
+- Interactive multimedia systems
+
+### Differentiated Services
+
+Aka. DiffServ. Divides traffic into classes with different priorities.
+
+Each class receives different bandwidth, delay, and priority. Scales well in large networks. Does not guarantee QoS for individual flows.
+
+Uses Differentiated Services (DS) field in the IP header. A 8-bit field. Includes:
+
+- Differentiated Services Code Point (DSCP) field  
+  6-bit field. used to indicate the QoS class or priority level of a packet in DiffServ networks.
+- Explicit Congestion Notification (ECN) field  
+  2-bit field. used to indicate network congestion without dropping packets. ECN-capable transport protocols can use this information to adjust their sending rates and avoid congestion collapse.)

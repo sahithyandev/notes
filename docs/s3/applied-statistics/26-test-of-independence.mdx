@@ -1,0 +1,45 @@
+---
+title: Test of Independence
+sidebar:
+  order: 26
+slug: s3/applied-statistics/test-of-independence
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.682Z
+lastUpdatedOn: 2026-04-24T03:19:45.157Z
+---
+
+Used when two categorical variables are measured on the same sample. Tests if there is a relationship between the variables.
+
+Suppose a table of $r$ rows and $c$ columns, containing observed data, is provided. Observed values are dentoed by $O_{ij}$.
+
+### Hypotheses
+
+$
+H_0 : \text{There is no association between the two variables.}
+$
+
+$
+H_1 : \text{There is a significant association between the two variables.}
+$
+
+### Degrees of freedom
+
+```math
+\nu = (r - 1)(c - 1)
+```
+
+### Expected Frequency
+
+```math
+E_{ij} = \frac{(\text{Row total}) \times (\text{Column total})}{\text{Grand total}}
+```
+
+### Test Statistic
+
+```math
+\chi_{\text{calc}}^2 = \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}}
+\quad \sim \chi^2_\nu
+```
+
+$H_0$ is rejected **if** $\chi_{\text{calc}}^2 \gt \chi_{\nu,\alpha}$.

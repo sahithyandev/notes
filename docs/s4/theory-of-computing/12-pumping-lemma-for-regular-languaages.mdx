@@ -1,0 +1,63 @@
+---
+title: Pumping Lemma for Regular Languages
+sidebar:
+  order: 12
+slug: s4/theory-of-computing/pumping-lemma-for-regular-languaages
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.634Z
+lastUpdatedOn: 2026-04-24T03:19:45.189Z
+---
+
+A property that all regular languages must satisfy. A necessary (not sufficient) condition for regular languages.
+
+> Any sufficiently long string in a regular language can be divided into parts that can be repeated (pumped) any number of times and still remain in the language.
+
+Used to prove a language is not regular.
+
+## Versions
+
+### Version 1
+
+Suppose $L$ is a language recognized by an FA with $p$ states. Any string $w \in L$ with $\lvert w \rvert \ge p$ can be written as $w = xyz$ where the following conditions hold:
+
+- $\lvert xy \rvert \le p$  
+  The substring $xy$ lies within the first $p$ characters.
+- $\lvert y \rvert \gt 0$  
+  The substring $y$ must not be empty.
+- $xy^iz \in L$ for all $i \ge 0$  
+  The substring $y$ can be repeated 0 or more times and the resulting string must still belong to $L$.
+
+### Version 2
+
+For a regular language $L$, there exists a integer constant $p$ (called the pumping length) such that:
+
+Any string $w \in L$ with $\lvert w \rvert \ge p$ can be written as $w = xyz$ where the version 1's conditions hold.
+
+More common than version 1.
+
+:::note[Difference between versions]
+
+First version deals with an FA with $p$ states.
+
+Second version deals with a language alone, and defines the pumping length.
+
+:::
+
+:::note[Proof Hint]
+
+- All regular languages can be recognized by some FA.
+- An FA has finite number of states.
+- When processing a sufficiently long string, some state must repeat (Pigeonhole Principle).
+- The repeated state forms a loop in the automaton.
+- The portion of the string corresponding to this loop can be pumped (repeated).
+
+Thus, the string can be decomposed into:
+
+- $x$ : prefix before the loop
+- $y$ : substring corresponding to the loop
+- $z$ : remaining suffix
+
+Repeating $y$ corresponds to traversing the loop multiple times.
+
+:::

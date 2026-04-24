@@ -1,0 +1,165 @@
+---
+title: Internet Protocol
+sidebar:
+  label: IP
+  order: 6
+slug: s4/computer-networks/ip
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.620Z
+lastUpdatedOn: 2026-04-24T03:19:45.181Z
+---
+
+A protocol used in network layer of the Internet. Has 2 versions: IPv4 and IPv6.
+
+## IP Datagram
+
+The basic unit of data transferred in the network layer. Includes:
+
+- Header (control information)  
+  Defines how packets are routed and handled across networks. Includes:
+  - source IP address
+  - destination IP address
+  - TTL (Time To Live)
+  - protocol (TCP/UDP)
+  - checksum (error detection)
+  - fragmentation fields
+- Payload (data from transport layer)  
+  Typically contains TCP or UDP segment
+
+The header format defines how packets are routed and handled across networks.
+
+## Interface
+
+The connection between a host/router and a physical network.
+
+Routers have multiple interfaces. Hosts usually have one or two interfaces.
+
+## IP Address
+
+A unique identifer assigned to a network interface (not for a host).
+
+In IPv4, 32 bits. Written as 4 decimal values (0-255) separated by dots. 223.1.7.4 for example.
+
+In IPv6, 128 bits.
+
+Routers have multiple IPs (each per interface).
+
+## Network and Host Parts
+
+An IP address is divided into network and host portions.
+
+- Network part  
+  Identifies the network.
+- Host part  
+  Identifies the device within the network.
+
+Hosts with same network part belong to the same network and can communicate without a router.
+
+### Network Size
+
+Depends on number of bits allocated to host portion. More bits on the host portion means larger network.
+
+This controls how many devices a network can support.
+
+## Addressing
+
+### Classful Addressing
+
+Divides IP addresses into fixed classes.
+
+| Class | Range                       |
+| ----- | --------------------------- |
+| A     | 1.0.0.0 – 127.255.255.255   |
+| B     | 128.0.0.0 – 191.255.255.255 |
+| C     | 192.0.0.0 – 223.255.255.255 |
+| D     | Multicast addresses         |
+
+Now obsolete because of inefficiency. Replaced by CIDR.
+
+### Classless Inter-Domain Routing
+
+Aka. CIDR. Allows flexible division of IP address into network and host parts.
+
+Format: `a.b.c.d/x`. Here $x$ is the number of bits in network part.
+
+Allows more flexible and efficient address allocation. Reduces address wastage.
+
+## Network Mask
+
+Identifies the network portion of an IP address. Network bits are denoted by `1` and host bits are denoted by `0`.
+
+For example:
+- `/28` → `255.255.255.240`
+- `/14` → `255.252.0.0`
+
+Modern routers allow specifying the network bits as `/24` instead of the subnet mask.
+
+## Broadcast Address
+
+An IP address used to send data to all hosts in a network. Last address in network range. Cannot be assigned to a host. Network will malfunction if assigned to a host. 
+
+## IP Address Allocation
+
+IP addresses are assigned to hosts and networks.
+
+• host assignment:
+
+- manually configured
+- dynamically via DHCP
+
+• network assignment:
+
+- ISP → allocates address block
+- ISP gets addresses from RIR (e.g., APNIC)
+- RIR gets addresses from ICANN
+
+## Dynamic Host Configuration Protocol
+
+Aka. DHCP. A protocol for dynamically assigning IP addresses to hosts. DHCP server assigns IP address to hosts.
+
+Allows automatic configuration, reuse of IP addresses and mobility.
+
+Uses DORA exchange mechanism:
+- Discover   
+- Host sends a broadcast message to discover DHCP servers. 
+- Offer
+- Request
+- Ack
+
+- Host is discovered by the DHCP server
+- DHCP server offers a 
+
+- discover → offer → request → ack
+
+## Packet Forwarding
+
+Forwarding is the process of moving packets toward destination.
+
+• routers use forwarding tables
+• decision based on destination network
+
+• cases:
+
+- same network → direct delivery
+- different network → send to next-hop router
+
+Datagram remains unchanged except for certain fields (e.g., TTL).
+
+## Address Resolution Protocol
+
+Aka. ARP. Maps IP addresses to MAC addresses in a local network. Works by broadcasting query over the network and the target replies its MAC address.
+
+Used only within local network. Cannot work in bigger networks because of broadcasting.
+
+## Internet Control Message Protocol
+
+Aka. ICMP. Used for network-level error reporting and diagnostics. Uses IP datagrams.
+
+`ping`, which is used to check if a device is accessible over a network, uses ICMP.
+
+## Network Address Translation
+
+Aka. NAT. Allows multiple devices to share a single public IP address. Internal network uses private IPs. External communication uses one public IP. NAT server replaces source IP (internal IP) and port for outgoing packets. Maintains a translation table. Restores original values for incoming packets.
+
+Used to overcome IPv4 address shortage. Adds a security layer. Simplifies ISP changes.

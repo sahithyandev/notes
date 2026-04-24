@@ -1,0 +1,61 @@
+---
+title: Dynamic Scheduling
+sidebar:
+  order: 16
+slug: s3/computer-architecture/dynamic-scheduling
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.689Z
+lastUpdatedOn: 2026-04-24T03:19:45.161Z
+---
+
+Reordering instructions at runtime to avoid stalls and extract more ILP. Done by hardware. Allows out-of-order execution and completion of instructions.
+
+Compiler does not need hardware details.
+
+## Tomasulo's Algorithm
+
+Renames registers, buffers operands, and issues instructions out of order.
+
+### Reservation Station
+
+Aka. RS. Hardware component. A waiting slot for instructions until their operands are ready. Each functional unit has a RS. Handles register renaming.
+
+Each RS entry holds:
+
+- The operation (ADD, MUL, LOAD, etc.)
+- Source operands  
+  Either actual values or tags of the producing instructions
+- Destination tag  
+  which register/result it will produce
+- Status bits  
+  Whether busy, ready.
+  
+Listens to CDB for when an operand becomes available.
+
+### Common Data Bus
+
+Aka. CDB. Hardware component. A broadcast bus used to send computed results to every reservation station and the register file.
+
+When any functional unit finishes:
+
+- It places (tag, value) on the CDB
+- All RS entries listen
+- If an RS was waiting for that tag, it grabs the value → operand becomes ready
+- The register file also grabs the value if the tag matches its pending write
+
+### Steps
+
+#### Issue
+
+Aka. dispatch. Instruction is sent to a free RS. If a source register already has its operand value, it is copied into RS. If not,the _tag_ of the producing instruction is stored.
+
+Decouples issuing from executing.
+
+#### Execute
+
+The functional unit starts executing as soon as all operands are ready.
+
+#### Write
+
+Once the functional unit finishes execution. Result and tag are broadcasted using CDB.

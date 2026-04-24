@@ -1,0 +1,48 @@
+---
+title: Edge Coloring
+sidebar:
+  order: 10
+slug: s4/graph-theory/edge-coloring
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.623Z
+lastUpdatedOn: 2026-04-24T03:19:45.182Z
+---
+
+The assignment of colors to edges so that adjacent edges have different colors. If $m$ colors used, then referred to as $m$-edge coloring.
+
+## Edge Chromatic Number
+
+The minimum number of colors required for proper edge coloring. Denoted by $\chi'(G)$.
+
+```math
+\chi'(K_n) = \begin{cases}
+n - 1 & \text{if }n\text{ is even} \\
+n & \text{if }n\text{ is odd}
+\end{cases}
+```
+
+## Applications
+
+### Meeting Scheduling Problem
+
+Meeting scheduling can be modeled using edge coloring.
+
+- vertices represent people
+- edges represent meetings between pairs
+- assigning a color = assigning a time slot
+- adjacent edges (meetings sharing a person) cannot occur simultaneously
+
+Explanation:
+
+- Each person cannot attend two meetings at the same time
+- Therefore, edges incident to the same vertex must have different colors
+
+Goal:
+
+- minimize number of colors → minimum number of time slots
+
+Example:
+
+- Given multiple pair meetings among students
+- Find minimum time slots so no student has overlapping meetings

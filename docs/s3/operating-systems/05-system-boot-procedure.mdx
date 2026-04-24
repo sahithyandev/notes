@@ -1,0 +1,79 @@
+---
+title: System Boot Procedure
+sidebar:
+  order: 5
+slug: s3/operating-systems/system-boot-procedure
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.706Z
+lastUpdatedOn: 2026-04-24T03:19:45.178Z
+---
+
+The sequence of steps a computer performs from being powered on until the operating system becomes ready to run user programs.
+
+## Power-On Self Test
+
+Aka. POST. A firmware-level diagnostic routine. Checks whether basic hardware is working
+(memory, CPU, keyboard interface, simple buses). If POST fails, system halts or shows an error.
+
+:::note[Fun Fact]
+
+Keyboard is considered essential and checked during POST. But mouse is not.
+
+:::
+
+## Firmware Stage
+
+Can either be BIOS or UEFI. Firmware performs:
+
+- Hardware initialization
+- Device discovery
+- Locating the next-stage bootloader
+- Loads bootloader into memory
+
+### BIOS
+
+Short for Basic Input/Output System. Traditional firmware providing hardware initialization and the old-style bootloader interface.
+
+### UEFI
+
+Short for Unified Extensible Firmware Interface. Modern replacement with better drivers, secure booting, and support for large disks.
+
+## Bootloader Stage
+
+Bootloader is a small program that prepares the system to load the operating system kernel.
+
+Role of the bootloader:
+
+- Provide a menu of OS installations (multiboot)
+- Load the kernel into RAM
+- Provide kernel parameters (optional)
+- Switch the CPU to the proper mode
+- Finally jumps to the kernel entry point, transferring control.
+
+Examples: GRUB, LILO, Windows Boot Manager, systemd-boot.
+
+## Kernel Initialization
+
+Kernel initilization involves:
+
+- Sets up [interrupt handlers](/operating-systems/interrupt-driven-io/#interrupt)
+- Initializes memory management
+- Detects and initializes [device drivers](/operating-systems/io-system/#device-driver)
+- Mounts the root filesystem
+
+Once the kernel finishes its internal setup, it starts the first user-space process.
+
+## Init System / User Space Start
+
+Init system is the very first user-space process started by the kernel. Responsible for launching all other system services.
+
+Init performs:
+
+- Starting system services (networking, logging, daemons)
+- Creating the user environment
+- Starting login managers or shells
+
+At this point, the system is fully booted and ready for user programs.
+
+Examples: `systemd`, `SysVinit`, `OpenRC`.

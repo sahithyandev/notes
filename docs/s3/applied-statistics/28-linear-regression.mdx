@@ -1,0 +1,156 @@
+---
+title: Linear Regression
+sidebar:
+  order: 28
+slug: s3/applied-statistics/linear-regression
+prev: true
+next: false
+dateCreated: 2026-04-22T07:09:10.683Z
+lastUpdatedOn: 2026-04-24T03:19:45.157Z
+---
+
+The simplest method in statistics used to model and predict the relationship between continuous variables.
+
+### Simple Linear Regression
+
+Linear regression involving 2 variables, dependent (response) and independent (explanatory).
+
+### Indications of a Linear Relationship
+
+- Scatter Diagram  
+  Plots observed pairs $(x_i, y_i)$ to visualize the relationship.
+- [Correlation Coefficient](https://s2.sahithyan.dev/methods-of-mathematics/probability/joint-distribution/#correlation)  
+  Measures the strength and direction of the linear relationship.
+
+## Model
+
+General population model:
+
+```math
+Y = \alpha + \beta X
+```
+
+For an individual observation:
+
+```math
+y_i = \alpha + \beta x_i + \varepsilon_i
+```
+
+where
+
+- $ \alpha $ = intercept (value of $Y$ when $X = 0$)
+- $ \beta $ = slope (rate of change of $Y$ with respect to $X$)
+- $ \varepsilon_i$ = random error, assumed $\varepsilon_i \sim N(0, \sigma^2)$
+
+### Coefficient of Determination
+
+Shows how much of the variance in ($Y$) is explained by ($X$). Denoted by $R^2$.
+
+### Error Sum of Squares
+
+Denoted by $\text{ESS}$.
+
+```math
+ESS = \sum (y_i - \alpha - \beta x_i)^2
+```
+
+## Estimation of Parameters
+
+Suppose the fitted regression line is $\hat{y} = \hat{\alpha} + \hat{\beta}x$. Finding $\hat{\alpha}, \hat{\beta}$ that minimize $\text{ESS}$ is the goal. [Least Squares Method](https://s2.sahithyan.dev/methods-of-mathematics/numerical-methods/least-squares-approximation/) is used here.
+
+By setting partial derivatives to zero gives the **normal equations**:
+
+```math
+\sum y_i = n\alpha + \beta \sum x_i
+```
+
+```math
+\sum x_i y_i = \alpha \sum x_i + \beta \sum x_i^2
+```
+
+Solving gives:
+
+```math
+\hat{\beta} = \frac{n\sum x_i y_i - (\sum x_i)(\sum y_i)}{n\sum x_i^2 - (\sum x_i)^2}
+```
+
+```math
+\hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}
+```
+
+Alternate form using deviations:
+
+```math
+\hat{\beta} = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}
+```
+
+## Sampling Distribution of Beta
+
+Under the normal error assumption $\varepsilon_i \sim N(0, \sigma^2)$:
+
+```math
+\hat{\beta} \sim N\left(\beta, \frac{\sigma^2}{S_{xx}}\right)
+```
+
+where $S_{xx} = \sum (x_i - \bar{x})^2 = n\sigma $.
+
+When $\sigma^2$ is unknown, estimate it using:
+
+```math
+s^2 = \frac{ESS}{n - 2}
+```
+
+A confidence interval for the true slope $\beta$ is:
+
+```math
+\hat{\beta} \pm t_{\alpha/2, n-2} \times \frac{s}{\sqrt{S_{xx}}}
+```
+
+## Hypothesis Testing on the Regression Coefficient
+
+To test whether $X$ significantly predicts $Y$:
+
+```math
+H_0: \beta = 0 \quad \text{and} \quad H_1: \beta \neq 0
+```
+
+Test statistic:
+
+```math
+t = \frac{\hat{\beta} - 0}{s / \sqrt{S_{xx}}} \sim t_{n-2}
+```
+
+If $|t| > \text{critical value}$, reject $H_0$, which means the relationship between X and Y is statistically significant.
+
+## Analysis of Variance (ANOVA) for Regression
+
+Tests whether the regression line fits the data well.
+
+| Source of Variation | Sum of Squares (SS)                    | df    | Mean Square (MS)     |
+| ------------------- | -------------------------------------- | ----- | -------------------- |
+| Regression (RSS)    | $\sum_{i=1}^n {(\hat{y_i}-\bar{y})^2}$ | $1$   | $\text{RSS} / 1$     |
+| Error (ESS)         | $\sum_{i=1}^n {(y_i-\hat{y_i})^2}$     | $n–2$ | $\text{ESS} / (n–2)$ |
+| Total (TSS)         | $\sum_{i=1}^n {(y_i-\bar{y})^2}$       | $n–1$ |                      |
+
+Here:
+
+- $y_i$: Actual observed value of the dependent variable for observation $i$
+- $\hat{y_i}$: Predicted value of $y_i$ from the regression line
+- $\bar{y}$: Mean of all observed $y_i$ values (overall average)
+
+If RSS is large relative to ESS, the model fits well. Computed by F-ratio.
+
+### F-ratio
+
+```math
+F_\text{calc} = \frac{\text{RSS}/1}{\text{ESS}/(n-2)}
+\sim F_{1, n-2}
+```
+
+### Decision Rule
+
+$H_0: \text{regression line does not fit the data}$
+
+$H_1: \text{regression line fits the data}$
+
+Reject $H_0$ if $F_{\text{calc}} > F_{1, n-2, \alpha}$.

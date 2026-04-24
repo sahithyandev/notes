@@ -1,0 +1,93 @@
+---
+title: Uncertainty
+sidebar:
+  order: 21
+slug: s3/artificial-intelligence/uncertainty
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.686Z
+lastUpdatedOn: 2026-04-24T03:19:45.159Z
+---
+
+In real life systems, AI has to support uncertainty. Probability theory provides a mathematical framework for reasoning under uncertainty.
+
+Required in environments when they are:
+- Partially observable
+- Stochastic
+- Noisy
+
+### Deterministic Reasoning
+
+Assumes perfect information and predictable outcomes.
+
+Not suitable in uncertain domains, because of:
+- Impractical to write exhaustive axioms.
+- Incomplete knowledge of domain laws.
+- Missing evidence about current case.
+
+### Probabilistic Reasoning
+
+Assumes that outcomes have likelihoods.
+
+Probability captures degrees of belief, summarizing uncertainty due to ignorance.
+
+
+### Approaches
+Uncertainty can be approached with either:
+- Non-monotonic logic   
+  Retractable conclusions (e.g., “Birds can fly” except penguins).
+- Probability theory   
+  Quantitative model of uncertainty.
+
+## Probability Theory
+
+Revise [Probability](https://s2.sahithyan.dev/methods-of-mathematics/probability/introduction/) basics covered in semester 2.
+
+$\Omega$ is the set of all possible world descriptions. Elements of $\Omega$ are atomic (cannot be broken down).
+
+### Probability Model
+
+Aka. probability space. Defined by sample space $\Omega$ and probability function $P$ which assigns a probability for all elements of $\Omega$.
+
+### Inference by Enumeration
+
+Given a joint distribution, probability of any proposition φ:
+
+```math
+P(φ)=\sum_{\omega: \omega\models φ} P(ω)
+```
+
+Conditional inference uses normalization:
+```math
+P(\text{Cavity}|\text{Toothache})=\alpha P(\text{Cavity},\text{Toothache})
+```
+
+Here $\alpha$ is a constant ensuring probabilities sum to 1.
+
+In general:
+```math
+P(Y|E=e)=α\sum_h P(Y,E=e,H=h)
+```
+
+Here $H$ means hidden variables. Time complexity is $O(2^n)$ for $n$ binary variables.
+
+### Conditional Independence
+
+$A$ and $B$ are conditionally independent given $C$ **if**:
+
+```math
+P(A,B|C)=P(A|C)P(B|C)
+```
+
+Reduces required parameters from exponential to linear in n. Useful for efficient probabilistic reasoning.
+
+### Naïve Bayes Model
+
+Assumes conditional independence of effects given the cause:
+
+```math
+P(\text{Cause},\text{Effect}_1,…,\text{Effect}_n)=P(\text{Cause})\prod_i P\left(\text{Effect}_i|\text{Cause}\right)
+```
+
+Simplifies computation—parameters grow linearly with n.
+Example: P(Cavity|toothache ∧ catch) computed from individual conditional probabilities.

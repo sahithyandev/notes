@@ -1,0 +1,58 @@
+---
+title: NFA-Lambda
+sidebar:
+  order: 6
+slug: s4/theory-of-computing/nfa-lambda
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.633Z
+lastUpdatedOn: 2026-04-24T03:19:45.188Z
+---
+
+A variant of [NFA](/theory-of-computing/non-deterministic-finite-automata) where $\Lambda$-transitions are allowed. Denoted as NFA-$\Lambda$.
+
+More flexible than an NFA. Does not increase computational power compared to DFA or NFA. Useful for simplifying automata construction, especially when building from regular expressions.
+
+### Lambda Transition
+
+A type of transition where the automaton can move from one state to another without consuming any input symbol. Referred to as "$\Lambda$-transition". Labelled as $\Lambda$ on the transition diagram.
+
+## Definition
+
+An NFA-$\Lambda$ is defined as a 5-tuple: $M = (Q, \Sigma, q_0, A, \delta)$ where:
+
+- $Q$ - finite set of states
+- $\Sigma$ - input alphabet
+- $q_0$ - start state
+- $A$ - set of accepting states
+- $\delta: Q \times (Σ \cup {\Lambda}) \rightarrow 2^Q $ - transition function
+
+The only difference from a standard NFA is that the transition function $\delta$ can also take $\Lambda$ as input.
+
+## Lambda-Closure
+
+Set of all states reachable from a given state (or set of states) using only $\Lambda$-transitions. Referred to as $\Lambda$-Closure.
+
+Suppose $S$ is a set of states ($S \subset Q$). $\Lambda(S)$ satisfies:
+
+- $S \subset \Lambda(S)$  
+  Every state in $S$ is included in $\Lambda(S)$
+- $p \in \Lambda(S)$ **iff** $q \in S$ and $\delta(q, \Lambda) = p$
+- No other states are included
+
+## Extended Transition Function
+
+```math
+\delta^* : Q \times \Sigma^* \rightarrow 2^Q
+```
+
+Properties:
+
+- $\delta^*(q, \Lambda) = Λ(q)$
+- $\delta^*(q, ya) = Λ \left( \bigcup_{r \in δ^*(q,y)} δ(r,a) \right)$
+
+### Acceptance
+
+A string is accepted **iff** there exists a sequence of transitions (including $\Lambda$-transitions) from the start state to an accepting state that corresponds to the input string.
+
+A string $x$ is accepted **iff** $ \delta ^\*(q_0, x) \cap A \neq \emptyset$.

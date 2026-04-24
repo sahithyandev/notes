@@ -1,0 +1,28 @@
+---
+title: Amdahl's Law
+sidebar:
+  order: 9
+slug: s3/operating-systems/amdahls-law
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.706Z
+lastUpdatedOn: 2026-04-24T03:19:45.178Z
+---
+
+
+The performance rule that tells how much speed-up a program can gain when only part of it can run in parallel.
+
+All programs have a serial portion and a parallel portion. Addition of CPU cores only speeds up the parallel portion. The performance improvement gained is limited by the fraction of time that the improved part is actually used.
+
+```math
+\text{Speedup}(N) = \cfrac{1}{S + \frac{1 - S}{N}}
+```
+
+Here:
+- $N$ - number of processing cores
+- $S$ - serial portion of the task
+- $P = 1- S$ - parallel portion of the task
+
+Serial portion of an application has disproportionate effect on performance gained by adding additional cores.
+
+If $S$ is large, speedup is small even with many cores. As $N$ increases, the speedup approaches $\frac{1}{S}$, which is the maximum.

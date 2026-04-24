@@ -1,0 +1,223 @@
+---
+title: Programming Model
+sidebar:
+  order: 21
+slug: s3/computer-architecture/programming-models
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.689Z
+lastUpdatedOn: 2026-04-24T03:19:45.162Z
+---
+
+Defines how instructions are organized, how control flow works and how multiple tasks are executed at the hardware level.
+
+## Types of Programs
+
+### Traditional Programs
+
+Control flow via:
+
+- Branching (if/else, loops)
+- Function calls (sub-routines)
+
+### Interruptable Programs
+
+Can be paused and resumed. Paused through [interrupts](/operating-systems/interrupt-driven-io#interrupt). In that case, CPU context-switches to Interrupt Service Routine.
+
+### Multi-Threaded Programs
+
+Contains 1 or more threads running in parallel.
+
+- Shared memory → memory safety needed
+- Threads from different libraries, languages, or modules
+
+## Multi-Core and Heterogeneous Systems
+
+### Multi-Core Programming
+
+- Homogeneous multi-core: all cores are identical.
+- Challenges:
+  - How to split work across cores
+  - Avoid race conditions
+  - Synchronization and memory consistency
+
+### Heterogeneous Systems
+
+- Mix of CPU + GPU + accelerators.
+- GPU executes:
+  - Large-scale parallel tasks
+  - Single Instruction, Multiple Data (SIMD)
+
+- CPU executes:
+  - Control-heavy, serial tasks
+
+### System-on-Chip (SoC)
+
+- Multiple components on a single chip:
+  - CPU cores
+  - GPU
+  - DSP
+  - Memory controllers
+  - I/O
+
+- Requires different programming models for each subsystem.
+
+### Virtualization Architectures
+
+- One hardware → multiple virtual machines.
+- Hypervisor enforces memory safety.
+- Each VM sees its _own virtual hardware_.
+
+## Memory Safety
+
+Memory safety ensures:
+
+- One program cannot illegally access another’s memory.
+- Prevents corruption, attacks, or accidental bugs.
+
+### Role of Virtual Memory
+
+Based on segmentation + paging:
+
+- Virtual pages → physical frames mapping
+- Unauthorized access triggers page fault
+- OS/hardware stops programs from corrupting each other
+
+### Why Needed?
+
+If a program accesses another program’s memory:
+
+- Could be intended (IPC)
+- Could corrupt data
+- Could be malicious
+
+### Who Enforces It?
+
+- CPU hardware: MMU, page tables, permission bits
+- OS kernel: manages virtual address space, allocates pages
+- User program cannot bypass these mechanisms
+
+---
+
+## Memory Segmentation & Paging
+
+### Introduction
+
+Segmentation and paging originally built for:
+
+- Caching data between main memory and disk
+- Reducing address-translation overhead
+- Providing memory protection
+
+### How It Works
+
+- Logical address → virtual address
+- MMU translates to physical frame
+- If not present: page fault
+- OS loads page from disk
+
+### As a Security Mechanism
+
+Virtual memory doubles as:
+
+- Isolation barrier
+- Boundary around each program
+- Prevents illegal reads/writes
+
+---
+
+## Kernels (OS Kernels)
+
+### Introduction
+
+A kernel controls:
+
+- CPU scheduling
+- Memory management
+- Interrupt handling
+- Page tables and MMU configuration
+
+### Privileged Instructions
+
+Kernels manage:
+
+- Virtual memory
+- Hardware interrupts
+- Device drivers
+- Resource sharing
+
+They run in privileged mode as defined in ISA (e.g., RISC-V Privileged Architecture).
+
+---
+
+## System-on-Chip Programming Model
+
+### Introduction
+
+SoCs pack various compute blocks together.
+Programming requires:
+
+- Understanding of heterogeneous compute units
+- Separate drivers, runtimes, firmware
+- Coordination between CPU, GPU, peripherals
+
+### Key Ideas
+
+- Work partitioning: which core does what?
+- Communication and synchronization across components
+- Memory safety between many sub-systems
+  (DMA engines, accelerators, network units)
+
+---
+
+# Summary
+
+- Modern systems require models for:
+  - Multi-threading
+  - Multi-core execution
+  - Heterogeneous devices (CPU+GPU)
+  - Virtualized hardware
+  - SoC platforms
+
+- Memory safety is enforced through virtual memory, segmentation, paging, and OS kernel control.
+- Virtual memory is both a performance and security mechanism.
+
+- Key Concepts:
+  - Single Program: A simple, linear flow of instructions executed by a processor.
+  - Branching: Introduces decision points, allowing different instructions to be executed based on conditions.
+  - Sub-routines/Function Calls: Enables modularization of code for better readability and reusability.
+
+### Multi-threaded and Multi-core Programming
+
+- Multi-threaded Programs: Programs that execute multiple threads of control within a single program, improving efficiency and performance.
+- Memory Safety: Ensuring that a program does not access unauthorized memory regions, preventing data corruption and system crashes.
+- Multi-core Programming:
+  - Homogeneous Multi-core Processors: Multiple identical cores, requiring synchronization and load balancing for optimal performance.
+  - Heterogeneous Systems (GPU-CPU Co-processing): Combining CPUs and GPUs for parallel processing, offering significant performance improvements for specific workloads (e.g., graphics rendering, machine learning).
+  - System On Chip (SoC): An integrated circuit that combines all components of a computer system into a single chip, often used in embedded systems and mobile devices.
+  - Virtualization Architectures: Supports multiple virtual machines (VMs) running on the same hardware, enabling efficient resource sharing and isolation.
+
+### Memory Safety
+
+- What is Memory Safety?: Refers to mechanisms that prevent a program from accessing memory regions that it is not authorized to access.
+- Issues:
+  - Unauthorized access can corrupt programs and tamper with data.
+
+- Protection: Managed by the operating system through techniques like virtual memory and page protection.
+- Virtual Memory: Virtual memory provides an abstraction of physical memory, allowing programs to use more memory than is physically available by swapping data between RAM and disk storage.
+
+### Memory Segmentation and Paging (Virtual Memory)
+
+- Segmentation: Divides memory into segments based on logical divisions (e.g., code, data, stack).
+- Paging: Divides memory into fixed-size pages, improving memory management and allocation.
+  - Advantages:
+    - Efficient memory use.
+    - Security (each program can be isolated from others by mapping to different virtual pages).
+
+- Caching Mechanism: Used between main memory and hard disk to speed up access and improve system performance.
+- Security Mechanism: Helps prevent unauthorized memory access, ensuring program integrity.
+
+### Kernel and System Management
+
+- Role of the Kernel: The kernel is the core component of an operating system that manages system resources and facilitates communication between hardware and software.
+- System On Chip (SoC) Designs: In SoC architectures, the kernel manages the integration of processors, memory, and peripherals on a single chip.

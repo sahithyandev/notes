@@ -1,0 +1,83 @@
+---
+title: Software Testing
+sidebar:
+  order: 9
+slug: s4/software-engineering/software-testing
+prev: true
+next: false
+dateCreated: 2026-04-23T17:39:39.631Z
+lastUpdatedOn: 2026-04-24T03:19:45.187Z
+---
+
+In software testing, a program is executed with artificial data to check for errors, anomalies, or non-functional issues. Testing can reveal the presence of bugs/errors, but NOT their absence. Dynamic verification.
+
+Easily reproducible.
+
+Certain errors may be masked by other errors.
+
+## Goals
+
+### Validation Testing
+
+To demonstrate the system meets the requirements. Validation testing confirms the software meets its requirements. A successful test shows the system works as intended.
+
+### Defect Testing
+
+To discover situations where the system behaves incorrectly.
+Uncovers faults. A successful test is one that makes the system fail, exposing a defect.
+
+## Automated Testing
+
+Where software testing is done without manual intervention. Implemented through a testing framework such as JUnit or Vitest.
+
+Includes:
+
+- Setup part  
+  The system is initialized with the test case, namely the inputs and expected outputs.
+- A call part  
+  Methods or functions to be tested, are called.
+- An assertion part  
+  Expected output and received output are compared. If the assertion evaluates to true, the test has been successful if false, then it has failed.
+
+## Regression Testing
+
+Re-running all tests after changes to ensure nothing previously working is broken. Easy to do with automated testing.
+
+## Performance and Stress Testing
+
+Performance testing gradually increases load until the system degrades. Stress testing deliberately overloads the system to observe failure behavior.
+
+## Partition Testing
+
+Inputs are grouped into equivalence partitions. Test cases are picked from each group.
+
+## Guideline-based Testing
+
+uses experience of common programmer errors to select test cases.
+
+## Stages of Testing
+
+### Development Testing
+
+Done by the development team. Includes:
+
+- Unit testing  
+  Individual components are tested in isolation. Defect testing process. Inheritance makes it difficult to test classes. If possible, unit testing must be automated.
+- Component testing (interfaces between integrated units)
+- System testing (the whole integrated system)
+
+### Release Testing
+
+Done by a separate team. To validate the system before it goes to users. Checks functionality, performance, and dependability.
+
+### User Testing
+
+Involves actual users. Includes:
+
+- Alpha testing (at developer's site)
+- Beta testing (released to users)
+- Acceptance testing (customer decides if system is deployable)
+
+## Test-Driven Development
+
+Tests are written before the code. The tests function as the speficiation initially and then as the regression test suite.

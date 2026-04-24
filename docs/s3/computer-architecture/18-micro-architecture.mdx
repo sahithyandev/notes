@@ -1,0 +1,77 @@
+---
+title: Micro Architecture
+sidebar:
+  order: 18
+slug: s3/computer-architecture/micro-architecture
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.689Z
+lastUpdatedOn: 2026-04-24T03:19:45.162Z
+---
+
+Defines the internal implementation of a processor, how the ISA is actually executed in hardware, how instructions are executed in hardware—timing, data paths, and control logic.
+
+- Common Case Optimization  
+  Focus on frequently executed operations.
+- Bottleneck Elimination  
+  Remove slow elements that block throughput.
+
+### Critical Path
+
+Longest path through combinational logic determining minimum clock period. Must be less for better performance. Long critical paths must be reduced into smaller stages.
+
+## Limits of Performance
+
+Modern processors are near physical and design limits. Performance now depends more on architecture efficiency than transistor count.
+
+Main Factors Affecting Limits:
+
+- Multi-level caches (L1 → L4)
+- Wide SIMD units (e.g., 512-bit FPUs)
+- Deep pipelines (15+ stages)
+- Branch prediction and speculative execution
+- Out-of-order execution
+- Multithreading and multiprocessing
+
+Beyond a point, more hardware does not guarantee speed; efficiency and specialization matter.
+
+### Design Questions
+
+- Fastest and slowest instruction cycle counts?
+- Why does each instruction take specific time?
+- What limits the clock cycle period?
+
+## Programmable Control Unit
+
+PCU's behavior is defined by microprogram. Programmed by the processor manufacturer. Has 3 components.
+
+Consumes more power. Slower than hardwired control unit.
+
+### Microinstruction
+
+An abstraction over combinational logic circuits. Specifies the exact control signals to activate inside the CPU in one micro-step, such as:
+
+- which registers to read
+- which ALU operation to perform
+- whether to write back
+- how to update the micro-PC
+- how to control memory / bus
+- how to set flags, etc.
+
+Makes it easy to implement complex instructions.
+
+### Control Store
+
+Memory that holds microinstructions. Traditionally a ROM. Nowadays they are writable to allow patches.
+
+### Microsequencer
+
+Determines the address of the next microinstruction.
+
+## Microprogramming
+
+Translate complex CPU operations into sequences of microinstructions.
+
+Easier hardware design. Flexible and updateable via microcode.
+
+High power and complexity (CISC tendency). Vendor-dependent optimization. Compiler may not fully exploit ISA features.

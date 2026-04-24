@@ -1,0 +1,83 @@
+---
+title: Design
+sidebar:
+  order: 3
+slug: s3/operating-systems/design
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.705Z
+lastUpdatedOn: 2026-04-24T03:19:45.178Z
+---
+
+Design of an OS depends on a lot of things, and a lot of variations exist. Some important design aspects are discussed below.
+
+Factors affecting the design of OS:
+- [Computer system architecture](/computer-architecture/introduction#computer-system-architecture)
+- [Computing environment](#computing-environment)
+- [Goals](#goals)
+- [Expected services](/services)
+
+### Policy
+
+Defines what needs to be done.
+
+### Mechanism
+
+Defines how something is done at the low-level implementation.
+
+Examples:
+
+- CPU Scheduling
+  - Mechanism: The context-switch routine that saves/restores registers.
+  - Policy: Which process to run next (FCFS, Round Robin, Priority).
+- Memory Management
+  - Mechanism: Page table structures, page replacement hooks.
+  - Policy: Which page replacement strategy (LRU, FIFO).
+- I/O
+  - Mechanism: Device driver interface to queues requests.
+  - Policy: Which request to serve first (SCAN, SSTF).-
+
+## Computing Environments
+
+### Traditional
+
+Standalone computers, networked nowadays.
+
+### Mobile
+
+Smartphones/tablets with sensors and wireless networks.
+
+### Client-Server
+
+Servers respond to client requests.
+
+### Peer-to-Peer
+
+All nodes act as both client and server.
+
+### Cloud Computing
+
+Computing delivered as services (SaaS, PaaS, IaaS).
+Uses virtualization heavily.
+
+### Real-Time Embedded
+
+Perform tasks within strict timing constraints (automotive, medical).
+  
+## Goals
+
+### User Goals
+
+Characteristics of an OS expected by a user.
+
+Examples: easy to use, fast, safe.
+
+### System Goals
+
+Characteristics of an OS expected by its developers.
+
+Examples: easy to design, maintain, reliable.
+
+## Implementation Languages
+
+A system goal. Usually kernel is implemented using a language that is closer to the hardware. Examples: C and assembly. System programs are built using C, C++ or scripting languages.

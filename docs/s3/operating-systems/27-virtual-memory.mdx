@@ -1,0 +1,189 @@
+---
+title: Virtual Memory
+sidebar:
+  order: 27
+slug: s3/operating-systems/virtual-memory
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.709Z
+lastUpdatedOn: 2026-04-24T03:19:45.180Z
+---
+
+A system that allows programs to use more memory than is physically available in RAM. Achieved by combining the use of physical memory and disk space. The operating system uses paging and swapping as techniques to create an illusion of a larger memory space than what is physically available.
+
+Allows programs to use a large, continuous memory space independent of the actual physical memory available.
+
+Pros:
+
+- Enables programs larger than physical memory.
+- Provides better memory protection between processes.
+- Simplifies memory allocation for the OS.
+- Enables efficient memory sharing between processes.
+
+Each process is given its own virtual address space. CPU generates virtual addresses, which are translated to physical addresses. Only the active parts of a program reside in RAM; the rest stays on disk.
+
+## Paging
+
+Virtual memory is divided into fixed-size _pages_. Page size is equal to [frame](/computer-architecture/memory/) size. Typically 4 KB or 8 KB. There can be more pages than frames.
+
+Virtual memory address is composed of:
+
+- Page number
+  Index into page table.
+- Page offset
+  Location within the page.
+
+Advantages:
+
+- Eliminates external fragmentation.
+- Simplifies memory management from the perspective of OS.
+
+Disadvantage:
+
+- Page tables can be large; require optimization (e.g., multi-level paging).
+
+### Page Table
+
+Maps virtual page numbers to physical frame numbers. Indexed by virtual page number.
+
+Each entry includes:
+
+- a valid bit: to identify if the page belongs to the process' address space
+- a reference bit
+- a dirt bit
+- physical frame number
+
+Kept in main memory. Because of this, every memory operation now requires 2 accesses.
+
+Page table quickly becomes very huge. Multi-level paging is used to reduce the size of the page table.
+
+Multi-level paging is involves dividing the page table into multiple levels, with each level containing a smaller number of entries. This reduces the size of the page table and improves performance.
+
+[TLBs](/computer-architecture/memory#tlb) are used to speed up page table lookups.
+
+### Page Replacement
+
+When memory is full, the OS must choose which page to evict. Algorithms like FIFO (First-In, First-Out), LRU (Least Recently Used), and Optimal are used to manage which page to replace.
+
+### Page Faults
+
+Occurs when a page referenced by the CPU is not in physical memory.
+
+Handling steps:
+
+1. CPU traps to OS.
+2. OS loads the required page from disk to RAM.
+3. Updates page table.
+4. Restarts the instruction.
+
+Adds major delay due to disk latency (in ms). Higher frequency of page faults degrades performance significantly.
+
+### Hit Ratio
+
+Percentage of times that a page number is found in the TLB.
+
+### Effective Access Time
+
+Aka. EAT.
+
+```math
+\begin{equation}
+\nonumber
+\begin{split}
+\text{EAT} = & \text{Hit Ratio} \times \text{TLB Access Time} + \\
+& (1 - \text{Hit Ratio}) \times 2 \times \text{Memory Access Time}
+\end{split}
+\end{equation}
+```
+
+### Memory Protection
+
+A protection bit is added to each frames. To denote whether write access is allowed. Additional metadata can also be included.
+
+### Shared Pages
+
+Read-only, reentrant code that are frequently used by multiple processes can be loaded once into the memory and shared.
+
+Shared pages also enable fast interprocess communication.
+
+Each process has its own copy of modifiable code or data on private pages. These pages are mapped to different physical frames. The OS ensures that modifications by one process don’t affect another.
+
+### Paging Implementation
+
+Windows uses demand paging.
+
+Solaris uses demand paging. Uses 2 hashed page tables: one for kernel and one for all user processes. Supports 2 page sizes to balance performance and memory efficiency.
+
+## Structures for Page Table
+
+### Hierarchical Page Table
+
+Break page table into multiple page tables. The resulting page tables are paged. Can be done at multiple levels. Designed to reduce memory overhead. Slows down lookup.
+
+For 32-bit memory space, 2 level paging would be enough.
+
+### Hashed page tables
+
+Used when memory address space is big or sparse. Reduces memory usage by storing only entries that actually exist. Uses hash table for quick lookup.
+
+Virutal page number is hashed and used as an index into the hash table. At that index is a linked list of entries.
+
+Each entry stores:
+
+- Virutal page number
+- The mapped frame number
+- A pointer to the next entry
+
+Lookup time is roughly constant on average.
+
+### Inverted page tables
+
+Keeps track of all physical frames instead of pages per process. One entry per physical frame.
+
+Entry consists:
+
+- Virtual page address
+- Process that owns the page
+
+Decreases memory usage. Increases lookup time.
+
+Hash table can be used to decrease lookup time. TLB can accelerate access. Shared memory can be implemented by using a mapping of a virtual address to the shared physical address.
+
+## Swapping
+
+The technique of moving processes moved from/to swap space which is on secondary disk. Used when total process memory is higher than the physical memory. OS maintains tables to track which virtual memory pages are in RAM and which are on disk. Swap space would also be split into pages.
+
+- Page-out: Pages are written (swapped) from RAM to swap space.
+- Page-in: When swapped pages are needed again, they’re read back into RAM.
+
+Swapped out processes can be loaded into a different physical address space if no pending I/O and if the address binding method allows.
+
+Allows running more processes than physical memory can hold. Prevents “out of memory” crashes.
+
+Major part of swap time is transfer time. Total transfer time is directly proportional to the amount of memory swapped. As disk I/O is much slower than RAM access, frequent swapping (_thrashing_) degrades performance. OS tries to reduce swapping frequency and use multiple swap areas to distribute load.
+
+OS maintains a ready queue of ready-to-run processes which have memory images on disk.
+
+### Pending I/O
+
+If a process is currently doing an I/O operation, it cannot be swapped out. Can be solved by [double buffering](/operating-systems/io-systems#double-buffering).
+
+### Swap Implementation
+
+Swapping is disabled by default on modern systems. Enabled automatically only when a certain threshold of memory is used. Not used on mobile devices and when NVMs are used (due to write cycles limit).
+
+Swap space can be a dedicated raw partition (faster) or a swap file within an existing filesystem (easier to resize or add).
+
+In Linux, multiple swap areas are supported. The kernel balances I/O between them. Swap map tracks which slots are free and which are used.
+
+iOS asks apps to voluntarily relinquish allocated memory. If not, terminates the app. Android terminates apps if low free memory after writing application state to flash for fast restart.
+
+## Architecture Examples
+
+### Intel IA-32 / x86-64
+
+Supports both segmentation and paging. 32-bit uses 3-level paging; 64-bit uses 4-level paging. PAE (Page Address Extension) expands 32-bit memory to 64GB.
+
+### ARMv8
+
+Supports 1 MB–16 MB sections and 4 KB pages. Two-level TLB system improves performance.

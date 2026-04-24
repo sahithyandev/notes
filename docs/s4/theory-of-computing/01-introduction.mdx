@@ -1,0 +1,165 @@
+---
+title: Introduction to Theory of Computing
+sidebar:
+  order: 1
+  label: Introduction
+slug: s4/theory-of-computing/introduction
+prev: false
+next: true
+dateCreated: 2026-04-23T17:39:39.631Z
+lastUpdatedOn: 2026-04-24T03:19:45.187Z
+---
+
+Theory of Computing studies what computers can and cannot do. Focuses on answering:
+
+- What problems can a computer solve?
+- What problems cannot be solved at all?
+- Why are some problems easy and others hard?
+
+## Computation
+
+The execution of an algorithm.
+
+- Input is given
+- A step-by-step procedure is followed
+- An output is produced
+
+Each step must be an operation that the computer model can perform.
+
+For the precise reasoning purpose, computers are defined as abstract mathematics objects. They are simpler than real computers; but as powerful as real computers.
+
+## Decision Problems
+
+A problem with a yes or no answer.
+
+Examples:
+
+- Given a number `n`, is `n` prime?
+- Input is encoded as a string
+- Output is yes or no
+
+## Definitions
+
+### Alphabet
+
+A finite set of symbols. Denoted by $\Sigma$.
+
+### Strings
+
+A finite sequence of symbols from $\Sigma$. Length of string $x$ is denoted by $|x|$.
+
+#### Null String
+
+String with length 0. Denoted by $\Lambda$.
+
+### Languages
+
+A set of strings.
+
+### Σ-star
+
+Set of all strings over $\Sigma$. Any language over $\Sigma$ is a subset of $\Sigma *$.
+
+### Language Quotient
+
+Let $L \subseteq \Sigma^*$ and $x, y \in \Sigma^*$.
+
+```math
+L/x = \set{ z \in \Sigma^* | xz \in L }
+```
+
+## Language Operations
+
+### Set Operations
+
+For languages $L_1$ and $L_2$:
+
+- Union
+- Intersection
+- Difference
+- Complement
+  $L = \Sigma* − L$
+
+### Concatenation
+
+Concatenation of strings $x$ and $y$ is $xy$. Associative.
+
+### Substrings
+
+A string that is found inside another string.
+
+- Prefix: initial substring
+- Suffix: final substring
+
+## Language Powers
+
+### String and Language Repetition
+
+- $a^k$ means symbol $a$ repeated $k$ times
+- $\Sigma^k$ is the set of all strings of length $k$
+- $L^k$ is concatenation of $L$ with itself $k$ times
+
+### Special Cases
+
+- $a^0 = Λ$
+- $Σ^0 = {Λ}$
+- $L^0 = {Λ}$
+
+## Kleene Star and Plus
+
+### Kleene Star
+
+$L*$ = zero or more concatenations of $L$.
+
+### Kleene Plus
+
+$L+$ = one or more concatenations of $L$. Can also be written as $L*L$ or $LL*$
+
+## Models of Computation
+
+Different machines recognize different classes of languages.
+
+- Finite Automata
+  Recognize regular languages
+- Pushdown Automata
+  Recognize context-free languages
+- Linear Bounded Automata
+  Recognize context-sensitive languages
+- Turing Machines
+  Recognize recursively enumerable languages
+
+### Turing Machines
+
+A mathematical model of computation that captures the intuitive notion of an algorithm. Most general model of computation. Can simulate any algorithm.
+
+Consists of:
+
+- a finite set of states,
+- an infinite tape divided into cells (each cell holds a symbol),
+- a tape head that can read and write symbols on the tape and move left or right,
+- a transition function that, given the current state and the symbol under the head, specifies a new state, a symbol to write, and a head move.
+
+Formally a (deterministic) Turing machine is a 7-tuple $(Q, \Sigma, \Gamma, \delta, q_0, q_\text{accept}, q_\text{reject})$, where:
+
+- $Q$ is a finite set of states,
+- $\Sigma$ is the input alphabet (not containing the blank symbol),
+- $\Gamma$ is the tape alphabet with $\Sigma \subseteq \Gamma$ and including a special blank symbol,
+- $\delta: Q \times \Gamma \rightarrow Q \times \Gamma \times \set{L, R}$ is the (partial) transition function,
+- $q_0 \in Q$ is the start state,
+- $q_\text{accept} \in Q$ and $q_\text{reject} ∈ Q$ are distinct halting states.
+
+Computation starts with the input written on the tape, the head positioned at the leftmost input cell, and the machine in q0. The machine follows δ step by step, updating its state, tape, and head position. The computation halts when it enters q_accept (accept) or q_reject (reject). A string is accepted if the machine halts in q_accept; the set of accepted strings is the language recognized by the machine.
+
+There are many variants (e.g., multi-tape, nondeterministic), but they are equivalent in power to this basic model.
+
+Even Turing machines cannot solve all problems. Some problems are undecidable.
+
+## Solvable vs Practical Problems
+
+### Computability Theory
+
+Studies whether a problem is solvable at all
+
+### Complexity Theory
+
+Studies time and memory requirements. Some problems are solvable but impractical.

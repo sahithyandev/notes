@@ -1,0 +1,183 @@
+---
+title: Types of Graphs
+sidebar:
+  order: 2
+slug: s4/graph-theory/types-of-graphs
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.622Z
+lastUpdatedOn: 2026-04-24T03:19:45.181Z
+---
+
+## Simple Graph
+
+A graph with no loops and no multiple edges between the same pair of vertices.
+
+## Pseudograph
+
+Aka. multi-graph. Consists of a set of vertices (aka. nodes or points) and some pair of vertices are connected by edges (aka. line segments).
+
+The set of vertices is usually denoted by $V$. The set of edges is denoted by $E$. The pseudograph $G$ is denoted as $G = (V, E)$.
+
+## Regular Graph
+
+A graph where all vertices have the same degree ($r$). Aka. $r$-regular graph.
+
+## Null Graph
+
+A graph with no edges. All vertices are isolated.
+
+## Directed Graph
+
+Aka. digraph. Edges have direction.
+
+$G=(V,E)$ where $E$ is a set of ordered pairs of vertices. Edges of a directed graph are called arcs or directed edges or arrows or directed lines.
+
+Starting vertex (where the arrow starts from) is called the tail, ending vertex (where the arrow points to) is called the head. Vertices have in-degree (denoted as $\text{indeg}(v)$) and out-degree (denoted as $\text{outdeg}(v)$) which means the number of incoming and outgoing edges respectively. Loops contribute 1 to both in-degree and out-degree.
+
+```math
+\text{deg}(v) = \text{indeg}(v) + \text{outdeg}(v)
+```
+
+Simple and multi digraph versions exist.
+
+## Complete Graph
+
+A simple graph where every pair of vertices is adjacent. Denoted by $K_n$ where $n$ is the number of vertices.
+
+Contains $\frac{n(n-1)}{2}$ number of edges, which is the maximum for a simple graph with $n$ vertices.
+
+:::note
+
+$G \cup G^c = K_n$.
+
+:::
+
+## Bipartite Graph
+
+A graph whose vertices can be split into disjoint sets $V_1$ and $V₂$ such that:
+
+- All edges go between $V_1$ and $V_2$,
+- No edges exist inside $V_1$ or inside $V_2$.
+
+Here $V_1$ and $V_2$ are called bipartition sets.
+
+## Complete Bipartite Graph
+
+Every vertex in $V_1$ is connected to every vertex in $V_2$. Denoted by $K_{m,n}$.
+
+## Self-Complementary Graph
+
+A graph satisfying $G = G^c$.
+
+If, $G$ is self-complementary, $G$ has $\frac{n(n-1)}{4}$ edges.
+
+## Cyclic Graph
+
+A graph with at least 1 cycle.
+
+A simple graph consisting of only a cycle with $n$ vertices, is called $n$-cyclic graph and denoted as $C_n$.
+
+$C_2$ is only possible as a multi-graph. Otherwise it will be a open path and not a cycle.
+
+## Acyclic Graph
+
+A graph with no cycles.
+
+## Euler Graph
+
+Aka. Eulerian graph. A connected graph that contains an [Eulerian circuit](/graph-theory/introduction#euler-circuit).
+
+A graph is Eulerian **iff** every vertex has an even degree. Whenever a walk enters a vertex, it must leave via another edge. Thus edges are used in pairs, making the vertex degree even.
+
+```math
+G\;\text{is Eulerian} \iff \forall v \in V(G),\;\text{deg}(v) \equiv 0 \mod 2
+```
+
+Examples:
+
+- $C_2$ (2 vertices connected by 2 parallel edges)  
+   The smallest Eulerian multi graph.
+- $C_3$ (triangle)  
+  The smallest Eulerian simple graph.
+
+## Hamiltonian Graph
+
+A graph that contains a [Hamiltonian cycle](/graph-theory/introduction/#hamiltonian-cycle). Introduced by William Hamilton in 1857, while studying cycles in the dodecahedron graph.
+
+### Dirac’s Theorem
+
+A simple graph with $n (\ge 3)$ vertices is Hamiltonian **if** every vertex has degree at least $n/2$.
+
+```math
+\forall v\;\text{deg}(v) \ge \frac{n}{2}
+```
+
+### Ore’s Theorem
+
+A simple graph with $n \ge 3$ vertices is Hamiltonian **if** for every pair of non-adjacent vertices $u$ and $v$:
+
+```math
+\text{deg}(u) + \text{deg}(v) \ge n
+```
+
+:::note
+
+There are Hamiltonian graphs that do not satisfy these conditions.
+
+:::
+
+## Weighted Graph
+
+A graph in which each edge is assigned a numerical value (aka. weight). 3-tuples, where the third element is a weight function, $w: E \to \mathbb{R}$.
+
+Weights often represent distance, cost, time, or capacity. Used in road networks, computer network routing, project scheduling, etc.
+
+## Planar Graphs
+
+A graph that can be drawn on a plane without any edges crossing.
+
+A drawing of the graph without edge crossings is called a planar representation or planar embedding. A graph can have multiple planar representations.
+
+### Euler’s Formula for Planar Graphs
+
+For a connected planar graph:
+
+```math
+v - e + f = 2
+```
+
+Here:
+
+- $v$ – number of vertices
+- $e$ – number of edges
+- $f$ – number of regions (faces), including the outer region.
+
+:::note
+
+Euler's identity for polyhedra is proved by representing a polyhedron using a planer graph.
+
+:::
+
+### Corollary of Euler’s Formula
+
+For a connected planar simple graph with $v \ge 3$, the graph must satisfy $e \le 3v - 6$.
+
+If a graph violates this inequality, it cannot be planar.
+
+## Non-Planar Graph
+
+Certain graphs cannot be drawn without edge crossings.
+
+Examples:
+
+- $K_5$   
+  Complete graph with 5 vertices. Does not satisfy the corollary of Euler’s formula for planar graphs, thus non-planar.
+- $K_{3,3}$   
+  Complete bipartite graph with partitions of size 3. Satisfies the corollary of Euler’s formula, but is still non-planar. It can be shown that it contains a subgraph homeomorphic to $K_5$.
+
+These are the smallest non-planar graphs.
+
+### Kuratowski’s Theorem
+
+A graph is non-planar **iff** it contains a subgraph homeomorphic to $K_5$ or $K_{3,3}$.

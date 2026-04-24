@@ -1,0 +1,125 @@
+---
+title: Deadlock
+sidebar:
+  order: 21
+slug: s3/operating-systems/deadlock
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.708Z
+lastUpdatedOn: 2026-04-24T03:19:45.179Z
+---
+
+Occurs when 2 or more threads is blocked and waiting for one another. No thread can continue. Wastes resources and slows down systems.
+
+### Conditions
+
+- [Mutual exclusion](/operating-systems/mutual-exclusion)
+- Hold and wait  
+  A thread holds at least one resource and waits for another.
+- No preemption  
+  Resource cannot be forcibly taken from a thread.
+- Circular wait  
+  Threads must be waiting for another, in a cycle.
+
+## Resource Allocation Graph
+
+A graph of threads, resources (nodes), resource requests and assignments (directed edges). Directed edge from thread to resource indicates resource request, from resource to thread indicates resource assignment.
+
+Cycles in the resource allocation graph indicate potential deadlocks.
+
+### Single-instance case
+
+When each resource type has exactly one unit. Cycle implies deadlock.
+
+### Multiple-instance case
+
+When a resource type may have several units. Cycle does not necessarily imply deadlock. There's a possibility for a deadlock.
+
+## Waits-For Graph
+
+Simplified version of RAG. Has only process nodes; not resource nodes. A directed edge from P to Q, means P is waiting for a resource currently held by Q.
+
+## Approaches
+
+### Ignore
+
+Aka. ostrich algorithm. Just pretend deadlocks never happen. Used when probability is low.
+
+### Prevention
+
+Break one of the four conditions.
+
+Can be done by:
+
+- Eliminating mutual exclusion  
+  Make resources sharable if possible.
+- Eliminating hold and wait  
+  Requiring processes to request all resources at once, or release held resources before requesting new ones. Low overhead. Starvation is possible. 
+- Eliminating no preemption  
+  Allowing resources to be forcibly taken from processes.
+- Eliminating circular-wait  
+  Most common. Imposing an ordering on resource requests so cycles cannot form.
+
+### Avoidance
+
+Allocate resources only if the resulting state is safe. Good theoritcal problem but hard in practical.
+
+Example: [Banker’s algorithm](/operating-systems/bankers-algorithm).
+
+### Safe state
+
+When there exists some order in which all processes can finish.
+
+When it's not safe, there's chance for deadlock.
+
+### Detection & Recovery
+
+Allow deadlock, then detect and fix it.
+
+Detection scans resource usage to find cycles in the wait dependencies. Detection cost is high $O(m \times n^2)$. The algorithm is run only when deadlocks are expected or when many processes could be affected.
+
+- Single-instance  
+  Use cycles in Waits-For Graph to decide deadlocks.
+- Multiple-instance  
+  Use detection algorithm based on `Available`, `Allocation`, `Request`.
+
+Once detected, recovery is done by:
+
+- aborting all deadlocked processes OR
+- aborting processes one by one until cycle is eliminated
+- force preempt resources and rolling processes
+
+## Types
+
+### Types of Deadlocks
+
+Deadlocks can be classified based on the resources and processes involved:
+
+- Resource Deadlock: The classic form, where processes compete for exclusive access to resources (e.g., files, printers, memory). Each process holds one or more resources and waits for others, resulting in a cycle.
+
+- Communication Deadlock: Occurs when processes wait for messages or signals from each other. For example, two processes each waiting to receive a message from the other, but neither sends.
+
+- Thread Deadlock: In multithreaded applications, threads within the same process can deadlock by waiting for locks or synchronization primitives held by each other.
+
+- Database Deadlock: In database systems, transactions may lock tables or rows and wait for locks held by other transactions, causing a deadlock.
+
+- Distributed Deadlock: In distributed systems, deadlocks can span multiple machines or nodes, making detection and resolution more complex.
+
+Each type of deadlock may require different detection and resolution strategies, depending on the system and resources involved.
+
+Deadlocks can be handled in several ways, depending on system requirements and constraints:
+
+
+## Recovery
+
+### Abort processes
+
+- Abort all deadlocked processes
+  or
+- Abort one at a time until cycle is gone
+
+### Resource preemption
+
+- Select a victim
+- Rollback to safe state
+- Avoid starving the same process

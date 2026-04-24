@@ -1,0 +1,97 @@
+---
+title: Wireless Networks
+sidebar:
+  order: 31
+slug: s3/data-communication-and-networking/wireless-networks
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.694Z
+lastUpdatedOn: 2026-04-24T03:19:45.165Z
+---
+
+Wireless networks are required when devices are mobile, users are nomadic and temporary connections are needed.
+
+## Terminology
+
+### Base Station
+
+A wireless access point that provides connectivity to a wireless network.
+
+### BSS
+Short for Basic Service Set. The smallest building block of a WLAN. A set of stations executing same MAC protocol and competing for same shared wireless medium.
+
+### DS
+
+Short for Distribution System. A system used to interconnect a set of BSSs and integrated LANs to create
+an extended service set (ESS).
+
+### IBSS
+
+Short for Independent BSS. Aka. ad hoc network. A BSS that forms a self-contained network, and in which no access to a DS is available. No infrastructure to connect to. Nodes themselves provide services. 
+
+## Challenges
+
+Wireless networks face more challenges compared to wired networks.
+
+- Finding location of nodes
+- Services (Addressing, Routing, etc.)
+- Path loss, Fading, Interference
+- Multipath propagation
+
+### Handoff
+
+Change of attachment from one base station to another.
+
+### Hidden Terminal Problem
+
+When two or more stations are within range of the base station, but not of each other. Causes them to transmit data in parallely.
+
+## Spread spectrum
+
+A technique used in wireless networks to transmit signals over a wider frequency band than the required minimum.
+
+Helps reduce interference, improve resistance to eavesdropping, and enhance reliability in environments with noise and multipath effects.
+
+### FHSS
+
+Short for Frequency Hopping Spread Spectrum. A spread spectrum technique that uses a pseudo-random sequence of frequencies to transmit data. The transmitter hops between frequencies at a high rate, making it difficult for an attacker to intercept the signal. Spreading code defines the order of frequencies that are used.
+
+Used in Bluetooth.
+
+### DSSS
+
+Short for Direct Sequence Spread Spectrum. Each bit in the original signal is represented by multiple bits in the transmitted signal using a _spreading code_.
+
+Spreading code is a pseudo-random sequence of bits. The data bits are XOR-ed by the spreading code to produce a _chip_ sequence. Received signal is de-spread by XOR-ing with the same spreading code.
+
+Used in Wi-fi.
+
+## CDMA
+
+Short for Code Division Multiple Access. A channel access method used in wireless communication. Allows several transmitters to send information simultaneously over a single communication channel.
+
+Each bit is encoded with a unique _chipping code_. Multiple signals are transmitted over the same frequency band. Receiver decodes the signal using the relevant chipping code.
+
+## Standard
+
+Standardized by IEEE 802.11. There are many versions of this standard such as IEEE 802.11a, IEEE 802.11b, IEEE 802.11g, IEEE 802.11n, and so on.
+
+### Frame Structure
+
+Frame header includes 4 addresses:
+- Address 1: MAC address of the wireless receiving station
+- Address 2: MAC address of the wireless transmitting station
+- Address 3: MAC address of the (router) interface via which the BSS connects to other networks
+- Address 4: for Ad-hoc mode of operation
+
+## Media Access Control
+
+### DFWMAC
+
+Short for Distributed Foundation Wireless MAC.
+
+Uses Distributed Coordination Function (DCF) for distributed access control and Point Coordination Function (PCF) for centralized control.
+
+Examples:
+- DCF: CSMA/CA (Carrier Sense Multiple Access/Collision Avoidance)
+- PCF: Polling by Centralized Polling Master

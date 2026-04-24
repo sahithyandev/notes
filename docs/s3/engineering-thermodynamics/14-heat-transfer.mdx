@@ -1,0 +1,172 @@
+---
+title: Heat Transfer
+sidebar:
+  order: 14
+slug: s3/engineering-thermodynamics/heat-transfer
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.704Z
+lastUpdatedOn: 2026-04-24T03:19:45.176Z
+---
+
+The movement of thermal energy due to temperature difference. Heat flows from higher temperature to lower temperature.
+
+Three modes: conduction, convection, radiation. Heat transfer mode depends on the medium (solid, fluid, or vacuum).
+
+## Conduction
+
+Heat transfer due to random motion of atoms or molecules. Occurs in solids and stationary fluids.
+
+### Fourier’s Law
+
+```math
+\dot{q} = -k \frac{dT}{dx}
+```
+
+- $\dot{q}$: heat flux
+- $k$: thermal conductivity
+- $\frac{dT}{dx}$: temperature gradient
+
+Larger $k$ → faster heat transfer.
+
+### Heat Flux
+
+Rate of heat transfer per unit area. Denoted by $\dot{q}$. Unit: $\text{W}\,\text{m}^{-2}$.
+
+### Thermal Conductivity
+
+Measure of a material's ability to conduct heat. Denoted by $k$. Unit: $\text{W}\,\text{m}^{-1}\,\text{K}^{-1}$.
+
+## Convection
+
+Heat transfer from a solid surface to a moving fluid next to the surface (or vice versa).
+
+Can be caused by either:
+
+- Advection: bulk fluid motion.
+- Diffusion: random fluid movement.
+
+2 types:
+
+- Natural convection: buoyancy-driven flow.
+- Forced convection: external forcing (fan, pump).
+
+### Newton’s Law of Cooling
+
+```math
+\dot{q} = h (T_s - T_\infty)
+```
+
+- $\dot{q}$: convective heat flux
+- $h$: heat transfer coefficient
+- $T_s$: surface temperature
+- $T_\infty$: fluid temperature
+
+### Heat Transfer Coefficient
+
+Measure of convective heat transfer between surface and fluid. Denoted by $h$. Unit: $\text{W}\,\text{m}^{-2}\,\text{K}^{-1}$.
+
+Varies with flow conditions.
+
+## Radiation
+
+Heat transfer through electromagnetic waves. No medium required. Wavelength range: about 0.1–100 μm. Depends on surface temperature and emissivity. Dominant at high temperatures or between large surfaces.
+
+```math
+\dot{q} = \sigma \varepsilon \sigma f (T_1^4 - T_2^4)
+```
+
+Here:
+
+- $\dot{q}$: net radiative heat flux
+- $\sigma$: Stefan-Boltzmann constant
+- $\varepsilon$: emissivity
+- $f$: geometrical factor
+
+### Stefan-Boltzmann Constant
+
+Denoted by $\sigma$. Value: $5.67 \times 10^{-8} \;\text{W}\,\text{m}^{-2}\,\text{K}^{-4}$.
+
+### Emissivity
+
+Measure of a surface's ability to emit thermal radiation. Denoted by $\varepsilon \in [0,1]$.
+
+- $\varepsilon=0$: perfect reflector
+- $\varepsilon=1$: perfect emitter, blackbody
+
+### Geometrical Factor
+
+Depends on the orientation and shape of the surfaces exchanging radiation.
+
+## One-Dimensional Conduction
+
+Used for walls, rods, slabs where temperature varies in only one direction.
+
+```math
+\frac{dQ}{dx} = \frac{d}{dx} \left(k \frac{dT}{dx}\right) = 0
+```
+
+```math
+\frac{d^2 T}{dx^2} + \left( \frac{1}{A} \frac{\text{d}A}{\text{d}x} \right) \frac{\text{d}T}{\text{d}x} = 0
+```
+
+For constant $A$:
+
+```math
+\frac{d^2 T}{dx^2} = 0
+```
+
+### Temperature Distribution for Plane Slab
+
+For a plane slab, W$A$ is constant w.r.t $x$. Integrating the above equation twice gives:
+
+```math
+T(x) = a x + b
+```
+
+Temperature varies linearly throughout the conduction direction.
+
+```math
+T(x) = T_1 + \frac{T_2 - T_1}{L}x
+```
+
+:::note
+
+```math
+\frac{\partial T}{\partial t} = \frac{k}{\rho c} \frac{\text{d}T^2}{\text{d}x^2}  + \frac{\dot{q_g}}{\rho c}
+```
+
+Here:
+
+- $k$ - thermal conductivity
+- $\rho$ - density
+
+:::
+
+## Thermal Resistance
+
+Conduction–convection systems can be modeled using electrical analogy.
+
+```math
+R = \frac{\Delta T}{Q}
+```
+
+For a composite wall series and parallel thermal resistances are combined similar to electrical resistances.
+
+### Conduction Resistance
+
+```math
+R_\text{cond} = \frac{L}{kA}
+```
+
+### Convection Resistance
+
+```math
+R_\text{conv} = \frac{1}{hA}
+```
+
+:::note
+
+Real problems often involve a wall with convection on both sides. In that case, conduction resistance and convection resistance are combined as usual.
+
+:::

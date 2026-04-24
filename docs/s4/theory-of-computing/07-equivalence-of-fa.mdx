@@ -1,0 +1,55 @@
+---
+title: Equivalence of FA
+sidebar:
+  order: 7
+slug: s4/theory-of-computing/equivalence-of-fa
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.633Z
+lastUpdatedOn: 2026-04-24T03:19:45.188Z
+---
+
+If 2 automata models (regardless of their types: DFA, NFA, NFA-Λ) are equivalent **iff** they recognize the same language.
+
+Any language can be recognized by a DFA, or an NFA, or an NFA-$\Lambda$.
+
+## NFA to DFA
+
+Based on the subset construction method.
+
+Suppose $M=(Q, \Sigma, q, A, \delta)$ is a NFA accepting $L \subseteq \Sigma^*$. There is a DFA $M'=(Q_1, \Sigma, q_1, A_1, \delta_1)$ where:
+
+- $Q_1 = 2^Q$
+- $q_1 = \{q\}$
+- $\delta_1(S, a) = \bigcup_{r \in S} \delta(r, a)$ for $S \subseteq Q$ and $a \in \Sigma$
+- $A_1 = \{S \subseteq Q | S \cap A \neq \varnothing\}$
+
+The equivalency can be proven using induction on the length of the input string.
+
+A set of states in an NFA corresponds to a single state in the DFA, which means the DFA tracks all possible states the NFA could be in after reading an input.
+
+## NFA-Lambda to NFA
+
+Suppose $M=(Q, \Sigma, q_0, A, \delta)$ is an NFA-$\Lambda$ accepts a language $L \subset \Sigma^*$. There exists a NFA $M_1=(Q, \Sigma, q_0, A_1, \delta_1)$ that accepts the same language. Here:
+
+```math
+δ_1(q,a) = \Lambda( \delta( \Lambda(q), a ) )
+```
+
+and
+
+```math
+A_1 = \begin{cases}
+A \cup \set{q_0} & \text{if } \Lambda(\set{ q_0 }) \cap A \neq \emptyset \text{ in } M \\
+A & \text{otherwise}
+\end{cases}
+```
+
+If $\Lambda(q_0)$ contains an accepting state, $q_0$ must be included in the accepting states of the NFA.
+
+Steps:
+1. Find $\Lambda$-closure of every state
+2. Build new transitions using the closure   
+   For all states $q$ and input symbols $a$, take the $\Lambda$-closure. Follow $a$-transitions. Take the $\Lambda$-closure again. Build new transitions from $q$ to the final set of states.
+3. Remove all $\Lambda$ transitions 
+4. If $\Lambda(q_0)$ includes an accepting state, make $q_0$ an accepting state in the new NFA.

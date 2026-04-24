@@ -1,0 +1,53 @@
+---
+title: Interrupt-Driven I/O
+sidebar:
+  order: 33
+slug: s3/operating-systems/interrupt-driven-io
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.710Z
+lastUpdatedOn: 2026-04-24T03:19:45.180Z
+---
+
+Devices notify the CPU when ready. A device-driven method. Requires CPU attention.
+
+When an interrupt is received, control is transferred to an Interrupt Service Routine (ISR) via the interrupt vector. OS saves the context and executes the ISR. Once the ISR finishes, the context is stored and resumed.
+
+Types:
+
+- Maskable: Can be ignored or delayed.
+- Non-maskable: Cannot be ignored.
+
+## Interrupt
+
+Signal to CPU indicating an event. Caused by hardware or software.
+
+### Hardware Interrupt
+
+Interrupt caused by an I/O device.
+
+### Trap
+
+Aka. Exception. A software-generated interrupt.
+Usually caused by an error or a user request.
+
+## Interrupt Vector
+
+A memory address or a table of addresses that the processor uses to locate the appropriate Interrupt Service Routine (ISR) for a given interrupt. Each type of interrupt has its own unique vector, allowing the system to respond correctly to different sources of interrupts.
+
+## Interrupt Service Routine
+
+Aka. ISR, interrupt handler. When an interrupt occurs, the processor temporarily pauses its current execution, saves the context, and transfers control to ISR. The event is processed by the ISR. Once that's done, the processor resumes its previous activity.
+
+## Timer
+
+A programmable hardware component or a software mechanism that generates interrupts at specific time intervals. Used to measure time. The OS sets the timer to trigger an interrupt after every $n$ clock cycles.
+
+Crucial for managing how long a process or program can use the CPU, ensuring that no single process monopolizes system resources.
+
+Timers are used by the operating system to:
+- Enforce time-sharing among processes by preempting running processes after a set time slice.
+- Prevent infinite loops or runaway processes from hogging the CPU.
+- Schedule future events, such as waking up a process after a delay or triggering periodic tasks.
+
+Typically, the timer is programmed by the operating system (using privileged instructions) to count down from a specified value. When the timer reaches zero, it generates an interrupt, allowing the OS to regain control, perform context switches, or take corrective action if a process has exceeded its allotted time.

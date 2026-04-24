@@ -1,0 +1,231 @@
+---
+title: Optimizations Beyond Pipelining
+sidebar:
+  order: 12
+slug: s3/computer-architecture/optimizations-beyond-pipelining
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.688Z
+lastUpdatedOn: 2026-04-24T03:19:45.161Z
+---
+
+## Super-pipelining
+
+An enhancement of the basic pipelining. Pipeline stages are broken into smaller sub-stages. Allows executing more operations concurrently. Allows higher clock speeds. High throughput.
+
+Increases complexity. Pipeline hazards are more likely.
+
+## Super-scalar Architecture
+
+A type of CPU design. Includes multiple pipelines. Some pipeline stages can be shared. Allows multiple instructions to be processed simultaneously in each clock cycle. Possible when an instruction is independent of another. Helps maximize resource utilization.
+
+Increases performance. Reduces idle times. Improve throughput.
+
+Increases hardware complexity. Not always effective. If instructions depend on each other, parallel execution is limited.
+
+### Stall Point
+
+Refers to a situation where the pipeline cannot continue simultaneous execution due to certain dependencies or conflicts.
+
+### Out of Order Execution
+
+Refers to running instructions in a different order than in the programmed order. Only possible if an instruction's dependencies allow it. Done to increase performance. Common in super-scalar architecture.
+
+## Parallelism
+
+Refers to performing multiple operations simultaneously. Involves breaking down a task into smaller, independent sub-tasks that can be executed concurrently.
+
+Improves processing speed and efficiency.
+
+### Data-Level Parallelism
+
+Aka. DLP. Executes the same instruction across multiple data points. Used at application level.
+
+Used in image processing, matrix operations.
+
+### Task-Level Parallelism
+
+Aka. TLP. Executes independent tasks simultaneously. Used at application level.
+
+Used in web servers.
+
+### Instruction-Level Parallelism
+
+The processor's ability to execute multiple instructions from a single program simultaneously. Achieved through [pipelining](/computer-architecture/pipelining) and similar techniques. Used at architecture level.
+
+Exploits DLP in pipelining & speculative execution.
+
+### Thread-Level Parallelism
+
+Executes multiple threads (of the same program) in parallel. Exploits DLP & TLP. Used at architecture level.
+
+Used in multi-core or multi-threaded processors.
+
+### Request-Level Parallelism
+
+Parallel execution of tasks that are independent. Typically of different programs. Used at architecutre level.
+
+## Flynn's Taxonomy
+
+Categorizes systems based on:
+
+- how many instructions can be concurrently run (single or multiple)
+- how many data streams does an instruction work on (single or multiple)
+
+### SISD
+
+Single Instruction, Single Data. A single processing unit fetches and executes one instruction at a time on one data stream. Traditional sequential von Neumann model.
+
+Used in single-core CPU.
+
+### SIMD
+
+Single Instruction, Multiple Data. One instruction is applied simultaneously to multiple data elements.
+
+Mainly used in vector processors, GPUs, and [DLP](#data-level-parallelism) like image processing, audio, and array operations.
+
+### MISD
+
+Multiple Instruction, Single Data. Aka. systolic array. Multiple processing units execute different instructions on the same data stream. Rare in practice and mostly of theoretical interest.
+
+Used in fault-tolerant or redundant systems, where the same input is checked by diverse algorithms.
+
+### MIMD
+
+Multiple Instruction, Multiple Data. Independent processors execute different instructions on different data. Most general and widely used model.
+
+Used in multicore CPUs, clusters, and distributed systems, supporting task-level and thread-level parallelism.
+
+## Multithreading
+
+- Implementation: Time-sharing or multiple processors.
+- Simultaneous Multi-threading (Hyperthreading): Uses multiple virtual cores on a physical core.
+
+A technique to run multiple [threads](/operating-systems/thread/) concurrently. Using 1 or more cores.
+
+If only 1 core is available, the OS emulates multithreading by rapidly switching between threads (_time-sharing_). With multiple cores, threads can run truly in parallel.
+
+Improves performance, efficiency.
+
+### Complications in Multithreading
+
+- Synchronization
+- Access control for shared resources
+- Context Switching Overhead  
+  The OS must frequently switch between threads, which consumes CPU time and reduces overall efficiency.
+- Thread Safety  
+  Code must be designed in thread-safe manner. Otherwise may lead to data corruption or unexpected behavior.
+- Resource Contention  
+  Threads compete for shared resources (e.g., CPU, memory), leading to delays or performance bottlenecks.
+- Debugging  
+  Because the execution order of threads is not predictable.
+
+## Hyperthreading
+
+Allows a single physical core to appear as 2 logical cores to the OS. Proprietary technology by Intel.
+
+## Dual CPU
+
+Two separate physical processors in a single system. Each processor has its own cache and memory controller.
+
+## Multi-Core Processor
+
+Multiple cores within a single processor. Typically 2 to 8. Allowing each thread to run on a separate core for improved performance. No context switches required. Designed to improve the performance of general-purpose tasks. General-purpose cores.
+
+Cache coherency is a challenge. Occurs when multiple cores have their own caches. If the caches have the same data, changes in one cache must be reflected in others to maintain consistency. Without proper cache coherence protocols, different cores may work with outdated data, leading to errors.
+
+Used in consumer devices like laptops.
+
+### Programming Model
+
+Serial programs can run without issues in a single-threaded environment. OS can manage threads in such programs.
+
+Programs designed to be run by multiple threads, must consider concurrency between threads. When multiple threads access the same shared memory, atomicity, mutual exclusion, and synchronization must be ensured.
+
+[RISC-V](/computer-architecture/risc-v-architecture)'s atomic extension includes instructions for multithreading.
+
+### Many-core Processor
+
+An extreme variant of multi-core processor. Contains a large number of cores. Typically 8 to 100. Designed to handle workloads that benefit from a high degree of parallelism. Designed for tasks that require massive parallel processing. Consists of simpler, specialized cores that are optimized for parallel processing.
+
+Better performance compared to multi-core processor. Consumes a lot of power.
+
+Used in specialized applications like scientific computing, machine learning, and high-performance computing (HPC).
+
+## Sytem-on-Chip
+
+Aka. SoC. Integrates multiple components of a computer or electronic system into a single chip. Includes CPU, memory, I/O ports, and secondary storage.
+
+SoCs are similar to microcontrollers but are more powerful and complex. Designed for specific applications like smartphones, tablets, and embedded systems. SoCs can run full operating systems.
+
+## Co-Processing Units
+
+Specialized processors like Neural Processing Units (NPUs), Tensor Processing Units (TPUs), and Data Processing Units for specific tasks like machine learning and data sorting.
+
+### GPU
+
+Short for Graphical Processing Unit. Calculations required for graphics are independent. Performance improves linearly with the number of cores.
+
+A function that runs on a GPU is a _kernel_.
+
+Here is a vector addition implementation using GPU programming (CUDA).
+
+```c
+__global__ void vectorAdd(int *A, int *B, int *C, int N) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x; // Global index of the thread
+
+    if (i < N) {  // Ensure thread index is within bounds
+        C[i] = A[i] + B[i];
+    }
+}
+
+int main() {
+    int N = 1000;
+    int *A, *B, *C;  // Arrays for input and output
+    // Allocate and initialize A, B, C on host (CPU)
+
+    // Allocate memory on the GPU (device)
+    int *d_A, *d_B, *d_C;
+    cudaMalloc(&d_A, N * sizeof(int));
+    cudaMalloc(&d_B, N * sizeof(int));
+    cudaMalloc(&d_C, N * sizeof(int));
+
+    // Copy data from host to device
+    cudaMemcpy(d_A, A, N * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, B, N * sizeof(int), cudaMemcpyHostToDevice);
+
+    // Launch the kernel with N threads
+    int blockSize = 256;  // Number of threads per block
+    int numBlocks = (N + blockSize - 1) / blockSize;  // Number of blocks
+
+    vectorAdd<<<numBlocks, blockSize>>>(d_A, d_B, d_C, N);  // Kernel call
+
+    // Copy result back from device to host
+    cudaMemcpy(C, d_C, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+    // Clean up
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+}
+```
+
+### NPU
+
+Short for Neural Processing Unit. A specialized accelerator designed for neural network workloads. Optimized for massively parallel matrix and convolution operations, low‑precision arithmetic, and energy‑efficient inference on edge and mobile devices.
+
+### Systolic Array
+
+A hardware architecture consisting of a network of processing elements that rhythmically compute and pass data through the system. Ideal for matrix operations and deep learning workloads.
+
+### TPU
+
+Short for Tensor Processing Unit. An accelerator (originally by Google) tuned for tensor computations in deep learning. Uses large systolic arrays for very high‑throughput matrix operations, commonly used in datacenter training and inference with support for efficient low‑precision formats.
+
+### DPU
+
+Aka. Data Processing Unit. A specialized processor designed to handle data-centric tasks like sorting, filtering, and transforming large datasets. Optimized for high-throughput data processing workloads.
+
+### Warehouse-Scale Parallelism
+
+Cloud and distributed computing that scale to handle large amounts of data and parallel processing tasks.

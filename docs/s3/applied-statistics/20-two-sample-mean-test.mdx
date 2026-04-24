@@ -1,0 +1,133 @@
+---
+title: Two-Sample Mean Test
+sidebar:
+  order: 20
+slug: s3/applied-statistics/two-sample-mean-test
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.682Z
+lastUpdatedOn: 2026-04-24T03:19:45.156Z
+---
+
+Suppose two independent random samples of size $n_1$ and $n_2$ respectively are drawn
+from two populations with means $\mu_1$ and $\mu_2$ and variance $\sigma_1$ and $\sigma_2$ respectively.
+
+```math
+H_0:\ \mu_1 - \mu_2 = d_0
+```
+
+```math
+H_1:\ \mu_1 - \mu_2 < d_0\ \text{ or }\ \mu_1 - \mu_2 \neq d_0\ \text{ or }\ \mu_1 - \mu_2 > d_0
+```
+
+The appropriate test statistics depends on $\sigma_1$ and $\sigma_2$ are known or unknown.
+
+### Assumptions
+
+- Independence: samples are independent within and across groups
+- Distribution: each population is normal, or samples are large (CLT)
+- Known vs unknown variances: choose Z or t accordingly
+- Equal-variance assumption only for pooled t; otherwise use Welch t
+
+## Test Statistic
+
+### Case 1
+
+Both $\sigma_1$ and $\sigma_2$ are known.
+
+```math
+Z \;=\; \frac{(\bar X_1 - \bar X_2) - d_0}{\sqrt{\frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2}}}
+\;\sim\; N(0,1)\ \text{under } H_0
+```
+
+Decision
+
+- Two-tailed: reject $H_0$ **if** $|Z|\ge z_{1-\alpha/2}$
+- Right-tailed $(>)$: reject **if** $Z\ge z_{1-\alpha}$
+- Left-tailed $(<)$: reject **if** $Z\le -z_{1-\alpha}$
+
+Confidence interval for $d_0$:
+
+```math
+(\bar X_1 - \bar X_2) \pm z_{1-\alpha/2}\sqrt{\frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2}}
+```
+
+### Case 2
+
+Both $\sigma_1$ and $\sigma_2$ are unknown.
+
+#### Type I
+
+Variances are equal and unknown. Pooled t statistic is used.
+
+Pooled variance $s_p$ is defined as:
+
+```math
+s_p^2 \;=\; \frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{\nu}
+```
+
+Here: $\nu = n_1 + n_2 - 2$.
+
+The test statistic for this use case is:
+
+```math
+t \;=\; \frac{(\bar X_1 - \bar X_2) - d_0}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
+\;\sim\; t_{\nu} \text{under } H_0
+```
+
+Decision
+- Two-tailed: reject **if** $|t|\ge t_{v,,1-\alpha/2}$
+- Right-tailed: reject **if** $t\ge t_{v,,1-\alpha}$
+- Left-tailed: reject **if** $t\le -t_{v,,1-\alpha}$
+
+Confidence interval for $d_0$:
+
+```math
+(\bar X_1 - \bar X_2) \pm t_{v,\,1-\alpha/2}\, s_p \sqrt{\tfrac{1}{n_1} + \tfrac{1}{n_2}}
+```
+
+#### Type II
+
+Unknown and unequal variances. Welch t statistic is used.
+
+Approximate degrees of freedom is:
+
+```math
+\nu \;=\; \frac{\big(\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}\big)^2}{\frac{(s_1^2/n_1)^2}{n_1-1} + \frac{(s_2^2/n_2)^2}{n_2-1}}
+```
+
+If $\nu\gt 30$, z-statistic can be used. Otherwise the test statistic is:
+
+```math
+t \;=\; \frac{(\bar X_1 - \bar X_2) - d_0}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}} \sim t_v\ \text{under } H_0
+```
+
+Confidence interval for $d_0$:
+
+```math
+(\bar X_1 - \bar X_2) \pm t_{v,\,1-\alpha/2}\, \sqrt{\tfrac{s_1^2}{n_1} + \tfrac{s_2^2}{n_2}}
+```
+
+## P-value
+
+For any computed statistic $T$:
+
+• Two-tailed $H_1:\mu_1-\mu_2\neq d_0$
+
+```math
+p\text{-value} = 2\,\min\{\Pr(T \le t_{\text{obs}}),\ \Pr(T \ge t_{\text{obs}})\}
+```
+
+• Right-tailed $H_1:\mu_1-\mu_2> d_0$
+
+```math
+p\text{-value} = \Pr(T \ge t_{\text{obs}})
+```
+
+• Left-tailed $H_1:\mu_1-\mu_2< d_0$
+
+```math
+p\text{-value} = \Pr(T \le t_{\text{obs}})
+```
+
+Decision: reject $H_0$ if $p\text{-value}\le \alpha$.

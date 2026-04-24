@@ -1,0 +1,186 @@
+---
+title: Mass Storage Systems
+sidebar:
+  order: 28
+slug: s3/operating-systems/mass-storage-systems
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.709Z
+lastUpdatedOn: 2026-04-24T03:19:45.180Z
+---
+
+Mass storage = non-volatile secondary storage. OS manages mass storage devices and provides file systems for data organization. OS manages free space, allocation, partitioning, and scheduling.
+
+Main devices: [HDDs](/computer-architecture/permanent-storage/#hard-disk-drives), [SSDs](/computer-architecture/permanent-storage/#solid-state-drives) ([NVM](/computer-architecture/permanent-storage/#non-volatile-memory)), magnetic tapes.
+
+## Terminology
+
+### IOPS
+
+Short for I/O Operations Per Second. Measuring unit for speed of an I/O device.
+
+- For HDD: in the magnitude of $10^2$
+- For NVM: in the magnitude of $10^5$
+
+### Partition
+
+A logical storage device. Each storage device is divided into one or more partitions.
+
+- For HDD - Defined by cylinder/head/sector ranges.
+- For NVM - Defined by a range of logical block addresses using start and end index.
+
+Can be set to be mounted at boot time or manually later. When mounting, file system consistency is checked, and repaired if needed.
+
+### Root Partition
+
+The main partition containing the OS files. Mounted at boot time.
+
+### Blocks
+
+Smallest unit of data transfer between OS and storage device.
+
+### Clusters
+
+A group of contiguous logical blocks. Smallest unit of allocation in a file system.
+
+### Boot Block
+
+A small, special part of a storage device that contains the first program (_bootstrap loader_) executed during bootup. Finds and loads the next stage, the [boot loader](#boot-loader) or [boot manager](#boot-manager).
+
+Examples:
+
+- Master Boot Record (MBR): used in old systems
+- EFI System Partition (ESP): used in modern UEFI systems.
+
+When a computer starts, the boot block is read first, from the configured bootable device.
+
+### Boot Loader
+
+A program that loads the OS kernel into memory and starts its execution.
+
+### Boot Manager
+
+Allows user to choose between multiple operating systems at boot time. Calls the selected OS’s [boot loader](#boot-loader) to load its kernel.
+
+Examples: GRUB, Windows Boot Manager.
+
+Depending on the system setup, it can do two things:
+
+### Sector Sparing
+
+A bad-sector remapping technique. Sectors are scanned for faulty ones continuously, using ECC. When a sector is detected faulty, the disk controller marks it as bad and transparently replaces it with an unused sector from a reserved pool. And also updates the internal mapping table. Done automatically by the disk controller in modern systems.
+
+The reserved pool of spare sectors are not visible to the OS. If the reserved pool is exhausted, the remapping cannot be done anymore.
+
+Increases reliability. Increases seek latency slightly for remapped sectors.
+
+2 types:
+
+- Forward sparing – detects a bad sector during a write.
+- Backward sparing – detects a bad sector during a read and later remaps it.
+
+Used in HDDs and SSDs.
+
+# Practical application
+
+- Example:
+  - Original LBA = 1056 fails ECC check.
+  - Controller remaps LBA 1056 → spare #1.
+  - OS still accesses sector 1056 normally.
+
+## NVM
+
+### Flash Translation Layer
+
+Aka. FTL. Maps logical block addresses to physical pages. Ensures the latest is read always.
+
+### Garbage collection
+
+Aka. GC. The process of erasing invalid pages. Valid pages from a partially invalid block are moved to new block and old block is erased.
+
+### Wear Leveling
+
+The controller uses wear leveling algorithms to spread writes evenly across all blocks, ensuring no single block fails prematurely.
+
+### Overprovisioning
+
+The technique of reserving some space for background management, such as GC and wear leveling.
+
+## Volatile Storage
+
+Aka. RAM Disks. A portion of main memory is reserved and emulated as a secondary storage disk. RAM disks are used instead of RAM with software expecting a filesystem.
+
+Used as a high-speed temporary storage. Used for caching, buffering, temporary data sharing.
+
+## Host-Bus Adapter
+
+Aka. HBA or controller.
+
+A hardware interface card that connects a computer’s system bus (like PCIe) to a storage network or device (like SCSI, SATA, or Fibre Channel).
+
+### Device Controller
+
+An electronic circuit on the device side that manages the device’s operations and communication with the CPU.
+
+### Host Controller
+
+The hardware interface on the host side that manages communication between the CPU/memory and the peripheral device controller.
+
+### Steps
+
+- Host places command on host controller, using [memory-mapped I/O](/computer-architecture/io/#memory-mapped) ports.
+- Host controller sends messages to device controller.
+- Device controller transferes data between device and main memory via DMA.
+
+## Address Mapping
+
+Disk drives are addresses as 1-dimensional arrays of _logical blocks_ (smallest unit of data transfer). Logical blocks are created using hardware-level formatting, which is usually done by the manufacturer.
+
+The logical blocks are mapped to physical sectors on the disk.
+
+:::note
+
+In HDD, sector 0 is the first sector on the first track of the outermost cylinder.
+
+Data is written track by track, cylinder by cylinder, from the outer edge inward.
+
+:::
+
+Address mapping is usually easy except:
+
+- Bad sectors  
+  Some disk sectors are damaged (unusable). The controller remaps these to unused sectors. Because of this, the logical order no longer matches the physical layout.
+- Non-constant sectors per track  
+  Due to constant angular velocity of HDD. Outer tracks can store more sectors because they are longer. Thus, the number of sectors per track changes with radius, making mapping less uniform.
+
+## Disk Scheduling
+
+Disk scheduling is done differently for HDDs and NVMs. [HDD scheduling](/operating-systems/hdd-scheduling) is explained on a separate page.
+
+### NVM Scheduling
+
+Simpler compared to HDD scheduling because no seek or rotation delays.
+
+Sometimes the NVM might need to write more pages than the pages requested by the OS, which is called _write amplification_. In that case, performance would be degraded.
+
+## Error Detection & Correction
+
+### Parity bits
+
+Used to detect single-bit errors. Might produce false-negatives if more than 1-bit errors occur in a specific way. Most frequently used.
+
+### Checksum
+
+Can detect multi-bit errors. Might produce false-negatives if multiple bits are altered in a specific way.
+
+### CRC
+
+[Cyclic Redundancy Check](/data-communication-and-networking/information-redundancy/#crc) is a more robust and reliable form of checksum. False-negatives are very rare. Does not break for burst errors.
+
+### ECC
+
+Short for Error-Correcting Code. Can detect and correct soft errors (like bit flips due to radiation). More complex and expensive.
+
+## Object Storage
+
+Stores data as objects in a storage pool. Object is a container of data. Each object includes an ID, data, and metadata. Computer-oriented. No directories. Read/writes and protection are managed by systems like Hadoop File System (HDFS) or Ceph. Typically stores $N$ copies, across $N$ systems. Distributed. Horizontally scalable. Content addressable. Unstructured.

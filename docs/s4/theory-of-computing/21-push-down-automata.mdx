@@ -1,0 +1,91 @@
+---
+title: Push Down Automata
+sidebar:
+  order: 21
+slug: s4/theory-of-computing/push-down-automata
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.635Z
+lastUpdatedOn: 2026-04-24T03:19:45.190Z
+---
+
+An automaton with a stack used to recognize CFLs.
+
+A 7-tuple: $(Q, \Sigma, \Gamma, q_0, Z_0, A, \delta)$
+
+Here:
+
+- $Q$: states
+- $\Sigma$: input alphabet
+- $\Gamma$: stack alphabet
+- $q_0$: initial state
+- $Z_0$: initial stack symbol
+- $A$: accepting states
+- $\delta$: transition function
+
+## Stack
+
+PDAs work with an internal stack, where elements can be pushed, popped, and replaced. The contents of the stack is expressed by a string of stack alphabet. By convention, left end of the string is the top element of the stack.
+
+Stack is never empty. A special symbol $Z_0$ is always the bottom-most element. It's never removed and no additional copies of $Z_0$ are pushed onto the stack.
+
+## Configuration
+
+Represents current machine state. Denoted by $(q, x, \alpha)$ where:
+
+- $q$: current state
+- $x$: remaining input
+- $\alpha$: stack contents
+
+## Transition
+
+$δ: Q \times (\Sigma \cup {\Lambda}) \times \Gamma \rightarrow \text{finite subsets of }Q \times \Gamma^*$
+
+Each transition maps a (state, input, stack) to a set of finite subsets of $Q\times \Gamma^*$.
+
+$\delta (q, a, X) = (p, \beta)$ means, when the PDA has $X$ on the stack top, and gets $a$ as input, it moves to $p$, replacing $X$ with $β$.
+
+Multi-step transition is denoted using $⊢^*$.
+
+## Acceptance
+
+2 modes.
+
+### Final state acceptance
+
+A string is accepted (by final state acceptance) **iff** it reaches a configuration with an accepting state.
+
+```math
+(q_0, x, Z_0) ⊢^* (q, \Lambda, \alpha) \text{ where } q \in A
+```
+
+Input must be fully consumed. Stack may or may not be empty.
+
+### Empty stack acceptance
+
+A string is accepted (by empty stack acceptance) **iff** it reaches a configuration with empty stack.
+
+:::note
+
+Both models of acceptance are equivalent. If a language is accepted by a PDA using one mode of acceptance, there is another PDA using the other mode that accepts the language
+:::
+
+## Computation Tree
+
+Represents all possible PDA execution paths. Each node is a configuration. Each branch is a non-deterministic choice. 
+
+An input string is accepted **iff** any paths reaches final state.
+
+## Non-determinism
+
+When multiple transitions are possible from the same configuration. It could be:
+- consume input or not
+- consume input and multiple transitions for the same input
+
+If not, the PDA is called a Deterministic PDA or DPDA in short. A CFL is called a Determinsitic CFL or DCFL if there exists a DPDA accepting the language.
+
+:::note
+
+Language of palindromes requires non-determinism in the PDA. Hence it's not a DCFL.
+
+:::

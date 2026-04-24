@@ -1,0 +1,63 @@
+---
+title: Orthogonality
+sidebar:
+  order: 9
+slug: s4/linear-algebra/orthogonality
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.627Z
+lastUpdatedOn: 2026-04-24T03:19:45.185Z
+---
+
+## Definition
+
+### For 2 vectors
+
+When their [inner product](/linear-algebra/inner-product) is $0$.
+
+### For a set
+
+When all pairs of vectors are orthogonal.
+
+An orthogonal set is automatically LI.
+
+## Orthonormal
+
+When 2 vectors or all pairs of vectors of a set are:
+
+- orthogonal and
+- norm of all vectors is 1
+
+## Gram–Schmidt Orthogonalization
+
+A method to convert a linearly independent set into a orthogonal set.
+
+Suppose $\set{x_1,\dots,x_n}$ is linearly independent.
+
+```math
+y_k = x_k - \sum_{j<k} \frac{\langle x_k, y_j\rangle}{|y_j|^2} y_j.
+```
+
+For $\langle p,q\rangle = \int_{-1}^{1} p(x)q(x)\,\text{d}x$, its orthogonal set is named _Legendre polynomials of the first kind_.
+
+```math
+\set{ p_n(x) } = \bigg\{ 1, x, \frac{1}{2}(3x^2-1), \dots \bigg\}
+```
+
+$n$ starts from 0. Additionally $p_n(x)$ also satisfies:
+
+```math
+(1-x^2)y'' - 2xy' + x(x+1)y = 0
+```
+
+For $\langle p,q\rangle = \int_{0}^{\infty} e^{-x}p(x)q(x)\,\text{d}x$, its orthogonal set is named _Leguerre polynomials of the first kind_.
+
+```math
+\set{ L_n(x) } = \set { 1, 1-x, \frac{1}{2}(x^2-4x+2) }
+```
+
+$n$ starts from 0. Additionally $L_n(x)$ satisfies:
+
+```math
+xy'' - (1-x)y' + xy = 0
+```
