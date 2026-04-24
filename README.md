@@ -15,11 +15,11 @@ bun install
 
 ## Commands
 
-| Command        | Action                                      |
-| :------------- | :------------------------------------------ |
-| `bun dev`      | Start local dev server at `localhost:4321`  |
-| `bun build`    | Build production site to `./dist/`          |
-| `bun preview`  | Preview production build locally            |
+| Command       | Action                                     |
+| :------------ | :----------------------------------------- |
+| `bun dev`     | Start local dev server at `localhost:4321` |
+| `bun build`   | Build production site to `./dist/`         |
+| `bun preview` | Preview production build locally           |
 
 ## Adding Notes
 

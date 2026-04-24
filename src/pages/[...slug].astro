@@ -106,12 +106,14 @@ async function getSidebarData(currentSlug: string) {
   let prevNote: any = null;
   let nextNote: any = null;
   const slugParts = currentSlug.split("/");
-  
+
   if (slugParts.length >= 4) {
     const currentModule = slugParts[2];
     const moduleNotes = currentSubjectTree.modules[currentModule] || [];
-    const currentIndex = moduleNotes.findIndex((note) => note.slug === currentSlug);
-    
+    const currentIndex = moduleNotes.findIndex(
+      (note) => note.slug === currentSlug,
+    );
+
     if (currentIndex > 0) {
       prevNote = moduleNotes[currentIndex - 1];
     }
@@ -237,15 +239,57 @@ const description = generateDescription(notesEntry.body || "");
   <Nav />
 
   <div class="mobile-bar">
-    <button class="mobile-bar-btn" id="open-sidebar" type="button" aria-label="Open contents">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+    <button
+      class="mobile-bar-btn"
+      id="open-sidebar"
+      type="button"
+      aria-label="Open contents"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><line x1="3" y1="6" x2="21" y2="6"></line><line
+          x1="3"
+          y1="12"
+          x2="15"
+          y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg
+      >
       <span>Contents</span>
     </button>
     {
       tocHeadings.length > 0 && (
-        <button class="mobile-bar-btn right" id="open-toc" type="button" aria-label="Open table of contents">
+        <button
+          class="mobile-bar-btn right"
+          id="open-toc"
+          type="button"
+          aria-label="Open table of contents"
+        >
           <span>On this page</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <>
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </>
+          </svg>
         </button>
       )
     }
@@ -280,7 +324,7 @@ const description = generateDescription(notesEntry.body || "");
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path d="m6 9 6 6 6-6" />
+            <path d="m6 9 6 6 6-6"></path>
           </svg>
         </button>
         <div class="sb-sem-menu" id="sem-switcher-menu" hidden role="listbox">
@@ -393,7 +437,10 @@ const description = generateDescription(notesEntry.body || "");
         notesEntry.data.prev && notesEntry.data.next && (
           <div class="note-nav">
             {sidebarData.prevNote && (
-              <a href={`/${sidebarData.prevNote.slug}`} class="note-nav-btn left">
+              <a
+                href={`/${sidebarData.prevNote.slug}`}
+                class="note-nav-btn left"
+              >
                 <svg
                   width="24"
                   height="24"
@@ -409,12 +456,17 @@ const description = generateDescription(notesEntry.body || "");
                 </svg>
                 <div class="note-nav-content">
                   <span class="note-nav-dir">Previous</span>
-                  <span class="note-nav-title">{sidebarData.prevNote.label}</span>
+                  <span class="note-nav-title">
+                    {sidebarData.prevNote.label}
+                  </span>
                 </div>
               </a>
             )}
             {sidebarData.nextNote && (
-              <a href={`/${sidebarData.nextNote.slug}`} class="note-nav-btn right">
+              <a
+                href={`/${sidebarData.nextNote.slug}`}
+                class="note-nav-btn right"
+              >
                 <svg
                   width="24"
                   height="24"
@@ -430,7 +482,9 @@ const description = generateDescription(notesEntry.body || "");
                 </svg>
                 <div class="note-nav-content">
                   <span class="note-nav-dir">Next</span>
-                  <span class="note-nav-title">{sidebarData.nextNote.label}</span>
+                  <span class="note-nav-title">
+                    {sidebarData.nextNote.label}
+                  </span>
                 </div>
               </a>
             )}
@@ -528,7 +582,11 @@ const description = generateDescription(notesEntry.body || "");
     backdrop?.addEventListener("click", closeDrawers);
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && (root.classList.contains("sidebar-open") || root.classList.contains("toc-open"))) {
+      if (
+        e.key === "Escape" &&
+        (root.classList.contains("sidebar-open") ||
+          root.classList.contains("toc-open"))
+      ) {
         closeDrawers();
       }
     });
@@ -598,7 +656,9 @@ const description = generateDescription(notesEntry.body || "");
 
         const isDesktop = mqDesktop.matches;
         const viewportTop = isDesktop ? section.getBoundingClientRect().top : 0;
-        const viewportHeight = isDesktop ? section.clientHeight : window.innerHeight;
+        const viewportHeight = isDesktop
+          ? section.clientHeight
+          : window.innerHeight;
 
         tocLinks.forEach((t) => t.classList.remove("active"));
         trailSegments.forEach((t) => t.classList.remove("active"));
@@ -1101,7 +1161,9 @@ const description = generateDescription(notesEntry.body || "");
     color: var(--text-secondary);
     text-decoration: none;
     border-radius: 4px;
-    transition: background 0.1s, color 0.1s;
+    transition:
+      background 0.1s,
+      color 0.1s;
   }
 
   .sb-sem-opt:hover {
@@ -1539,7 +1601,10 @@ const description = generateDescription(notesEntry.body || "");
     border: 1px solid var(--border);
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    transition:
+      background 0.12s,
+      color 0.12s,
+      border-color 0.12s;
   }
 
   .mobile-bar-btn:hover,

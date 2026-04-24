@@ -2,88 +2,100 @@
 import { SITE_DOMAIN } from "../utils/values";
 ---
 
-<div id="live-users-count-container" title="Currently active users" class="hide">
-    <span class="live-dot" aria-hidden="true"></span>
-    <span class="live-count">1</span>
+<div
+  id="live-users-count-container"
+  title="Currently active users"
+  class="hide"
+>
+  <span class="live-dot" aria-hidden="true"></span>
+  <span class="live-count">1</span>
 </div>
 
 <script define:vars={{ SITE_DOMAIN }}>
-    (() => {
-        const container = document.getElementById("live-users-count-container");
-        if (!container) {
-            return;
+  (() => {
+    const container = document.getElementById("live-users-count-container");
+    if (!container) {
+      return;
+    }
+    const countDisplay = container.querySelector("span.live-count");
+    if (!countDisplay) {
+      return;
+    }
+    const hideCountDisplay = () => {
+      container.classList.add("hide");
+    };
+    const showCountDisplay = () => {
+      container.classList.remove("hide");
+    };
+    const eventSource = new EventSource(
+      `//rando.sahithyan.dev/live-users-count?d=${SITE_DOMAIN}`,
+      {},
+    );
+    eventSource.addEventListener("message", function (event) {
+      try {
+        if (Number.parseInt(event.data) >= 0) {
+          countDisplay.innerHTML = event.data;
+          showCountDisplay();
+        } else {
+          hideCountDisplay();
         }
-        const countDisplay = container.querySelector("span.live-count");
-        if (!countDisplay) {
-            return;
-        }
-        const hideCountDisplay = () => {
-            container.classList.add("hide");
-        };
-        const showCountDisplay = () => {
-            container.classList.remove("hide");
-        };
-        const eventSource = new EventSource(`//rando.sahithyan.dev/live-users-count?d=${SITE_DOMAIN}`, {});
-        eventSource.addEventListener("message", function (event) {
-            try {
-                if (Number.parseInt(event.data) >= 0) {
-                    countDisplay.innerHTML = event.data;
-                    showCountDisplay();
-                } else {
-                    hideCountDisplay();
-                }
-            } catch {}
-        });
-        eventSource.addEventListener("open", function () {
-            console.log("opened");
-        });
-        eventSource.addEventListener("error", function () {
-            hideCountDisplay();
-        });
-    })();
+      } catch {}
+    });
+    eventSource.addEventListener("open", function () {
+      console.log("opened");
+    });
+    eventSource.addEventListener("error", function () {
+      hideCountDisplay();
+    });
+  })();
 </script>
 
 <style>
-    #live-users-count-container {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        height: 26px;
-        border-radius: 7px;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        font-size: 12px;
-        font-family: var(--font-ui);
-        color: var(--text-secondary);
-        line-height: 1;
-    }
+  #live-users-count-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-family: var(--font-ui);
+    color: var(--text-secondary);
+    line-height: 1;
+  }
 
-    #live-users-count-container.hide {
-        display: none;
-    }
+  #live-users-count-container.hide {
+    display: none;
+  }
 
-    .live-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #22c55e;
-        box-shadow: 0 0 0 3px color-mix(in oklab, #22c55e 22%, transparent);
-        animation: live-pulse 2s ease-in-out infinite;
-    }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px color-mix(in oklab, #22c55e 22%, transparent);
+    animation: live-pulse 2s ease-in-out infinite;
+  }
 
-    .live-count {
-        font-weight: 600;
-        color: var(--text-primary);
-        font-variant-numeric: tabular-nums;
-    }
+  .live-count {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
 
-    .live-label {
-        color: var(--text-muted);
-    }
+  .live-label {
+    color: var(--text-muted);
+  }
 
-    @keyframes live-pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.55; }
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
     }
+    50% {
+      opacity: 0.55;
+    }
+  }
 </style>
