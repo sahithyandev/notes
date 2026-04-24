@@ -7,6 +7,8 @@ interface Props {
   description?: string;
   image?: string;
   canonical?: string;
+  keywords?: string[];
+  slug?: string;
 }
 
 const {
@@ -14,7 +16,40 @@ const {
   description = SITE_DESCRIPTION,
   image = `${SITE_DOMAIN}/og/default`,
   canonical = SITE_DOMAIN,
+  keywords,
+  slug,
 } = Astro.props;
+
+const finalizedKeywords: Array<string> = [SITE_NAME];
+
+if (slug) {
+  // Extract path from slug prop
+  const slugParts = slug.split("/").filter(Boolean);
+
+  // Add semester (s1, s2, etc.)
+  if (slugParts.length > 0) {
+    finalizedKeywords.push(`semester ${slugParts[0].slice(1)}`);
+  }
+
+  // Add module name
+  if (slugParts.length > 1) {
+    finalizedKeywords.push(slugParts[1]);
+  }
+
+  // Add submodule name
+  if (slugParts.length > 2) {
+    finalizedKeywords.push(slugParts[2]);
+  }
+
+  // Add note name
+  if (slugParts.length > 3) {
+    finalizedKeywords.push(slugParts[3]);
+  }
+}
+
+if (keywords && keywords.length > 0) {
+  finalizedKeywords.push(...keywords);
+}
 ---
 
 <!doctype html>
@@ -25,6 +60,7 @@ const {
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={finalizedKeywords.join(", ")} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
