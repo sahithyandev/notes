@@ -835,10 +835,8 @@ const description = generateDescription(notesEntry.body || "");
 
     /* Code block */
     pre {
-      background: #0c0e18;
       border-radius: 9px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 20px 22px;
+      padding: 12px 16px;
       margin: 20px 0;
       overflow-x: auto;
       position: relative;
@@ -849,8 +847,7 @@ const description = generateDescription(notesEntry.body || "");
       border: none;
       padding: 0;
       font-size: 0.875rem;
-      line-height: 1.7;
-      color: #b0bdd8;
+      line-height: 1;
       font-weight: 400;
     }
 
@@ -888,7 +885,6 @@ const description = generateDescription(notesEntry.body || "");
       font-family: var(--font-mono);
       font-size: 0.625rem;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.18);
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
@@ -1565,9 +1561,25 @@ const description = generateDescription(notesEntry.body || "");
     align-items: flex-end;
   }
 
-  [data-theme="dark"] .prose pre {
-    background: #090b14;
-    border-color: rgba(255, 255, 255, 0.08);
+  :global(pre) {
+    background: var(--shiki-light-bg);
+    color: var(--shiki-light);
+    border-color: var(--border);
+  }
+
+  :global(pre code span) {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+
+  :global([data-theme="dark"]) :global(pre) {
+    background: var(--shiki-dark-bg);
+    color: var(--shiki-dark);
+  }
+
+  :global([data-theme="dark"]) :global(pre code span) {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
   }
 
   [data-theme="dark"] .note-nav-btn:hover {

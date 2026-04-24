@@ -86,6 +86,13 @@ export default defineConfig({
   markdown: {
     rehypePlugins: [rehypeKatex],
     remarkPlugins: [remarkMath],
+    shikiConfig: {
+      themes: {
+        light: "snazzy-light",
+        dark: "rose-pine-moon",
+      },
+      defaultColor: false,
+    },
   },
 
   vite: {
