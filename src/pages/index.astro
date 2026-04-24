@@ -1,7 +1,8 @@
 ---
+import Hero from "../components/hero.astro";
+import Footer from "../components/footer.astro";
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/nav.astro";
-import Hero from "../components/hero.astro";
 import SemesterCard from "../components/semester-card.astro";
 import { getCollection } from "astro:content";
 import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
@@ -201,6 +202,8 @@ const recentNotes = await getRecentNotes();
       </div>
     </div>
   </section>
+
+  <Footer />
 </Layout>
 
 <style>
