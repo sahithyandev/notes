@@ -15,14 +15,16 @@ const semesterColor = `var(${semesterVar})`;
 
 <a href={href} class="sem-card" data-s={number}>
   <div class="sem-card-top" style={`background:${semesterColor}`}></div>
-  <div class="sem-card-wm" style={`color:${semesterColor}`}>{number.toString().padStart(2, '0')}</div>
+  <div class="sem-card-wm" style={`color:${semesterColor}`}>
+    {number.toString().padStart(2, "0")}
+  </div>
   <div class="sem-card-body">
     <div class="sem-card-num" style={`color:${semesterColor}`}>
       <div class="sem-card-num-dot" style={`background:${semesterColor}`}></div>
       Semester {number}
     </div>
     <ul class="sem-card-subjects">
-      {subjects.map(subject => <li>{subject}</li>)}
+      {subjects.map((subject) => <li>{subject}</li>)}
     </ul>
   </div>
   <div class="sem-card-footer">

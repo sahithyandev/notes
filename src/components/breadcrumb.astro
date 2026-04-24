@@ -11,44 +11,47 @@ export interface Props {
 const { slug } = Astro.props;
 
 function generateBreadcrumb(slug: string): BreadcrumbItem[] {
-  const parts = slug.split('/');
+  const parts = slug.split("/");
   const breadcrumb: BreadcrumbItem[] = [];
-  
+
   parts.forEach((part, index) => {
     let label = part;
     let href: string | undefined;
-    
+
     // Handle semester
-    if (part.startsWith('s')) {
+    if (part.startsWith("s")) {
       const semesterNum = part.substring(1);
       label = `Semester ${semesterNum}`;
       href = `/${part}`;
     }
     // Handle module names (convert kebab-case to title case)
     else if (index === 1) {
-      label = part.split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      href = `/${parts.slice(0, index + 1).join('/')}`;
+      label = part
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      href = `/${parts.slice(0, index + 1).join("/")}`;
     }
     // Handle subdirectories
     else if (index > 1 && index < parts.length - 1) {
-      label = part.split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      href = `/${parts.slice(0, index + 1).join('/')}`;
+      label = part
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      href = `/${parts.slice(0, index + 1).join("/")}`;
     }
     // Handle the final note (current page)
     else if (index === parts.length - 1) {
-      label = part.split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+      label = part
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
       // No href for current page
     }
-    
+
     breadcrumb.push({ label, href });
   });
-  
+
   return breadcrumb;
 }
 
@@ -56,16 +59,20 @@ const breadcrumbItems = generateBreadcrumb(slug);
 ---
 
 <div class="breadcrumb" aria-label="Breadcrumb">
-  {breadcrumbItems.map((item, index) => (
-    <>
-      {index > 0 && <span class="breadcrumb-sep">/</span>}
-      {item.href ? (
-        <a href={item.href} class="breadcrumb-link">{item.label}</a>
-      ) : (
-        <span class="breadcrumb-current">{item.label}</span>
-      )}
-    </>
-  ))}
+  {
+    breadcrumbItems.map((item, index) => (
+      <>
+        {index > 0 && <span class="breadcrumb-sep">/</span>}
+        {item.href ? (
+          <a href={item.href} class="breadcrumb-link">
+            {item.label}
+          </a>
+        ) : (
+          <span class="breadcrumb-current">{item.label}</span>
+        )}
+      </>
+    ))
+  }
 </div>
 
 <style>

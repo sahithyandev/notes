@@ -7,7 +7,7 @@ const allNotes = await getCollection("notes");
 
 // Calculate semesters (unique top-level directories)
 const semesters = new Set();
-allNotes.forEach(note => {
+allNotes.forEach((note) => {
   const pathParts = note.id.split("/");
   if (pathParts.length > 0) {
     semesters.add(pathParts[0]);
@@ -16,7 +16,7 @@ allNotes.forEach(note => {
 
 // Calculate modules (unique second-level directories)
 const modules = new Set();
-allNotes.forEach(note => {
+allNotes.forEach((note) => {
   const pathParts = note.id.split("/");
   if (pathParts.length > 1) {
     modules.add(pathParts.slice(0, 2).join("/"));
@@ -28,16 +28,16 @@ const totalNotes = allNotes.length;
 ---
 
 <div class="stats-band">
-    <StatCard value={semesters.size.toString()} label="Semesters" />
-    <StatCard value={modules.size.toString()} label="Modules" />
-    <StatCard value={totalNotes.toString()} label="Notes" />
+  <StatCard value={semesters.size.toString()} label="Semesters" />
+  <StatCard value={modules.size.toString()} label="Modules" />
+  <StatCard value={totalNotes.toString()} label="Notes" />
 </div>
 
 <style>
-    /* ── STATS BAND ───────────────────────────────────────────────── */
-    .stats-band {
-        display: flex;
-        justify-content: start;
-        gap: calc(var(--spacing) * 12);
-    }
+  /* ── STATS BAND ───────────────────────────────────────────────── */
+  .stats-band {
+    display: flex;
+    justify-content: start;
+    gap: calc(var(--spacing) * 12);
+  }
 </style>

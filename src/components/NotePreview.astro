@@ -8,12 +8,25 @@ interface Props {
   lastUpdated?: string;
 }
 
-const { title, semester, module, preview, isPopular = false, lastUpdated } = Astro.props;
-import { Star, ArrowRight } from '@lucide/astro';
+const {
+  title,
+  semester,
+  module,
+  preview,
+  isPopular = false,
+  lastUpdated,
+} = Astro.props;
+import { Star, ArrowRight } from "@lucide/astro";
 
 const semesterColors = [
-  '#FF6B6B', '#A8E6CF', '#FF8CC8', '#4E80F6',
-  '#FFB347', '#95E1D3', '#F38181', '#667EEA'
+  "#FF6B6B",
+  "#A8E6CF",
+  "#FF8CC8",
+  "#4E80F6",
+  "#FFB347",
+  "#95E1D3",
+  "#F38181",
+  "#667EEA",
 ];
 
 const semesterColor = semesterColors[semester - 1] || semesterColors[0];
@@ -22,32 +35,38 @@ const semesterColor = semesterColors[semester - 1] || semesterColors[0];
 <div class="note-preview">
   <div class="note-header">
     <div class="note-meta">
-      <span class="semester-badge" style={`background: ${semesterColor}20; color: ${semesterColor};`}>
+      <span
+        class="semester-badge"
+        style={`background: ${semesterColor}20; color: ${semesterColor};`}
+      >
         S{semester}
       </span>
       <span class="module-name">{module}</span>
     </div>
-    {isPopular && (
-      <div class="popular-badge">
-        <Star class="popular-icon" />
-        <span class="popular-text">Popular</span>
-      </div>
-    )}
+    {
+      isPopular && (
+        <div class="popular-badge">
+          <Star class="popular-icon" />
+          <span class="popular-text">Popular</span>
+        </div>
+      )
+    }
   </div>
-  
+
   <div class="note-content">
     <h3 class="note-title">{title}</h3>
     <p class="note-preview-text">{preview}</p>
   </div>
-  
+
   <div class="note-footer">
-    <a href={`/notes/${title.toLowerCase().replace(/\s+/g, '-')}`} class="read-more">
+    <a
+      href={`/notes/${title.toLowerCase().replace(/\s+/g, "-")}`}
+      class="read-more"
+    >
       Read More
       <ArrowRight class="arrow" />
     </a>
-    {lastUpdated && (
-      <span class="last-updated">{lastUpdated}</span>
-    )}
+    {lastUpdated && <span class="last-updated">{lastUpdated}</span>}
   </div>
 </div>
 
@@ -111,7 +130,7 @@ const semesterColor = semesterColors[semester - 1] || semesterColors[0];
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
+    background: linear-gradient(135deg, #ffd700, #ffa500);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;

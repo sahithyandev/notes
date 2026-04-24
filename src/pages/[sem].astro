@@ -33,7 +33,10 @@ interface SemesterData {
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
-  const bySem = new Map<number, Map<string, { subModules: Map<string, NoteRef[]>, directNotes: NoteRef[] }>>();
+  const bySem = new Map<
+    number,
+    Map<string, { subModules: Map<string, NoteRef[]>; directNotes: NoteRef[] }>
+  >();
 
   for (const note of notes) {
     const parts = note.data.slug.split("/");
@@ -43,7 +46,8 @@ export async function getStaticPaths() {
 
     if (!bySem.has(n)) bySem.set(n, new Map());
     const modMap = bySem.get(n)!;
-    if (!modMap.has(moduleKey)) modMap.set(moduleKey, { subModules: new Map(), directNotes: [] });
+    if (!modMap.has(moduleKey))
+      modMap.set(moduleKey, { subModules: new Map(), directNotes: [] });
     const moduleData = modMap.get(moduleKey)!;
 
     const noteRef: NoteRef = {
@@ -78,12 +82,18 @@ export async function getStaticPaths() {
             notes: [...notes].sort((a, b) => a.order - b.order),
           }))
           .sort((a, b) => a.name.localeCompare(b.name)),
-        directNotes: [...moduleData.directNotes].sort((a, b) => a.order - b.order),
+        directNotes: [...moduleData.directNotes].sort(
+          (a, b) => a.order - b.order,
+        ),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    const noteCount = modules.reduce((sum, m) => 
-      sum + m.directNotes.length + m.subModules.reduce((subSum, sm) => subSum + sm.notes.length, 0), 0
+    const noteCount = modules.reduce(
+      (sum, m) =>
+        sum +
+        m.directNotes.length +
+        m.subModules.reduce((subSum, sm) => subSum + sm.notes.length, 0),
+      0,
     );
     const data: SemesterData = { number, modules, noteCount };
 
@@ -111,7 +121,9 @@ for (const mod of modules) {
     if (weights[i] < weights[idx]) idx = i;
   }
   columns[idx].push(mod);
-  const totalNotes = mod.directNotes.length + mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0);
+  const totalNotes =
+    mod.directNotes.length +
+    mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0);
   weights[idx] += totalNotes + 2;
 }
 
@@ -154,7 +166,7 @@ const semDescription = `Browse ${noteCount} notes across ${modules.length} modul
                         <span class="topic-title">{note.title}</span>
                       </a>
                     ))}
-                    
+
                     {/* Sub-modules with their notes */}
                     {mod.subModules.map((subModule) => (
                       <div class="sub-module-section">
@@ -163,7 +175,10 @@ const semDescription = `Browse ${noteCount} notes across ${modules.length} modul
                         </div>
                         <div class="sub-module-topics">
                           {subModule.notes.map((note: NoteRef, i: number) => (
-                            <a href={`/${note.slug}`} class="module-topic sub-module-topic">
+                            <a
+                              href={`/${note.slug}`}
+                              class="module-topic sub-module-topic"
+                            >
                               <span class="topic-idx">
                                 {(i + 1).toString().padStart(2, "0")}
                               </span>
@@ -178,7 +193,12 @@ const semDescription = `Browse ${noteCount} notes across ${modules.length} modul
                 </div>
                 <div class="module-card-footer">
                   <span class="module-footer-stat">
-                    {mod.directNotes.length + mod.subModules.reduce((sum, sm) => sum + sm.notes.length, 0)} notes
+                    {mod.directNotes.length +
+                      mod.subModules.reduce(
+                        (sum, sm) => sum + sm.notes.length,
+                        0,
+                      )}{" "}
+                    notes
                   </span>
                 </div>
               </div>
@@ -349,7 +369,7 @@ const semDescription = `Browse ${noteCount} notes across ${modules.length} modul
     gap: 6px;
   }
   .sub-module-name::before {
-    content: '';
+    content: "";
     width: 8px;
     height: 1px;
     background: var(--border-strong);

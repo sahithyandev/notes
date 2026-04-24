@@ -48,9 +48,17 @@ const numLabel = number.toString().padStart(2, "0");
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image: radial-gradient(circle, color-mix(in oklab, var(--text-primary) 18%, transparent) 1px, transparent 1px);
+    background-image: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--text-primary) 18%, transparent) 1px,
+      transparent 1px
+    );
     background-size: 28px 28px;
-    mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 20%, transparent 80%);
+    mask-image: radial-gradient(
+      ellipse 90% 100% at 50% 0%,
+      black 20%,
+      transparent 80%
+    );
   }
   .sem-hero::after {
     content: "";
@@ -58,8 +66,16 @@ const numLabel = number.toString().padStart(2, "0");
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 50% 70% at 8% 60%, color-mix(in oklab, var(--sem) 40%, transparent) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 55% at 80% 10%, color-mix(in oklab, var(--sem) 18%, transparent) 0%, transparent 55%);
+      radial-gradient(
+        ellipse 50% 70% at 8% 60%,
+        color-mix(in oklab, var(--sem) 40%, transparent) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 40% 55% at 80% 10%,
+        color-mix(in oklab, var(--sem) 18%, transparent) 0%,
+        transparent 55%
+      );
   }
 
   .hero-breadcrumb {

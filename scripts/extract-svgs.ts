@@ -7,11 +7,11 @@
  * Usage: bun run scripts/extract-svgs.ts <directory>
  */
 
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import parser from '@babel/parser';
-import generate from '@babel/generator';
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import parser from "@babel/parser";
+import generate from "@babel/generator";
 
 interface Heading {
   level: number;
@@ -37,7 +37,7 @@ function findMdxFiles(dir: string, files: string[] = []): string[] {
 
     if (entry.isDirectory()) {
       findMdxFiles(fullPath, files);
-    } else if (entry.isFile() && entry.name.endsWith('.mdx')) {
+    } else if (entry.isFile() && entry.name.endsWith(".mdx")) {
       files.push(fullPath);
     }
   }
@@ -71,16 +71,19 @@ function extractHeadings(content: string): Heading[] {
 function dasherize(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .replace(/-+/g, '-') // Replace multiple dashes with single
-    .replace(/^-|-$/g, ''); // Remove leading/trailing dashes
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
+    .replace(/\s+/g, "-") // Replace spaces with dashes
+    .replace(/-+/g, "-") // Replace multiple dashes with single
+    .replace(/^-|-$/g, ""); // Remove leading/trailing dashes
 }
 
 /**
  * Find the last heading before a given position
  */
-function findHeadingBeforePosition(headings: Heading[], position: number): Heading | null {
+function findHeadingBeforePosition(
+  headings: Heading[],
+  position: number,
+): Heading | null {
   let lastHeading: Heading | null = null;
 
   for (const heading of headings) {
@@ -113,13 +116,13 @@ function extractSvgsFromMdx(content: string): Svg[] {
 
     // Find the last heading before this SVG
     const heading = findHeadingBeforePosition(headings, start);
-    const headingLabel = heading ? dasherize(heading.text) : 'untitled';
+    const headingLabel = heading ? dasherize(heading.text) : "untitled";
 
     try {
       // Validate and clean the SVG using Babel
       const ast = parser.parse(svgContent, {
-        sourceType: 'module',
-        plugins: ['jsx'],
+        sourceType: "module",
+        plugins: ["jsx"],
       });
 
       // Generate clean SVG code
@@ -134,7 +137,9 @@ function extractSvgsFromMdx(content: string): Svg[] {
         headingLabel: headingLabel,
       });
     } catch (error) {
-      console.warn(`  Warning: Failed to parse SVG at position ${start}: ${(error as Error).message}`);
+      console.warn(
+        `  Warning: Failed to parse SVG at position ${start}: ${(error as Error).message}`,
+      );
       console.warn(`  SVG content preview: ${svgContent.substring(0, 100)}...`);
     }
   }
@@ -162,14 +167,21 @@ function extractExistingImports(content: string): string[] {
 /**
  * Generate import statement for an SVG
  */
-function generateImportStatement(componentName: string, filename: string): string {
+function generateImportStatement(
+  componentName: string,
+  filename: string,
+): string {
   return `import ${componentName} from './images/${filename}';`;
 }
 
 /**
  * Replace inline SVG with component usage
  */
-function replaceSvgWithComponent(content: string, svg: Svg, componentName: string): string {
+function replaceSvgWithComponent(
+  content: string,
+  svg: Svg,
+  componentName: string,
+): string {
   const componentUsage = `<${componentName} />`;
 
   // Replace the SVG code with component usage
@@ -185,11 +197,12 @@ function replaceSvgWithComponent(content: string, svg: Svg, componentName: strin
 function processMdxFile(filePath: string, dryRun: boolean = false): void {
   console.log(`Processing: ${filePath}`);
 
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = fs.readFileSync(filePath, "utf-8");
 
   // Strip frontmatter using gray-matter
-  const { content: contentWithoutFrontmatter, data: frontmatterData } = matter(content);
-  const frontmatterString = matter.stringify('', frontmatterData).trim();
+  const { content: contentWithoutFrontmatter, data: frontmatterData } =
+    matter(content);
+  const frontmatterString = matter.stringify("", frontmatterData).trim();
   const frontmatterLength = content.indexOf(contentWithoutFrontmatter);
 
   const svgs = extractSvgsFromMdx(contentWithoutFrontmatter);
@@ -203,7 +216,7 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
 
   // Create images directory relative to the MDX file
   const fileDir = path.dirname(filePath);
-  const imagesDir = path.join(fileDir, 'images');
+  const imagesDir = path.join(fileDir, "images");
 
   if (!dryRun && !fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
@@ -229,7 +242,7 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
     const svg = svgs[i];
 
     // Generate base filename from heading label
-    let baseFilename = svg.headingLabel || 'untitled';
+    let baseFilename = svg.headingLabel || "untitled";
     let svgFilename = `${baseFilename}.svg`;
     let suffix = 1;
 
@@ -246,10 +259,10 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
 
     // Generate component name (PascalCase)
     const componentName = svgFilename
-      .replace('.svg', '')
-      .split('-')
+      .replace(".svg", "")
+      .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join('');
+      .join("");
 
     const svgPath = path.join(imagesDir, svgFilename);
 
@@ -259,7 +272,7 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
     } else if (dryRun) {
       console.log(`  [DRY RUN] Would create: ${svgPath}`);
     } else {
-      fs.writeFileSync(svgPath, svg.code, 'utf-8');
+      fs.writeFileSync(svgPath, svg.code, "utf-8");
       console.log(`  Created: ${svgPath}`);
     }
 
@@ -272,30 +285,34 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
     }
 
     // Replace inline SVG with component usage
-    modifiedContent = replaceSvgWithComponent(modifiedContent, svg, componentName);
+    modifiedContent = replaceSvgWithComponent(
+      modifiedContent,
+      svg,
+      componentName,
+    );
   }
 
   // Add new imports at the top of the file
   if (newImports.length > 0) {
-    console.log(`  [DRY RUN] Would add imports: ${newImports.join(', ')}`);
+    console.log(`  [DRY RUN] Would add imports: ${newImports.join(", ")}`);
 
     // Find the position to insert imports (after existing imports or at the start)
-    const lines = modifiedContent.split('\n');
+    const lines = modifiedContent.split("\n");
     let insertIndex = 0;
 
     // Skip existing import statements
     for (let i = 0; i < lines.length; i++) {
       const trimmedLine = lines[i].trim();
-      if (trimmedLine.startsWith('import ')) {
+      if (trimmedLine.startsWith("import ")) {
         insertIndex = i + 1;
-      } else if (trimmedLine && !trimmedLine.startsWith('import ')) {
+      } else if (trimmedLine && !trimmedLine.startsWith("import ")) {
         break;
       }
     }
 
     // Insert new imports
     lines.splice(insertIndex, 0, ...newImports);
-    modifiedContent = lines.join('\n');
+    modifiedContent = lines.join("\n");
   }
 
   // Write modified content back to file
@@ -303,8 +320,8 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
     console.log(`  [DRY RUN] Would update: ${filePath}`);
   } else {
     // Reconstruct with frontmatter
-    const finalContent = frontmatterString + '\n\n' + modifiedContent.trim();
-    fs.writeFileSync(filePath, finalContent, 'utf-8');
+    const finalContent = frontmatterString + "\n\n" + modifiedContent.trim();
+    fs.writeFileSync(filePath, finalContent, "utf-8");
     console.log(`  Updated: ${filePath}`);
   }
 }
@@ -316,15 +333,17 @@ function main(): void {
   const args = process.argv.slice(2);
 
   // Check for --dry-run flag
-  const dryRunIndex = args.indexOf('--dry-run');
+  const dryRunIndex = args.indexOf("--dry-run");
   const dryRun = dryRunIndex !== -1;
 
   // Remove --dry-run from args if present
   const targetDir = dryRun ? (dryRunIndex === 0 ? args[1] : args[0]) : args[0];
 
   if (!targetDir) {
-    console.error('Error: Please provide a directory path');
-    console.error('Usage: bun run scripts/extract-svgs.ts <directory> [--dry-run]');
+    console.error("Error: Please provide a directory path");
+    console.error(
+      "Usage: bun run scripts/extract-svgs.ts <directory> [--dry-run]",
+    );
     process.exit(1);
   }
 
@@ -339,7 +358,7 @@ function main(): void {
   }
 
   if (dryRun) {
-    console.log('DRY RUN MODE - No files will be modified\n');
+    console.log("DRY RUN MODE - No files will be modified\n");
   }
 
   console.log(`Scanning directory: ${targetDir}`);
@@ -347,7 +366,7 @@ function main(): void {
   const mdxFiles = findMdxFiles(targetDir);
 
   if (mdxFiles.length === 0) {
-    console.log('No .mdx files found');
+    console.log("No .mdx files found");
     return;
   }
 
@@ -358,7 +377,7 @@ function main(): void {
     console.log();
   }
 
-  console.log(dryRun ? 'Dry run complete!' : 'Done!');
+  console.log(dryRun ? "Dry run complete!" : "Done!");
 }
 
 main();
