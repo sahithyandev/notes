@@ -172,7 +172,7 @@ const description = generateDescription(notesEntry.body || "");
   title={`${notesEntry.data.title} | ${SITE_NAME}`}
   description={description}
   image={`${SITE_DOMAIN}/og/${slug}`}
-  canonical={`${SITE_DOMAIN}/notes/${slug}`}
+  canonical={`${SITE_DOMAIN}/${slug}`}
 >
   <Nav />
 
@@ -220,7 +220,7 @@ const description = generateDescription(notesEntry.body || "");
             {/* Direct notes under subject */}
             {sidebarData.currentSubjectTree.direct.map((note: any) => (
               <a
-                href={`/notes/${note.slug}`}
+                href={`/${note.slug}`}
                 class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
               >
                 {note.label}
@@ -238,7 +238,7 @@ const description = generateDescription(notesEntry.body || "");
                   </div>
                   {moduleNotes.map((note: any) => (
                     <a
-                      href={`/notes/${note.slug}`}
+                      href={`/${note.slug}`}
                       class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
                     >
                       {note.label}
