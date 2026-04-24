@@ -6,7 +6,7 @@ slug: s4/linear-algebra/sink
 prev: true
 next: false
 dateCreated: 2026-04-23T17:39:39.627Z
-lastUpdatedOn: 2026-04-24T03:19:45.185Z
+lastUpdatedOn: 2026-04-24T10:47:59.208Z
 ---
 
 # **7. Rank, Row Space, Column Space**
@@ -32,16 +32,13 @@ Eigenvalues satisfy $\det(A-\lambda I)=0$.
 - Geometric: $\dim\ker(A-\lambda I)$
 - Minimal multiplicity: exponent in minimal polynomial
   and
-  [
-  a_\lambda - g_\lambda \ge m_\lambda - 1.
-  ]
+  ```math
+  a_\lambda - g_\lambda \ge m_\lambda - 1
+  ```
 
 ## 8.4 Diagonalization
 
-A matrix is diagonalizable iff
-[
-a_\lambda = g_\lambda\ \text{for all }\lambda.
-]
+A matrix is diagonalizable iff $a_\lambda = g_\lambda\ \text{for all }\lambda$.
 
 # **9. Hermitian Matrices**
 
@@ -55,8 +52,6 @@ $A^H=A$.
 - Eigenvectors of distinct eigenvalues are orthogonal
 - There exists an orthonormal eigenbasis (spectral theorem) .
 
----
-
 # **10. Jordan Form**
 
 ## 10.1 Introduction
@@ -68,11 +63,9 @@ Generalizes diagonalization when matrix is not diagonalizable.
 Block with λ on diagonal and 1s on the super-diagonal.
 
 Every matrix has a Jordan decomposition:
-[
-A = PJP^{-1}.
-]
-
----
+```math
+A = PJP^{-1}
+```
 
 # **11. SVD — Singular Value Decomposition**
 
@@ -82,17 +75,16 @@ Factorization that works for all matrices.
 
 ## 11.2 Definition
 
-[
+```math
 A = V \Sigma U^H
-]
+```
+
 where
 
 - $U$, $V$ are unitary
 - $\Sigma$ has singular values on diagonal.
 
 Singular values are square roots of eigenvalues of $A^HA$ (or $AA^H$).
-
----
 
 # **12. QR Decomposition**
 
@@ -102,9 +94,9 @@ Used for solving systems and iterative eigenvalue algorithms.
 
 ## 12.2 Definition
 
-[
+```math
 A = QR
-]
+```
 
 - $Q$ orthonormal (via Gram–Schmidt)
 - $R$ upper triangular.
