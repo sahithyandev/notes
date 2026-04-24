@@ -1,0 +1,189 @@
+---
+import StatsBand from "./stats-band.astro";
+---
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      Navigate your degree,<br /><em>one concept at a time.</em>
+    </h1>
+    <p class="hero-sub">
+      Structured university notes from foundations through capstone - organized
+      by semester, searchable by topic.
+    </p>
+    <div class="hero-cta">
+      <a href="#semesters" class="btn-primary">
+        Browse Semesters
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+        >
+          <path d="M3 8h10M8 3l5 5-5 5"></path>
+        </svg>
+      </a>
+    </div>
+
+    <StatsBand />
+  </div>
+</section>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-2);
+    padding: 68px var(--body-margin-x) 20px;
+  }
+
+  /* Dot grid */
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      var(--border-strong) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+    mask-image: radial-gradient(
+      ellipse 80% 80% at 50% 0%,
+      black 20%,
+      transparent 80%
+    );
+  }
+
+  /* Color wash */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 55% 65% at 15% 50%,
+        rgba(51, 72, 200, 0.28) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 45% 55% at 85% 20%,
+        rgba(107, 56, 160, 0.18) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 35% 45% at 65% 95%,
+        rgba(14, 122, 150, 0.14) 0%,
+        transparent 50%
+      );
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    padding: 4px 12px 4px 8px;
+    border-radius: 99px;
+    background: var(--accent-subtle);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.2px;
+  }
+
+  .hero-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-size: clamp(40px, 4.8vw, 60px);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.02;
+    letter-spacing: -2px;
+    margin-bottom: 22px;
+    max-width: 700px;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 16.5px;
+    line-height: 1.7;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin-bottom: 38px;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary {
+    padding: 11px 22px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.1px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition:
+      background 0.14s,
+      transform 0.1s,
+      box-shadow 0.14s;
+    box-shadow: 0 0 0 0 rgba(51, 72, 200, 0);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(51, 72, 200, 0.45);
+  }
+
+  .btn-ghost {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition:
+      border-color 0.14s,
+      color 0.14s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+</style>
