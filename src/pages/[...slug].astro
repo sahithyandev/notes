@@ -236,6 +236,21 @@ const description = generateDescription(notesEntry.body || "");
 >
   <Nav />
 
+  <div class="mobile-bar">
+    <button class="mobile-bar-btn" id="open-sidebar" type="button" aria-label="Open contents">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+      <span>Contents</span>
+    </button>
+    {
+      tocHeadings.length > 0 && (
+        <button class="mobile-bar-btn right" id="open-toc" type="button" aria-label="Open table of contents">
+          <span>On this page</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      )
+    }
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
   <main
     data-pagefind-body
     class="grid grid-cols-[auto_1fr_auto]"
@@ -485,6 +500,63 @@ const description = generateDescription(notesEntry.body || "");
   </script>
 
   <script>
+    // Mobile drawer toggles
+    const openSidebarBtn = document.getElementById("open-sidebar");
+    const openTocBtn = document.getElementById("open-toc");
+    const backdrop = document.getElementById("drawer-backdrop");
+    const sidebarEl = document.querySelector(".sidebar");
+    const tocEl = document.querySelector(".toc-rail");
+    const root = document.documentElement;
+
+    const closeDrawers = () => {
+      root.classList.remove("sidebar-open", "toc-open");
+      document.body.style.overflow = "";
+    };
+    const openSidebar = () => {
+      root.classList.add("sidebar-open");
+      root.classList.remove("toc-open");
+      document.body.style.overflow = "hidden";
+    };
+    const openToc = () => {
+      root.classList.add("toc-open");
+      root.classList.remove("sidebar-open");
+      document.body.style.overflow = "hidden";
+    };
+
+    openSidebarBtn?.addEventListener("click", openSidebar);
+    openTocBtn?.addEventListener("click", openToc);
+    backdrop?.addEventListener("click", closeDrawers);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && (root.classList.contains("sidebar-open") || root.classList.contains("toc-open"))) {
+        closeDrawers();
+      }
+    });
+
+    // Close drawer when a link inside is tapped (before navigation completes)
+    sidebarEl?.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a")) closeDrawers();
+    });
+    tocEl?.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a")) closeDrawers();
+    });
+
+    // Close drawers when crossing back to desktop
+    const mqDesktop = window.matchMedia("(min-width: 48rem)");
+    mqDesktop.addEventListener("change", (e) => {
+      if (e.matches) closeDrawers();
+    });
+
+    // Enable drawer transitions only after initial paint, so the closed
+    // state doesn't briefly animate in on page load / navigation.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => root.classList.add("drawers-ready"));
+    });
+  </script>
+
+  <script>
     // TOC active state on scroll
     const headings = [...document.querySelectorAll("article h2, article h3")];
     const tocLinks = [...document.querySelectorAll(".toc-item")];
@@ -517,25 +589,26 @@ const description = generateDescription(notesEntry.body || "");
         });
       };
 
+      const mqDesktop = window.matchMedia("(min-width: 48rem)");
+
       // Function to update active TOC items based on visible headings
       const updateActiveToc = () => {
         const section = document.querySelector("section");
         if (!section) return;
 
-        const sectionRect = section.getBoundingClientRect();
+        const isDesktop = mqDesktop.matches;
+        const viewportTop = isDesktop ? section.getBoundingClientRect().top : 0;
+        const viewportHeight = isDesktop ? section.clientHeight : window.innerHeight;
 
-        // Remove active from all TOC links and trail segments
         tocLinks.forEach((t) => t.classList.remove("active"));
         trailSegments.forEach((t) => t.classList.remove("active"));
 
-        // Add active to all headings visible in viewport
         headings.forEach((heading, index) => {
           const rect = heading.getBoundingClientRect();
-          const relativeTop = rect.top - sectionRect.top;
+          const relativeTop = rect.top - viewportTop;
           const relativeBottom = relativeTop + rect.height;
 
-          // Check if heading is visible in section viewport
-          if (relativeBottom > 0 && relativeTop < sectionRect.height) {
+          if (relativeBottom > 0 && relativeTop < viewportHeight) {
             if (tocLinks[index]) tocLinks[index].classList.add("active");
             if (trailSegments[index])
               trailSegments[index].classList.add("active");
@@ -546,11 +619,10 @@ const description = generateDescription(notesEntry.body || "");
       // Initial positioning
       positionTrailSegments();
 
-      // Update on scroll
+      // Update on scroll — section on desktop, window on mobile
       const section = document.querySelector("section");
-      if (section) {
-        section.addEventListener("scroll", updateActiveToc);
-      }
+      section?.addEventListener("scroll", updateActiveToc);
+      window.addEventListener("scroll", updateActiveToc, { passive: true });
 
       // Initial update
       updateActiveToc();
@@ -938,7 +1010,7 @@ const description = generateDescription(notesEntry.body || "");
     overflow-y: auto;
     background: var(--surface);
     border-right: 1px solid var(--border);
-    padding: 0 0 32px;
+    padding: 0;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
@@ -1438,5 +1510,157 @@ const description = generateDescription(notesEntry.body || "");
 
   [data-theme="dark"] .note-nav-btn:hover {
     box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ── MOBILE ACTION BAR & DRAWER CONTROLS ──────────────────────── */
+  .mobile-bar {
+    display: none;
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px calc(4 * var(--spacing));
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+
+  .mobile-bar-btn:hover,
+  .mobile-bar-btn:active {
+    background: var(--sem-bg);
+    border-color: var(--sem-border);
+    color: var(--sem);
+  }
+
+  .drawer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  html.drawers-ready .drawer-backdrop {
+    transition: opacity 0.2s ease;
+  }
+
+  [data-theme="dark"] .drawer-backdrop {
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  html.sidebar-open .drawer-backdrop,
+  html.toc-open .drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 47.99rem) {
+    main {
+      display: block !important;
+      height: auto;
+      overflow: visible;
+    }
+
+    .mobile-bar {
+      display: flex;
+    }
+
+    .drawer-backdrop {
+      display: block;
+    }
+
+    section:has(article) {
+      padding: 0 calc(4 * var(--spacing));
+      overflow: visible;
+      height: auto;
+    }
+
+    /* Left sidebar as slide-in drawer */
+    .sidebar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      height: calc(100dvh - var(--nav-h));
+      width: min(300px, 85vw);
+      z-index: 50;
+      transform: translateX(-100%);
+      box-shadow: 2px 0 18px rgba(0, 0, 0, 0.18);
+    }
+
+    html.drawers-ready .sidebar {
+      transition: transform 0.22s ease;
+    }
+
+    html.sidebar-open .sidebar {
+      transform: translateX(0);
+    }
+
+    /* TOC rail as slide-in drawer from right */
+    .toc-rail {
+      position: fixed;
+      top: var(--nav-h);
+      right: 0;
+      height: calc(100dvh - var(--nav-h));
+      width: min(280px, 85vw);
+      z-index: 50;
+      transform: translateX(100%);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
+      padding: 20px 16px 20px 0;
+      overflow-y: auto;
+    }
+
+    html.drawers-ready .toc-rail {
+      transition: transform 0.22s ease;
+    }
+
+    html.toc-open .toc-rail {
+      transform: translateX(0);
+    }
+
+    /* TOC trail uses absolute positioning relative to rail; keep it bounded */
+    .toc-trail {
+      top: 52px;
+      bottom: 20px;
+    }
+
+    /* Article tweaks for narrow screens */
+    .note-title {
+      font-size: 1.625rem;
+    }
+
+    article {
+      font-size: 0.9375rem;
+    }
+
+    .note-nav {
+      flex-direction: column;
+    }
+
+    .note-nav-btn,
+    .note-nav-btn.right {
+      max-width: 100%;
+      margin-left: 0;
+    }
   }
 </style>
