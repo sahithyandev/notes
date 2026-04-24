@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { SITE_DOMAIN } from "../utils/values";
+import { SITE_HOST_URL } from "../utils/values";
 
 export async function GET() {
   const notes = await getCollection("notes");
@@ -30,14 +30,14 @@ export async function GET() {
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <sitemap>
-    <loc>${SITE_DOMAIN}/</loc>
+    <loc>${SITE_HOST_URL}/</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </sitemap>
   ${sortedSemesters
     .map(
       ([sem, lastmod]) => `
   <sitemap>
-    <loc>${SITE_DOMAIN}/sitemaps/${sem}.xml</loc>
+    <loc>${SITE_HOST_URL}/sitemaps/${sem}.xml</loc>
     <lastmod>${lastmod.toISOString()}</lastmod>
   </sitemap>`,
     )

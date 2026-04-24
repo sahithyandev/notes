@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import { getEntry } from "astro:content";
 import Nav from "../components/nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
-import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 
@@ -191,8 +191,8 @@ const description = generateDescription(notesEntry.body || "");
 <Layout
   title={`${notesEntry.data.title} | ${SITE_NAME}`}
   description={description}
-  image={`${SITE_DOMAIN}/og/${slug}`}
-  canonical={`${SITE_DOMAIN}/${slug}`}
+  image={`${SITE_HOST_URL}/og/${slug}`}
+  canonical={`${SITE_HOST_URL}/${slug}`}
   slug={slug}
 >
   <Nav />

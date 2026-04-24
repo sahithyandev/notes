@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { SITE_NAME, SITE_DOMAIN, SITE_DESCRIPTION } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
 
 interface Props {
   title?: string;
@@ -14,8 +14,8 @@ interface Props {
 const {
   title = SITE_NAME,
   description = SITE_DESCRIPTION,
-  image = `${SITE_DOMAIN}/og/default`,
-  canonical = SITE_DOMAIN,
+  image = `${SITE_HOST_URL}/og/default`,
+  canonical = SITE_HOST_URL,
   keywords,
   slug,
 } = Astro.props;

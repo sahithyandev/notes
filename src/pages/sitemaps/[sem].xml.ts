@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { SITE_DOMAIN } from "../../utils/values";
+import { SITE_HOST_URL } from "../../utils/values";
 
 export async function GET({ params }) {
   const { sem } = params;
@@ -16,7 +16,7 @@ export async function GET({ params }) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Semester overview page -->
   <url>
-    <loc>${SITE_DOMAIN}/${sem}</loc>
+    <loc>${SITE_HOST_URL}/${sem}</loc>
     <lastmod>${getMostRecentDate(semesterNotes)}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -25,7 +25,7 @@ export async function GET({ params }) {
     .map(
       (note) => `
   <url>
-    <loc>${SITE_DOMAIN}/${note.data.slug}</loc>
+    <loc>${SITE_HOST_URL}/${note.data.slug}</loc>
     <lastmod>${note.data.lastUpdatedOn ? formatDate(note.data.lastUpdatedOn) : new Date().toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

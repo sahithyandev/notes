@@ -4,7 +4,7 @@ import Nav from "../components/nav.astro";
 import Hero from "../components/hero.astro";
 import SemesterCard from "../components/semester-card.astro";
 import { getCollection } from "astro:content";
-import { SITE_NAME, SITE_DOMAIN, SITE_DESCRIPTION } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
 
 interface SemesterInfo {
   number: number;
@@ -151,8 +151,8 @@ const recentNotes = await getRecentNotes();
 <Layout
   title={SITE_NAME}
   description={SITE_DESCRIPTION}
-  image={`${SITE_DOMAIN}/og/default`}
-  canonical={SITE_DOMAIN}
+  image={`${SITE_HOST_URL}/og/default`}
+  canonical={SITE_HOST_URL}
   slug=""
 >
   <Nav />

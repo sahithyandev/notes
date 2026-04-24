@@ -4,7 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/nav.astro";
 import SemesterHero from "../components/semester-hero.astro";
 import { titleize } from "../utils";
-import { SITE_NAME, SITE_DOMAIN } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 
 interface NoteRef {
   title: string;
@@ -133,8 +133,8 @@ const semDescription = `Browse ${noteCount} notes across ${modules.length} modul
 <Layout
   title={`Semester ${number} | ${SITE_NAME}`}
   description={semDescription}
-  image={`${SITE_DOMAIN}/og/s${number}`}
-  canonical={`${SITE_DOMAIN}/s${number}`}
+  image={`${SITE_HOST_URL}/og/s${number}`}
+  canonical={`${SITE_HOST_URL}/s${number}`}
   slug={`s${number}`}
 >
   <Nav />
