@@ -347,8 +347,6 @@ const description = generateDescription(notesEntry.body || "");
         if (!section) return;
 
         const sectionRect = section.getBoundingClientRect();
-        const viewportTop = section.scrollTop;
-        const viewportBottom = viewportTop + sectionRect.height;
 
         // Remove active from all TOC links and trail segments
         tocLinks.forEach((t) => t.classList.remove("active"));
@@ -357,12 +355,11 @@ const description = generateDescription(notesEntry.body || "");
         // Add active to all headings visible in viewport
         headings.forEach((heading, index) => {
           const rect = heading.getBoundingClientRect();
-          const sectionRect = section.getBoundingClientRect();
           const relativeTop = rect.top - sectionRect.top;
           const relativeBottom = relativeTop + rect.height;
 
           // Check if heading is visible in section viewport
-          if (relativeBottom > viewportTop && relativeTop < viewportBottom) {
+          if (relativeBottom > 0 && relativeTop < sectionRect.height) {
             if (tocLinks[index]) tocLinks[index].classList.add("active");
             if (trailSegments[index])
               trailSegments[index].classList.add("active");
@@ -409,7 +406,7 @@ const description = generateDescription(notesEntry.body || "");
 <style>
   :root {
     --sidebar-w: 280px;
-    --toc-w: 200px;
+    --toc-w: 250px;
     --nav-h: 54px;
   }
 
