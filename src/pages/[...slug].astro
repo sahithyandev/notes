@@ -554,6 +554,17 @@ const description = generateDescription(notesEntry.body || "");
   </script>
 
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const activeSidebarItem = document.querySelector(
+        ".sidebar .sb-item-sub.active",
+      );
+      if (activeSidebarItem) {
+        activeSidebarItem.scrollIntoView({ block: "center" });
+      }
+    });
+  </script>
+
+  <script>
     // Mobile drawer toggles
     const openSidebarBtn = document.getElementById("open-sidebar");
     const openTocBtn = document.getElementById("open-toc");
@@ -745,11 +756,12 @@ const description = generateDescription(notesEntry.body || "");
       font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: -0.4px;
+      line-height: 1;
       color: var(--text-primary);
-      margin: 44px 0 14px;
+      margin: 24px 0 14px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 6px;
     }
 
     h2:first-child {
@@ -762,7 +774,7 @@ const description = generateDescription(notesEntry.body || "");
       font-weight: 700;
       letter-spacing: -0.1px;
       color: var(--text-primary);
-      margin: 30px 0 10px;
+      margin: 20px 0 10px;
     }
 
     h4 {
@@ -773,35 +785,26 @@ const description = generateDescription(notesEntry.body || "");
       margin: 24px 0 8px;
     }
 
-    p {
-      margin-bottom: 16px;
-      font-size: 1.06rem;
-      text-wrap: pretty;
-    }
-
     ul {
-      list-style: none;
-      padding: 0;
+      list-style: disc outside;
+      padding-left: 22px;
       margin-bottom: 16px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    ul li {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
+    ul li::marker {
+      color: var(--sem);
     }
 
-    ul li::before {
-      content: "";
-      flex-shrink: 0;
-      width: 5px;
-      height: 5px;
-      border-radius: 2.5px;
-      background: var(--sem);
-      margin-top: 0.62em;
+    ul ul {
+      list-style: circle outside;
+      margin-bottom: 0;
+    }
+
+    ul ul ul {
+      list-style: square outside;
     }
 
     ol {
@@ -846,7 +849,7 @@ const description = generateDescription(notesEntry.body || "");
       background: none;
       border: none;
       padding: 0;
-      font-size: 0.875rem;
+      font-size: 0.78125rem;
       line-height: 1;
       font-weight: 400;
     }
@@ -938,7 +941,10 @@ const description = generateDescription(notesEntry.body || "");
     /* Additional article content styles */
     p {
       font-size: 1rem;
+      margin-bottom: 16px;
+      font-size: 1.06rem;
       line-height: 1.6;
+      text-wrap: pretty;
 
       &:not(:has(.MathJax:only-of-type)):not(:has(img:only-of-type)) {
         max-width: 84ch;
@@ -976,9 +982,15 @@ const description = generateDescription(notesEntry.body || "");
       }
     }
 
+    img,
+    svg {
+      max-width: 90ch;
+    }
+
+    img,
     svg.block-image {
-      margin-left: auto;
-      margin-right: auto;
+      display: block;
+      margin: 0 auto;
     }
 
     mjx-container[display="true"] svg {
@@ -995,7 +1007,7 @@ const description = generateDescription(notesEntry.body || "");
 
     .katex-display {
       text-align: center;
-      font-size: 1.25rem;
+      font-size: 1.12rem;
       overflow-x: scroll;
       overflow-y: hidden;
     }

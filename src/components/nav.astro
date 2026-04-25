@@ -3,7 +3,7 @@ import { Monitor, Sun, Moon } from "@lucide/astro";
 import SearchModal from "./search-modal.astro";
 import LiveUsersCount from "./live-users-count.astro";
 
-const shouldStretchFull = Astro.url.pathname !== "/" && !Astro.url.pathname.startsWith("/s");
+const shouldStretchFull = Astro.url.pathname.startsWith("/s");
 ---
 
 <nav
