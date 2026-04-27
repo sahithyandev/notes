@@ -14,6 +14,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Sagittaire Display";
+  src: url("/fonts/SagittaireDisplay-Regular.woff2") format("woff2");
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -28,6 +34,7 @@
 
   --font-ui: "Manrope", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-heading: "Sagittaire Display", serif;
 
   --bg: #f4f3f0;
   --surface: #ffffff;
@@ -113,6 +120,15 @@ html {
   color: var(--text-primary);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
 
 html,
