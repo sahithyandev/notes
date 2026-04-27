@@ -1,15 +1,13 @@
 ---
-title: Types of Trees
+title: Rooted Tree
 sidebar:
   order: 14
-slug: s4/graph-theory/types-of-trees
+slug: s4/graph-theory/rooted-tree
 prev: true
-next: false
+next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-04-24T07:36:29.648Z
+lastUpdatedOn: 2026-04-27T04:57:01.895Z
 ---
-
-## Rooted Trees
 
 A tree where a vertex is designated as the _root_ vertex.
 
@@ -49,42 +47,35 @@ In a rooted tree, a leaf does not have any children.
 
 Vertices that have children.
 
-### Sub-rooted tree
+## Sub-rooted tree
 
 Suppose $a$ is a vertex in a tree. Then the sub-tree with $a$ as its root is the sub-graph of the
 tree consisting of $a$ and its descendants and all edges incident to these descendants.
 
-### m-ary tree
+## Decision tree
 
-When all internal vertices has $\le m$ children.
+Vertices represent the decision points or events, where a decision could be made. Edges represent the possible decisions/outcomes of different choices.
 
-### Full m-ary tree
+## Representation of Algebraic Expressions
 
-When all internal vertices have exactly $m$ children.
+There are 3 common forms of algebraic expressions.
 
-A full $m$-ary tree with:
+### Infix form
 
-- $n$ vertices has $i = (n−1)/m$ internal vertices and $l = [(m−1)n + 1]/m$ leaves.
-- $i$ internal vertices has $n = mi + 1$ vertices and $l = (m−1)i + 1$ leaves.
-- $l$ leaves has $n = (ml−1)/(m−1)$ vertices and $i = (l−1)/(m−1)$ internal vertices.
+The symbol is written in-between the operands. The form we usually use.
 
-<Note title="Proof Hint">
+Example: $x*y$
 
-Use the following equations:
+### Prefix form
 
-- $i+l=n$
-- $m+(i-1)(m+1)+l = 2(n-1)$
+Aka. Polish form. The symbol is written before the operands.
 
-</Note>
+$x*y$'s prefix form is: $* x y$
 
-There are at most $m^h$ leaves in an $m$-ary tree of height $h$.
+Parantheses are not required.
 
-<Note title="Proof Hint">
+### Postfix form
 
-Use induction on level.
+Aka. reverse Polish form. The symbol is written after the operands. Used commonly when parsing algebraic expressions in calculators.
 
-</Note>
-
-## Binary Tree
-
-A 2-ary tree.
+$x*y$'s prefix form is: $x y *$

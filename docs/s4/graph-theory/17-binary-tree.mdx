@@ -1,0 +1,34 @@
+---
+title: Binary Tree
+sidebar:
+  order: 17
+slug: s4/graph-theory/binary-tree
+prev: true
+next: false
+dateCreated: 2026-04-27T04:57:01.896Z
+lastUpdatedOn: 2026-04-27T04:57:01.896Z
+---
+
+## Binary Search Tree
+
+A binary tree of comparable elements, primarily designed for efficient searching, insertion and deletion.
+
+Each vertex has a (comparable) key and value.
+Left sub-tree of a vertex has a key less than its parent vertex's key.
+Right sub-tree of a vertex has a key greater than its parent vertex's key.
+
+### Insertion
+
+```py
+insert(root, key, value):
+  if root is null:
+    return new Node(key, value)       # base case: empty spot found
+
+  if key < root.key:
+    root.left = insert(root.left, key, value)   # go left
+  else if key > root.key:
+    root.right = insert(root.right, key, value) # go right
+  # if key == root.key, duplicate — no-op (or update value)
+
+  return root
+```
