@@ -53,10 +53,24 @@ function buildModuleRedirects() {
   for (const sem of readdirSync(docsRoot)) {
     const semDir = join(docsRoot, sem);
     if (!statSync(semDir).isDirectory()) continue;
-    for (const moduleName of readdirSync(semDir)) {
+    const moduleNames = readdirSync(semDir)
+      .filter((name) => {
+        if (EXCLUDED.has(name)) return false;
+        return statSync(join(semDir, name)).isDirectory();
+      })
+      .sort((a, b) => a.localeCompare(b));
+
+    const firstModule = moduleNames[0];
+    if (firstModule) {
+      const semFirst = firstNote(join(semDir, firstModule));
+      if (semFirst) {
+        redirects[`/${sem}`] =
+          `/${sem}/${firstModule}/${semFirst.slugTail}`;
+      }
+    }
+
+    for (const moduleName of moduleNames) {
       const moduleDir = join(semDir, moduleName);
-      if (EXCLUDED.has(moduleName)) continue;
-      if (!statSync(moduleDir).isDirectory()) continue;
 
       const modFirst = firstNote(moduleDir);
       if (modFirst) {
