@@ -6,7 +6,7 @@ slug: s4/linear-algebra/eigenvalues-and-eigenvectors
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.627Z
-lastUpdatedOn: 2026-04-28T07:56:31.656Z
+lastUpdatedOn: 2026-04-28T08:42:00.725Z
 ---
 
 Let $T: V\rightarrow V$ over $F$. $\lambda \in F$ and $v \in V$ satisfying $T(v)=\lambda v$ are called an eigenvalue and a corresponding eigenvector of $T$ respectively.
@@ -70,6 +70,27 @@ Sum of the eigenvalues is the equal to the [trace](/s1/mathematics/matrices/trac
 
 </Note>
 
+If $\lambda$ is an eigenvalue of $A$, then $\lambda^n$ is an eigenvalue of $A^n$ where $n \in \mathbb{Z} $.
+
+<Note title="Proof Hint">
+
+For $n \in \mathbb{Z}^+$:
+- Start with $Av = \lambda v$
+- Multiply $A$ from the left repeatedly
+- Subtitute $\lambda v$ for $Av$ 
+
+Obvious for $n=0$. Already proven for $n=-1$. Use the above method and multiply from left.
+
+</Note>
+
+If $\lambda$ is an eigenvalue of $A$, then $p(\lambda)$ is an eigenvalue of $p(A)$ where $p$ is any polynomial which takes in an number or a matrix.
+
+<Note title="Proof Hint">
+
+Use the above conclusion for a polynomial.
+
+</Note>
+
 ## Eigenspace
 
 For a given $\lambda \in F$, the set of corresponding eigenvectors.
@@ -89,3 +110,45 @@ An eigenspace is a subspace of $V$.
 </Note>
 
 Basis of an eigenspace is usually given as the eigenvectors.
+
+### Geometric Multiplicity
+
+Dimension of $V_\lambda$.
+
+## Minimal Polynomial
+
+For $A \in F^{nn\times n}$, $m(x)$ of $A$ is such that:
+- $m(x)$ is monic (i.e. the leading coefficient is 1) (which implies $m(x) \not\equiv 0$)
+- $m(A) = 0$
+- **If** $h(x) \not\equiv 0$ and $h(A)=0$ **then** $\text{deg}(h) \ge \text{deg}(m)$
+
+**If** $f(\lambda)=0$ **then** $m(\lambda)=0$.
+
+<Note title="Proof Hint">
+
+- $f(\lambda)=0$ implies $\lambda$ is an eigenvalue
+- $Av=\lambda v$
+- Use one of the above theorems to $m(A)v = m(\lambda)v$ which implies $0 = m(\lambda) v$ which implies $m(\lambda)=0$
+
+</Note>
+
+$m(x)$ divides $f(x)$.
+
+<Note title="Proof Hint">
+
+- By [Cayley-Hamilton theorem](s1/mathematics/matrices/cayley-hamilton-theorem), $f(A)=0$
+- Minimal polynomial $m$ has the least degree $\text{deg}(m) \lt \text{deg}(f)$
+- Hence: $f(x) = p(x)m(x) + q(x)$ where $\text{deg}(q) \lt \text{deg}(m)$
+- Subtitute $A$ for $x$, $q(A)=0$
+- Only possibility is: $q(x) \equiv 0$
+- Which means $f(x) = p(x)m(x)$
+
+</Note>
+
+**If** $m(\lambda)=0$ **then** $f(\lambda)=0$.
+
+As $m(x)$ divides $f(x)$, they both have the same basic factors with different powers. The powers in $f(x)$ are called algebraic multiplicity (denoted as $a_\lambda$). The powers in $m(x)$ are called minimal mulitplicity (denoted as $m_\lambda$).
+
+```math
+n \ge a_\lambda \ge m_\lambda \ge 1 
+```
