@@ -6,12 +6,69 @@ slug: s4/linear-algebra/eigenvalues-and-eigenvectors
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.627Z
-lastUpdatedOn: 2026-04-24T07:36:29.649Z
+lastUpdatedOn: 2026-04-28T05:41:50.947Z
 ---
 
 Let $T: V\rightarrow V$ over $F$. $\lambda \in F$ and $v \in V$ satisfying $T(v)=\lambda v$ are called an eigenvalue and a corresponding eigenvector of $T$ respectively.
 
 Here for any $\lambda$, $v=\underline{0}$ is a trivial solution. Usually only non-trivial solutions are mentioned.
+
+### Properties
+
+**If** $\lambda$ is an eigenvalue of $A$ **then** $\lambda^{-1}$ is an eigenvalue of $A^{-1}$.
+
+<Note title="Proof Hint">
+
+- Assume $A$ has an inverse
+- $\lvert A - \lambda I \rvert = 0$
+- Multiply both sides by $A^{-1}$ from left
+- Rearrange to get $\lvert A^{-1} - \lambda I \rvert = 0$
+
+</Note>
+
+**If** $A^{-1} = P^{-1} A P$ for some matrix $P$ **then** $A$ and $A^{-1}$ has the same set of eigenvalues. 
+
+<Note title="Proof Hint">
+
+- Assume $A$ has an inverse
+- $\lvert A^{-1} - \lambda I \rvert = 0$
+- Subtitute for $A^{-1}$ and $I = P^{-1}P$
+- Simplify to get $\lvert A - \lambda I \rvert = 0$
+
+</Note>
+
+Product of the eigenvalues is equal to the [determinant](/s1/mathematics/matrices/determinant).
+
+<Note title="Proof Hint">
+
+- $f(\lambda) = \lvert \lambda I -  A \rvert = \prod_{i=1}^{n} (\lambda - \lambda_i) = \lambda^n + (-1)^n (\lambda_1+\lambda_2+\dots+\lambda_n)\lambda^{n-1} + O(\lambda^{n-2})$
+- $f(0) = \lvert - A \rvert = (-1)^{n} \lvert A \rvert = (-1)^{n}\big(\prod_{i=1}^{n} \lambda_i\big)$
+- $\lvert A \rvert = \prod_{i=1}^n \lambda_i$
+
+</Note>
+
+Sum of the eigenvalues is the equal to the [trace](/s1/mathematics/matrices/trace) of the matrix.
+
+<Note title="Proof Hint">
+
+- Expand $\lvert \lambda I - A\rvert$ to $\prod_{i=1}^n (\lambda - a_{ii}) = \lambda^{n} + (a_11+a_22+\dots+a_nn)\lambda^{n-1} + O(\lambda^{n-2})$
+- Use the above prove's hint and compare the coefficients of $\lambda^{n-1}$
+
+</Note>
+
+[Cayley Hamilton theorem](/s1/mathematics/matrices/cayley-hamilton-theorem) can be used to find the inverses and higher power matrices efficiently.
+
+<Note title="Proof Hint">
+
+- Suppose $f(\lambda)=\sum_{i=0}^{n} a_i\lambda^{i}$
+- Use [the below property of adjoint](/s1/mathematics/matrices/adjoint#properties) on $\lambda I - A$:    
+  $A\cdot\text{adj}(A) = \lvert A\rvert I$
+- Use $\text{adj}(\lambda I - A) = \sum_{i=1}^n B_{n-i}\lambda^{n-n}$
+- Expand both sides and equate coefficients
+- Multiple $i$th equation by $A^{n-i+1}$ (do this for all)
+- Sum all the equations
+
+</Note>
 
 ## Eigenspace
 
@@ -30,3 +87,5 @@ An eigenspace is a subspace of $V$.
 - $V_\lambda$ is closed under vector addition and scalar multiplication
 
 </Note>
+
+Basis of an eigenspace is usually given as the eigenvectors.
