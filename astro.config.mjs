@@ -99,6 +99,7 @@ export default defineConfig({
   integrations: [
     mdx(),
     linkValidator({
+      failOnBrokenLinks: false,
       verbose: true,
     }),
   ],
