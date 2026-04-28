@@ -20,8 +20,7 @@ async function insertPage(args: string[]) {
 
   const directory = relative("./", args[0]);
   const title = args[1];
-  /** @type {number | undefined} */
-  let n = undefined;
+  let n: number | undefined = undefined;
   let isDryRun = false;
 
   if (args.length >= 3) {

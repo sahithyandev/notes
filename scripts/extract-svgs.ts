@@ -107,8 +107,6 @@ function extractSvgsFromMdx(content: string): Svg[] {
   // Use regex to find SVG blocks (handles multiline, nested elements)
   const svgRegex = /<svg[^>]*>[\s\S]*?<\/svg>/g;
   let match: RegExpExecArray | null;
-  let lastIndex = 0;
-
   while ((match = svgRegex.exec(content)) !== null) {
     const svgContent = match[0];
     const start = match.index;
@@ -203,7 +201,6 @@ function processMdxFile(filePath: string, dryRun: boolean = false): void {
   const { content: contentWithoutFrontmatter, data: frontmatterData } =
     matter(content);
   const frontmatterString = matter.stringify("", frontmatterData).trim();
-  const frontmatterLength = content.indexOf(contentWithoutFrontmatter);
 
   const svgs = extractSvgsFromMdx(contentWithoutFrontmatter);
 

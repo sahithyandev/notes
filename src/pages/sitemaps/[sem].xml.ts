@@ -1,7 +1,7 @@
 import { getCollection } from "astro:content";
 import { SITE_HOST_URL } from "../../utils/values";
 
-export async function GET({ params }) {
+export async function GET({ params }: { params: { sem: string } }) {
   const { sem } = params;
   const notes = await getCollection("notes");
 
