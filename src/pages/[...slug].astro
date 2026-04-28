@@ -31,6 +31,14 @@ if (!notesEntry) {
 
 const { Content, headings } = await render(notesEntry);
 
+const prereqEntries = notesEntry.data.prereqs
+  ? (
+      await Promise.all(
+        notesEntry.data.prereqs.map((s) => getEntry("notes", s)),
+      )
+    ).filter((e): e is NonNullable<typeof e> => !!e)
+  : [];
+
 // Helper functions to generate sidebar data
 function getSemesterInfo(slugParts: string[]) {
   const match = slugParts[0].match(/^s(\d)$/);
@@ -426,6 +434,37 @@ const description = generateDescription(notesEntry.body || "");
               <span class="note-meta-item">Updated {lastUpdated}</span>
             )}
           </div>
+        )
+      }
+
+      {
+        prereqEntries.length > 0 && (
+          <aside class="prereqs">
+            <div class="prereqs-label">Prerequisites</div>
+            <ul class="prereqs-list">
+              {prereqEntries.map((p) => {
+                const semMatch = p.data.slug.match(/^s(\d)/);
+                const semNum = semMatch ? semMatch[1] : null;
+                return (
+                  <li>
+                    <a
+                      href={`/${p.data.slug}`}
+                      style={
+                        semNum
+                          ? `--sem: var(--s${semNum});`
+                          : undefined
+                      }
+                    >
+                      <span class="prereqs-title">{p.data.title}</span>
+                      {semNum && (
+                        <span class="prereqs-sem"> — Semester {semNum}</span>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
         )
       }
 
@@ -1371,6 +1410,56 @@ const description = generateDescription(notesEntry.body || "");
   .note-meta-sep {
     margin: 0 10px;
     opacity: 0.4;
+  }
+
+  .prereqs {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--sem);
+    border-radius: 6px;
+  }
+
+  .prereqs-label {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .prereqs-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .prereqs-list li {
+    margin: 0;
+  }
+
+  .prereqs-list a {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--sem);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+  }
+
+  .prereqs-list a:hover {
+    border-bottom-color: var(--sem);
+  }
+
+  .prereqs-sem {
+    color: var(--text-muted);
+    font-weight: 400;
   }
 
   /* ── TOC RAIL ─────────────────────────────────────────────────── */

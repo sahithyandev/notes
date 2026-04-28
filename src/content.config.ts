@@ -18,6 +18,7 @@ const notes = defineCollection({
     dateCreated: z.date().optional(),
     lastUpdatedOn: z.date().optional(),
     keywords: z.optional(z.array(z.string())),
+    prereqs: z.optional(z.array(z.string())),
   }),
 });
 
