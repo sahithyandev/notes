@@ -118,7 +118,7 @@ async function getRecentNotes(count: number = 4) {
     const lastUpdated = new Date(note.data.lastUpdatedOn!);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - lastUpdated.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     let lastUpdatedText: string;
     if (diffDays === 0) {
