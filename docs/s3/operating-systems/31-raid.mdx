@@ -6,7 +6,7 @@ slug: s3/operating-systems/raid
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.710Z
-lastUpdatedOn: 2026-04-24T07:36:29.647Z
+lastUpdatedOn: 2026-04-28T07:56:31.655Z
 ---
 
 Short for Redundant Array of Independent Disks. A setup of multiple disks, combined to form a single logical unit. Data is stored redundantly across disks to improve reliability. Increases mean time to failure.
@@ -143,7 +143,7 @@ Duplicate across sites. Can either be sync or async.
 
 ### ZFS
 
-Zettabyte File System (ZFS) from Solaris adds end-to-end data integrity through [checksums](/operating-systems/mass-storage-systems/#checksum) and self-healing (automatically fixes errors when redundancy exists) storage. Can find silent data corruption. Checksums are calculated per block for both data and metadata. Checksums are stored separately. When data is read, checksums are rechecked.
+Zettabyte File System (ZFS) from Solaris adds end-to-end data integrity through [checksums](/s3/operating-systems/mass-storage-systems/#checksum) and self-healing (automatically fixes errors when redundancy exists) storage. Can find silent data corruption. Checksums are calculated per block for both data and metadata. Checksums are stored separately. When data is read, checksums are rechecked.
 
 If the data is corrupted and the system is using mirrored or RAID-Z storage, ZFS can read a good copy from another disk and automatically repair the corrupted block.
 

@@ -6,7 +6,7 @@ slug: s3/operating-systems/virtual-memory
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-04-24T03:19:45.180Z
+lastUpdatedOn: 2026-04-28T07:56:31.654Z
 ---
 
 A system that allows programs to use more memory than is physically available in RAM. Achieved by combining the use of physical memory and disk space. The operating system uses paging and swapping as techniques to create an illusion of a larger memory space than what is physically available.
@@ -24,7 +24,7 @@ Each process is given its own virtual address space. CPU generates virtual addre
 
 ## Paging
 
-Virtual memory is divided into fixed-size _pages_. Page size is equal to [frame](/computer-architecture/memory/) size. Typically 4 KB or 8 KB. There can be more pages than frames.
+Virtual memory is divided into fixed-size _pages_. Page size is equal to [frame](/s3/computer-architecture/memory/) size. Typically 4 KB or 8 KB. There can be more pages than frames.
 
 Virtual memory address is composed of:
 
@@ -59,7 +59,7 @@ Page table quickly becomes very huge. Multi-level paging is used to reduce the s
 
 Multi-level paging is involves dividing the page table into multiple levels, with each level containing a smaller number of entries. This reduces the size of the page table and improves performance.
 
-[TLBs](/computer-architecture/memory#tlb) are used to speed up page table lookups.
+[TLBs](/s3/computer-architecture/memory#tlb) are used to speed up page table lookups.
 
 ### Page Replacement
 
@@ -166,7 +166,7 @@ OS maintains a ready queue of ready-to-run processes which have memory images on
 
 ### Pending I/O
 
-If a process is currently doing an I/O operation, it cannot be swapped out. Can be solved by [double buffering](/operating-systems/io-systems#double-buffering).
+If a process is currently doing an I/O operation, it cannot be swapped out. Can be solved by [double buffering](/s3/operating-systems/io-systems#double-buffering).
 
 ### Swap Implementation
 

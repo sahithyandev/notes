@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/simplified-form-of-cfg
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-04-24T03:19:45.189Z
+lastUpdatedOn: 2026-04-28T07:56:31.657Z
 ---
 
 Simplification removes unnecessary productions while preserving the language.
@@ -20,7 +20,7 @@ Aka. null productions. Allow non-terminals to derive the empty string. Null prod
 For a given CFG $G=(V, \Sigma, S, P)$, an equivalent CFG $G_1=(V,\Sigma,S,P_1)$ (with no null-productions) can be derived using the following steps:
 
 - Initialize $P_1 = P$
-- Find all nullable non-terminals ($\subseteq V$) of $G$ using [FindNull algorithm](/theory-of-computing/context-free-grammar/#findnull-algorithm)
+- Find all nullable non-terminals ($\subseteq V$) of $G$ using [FindNull algorithm](/s4/theory-of-computing/context-free-grammar/#findnull-algorithm)
 - For each $A\rightarrow \alpha$ in $P$:
   - Add all productions that can be obtained by deleting one or more occurences of nullable non-terminals in $\alpha$, to $P_1$
 - Remove $\Lambda$-productions and $A\rightarrow A$ productions from $P_1$

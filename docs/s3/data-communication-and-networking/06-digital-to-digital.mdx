@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/digital-to-digital
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.691Z
-lastUpdatedOn: 2026-04-24T07:36:29.640Z
+lastUpdatedOn: 2026-04-28T07:56:31.650Z
 ---
 
 ### Multilevel Binary
@@ -62,14 +62,14 @@ For the same error rate, NRZ is more power efficient compared to multilevel bina
 
 ### Bipolar-AMI
 
-Short for Alternate Mark Inversion. Most common [bipolar encoding scheme](/data-communication-and-networking/encoding-decoding#biploar-encoding). 0 is represented by 0. 1 is represented by non-zero level, with alternating polarity.
+Short for Alternate Mark Inversion. Most common [bipolar encoding scheme](/s3/data-communication-and-networking/encoding-decoding#biploar-encoding). 0 is represented by 0. 1 is represented by non-zero level, with alternating polarity.
 
 Pros:
 
 - No DC component
 - No loss of sync due to long sequences of 1s
 - Uses less bandwidth compared to Manchester
-- Can detect errors ([bipolar violation](/data-communication-and-networking/encoding-decoding#biploar-violation))
+- Can detect errors ([bipolar violation](/s3/data-communication-and-networking/encoding-decoding#biploar-violation))
 
 Cons:
 
@@ -83,7 +83,7 @@ Opposite of AMI. No advantage or disadvantage compared to AMI.
 
 ### Manchester
 
-Aka. Phase encoding, or PE. A [biphase encoding scheme](/data-communication-and-networking/encoding-decoding#biphase-encoding). Each bit is represented by a transition at the middle part of the bit period.
+Aka. Phase encoding, or PE. A [biphase encoding scheme](/s3/data-communication-and-networking/encoding-decoding#biphase-encoding). Each bit is represented by a transition at the middle part of the bit period.
 
 - Low to high: 1
 - High to low: 0
@@ -99,13 +99,13 @@ Used by IEEE 802.3 which defines the physical and data-link layer's media access
 
 ### Differential Manchester
 
-Aka. Differential Phase encoding, or DPE. A [biphase encoding scheme](/data-communication-and-networking/encoding-decoding#biphase-encoding) and a [differential encoding scheme](/data-communication-and-networking/encoding-decoding#differential-encoding). Midbit transition is used for clocking. Non-midbit transitions denote the data. Transition at the start of a bit is 0. No transition means 1.
+Aka. Differential Phase encoding, or DPE. A [biphase encoding scheme](/s3/data-communication-and-networking/encoding-decoding#biphase-encoding) and a [differential encoding scheme](/s3/data-communication-and-networking/encoding-decoding#differential-encoding). Midbit transition is used for clocking. Non-midbit transitions denote the data. Transition at the start of a bit is 0. No transition means 1.
 
 Used by IEEE 802.5 which is used to build local area networks.
 
 ### B8ZS
 
-[Bipolar](/data-communication-and-networking/encoding-decoding#bipolar-encoding) with 8-zero substitution. Based on [Bipolar-AMI](/data-communication-and-networking/digital-to-digital#bipolar-ami). Used to prevent long sequence of zeros in bipolar-AMI signals. Replaces 8 consecutive zeros with a special sequence that intentionally includes 2 bipolar violations.
+[Bipolar](/s3/data-communication-and-networking/encoding-decoding#bipolar-encoding) with 8-zero substitution. Based on [Bipolar-AMI](/s3/data-communication-and-networking/digital-to-digital#bipolar-ami). Used to prevent long sequence of zeros in bipolar-AMI signals. Replaces 8 consecutive zeros with a special sequence that intentionally includes 2 bipolar violations.
 
 **If** the octet is full of zeros and:
 
@@ -116,7 +116,7 @@ The intentional violations are placed to make sure the replacement is detected c
 
 ### HDB3
 
-High Density Bipolar 3-level encoding. Similar to [B8ZS](/data-communication-and-networking/digital-to-digital#b8zs). Replaces 4 consecutive zeros with patterns containing a non-zero pulse, to maintain synchronization. The exact pattern depends on the number of pulses since the last substitution, to keep it DC-balanced.
+High Density Bipolar 3-level encoding. Similar to [B8ZS](/s3/data-communication-and-networking/digital-to-digital#b8zs). Replaces 4 consecutive zeros with patterns containing a non-zero pulse, to maintain synchronization. The exact pattern depends on the number of pulses since the last substitution, to keep it DC-balanced.
 
 The substitution pattern includes:
 

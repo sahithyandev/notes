@@ -6,12 +6,12 @@ slug: s3/operating-systems/mass-storage-systems
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-04-24T03:46:02.229Z
+lastUpdatedOn: 2026-04-28T07:56:31.654Z
 ---
 
 Mass storage = non-volatile secondary storage. OS manages mass storage devices and provides file systems for data organization. OS manages free space, allocation, partitioning, and scheduling.
 
-Main devices: [HDDs](/computer-architecture/permanent-storage/#hard-disk-drives), [SSDs](/computer-architecture/permanent-storage/#solid-state-drives) ([NVM](/computer-architecture/permanent-storage/#non-volatile-memory)), magnetic tapes.
+Main devices: [HDDs](/s3/computer-architecture/permanent-storage/#hard-disk-drives), [SSDs](/s3/computer-architecture/permanent-storage/#solid-state-drives) ([NVM](/s3/computer-architecture/permanent-storage/#non-volatile-memory)), magnetic tapes.
 
 ## Terminology
 
@@ -128,7 +128,7 @@ The hardware interface on the host side that manages communication between the C
 
 ### Steps
 
-- Host places command on host controller, using [memory-mapped I/O](/computer-architecture/io/#memory-mapped) ports.
+- Host places command on host controller, using [memory-mapped I/O](/s3/computer-architecture/io/#memory-mapped) ports.
 - Host controller sends messages to device controller.
 - Device controller transferes data between device and main memory via DMA.
 
@@ -155,7 +155,7 @@ Address mapping is usually easy except:
 
 ## Disk Scheduling
 
-Disk scheduling is done differently for HDDs and NVMs. [HDD scheduling](/operating-systems/hdd-scheduling) is explained on a separate page.
+Disk scheduling is done differently for HDDs and NVMs. [HDD scheduling](/s3/operating-systems/hdd-scheduling) is explained on a separate page.
 
 ### NVM Scheduling
 
@@ -175,7 +175,7 @@ Can detect multi-bit errors. Might produce false-negatives if multiple bits are 
 
 ### CRC
 
-[Cyclic Redundancy Check](/data-communication-and-networking/information-redundancy/#crc) is a more robust and reliable form of checksum. False-negatives are very rare. Does not break for burst errors.
+[Cyclic Redundancy Check](/s3/data-communication-and-networking/information-redundancy/#crc) is a more robust and reliable form of checksum. False-negatives are very rare. Does not break for burst errors.
 
 ### ECC
 
