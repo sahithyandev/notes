@@ -161,7 +161,9 @@ const recentNotes = await getRecentNotes();
 
   <section id="semesters">
     <h2 class="section-title">All Semesters</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+    >
       {
         semestersData.map((semester) => (
           <SemesterCard
@@ -178,7 +180,9 @@ const recentNotes = await getRecentNotes();
   <section>
     <h2 class="section-title">Recent Notes</h2>
     <div id="recent">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+      >
         {
           recentNotes.map((note) => (
             <a href={`/notes/${note.slug}`} class="note-card">

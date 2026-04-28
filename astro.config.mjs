@@ -65,8 +65,7 @@ function buildModuleRedirects() {
     if (firstModule) {
       const semFirst = firstNote(join(semDir, firstModule));
       if (semFirst) {
-        redirects[`/${sem}`] =
-          `/${sem}/${firstModule}/${semFirst.slugTail}`;
+        redirects[`/${sem}`] = `/${sem}/${firstModule}/${semFirst.slugTail}`;
       }
     }
 
