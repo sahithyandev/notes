@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
+import linkValidator from 'astro-link-validator';
 
 // Only note files carry a numeric prefix; semester / module / submodule
 // directory names do not.
@@ -96,7 +97,7 @@ function buildModuleRedirects() {
 // https://astro.build/config
 export default defineConfig({
   redirects: buildModuleRedirects(),
-  integrations: [mdx()],
+  integrations: [mdx(), linkValidator()],
   markdown: {
     rehypePlugins: [rehypeKatex],
     remarkPlugins: [remarkMath],
