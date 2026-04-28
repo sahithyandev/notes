@@ -843,6 +843,17 @@ const description = generateDescription(notesEntry.body || "");
       margin: 20px 0;
       overflow-x: auto;
       position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) transparent;
+    }
+
+    pre::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 3px;
     }
 
     pre code {
@@ -1008,8 +1019,13 @@ const description = generateDescription(notesEntry.body || "");
     .katex-display {
       text-align: center;
       font-size: 1.12rem;
-      overflow-x: scroll;
+      overflow-x: auto;
       overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .katex-display::-webkit-scrollbar {
+      display: none;
     }
 
     table {
