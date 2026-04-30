@@ -67,7 +67,7 @@ async function insertPage(args: string[]) {
 
   const newFileLocation = join(
     directory,
-    `${n.toString().padStart(2, "0")}-${title}.md`,
+    `${n.toString().padStart(2, "0")}-${title}.mdx`,
   );
   console.log("writing", newFileLocation, "with the content below");
   const lines = [

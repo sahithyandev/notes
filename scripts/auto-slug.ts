@@ -1,6 +1,6 @@
 import { readdirSync } from "node:fs";
 import { rename, writeFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 
 const PATTERN_TITLE_PREFIX = /(\d+)-/;
@@ -42,7 +42,11 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
     if (!currentFrontMatter.title) {
       return;
     }
-    const relativeFromDocsDirectory = relative("docs", newFilePath);
+    const docsIndex = newFilePath.indexOf("docs/");
+    const relativeFromDocsDirectory =
+      docsIndex >= 0
+        ? newFilePath.slice(docsIndex + "docs/".length)
+        : relative("docs", newFilePath);
     const parts = relativeFromDocsDirectory.split("/");
     parts.pop();
     const section = parts.join("/");
@@ -94,13 +98,16 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
       file.data.prev = true;
       console.log(">>> prev true");
     }
-    if (i === mdFilePaths.length - 1 || !mdFilePaths[i + 1].includes(section)) {
-      file.data.next = false;
-      console.log(">>> next false");
-    } else {
-      file.data.next = true;
-      console.log(">>> next true");
-    }
+    const nextFile = mdFilePaths.slice(i + 1).find(
+      (p) =>
+        dirname(p) === dirname(filePath) &&
+        !p.includes("/summary/") &&
+        !p.includes("/images/") &&
+        (p.endsWith(".md") || p.endsWith(".mdx")) &&
+        PATTERN_TITLE_PREFIX.test(basename(p)),
+    );
+    file.data.next = nextFile !== undefined;
+    console.log(`>>> next ${file.data.next}`);
 
     if (dryRun) {
       console.log(`[DRY RUN] New slug: ${file.data.slug}`);
