@@ -190,24 +190,8 @@ const tocHeadings = headings.filter(
   (heading) => heading.depth === 2 || heading.depth === 3,
 );
 
-// Format last updated date
-function formatLastUpdated(date: Date | undefined): string | null {
-  if (!date) return null;
-  const lastUpdated = new Date(date);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - lastUpdated.getTime());
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "today";
-  if (diffDays === 1) return "yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-
-  const weeks = Math.floor(diffDays / 7);
-  if (weeks < 4) return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
-
-  const months = Math.floor(diffDays / 30);
-  return `${months} month${months > 1 ? "s" : ""} ago`;
-}
+// Pass raw ISO date for client-side calculation
+const lastUpdatedIso = notesEntry.data.lastUpdatedOn;
 
 // Calculate read time based on word count
 function calculateReadTime(content: string): number {
@@ -232,7 +216,6 @@ function generateDescription(content: string): string {
     : cleanText;
 }
 
-const lastUpdated = formatLastUpdated(notesEntry.data.lastUpdatedOn);
 const readTime = calculateReadTime(notesEntry.body || "");
 const description = generateDescription(notesEntry.body || "");
 
@@ -444,7 +427,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       <div class="note-meta">
         <div class="flex">
           <span class="note-meta-item">{readTime} min read</span>
-          <span class="note-meta-item">Updated {lastUpdated}</span>
+          <span class="note-meta-item" data-date={lastUpdatedIso}>Updated {lastUpdatedIso}</span>
         </div>
 
         <div class="flex">
@@ -808,6 +791,36 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
         });
       });
     }
+  </script>
+
+  <script>
+    function formatRelativeTime(isoDate: string): string {
+      const lastUpdated = new Date(isoDate);
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - lastUpdated.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return "today";
+      if (diffDays === 1) return "yesterday";
+      if (diffDays < 7) return `${diffDays} days ago`;
+
+      const weeks = Math.floor(diffDays / 7);
+      if (weeks < 4) return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+
+      const months = Math.floor(diffDays / 30);
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    }
+
+    // Update relative time label on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const metaElement = document.querySelector('.note-meta-item[data-date]');
+      if (metaElement) {
+        const isoDate = metaElement.getAttribute('data-date');
+        if (isoDate) {
+          metaElement.textContent = 'Updated ' + formatRelativeTime(isoDate);
+        }
+      }
+    });
   </script>
 </Layout>
 
