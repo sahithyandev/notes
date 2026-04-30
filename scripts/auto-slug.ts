@@ -98,14 +98,16 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
       file.data.prev = true;
       console.log(">>> prev true");
     }
-    const nextFile = mdFilePaths.slice(i + 1).find(
-      (p) =>
-        dirname(p) === dirname(filePath) &&
-        !p.includes("/summary/") &&
-        !p.includes("/images/") &&
-        (p.endsWith(".md") || p.endsWith(".mdx")) &&
-        PATTERN_TITLE_PREFIX.test(basename(p)),
-    );
+    const nextFile = mdFilePaths
+      .slice(i + 1)
+      .find(
+        (p) =>
+          dirname(p) === dirname(filePath) &&
+          !p.includes("/summary/") &&
+          !p.includes("/images/") &&
+          (p.endsWith(".md") || p.endsWith(".mdx")) &&
+          PATTERN_TITLE_PREFIX.test(basename(p)),
+      );
     file.data.next = nextFile !== undefined;
     console.log(`>>> next ${file.data.next}`);
 
