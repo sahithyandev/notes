@@ -829,6 +829,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     --sidebar-w: 280px;
     --toc-w: 250px;
     --nav-h: 54px;
+    --pip-size: 16px;
   }
 
   main {
@@ -1301,23 +1302,20 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     color: var(--opt-sem);
   }
 
-  .sb-sem-opt-pip {
-    width: 3px;
-    height: 16px;
+  .sb-sem-opt-pip,
+  .sb-sem-pip {
+    width: var(--pip-size);
+    height: var(--pip-size);
     border-radius: 2px;
-    background: var(--opt-sem);
     flex-shrink: 0;
+  }
+
+  .sb-sem-opt-pip {
+    background: var(--opt-sem);
   }
 
   .sb-sem-pip {
-    width: 3px;
-    height: 28px;
-    border-radius: 2px;
     background: var(--sem);
-    flex-shrink: 0;
-  }
-
-  .sb-sem-info {
   }
 
   .sb-sem-label {
