@@ -1,0 +1,117 @@
+---
+title: IPv4
+sidebar:
+  order: 7
+slug: s4/computer-networks/ipv4
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.620Z
+lastUpdatedOn: 2026-05-03T07:56:35.319Z
+prereqs:
+  - s3/data-communication-and-networking/ip
+---
+## Datagram
+
+The basic unit of data transferred in the network layer. Includes:
+
+- Header (control information)  
+  Defines how packets are routed and handled across networks. Includes:
+  - source IP address
+  - destination IP address
+  - TTL (Time To Live)
+  - protocol (TCP/UDP)
+  - checksum (error detection)
+  - fragmentation fields
+- Payload (data from transport layer)  
+  Typically contains TCP or UDP segment
+
+The header format defines how packets are routed and handled across networks.
+
+## Network and Host Parts
+
+An IP address is divided into network and host portions.
+
+- Network part  
+  Identifies the network.
+- Host part  
+  Identifies the device within the network.
+
+Hosts with same network part belong to the same network and can communicate without a router.
+
+### Network Size
+
+Depends on number of bits allocated to host portion. More bits on the host portion means larger network.
+
+This controls how many devices a network can support.
+
+## IP Address Allocation
+
+IP addresses are assigned to hosts and networks.
+
+• host assignment:
+
+- manually configured
+- dynamically via DHCP
+
+• network assignment:
+
+- ISP → allocates address block
+- ISP gets addresses from RIR (e.g., APNIC)
+- RIR gets addresses from ICANN
+
+## Dynamic Host Configuration Protocol
+
+Aka. DHCP. A protocol for dynamically assigning IP addresses to hosts. DHCP server assigns IP address to hosts.
+
+Allows automatic configuration, reuse of IP addresses and mobility.
+
+Uses DORA exchange mechanism:
+
+- Discover   
+  Host sends a broadcast message to discover DHCP servers.
+- Offer
+- Request
+- Ack
+
+- Host is discovered by the DHCP server
+- DHCP server offers a
+
+- discover → offer → request → ack
+
+## Packet Forwarding
+
+Forwarding is the process of moving packets toward destination.
+
+• routers use forwarding tables
+• decision based on destination network
+
+• cases:
+
+- same network → direct delivery
+- different network → send to next-hop router
+
+Datagram remains unchanged except for certain fields (e.g., TTL).
+
+## Address Resolution Protocol
+
+Aka. ARP. Maps IP addresses to MAC addresses in a local network. Works by broadcasting query over the network and the target replies its MAC address.
+
+Used only within local network. Cannot work in bigger networks because of broadcasting.
+
+## Longest Prefix Match
+
+Aka. LPM. Routers have to find the most specific matching prefix in their routing table when forwarding packets.
+
+If done using software (tree search), it's slow but space-efficient. If done using hardware (TCAM), it's fast but expensive and power-hungry.
+
+## Hop-by-Hop Fragmentation
+In IPv4, if a packet is too big for a link, any router can split the packet into smaller chunks. This adds processing overhead at each hop.
+## Issues
+
+- Restricted address space   
+  IPv4 has only 32 bits, limiting the number of available addresses to about 4.3 billion.
+- Huge routing table   
+  IPv4 follows flat addressing. As the internet grew, global BGP routing tables became too large (more than 1 million rows) to manage efficiently. TCAM (Ternary Content-Addressable Memory) is used to store these routing tables, which is expensive, power-hungry, and physically limited.
+- Longest Prefix Match searches take a lot of time   
+- Convergence delays   
+  If routing tables are huge, when network topology changes, it takes longer for routers to converge and update their routing tables.
