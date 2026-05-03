@@ -6,7 +6,7 @@ slug: s4/computer-networks/ipv6
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.319Z
-lastUpdatedOn: 2026-05-03T07:56:35.319Z
+lastUpdatedOn: 2026-05-03T07:59:30.500Z
 ---
 
 Uses 128-bit addresses. Consists of 8 groups of 4 hexadecimal digits separated by colons.
@@ -29,7 +29,9 @@ Introduced in 1994. Still not fully adopted.
 2. One contiguous run of all-zero groups can be replaced with `::`
 
 ## Types of IPv6 Addresses
+
 IPv6 assumes that each interface has multiple IPv6 addresses (different types for different use cases). Source address selection algorithm is defined in IPv6.
+
 ### Unicast
 
 Used to identify a single interface.
@@ -75,13 +77,14 @@ Replaced broadcast from IPv4. As there are no broadcast in IPv6, the network add
 ### Anycast
 
 Any address that is not unicast or multicast is considered anycast.
+
 ## Network and Host Parts
 
 Usually in IPv6, the network part is 64 bits and the host part is 64 bits.
 
 IPv6 uses the `/prefix-length` notation similar to IPv4.
 
-For example:  <span class="font-mono">2001:db8:85a3::/48</span>.
+For example: <span class="font-mono">2001:db8:85a3::/48</span>.
 
 ### SLAAC
 
@@ -112,21 +115,23 @@ EUI-64 is hardcoded to produce 64-bit length parts for simplicity and reduce col
 
 ### Privacy Address
 
-As EUI-64 allowed tracking a device across different connections and networks, privacy addresses were added. Instead of calculating a 64-bit interface ID using EUI-64, a random number is used instead. And different interface IDs are used for different networks. 
+As EUI-64 allowed tracking a device across different connections and networks, privacy addresses were added. Instead of calculating a 64-bit interface ID using EUI-64, a random number is used instead. And different interface IDs are used for different networks.
 
 If a LAN network is configured manually, then SLAAC is not required, and network prefix can go beyond 64 bits.
 
 ### SLAAC Steps
 
-1. Host creates a link-local address.   
+1. Host creates a link-local address.  
    Uses the fixed prefix <span class="font-mono">FE80::/10</span> and EUI-64.
-2. The host joins the  <span class="font-mono">FF02::1</span> multicast group.
+2. The host joins the <span class="font-mono">FF02::1</span> multicast group.
 3. The host sends a Router Solicitation message (ICMPv6 Type 133) to FF02::2.  
    The solicitation includes the host's own link-layer (MAC) address so routers know who's asking.
-4. If a router exists, it replies with a Router Advertisement (ICMPv6 Type 134) containing the network prefix.   
+4. If a router exists, it replies with a Router Advertisement (ICMPv6 Type 134) containing the network prefix.  
    The host combines that prefix with its EUI-64 address to form a full global unicast address.
 5. The host keeps using its link-local address for local communication.
+
 ### DHCPv6
+
 Alternative to DHCP in IPv6. Not required in IPv6. Allows stateful configuration. Requires a server for configuration. Supports DNS. Best for servers and fixed devices.
 
 Most DHCPv6 implementations assume <span class="font-mono">/64</span> network prefix, which might cause issues if a higher length network prefix is used.
@@ -135,7 +140,10 @@ Most DHCPv6 implementations assume <span class="font-mono">/64</span> network pr
 
 A direct connection between exactly 2 devices. In that case, the network part is not needed and the entire address can be used as the host part. SLAAC or EUI-64 are not required here. Usually the addresses are configured manually with `/127` or `/126` prefix length.
 
-<span class="font-mono">/127</span> is the modern recommendation by RFC 6164. <span class="font-mono">/126</span> mimics IPv4's <span class="font-mono">/30</span> (which reserved network and broadcast addresses).
+<span class="font-mono">/127</span> is the modern recommendation by RFC 6164.
+<span class="font-mono">/126</span> mimics IPv4's
+<span class="font-mono">/30</span> (which reserved network and broadcast
+addresses).
 
 ## Address Hierarchy
 
@@ -143,7 +151,7 @@ IPv6 addresses are structured as a strict hierarchy from global internet authori
 
 - Global Prefix: first 48 bits
 - Subnet ID: 16 bits
-- Interface ID: 64 bits 
+- Interface ID: 64 bits
 
 Internet Assigned Numbers Authority (IANA) controls the entire IPv6 address space. Large blocks of addresses (<span class="font-mono">/12</span> to <span class="font-mono">/23</span> ) are assigned to the 5 Regional Internet Registries.
 
@@ -154,9 +162,10 @@ Internet Assigned Numbers Authority (IANA) controls the entire IPv6 address spac
 | APNIC    | Asia-Pacific                      |
 | LACNIC   | Latin America & Caribbean         |
 | AFRINIC  | Africa                            |
+
 RIRs typically assign a <span class="font-mono">/32</span> prefix to ISPs which means each ISP has $2^{32}$ number of <span class="font-mono">/64</span> subnets to distribute.
 
-ISPs delegate a <span class="font-mono">/48</span> prefix to each customer organization (like businesses and universities). Each organization gets  $2^{16}$ subnets. Residential customers typically get a <span class="font-mono">/56</span> or <span class="font-mono">/64</span> instead.
+ISPs delegate a <span class="font-mono">/48</span> prefix to each customer organization (like businesses and universities). Each organization gets $2^{16}$ subnets. Residential customers typically get a <span class="font-mono">/56</span> or <span class="font-mono">/64</span> instead.
 
 ## Special Address Ranges
 
@@ -168,21 +177,22 @@ ISPs delegate a <span class="font-mono">/48</span> prefix to each customer organ
 | `ff00::/8`      | Multicast (replaces IPv4 broadcast)        |
 | `2000::/3`      | Global unicast (public internet addresses) |
 | `2001:db8::/32` | Documentation/examples only                |
+
 ## Header
 
 IPv6 header is always 40 bytes long.
 
-- Version (4 bits)   
+- Version (4 bits)  
   Same as IPv4.
-- Class (8 bits)   
+- Class (8 bits)  
   Similar to IPv4's "Type of Service" field. Used for QoS. Marks packets for priority handling.
-- Flow Label (20 bits)   
+- Flow Label (20 bits)  
   A new addition in IPv6. Allows routers to identify and handle packets belonging to the same _flow_ (e.g., a video stream) without inspecting inner layers. Set by the source.
-- Payload Length (16 bits)   
+- Payload Length (16 bits)  
   The size of the data following the header, in bytes. Unlike IPv4, this does not include the header itself.
-- Next Header (8 bits)   
+- Next Header (8 bits)  
   Identifies what comes after the IPv6 header. Either an upper-layer protocol (like TCP = 6, UDP = 17) or an _extension header_. Replaces IPv4's _Protocol_ and _Options_ fields. Enables IPv6's flexible extension header chaining.
-- Hop Limit (8 bits)   
+- Hop Limit (8 bits)  
   Equivalent to IPv4's TTL (Time to Live). Decremented by 1 at each router. Packet is discarded when it reaches 0. Prevents infinite routing loops.
 - Source address (128 bits)
 - Destination address (128 bits)
@@ -190,53 +200,66 @@ IPv6 header is always 40 bytes long.
 Header checksums from IPv4 are removed, preferring checksums in other layers.
 
 ## Extension Header
+
 Inserted between the base header and the payload. Optional. Each extension header starts with its length measured in 8-bytes units.
 
 Types:
-- Hop-by-Hop Options Header   
+
+- Hop-by-Hop Options Header  
   Must be the first one if present. Processed by every routers.
-- Routing Header   
+- Routing Header  
   Defines the intermediate nodes that the packet must go through. Set by the source host. A maximum of 88 intermediate addresses are supported. Deprecated because of security issues.
-- Fragmentation Header   
+- Fragmentation Header  
   Used to fragment the packet.
-- Destination Options Header   
+- Destination Options Header  
   Optional information meant only for the destination.
-- Authentication Header   
+- Authentication Header  
   A hashed value of all immutable fields of the packet. Does not work with NAT.
-- Encrypted Security Payload Header   
+- Encrypted Security Payload Header  
   Provides encryption, integrity and authentication of the payload.
 
 ## Packet Fragmentation
+
 In IPv6, only the source host handles fragmentation of the packets. Fragmentation is handled via Fragmentation extension header.
 
 If a router receives a packet too large to forward, it simply drops it and sends back an ICMPv6 _Packet Too Big_ message to the source.
+
 ### Path MTU Discovery
+
 As routers cannot fragment the packets, maximum transmission unit size of the path (of the packet) must be initially calculated. The host repeatedly tries different sizes of ICMPv6 packets until the transmission succeeds.
 
 IPv6 mandates that all links and routers must support a minimum MTU of 1280 bytes.
+
 ## Tunnel
+
 A transition mechanism that allows IPv6 packets to be transmitted over IPv4 networks (and vice versa) by encapsulating one protocol's packets inside another's. The encapsulation is done at the entry and exit points of a tunnel.
 
 Might cause issues because:
+
 - IPv4 does not honor IPv6 options
 - Tunneling adds an overhead which might hit maximum MTU.
 
 Application Layer Gateway (ALG) is required if application code contains IP addresses.
 
 ## ICMPv6
+
 Alternative to ICMP in IPv4. Required for packet fragmentation and path MTU discovery. As ICMPv6 cannot be blocked (as opposed to ICMP), rate limiting must be defined in the IPv6 spec to prevent it from becoming an actor vector.
 
 ## Transitions Issues
+
 IPv4 and IPv6 are not natively interoperable. The solution was to dual-stack everything (i.e. make them support both) or use Application Layer Gateways.
+
 ### Root Servers
+
 Servers at the root of DNS resolving. Had to be upgraded to serve both versions.
+
 ### Nameservers
 
 Nameservers introduced new record types to support IPv6.
 
- - A records   
-   Maps hostnames to IPv4 addresses
-- AAAA records   
+- A records  
+  Maps hostnames to IPv4 addresses
+- AAAA records  
   Map hostnames to IPv6 addresses
 
 <Note>
@@ -246,19 +269,23 @@ IPv4 address is 4 bytes. IPv6 address is 16 bytes, 4 times the IPv4. Hence A and
 </Note>
 ### MX records
 
-MX records in DNS points to a hostname. If the host has only A type or AAAA type record, the IPv4-only or IPv6-only sender cannot send their email. 
+MX records in DNS points to a hostname. If the host has only A type or AAAA type record, the IPv4-only or IPv6-only sender cannot send their email.
+
 ### Software upgrade to all L3 devices
 
 Layer 3 devices (routers, multilayer switches) handle IP routing. Since IPv6 is hugely different from IPv4, every L3 device needs a software/firmware update to understand and forward IPv6 packets.
 
 Even the OS or routing software must explicitly support IPv6 routing, neighbor discovery, and related protocols.
+
 ### Hardware accelerator changes
 
-Many L2 and L3 devices use dedicated hardware to do certain tasks. These are often programmed for IPv4's packet structure. As IPv6 is different, certain hardware may require reprogramming or even physical replacement. 
+Many L2 and L3 devices use dedicated hardware to do certain tasks. These are often programmed for IPv4's packet structure. As IPv6 is different, certain hardware may require reprogramming or even physical replacement.
 
 L2 switches can also be affected if they do any IP-aware processing.
+
 ### Firewalls
 
 Firewalls need to be updated in two ways.
+
 1. The software must be able to inspect IPv6 traffic.
 2. Rulesets must be rewritten or mirrored for IPv6.
