@@ -178,7 +178,9 @@ const recentNotes = await getRecentNotes();
                 </div>
                 <div class="note-card-title">{note.title}</div>
                 <div class="note-card-foot">
-                  <span class="note-card-meta" data-date={note.lastUpdatedIso}>{note.lastUpdatedIso}</span>
+                  <span class="note-card-meta" data-date={note.lastUpdatedIso}>
+                    {note.lastUpdatedIso}
+                  </span>
                   <span class="note-card-cta">Read &rarr;</span>
                 </div>
               </div>
@@ -372,10 +374,12 @@ const recentNotes = await getRecentNotes();
   }
 
   // Update all relative time labels on page load
-  document.addEventListener('DOMContentLoaded', () => {
-    const metaElements = document.querySelectorAll('.note-card-meta[data-date]');
+  document.addEventListener("DOMContentLoaded", () => {
+    const metaElements = document.querySelectorAll(
+      ".note-card-meta[data-date]",
+    );
     metaElements.forEach((el) => {
-      const isoDate = el.getAttribute('data-date');
+      const isoDate = el.getAttribute("data-date");
       if (isoDate) {
         el.textContent = formatRelativeTime(isoDate);
       }
