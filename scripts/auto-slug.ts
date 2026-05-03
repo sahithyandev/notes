@@ -1,5 +1,5 @@
 import { readdirSync } from "node:fs";
-import { rename, writeFile } from "node:fs/promises";
+import { lstat, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 
@@ -51,8 +51,14 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
     parts.pop();
     const section = parts.join("/");
 
+    const stat = await lstat(dryRun ? filePath : newFilePath);
+
     file.data = {
       ...currentFrontMatter,
+      dateCreated:
+        currentFrontMatter.dateCreated ?? stat.birthtime.toISOString(),
+      lastUpdatedOn:
+        currentFrontMatter.lastUpdatedOn ?? stat.mtime.toISOString(),
     };
 
     const slugSection = relativeFromDocsDirectory.replace(".mdx", "");
