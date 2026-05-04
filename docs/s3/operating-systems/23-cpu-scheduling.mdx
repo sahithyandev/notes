@@ -6,7 +6,7 @@ slug: s3/operating-systems/cpu-scheduling
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-04-24T07:36:29.647Z
+lastUpdatedOn: 2026-05-04T09:51:20.271Z
 ---
 
 Determines the order in which processes or threads are given access to the processor, aiming to optimize various aspects such as CPU utilization, throughput, turnaround time, waiting time, and response time.
@@ -54,11 +54,11 @@ Aka. swapper. Handles swapping processes in and out of memory to improve process
 
 ### Non-preemptive
 
-When scheduling takes place only under circumstances 1 (running -> waiting) and 4 (terminates). A running process continues to use the CPU until completion or by switching to the waiting state. Processes cannot be interrupted.
+Process runs to completion or until blocked. Higher-priority processes must wait. Executing task cannot be stopped. Has a risk of priority inversion.
 
 ### Preemptive
 
-When scheduling is not nonpreemptive. Processes can be interrupted. Might cause race conditions. Commonly used in general purpose OSes.
+Processes can be interrupted. Might cause race conditions. Commonly used in general purpose OSes.
 
 ## Dispatcher
 
