@@ -1,0 +1,89 @@
+---
+title: Real Time OS
+sidebar:
+  order: 10
+dateCreated: 2026-05-04T09:25:34.261Z
+lastUpdatedOn: 2026-05-04T09:50:20.944Z
+slug: s4/software-engineering/real-time-os
+prev: true
+next: false
+prereqs:
+  - s3/operating-systems/cpu-scheduling
+  - s3/operating-systems/interrupt-driven-io
+---
+
+Aka. RTOS. Lightweight platforms providing minimal features for real-time software.
+
+Examples:
+
+- FreeRTOS
+- Windows CE
+- Apache Nuttx
+
+### RTOS vs. Conventional OS
+
+Conventional OSes (such as Linux and macOS) are:
+
+- complex
+- feature-rich
+- large disk footprint
+  They provide file systems, runtime process management. Has coarse-grained process scheduling control.
+
+RTOS strips non-essential features. Omits file management. Optimized for deterministic, fine-grained scheduling.
+
+## Components
+
+### Real-Time Clock
+
+Provides periodic time ticks for process scheduling.
+
+### Interrupt Handler
+
+Manages aperiodic or out-of-frequency requests.
+
+### Scheduler
+
+Selects the next process for execution. Inputs: clock ticks + interrupt signals.
+
+### Resource manager
+
+Allocates processor and memory to scheduled processes.
+
+### Dispatcher
+
+Initiates execution of the selected process on available hardware.
+
+## Process Management
+
+Manages concurrent periodic and aperiodic processes. Scheduling based on execution period and deadline.
+
+2 priority levels:
+
+1. Interrupt level  
+   Highest. Reserved for time-critical interrupts.
+2. Clock level  
+   Allocated to periodic processes.
+
+How interrupts are handled is already explained in [Interrupt Driven IO - Operating Systems from S3](s3/operating-systems/interrupt-driven-io).
+
+### Periodic Processes
+
+Differ across three dimensions:
+
+- Period  
+  Time between successive executions.
+- Execution time  
+  Duration of a single execution.
+- Deadline  
+  Completion deadline for each instance.
+
+### Scheduling Strategies
+
+May use [non-preemptive](/s3/operating-systems/cpu-scheduling#non-preemptive-scheduling) or [preemptive scheduling](/s3/operating-systems/cpu-scheduling#preemptive-scheduling).
+
+Algorithms applicable under both strategies:
+
+- Round robin.
+- Shortest deadline first.
+
+The resource manager and dispatcher operate in sequence after scheduling.
