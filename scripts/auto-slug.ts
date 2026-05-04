@@ -53,12 +53,16 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
 
     const stat = await lstat(dryRun ? filePath : newFilePath);
 
+    const toDate = (v: unknown): Date | undefined => {
+      if (v instanceof Date) return v;
+      if (typeof v === "string") return new Date(v);
+      return undefined;
+    };
+
     file.data = {
       ...currentFrontMatter,
-      dateCreated:
-        currentFrontMatter.dateCreated ?? stat.birthtime.toISOString(),
-      lastUpdatedOn:
-        currentFrontMatter.lastUpdatedOn ?? stat.mtime.toISOString(),
+      dateCreated: toDate(currentFrontMatter.dateCreated) ?? stat.birthtime,
+      lastUpdatedOn: toDate(currentFrontMatter.lastUpdatedOn) ?? stat.mtime,
     };
 
     const slugSection = relativeFromDocsDirectory.replace(".mdx", "");

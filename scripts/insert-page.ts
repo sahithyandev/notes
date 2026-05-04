@@ -70,11 +70,14 @@ async function insertPage(args: string[]) {
     `${n.toString().padStart(2, "0")}-${title}.mdx`,
   );
   console.log("writing", newFileLocation, "with the content below");
+  const now = new Date().toISOString();
   const lines = [
     "---",
     `title: ${hyphenCaseToTitleCase(title)}`,
     "sidebar:",
     `  order: ${n}`,
+    `dateCreated: ${now}`,
+    `lastUpdatedOn: ${now}`,
     "---",
   ];
   for (const line of lines) {
