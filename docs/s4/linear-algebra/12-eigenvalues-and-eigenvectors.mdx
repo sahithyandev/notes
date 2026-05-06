@@ -6,9 +6,10 @@ slug: s4/linear-algebra/eigenvalues-and-eigenvectors
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.627Z
-lastUpdatedOn: 2026-04-30T05:33:04.641Z
+lastUpdatedOn: 2026-05-06T19:36:36.348Z
 prereqs:
   - s1/mathematics/matrices/eigenvalues-eigenvectors
+  - s1/mathematics/matrices/diagonalization
 ---
 
 Let $T: V\rightarrow V$ over $F$. $\lambda \in F$ and $v \in V$ satisfying $T(v)=\lambda v$ are called an eigenvalue and a corresponding eigenvector of $T$ respectively.
@@ -34,7 +35,7 @@ Here for any $\lambda$, $v=\underline{0}$ is a trivial solution. Usually only no
 
 - Assume $A$ has an inverse
 - $\lvert A^{-1} - \lambda I \rvert = 0$
-- Subtitute for $A^{-1}$ and $I = P^{-1}P$
+- Substitute for $A^{-1}$ and $I = P^{-1}P$
 - Simplify to get $\lvert A - \lambda I \rvert = 0$
 
 </Note>
@@ -62,7 +63,7 @@ Sum of the eigenvalues is the equal to the [trace](/s1/mathematics/matrices/trac
 
 <Note title="Proof Hint">
 
-- Suppose $f(\lambda)=\sum_{i=0}^{n} a_i\lambda^{i}$
+- Suppose $ f(\lambda)=\sum\_{i=0}^{n} a_i\lambda^{i} $
 - Use [the below property of adjoint](/s1/mathematics/matrices/adjoint#properties) on $\lambda I - A$:  
   $A\cdot\text{adj}(A) = \lvert A\rvert I$
 - Use $\text{adj}(\lambda I - A) = \sum_{i=1}^n B_{n-i}\lambda^{n-n}$
@@ -98,9 +99,9 @@ Use the above conclusion for a polynomial.
 
 For a given $\lambda \in F$, the set of corresponding eigenvectors.
 
-```math
+$$
 V_\lambda = \set{ v\in V | T(v)=\lambda v }
-```
+$$
 
 An eigenspace is a subspace of $V$.
 
@@ -114,9 +115,22 @@ An eigenspace is a subspace of $V$.
 
 Basis of an eigenspace is usually given as the eigenvectors.
 
+For any eigenvalues $\lambda_1$ and $\lambda_2$,
+
+$$
+V_{\lambda_1} \cap V_{\lambda_2} = \set { \underline{0} }
+$$
+
+<Note title="Proof Hint">
+
+- Let $B_1$ and $B_2$ are bases of
+-
+
+</Note>
+
 ### Geometric Multiplicity
 
-Dimension of $V_\lambda$.
+Dimension of $V_\lambda$. Denoted as $g_\lambda$.
 
 ## Minimal Polynomial
 
@@ -151,8 +165,19 @@ $m(x)$ divides $f(x)$.
 
 **If** $m(\lambda)=0$ **then** $f(\lambda)=0$.
 
-As $m(x)$ divides $f(x)$, they both have the same basic factors with different powers. The powers in $f(x)$ are called algebraic multiplicity (denoted as $a_\lambda$). The powers in $m(x)$ are called minimal mulitplicity (denoted as $m_\lambda$).
+As $m(x)$ divides $f(x)$, they both have the same basic factors with different powers. The powers in $f(x)$ are called algebraic multiplicity ($a_\lambda$). The powers in $m(x)$ are called minimal mulitplicity ($m_\lambda$).
 
-```math
+$$
 n \ge a_\lambda \ge m_\lambda \ge 1
-```
+$$
+
+## Diagonalization
+
+[Basics for Diagonalization](/s1/mathematics/matrices/diagonalization) is already covered in 1st semester.
+
+The following statements are equivalent:
+
+- $A \in C_{n\times n}$ is diagonalizable
+- $a_\lambda = g_\lambda$
+- $m_\lambda = 1$
+- Eigenvectors form a basis for $C_n$

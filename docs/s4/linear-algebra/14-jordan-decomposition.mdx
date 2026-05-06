@@ -1,0 +1,59 @@
+---
+title: Jordan Decomposition
+sidebar:
+  order: 14
+dateCreated: 2026-05-05T19:13:22.425Z
+lastUpdatedOn: 2026-05-06T19:36:36.348Z
+slug: s4/linear-algebra/jordan-decomposition
+prev: true
+next: true
+prereqs:
+  - s1/mathematics/matrices/diagonalization
+---
+
+The process of decomposing a square matrix $A$ into this form:
+
+$$
+A = PJP^{-1}
+$$
+
+Here:
+
+- $J$ is the Jordan form of $A$
+- $P$ is an invertible matrix where the columns are generalized eigenvectors of $A$
+
+Generalizes diagonalization when matrix is not diagonalizable. Every square matrix $A$ is Jordan-decomposable.
+
+## Jordan Block
+
+Denoted by $B(\lambda,m)$. An upper triangular matrix $B_{m\times m}$ is a Jordan block **iff**:
+
+- All $m$ diagonal elements are the same eigenvalue ($\lambda$) and
+- All super-diagonal elements are $1$
+
+$$
+B(\lambda, m) =
+\begin{pmatrix}
+\lambda & 1 & 0 & \cdots & 0 & 0 \\
+\vdots  & \vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & \lambda & 1 \\
+0 & 0 & 0 & \cdots & 0 & \lambda
+\end{pmatrix}
+$$
+
+## Jordan Form
+
+$J$ from the decomposition.
+
+$$
+J = \text{diag}(B(λ_1, m_1), B(λ_2, m_2), \dots , B(λ_k, m_k))
+$$
+
+Here:
+
+- $\lambda_i$ is an eigenvalue of $A$ for $i=1,2,\dots,m$
+- $m_i$ is the algebraic multiplicity of $\lambda_i$
+
+## Matrix of Generalized Vectors
+
+$P$ from the decomposition.
