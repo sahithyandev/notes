@@ -1,0 +1,87 @@
+---
+title: Spanning Tree
+sidebar:
+  order: 16
+slug: s4/graph-theory/spanning-tree
+prev: true
+next: true
+dateCreated: 2026-04-27T04:57:01.895Z
+lastUpdatedOn: 2026-05-09T18:16:38.723Z
+---
+
+A subgraph of a connected simple graph $G$ that is a tree containing every vertex of $G$. Spanning trees are not unique in general.
+
+For any simple graph $G$:
+$$
+G\text{ is connected} \iff G\text{ has a spanning tree}
+$$
+
+<Note title="Proof Hint">
+
+TODO.
+
+</Note>
+
+Any tree has a unique spanning tree, which is itself.
+
+## Finding Spanning Trees
+
+Two efficient algorithms for constructing spanning trees by adding edges incrementally. Both avoid the inefficient approach of removing edges from circuits.
+
+### Breadth-First Search
+
+Aka. BFS or level-order construction. Builds the spanning tree level by level from a chosen root.
+
+**Steps:**
+
+1. Order all vertices arbitrarily.
+2. Select first vertex as root — level 0.
+3. Add all edges incident to the root. New vertices form level 1.
+4. For each level-$k$ vertex (in order), add all incident edges not creating a circuit. New vertices form level $k+1$.
+5. Repeat until all vertices are added.
+
+**Pseudocode:**
+
+```
+bfs(V, E):
+  S = (v₁)                  // ordered list starting at root
+  V' = {v₁}; E' = ∅
+  while (true):
+    for each x ∈ S, in order:
+      for each y ∈ V − V', in order:
+        if (x, y) is an edge:
+          add (x, y) to E'; add y to V'
+    if (no edges were added):
+      return T
+    S = children of S ordered by original vertex ordering
+```
+
+#### Connectivity test
+Apply BFS to $G$ with $n$ vertices. $G$ is connected iff the resulting tree $T$ has $n$ vertices.
+
+### Depth-First Search
+
+Aka. DFS or backtracking algorithm. Proceeds as deep as possible along a path before backtracking.
+
+**Steps:**
+
+1. Order all vertices arbitrarily.
+2. Select first vertex as root.
+3. Add edge to the highest-priority unvisited adjacent vertex. Move to that vertex.
+4. Repeat — extend the path as far as possible.
+5. When no extension is possible, backtrack to the previous vertex.
+6. From there, attempt to extend again. Repeat until all vertices added.
+
+**Pseudocode:**
+
+```
+dfs(V, E):
+  V' = {v₁}; E' = ∅; w = v₁
+  while (true):
+    while (∃ edge (w, v) not creating a cycle in T):
+      choose edge (w, vₖ) with minimum k not creating a cycle
+      add (w, vₖ) to E'; add vₖ to V'; w = vₖ
+    if (w == v₁):
+      return T
+    w = parent of w in T   // backtrack
+```

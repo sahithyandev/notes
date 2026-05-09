@@ -1,0 +1,49 @@
+---
+title: Minimum Spanning Tree
+sidebar:
+  order: 17
+dateCreated: 2026-05-09T13:36:38.203Z
+lastUpdatedOn: 2026-05-09T18:16:38.723Z
+slug: s4/graph-theory/minimum-spanning-tree
+prev: true
+next: true
+prereqs:
+  - s2/data-structures-and-algorithms/algorithms/kruskals-algorithm
+  - s2/data-structures-and-algorithms/algorithms/prims-algorithm
+---
+
+A spanning tree of a weighted undirected connected graph $G$ with  minimum total edge weight.
+
+Both algorithms below build the MST by greedily adding minimum-weight edges.
+
+## Prim's Algorithm
+
+For a weighted connected undirected graph $G$, finds a minimum spanning tree. Starts from an edge. At each step, adds the minimum-weight edge incident to the current tree that does not form a circuit.
+
+**Pseudocode:**
+
+```
+Prim(G):                        // G: weighted connected undirected, n vertices
+  T := minimum-weight edge
+  for i := 1 to n − 2:
+    e := min-weight edge incident to a vertex in T, not forming a simple circuit in T
+    T := T with e added
+  return T
+```
+
+## Kruskal's Algorithm
+
+Builds the MST by selecting globally minimum-weight edges one at a time, that does not form a circuit, regardless of adjacency to current tree.
+
+**Pseudocode:**
+
+```
+Kruskal(G):                     // G: weighted connected undirected, n vertices
+  T := empty graph
+  for i := 1 to n − 1:
+    e := any edge in G with smallest weight not forming a simple circuit in T
+    T := T with e added
+  return T
+```
+
+Both Prim's and Kruskal's produce a valid MST. They may yield different trees if multiple edges share the minimum weight.

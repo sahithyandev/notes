@@ -6,10 +6,10 @@ slug: s4/graph-theory/rooted-tree
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-04-27T04:57:01.895Z
+lastUpdatedOn: 2026-05-09T18:16:38.722Z
 ---
 
-A tree where a vertex is designated as the _root_ vertex.
+A tree with a _root_ vertex.
 
 ### Height
 
@@ -21,7 +21,7 @@ For a given vertex $v$, length of the simple path from the root to $v$.
 
 ### Parent
 
-For a given vertex $v$, its parent vertex is the unique vertex $u$ where $\text{level}(u) \lt \text{level}(v)$ and there is an edge between $u$ and $v$.
+For a given vertex $v$, its parent vertex is the unique vertex $u$ where $\text{level}(u) = \text{level}(v) - 1$ and there is an edge between $u$ and $v$.
 
 ### Child
 
@@ -41,11 +41,11 @@ For a given vertex $v$, all vertices that have $v$ as their ancestor.
 
 ### Leaf
 
-In a rooted tree, a leaf does not have any children.
+A vertex without any children.
 
 ### Internal vertices
 
-Vertices that have children.
+Vertices that have children. Non-leaf vertices.
 
 ## Sub-rooted tree
 
@@ -56,26 +56,3 @@ tree consisting of $a$ and its descendants and all edges incident to these desce
 
 Vertices represent the decision points or events, where a decision could be made. Edges represent the possible decisions/outcomes of different choices.
 
-## Representation of Algebraic Expressions
-
-There are 3 common forms of algebraic expressions.
-
-### Infix form
-
-The symbol is written in-between the operands. The form we usually use.
-
-Example: $x*y$
-
-### Prefix form
-
-Aka. Polish form. The symbol is written before the operands.
-
-$x*y$'s prefix form is: $* x y$
-
-Parantheses are not required.
-
-### Postfix form
-
-Aka. reverse Polish form. The symbol is written after the operands. Used commonly when parsing algebraic expressions in calculators.
-
-$x*y$'s prefix form is: $x y *$
