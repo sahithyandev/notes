@@ -9,6 +9,7 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 import { titleize } from "../utils";
+import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -504,7 +505,9 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       }
 
       <article data-pagefind-body>
-        <Content components={{ Note, WalksVennDiagram }} />
+        <Content
+          components={{ Note, WalksVennDiagram, TreePropertiesProofs }}
+        />
       </article>
 
       {
@@ -919,6 +922,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       display: flex;
       flex-direction: column;
       gap: 5px;
+      list-style: decimal;
     }
 
     strong {

@@ -1,0 +1,462 @@
+<svg id="tree-props-proof" width="100%" viewBox="0 0 680 720" role="img">
+  <title>Tree characterisation equivalence proof</title>
+  <desc
+    >Four equivalent characterisations of a tree in a diamond layout. Each arrow
+    uses a dedicated lane so no two arrow paths share the same corridor.</desc
+  >
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </marker>
+  </defs>
+
+  <!-- NODE 1 (top centre): x=220..460, y=50..114 -->
+  <g class="c-purple">
+    <rect x="220" y="50" width="240" height="64" rx="8" stroke-width="0.5"
+    ></rect>
+    <text
+      class="th"
+      x="340"
+      y="75"
+      text-anchor="middle"
+      dominant-baseline="central">Statement 1</text
+    >
+    <text
+      class="ts"
+      x="340"
+      y="97"
+      text-anchor="middle"
+      dominant-baseline="central">T is a tree</text
+    >
+  </g>
+
+  <!-- NODE 2 (right): x=450..660, y=320..396 -->
+  <g class="c-teal">
+    <rect x="450" y="320" width="210" height="76" rx="8" stroke-width="0.5"
+    ></rect>
+    <text
+      class="th"
+      x="555"
+      y="344"
+      text-anchor="middle"
+      dominant-baseline="central">Statement 2</text
+    >
+    <text
+      class="ts"
+      x="555"
+      y="365"
+      text-anchor="middle"
+      dominant-baseline="central">Unique path between</text
+    >
+    <text
+      class="ts"
+      x="555"
+      y="381"
+      text-anchor="middle"
+      dominant-baseline="central">any two vertices</text
+    >
+  </g>
+
+  <!-- NODE 3 (left): x=20..230, y=320..396 -->
+  <g class="c-coral">
+    <rect x="20" y="320" width="210" height="76" rx="8" stroke-width="0.5"
+    ></rect>
+    <text
+      class="th"
+      x="125"
+      y="344"
+      text-anchor="middle"
+      dominant-baseline="central">Statement 3</text
+    >
+    <text
+      class="ts"
+      x="125"
+      y="365"
+      text-anchor="middle"
+      dominant-baseline="central">T connected and</text
+    >
+    <text
+      class="ts"
+      x="125"
+      y="381"
+      text-anchor="middle"
+      dominant-baseline="central">|E(T)| = |V(T)| − 1</text
+    >
+  </g>
+
+  <!-- NODE 4 (bottom centre): x=220..460, y=590..666 -->
+  <g class="c-amber">
+    <rect x="220" y="590" width="240" height="76" rx="8" stroke-width="0.5"
+    ></rect>
+    <text
+      class="th"
+      x="340"
+      y="614"
+      text-anchor="middle"
+      dominant-baseline="central">Statement 4</text
+    >
+    <text
+      class="ts"
+      x="340"
+      y="635"
+      text-anchor="middle"
+      dominant-baseline="central">T acyclic and</text
+    >
+    <text
+      class="ts"
+      x="340"
+      y="651"
+      text-anchor="middle"
+      dominant-baseline="central">|E(T)| = |V(T)| − 1</text
+    >
+  </g>
+
+  <!-- ARROW 1→2: right outer lane x=614 -->
+  <g class="ag">
+    <path
+      class="al"
+      d="M460,82 L601,82 Q614,82 614,95 L614,295 Q614,308 601,308 L568,308 Q555,308 555,315 L555,320"
+      fill="none"
+      stroke="var(--s)"
+      stroke-width="1"
+      marker-end="url(#arrow)"></path>
+    <path
+      class="hit"
+      d="M460,82 L601,82 Q614,82 614,95 L614,295 Q614,308 601,308 L568,308 Q555,308 555,315 L555,320"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="12"
+      pointer-events="stroke"
+      opacity="0"></path>
+    <rect
+      class="lb"
+      x="468"
+      y="130"
+      width="140"
+      height="52"
+      rx="5"
+      fill="var(--bg2)"
+      stroke="var(--b)"
+      stroke-width="0.5"></rect>
+    <text
+      class="ts"
+      x="538"
+      y="149"
+      text-anchor="middle"
+      dominant-baseline="central">Connectivity gives path;</text
+    >
+    <text
+      class="ts"
+      x="538"
+      y="167"
+      text-anchor="middle"
+      dominant-baseline="central">two paths → cycle → ✗</text
+    >
+  </g>
+
+  <!-- ARROW 2→1: right inner lane x=482 -->
+  <g class="ag">
+    <path
+      class="al"
+      d="M555,320 L555,235 Q555,222 542,222 L495,222 Q482,222 482,209 L482,95 Q482,82 469,82 L460,82"
+      fill="none"
+      stroke="var(--s)"
+      stroke-width="1"
+      marker-end="url(#arrow)"></path>
+    <path
+      class="hit"
+      d="M555,320 L555,235 Q555,222 542,222 L495,222 Q482,222 482,209 L482,95 Q482,82 469,82 L460,82"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="12"
+      pointer-events="stroke"
+      opacity="0"></path>
+    <rect
+      class="lb"
+      x="274"
+      y="196"
+      width="176"
+      height="52"
+      rx="5"
+      fill="var(--bg2)"
+      stroke="var(--b)"
+      stroke-width="0.5"></rect>
+    <text
+      class="ts"
+      x="362"
+      y="215"
+      text-anchor="middle"
+      dominant-baseline="central">Unique paths → connected</text
+    >
+    <text
+      class="ts"
+      x="362"
+      y="233"
+      text-anchor="middle"
+      dominant-baseline="central">and acyclic → tree</text
+    >
+  </g>
+
+  <!-- ARROW 1→3: left outer lane x=66 -->
+  <g class="ag">
+    <path
+      class="al"
+      d="M220,82 L79,82 Q66,82 66,95 L66,295 Q66,308 79,308 L112,308 Q125,308 125,315 L125,320"
+      fill="none"
+      stroke="var(--s)"
+      stroke-width="1"
+      marker-end="url(#arrow)"></path>
+    <path
+      class="hit"
+      d="M220,82 L79,82 Q66,82 66,95 L66,295 Q66,308 79,308 L112,308 Q125,308 125,315 L125,320"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="12"
+      pointer-events="stroke"
+      opacity="0"></path>
+    <rect
+      class="lb"
+      x="62"
+      y="130"
+      width="148"
+      height="52"
+      rx="5"
+      fill="var(--bg2)"
+      stroke="var(--b)"
+      stroke-width="0.5"></rect>
+    <text
+      class="ts"
+      x="136"
+      y="149"
+      text-anchor="middle"
+      dominant-baseline="central">Induction on |V|: remove</text
+    >
+    <text
+      class="ts"
+      x="136"
+      y="167"
+      text-anchor="middle"
+      dominant-baseline="central">leaf, both counts −1</text
+    >
+  </g>
+
+  <!-- ARROW 3→4: left descend lane x=125, elbow y=548 -->
+  <g class="ag">
+    <path
+      class="al"
+      d="M125,396 L125,535 Q125,548 138,548 L207,548 Q220,548 220,561 L220,590"
+      fill="none"
+      stroke="var(--s)"
+      stroke-width="1"
+      marker-end="url(#arrow)"></path>
+    <path
+      class="hit"
+      d="M125,396 L125,535 Q125,548 138,548 L207,548 Q220,548 220,561 L220,590"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="12"
+      pointer-events="stroke"
+      opacity="0"></path>
+    <rect
+      class="lb"
+      x="132"
+      y="452"
+      width="172"
+      height="64"
+      rx="5"
+      fill="var(--bg2)"
+      stroke="var(--b)"
+      stroke-width="0.5"></rect>
+    <text
+      class="ts"
+      x="218"
+      y="472"
+      text-anchor="middle"
+      dominant-baseline="central">If cycle exists,</text
+    >
+    <text
+      class="ts"
+      x="218"
+      y="490"
+      text-anchor="middle"
+      dominant-baseline="central">|E| ≥ |V|, contradicts</text
+    >
+    <text
+      class="ts"
+      x="218"
+      y="508"
+      text-anchor="middle"
+      dominant-baseline="central">|E| = |V| − 1</text
+    >
+  </g>
+
+  <!-- ARROW 4→1: far-right lane x=664, clears N2 right edge (x=660) -->
+  <g class="ag">
+    <path
+      class="al"
+      d="M460,628 L651,628 Q664,628 664,615 L664,95 Q664,82 651,82 L460,82"
+      fill="none"
+      stroke="var(--s)"
+      stroke-width="1"
+      marker-end="url(#arrow)"></path>
+    <path
+      class="hit"
+      d="M460,628 L651,628 Q664,628 664,615 L664,95 Q664,82 651,82 L460,82"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="12"
+      pointer-events="stroke"
+      opacity="0"></path>
+    <rect
+      class="lb"
+      x="468"
+      y="452"
+      width="172"
+      height="78"
+      rx="5"
+      fill="var(--bg2)"
+      stroke="var(--b)"
+      stroke-width="0.5"></rect>
+    <text
+      class="ts"
+      x="554"
+      y="472"
+      text-anchor="middle"
+      dominant-baseline="central">Acyclic + disconnected</text
+    >
+    <text
+      class="ts"
+      x="554"
+      y="490"
+      text-anchor="middle"
+      dominant-baseline="central">= forest of m trees;</text
+    >
+    <text
+      class="ts"
+      x="554"
+      y="508"
+      text-anchor="middle"
+      dominant-baseline="central">|E|=|V|−1 forces m=1,</text
+    >
+    <text
+      class="ts"
+      x="554"
+      y="526"
+      text-anchor="middle"
+      dominant-baseline="central">so T is connected</text
+    >
+  </g>
+</svg>
+<style>
+  #tree-props-proof {
+    --s: #4c4c5e;
+    --bg2: #ffffff;
+    --b: #e0deda;
+    --hl: #6b38a0;
+    --hl-bg: rgba(107, 56, 160, 0.1);
+  }
+  :root[data-theme="dark"] #tree-props-proof {
+    --s: #aab0ca;
+    --bg2: #212430;
+    --b: #353849;
+    --hl: #a89eff;
+    --hl-bg: rgba(168, 158, 255, 0.14);
+  }
+  #tree-props-proof .th {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--tpp-node-color);
+  }
+  #tree-props-proof .ts {
+    font-size: 10.5px;
+    fill: var(--s);
+  }
+  #tree-props-proof .ag .al {
+    transition:
+      stroke 0.18s ease,
+      stroke-width 0.18s ease;
+  }
+  #tree-props-proof .ag:hover .al {
+    stroke: var(--hl) !important;
+    stroke-width: 2 !important;
+  }
+  #tree-props-proof .ag .lb {
+    transition:
+      stroke 0.18s ease,
+      fill 0.18s ease;
+  }
+  #tree-props-proof .ag:hover .lb {
+    stroke: var(--hl) !important;
+    fill: var(--hl-bg) !important;
+  }
+  #tree-props-proof .c-purple {
+    --tpp-node-color: #6b38a0;
+  }
+  #tree-props-proof .c-purple rect {
+    fill: rgba(107, 56, 160, 0.08);
+    stroke: rgba(107, 56, 160, 0.45);
+  }
+  #tree-props-proof .c-teal {
+    --tpp-node-color: #0e7a96;
+  }
+  #tree-props-proof .c-teal rect {
+    fill: rgba(14, 122, 150, 0.08);
+    stroke: rgba(14, 122, 150, 0.45);
+  }
+  #tree-props-proof .c-coral {
+    --tpp-node-color: #b84030;
+  }
+  #tree-props-proof .c-coral rect {
+    fill: rgba(184, 64, 48, 0.08);
+    stroke: rgba(184, 64, 48, 0.45);
+  }
+  #tree-props-proof .c-amber {
+    --tpp-node-color: #8a5a18;
+  }
+  #tree-props-proof .c-amber rect {
+    fill: rgba(138, 90, 24, 0.08);
+    stroke: rgba(138, 90, 24, 0.45);
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-purple {
+    --tpp-node-color: #c090ee;
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-purple rect {
+    fill: rgba(168, 112, 224, 0.12);
+    stroke: rgba(168, 112, 224, 0.55);
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-teal {
+    --tpp-node-color: #28b4d4;
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-teal rect {
+    fill: rgba(40, 180, 212, 0.12);
+    stroke: rgba(40, 180, 212, 0.55);
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-coral {
+    --tpp-node-color: #f07868;
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-coral rect {
+    fill: rgba(240, 120, 104, 0.12);
+    stroke: rgba(240, 120, 104, 0.55);
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-amber {
+    --tpp-node-color: #d89040;
+  }
+  :root[data-theme="dark"] #tree-props-proof .c-amber rect {
+    fill: rgba(216, 144, 64, 0.12);
+    stroke: rgba(216, 144, 64, 0.55);
+  }
+</style>
