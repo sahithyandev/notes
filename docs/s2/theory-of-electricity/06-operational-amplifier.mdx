@@ -6,7 +6,7 @@ slug: s2/theory-of-electricity/operational-amplifier
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.602Z
-lastUpdatedOn: 2026-04-24T07:36:29.636Z
+lastUpdatedOn: 2026-05-10T07:10:02.675Z
 ---
 
 A high-gain electronic voltage amplifier with a differential input and, usually,
@@ -26,9 +26,9 @@ source. Aka. op-amp.
 
 The ratio between the output and the difference between the input voltages.
 
-```math
+$$
 A = \frac{V_0}{V_d}
-```
+$$
 
 ## Equivalent circuit
 
@@ -99,9 +99,9 @@ Image from [Spiceman](https://spiceman.net/inverting-amplifier-circuit/)
 </figcaption>
 </figure>
 
-```math
+$$
 A_v = \text{Closed-loop voltage gain} = \frac{v_0}{v_\text{in}} = -\frac{R_2}{R_1}
-```
+$$
 
 ### Non-inverting amplifier
 
@@ -111,9 +111,9 @@ Input signal is fed to non-inverting input terminal. Inverting input terminal is
 grounded through $R_1$ resistor. Negative feedback is used with $R_2$ resistor.
 Negative feedback is used with $R_2$ resistor.
 
-```math
+$$
 A_v = \frac{v_0}{v_\text{in}} = 1 + \frac{R_2}{R_1}
-```
+$$
 
 Here:
 
@@ -126,9 +126,9 @@ Here:
 An extension of the inverting amplifier. Multiple input signals are added
 together.
 
-```math
+$$
 v_0 = -\left(\frac{R_f}{R_1}v_1 + \frac{R_f}{R_2}v_2 + \ldots + \frac{R_f}{R_n}v_n\right)
-```
+$$
 
 ### Differential amplifier
 
@@ -138,9 +138,9 @@ Used to amplify the difference between two input signals.
 
 When $\frac{R_4}{R_3} = \frac{R_2}{R_1}$: $ $
 
-```math
+$$
 v_0 = \frac{R_2}{R_1}(v_1 - v_2)
-```
+$$
 
 Otherwise, the output must be derived.
 
@@ -152,9 +152,9 @@ Input is fed to inverting input terminal through a resistor $R$. Non-inverting
 input terminal is grounded. Negative feedback through a capacitor. Includes a
 reset switch. Output is the integral of the input signal. $ $
 
-```math
+$$
 v_0 = -\frac{1}{RC}\int_0^t v_\text{in}\text{d}t
-```
+$$
 
 ### Differentiator
 
@@ -164,6 +164,6 @@ Input is fed to inverting input terminal through a capacitor $C$. Non-inverting
 input terminal is grounded. Negative feedback through a resistor $R$. Output is
 the derivative of the input signal.
 
-```math
+$$
 v_0 = -RC\frac{\text{d}v_\text{in}}{\text{d}t}
-```
+$$

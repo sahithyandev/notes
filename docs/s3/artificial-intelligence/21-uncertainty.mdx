@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/uncertainty
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-04-24T07:36:29.639Z
+lastUpdatedOn: 2026-05-10T07:10:02.680Z
 ---
 
 In real life systems, AI has to support uncertainty. Probability theory provides a mathematical framework for reasoning under uncertainty.
@@ -56,23 +56,23 @@ Aka. probability space. Defined by sample space $\Omega$ and probability functio
 
 Given a joint distribution, probability of any proposition φ:
 
-```math
+$$
 P(φ)=\sum_{\omega: \omega\models φ} P(ω)
-```
+$$
 
 Conditional inference uses normalization:
 
-```math
+$$
 P(\text{Cavity}|\text{Toothache})=\alpha P(\text{Cavity},\text{Toothache})
-```
+$$
 
 Here $\alpha$ is a constant ensuring probabilities sum to 1.
 
 In general:
 
-```math
+$$
 P(Y|E=e)=α\sum_h P(Y,E=e,H=h)
-```
+$$
 
 Here $H$ means hidden variables. Time complexity is $O(2^n)$ for $n$ binary variables.
 
@@ -80,9 +80,9 @@ Here $H$ means hidden variables. Time complexity is $O(2^n)$ for $n$ binary vari
 
 $A$ and $B$ are conditionally independent given $C$ **if**:
 
-```math
+$$
 P(A,B|C)=P(A|C)P(B|C)
-```
+$$
 
 Reduces required parameters from exponential to linear in n. Useful for efficient probabilistic reasoning.
 
@@ -90,9 +90,9 @@ Reduces required parameters from exponential to linear in n. Useful for efficien
 
 Assumes conditional independence of effects given the cause:
 
-```math
+$$
 P(\text{Cause},\text{Effect}_1,…,\text{Effect}_n)=P(\text{Cause})\prod_i P\left(\text{Effect}_i|\text{Cause}\right)
-```
+$$
 
 Simplifies computation—parameters grow linearly with n.
 Example: P(Cavity|toothache ∧ catch) computed from individual conditional probabilities.

@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/state-minimization
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.634Z
-lastUpdatedOn: 2026-04-24T07:36:29.650Z
+lastUpdatedOn: 2026-05-10T07:10:02.690Z
 ---
 
 The process of reducing the number of states in a DFA. The equivalent DFA with the minimum number of states is called the minimal DFA. For a regular language, its minimal DFA is unique up to state renaming.
@@ -55,9 +55,9 @@ Implies that for all language $L$ there exists a unique minimal DFA with a numbe
 
 Two strings $x$ and $y$ are equivalent with respect to a language $L$ **iff**:
 
-```math
+$$
 \forall z \ in L, xz \in L \iff yz \in L
-```
+$$
 
 ## Table Filling Algorithm
 
@@ -83,9 +83,9 @@ Mark pairs where one state is final and the other is non-final. These states are
 
 For each unmarked pair $(p,q)$, examine transitions for every input symbol
 
-```math
+$$
 \delta(p, a) = r \text{ and } \delta(q, a) = s
-```
+$$
 
 If pair $(r,s)$ is already marked, then $(p,q)$ must also be marked.
 

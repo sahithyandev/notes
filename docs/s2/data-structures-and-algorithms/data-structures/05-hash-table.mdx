@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/data-structures/hash-table
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.590Z
-lastUpdatedOn: 2026-04-28T07:56:31.643Z
+lastUpdatedOn: 2026-05-10T07:10:02.669Z
 ---
 
 A data structure that implements an associative array, a structure that can map
@@ -43,9 +43,9 @@ A good hash function distributes keys uniformly across the array, minimizing col
 
 The hashed value is the remainder of the key divided by the size of the array.
 
-```math
+$$
 H(k) = k \mod m
-```
+$$
 
 Usually, $m$ is chosen as a prime, not close to power of 2.
 
@@ -53,9 +53,9 @@ Usually, $m$ is chosen as a prime, not close to power of 2.
 
 The hashed value is the fractional part of the product of the key and a constant.
 
-```math
+$$
 H(k) = \lfloor m(kA \mod 1) \rfloor\;\; \text{where}\; 0\lt A \lt 1
-```
+$$
 
 Usually, $m$ is a power of 2, but can be any value.
 
@@ -78,9 +78,9 @@ Array slots where the values are stored.
 
 The ratio of the number of elements in the hash table to the number of buckets.
 
-```math
+$$
 \text{Load Factor} = \frac{\text{Number of Elements}}{\text{Number of Buckets}}
-```
+$$
 
 Must be kept reasonable for optimal performance. Probably between 0.5 and 0.75.
 

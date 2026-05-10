@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/complexity-analysis
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.587Z
-lastUpdatedOn: 2026-04-24T03:19:45.143Z
+lastUpdatedOn: 2026-05-10T07:10:02.668Z
 ---
 
 A way of comparing different algorithms. Algorithms' time to run is hard to
@@ -55,9 +55,9 @@ Suppose $f,g$ are 2 functions of $n$. $ $
 $f(n) \in O(g(n))$ **iff**
 $\exists\, c \gt 0 \land  n_0 \in \mathbb{N}\;\; \text{s.t}$:
 
-```math
+$$
 \forall n \ge n_0,\; f(n) \le c* g(n)
-```
+$$
 
 An asymptotic upper bound.
 
@@ -66,9 +66,9 @@ An asymptotic upper bound.
 $f(n) \in \Omega(g(n))$ **iff**
 $\exists\, c \gt 0 \land  n_0 \in \mathbb{N}\;\; \text{s.t}$:
 
-```math
+$$
 \forall n \ge n_0,\; f(n) \ge c* g(n)
-```
+$$
 
 An asymptotic lower bound.
 
@@ -77,9 +77,9 @@ An asymptotic lower bound.
 $f(n) \in \Theta(g(n))$ **iff**
 $\exists\, c_1, c_2 \gt 0 \land  n_0 \in \mathbb{N}\;\; \text{s.t}$:
 
-```math
+$$
 \forall n \ge n_0,\; c_1 * g(n) \le f(n) \le c_2* g(n)
-```
+$$
 
 An asymptotic equivalence. A tight characterization unlike Big-O or Big-Omega.
 
@@ -92,46 +92,46 @@ removed in the analysis. Not used as much as the other three. $ $
 
 $f(n) \in o(g(n))$ **iff** $\forall \epsilon \gt 0,\;\exists N\;\text{s.t}$:
 
-```math
+$$
 \forall n \ge N,\;|f(n)|\le\epsilon|g(n)|
-```
+$$
 
 Strict upper bound characterization.
 
 Implies Big-O.
 
-```math
+$$
 f(n) \in o(g(n)) \implies f(n) \in O(g(n))
-```
+$$
 
 Implies "not Big-Theta".
 
-```math
+$$
 f(n) \in o(g(n)) \implies f(n) \not\in \Theta(g(n))
-```
+$$
 
 ### Little-omega
 
 $f(n) \in \omega(g(n))$ **iff**
 $\forall \epsilon \gt 0,\;\exists N\;\text{s.t}$:
 
-```math
+$$
 \forall n \ge N,\;|f(n)|\ge\epsilon|g(n)|
-```
+$$
 
 Strict lower bound characterization.
 
 Implies Big-Omega.
 
-```math
+$$
 f(n) \in \omega(g(n)) \implies f(n) \in \Omega(g(n))
-```
+$$
 
 Implies "not Big-Theta".
 
-```math
+$$
 f(n) \in \omega(g(n)) \implies f(n) \not\in \Theta(g(n))
-```
+$$
 
 ## Limit definitions
 
@@ -175,9 +175,9 @@ g(n) = \omega(f(n))
 
 ### Big-O & Big-Omega
 
-```math
+$$
 f(n) \in O(g(n)) \iff g(n) \in \Omega(f(n))
-```
+$$
 
 ### Big-Theta => Big-O & Big-Omega
 
@@ -189,9 +189,9 @@ f(n) \in \Omega(g(n))
 
 ### Big-Theta equivalence
 
-```math
+$$
 f(n) \in \Theta(g(n)) \iff g(n) \in \Theta(f(n))
-```
+$$
 
 ## Real life timing
 

@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/numerical-methods/fixed-point-method
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.593Z
-lastUpdatedOn: 2026-04-24T07:36:29.633Z
+lastUpdatedOn: 2026-05-10T07:10:02.672Z
 ---
 
 The number $p$ is a fixed point of the function $f$ **iff** $f(p) = p$.
@@ -19,9 +19,9 @@ at least one fixed point in $[a,b]$.
 **If** in addition, $g'(x)$ exists on $(a,b)$ and
 $\exists k\ \in (0,1)$ such that:
 
-```math
+$$
 \Big\rvert g'(x)\Big\rvert \leq k \;\; \forall x \in (a,b)
-```
+$$
 
 **Then** $g$ has a unique fixed point in $(a,b)$.
 
@@ -69,10 +69,10 @@ def fixed_point(g, p0, tolerance=1e-6, max_iteration_count=100):
 
 **Then** both equations mentioned below hold:
 
-```math
+$$
 \Big\lvert p_n - p \Big\rvert \le k^n \max\Big\{p_0 - a, b - p_0\Big\}
-```
+$$
 
-```math
+$$
 \lvert p_n - p \rvert \le \frac{k^n}{1-k} \lvert p_1 - p_0 \rvert
-```
+$$

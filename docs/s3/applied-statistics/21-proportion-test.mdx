@@ -6,7 +6,7 @@ slug: s3/applied-statistics/proportion-test
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.682Z
-lastUpdatedOn: 2026-04-24T07:36:29.638Z
+lastUpdatedOn: 2026-05-10T07:10:02.679Z
 ---
 
 Used to test whether the sample proportion $p̂$ from a population differs significantly from a claimed or hypothesized population proportion $p_0$.
@@ -17,23 +17,23 @@ Let $p$ the true population proportion, $\hat{p} = \frac{x}{n}$. Here $x$ = numb
 
 Then:
 
-```math
+$$
 H_0 : p = p_0
-```
+$$
 
 Alternative hypothesis depends on the problem:
 
-```math
+$$
 H_1 : p < p_0 \quad \text{(left-tailed)}
-```
+$$
 
-```math
+$$
 H_1 : p > p_0 \quad \text{(right-tailed)}
-```
+$$
 
-```math
+$$
 H_1 : p \neq p_0 \quad \text{(two-tailed)}
-```
+$$
 
 ## Test Statistic
 
@@ -54,16 +54,16 @@ Z = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1 - p_0)}{n}}}
 
 The confidence interval for $p$ is:
 
-```math
+$$
 \hat{p} \pm Z_{1-\alpha/2} \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
-```
+$$
 
 If $p_0$ lies outside the confidence interval, reject $H_0$ at significance level $\alpha$.
 
 ### Binomial Test
 
-```math
+$$
 X \sim \text{Binomial}(n, p_0)
-```
+$$
 
 For tailed tests, calculate p-value directly by summing over binomial probabilities. $H_0$ is rejected if $p\text{-value} \le \alpha$.

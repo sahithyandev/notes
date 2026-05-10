@@ -6,7 +6,7 @@ slug: s3/applied-statistics/linear-regression
 prev: true
 next: false
 dateCreated: 2026-04-22T07:09:10.683Z
-lastUpdatedOn: 2026-04-24T07:36:29.638Z
+lastUpdatedOn: 2026-05-10T07:10:02.680Z
 ---
 
 The simplest method in statistics used to model and predict the relationship between continuous variables.
@@ -26,15 +26,15 @@ Linear regression involving 2 variables, dependent (response) and independent (e
 
 General population model:
 
-```math
+$$
 Y = \alpha + \beta X
-```
+$$
 
 For an individual observation:
 
-```math
+$$
 y_i = \alpha + \beta x_i + \varepsilon_i
-```
+$$
 
 where
 
@@ -50,9 +50,9 @@ Shows how much of the variance in ($Y$) is explained by ($X$). Denoted by $R^2$.
 
 Denoted by $\text{ESS}$.
 
-```math
+$$
 ESS = \sum (y_i - \alpha - \beta x_i)^2
-```
+$$
 
 ## Estimation of Parameters
 
@@ -60,65 +60,65 @@ Suppose the fitted regression line is $\hat{y} = \hat{\alpha} + \hat{\beta}x$. F
 
 By setting partial derivatives to zero gives the **normal equations**:
 
-```math
+$$
 \sum y_i = n\alpha + \beta \sum x_i
-```
+$$
 
-```math
+$$
 \sum x_i y_i = \alpha \sum x_i + \beta \sum x_i^2
-```
+$$
 
 Solving gives:
 
-```math
+$$
 \hat{\beta} = \frac{n\sum x_i y_i - (\sum x_i)(\sum y_i)}{n\sum x_i^2 - (\sum x_i)^2}
-```
+$$
 
-```math
+$$
 \hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}
-```
+$$
 
 Alternate form using deviations:
 
-```math
+$$
 \hat{\beta} = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}
-```
+$$
 
 ## Sampling Distribution of Beta
 
 Under the normal error assumption $\varepsilon_i \sim N(0, \sigma^2)$:
 
-```math
+$$
 \hat{\beta} \sim N\left(\beta, \frac{\sigma^2}{S_{xx}}\right)
-```
+$$
 
 where $S\_{xx} = \sum (x_i - \bar{x})^2 = n\sigma $.
 
 When $\sigma^2$ is unknown, estimate it using:
 
-```math
+$$
 s^2 = \frac{ESS}{n - 2}
-```
+$$
 
 A confidence interval for the true slope $\beta$ is:
 
-```math
+$$
 \hat{\beta} \pm t_{\alpha/2, n-2} \times \frac{s}{\sqrt{S_{xx}}}
-```
+$$
 
 ## Hypothesis Testing on the Regression Coefficient
 
 To test whether $X$ significantly predicts $Y$:
 
-```math
+$$
 H_0: \beta = 0 \quad \text{and} \quad H_1: \beta \neq 0
-```
+$$
 
 Test statistic:
 
-```math
+$$
 t = \frac{\hat{\beta} - 0}{s / \sqrt{S_{xx}}} \sim t_{n-2}
-```
+$$
 
 If $|t| > \text{critical value}$, reject $H_0$, which means the relationship between X and Y is statistically significant.
 

@@ -6,7 +6,7 @@ slug: s2/theory-of-electricity/filters
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.602Z
-lastUpdatedOn: 2026-04-24T03:19:45.153Z
+lastUpdatedOn: 2026-05-10T07:10:02.676Z
 ---
 
 In electronic circuits, filters are components or systems designed to attenuate (reduce) certain frequencies while allowing others to pass through. They process signals based on their frequency content, making them essential for applications like audio systems, radio communications, power supplies, and signal processing.
@@ -15,15 +15,15 @@ In electronic circuits, filters are components or systems designed to attenuate 
 
 Describes a function's frequency response. Shows how the filter modifies the amplitude and phase of different frequencies. Typically represented as a ratio of the output voltage to the input voltage in the frequency domain.
 
-```math
+$$
 H(f) = \frac{V_{out}}{V_{in}}
-```
+$$
 
 A transfer function's magnitude value can be converted to decibels using the formula:
 
-```math
+$$
 H(f)_{dB} = 20 \log_{10} \lvert H(f) \rvert
-```
+$$
 
 ### Bode plot
 
@@ -109,25 +109,25 @@ Contains resistors and one type of reactive component.
 
 $f_B$ is the frequency at which the power of the signal is reduced by half, and called "half power frequency". $ $
 
-```math
+$$
 f_B = \frac{1}{2\pi R C}\;\; \text{or}\;\; f_B = \frac{R}{2\pi L}
-```
+$$
 
 #### First-order low-pass filter
 
 ![First-order low-pass filter](./images/first-order-low-pass.jpg)
 
-```math
+$$
 H(f) = \frac{1}{1 + j(f/f_B)}
-```
+$$
 
 When $f=f_B$, the magnitude response is $-3\,\text{dB}$ or $0.707$ of the maximum amplitude. And the phase response is $-45^\circ$.
 
 #### First-order high-pass filter
 
-```math
+$$
 H(f) = \frac{1}{1 - j(f_B/f)}
-```
+$$
 
 ### Second-order
 
@@ -135,9 +135,9 @@ H(f) = \frac{1}{1 - j(f_B/f)}
 
 Contains resistors, capacitors, and inductors. Provides a roll-off rate of $40\,\text{dB}$ per decade (or $12\,\text{dB}$ per octave) beyond the cutoff frequency, making them more effective at signal rejection than first-order filters.
 
-```math
+$$
 Q = \frac{2\pi f_0 L}{R} = \frac{1}{2\pi f_0 C R}
-```
+$$
 
 Here $f_0$ is the resonance frequency. Higher $Q$ means higher selectivity, and narrower bandwidth.
 

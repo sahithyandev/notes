@@ -6,14 +6,14 @@ slug: s2/theory-of-electricity/laplace-transform
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-04-24T07:36:29.636Z
+lastUpdatedOn: 2026-05-10T07:10:02.676Z
 ---
 
 A mathematical operation that transforms a function of time $f(t)$, into a function of a complex variable, denoted as $F(s)$. Mathematically, the Laplace Transform of a function $f(t)$ is defined as:
 
-```math
+$$
 F(s) = \mathcal{L}\{f(t)\} = \int_{0}^{\infty} e^{-st} f(t) \, \text{d}t
-```
+$$
 
 Here:
 
@@ -27,17 +27,17 @@ Can only be applied to casual functions. Converts a differential equation (time 
 
 A function of time $f(t)$ satisfying: $ $
 
-```math
+$$
 f(t) = 0 \quad \text{for} \quad t < 0
-```
+$$
 
 ### Inverse Laplace transform
 
 If $\mathcal{L}\{f(t)\} = F(s)$, then the inverse Laplace Transform is given by: $ $
 
-```math
+$$
 f(t) = \mathcal{L}^{-1}\{F(s)\} = \frac{1}{2\pi j} \int_{\sigma - j\infty}^{\sigma + j\infty} e^{st} F(s) \, \text{d}s
-```
+$$
 
 ## Special functions
 
@@ -53,9 +53,9 @@ u(t) =
 
 Laplace transform of the unit step function is:
 
-```math
+$$
 \mathcal{L}\{u(t)\} = \frac{1}{s}
-```
+$$
 
 ### Unit impulse function
 
@@ -69,21 +69,21 @@ Laplace transform of the unit step function is:
 
 Laplace transform of the unit impulse function is:
 
-```math
+$$
 \mathcal{L}\{\delta(t)\} = 1
-```
+$$
 
 Area under the curve is $1$. $ $
 
-```math
+$$
 \int_{-\infty}^{\infty} \delta(t)\, \text{d}t = 1
-```
+$$
 
 And it has a special property:
 
-```math
+$$
 \int_{-\infty}^{\infty} f(t-k)\,\delta(t)\, \text{d}t = f(k)
-```
+$$
 
 ### Unit ramp function
 
@@ -97,9 +97,9 @@ t, & t>0
 
 Laplace transform of the unit ramp function is:
 
-```math
+$$
 \mathcal{L}\{r(t)\} = \frac{1}{s^2}
-```
+$$
 
 ## Circuit transformation
 
@@ -117,59 +117,59 @@ Suppose $f(t)$ has a Laplace transform $F(s)$ for the below definitions.
 
 $a$ and $b$ are constants.
 
-```math
+$$
 \mathcal{L}\{a f(t) + b g(t)\} = a \mathcal{L}\{f(t)\} + b \mathcal{L}\{g(t)\}
-```
+$$
 
 ### Differentiation
 
-```math
+$$
 \mathcal{L}\{f'(t)\} = sF(s) - f(0^+)
-```
+$$
 
-```math
+$$
 \mathcal{L}\{f''(t)\} = s^2F(s) - sf(0^+) - f'(0^+)
-```
+$$
 
-```math
+$$
 \mathcal{L}\{f^{(n)}(t)\} = s^nF(s) - \sum_{k=1}^{n-1} {s^{k} f(0^+)} - \sum_{k=1}^{n-1} f^{(k)}(0^+)
-```
+$$
 
 ### Integration
 
-```math
+$$
 \mathcal{L}\left\{\int_{0}^{t} f(t) \, \text{d}t\right\} = \frac{F(s)}{s}
-```
+$$
 
 ### Time Scaling
 
-```math
+$$
 \mathcal{L}\left\{f\left(\frac{t}{a}\right)\right\} = aF\left(as\right)
-```
+$$
 
 ### Frequency Scaling
 
-```math
+$$
 \mathcal{L}^{-1}\left\{F\left(\frac{s}{a}\right)\right\} = af\left(at\right)
-```
+$$
 
 ### Multiplication by t
 
-```math
+$$
 \mathcal{L}\left\{t^n f(t)\right\} = (-1)^n \frac{\text{d}^n F(s)}{\text{d}s^n}
-```
+$$
 
 ### Time shift
 
-```math
+$$
 \mathcal{L}\left\{f(t - T)\right\} = e^{-sT}F(s)
-```
+$$
 
 ### Frequency shift
 
-```math
+$$
 \mathcal{L}^{-1}\{F(s+a)\} = e^{-at}f(t)
-```
+$$
 
 ## Theorems
 

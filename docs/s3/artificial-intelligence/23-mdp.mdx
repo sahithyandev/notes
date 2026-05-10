@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/mdp
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-04-24T07:36:29.639Z
+lastUpdatedOn: 2026-05-10T07:10:02.681Z
 ---
 
 Aka. MDP. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
@@ -62,17 +62,17 @@ A policy that exhaustively defines the action for all the states. Results in a r
 
 The process of computing the state-value function $V_\pi$ for a given policy $\pi$.
 
-```math
+$$
 V_\pi (s) = \sum_{s'} T\left(s,\pi(s),s'\right) \Big[ R\left(s,\pi(s),s'\right) + \gamma V_\pi(s') \Big]
-```
+$$
 
 ### Discounting rewards
 
 It's reasonable to prefer rewards sooner. A solution for incorporating discounting rewards is to use a discount factor $\gamma \in (0,1]$ that reduces the importance of future rewards. The discounted reward is denoted as:
 
-```math
+$$
 G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
-```
+$$
 
 Here:
 
@@ -119,9 +119,9 @@ Represents the decision point where the opponent chooses an action that minimize
 
 Represents uncertainty such as dice rolls or card draws. The value of a chance node is the expected value over all possible outcomes:
 
-```math
+$$
 V = \sum_i P(i) \times V_i
-```
+$$
 
 Here:
 
@@ -169,9 +169,9 @@ Here:
 
 Once the threshold is reached, the algorithm terminates. $\pi^*(s)$ can be found by the latest iteration's results.
 
-```math
+$$
 \pi^*(s) = \arg\max_a Q^*(s,a)
-```
+$$
 
 Requirements for convergence:
 
@@ -274,9 +274,9 @@ Similar to value iteration. Calculates q-values instead of state-values. Approxi
 
 Initially $Q_0(s,a) = 0, \forall s \in S,\; a \in A$.
 
-```math
+$$
 Q_{k+1}(s,a) = \sum_{s'} T(s,a,s') \Big[ R(s,a,s') + \gamma \max_{a'} Q_k(s',a') \Big]
-```
+$$
 
 Here:
 
@@ -300,9 +300,9 @@ Alternates between two steps until convergence:
 
 For a deterministic policy $\pi$, the Bellman equation for $V^\pi$ is:
 
-```math
+$$
 V^\pi(s) = sum\_{s'} T(s,\pi(s),s*) [ R(s,\pi(s),s') + \gamma V^\pi(s') ]
-```
+$$
 
 Policy iteration typically converges in a finite number of policy improvements for finite MDPs to an optimal policy π\*.
 

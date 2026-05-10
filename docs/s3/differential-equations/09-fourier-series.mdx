@@ -6,16 +6,16 @@ slug: s3/differential-equations/fourier-series
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.702Z
-lastUpdatedOn: 2026-04-24T07:36:29.644Z
+lastUpdatedOn: 2026-05-10T07:10:02.685Z
 ---
 
 Used to decompose periodic non-sinusoidal waveforms into a sum of sinusoidal ones.
 
 Suppose $f(x)$ is a $2\pi$-periodic function.
 
-```math
+$$
 f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \big[ a_n \cos\left(nx\right) + b_n \sin\left(nx\right) \big]
-```
+$$
 
 ### Useful trigonometric integrals
 
@@ -24,9 +24,9 @@ f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \big[ a_n \cos\left(nx\right) + b_n \
 \int_{\tau}^{\tau + T} \sin(nx)\, \text{d}x = 0
 ```
 
-```math
+$$
 \int_{\tau}^{\tau + T} \sin(nx) \cos(mx) \, \text{d}t = 0
-```
+$$
 
 ```math
 \int_{\tau}^{\tau + T} \sin(nx) \sin(mx) \, \text{d}x = \begin{cases}
@@ -46,13 +46,13 @@ f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \big[ a_n \cos\left(nx\right) + b_n \
 
 $\forall n \geq 0$. $ $
 
-```math
+$$
 a_n = \frac{2}{T} \int_{\tau}^{\tau + T} f(x)\cos(nx) \, \text{d}x
-```
+$$
 
-```math
+$$
 b_n = \frac{2}{T} \int_{\tau}^{\tau + T} f(x)\sin(nx)\, \text{d}x
-```
+$$
 
 $\cfrac{a_0}{2}$ is the DC offset. $ $
 
@@ -64,9 +64,9 @@ For any waveform, subtracting the DC offset results in a symmetrical waveform.
 
 When a wave is symmetric about the y-axis.
 
-```math
+$$
 f(x) = f(-t)
-```
+$$
 
 The fourier series of an even waveform contains only cosine terms.
 
@@ -80,9 +80,9 @@ b_n = 0
 
 When a wave is symmetric about the origin.
 
-```math
+$$
 f(x) = -f(-t)
-```
+$$
 
 The fourier series of an odd waveform contains only sine terms.
 
@@ -168,9 +168,9 @@ Then:
 - At continuity points, Fourier series = f(x)
 - At discontinuities, it converges to
 
-```math
+$$
 \frac{f(c^-)+f(c^+)}{2}
-```
+$$
 
 ## Piecewise-Defined Periodic Functions
 
@@ -221,9 +221,9 @@ And $b_n = 0$.
 
 The function is extended as an odd function.
 
-```math
+$$
 b_n=\frac{2}{\pi}\int_0^\pi f(x)\sin nx\,dx
-```
+$$
 
 And $a_0 = a_n = 0$.
 
@@ -231,51 +231,51 @@ And $a_0 = a_n = 0$.
 
 For period $2l$:
 
-```math
+$$
 f(x)=\frac{a_0}{2}+\sum_{n=1}^{\infty}\left[a_n\cos\left(\frac{n\pi x}{l}\right)+b_n\sin\left(\frac{n\pi x}{l}\right)\right]
-```
+$$
 
 Coefficients:
 
-```math
+$$
 a_0=\frac{1}{l}\int_{-l}^{l}f(x)\,dx
-```
+$$
 
-```math
+$$
 a_n=\frac{1}{l}\int_{-l}^{l}f(x)\cos\left(\frac{n\pi x}{l}\right)\,dx
-```
+$$
 
-```math
+$$
 b_n=\frac{1}{l}\int_{-l}^{l}f(x)\sin\left(\frac{n\pi x}{l}\right)\,dx
-```
+$$
 
 ## Parseval’s Identity
 
 A method to find higher order algebraic series, that is, for $n>2$:
 
-```math
+$$
 \sum_{i=1}^\infty \frac{1}{i^n}
-```
+$$
 
 For period $2c$:
 
-```math
+$$
 \int_{-c}^{c}[f(x)]^2\,dx = c\left[\frac{a_0^2}{2}+\sum_{n=1}^{\infty}(a_n^2 + b_n^2)\right]
-```
+$$
 
 ## Complex Form
 
 For period 2π:
 
-```math
+$$
 f(x)=\sum_{n=-\infty}^{\infty} c_n e^{-inx}
-```
+$$
 
 where
 
-```math
+$$
 c_n=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(x)e^{inx}\,dx
-```
+$$
 
 Here:
 

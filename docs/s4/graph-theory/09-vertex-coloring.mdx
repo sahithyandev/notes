@@ -6,7 +6,7 @@ slug: s4/graph-theory/vertex-coloring
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-04-28T07:56:31.655Z
+lastUpdatedOn: 2026-05-10T07:10:02.688Z
 ---
 
 Aka. proper vertex coloring. The assignment of colors to vertices such that no two adjacent vertices have the same color. If a maximum of $m$ colors are used, then referred to as $m$-coloring.
@@ -32,21 +32,21 @@ A polynomial representing the number of proper vertex colorings of a graph for $
 
 For [$K_n$](/s4/graph-theory/types-of-graphs/#complete-graph),
 
-```math
+$$
 P(G,x) = \prod_{i=0}^{n-1} {x - i}
-```
+$$
 
 For a [null graph](/s4/graph-theory/types-of-graphs/#null-graph) with $n$ vertices,
 
-```math
+$$
 P(G,x) = x^n
-```
+$$
 
 For a graph with multiple connected components $\set{ G_1, G_2, \dots, G_k }$,
 
-```math
+$$
 P(G, x) = \prod_{i=1}^{k} P(G_i, x)
-```
+$$
 
 In the polynomial, absolut value of the coeffecient of $x^{n-1}$ gives the number of edges in the graph where $n$ is the number of vertices.
 
@@ -54,9 +54,9 @@ In the polynomial, absolut value of the coeffecient of $x^{n-1}$ gives the numbe
 
 A recursive method to compute the chromatic polynomial.
 
-```math
+$$
 P(G, x) = P(G - e, x) - P(G/e, x)
-```
+$$
 
 Here:
 

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/indexing
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-04-24T03:19:45.170Z
+lastUpdatedOn: 2026-05-10T07:10:02.683Z
 ---
 
 Indexing and hashing is used to speed up data retrieval in databases. Instead of scanning an entire file, indexes provide fast access paths to records using keys. When a file is modified, every index on the file must be updated.
@@ -95,9 +95,9 @@ A bitmap is an array of bits. Can only be used when the attribute has a small do
 
 Each record is stored in a bucket determined by a hash function:
 
-```math
+$$
 h(key) → bucket\ address
-```
+$$
 
 - Each bucket is typically one disk block.
 - Used for equality search (not range queries).

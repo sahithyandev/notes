@@ -6,7 +6,7 @@ slug: s3/operating-systems/cpu-scheduling
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-05-04T09:51:20.271Z
+lastUpdatedOn: 2026-05-10T07:10:02.687Z
 ---
 
 Determines the order in which processes or threads are given access to the processor, aiming to optimize various aspects such as CPU utilization, throughput, turnaround time, waiting time, and response time.
@@ -125,9 +125,9 @@ Aka. SJF. The process with the shortest estimated CPU burst is scheduled next. N
 
 Length of the next CPU burst must be estimated. Exponential averaging can be used for estimation.
 
-```math
+$$
 \tau_{n+1} = \alpha t_n + (1 - \alpha) \tau_n
-```
+$$
 
 Here:
 
@@ -157,9 +157,9 @@ Starvation is possible for low priority threads. Can be solved by aging (increas
 
 SJF is also priority scheduling with:
 
-```math
+$$
 \text{Priority} = \frac{1}{\text{Next CPU burst time}}
-```
+$$
 
 </Note>
 

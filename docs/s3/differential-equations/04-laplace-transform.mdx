@@ -6,14 +6,14 @@ slug: s3/differential-equations/laplace-transform
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.701Z
-lastUpdatedOn: 2026-04-28T07:56:31.652Z
+lastUpdatedOn: 2026-05-10T07:10:02.684Z
 ---
 
 Converts a time-domain function $f(t)$ into a frequency-domain function $F(s)$.
 
-```math
+$$
 F(s) = \mathcal{L}\{ f(t) \} = \int_{0}^{\infty} e^{-st} f(t) \,\text{d}t
-```
+$$
 
 Mainly used to solve linear ODEs with initial conditions.
 
@@ -23,73 +23,73 @@ For all below-mentioned formulas, the Laplace transform of $f(t)$, is denoted as
 
 For $n\ge 0$ and $s \gt 0$.
 
-```math
+$$
 \mathcal{L} \{ t^n \} = \frac{n!}{s^{n+1}}
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ e^{at} \} = \frac{1}{s-a}
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ \sin (at) \} = \frac{a}{s^2 + a^2}
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ \cos (at) \} = \frac{s}{s^2 + a^2}
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ \sinh (at) \} = \frac{a}{s^2 - a^2}
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ \cosh (at) \} = \frac{s}{s^2 - a^2}
-```
+$$
 
-```math
+$$
 \mathcal{L}\{u(t-a)\}= \frac{e^{-as}}{s}
-```
+$$
 
 ## Properties
 
 ### Linearity
 
-```math
+$$
 \mathcal{L} \{ cf(t) + g(t) \} = c\mathcal{L}\{ f(t) \} + \mathcal{L} \{ g(t) \}
-```
+$$
 
 ### Shiting
 
 Suppose $F(s)$ is the Laplace transform of $f$, where $s \gt \alpha$.
 
-```math
+$$
 \mathcal{L} \{ e^{at} f(t) \} = F(s-a)
-```
+$$
 
 For $s \gt \alpha + a$. $ $
 
 ### Time scaling
 
-```math
+$$
 \mathcal{L} \{ f(\alpha t) \} = \frac{1}{\alpha} F\left(\frac{s}{\alpha}\right)
-```
+$$
 
 ### Transform with t
 
-```math
+$$
 \mathcal{L} \{ t^n f(t) \} = (-1)^n \frac{\text{d}^n}{\text{d}s^n} {F(s)}
-```
+$$
 
-```math
+$$
 \mathcal{L} \left\{ \frac{1}{t} f(t) \right\} = \int_s^\infty F(x)\,\text{d}x
-```
+$$
 
 ### Time shifting
 
-```math
+$$
 \mathcal{L}\{ u(t-a)f(t - a) \} = e^{-as}F(s)
-```
+$$
 
 Here $u$ is the [unit step function](/s3/differential-equations/introduction/#unit-step-function).
 
@@ -97,23 +97,23 @@ Here $u$ is the [unit step function](/s3/differential-equations/introduction/#un
 
 ### Derivative
 
-```math
+$$
 \mathcal{L} \{ f'(t) \} = s F(s) - f(0)
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ f''(t) \} = s^2 F(s) - sf(0) - f'(0)
-```
+$$
 
-```math
+$$
 \mathcal{L} \{ f^{(n)}(t) \} = s^n F(s) - \sum_{k=0}^{n-1} s^k f^{(n - 1 - k)}(0)
-```
+$$
 
 ### Integral
 
-```math
+$$
 \mathcal{L} \left\{ \int_0^t f(x) \,\text{d}x \right\} = \frac{1}{s} F(s)
-```
+$$
 
 Provided that $s \neq 0$. $ $
 
@@ -123,6 +123,6 @@ Suppose $f(t)$ is a periodic function with period $T$.
 
 **If** the Laplace transform of $f(t)$ exists **then**:
 
-```math
+$$
 \mathcal{L}\{ f(t) \} = \frac{1}{1 - e^{-sT}} \int_0^T e^{-st} f(t) \,\text{d}t
-```
+$$

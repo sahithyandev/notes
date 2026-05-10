@@ -6,7 +6,7 @@ slug: s3/computer-architecture/cache
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.687Z
-lastUpdatedOn: 2026-04-24T07:36:29.640Z
+lastUpdatedOn: 2026-05-10T07:10:02.682Z
 ---
 
 Small amount of memory, ranging from a few KBs to MBs. Built using SRAM. Slower than registers but faster than main memory. Used to store frequently accessed data. A transparent speedup mechanism; performance increases even though the program instructions remain unchanged.
@@ -45,9 +45,9 @@ Time to bring a block from memory plus deliver it to processor.
 
 <Note>
 
-```math
+$$
 \text{Avg. memory access time} = \text{Hit time} + \text{Miss rate} \times \text{Miss penalty}
-```
+$$
 
 </Note>
 
@@ -82,9 +82,9 @@ Defines how memory blocks are mapped into cache locations. Directly impacts miss
 
 Each memory block maps to exactly one cache line. Mapping is simpler.
 
-```math
+$$
 \text{Index} = \text{Block address} \mod \text{Number of lines}
-```
+$$
 
 Simple implementation. Faster. High risk for conflict misses.
 

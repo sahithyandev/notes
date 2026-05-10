@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/reinforcement-learning
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-04-28T07:56:31.647Z
+lastUpdatedOn: 2026-05-10T07:10:02.681Z
 ---
 
 The process of _learning_ to maximize expected rewards by trial and error. Feedback is given in the form of _rewards_. Agent's utility is defined by the reward function. All learning is based on observed samples of outcomes.
@@ -35,9 +35,9 @@ A method for estimating the value of a given policy $\pi$ by using averages obta
 
 Over multiple episodes, following $\pi(s)$, the following update rule is executed.
 
-```math
+$$
 V_{\pi}(s) \approx \dfrac{1}{N(s)} \sum_{i=1}^{N(s)} G_i(s)
-```
+$$
 
 Here:
 
@@ -129,21 +129,21 @@ Faster than Direct Evaluation.
 
 The sample value of $s$ using $\pi$ is calculated as:
 
-```math
+$$
 V^s_\pi (s) = R(s,\pi(s),s') + \gamma V_\pi(s')
-```
+$$
 
 The update rule is:
 
-```math
+$$
 V_\pi (s) \leftarrow (1-\alpha)V_\pi(s) + \alpha V^s_\pi(s)
-```
+$$
 
 Or:
 
-```math
+$$
 V_\pi(s) \leftarrow V_\pi(s) + \alpha \Big[ R(s,a,s') + \gamma V(s') − V(s) \Big]
-```
+$$
 
 Here $\alpha$ is the learning rate. Larger $\alpha$ provides faster but noisier learning. Decreasing $\alpha$ gives convergent average.
 
@@ -155,20 +155,20 @@ Requires enough exploration to be optimal. The learning rate must be reduced. An
 
 The sample q-value of $s$ at $a$ using $\pi$ is calculated as:
 
-```math
+$$
 Q_s (s,a) = R(s,a,s') + \gamma \max_{a'} Q(s',a')
-```
+$$
 
 The update rule is:
 
-```math
+$$
 Q (s,a) \leftarrow (1-\alpha)Q(s,a) + \alpha Q_s(s)
-```
+$$
 
 Or:
 
-```math
+$$
 Q(s, a) \leftarrow Q(s, a) + \alpha \Big[ R(s,a,s') + \gamma \max_a Q(s', a') − Q(s, a) \Big]
-```
+$$
 
 The optimal policy can be extracted using $\pi^*(s) = \arg\max_a Q(s,a)$.

@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/probability/continuous-probablity-distribution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.596Z
-lastUpdatedOn: 2026-04-28T07:56:31.644Z
+lastUpdatedOn: 2026-05-10T07:10:02.673Z
 ---
 
 Describes a continuous random variable.
@@ -17,22 +17,22 @@ Denoted by $f$. Does not give the probability at an exact point (which is always
 
 The probability of an event is the integral of the PDF over the region corresponding to the event:
 
-```math
+$$
 P(a \leq X \leq b) = \int_{a}^{b} f(x) dx
-```
+$$
 
 Probability of all the values combined, is 1:
 
-```math
+$$
 \int_{-\infty}^{\infty} f(x)\; \text{d}x = 1
-```
+$$
 
 <Note>
 **If** $X$ follows a standard normal distribution, **then** its PDF is: $ $
 
-```math
+$$
 f(x) = \frac{1}{\sqrt{2\pi}}\exp\bigg(-\frac{x^2}{2}\bigg)
-```
+$$
 
 </Note>
 
@@ -40,35 +40,35 @@ f(x) = \frac{1}{\sqrt{2\pi}}\exp\bigg(-\frac{x^2}{2}\bigg)
 
 The integral is taken over the entire domain of the random variable
 
-```math
+$$
 E(X) = \mu = \int_{-\infty}^{\infty} x \cdot f(x) \, dx
-```
+$$
 
 Here $f(x)$ is the probability density function. $ $
 
 ### Variance
 
-```math
+$$
 \text{Var}(X) = \sigma^2 = \int_{-\infty}^{\infty} (x - \mu)^2 \cdot f(x) \, dx
-```
+$$
 
 An equivalent computational formula is:
 
-```math
+$$
 \text{Var}(X) = \int_{-\infty}^{\infty} x^2 \cdot f(x) \, dx - \mu^2
-```
+$$
 
 ### Covariance
 
-```math
+$$
 \text{Cov}(X,Y) = E(XY) - E(X)E(Y)
-```
+$$
 
 ### Cumulative Distribution Function
 
-```math
+$$
 F(x) = \int_{-\infty}^{x} f(t) dt
-```
+$$
 
 ## Example
 
@@ -100,13 +100,13 @@ f(x) = \begin{cases}
 
 The mean, variance and CDF are:
 
-```math
+$$
 E(X) = \mu = \frac{a + b}{2}
-```
+$$
 
-```math
+$$
 \text{Var}(X) = \sigma^2 = \frac{(b-a)^2}{12}
-```
+$$
 
 ```math
 F(x) = \begin{cases}
@@ -120,9 +120,9 @@ F(x) = \begin{cases}
 
 Describes data that clusters around a mean value, forming a symmetric bell-shaped curve. Denoted by $N(\mu, \sigma^2)$. Has PDF: $ $
 
-```math
+$$
 f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp{\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)}
-```
+$$
 
 Follows [the empirical rule](/s2/methods-of-mathematics/probability-and-statistics/empirical-rule/).
 
@@ -138,17 +138,17 @@ It’s often used to model real-world phenomena like heights, test scores, or me
 
 A special case of the normal distribution where $\mu=0$ and $\sigma= 1$. Denoted by $N(0, 1)$. Has PDF:
 
-```math
+$$
 f(x) = \frac{1}{\sqrt{2\pi}} \exp{\left(-\frac{x^2}{2}\right)}
-```
+$$
 
 <Note>
 
 Z-score equation is used to standardize a normal distribution.
 
-```math
+$$
 Z = \frac{X - \mu}{\sigma}
-```
+$$
 
 </Note>
 
@@ -156,9 +156,9 @@ Z = \frac{X - \mu}{\sigma}
 
 Distribution of the sum of the squares of $k$ independent standard normal random variables, where $k$ is the degrees of freedom. Has the PDF:
 
-```math
+$$
 f(x; k) = \frac{1}{2^{k/2} \Gamma(k/2)} x^{k/2 - 1} e^{-x/2}, \quad x > 0
-```
+$$
 
 Here:
 
@@ -174,9 +174,9 @@ Denoted by $X \sim t(v)$. Here the parameter $v$ is the degrees of freedom, and 
 
 For a Student's t-distribution, with $v \gt 2$: $ $
 
-```math
+$$
 \text{Var}(X) = \frac{v}{v-2}
-```
+$$
 
 Used when:
 
@@ -185,9 +185,9 @@ Used when:
 
 <Note>
 
-```math
+$$
 t= \frac{\bar x - \mu}{s / \sqrt{n}} \sim t(n-1)
-```
+$$
 
 </Note>
 

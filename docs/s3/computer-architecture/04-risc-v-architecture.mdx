@@ -6,7 +6,7 @@ slug: s3/computer-architecture/risc-v-architecture
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.687Z
-lastUpdatedOn: 2026-04-28T07:56:31.648Z
+lastUpdatedOn: 2026-05-10T07:10:02.681Z
 ---
 
 An open-standard ISA based on established RISC principles. Open source. Modular by design. Denoted as <span class="font-mono">RV32I</span> or <span class="font-mono">RV64I</span>. The number represent the bit width of the registers and the address bus. Only 32-bit version is discussed in this module.
@@ -138,9 +138,9 @@ Memory is byte-addressable. Instructions can only start from addresses that are 
 
 The exact range branchable range is:
 
-```math
+$$
 \left[-2^{12},\,2^{12} - 2\right]
-```
+$$
 
 To improve the branch range, the LSB, which is always 0, is not stored in the instruction. When actually executing the instruction, the target address is left shifted by 1 bit.
 
@@ -175,9 +175,9 @@ The instruction format:
 
 Allows 20-bit signed offsets, allowing jumps to targets further away than B-type branches. The exact range is:
 
-```math
+$$
 \left[2^{-21},\,2^{21} - 2\right]
-```
+$$
 
 The immediate bits are arranged in a non-sequential order to simplify hardware implementation. The most significant bit is placed at bit 31 for efficient sign extension, and the remaining bits are organized to maximize compatibility with other instruction formats.
 

@@ -6,14 +6,14 @@ slug: s2/methods-of-mathematics/numerical-methods/system-of-linear-equations
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.593Z
-lastUpdatedOn: 2026-04-24T07:36:29.633Z
+lastUpdatedOn: 2026-05-10T07:10:02.672Z
 ---
 
 A linear equation is an equation that may be put in the form:
 
-```math
+$$
 a_{11}x_1 + a_{12}x_2 + a_{13}x_3 + \cdots + a_{1n}x_n = b_1
-```
+$$
 
 where $x_1, x_2, x_3, \cdots, x_n$ are variables, $a$’s are coefficients, and $b_1$ is constant.
 
@@ -33,9 +33,9 @@ a_{n1}x_1 + a_{n2}x_2 + a_{n3}x_3 + \cdots + a_{nn}x_n &= b_n
 
 It can also be written in matrix form:
 
-```math
+$$
 A \vec{X} = \vec{B}
-```
+$$
 
 where $A$ is called the coefficient matrix, $\vec{X}$ is a variable or unknown matrix, and $\vec{B}$ is a constant matrix.
 
@@ -72,15 +72,15 @@ The solution is guessed and then iteratively improved.
 
 A slow method for solving systems of linear equations iteratively. An initial guess is made for the solution vector $\vec{X}^{(0)}$. Then iteratively, subsequent approximations are made using the equation: ($x_i$ is made subject in $i$-th equation). $ $
 
-```math
+$$
 x_i = \left(\sum_{j=1, j \neq i}^{n}  -\frac{a_{ij}x_j}{a_{ii}} \right) + \frac{b_i}{a_{ii}}, \quad i = 1, 2, \ldots, n
-```
+$$
 
 For each $k \geq 1$, generate the components $x_i^{(k)}$ of $\vec{X}^{(k)}$ using the components of previous iteration $\vec{X}^{(k-1)}$ for each $i = 1, 2, \ldots, n$ using:
 
-```math
+$$
 x_i^{(k)} = \frac{1}{a_{ii}} \left[ -\sum_{j=1, j \neq i}^{n} a_{ij}x_j^{(k-1)} + b_i \right]
-```
+$$
 
 Cannot be used for singular matrix.
 
@@ -88,15 +88,15 @@ Cannot be used for singular matrix.
 
 $A_{n\times n}$ is diagonally dominant **when** $\forall i \in \{1, 2, \ldots, n\}$:
 
-```math
+$$
 \lvert a_{ii} \rvert \ge \sum_{j=1,j\neq i}^{n} \lvert a_{ij} \rvert
-```
+$$
 
 $A_{n\times n}$ is strictly diagonally dominant **when** $\forall i \in \{1, 2, \ldots, n\}$:
 
-```math
+$$
 \lvert a_{ii} \rvert \gt \sum_{j=1,j\neq i}^{n} \lvert a_{ij} \rvert
-```
+$$
 
 </Note>
 
@@ -145,9 +145,9 @@ An improvement over the Jacobi method. Major difference from Jacobi method is in
 
 When computing $x_i^{(k)}$, the components $x_1^{(k)}, \ldots, x_{i-1}^{(k)}$ would have already been computed. They will be used to compute the $x_i^{(k)}$ as follows for each $i = 1, 2, \ldots, n$.
 
-```math
+$$
 x_i^{(k)} = \frac{1}{a_{ii}} \left[ b_i -\sum_{j=1}^{i-1} a_{ij}x_j^{(k)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k-1)} \right]
-```
+$$
 
 <Note>
 
@@ -178,13 +178,13 @@ The sequence ${\vec{X}^{(k)}}_{k=0}^\infty$ converges to the unique solution of 
 
 **If** $||T|| < 1$ for any natural matrix norm and $\vec{C}$ is a given vector, **then** for any $\vec{X}^{(0)} \in R^n$, the sequence converges to a vector $\vec{X} \in R^n$, with $\vec{X} = T\vec{X} + \vec{C}$, and the following error bounds hold:
 
-```math
+$$
 \lVert\vec{X} - \vec{X}^{(k)}\lVert \leq \lVert T\lVert^k \;\cdot\; \lVert\vec{X} - \vec{X}^{(0)}\lVert
-```
+$$
 
-```math
+$$
 \lVert\vec{X} - \vec{X}^{(k)}\rVert \leq \frac{\lVert T\rVert^k}{1 - \lVert T\rVert} \lVert\vec{X}^{(1)} - \vec{X}^{(0)}\rVert
-```
+$$
 
 ### Theorem 2
 
