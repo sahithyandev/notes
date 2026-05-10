@@ -6,7 +6,7 @@ slug: s4/graph-theory/rooted-tree
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-05-09T18:16:38.722Z
+lastUpdatedOn: 2026-05-10T04:24:47.760Z
 ---
 
 A tree with a _root_ vertex.
@@ -52,7 +52,15 @@ Vertices that have children. Non-leaf vertices.
 Suppose $a$ is a vertex in a tree. Then the sub-tree with $a$ as its root is the sub-graph of the
 tree consisting of $a$ and its descendants and all edges incident to these descendants.
 
+## Ordered Rooted Tree
+
+Rooted tree with a specified left-to-right ordering among siblings.
+
+Labeling scheme (recursive):
+
+1. Root $\to$ label $0$. Its $k$ children at level 1 $\to$ labels $1, 2, \ldots, k$ (left to right).
+2. Vertex at level $n$ with label $A$, having $k_v$ children $\to$ children labeled $A.1, A.2, \ldots, A.k_v$.
+
 ## Decision tree
 
 Vertices represent the decision points or events, where a decision could be made. Edges represent the possible decisions/outcomes of different choices.
-

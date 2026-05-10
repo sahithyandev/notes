@@ -6,9 +6,35 @@ slug: s4/graph-theory/binary-tree
 prev: true
 next: true
 dateCreated: 2026-04-27T04:57:01.896Z
-lastUpdatedOn: 2026-05-09T18:16:38.723Z
+lastUpdatedOn: 2026-05-10T04:24:47.761Z
+prereqs:
+  - s2/data-structures-and-algorithms/data-structures/tree
 ---
 
+[$m$-ary tree](s4/graph-theory/m-ary-tree) where $m=2$. If a vertex has 1 child, it's either a left child or a right child. If a vertex has 2 children, one is the left child and the other is a right child.
+
+## Full Binary Tree
+
+A full $m$-ary tree where $m=2$.
+
+A full binary tree with:
+
+- $n$ vertices has $i = (n−1)/2$ internal vertices and $l = (n + 1)/2$ leaves.
+- $i$ internal vertices has $n = 2i + 1$ vertices and $l = i + 1$ leaves.
+- $l$ leaves has $n = (2l−1)$ vertices and $i = (l−1)$ internal vertices.
+
+<Note title="Proof Hint">
+
+Use the property of full $m$-ary trees, and apply $m=2$.
+
+Use the following equations:
+
+- $i+l=n$  
+  Internal + leaf vertices is the number of all vertices.
+- $2i = |E| = (n-1)$  
+  Each internal nodes contribute $2$ edges.
+
+</Note>
 ## Binary Search Tree
 
 A binary tree of comparable elements, primarily designed for efficient searching, insertion and deletion.
@@ -32,3 +58,72 @@ insert(root, key, value):
 
   return root
 ```
+
+### Searching
+
+The process of locating a node by key. At each step, eliminates half the tree using BST's ordering.
+
+```py
+search(root, key):
+  if root is null:
+    return null               # key not found
+
+  if key == root.key:
+    return root.value         # found
+
+  if key < root.key:
+    return search(root.left, key)   # go left
+  else:
+    return search(root.right, key)  # go right
+```
+
+- Time complexity - $O(h)$ where $h$ is tree height.
+- Best/average case - $O(\log n)$ for balanced tree.
+- Worst case - $O(n)$ for degenerate (skewed) tree.
+
+### Deletion
+
+BST ordering must be preserved when removing a key. Three cases based on the target node's child count.
+
+- Case 1: leaf node  
+  Can remove directly. And return null to parent.
+- Case 2: one child  
+  Bypass the node. Return the single child to parent.
+- Case 3: 2 children  
+  Find the in-order successor (leftmost node of right subtree or rightmost node of left subtree). Copy its key and value into the current node. Delete the successor from the right subtree (always Case 1 or 2).
+
+```py
+delete(root, key):
+  if root is null:
+    return null                       # key not found
+
+  if key < root.key:
+    root.left = delete(root.left, key)
+  else if key > root.key:
+    root.right = delete(root.right, key)
+  else:                               # found the node to delete
+    # Case 1: no left child
+    if root.left is null:
+      return root.right
+
+    # Case 2: no right child
+    else if root.right is null:
+      return root.left
+
+    # Case 3: two children — replace with in-order successor
+    else:
+      successor = findMin(root.right)
+      root.key   = successor.key
+      root.value = successor.value
+      root.right = delete(root.right, successor.key)
+
+  return root
+
+
+findMin(node):
+  while node.left is not null:
+    node = node.left
+  return node
+```
+
+Time complexity is $O(h)$ for all three cases.

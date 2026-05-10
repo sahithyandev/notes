@@ -1,0 +1,52 @@
+---
+title: Tree Traversal
+sidebar:
+  order: 20
+dateCreated: 2026-05-10T03:43:06.984Z
+lastUpdatedOn: 2026-05-10T04:24:47.761Z
+slug: s4/graph-theory/tree-traversal
+prev: true
+next: false
+---
+
+Systematic process of visiting each vertex of an [ordered rooted tree](/s4/graph-theory/rooted-tree#ordered-rooted-tree) exactly once.
+
+## Algorithms
+
+Each defined recursively over subtrees $T_1, T_2, \ldots, T_n$ at root $r$ (left to right).
+
+### Preorder Traversal
+
+Visit $r$, then traverse $T_1, T_2, \ldots, T_n$ each in preorder.
+
+Mnemonic: **root first**, then subtrees left-to-right.
+
+### Inorder Traversal
+
+Root after leftmost subtree. Traverse $T_1$ in inorder, visit $r$, then traverse $T_2, T_3, \ldots, T_n$ each in inorder.
+
+Visits keys in sorted (ascending) order.
+
+### Postorder Traversal
+
+Root last after 2 subtrees. Traverse $T_1, T_2, \ldots, T_n$ each in postorder, then visit $r$.
+
+<Note>
+
+Naming mnemonic: where the root appears.
+
+| Root appears at | Name      |
+| --------------- | --------- |
+| Start           | Preorder  |
+| Middle          | Inorder   |
+| End             | Postorder |
+
+Visual shortcut:
+
+Draw a curve starting at root, tracing all edges counterclockwise:
+
+- Preorder - list a vertex the **first** time the curve passes it.
+- Inorder - list a leaf the first time passed; list each internal vertex the **second** time passed.
+- Postorder - list a vertex the **last** time passed (on the way back up to parent).
+
+</Note>
