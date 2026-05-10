@@ -3,7 +3,7 @@ title: Jordan Decomposition
 sidebar:
   order: 14
 dateCreated: 2026-05-05T19:13:22.425Z
-lastUpdatedOn: 2026-05-06T19:36:36.348Z
+lastUpdatedOn: 2026-05-10T07:10:48.858Z
 slug: s4/linear-algebra/jordan-decomposition
 prev: true
 next: true
@@ -43,7 +43,7 @@ $$
 
 ## Jordan Form
 
-$J$ from the decomposition.
+Aka. Jordan canonical form. $J$ from the decomposition.
 
 $$
 J = \text{diag}(B(λ_1, m_1), B(λ_2, m_2), \dots , B(λ_k, m_k))
@@ -52,7 +52,17 @@ $$
 Here:
 
 - $\lambda_i$ is an eigenvalue of $A$ for $i=1,2,\dots,m$
-- $m_i$ is the algebraic multiplicity of $\lambda_i$
+- $m_i \in \mathbb{R}$ where $\sum m_i = n$
+
+Unique for a given matrix, up to the reordering of the Jordan blocks.
+
+2 matrices $A$ and $B$ are similar **iff** they have the same Jordan form (up to the reordering of the Jordan blocks).
+
+### Number of Jordan Blocks
+
+There are $2\gamma_k - \gamma_{k+1} - \gamma_{k-1}$ number of $B(\lambda,k)$ Jordan blocks, where $\gamma_k = \text{dim}(\text{null}((A - \lambda I)^k))$.
+
+$\gamma_0 = 0$ for all matrices. If $\lambda$'s algebraic multiplicity is $j$, $\gamma_{k} = \gamma_{j}$ for all $k \gt j$.
 
 ## Matrix of Generalized Vectors
 
