@@ -7,10 +7,10 @@ slug: s4/graph-theory/introduction
 prev: false
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-05-09T18:16:38.720Z
+lastUpdatedOn: 2026-05-10T06:44:19.844Z
 ---
 
-For all the definitions below, consider a graph $G$ with vertex set $V$ and edge set $E$.
+For all the definitions below, consider a graph $G$ with non-empty vertex set $V$ and edge set $E$.
 
 ## Vertex
 
@@ -77,10 +77,7 @@ Denoted by $G^c$.
 
 A finite alternating sequence of vertices and edges, which begins and ends with a vertex, so that each edge is incident with the vertices preceding and following it, and any vertex or edge can appear more than once.
 
-If $A$ is the adjacency matrix of $G$, entry (i, j) of Aᵐ = number of walks of length m from vᵢ to vⱼ
-
-Explanation:
-Matrix multiplication accumulates all possible paths step by step.
+If $A$ is the adjacency matrix of $G$, entry $(i, j)$ of $A^m$ is equal to the number of walks of length m from $v_i$ to $v_j$.
 
 ### Trail
 
@@ -88,13 +85,13 @@ A walk with no repeating edges. Vertices may repeat.
 
 ### Circuit
 
-Aka. closed trail. A trial with the same starting and ending vertices. No repeating edges.
+Aka. closed trail. A trial with the same starting and ending vertices. A walk with no repeating edges, that start and end in the same vertex.
 
 ### Path
 
-A trail with no repeating vertices (except the starting and ending pair). No repeating edges.
+A trail with no repeating vertices (except the starting and ending pair). A walk with no repeating edges or vertices.
 
-In a connected graph with $n$ vertices, any two vertices are connected by a path of length $\le n − 1$.
+In a connected graph with $n$ vertices, any two vertices are connected by a path of length $k$ where $k \le n − 1$.
 
 ### Cycle
 
@@ -109,7 +106,7 @@ Length of a cycle is defined as:
 
 ### Euler Path
 
-A trail that traverses every edge. No repeating edges.
+A trail that traverses every edge. No repeating edges. Vertices may repeat.
 
 <Note title='Euler "Path"?' type="caution">
 

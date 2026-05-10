@@ -6,7 +6,10 @@ slug: s4/graph-theory/shortest-path-problem
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-04-24T07:36:29.648Z
+lastUpdatedOn: 2026-05-10T06:44:19.846Z
+prereqs:
+  - s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm/
+  - s2/data-structures-and-algorithms/algorithms/bellman-ford-algorithm/
 ---
 
 The task of finding a path between 2 vertices such that the sum of edge weights is minimized. There might multiple shortest path trees for a given graph and a source vertex.
@@ -21,9 +24,9 @@ A tree that represents shortest paths from a source to all vertices. Source vert
 
 Relaxation updates distances when a shorter path is found:
 
-```math
+$$
 \text{dist}(v) = \text{dist}(u) + w(u,v)
-```
+$$
 
 ## Dijkstra’s Algorithm
 
@@ -38,8 +41,6 @@ A greedy method for finding shortest paths from a single source in graphs with n
    - pick vertex with minimum distance not in $S$
    - add it to $S$
    - update (relax) distances of neighbors
-
-[Dijkstra's Algorithm was covered in S2](https://s2.sahithyan.dev/data-structures-and-algorithms/algorithms/dijkstras-algorithm/) as well.
 
 ## Bellman–Ford Algorithm
 
@@ -57,5 +58,3 @@ A negative cycle is a cycle whose total edge weight is negative. A negative cycl
    For each edge $(u,v)$, if $\text{dist}(u) + w(u,v) < \text{dist}(v)$, update the distance to be the smaller one.
 
 $n-1$ iterations are enough for bellman-form to become stable, where $n$ is the number of vertices. If $n$-th iteration causes distance changes, it means there are negative cycles.
-
-[Bellman-Ford Algorithm was covered in S2](https://s2.sahithyan.dev/data-structures-and-algorithms/algorithms/bellman-ford-algorithm/) as well.

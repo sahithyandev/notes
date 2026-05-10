@@ -6,7 +6,7 @@ slug: s4/graph-theory/types-of-graphs
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-05-09T18:16:38.722Z
+lastUpdatedOn: 2026-05-10T06:44:19.845Z
 ---
 
 ## Simple Graph
@@ -35,9 +35,9 @@ $G=(V,E)$ where $E$ is a set of ordered pairs of vertices. Edges of a directed g
 
 Starting vertex (where the arrow starts from) is called the tail, ending vertex (where the arrow points to) is called the head. Vertices have in-degree (denoted as $\text{indeg}(v)$) and out-degree (denoted as $\text{outdeg}(v)$) which means the number of incoming and outgoing edges respectively. Loops contribute 1 to both in-degree and out-degree.
 
-```math
+$$
 \text{deg}(v) = \text{indeg}(v) + \text{outdeg}(v)
-```
+$$
 
 Simple and multi digraph versions exist.
 
@@ -62,7 +62,7 @@ A graph whose vertices can be split into disjoint sets $V_1$ and $V₂$ such tha
 
 Here $V_1$ and $V_2$ are called bipartition sets.
 
-## Complete Bipartite Graph
+### Complete Bipartite Graph
 
 Every vertex in $V_1$ is connected to every vertex in $V_2$. Denoted by $K_{m,n}$.
 
@@ -70,7 +70,7 @@ Every vertex in $V_1$ is connected to every vertex in $V_2$. Denoted by $K_{m,n}
 
 A graph satisfying $G = G^c$.
 
-If, $G$ is self-complementary, $G$ has $\frac{n(n-1)}{4}$ edges.
+**If** $G$ is self-complementary **then** $G$ has $\frac{n(n-1)}{4}$ edges.
 
 ## Cyclic Graph
 
@@ -90,9 +90,9 @@ Aka. Eulerian graph. A connected graph that contains an [Eulerian circuit](/s4/g
 
 A graph is Eulerian **iff** every vertex has an even degree. Whenever a walk enters a vertex, it must leave via another edge. Thus edges are used in pairs, making the vertex degree even.
 
-```math
+$$
 G\;\text{is Eulerian} \iff \forall v \in V(G),\;\text{deg}(v) \equiv 0 \mod 2
-```
+$$
 
 Examples:
 

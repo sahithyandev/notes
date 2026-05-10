@@ -6,7 +6,7 @@ slug: s4/graph-theory/travelling-problems
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-04-28T07:56:31.655Z
+lastUpdatedOn: 2026-05-10T06:44:19.846Z
 ---
 
 Modeled using graphs to formalize routes and distances.
@@ -17,7 +17,7 @@ Modeled using graphs to formalize routes and distances.
 
 ## Travelling Salesman Problem
 
-The problem of finding the shortest possible closed walk that visits every vertex at least once and returns to the starting point. Edges may repeat. Multiple valid optimal solutions may exist.
+The problem of finding the shortest possible closed walk that visits every vertex at least once and returns to the starting point. No repeating edges. Multiple valid optimal solutions may exist.
 
 Defined on a weighted graph. The graph is typically assumed connected and undirected.
 
@@ -30,7 +30,7 @@ Widely used in:
 
 ### Brute force algorithm
 
-A method that solves a problem by trying all possible solutions and selecting the optimal one. May start at any vertex. Simple. Guaranteed to be optimal. Computationally very expense. Not suitable for real world applications.
+Solving the problem by trying all possible solutions and selecting the optimal one. May start at any vertex. Simple. Guaranteed to be optimal. Computationally very expense. Not suitable for real world applications.
 
 The algorithm systematically generates all possible closed walks and computes their total cost.
 
@@ -48,7 +48,7 @@ Time complexity is $O(n!)$. Space complexity is $O(n)$.
 
 ### Nearest neighbour algorithm
 
-A greedy method that builds a route by repeatedly visiting the closest unvisited vertex. Sensitive to starting vertex. Fast. Simple. Not necessarily optimal.
+A greedy method. Builds a route by repeatedly visiting the closest unvisited vertex. Sensitive to starting vertex. Fast. Simple. Not necessarily optimal.
 
 Steps:
 
@@ -64,7 +64,9 @@ Time complexity is $O(n^2)$. Space complexity is $O(n)$.
 
 ### Bellman-Held-Karp algorithm
 
-A dynamic programming method. Solves TSP by breaking it into smaller subproblems and combining their optimal solutions. Guaranteed to be optimal. More optimal than brute force. Still exponential in nature. High memory usage. Impractical for very large $n$.
+A dynamic programming method. Solves the problem by breaking it into smaller subproblems and combining their optimal solutions. Guaranteed to be optimal. More optimal than brute force. Still exponential in nature. High memory usage. Impractical for very large $n$.
+
+Only applicable for connected graphs. If not complete, missing edges must be added (with high weights).
 
 In this algorithm:
 
@@ -76,7 +78,8 @@ In this algorithm:
 
 The steps:
 
-- Calculate the cost of visiting every possible combination of 2 nodes from the starting node
+- Calculate the cost of visiting every possible combination of 2 nodes from the starting node  
+  Such as: $AB(C)$, $AC(B)$ and so on.
 - Extend it to one more node
 - Use the above cost equation to find the minimum cost and minimum cost route
 - Do this until all the vertices are included
@@ -87,7 +90,7 @@ Time complexity is $O(n^2 \cdot 2^n)$. Much better than $O(n!)$. Space complexit
 
 ## Chinese Postman Problem
 
-Aka. Route Inspection Problem. The problem of finding the shortest closed path that traverses every edge of a graph at least once. Defined on undirected connected graph.
+Aka. Route Inspection Problem. The problem of finding the shortest closed path that traverses every edge of a graph at least once. Defined on weighted undirected connected graphs.
 
 Used in:
 

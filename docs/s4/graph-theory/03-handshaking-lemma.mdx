@@ -6,7 +6,7 @@ slug: s4/graph-theory/handshaking-lemma
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-04-24T03:19:45.182Z
+lastUpdatedOn: 2026-05-10T06:44:19.846Z
 ---
 
 Describes the relationship between vertex degrees and edges in a graph. Each edge contributes 1 to the degree of each of its endpoints, leading to a fundamental counting principle.
@@ -17,9 +17,9 @@ For all the definitions below, consider a graph $G$ with $n$ vertices and $m$ ed
 
 Sum of all vertex degrees equals twice the number of edges.
 
-```math
+$$
 \sum_{i=1}^{n} \deg(v_i) = 2m
-```
+$$
 
 Applies for connected components as well.
 
@@ -27,10 +27,18 @@ Applies for connected components as well.
 
 The number of vertices with odd degree is always even.
 
+<Note title="Proof Hint">
+
+- Sum of all degrees is even.
+- Sum of all even degrees is even.
+- Hence sum of odd degrees should also be even. Hence even number of odd degrees.
+
+</Note>
+
 ## For Digraphs
 
 Sum of in-degrees equals sum of out-degrees, both equal to the number of edges.
 
-```math
+$$
 \sum_{i=1}^{n} \text{indeg}(v_i) = \sum_{i=1}^{n} \text{outdeg}(v_i) = m
-```
+$$
