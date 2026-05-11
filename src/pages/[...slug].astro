@@ -706,6 +706,35 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       }
     });
   </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("article pre").forEach((pre) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "copy-btn";
+        btn.setAttribute("aria-label", "Copy code");
+        btn.textContent = "Copy";
+
+        btn.addEventListener("click", () => {
+          const code = pre.querySelector("code");
+          const text = code?.innerText ?? "";
+          navigator.clipboard.writeText(text).then(
+            () => {
+              btn.textContent = "Copied";
+              setTimeout(() => (btn.textContent = "Copy"), 1500);
+            },
+            () => {
+              btn.textContent = "Failed";
+              setTimeout(() => (btn.textContent = "Copy"), 1500);
+            }
+          );
+        });
+
+        pre.appendChild(btn);
+      });
+    });
+  </script>
 </Layout>
 
 <style>
@@ -890,6 +919,42 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+      transition: opacity 120ms;
+    }
+
+    pre:hover::before {
+      opacity: 0;
+    }
+
+    :global(.copy-btn) {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-2, var(--surface));
+      color: var(--text-2, var(--text));
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 120ms;
+      line-height: 1.6;
+    }
+
+    :global(pre:hover .copy-btn) {
+      opacity: 1;
+    }
+
+    @media (hover: none) {
+      :global(.copy-btn) {
+        opacity: 1;
+      }
+      pre:hover::before {
+        opacity: 1;
+      }
     }
 
     /* Table */
@@ -1552,6 +1617,12 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
   :global([data-theme="dark"]) :global(pre code span) {
     color: var(--shiki-dark);
     background-color: var(--shiki-dark-bg);
+  }
+
+  :global([data-theme="dark"]) :global(.copy-btn) {
+    background: var(--shiki-dark-bg);
+    border-color: var(--border);
+    color: var(--shiki-dark);
   }
 
   [data-theme="dark"] .note-nav-btn:hover {
