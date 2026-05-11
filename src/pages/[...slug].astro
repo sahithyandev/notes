@@ -10,6 +10,7 @@ import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 import { titleize } from "../utils";
 import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
+import TocRail from "../components/toc-rail.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -570,33 +571,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       }
     </section>
 
-    {
-      tocHeadings.length > 0 && (
-        <aside class="toc-rail">
-          <div class="toc-title">On this page</div>
-          <div class="toc-trail">
-            {tocHeadings.map((heading, index) => (
-              <div
-                class={`toc-trail-segment ${heading.depth === 3 ? "toc-trail-sub" : ""}`}
-                data-depth={heading.depth}
-                data-index={index}
-              />
-            ))}
-          </div>
-          {tocHeadings.map((heading, index) => (
-            <a
-              href={`#${heading.slug}`}
-              class={`toc-item ${heading.depth === 3 ? "toc-sub" : ""} ${index === 0 ? "active" : ""}`}
-              data-depth={heading.depth}
-              data-index={index}
-            >
-              {heading.text}
-            </a>
-          ))}
-          {tocHeadings.length > 5 && <div class="toc-rule" />}
-        </aside>
-      )
-    }
+    <TocRail headings={tocHeadings} />
   </main>
 
   <script>
@@ -700,102 +675,6 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => root.classList.add("drawers-ready"));
     });
-  </script>
-
-  <script>
-    // TOC active state on scroll
-    const headings = [...document.querySelectorAll("article h2, article h3")];
-    const tocLinks = [...document.querySelectorAll(".toc-item")];
-    const trailSegments = [...document.querySelectorAll(".toc-trail-segment")];
-
-    if (headings.length > 0 && tocLinks.length > 0) {
-      // Position trail segments to match TOC items
-      const positionTrailSegments = () => {
-        const tocTrail = document.querySelector(".toc-trail");
-        if (!tocTrail) return;
-        const trailRect = tocTrail.getBoundingClientRect();
-        // Shorten segments on the side where they meet a different-depth
-        // neighbour, so the diagonal connector can occupy that gap.
-        const JOIN = 5;
-        trailSegments.forEach((segment, index) => {
-          const tocItem = tocLinks[index];
-          if (!tocItem) return;
-          const tocRect = tocItem.getBoundingClientRect();
-          const relativeTop = tocRect.top - trailRect.top;
-          const depth = segment.getAttribute("data-depth");
-          const prevDepth =
-            trailSegments[index - 1]?.getAttribute("data-depth");
-          const nextDepth =
-            trailSegments[index + 1]?.getAttribute("data-depth");
-          const shrinkTop = prevDepth && prevDepth !== depth ? JOIN : 0;
-          const shrinkBottom = nextDepth && nextDepth !== depth ? JOIN : 0;
-          (segment as HTMLElement).style.top = `${relativeTop + shrinkTop}px`;
-          (segment as HTMLElement).style.height =
-            `${tocRect.height - shrinkTop - shrinkBottom}px`;
-        });
-      };
-
-      const mqDesktop = window.matchMedia("(min-width: 48rem)");
-
-      // Function to update active TOC items based on visible headings
-      const updateActiveToc = () => {
-        const section = document.querySelector("section");
-        if (!section) return;
-
-        const isDesktop = mqDesktop.matches;
-        const viewportTop = isDesktop ? section.getBoundingClientRect().top : 0;
-        const viewportHeight = isDesktop
-          ? section.clientHeight
-          : window.innerHeight;
-
-        tocLinks.forEach((t) => t.classList.remove("active"));
-        trailSegments.forEach((t) => t.classList.remove("active"));
-
-        headings.forEach((heading, index) => {
-          const rect = heading.getBoundingClientRect();
-          const relativeTop = rect.top - viewportTop;
-          const relativeBottom = relativeTop + rect.height;
-
-          if (relativeBottom > 0 && relativeTop < viewportHeight) {
-            if (tocLinks[index]) tocLinks[index].classList.add("active");
-            if (trailSegments[index])
-              trailSegments[index].classList.add("active");
-          }
-        });
-      };
-
-      // Initial positioning
-      positionTrailSegments();
-
-      // Update on scroll — section on desktop, window on mobile
-      const section = document.querySelector("section");
-      section?.addEventListener("scroll", updateActiveToc);
-      window.addEventListener("scroll", updateActiveToc, { passive: true });
-
-      // Initial update
-      updateActiveToc();
-
-      // Reposition on resize
-      window.addEventListener("resize", positionTrailSegments);
-
-      // Smooth scroll for TOC links
-      tocLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const href = link.getAttribute("href");
-          if (href) {
-            const targetId = href.substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-              targetElement.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }
-          }
-        });
-      });
-    }
   </script>
 
   <script>
@@ -1572,140 +1451,6 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     font-weight: 400;
   }
 
-  /* ── TOC RAIL ─────────────────────────────────────────────────── */
-  .toc-rail {
-    width: var(--toc-w);
-    flex-shrink: 0;
-    overflow: hidden;
-    padding: 32px 16px 32px 0;
-    border-left: 1px solid var(--border);
-    position: relative;
-  }
-
-  .toc-title {
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    padding-left: 14px;
-  }
-
-  .toc-item {
-    display: block;
-    padding: 2px 14px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition:
-      color 0.12s,
-      border-color 0.12s;
-    line-height: 1.4;
-  }
-
-  .toc-item:hover {
-    color: var(--text-secondary);
-  }
-
-  .toc-item.active {
-    color: var(--sem);
-    font-weight: 700;
-  }
-
-  .toc-sub {
-    padding-left: 24px;
-    font-size: 0.71875rem;
-  }
-
-  .toc-rule {
-    height: 1px;
-    background: var(--border);
-    margin: 10px 14px;
-  }
-
-  /* ── TOC TRAIL ────────────────────────────────────────────────── */
-  .toc-trail {
-    position: absolute;
-    left: 0;
-    top: 32px;
-    bottom: 32px;
-    width: 14px;
-    pointer-events: none;
-  }
-
-  .toc-trail-segment {
-    position: absolute;
-    left: 5px;
-    width: 2px;
-    background: var(--border);
-    transition: background 0.2s ease;
-  }
-
-  .toc-trail-segment:first-of-type {
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
-  }
-
-  .toc-trail-segment:last-of-type {
-    border-bottom-left-radius: 1px;
-    border-bottom-right-radius: 1px;
-  }
-
-  .toc-trail-segment.active {
-    background: var(--sem);
-  }
-
-  .toc-trail-sub {
-    left: 15px;
-  }
-
-  /* Diagonal connector between levels — bridges the 10px horizontal
-     gap between the h2 column (left:5) and the h3 column (left:15). */
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"]::before,
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"]::before {
-    border-radius: 1px;
-    content: "";
-    position: absolute;
-    width: 15.9px; /* sqrt(10² + 10²) */
-    height: 2px;
-    background: var(--border);
-    transform-origin: left center;
-  }
-
-  /* h2 above → h3 below: ::before on h3, bridges from h2 bottom-center to h3 top-center */
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"]::before {
-    left: -9.6px;
-    top: -12px;
-    transform: rotate(45deg);
-  }
-
-  /* h3 above → h2 below: ::before on h2, bridges from h3 bottom-center to h2 top-center */
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"]::before {
-    left: 11.5px;
-    top: -12px;
-    transform: rotate(135deg);
-  }
-
-  /* Highlight diagonals when either adjacent segment is active. Selectors
-     repeat the depth attributes to match the specificity of the default
-     background rule above — otherwise var(--border) would win. */
-  .toc-trail-segment[data-depth="2"].active
-    + .toc-trail-segment[data-depth="3"]::before,
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"].active::before,
-  .toc-trail-segment[data-depth="3"].active
-    + .toc-trail-segment[data-depth="2"]::before,
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"].active::before {
-    background: var(--sem);
-  }
-
   /* ── PREV / NEXT ──────────────────────────────────────────────── */
   .note-nav {
     display: flex;
@@ -1916,36 +1661,6 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
 
     html.sidebar-open .sidebar {
       transform: translateX(0);
-    }
-
-    /* TOC rail as slide-in drawer from right */
-    .toc-rail {
-      position: fixed;
-      top: var(--nav-h);
-      right: 0;
-      height: calc(100dvh - var(--nav-h));
-      width: min(280px, 85vw);
-      z-index: 50;
-      transform: translateX(100%);
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
-      padding: 20px 16px 20px 0;
-      overflow-y: auto;
-    }
-
-    html.drawers-ready .toc-rail {
-      transition: transform 0.22s ease;
-    }
-
-    html.toc-open .toc-rail {
-      transform: translateX(0);
-    }
-
-    /* TOC trail uses absolute positioning relative to rail; keep it bounded */
-    .toc-trail {
-      top: 52px;
-      bottom: 20px;
     }
 
     /* Article tweaks for narrow screens */
