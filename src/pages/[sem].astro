@@ -209,12 +209,18 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
 
       <div class="sb-group-title">Subjects</div>
       {
-        Object.keys(subjectTrees).map((subject) => (
-          <a href={`#${subject}`} class="sb-item">
-            {titleize(subject)}
-            <span class="sb-item-count">{grouped[subject].length}</span>
-          </a>
-        ))
+        Object.keys(subjectTrees).map((subject) => {
+          const { direct, modules } = subjectTrees[subject];
+          const firstNote =
+            direct[0] ?? Object.values(modules).flat()[0];
+          const href = firstNote ? `/${firstNote.slug}` : `#${subject}`;
+          return (
+            <a href={href} class="sb-item">
+              {titleize(subject)}
+              <span class="sb-item-count">{grouped[subject].length}</span>
+            </a>
+          );
+        })
       }
 
       <div class="sb-rule"></div>
