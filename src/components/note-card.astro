@@ -1,0 +1,54 @@
+---
+interface Props {
+  href: string;
+  order?: number;
+}
+
+const { href, order } = Astro.props;
+---
+
+<a href={href} class="note-card">
+  {order !== undefined && <span class="note-card-order">{order.toString().padStart(2, '0')}</span>}
+  <slot />
+</a>
+
+<style>
+  .note-card {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 1rem 1.4rem;
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-primary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    transition:
+      background 0.12s ease,
+      border-color 0.12s ease,
+      color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+
+  .note-card:hover {
+    background: var(--sem-bg);
+    border-color: var(--sem-border);
+    color: var(--sem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  [data-theme="dark"] .note-card:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .note-card-order {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+</style>

@@ -61,14 +61,6 @@ function buildModuleRedirects() {
       })
       .sort((a, b) => a.localeCompare(b));
 
-    const firstModule = moduleNames[0];
-    if (firstModule) {
-      const semFirst = firstNote(join(semDir, firstModule));
-      if (semFirst) {
-        redirects[`/${sem}`] = `/${sem}/${firstModule}/${semFirst.slugTail}`;
-      }
-    }
-
     for (const moduleName of moduleNames) {
       const moduleDir = join(semDir, moduleName);
 
