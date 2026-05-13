@@ -75,7 +75,11 @@ const tocHeadings: { depth: 2 | 3; slug: string; text: string }[] = [];
 Object.entries(subjectTrees).forEach(([subject, { modules }]) => {
   tocHeadings.push({ depth: 2, slug: subject, text: titleize(subject) });
   Object.keys(modules).forEach((mod) => {
-    tocHeadings.push({ depth: 3, slug: `${subject}-${mod}`, text: titleize(mod) });
+    tocHeadings.push({
+      depth: 3,
+      slug: `${subject}-${mod}`,
+      text: titleize(mod),
+    });
   });
 });
 
@@ -211,8 +215,7 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
       {
         Object.keys(subjectTrees).map((subject) => {
           const { direct, modules } = subjectTrees[subject];
-          const firstNote =
-            direct[0] ?? Object.values(modules).flat()[0];
+          const firstNote = direct[0] ?? Object.values(modules).flat()[0];
           const href = firstNote ? `/${firstNote.slug}` : `#${subject}`;
           return (
             <a href={href} class="sb-item">
@@ -236,7 +239,9 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
 
       <h1 class="sem-title">Semester {semNum}</h1>
       <p class="sem-subtitle">
-        {Object.keys(subjectTrees).length} subject{Object.keys(subjectTrees).length !== 1 ? "s" : ""},
+        {Object.keys(subjectTrees).length} subject{
+          Object.keys(subjectTrees).length !== 1 ? "s" : ""
+        },
         {allNotes.filter((n) => n.data.slug.startsWith(`${sem}/`)).length} notes
       </p>
 
@@ -248,7 +253,9 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
               {direct.length > 0 && (
                 <div class="note-grid">
                   {direct.map((note) => (
-                    <NoteCard href={`/${note.slug}`} order={note.order}>{note.label}</NoteCard>
+                    <NoteCard href={`/${note.slug}`} order={note.order}>
+                      {note.label}
+                    </NoteCard>
                   ))}
                 </div>
               )}
@@ -257,7 +264,9 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
                   <h3 id={`${subject}-${mod}`}>{titleize(mod)}</h3>
                   <div class="note-grid">
                     {notes.map((note) => (
-                      <NoteCard href={`/${note.slug}`} order={note.order}>{note.label}</NoteCard>
+                      <NoteCard href={`/${note.slug}`} order={note.order}>
+                        {note.label}
+                      </NoteCard>
                     ))}
                   </div>
                 </>
@@ -356,7 +365,6 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
       requestAnimationFrame(() => root.classList.add("drawers-ready"));
     });
   </script>
-
 </Layout>
 
 <style>
@@ -463,7 +471,6 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
       color: var(--text-primary);
       margin: 20px 0 8px;
     }
-
   }
 
   .note-grid {
@@ -472,7 +479,6 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
     gap: 10px;
     margin-bottom: 16px;
   }
-
 
   /* ── LEFT SIDEBAR ─────────────────────────────────────────────── */
   .sidebar {

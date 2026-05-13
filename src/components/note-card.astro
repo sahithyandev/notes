@@ -8,7 +8,11 @@ const { href, order } = Astro.props;
 ---
 
 <a href={href} class="note-card">
-  {order !== undefined && <span class="note-card-order">{order.toString().padStart(2, '0')}</span>}
+  {
+    order !== undefined && (
+      <span class="note-card-order">{order.toString().padStart(2, "0")}</span>
+    )
+  }
   <slot />
 </a>
 

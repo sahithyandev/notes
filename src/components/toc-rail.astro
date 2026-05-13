@@ -56,7 +56,8 @@ const { headings } = Astro.props;
         const shrinkTop = prevDepth && prevDepth !== depth ? JOIN : 0;
         const shrinkBottom = nextDepth && nextDepth !== depth ? JOIN : 0;
         (segment as HTMLElement).style.top = `${relativeTop + shrinkTop}px`;
-        (segment as HTMLElement).style.height = `${tocRect.height - shrinkTop - shrinkBottom}px`;
+        (segment as HTMLElement).style.height =
+          `${tocRect.height - shrinkTop - shrinkBottom}px`;
       });
     };
 
@@ -68,7 +69,9 @@ const { headings } = Astro.props;
 
       const isDesktop = mqDesktop.matches;
       const viewportTop = isDesktop ? section.getBoundingClientRect().top : 0;
-      const viewportHeight = isDesktop ? section.clientHeight : window.innerHeight;
+      const viewportHeight = isDesktop
+        ? section.clientHeight
+        : window.innerHeight;
 
       tocLinks.forEach((t) => t.classList.remove("active"));
       trailSegments.forEach((t) => t.classList.remove("active"));
@@ -80,7 +83,8 @@ const { headings } = Astro.props;
 
         if (relativeBottom > 0 && relativeTop < viewportHeight) {
           if (tocLinks[index]) tocLinks[index].classList.add("active");
-          if (trailSegments[index]) trailSegments[index].classList.add("active");
+          if (trailSegments[index])
+            trailSegments[index].classList.add("active");
         }
       });
     };
@@ -103,7 +107,10 @@ const { headings } = Astro.props;
           const targetId = href.substring(1);
           const targetElement = document.getElementById(targetId);
           if (targetElement) {
-            targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
           }
         }
       });
