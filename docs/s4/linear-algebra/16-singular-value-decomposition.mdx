@@ -3,7 +3,7 @@ title: Singular Value Decomposition
 sidebar:
   order: 16
 dateCreated: 2026-05-06T17:54:54.153Z
-lastUpdatedOn: 2026-05-06T19:36:36.348Z
+lastUpdatedOn: 2026-05-13T21:04:55.789Z
 slug: s4/linear-algebra/singular-value-decomposition
 prev: true
 next: false
@@ -12,12 +12,50 @@ next: false
 Factorization that works for all matrices.
 
 $$
-A = V \Sigma U^H
+A = U \Sigma V^H
 $$
 
 Here:
 
 - $U$, $V$ are unitary
-- $\Sigma$ has singular values on diagonal.
+- $\Sigma$ has singular values on diagonal
 
-Singular values are square roots of eigenvalues of $A^HA$ (or $AA^H$).
+Every matrix $A \in \mathbb{C}_{m\times n}$ has a SVD.
+
+$\text{rank}(A^HA) = \text{rank}(AA^H) = \text{rank}(A) = \text{rank}(AH)$ is equal to the no. of non zero singular values of A.
+
+### Singular Values and Singular Vectors
+
+Let $A\in \mathbb{C}_{m\times n}$. Singular values $\sigma \ge 0$ and the singular vectors $u \in \mathbb{C}_{m\times 1}$ and $v \in \mathbb{C}_{n\times 1}$ are defined by:
+
+$$
+Av= \sigma u\text{ and }A^Hu= \sigma v
+$$
+
+## Calculation
+
+Let $A\in \mathbb{C}_{m\times n}$.
+
+Singular values $\sigma \ge 0$ and singular vectors $u,v$ can be obtained by solving the below eigenvalue problems:
+
+- $AA^Hu=\sigma^2 u$ and
+- $A^HAv = \sigma^2v$
+
+The common eigenvalues for the above 2 equations $\sigma^2$ are the singular values. We choose the positive solutions when $\sigma^2$ is positive.
+
+Now $A$ can be written as:
+
+$$
+
+AV= UΣ
+
+
+$$
+
+Where:
+
+- $V \in \mathbb{C}_{n\times n}$ consists of $v$’s
+- $U \in \mathbb{C}_{m\times m}$ consists of $u$’s
+- $\Sigma \in \mathbb{R}_{n\times m}$ consists of eigenvalues on the diagonal and 0s elsewhere.
+
+Both $V$ and $U$ are unitary.

@@ -3,7 +3,7 @@ title: Jordan Decomposition
 sidebar:
   order: 14
 dateCreated: 2026-05-05T19:13:22.425Z
-lastUpdatedOn: 2026-05-10T07:10:48.858Z
+lastUpdatedOn: 2026-05-13T21:04:55.789Z
 slug: s4/linear-algebra/jordan-decomposition
 prev: true
 next: true
@@ -58,12 +58,16 @@ Unique for a given matrix, up to the reordering of the Jordan blocks.
 
 2 matrices $A$ and $B$ are similar **iff** they have the same Jordan form (up to the reordering of the Jordan blocks).
 
-### Number of Jordan Blocks
+TODO: explain how jordan decomposition is done easily.
 
-There are $2\gamma_k - \gamma_{k+1} - \gamma_{k-1}$ number of $B(\lambda,k)$ Jordan blocks, where $\gamma_k = \text{dim}(\text{null}((A - \lambda I)^k))$.
+## Relationship between multiplicities
 
-$\gamma_0 = 0$ for all matrices. If $\lambda$'s algebraic multiplicity is $j$, $\gamma_{k} = \gamma_{j}$ for all $k \gt j$.
+Suppose Jordan blocks of the eigenvalue $\lambda$ are of the sizes $k_1,k_2,\dots,k_r \ge 1$:
 
-## Matrix of Generalized Vectors
-
-$P$ from the decomposition.
+- $g_\lambda = r$
+  Number of Jordan blocks associated with $\lambda$ is equal to the geometric multiplicity of $\lambda$.
+- $a_λ = \sum_{i=1}^{r} k_i \ge r$
+  Algebraic multiplicity of $\lambda$ is equal to the sum of sizes of the Jordan blocks. And it's greater than the number of Jordan blocks. Obvious.
+- $m_\lambda = \text{max}(k_1, k_2,\dots, k_r)$
+- $g_\lambda (m_\lambda - 1) \ge a_\lambda - g_\lambda = \sum_{i=1}^{r} {k_i - 1} \ge m_\lambda - 1$
+- $a_\lambda−g_\lambda = m_\lambda−1$ if the size of the matrix $n\le3$

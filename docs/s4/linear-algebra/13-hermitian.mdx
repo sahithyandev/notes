@@ -3,10 +3,12 @@ title: Hermitian
 sidebar:
   order: 13
 dateCreated: 2026-05-05T19:14:52.388Z
-lastUpdatedOn: 2026-05-06T19:36:36.348Z
+lastUpdatedOn: 2026-05-13T21:04:55.789Z
 slug: s4/linear-algebra/hermitian-matrices
 prev: true
 next: true
+prereqs:
+  - s1/mathematics/matrices/rank
 ---
 
 Refers to the operation of transposing a matrix and taking the complex conjugate for all elements. Denoted by $A^{H}$.
@@ -19,11 +21,17 @@ $$
 
 Matrix $A$ is a Hermitian matrix **iff** $A^H=A$.
 
-### Properties
+For a Hermitian matrix $A$:
 
 - All eigenvalues are real
 - Eigenvectors of distinct eigenvalues are orthogonal
 - By spectral theorem (not covered in this module), there are exists $n$ orthogonal eigenvectors.
+- Eigenvectors of $A$ form a basis for $\mathbb{C}^{n\times 1}$
+
+For any matrix $B_{m\times n}$:
+
+- $BB^H$ and $B^HB$ are Hermitian matrices and have the same positive eigenvalues.
+- $\text{rank}(B^HB) = \text{rank}(BB^H) = \text{rank}(B^H) = \text{rank}(B)$ is equal to the number of positive eigenvalues of $B^HB$.
 
 ## Unitary Matrix
 
@@ -33,4 +41,16 @@ Matrix $P \in C_{n×n}$ Unitary **iﬀ**: $P^HP= PP^H = I$ (i.e. $P^{−1} = P^H
 
 ## Positive Definite Matrix
 
-Matrix $A\in C_{n×n}$ is Positive Definite **iﬀ** $x^HAx>0$ for all $x \neq \underline{0}$.
+Matrix $A\in C_{n×n}$ is Positive Definite **iﬀ** $X^HAX>0$ for all $X \in \mathbb{C}^n - \set{\underline{0}}$.
+
+For a Hermitian matrix $A$ with $\set{\lambda_1, \lambda_2,\dots,\lambda_n}$ eigenvalues:
+
+$$
+\forall i \in 1,\dots,n \quad \lambda_i\text{ is positive} \iff A\text{ is Positive Definite}
+$$
+
+## Principal Minor
+
+Principal minor of $A$ of order $k$ is the determinant of the matrix produced by deleting last $n-k$ rows and columns.
+
+**If** all principle minors are positive (of order $n=1$ to $n$) **when** A is Positive Definite.

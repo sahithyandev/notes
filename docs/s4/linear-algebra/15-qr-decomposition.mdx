@@ -3,19 +3,51 @@ title: QR Decomposition
 sidebar:
   order: 15
 dateCreated: 2026-05-06T17:53:46.963Z
-lastUpdatedOn: 2026-05-06T19:36:36.348Z
+lastUpdatedOn: 2026-05-13T21:04:55.789Z
 slug: s4/linear-algebra/qr-decomposition
 prev: true
 next: true
+prereqs:
+  - s1/mathematics/matrices/orthonormal
 ---
 
-Used for solving systems and iterative eigenvalue algorithms.
+The process of decomposing a matrix $A$ into $A_{m\times n}=QR$ where
+
+- $Q_{m\times n}$ is orthonormal (via Gram–Schmidt)
+- $R_{n\times n}$ is upper triangular
+
+Used for solving linear least squares problem and iterative eigenvalue algorithms.
+
+### For Square Matrix
+
+If $A$ is a $n\times n$ square matrix, both $Q$ and $R$ are square matrices of size $n$.
+
+If $A$ is complex, $Q$ is a [unitary matrix](/s4/linear-algebra/hermitian/#unitary-matrix).
+
+If $A$ has $n$ linearly independent columns, then first $n$ columns of $Q$ form an orthonormal basis for the column space of $A$.
+
+### For Rectangular Matrix
+
+If $A$ is a $m\times n$ rectangular matrix (with $m \ge n$), as the product of $m\times m$ unitary matrix $Q$ and $m\times m$ upper triangular matrix $R$ where as the $m-n$ bottom rows to be fully zeros.
+
+## Calculation
+
+- Apply [Gram-Schmidit Orthogonalization](/s4/linear-algebra/orthogonality#gram-schmidit-orthogonalization) to the columns of $A$
+- The orthonormal set of matrices are the columns of $Q$
+- $R=Q^{T}A$ (if $A$ is real) or $R = Q^HA$ (if $A$ is complex)
+
+## Application
+
+### Linear Least Solution
+
+For $A_{m\times n}X_{n\times 1}=B_{m\times 1}$. If $A=QR$ the equation can be converted into $R^{T}X = Q^{T}B$ which is easy to solve.
+
+### QR Algorithm
+
+Suppose $A$ is a square matrix. And $A = A_0 = Q_0 R_0$ be the QR decomposition of $A$. Define $R_{k-1}Q_{k-1} = A_k = Q_k R_k$ to recursively get $A_k$ and its QR decomposition.
 
 $$
-A = QR
+A_k = Q_k R_k Q_k Q_k^H = Q_k A_{k+1} Q_k^H
 $$
 
-Here:
-
-- $Q$ orthonormal (via Gram–Schmidt)
-- $R$ upper triangular.
+By the above relationship, and induction, all $A_i$ have the eigenvalue. Under suitable conditions $A_k$ approaches a upper triangular matrix, which makes it easy to find the eigenvalues of $A$.
