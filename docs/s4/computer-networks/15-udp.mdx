@@ -1,0 +1,125 @@
+---
+title: UDP
+sidebar:
+  order: 15
+dateCreated: 2026-05-14T12:24:44.126Z
+lastUpdatedOn: 2026-05-14T15:23:51.115Z
+slug: s4/computer-networks/udp
+prev: true
+next: true
+---
+
+Aka. User Datagram Protocol or Unreliable Datagram Protocol. Connectionless. Defined in RFC 768. Minimal overhead. No handshake. No delivery guarantee. Unacknowledged at the transport layer. Unicast or multicast.
+
+## Properties
+
+### Connectionless
+
+No handshakes before transmission. Each datagram independent. No state maintained between sender and receiver. No session setup/teardown overhead.
+
+### Unreliable
+
+No acknowledgments. No retransmission on loss. No duplicate detection. No ordering.
+
+### No Flow Control
+
+No rate regulation. Application must handle overload if needed.
+
+### No Congestion Control
+
+Ignores network congestion signals. Might contribute to network congestions.
+
+## Segment Format
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Source Port          |       Destination Port        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Length             |           Checksum            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                         Data (Payload)                        |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+Total header size is fixed at 8 bytes. Smallest possible transport header.
+
+Uses a 2-tuple with (source port, destination port) to represent the sender and receiver.
+
+### Source Port
+
+16 bits. Port number of the sending process. Optional. Set to 0 if not used (reply address not needed).
+
+Well-known ports: 0–1023. Registered: 1024–49151. Ephemeral: 49152–65535.
+
+### Destination Port
+
+16 bits. Port number of the receiving process. Mandatory.
+
+### Length
+
+16 bits. Total length of UDP segment including the header and data, in bytes. Ranges from 8 (header only) to 65535 bytes. Maximum value is rarely achieved due to IP fragmentation limits.
+
+$$
+\text{Length} = \text{Data size} + 8
+$$
+
+Practically payload is limited at 1472 bytes because of ethernet MTU 1500 bytes, 20 bytes, 8 bytes.
+
+### Checksum
+
+16 bits. Error detection over header + data + pseudo-header. Optional (set to 0 if not required). Used only for error detection; not error correction or retransmission.
+
+Header, data and pseudo headers are split into 16 bit chunks. All chunks are together using one's complement addition (carry outs on MSB are added to the LSB). Final sum is bitwise-inverted.
+
+One's complement is used to make hardware implementations simpler (compared to two's complement).
+
+If checksum field is set to 0, it means error detection is disabled. Optional in IPv4. Mandatory in IPv6 because IPv4 has its own checksum but [IPv6 does not](/s4/computer-networks/ipv6#header).
+
+#### Pseudo-header
+
+If only UDP header and data is used to calculate the checksum, it cannot detect misdelivery (a datagram delivered to a different host because of IP level corruption).
+
+Hence pseudo-header is included for checksum calculation (and no other reasons). Not transmitted.
+
+```
+0                                                               32
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Source IP Address                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Destination IP Address                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      Zero     |  Protocol=17  |         UDP Length            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+Pseudo-header structure differs in IPv6.
+
+### Payload
+
+Variable size. Passed as-is. Could be zero.
+
+## Applications
+
+| Scenario               | Reason                                               |
+| ---------------------- | ---------------------------------------------------- |
+| DNS queries            | Single request-response; handshake overhead wasteful |
+| VoIP / video streaming | Latency tolerance > reliability                      |
+| DHCP                   | Broadcast-based; no prior connection possible        |
+| SNMP                   | Simple management queries; loss acceptable           |
+| Gaming                 | Low latency critical; application handles loss       |
+| Multicast/broadcast    | TCP is unicast-only                                  |
+
+### QUIC
+
+Defined in RFC 9000. Modern protocol built on top of UDP. Supports reliability, per-stream ordering, and TLS 1.3 security at the application layer. As it is implemented in the application layer, it is easy to update.
+
+### HTTP/3
+
+Works on top of QUIC.
+**Broadcast** — mentioned in the applications table but not in the Properties section alongside unicast/multicast, which is slightly inconsistent.
+
+**QUIC/HTTP3** — these feel tacked on. A note on _why_ QUIC chose UDP (avoid middlebox ossification with TCP, deployability) would make this more than just a name-drop.
