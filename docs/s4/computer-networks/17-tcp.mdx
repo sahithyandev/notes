@@ -1,0 +1,178 @@
+---
+title: TCP
+sidebar:
+  order: 17
+dateCreated: 2026-05-14T12:24:50.329Z
+lastUpdatedOn: 2026-05-15T04:34:09.075Z
+slug: s4/computer-networks/tcp
+prev: true
+next: true
+---
+
+Transmission Control Protocol. Connection-oriented. Reliable. Unicast only. Defined in RFC 793. Operates end-to-end; routers do not participate. Provides byte-stream abstraction over an unreliable IP network.
+
+Treats data as an ordered byte-stream.
+
+## Segment Format
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Source Port          |       Destination Port        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        Sequence Number                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Acknowledgment Number                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Data |       |C|E|U|A|P|R|S|F|                               |
+| Offset|  Res. |W|C|R|C|S|S|Y|I|            Window             |
+|       |       |R|E|G|K|H|T|N|N|                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Checksum            |         Urgent Pointer        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Options (variable)                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Data (Payload)                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+Minimum header size: 20 bytes (no options). **Data Offset** field encodes actual header length in 32-bit words.
+
+### Sequence Number
+
+4 bytes. Byte offset of first data byte in this segment.
+
+### Acknowledgment Number
+
+4 bytes. Next byte expected from the other side. Valid only if ACK flag set.
+
+### Window
+
+2 bytes. Receiver's current buffer capacity. Drives flow control.
+
+### Flags
+
+| Flag | Full Name   | Set By | Purpose                                                                                                                                                                          |
+| ---- | ----------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SYN  | Synchronize | Both   | Initiates a connection and shares the sender's ISN. Only set in connection establishment.                                                                                        |
+| ACK  | Acknowledge | Both   | Confirms receipt of data. Once the connection is established, nearly every segment has this set. The acknowledgment number field is only valid when ACK=1.                       |
+| FIN  | Finish      | Both   | Signals the sender has no more data to send. Each side must send its own FIN to fully close the connection (four-way teardown).                                                  |
+| RST  | Reset       | Both   | Abruptly kills the connection with no teardown. Used when something is wrong — e.g. a segment arrives for a non-existent connection, or an application crashes.                  |
+| PSH  | Push        | Sender | Tells the receiver to deliver buffered data to the application immediately, rather than waiting to accumulate more. Common in interactive protocols like SSH or Telnet.          |
+| URG  | Urgent      | Sender | Marks that some data in the segment is urgent and should be prioritized. The Urgent Pointer field then indicates where the urgent data ends. Rarely used in modern applications. |
+
+Flags can be combined.
+
+### Checksum
+
+Mandatory. Computed over pseudo-header + header + data. Same pseudo-header structure as UDP.
+
+## Properties
+
+### Connection-oriented
+
+Logical circuit established before data transfer. Identified by a 4-tuple: (source IP, source port, destination IP, destination port). State maintained at both endpoints throughout session.
+
+### Reliability
+
+Receiver buffers out-of-order segments and delivers in-order to applications. Lost segments are detected via timeouts or duplicate ACKs and are retransmitted. Duplicate segments (based on sequence numbers) are detected and discarded.
+
+Retransmission timeout (RTO) is estimated from measured round trip time (RTT).
+
+$$
+\text{SRTT} = (1-\alpha)\cdot\text{SRTT} + \alpha \cdot \text{RTT}_\text{sample}
+$$
+
+Here:
+
+- SRTT stands for smoothed round trip time
+- Typically $\alpha = 0.125$
+
+### Flow Control
+
+Receiver advertises available buffer space in the Window field. Sender transmits at most that many unacknowledged bytes.
+
+$$
+\text{Sender window} \leq \min(\text{rwnd}, \text{cwnd})
+$$
+
+Here:
+
+- $\text{rwnd}$ = receiver window. Used for flow control.
+- $\text{cwnd}$ = congestion window. Used for congestion control.
+
+If Window is set to 0, sender would stop sending data and starts probing periodically with 1-byte segments.
+
+### Congestion Control
+
+Congestion is inferred from packet loss in TCP.
+
+4 algorithms operate together:
+
+- Slow Start  
+  cwnd begins at 1 MSS; doubles each RTT until ssthresh.
+- Congestion Avoidance  
+  cwnd grows linearly (additive increase) above ssthresh.
+- Fast Retransmit  
+  3 duplicate ACKs trigger immediate retransmit without waiting for timeout.
+- Fast Recovery  
+  After fast retransmit, halve cwnd (multiplicative decrease) instead of restarting slow start.
+
+## Connection Establishment
+
+Connection establishment is done as a 3-way handshake.
+
+- Initial SYN request  
+  Host A sends the initial request to host B. Includes a random sequence number ($\text{seq=}x$).
+- SYN-ACK response  
+  Host B sends back its sequence number ($\text{seq}=y$) and acknowledges A's sequence number ($\text{ack=}x+1$).
+- ACK response  
+  Host A acknowledges B's sequence number ($\text{ack}=y+1$).
+
+If the acknowledgements are not matching, either host will reject the connection.
+
+## Connection Termination
+
+After data transfer is complete, connection is released gracefully in both ends independently, in a 4-way handshake.
+
+- Initial FIN request  
+  Host A sends FIN segment to host B.
+- ACK response  
+  Host B acknowledges A's FIN. A will not send anymore data (but B might).
+- FIN from other end  
+  Once host B finish sending the data, it will send FIN to host A. If B did not have any data to send after the last ACK (for FIN), it will merge ACK and FIN into a single request.
+- ACK from A  
+  Host A acknowledges B's FIN. And A enters `TIME_WAIT` state for $2 \times \text{MSL}$ (which stands for Maximum Segment Lifetime). This is a safety time buffer for old network segments to expire. After that time is passed, the connection is closed.
+
+## Limitations
+
+### Latency
+
+As TCP is connection-oriented, there is an associated overhead for that. And that contributes to latency. Hence not suitable for VoIP, gaming and live streaming. Those applications use [UDP](/s4/computer-networks/udp) or [QUIC](/s4/computer-networks/udp#quic) instead.
+
+### Head-Of-Line Blocking
+
+Aka. HOL Blocking. Occurs because of in-order delivery guarantee. If a segment is lost in transit, TCP requires the receiver to wait for that missing segment to be retransmitted before passing any subsequent data up to the application, even if those later segments have already arrived and are sitting in the buffer. The receiver knows something is missing because sequence numbers have a gap, so it holds everything back until the hole is filled.
+
+This is a issue if multiple data streams are multiplexed over a TCP connection.
+
+## Applications
+
+TCP is inappropriate where latency matters more than reliability.
+
+### HTTP
+
+Both HTTP/1.1 and HTTP/2 work on top of TCP, because reliable page delivery is required.
+
+### SMPT, IMAP
+
+Email protocols are built on top of TCP, for reliability.
+
+### FTP
+
+File transfer cannot tolerate data losses.
+
+### SSH
+
+Used to create a secure shell to a remote server. Byte-stream with ordering guarantees is required.

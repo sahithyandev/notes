@@ -1,0 +1,49 @@
+---
+title: VLAN Trunking Protocol
+sidebar:
+  order: 14
+dateCreated: 2026-05-15T04:04:59.222Z
+lastUpdatedOn: 2026-05-15T04:34:09.074Z
+slug: s4/computer-networks/vtp
+prev: true
+next: true
+---
+
+Aka. VLAN Trunking Protocol. A Cisco-proprietary Layer 2 management protocol that automatically distributes VLAN configurations across switches over trunk links from a central switch.
+
+## Propagation
+
+A revision number is used to track changes. Every time a VLAN configuration is changed, the revision number increments by 1. And VTP advertisement is broadcasted, which is done through 802.1Q or ISL trunk links.
+
+When a switch receives a VTP advertisement, and if the incoming revision number is higher, it updates its VLAN database.
+
+It's risky as mis-configured or old switches with higher revision numbers might wipe the entire VLAN database.
+
+## Roles
+
+Every switch in a VTP domain plays one of three roles:
+
+- Server  
+  Can create, modify, and delete VLANs. Propagates changes to all other switches. There must be at least one server.
+- Client  
+  Receives and applies VLAN info from the server, but cannot make changes itself. Most access-layer switches are clients.
+- Transparent  
+  Manages its own VLAN configurations. Forwards VTP advertisements to other switches.
+
+## Domains
+
+Switches only sync with each other if they share the same VTP domain name and optionally the same VTP password.
+
+## Versions
+
+| -                          | V1                     | V2  | V3  |
+| -------------------------- | ---------------------- | --- | --- |
+| Extended VLANs (1006–4094) | ✗                      | ✗   | ✓   |
+| Private VLANs              | ✗                      | ✗   | ✓   |
+| Transparent passes through | Only if domain matches | ✓   | ✓   |
+
+V3 is significantly more capable and safer, but V1/V2 are still common in older networks.
+
+## Application
+
+Nowadays VTP is disabled entirely in many networks. The revision number overwrite risk makes VTP dangerous in production environments.

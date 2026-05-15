@@ -1,11 +1,72 @@
 ---
-title: VLAN
+title: Virtual LAN
 sidebar:
   order: 13
 dateCreated: 2026-05-06T04:56:36.623Z
-lastUpdatedOn: 2026-05-14T15:23:51.115Z
+lastUpdatedOn: 2026-05-15T04:34:09.074Z
 slug: s4/computer-networks/vlan
 prev: true
 next: true
 ---
 
+A logical segmentation of devices within the same or different physical network physical network. Each VLAN has its own network address and its own broadcast domain.
+
+VLAN is used to:
+
+- Reduce broadcast traffic in a big LAN
+- Group users without physical redesigning
+- Improve security
+
+Switches are used to create and manage VLANs.
+
+## VLAN Id
+
+Each VLAN is identified by a 12-bit _VLAN ID_.
+
+- 0 is used to denote that there are no VLAN
+- 1 - 4094 is the usable range
+- 4095 is used for internal switch use
+
+In switches where VLAN is supported, by default, all ports are assigned to the VLAN 1 which is the default.
+
+## Links
+
+### Access Link
+
+Port connecting a switch to another switch or an end device. Assigned to a single VLAN. If 2 switches are connected with an access link, only 1 VLAN is spanned across the switches. Other VLANs on either ends cannot cross-communicate through the link. Not scalable for switch-to-switch connection.
+
+### Trunk Link
+
+Port connecting a switch to another switch or a router. Carries multiple VLANs simultaneously over a single physical link. Standard choice for switch-to-switch connections as it is scalable. Uses [802.1Q tagging](#802).
+
+#### 802.1Q Tagging
+
+4 bytes. Used to identify which VLAN a frame belongs to. Tag is added when a frame enters the trunk and removed when it exits to an access link.
+
+```
+TPID (16 bits: 0x8100) | PCP (3 bits) | DEI (1 bit) | VLAN ID (12 bits)
+```
+
+| Field   | Size (Bits) | Purpose                                                                   |
+| ------- | ----------- | ------------------------------------------------------------------------- |
+| TPID    | 16          | Marks frame as 802.1Q tagged. Always 0x8100.                              |
+| PCP     | 3           | QoS priority, values 0–7                                                  |
+| DEI     | 1           | Drop Eligible Indicator. Frame eligible for drop under congestion or not. |
+| VLAN ID | 12          | Identifies VLAN.                                                          |
+
+## Intra-VLAN routing
+
+Any pair of devices inside a VLAN can communicate with each other.
+
+## Inter-VLAN Routing
+
+The process of forwarding network traffic between different VLANs. A Layer 3 switch or a router is required.
+
+3 approaches:
+
+- Traditional  
+  Each VLAN gets its own physical interface on the router. Simple. Does not scale.
+- Router-on-a-stick  
+  Single physical trunk link between Layer 2 switch and a router. The link is divided into logical sub-interfaces (one per VLAN), each tagged for a different VLAN using 802.1Q encapsulation. The switch port connecting to the router is set to trunk mode to carry all VLAN traffic. Common in smaller networks. Bandwidth of the physical link is a bottleneck.
+- Layer 3 Switch and SVI  
+  Each VLAN gets a Switch Virtual Interface which acts as the default gateway for that VLAN. Faster than router-on-a-stick approach. Most scalable. Standard in enterprise networks.

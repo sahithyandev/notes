@@ -1,33 +1,15 @@
 ---
 title: UDP
 sidebar:
-  order: 15
+  order: 16
 dateCreated: 2026-05-14T12:24:44.126Z
-lastUpdatedOn: 2026-05-14T15:23:51.115Z
+lastUpdatedOn: 2026-05-15T04:34:09.075Z
 slug: s4/computer-networks/udp
 prev: true
 next: true
 ---
 
 Aka. User Datagram Protocol or Unreliable Datagram Protocol. Connectionless. Defined in RFC 768. Minimal overhead. No handshake. No delivery guarantee. Unacknowledged at the transport layer. Unicast or multicast.
-
-## Properties
-
-### Connectionless
-
-No handshakes before transmission. Each datagram independent. No state maintained between sender and receiver. No session setup/teardown overhead.
-
-### Unreliable
-
-No acknowledgments. No retransmission on loss. No duplicate detection. No ordering.
-
-### No Flow Control
-
-No rate regulation. Application must handle overload if needed.
-
-### No Congestion Control
-
-Ignores network congestion signals. Might contribute to network congestions.
 
 ## Segment Format
 
@@ -101,6 +83,24 @@ Pseudo-header structure differs in IPv6.
 ### Payload
 
 Variable size. Passed as-is. Could be zero.
+
+## Properties
+
+### Connectionless
+
+No handshakes before transmission. Each datagram independent. No state maintained between sender and receiver. No session setup/teardown overhead.
+
+### Unreliable
+
+No acknowledgments. No retransmission on loss. No duplicate detection. No ordering.
+
+### No Flow Control
+
+No rate regulation. Application must handle overload if needed.
+
+### No Congestion Control
+
+Ignores network congestion signals. Might contribute to network congestions.
 
 ## Applications
 

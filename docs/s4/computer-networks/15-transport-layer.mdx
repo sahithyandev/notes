@@ -1,0 +1,72 @@
+---
+title: Transport Layer
+sidebar:
+  order: 15
+dateCreated: 2026-05-13T21:06:50.002Z
+lastUpdatedOn: 2026-05-15T04:34:09.075Z
+slug: s4/computer-networks/transport-layer
+prev: true
+next: true
+---
+
+Layer 4 of the OSI model. Operates in end stations only; not in network nodes. Primary interface to the network for application developers.
+
+Provides end-to-end data delivery between end stations. Shields upper layers from network peculiarities. Improves on network layer services (e.g. adds reliability).
+
+## Functions
+
+### Connection management
+
+In connection-oriented data communication, transport layer establishes, manages and deletes the connections.
+
+### Multiplexing and Demultiplexing
+
+Transport layer manages multiple connections on a single host using $16$-bit port numbers to distinguish services.
+
+- Outgoing connections: **multiplexing**.
+- Incoming connections: **demultiplexing**.
+
+### Segmentation
+
+Applications may send large amounts of data. Transport layer breaks them into smaller _segments_ and adds transport layer headers. The segments are sent individually and reassembled at destination.
+
+Segmentation is done to work around Maximum Transmission Unit (MTU) limitation.
+
+### Flow Control and Buffering
+
+Sender transmits as fast as possible without causing data loss. Receiving end has a buffer for incoming data. Sender should not send data beyond buffer space. Sender retains copies of sent-but-unacknowledged data.
+
+## Service Primitives
+
+- Listen  
+  Wait for an incoming connection.
+- Connect  
+  Establish a connection.
+- Send  
+  Transmit data.
+- Receive  
+  Wait for incoming data.
+- Disconnect  
+  Release connection.
+
+## Addressing
+
+### TSAP
+
+Aka. Transport Service Access Point. Transport layer address. Each host may contain one or more TSAPs.
+
+$$
+\text{TSAP} = \text{host address} + \text{port number}
+$$
+
+### Port
+
+16-bit numeric component of a TSAP. Distinguishes multiple connections on one host.
+
+Port identification methods:
+
+- Pre-arrangement (e.g., specified in a URL).
+- Well-known ports  
+  Such as 25 for SMTP and 80 for HTTP. First 1024 port numbers are assigned to well-known services by IANA.
+- Portmapper — maps service names to port numbers.
+- Application-defined.
