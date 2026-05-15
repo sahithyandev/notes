@@ -3,7 +3,7 @@ title: Singular Value Decomposition
 sidebar:
   order: 16
 dateCreated: 2026-05-06T17:54:54.153Z
-lastUpdatedOn: 2026-05-13T21:04:55.789Z
+lastUpdatedOn: 2026-05-15T07:37:40.533Z
 slug: s4/linear-algebra/singular-value-decomposition
 prev: true
 next: false
@@ -59,3 +59,9 @@ Where:
 - $\Sigma \in \mathbb{R}_{n\times m}$ consists of eigenvalues on the diagonal and 0s elsewhere.
 
 Both $V$ and $U$ are unitary.
+
+## Application
+
+### Linear Least Solution
+
+For $A_{m\times n}X_{n\times 1}=B_{m\times 1}$. If $A=U\Sigma V^H$ the equation can be converted into $\Sigma V^H X = \Sigma Y = U^{H}B = C$ which is easy to solve. To solve the system, ignore the zero-only rows in $\Sigma$ and solve other equations.
