@@ -1,0 +1,246 @@
+---
+title: Networks
+sidebar:
+  order: 19
+dateCreated: 2026-05-17T09:01:38.545Z
+lastUpdatedOn: 2026-05-17T21:20:18.448Z
+slug: s4/operating-systems-security/networks
+prev: true
+next: true
+prereqs:
+  - /s4/computer-networks/osi-model
+---
+
+Network security threats and countermeasures for remote networks. Two-part structure: attack taxonomy followed by defensive controls
+
+Network transmission media such as cable, optical fibre and microwave are all vulnerable for attacks regardless of their physical properties.
+
+Interception can occur at any of the [7 OSI layers](/s4/computer-networks/osi-model).
+
+Networks are very vulnerable because of:
+
+- Anonymity  
+  Attacker operates remotely and anonymously.
+- Many points of attack  
+  Large networks expose many entry points.
+- Sharing  
+  Multi-user access expands attack surface.
+- System complexity  
+  Heterogeneous OSes and purposes compound risk.
+- Unknown perimeter  
+  Network boundaries shift; bridged networks blur scope.
+- Unknown path  
+  Multiple routes exist; some are untrustworthy.
+
+## Threats
+
+### Interception
+
+Unauthorized viewing. Aka. wiretapping.
+
+### Modification
+
+Unauthorized changes in data.
+
+- Sequencing  
+  Altering the order of transmitted data segments. The content of individual packets may be intact, but reordering corrupts meaning or state.
+- Replay  
+  Capturing a valid transmission and retransmitting it later. Possible even if the payload is encrypted. Server accepts it as legitimate.
+- Insertion  
+  Injecting new, fabricated content into an existing communication stream. The attacker adds data that was never sent by the original party.
+
+Modification can happen in a non-malicious way such as hardware failure, noise, program errors, transmission problems.
+
+### Fabrication
+
+Unauthorized creation of content.
+
+### Interruption
+
+Preventing authorized access. Aka. denial of service.
+
+Can happen due to:
+
+- Routing failures  
+  Misconfigured routing protocol poisons downstream routers.
+- Excessive demand  
+  Attacker exhausts finite network capacity.
+- Component failure  
+  Sporadic hardware/software failure without redundancy planning.
+
+### Network Perimeter Components
+
+- **Border router** — last router under organizational control before untrusted network.
+- **Firewall** — enforces allow/deny rules on traffic.
+- **IDS (Intrusion Detection System)** — detects and alerts on suspicious activity.
+- **IPS (Intrusion Prevention System)** — detects and auto-responds without admin intervention.
+- **DMZ / Screened Subnet** — small network of public-facing services, protected by firewall.
+
+### Port Scanning
+
+Reconnaissance technique — not strictly an attack. Reveals: open ports, protocols, services, product names, versions, response times (infers network topology).
+
+### Network Scan Results
+
+- Host count and IP addresses.
+- MAC addresses and hardware brand.
+- OS type and version.
+- Responding ports and associated service applications.
+- Response latency — infers link speeds and network design.
+
+### Wireless Network Vulnerabilities
+
+- **Integrity** — higher signal strength wins; attackers spoof clients and boost signal to hijack sessions.
+- **Availability** — session hijacking, forced disassociation, jamming.
+- **Unauthorized access** — requires cryptographic controls.
+- **Hidden SSID discovery** — client probe requests expose SSIDs even without beacon.
+- **SSID in all frames** — SSID embedded in communication frames; sniffable post-association.
+
+## Wi-Fi
+
+Wi-Fi works in broadcast mode. Unencrypted traffic can be read by any receiver in range.
+
+And clients auto-connect to known SSIDs. Attackers can spoof trusted names.
+
+### WEP
+
+Aka. Wired Equivalent Privacy. Introduced with 802.11. Broken by 2001; fully crackable within minutes.
+
+Authentication mechanism:
+
+1. Client and AP share a pre-shared key.
+2. AP sends random challenge; client encrypts and returns it.
+3. AP decrypts and verifies match.
+4. Subsequent traffic encrypted with shared key.
+
+**Weaknesses:**
+
+- Key size: 64- or 128-bit total, but 24 bits reserved for Initialization Vector (IV) - effective key 40 or 104 bits.
+- Keys are user-typed passphrases — vulnerable to dictionary attacks.
+- Static key — unchanged for months; one key covers entire session history.
+- RC4 used incorrectly — allows decryption of large message portions.
+- Only ~16 million IV values; non-random distribution accelerates cracking.
+- Integrity check (CRC) does not detect malicious modification.
+- No client authentication — any client knowing SSID and MAC is accepted.
+
+### WPA
+
+Aka. WiFi Protected Access. WPA was introduced in 2003, WPA2 in 2004 and WPA3 in 2018. AES-based WPA2 remains the standard.
+
+Improvements over WEP:
+
+- Non-static keys — key hierarchy; new keys per session; encryption key rotated per packet.
+- Authentication — password, token, or certificate.
+- Strong encryption — AES support (vs. broken RC4).
+- Integrity protection — 64-bit cryptographic integrity check.
+- Session initiation — four-way handshake; separate encryption and integrity keys per direction.
+
+## Defenses
+
+### Link Encryption
+
+Encryption applied at OSI Layer 1 (Physical). Data decrypted at each intermediate node; re-encrypted for next link. Appropriate when transmission link is primary vulnerability.
+
+### End-to-End Encryption
+
+Data encrypted through to destination — intermediate nodes cannot decrypt. Appropriate for untrusted intermediate paths (e.g., Internet). SSL operates this way in practice.
+
+### SSL / TLS
+
+SSL stands for Secure Sockets Layer and TLS stands for Transport Layer Security. Works at OSI Layer 4, the transport layer. Designed 1990s.
+
+TLS stands for Transport Layer Security. Introduced in 1999. Currently used standard.
+
+SSL certificate contains domain, owner, issuing CA, validity dates and fingerprints. Trust propagates from root CAs to intermediate CAs to leaf certificate. Browsers trust certificates **iff** root CA is in its trusted store.
+
+At session start, cipher suite is negotiated between server and client. Includes digital signature algorithm (auth) + encryption algorithm (confidentiality) + hash algorithm (integrity).
+
+Used for:
+
+- Server authentication
+- Optional client authentication
+- Encrypted communication
+
+### Onion Routing
+
+Prevents eavesdropper from learning source, destination, or content. Used by Tor.
+
+Uses layered asymmetric encryption. Each intermediate node peels one layer and knows only previous and next hops.
+
+### VPN
+
+Aka. Virtual Private Network. Encrypted tunnel over public network. Provides confidentiality and integrity. Connects two sites as a single private network. Typically terminated by firewalls at both ends.
+
+### Firewall
+
+A device or software, filtering traffic between trusted (inside) and untrusted (outside) networks. Enforces security policy (set of allow/deny rules).
+
+Works as a reference monitor for the inside and outside networks.
+
+Types:
+
+- Packet-filtering gateway  
+  Filters by source/destination IP and port/protocol. Stateless. Fast, simple.
+- Stateful inspection firewall  
+  Tracks connection state across packets. Can enforce context-dependent rules (e.g., threshold on connections from single IP).
+- Application proxy  
+  Operates at OSI Layer 7. Simulates application behavior. Forwards only well-formed requests. Can log and cache. Common example: web proxy.
+- Circuit-level gateway  
+  Operates at OSI Layer 5, session layer. Allows one network to extend into another. Basis for VPN implementation.
+- Personal / host-based firewall  
+  Runs on individual workstation. Restricts traffic by IP, port, and per-application rules.
+
+Firewall has certain limitations:
+
+- Protects only if it controls the entire perimeter  
+  If there are any other paths that bypass the firewall, that path is completely unprotected.
+- Does not protect data outside the perimeter
+- High-visibility target  
+  Because of misconfigurations or vulnerabilities, if firewall is compromised, the whole system is compromised.
+- Only as good as its configurations  
+  Requires correct configuration, ongoing updates, and log review.
+- Limited control over content admitted — internal controls needed for malicious code.
+
+### Demilitarized Zone
+
+Aka. DMZ. A network architecture pattern. A design decision about where to place certain servers relative to trust boundaries.
+
+```
+Internet [Zone 1] → [Firewall 1] → DMZ [Zone 2] → [Firewall 2] → Internal Network [Zone 3]
+```
+
+2 firewalls. 3 zones.
+
+- Zone 1 (Internet)  
+  Fully untrusted.
+- Zone 2 (DMZ)  
+  Semi-trusted. Holds public-facing servers.
+- Zone 3 (Internal)  
+  Fully trusted. Holds databases, workstations, internal systems.
+
+Firewall 1 allows inbound internet traffic. Blocks direct access to internal network. Firewall 2 allows DMZ servers limited, specific access to internal resources. Blocks everything else.
+
+Even if an attacker compromises a DMZ server, they are still blocked by the 2nd firewall.
+
+### NAT
+
+[Network Address Translation](s3/data-communication-and-networking/ip) can be used to hide internal host addresses from outside.
+
+### IDS
+
+Aka. Intrusion Detection System. Monitors the internal network for malicious or suspicious events. Complements preventative controls.
+
+Detection can be either:
+
+- Signature based  
+  Detects known patterns only.
+- Heuristic based  
+  Detects anomalous behaviour patterns.
+
+Could be running on a host (at OS level) or the whole network. Could be active (responds to detections) or passive (detections only).
+
+### SIEM
+
+Aka. Security Information and Event Management. Software platform collecting audit logs from all security-related sources (such as OSes, applications, firewalls and so on) into unified security dashboard.
+
+Without SIEM, analysts must log into each device individually. Impractical at scale.

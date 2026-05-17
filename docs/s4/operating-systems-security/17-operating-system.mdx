@@ -1,0 +1,158 @@
+---
+title: Operating System
+sidebar:
+  order: 17
+dateCreated: 2026-05-16T16:07:46.260Z
+lastUpdatedOn: 2026-05-17T21:20:18.447Z
+slug: s4/operating-systems-security/operating-system
+prev: true
+next: true
+prereqs:
+  - s3/operating-systems/kernel
+  - s3/operating-systems/process
+  - s3/operating-systems/thread
+  - s3/operating-systems/virtual-memory
+---
+
+Operating system is the entry point to computers. First line of defense in digital world. Controls all system resources. If compromised, system control is completely lost. Hence most targeted by attackers.
+
+OSes enforce separation, access control and many other security features through kernel functions.
+
+## Protected Objects
+
+Objects requiring protection:
+
+- Memory  
+  User/process should not read or write to unauthorized cells in the memory.
+- Sharable I/O devices (disks)
+- Serially reusable I/O devices (printers, tape drives)
+- Sharable programs and subprocedures
+- Networks
+- Sharable data
+
+## Separation
+
+The process of keeping each user's objects apart from all others.
+
+4 types:
+
+- Physical separation  
+  Different processes use different physical objects.
+- Temporal separation  
+  Different-security processes run at different times.
+- Logical separation  
+  OS constrains program access; process unaware of others.
+- Cryptographic separation  
+  Processes conceal data/computations from outside.
+
+## Sharing
+
+There are different modes of sharing with different difficulty and granularity.
+
+1. Do not protect  
+   Appropriate for time-separated runs.
+2. Isolate  
+   Processes unaware of each other; own address space.
+3. Share all or share nothing  
+   Public or private designation.
+4. Share but limit access  
+   ACL-based. OS acts as guard.
+5. Limit use of object  
+   Controls what can be done after access (e.g., view but not print).
+
+## Memory Protection
+
+Implemented at hardware in most cases for performance reasons.
+
+### Fence
+
+Boundary confining user to one memory side and OS on other. Implemented as fixed address or fence register. Single-direction protection only.
+
+### Base/bounds registers
+
+Pair defining valid address range for a process.
+
+- Base register  
+  Lower bound (starting address); all addresses are offsets from base.
+- Bound register  
+  Upper address limit. Prevents buffer overflows.
+
+Contiguous ranges only; all-or-nothing sharing.
+
+There can be multiple pairs for base/bounds registers to separate code, read-only, writeable data.
+
+### Tagged architecture
+
+Extra bits are stored per memory location specifying access rights (R, RW, X). Set by privileged instructions only; checked on every access. Allows adjacent locations to have different rights.
+
+## Virtual Memory
+
+### Segmentation
+
+The process of dividing program into logical, separately relocatable pieces or _segments_. Each segment could be procedure code or array data or local variable.
+
+OS maintains a segment translation table per-process to translate segment names to real base address. Adds offset to get true address.
+
+Every address reference checked again segment bounds. Each segment can have different protection classes per process.
+
+Each segment is shared completely or not shared at all.
+
+### Paging
+
+Program is split into fixed-size pages. Memory is split into fixed-size page frames.
+
+OS maintains a page translation table per-process to translate pages to page frames.
+
+No fragmentation because of fixed size. Automatic bounds enforcement as offset overflow carries into page number.
+
+Per-page protection rights are meaningless as different type of data is stored in a single page.
+
+### Paging and Segmentation
+
+Program is divided into logical segments. Each segment is broken into fixed-size pages. 2 level translation: segment table to page table to real address.
+
+Retains logical protection of segmentation and memory efficiency of paging.
+
+## OS Design
+
+### Layered Design
+
+OS functions arranged by criticality (most critical to least):
+
+1. Hardware
+2. Security kernel (enforces security)
+3. OS kernel (allocates primitive resources)
+4. OS (file systems, device allocation)
+5. Utility functions
+6. User processes
+
+In non-hierarchical design, critical functions of the OS exists at all levels. Large attack surface.
+
+In hierarchical design, problems are isolated to their layer and above (least critical).
+
+### Kernelized Design
+
+Security kernel is a part of the [kernel](/s3/operating-systems/kernel). Enforces all security mechanisms of the entire OS. Provides security interfaces among hardware, OS, and other system parts.
+
+Security kernel is very small. Hence verifiable. Separated from OS and user space.
+
+Introduces a performance overhead. No guarantee of completeness. Can grow large as requirements increase.
+
+### Secure Design Principles
+
+- Least privilege  
+  Every process/user gets only the minimum permissions needed to perform its task. Limits damage if compromised.
+- Economy of mechanism  
+  Keep security mechanisms simple and small. Simple designs are easier to verify and test.
+- Open design  
+  Security must not depend on secrecy of the design. Only keys/passwords should be secret, not the algorithm or mechanism.
+- Complete mediation  
+  Every access to every object must be checked every time. No caching of access decisions that could become stale.
+- Permission-based (fail-safe defaults)  
+  Access granted only by explicit permission, and not by default. A missing rule means no access, not open access.
+- Separation of privilege  
+  Require two independent conditions to grant access rather than one. Example: two-person rule for sensitive operations; compromising one factor is insufficient.
+- Least common mechanism  
+  Minimize shared mechanisms between users. Shared resources create covert channels; less sharing = less leakage risk.
+- Ease of use  
+  Security interface must be simple enough that users comply naturally. A cumbersome mechanism gets bypassed or disabled, defeating its purpose entirely.

@@ -1,0 +1,39 @@
+---
+title: Virtualization
+sidebar:
+  order: 16
+dateCreated: 2026-05-17T03:17:07.650Z
+lastUpdatedOn: 2026-05-17T21:20:18.447Z
+slug: s4/operating-systems-security/virtualization
+prev: true
+next: true
+---
+
+Presenting one set of resources using different underlying resources.
+
+## Virtual machine
+
+Environment presenting only authorized resources to a user class. User cannot formulate commands exposing unauthorized resources.
+
+## Hypervisor
+
+Aka. virtual machine monitor. Software implementing a virtual machine. Mediates all access requests; redirects unauthorized requests.
+
+Used for:
+
+- Security isolation (e.g., two legal teams on same system).
+- Legacy OS support.
+- OS development/testing without target hardware.
+- Protected virtual networks.
+
+## Sandbox
+
+Environment limiting a process to controlled, bounded resources. Cannot affect outside resources.
+
+- Java's original design: local code = full access; remote applets = sandbox only.
+- Java Virtual Machine serves as reference monitor.
+- Weakness: opening sandbox for signed applets introduced vulnerabilities.
+
+## Honeypot
+
+Faux environment luring attackers. Administrators monitor in real time. Attacker sees a controlled, limited view of actual system.

@@ -1,0 +1,120 @@
+---
+title: Databases
+sidebar:
+  order: 21
+dateCreated: 2026-05-17T18:12:05.694Z
+lastUpdatedOn: 2026-05-17T21:20:18.448Z
+slug: s4/operating-systems-security/databases
+prev: true
+next: true
+---
+
+## Access Control
+
+DB administrator (DBA) specifies policy on who access what. Can be granular.
+
+Separate from the OS authentication, DBMS has its own authentication setup.
+
+## Database Integrity
+
+Protection of the database as a whole against damage both physical and logical. Managed by DBMS.
+
+Protection mechanisms:
+
+- Periodic full backups
+- Transaction logs  
+  Record all changes. Used to replay operations after failure.
+- Recovery procedure: restore backup → replay log → reach consistent state.
+
+**Two-phase update** — atomic write protocol.
+
+- Phase 1 (Intent): prepare all data, lock records, write commit flag.
+- Phase 2 (Write): execute all writes, remove commit flag.
+- Failure in either phase is recoverable without data corruption.
+
+**Redundancy/internal consistency** — shadow fields or check bits detect internal inconsistencies.
+
+### Element Accuracy
+
+Only correct value is written to the database. Enforced by field checks.
+
+### Element integrity
+
+Values written/changed only by authorized users. Enforced by access controls.
+
+## Auditability
+
+Audit record of all database access. All changes must be logged. Enables post-hoc analysis of who accessed what and when.
+
+## Disclosure
+
+### Sensitive Data
+
+Data not suitable for public disclosure.
+
+Categories:
+
+- Inherently sensitive  
+  Passwords, weapon locations.
+- From a sensitive source  
+  Confidential informant data.
+- Declared sensitive  
+  Classified documents, anonymous donor names.
+- Sensitive by record  
+  Salary field in employment database.
+- Sensitive in relation to other disclosed data  
+  Encrypted file combined with its key.
+
+### Types of Disclosure
+
+Disclosure modes beyond direct query:
+
+- Exact data  
+  Direct retrieval of a sensitive value.
+- Bounds  
+  Reveal that value $y$ satisfies $L \leq y \leq H$.
+- Negative result  
+  Confirm what a value is not.
+- Existence  
+  Confirm a field or record exists.
+- Probable value  
+  Probability that element has a specific value.
+- Direct inference  
+  Derive sensitive data without querying it directly.
+- Inference by arithmetic  
+  Deduce values from sums, averages, counts.
+- Aggregation  
+  Combine non-sensitive items to produce sensitive results.
+- Hidden data attributes  
+  Metadata leakage via file tags, geotags.
+
+### Preventing Disclosure
+
+No complete solution exists for inference and aggregation.
+
+Techniques:
+
+- Suppression  
+  Reject queries that would reveal sensitive data; responses withheld but correct.
+- Concealment  
+  Return approximate values; reduces precision, increases coverage.
+- Random perturbation  
+  Add/subtract small error values from actual values.
+- Rounding  
+  Return values rounded to a specified granularity.
+- Swapping  
+  Exchange values across records; preserves aggregate statistics.
+- Limited response suppression  
+  Omit low-frequency elements from results.
+- Blocking small sample sizes  
+  Refuse queries over populations below a threshold.
+- Query analysis  
+  Analyze query implications before returning results.
+
+**Security vs. precision tradeoff** — maximizing concealment reduces data utility; maximizing precision increases disclosure risk.
+
+## Inference
+
+Deriving protected values from unrestricted queries. System designers must anticipate inference possibilities while designing the system.
+
+Tracking per-user query history partially addresses inference, but users may pool knowledge or bring external data. No tracking strategy is complete.

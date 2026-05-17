@@ -1,0 +1,65 @@
+---
+title: Denial of Service
+sidebar:
+  order: 20
+dateCreated: 2026-05-17T10:39:21.053Z
+lastUpdatedOn: 2026-05-17T21:20:18.448Z
+slug: s4/operating-systems-security/denial-of-service
+prev: true
+next: true
+---
+
+Any attack targeting availability. Single attacker node.
+
+## DDoS
+
+Aka. Distributed Denial of Service. DoS via a botnet. Attacker plants malware (C2 software) on compromised hosts; issues coordinated attack command.
+
+### DDoS Botnet Structure
+
+Hierarchy: Attacker → Masters → C&C nodes → Bots → Victim. Redundant — loss of one master or C&C does not stop attack.
+
+**Botnets** — networks of compromised machines running malicious code under remote control. Often undetected; minimal harm to host machine. Attacker separated from bots by multiple layers — difficult to trace.
+
+## DoS Attack Types
+
+### Volumetric Attack
+
+Exhausts bandwidth or any other system resources.
+Examples:
+
+- Ping Flood  
+  Attacker sends ICMP echo requests exceeding victim's bandwidth. Only effective if attacker has greater bandwidth than victim.
+
+### Protocol Exhaustion
+
+Exhausts network layer tablespace.
+
+Examples:
+
+- SYN flood  
+  Attacker sends SYN packets with spoofed source IPs. Target sends SYN-ACK to non-existent addresses. Half-open connections queue until timeout. Queue exhausted and legitimate connections rejected.
+
+### Smurf Attack
+
+Amplification attack.
+
+1. Attacker sends ICMP request to broadcast address with victim's spoofed source IP.
+2. All devices behind router reply to victim.
+3. Amplification factor = number of devices behind router.
+
+### Teardrop Attack
+
+Sends packet fragments with conflicting reassembly offsets. OS cannot reassemble; can cause full OS lockup.
+
+### DNS Spoofing
+
+Attacker intercepts DNS query; returns malicious IP before legitimate DNS server responds. Victim's client receives attacker's response first and ignores later legitimate reply.
+
+### Rerouting
+
+Aka. BGP/routing poisoning. Attacker or misconfigured router advertises false routes. Adjacent routers propagate poisoned routing tables. Traffic redirected or dropped.
+
+### Session Hijacking
+
+Attacker monitors sequence numbers; injects forged packet with correct sequence number; sends RST to legitimate sender; takes over session.
