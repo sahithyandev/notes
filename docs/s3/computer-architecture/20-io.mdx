@@ -6,7 +6,7 @@ slug: s3/computer-architecture/io
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-04-28T07:56:31.649Z
+lastUpdatedOn: 2026-05-18T06:17:23.156Z
 ---
 
 ### Keyboard and Monitor
@@ -45,7 +45,7 @@ Categories:
 
 ### Programmed I/O
 
-CPU [polls](/s3/operating-systems/io-systems/#polling) the devices repeatedly and waits until the operation is complete. Simple to implement (no extra interrupt hardware or handlers required). Predictable control flow and timing.
+CPU [polls](/s3/operating-systems/io-system#polling) the devices repeatedly and waits until the operation is complete. Simple to implement (no extra interrupt hardware or handlers required). Predictable control flow and timing.
 Wastes clock cycles.
 
 Typical sequence:
@@ -57,7 +57,7 @@ Typical sequence:
 
 ### Interrupt-driven I/O
 
-CPU continues its operation. When the I/O device is ready, it [interrupts](/s3/operating-systems/io-systems/#interrupts) the CPU. Saves the current context (to the stack), handles the interrupt, restores the context (from the stack), and resumes execution. More efficient than programmed I/O. Requires special hardware.
+CPU continues its operation. When the I/O device is ready, it [interrupts](/s3/operating-systems/io-system#interrupt-driven) the CPU. Saves the current context (to the stack), handles the interrupt, restores the context (from the stack), and resumes execution. More efficient than programmed I/O. Requires special hardware.
 
 ### Direct Memory Access
 
