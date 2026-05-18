@@ -1,82 +1,76 @@
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { scanDocs } from "../src/integrations/link-validator/scan.ts";
+import {
+  buildValidUrls,
+  validate,
+} from "../src/integrations/link-validator/validate.ts";
 
-const semesterMap: Record<string, string> = {
-  "electrical-fundamentals": "s1",
-  "fluid-mechanics": "s1",
-  mathematics: "s1",
-  mechanics: "s1",
-  "programming-fundamentals": "s1",
-  "properties-of-materials": "s1",
-  "computer-organization-and-digital-design": "s2",
-  "data-structures-and-algorithms": "s2",
-  "methods-of-mathematics": "s2",
-  "program-construction": "s2",
-  "theory-of-electricity": "s2",
-  "applied-statistics": "s3",
-  "artificial-intelligence": "s3",
-  "computer-architecture": "s3",
-  "data-communication-and-networking": "s3",
-  "database-systems": "s3",
-  "differential-equations": "s3",
-  "engineering-thermodynamics": "s3",
-  "operating-systems": "s3",
-  "computer-networks": "s4",
-  "graph-theory": "s4",
-  iot: "s4",
-  "linear-algebra": "s4",
-  "operating-systems-security": "s4",
-  "software-engineering": "s4",
-  "theory-of-computing": "s4",
-};
-
-const subjectPattern = Object.keys(semesterMap).join("|");
-// Matches (/subject-folder...) but not already prefixed with /s1/ etc.
-const linkRegex = new RegExp(`\\(/(${subjectPattern})(/[^)]*)?\\)`, "g");
-
+const CONFIDENCE_THRESHOLD = 0.92;
 const dryRun = process.argv.includes("--dry-run");
-const dir = import.meta.dirname;
-console.log("dir=", dir);
-const docsDir = join(dir, "../docs");
+const docsRoot = join(import.meta.dirname, "../docs");
 
-function walkFiles(dir: string): string[] {
-  const entries = readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...walkFiles(full));
-    } else if (entry.name.endsWith(".md") || entry.name.endsWith(".mdx")) {
-      files.push(full);
-    }
+// Build the valid URL set from frontmatter slugs (no Astro routes needed).
+// Redirect URLs (e.g. /s4/linear-algebra) won't be auto-fixed anyway since
+// they resolve to real pages — only genuinely broken links get suggestions.
+const scanned = scanDocs(docsRoot);
+const validUrls = buildValidUrls(scanned);
+const reports = validate(scanned, validUrls);
+
+/** Compute what the fixed URL should be for a high-confidence violation. */
+function fixedUrl(v: (typeof reports)[0]["violations"][0]): string {
+  const top = v.suggestions[0];
+  if (v.kind === "broken-link" || v.kind === "missing-image") {
+    return top.candidate;
   }
-  return files;
+  // broken-anchor: reconstruct path + corrected anchor
+  return v.target ? `${v.target}#${top.candidate}` : `#${top.candidate}`;
 }
 
 let totalFiles = 0;
-let totalReplacements = 0;
+let totalFixes = 0;
+let totalSkipped = 0;
 
-for (const file of walkFiles(docsDir)) {
-  const original = readFileSync(file, "utf-8");
-  let count = 0;
-  const updated = original.replace(linkRegex, (match, subject, rest) => {
-    const sem = semesterMap[subject];
-    count++;
-    return `(/${sem}/${subject}${rest ?? ""})`;
-  });
+for (const { file, violations } of reports) {
+  const fixable = violations.filter(
+    (v) =>
+      v.suggestions.length > 0 &&
+      v.suggestions[0].score >= CONFIDENCE_THRESHOLD,
+  );
+  const skipped = violations.length - fixable.length;
+  totalSkipped += skipped;
 
-  if (count > 0) {
-    totalFiles++;
-    totalReplacements += count;
+  if (fixable.length === 0) continue;
+
+  const lines = readFileSync(file, "utf-8").split("\n");
+
+  // Apply fixes line-by-line, sorted by line then by position so multiple
+  // fixes on the same line don't shift each other.
+  for (const v of fixable) {
+    const idx = v.line - 1;
+    const replacement = fixedUrl(v);
+    // Replace first occurrence of the raw URL on this line only.
+    lines[idx] = lines[idx].replace(v.raw, replacement);
+    totalFixes++;
+    const rel = file.replace(docsRoot + "/", "docs/");
     console.log(
-      `${dryRun ? "[dry-run] " : ""}${file} — ${count} replacement(s)`,
+      `${dryRun ? "[dry-run] " : ""}${rel}:${v.line}  ${v.raw}  →  ${replacement}  (${v.suggestions[0].score.toFixed(2)})`,
     );
-    if (!dryRun) {
-      writeFileSync(file, updated, "utf-8");
-    }
   }
+
+  if (!dryRun) {
+    writeFileSync(file, lines.join("\n"), "utf-8");
+  }
+
+  totalFiles++;
+}
+
+if (totalSkipped > 0) {
+  console.log(
+    `\n${totalSkipped} violation(s) skipped (no suggestion above ${CONFIDENCE_THRESHOLD} confidence) — run \`bun dev\` to review them.`,
+  );
 }
 
 console.log(
-  `\n${dryRun ? "[dry-run] " : ""}Done: ${totalReplacements} replacement(s) across ${totalFiles} file(s).`,
+  `\n${dryRun ? "[dry-run] " : ""}Done: ${totalFixes} fix(es) across ${totalFiles} file(s).`,
 );

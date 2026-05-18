@@ -1,10 +1,17 @@
-import type { AstroIntegrationLogger } from "astro";
 import type { Suggestion } from "./similarity.ts";
+
+export interface SimpleLogger {
+  warn(msg: string): void;
+  info(msg: string): void;
+}
 
 export interface Violation {
   line: number;
   kind: "broken-link" | "broken-anchor" | "missing-image";
+  /** The raw URL string as it appeared in the source markdown. */
   raw: string;
+  /** Path portion of raw (no anchor, no trailing slash). Empty for in-page anchors. */
+  target: string;
   suggestions: Suggestion[];
 }
 
@@ -30,7 +37,7 @@ function kindLabel(kind: Violation["kind"]): string {
 
 export function printReport(
   reports: FileReport[],
-  logger: AstroIntegrationLogger,
+  logger: SimpleLogger,
   docsRoot: string,
 ): void {
   const total = reports.reduce((n, r) => n + r.violations.length, 0);

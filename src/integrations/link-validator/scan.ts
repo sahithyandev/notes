@@ -65,7 +65,13 @@ function extractHeadings(content: string): Set<string> {
   return headings;
 }
 
-function extractLinks(content: string, filePath: string): ExtractedLink[] {
+function frontmatterOffset(raw: string): number {
+  const m = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+  if (!m) return 0;
+  return m[0].split("\n").length - 1;
+}
+
+function extractLinks(content: string, lineOffset: number): ExtractedLink[] {
   const links: ExtractedLink[] = [];
   const lines = content.split("\n");
 
@@ -127,7 +133,7 @@ function extractLinks(content: string, filePath: string): ExtractedLink[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const lineNum = i + 1;
+    const lineNum = i + 1 + lineOffset;
 
     for (const m of line.matchAll(docLinkRe)) {
       const link = parseLinkUrl(m[1], "doc", lineNum);
@@ -149,7 +155,7 @@ export function scanDocs(docsRoot: string): ScannedFile[] {
     const { data, content } = matter(raw);
     const slug: string = data.slug ?? "";
     const headings = extractHeadings(content);
-    const links = extractLinks(content, file);
+    const links = extractLinks(content, frontmatterOffset(raw));
     return { file, slug, headings, links };
   });
 }
