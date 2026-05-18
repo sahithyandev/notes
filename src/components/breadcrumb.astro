@@ -19,7 +19,7 @@ function generateBreadcrumb(slug: string): BreadcrumbItem[] {
     let href: string | undefined;
 
     // Handle semester
-    if (part.startsWith("s")) {
+    if (index === 0 && part.startsWith("s")) {
       const semesterNum = part.substring(1);
       label = `Semester ${semesterNum}`;
       href = `/${part}`;
