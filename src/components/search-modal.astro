@@ -37,7 +37,6 @@
 </dialog>
 
 <script>
-  const IS_DEV = import.meta.env.DEV;
   let pagefind: any = null;
   let pagefindReady = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -80,7 +79,6 @@
   }
 
   async function ensurePagefind(): Promise<boolean> {
-    if (IS_DEV) return false;
     if (pagefindReady) return true;
     try {
       // Use eval to bypass Vite's static analysis
@@ -99,14 +97,8 @@
     modal.showModal();
     input.value = "";
     selectedIndex = -1;
-    if (IS_DEV) {
-      input.disabled = true;
-      input.placeholder = "Search disabled in dev";
-      resultsEl.innerHTML = `<div class="sr-empty">Search is disabled in development.<br/>Run <code>bun build &amp;&amp; bun preview</code> to try it.</div>`;
-    } else {
-      resultsEl.innerHTML = `<div class="sr-idle"><span class="sr-idle-prompt">$&nbsp;<span class="sr-idle-cursor">_</span></span><span class="sr-idle-hint">All notes indexed. Awaiting query.</span></div>`;
-      requestAnimationFrame(() => input.focus());
-    }
+    resultsEl.innerHTML = `<div class="sr-idle"><span class="sr-idle-prompt">$&nbsp;<span class="sr-idle-cursor">_</span></span><span class="sr-idle-hint">All notes indexed. Awaiting query.</span></div>`;
+    requestAnimationFrame(() => input.focus());
   }
 
   function closeModal() {
