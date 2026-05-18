@@ -1,0 +1,172 @@
+---
+title: Cloud Computing
+sidebar:
+  order: 24
+dateCreated: 2026-05-17T22:27:32.986Z
+lastUpdatedOn: 2026-05-18T05:02:41.218Z
+slug: s4/operating-systems-security/cloud-computing
+prev: true
+next: true
+---
+
+# Cloud Computing
+
+## Overview
+
+Cloud computing — a form of distributed computing that promotes availability via high-speed broadband and distributed servers. Introduces new security threats alongside expanded service models. Security responsibility is split between provider and client.
+
+## Key Concepts
+
+### Cloud Computing Characteristics
+
+Five defining properties:
+
+- **On-demand self-service** — resources added or removed as needed.
+- **Broad network access** — accessible from mobile, desktop, and mainframe.
+- **Resource pooling** — multiple tenants share dynamically reassigned resources, invisibly.
+- **Rapid elasticity** — services scale up or down automatically.
+- **Measured service** — usage monitored and billed like a utility.
+
+### Service Models
+
+**SaaS (Software as a Service)** — provider supplies applications running in the cloud. User has no control over hardware or software platform.
+
+- Security infrastructure: provider's responsibility.
+- User access control: client's responsibility.
+- Examples: Facebook, Microsoft 365.
+
+**PaaS (Platform as a Service)** — provider controls infrastructure and deployment platform. Client controls application security configuration.
+
+- Examples: Microsoft Azure, Google App Engine.
+
+**IaaS (Infrastructure as a Service)** — provider supplies processing, storage, networking, and OS. Client manages applications and software services.
+
+- Client may configure OS-level and application-level security settings.
+- Examples: Amazon Web Services (AWS), Google Compute Engine.
+
+### Deployment Models
+
+**Private cloud** — infrastructure operated exclusively for one organization. Full control over security setup.
+
+**Community cloud** — shared by organizations with common goals or interests. Management may be outsourced; responsibility remains with the community.
+
+**Public cloud** — operated by a provider for general public use. Client has no control over security setup.
+
+**Hybrid cloud** — two or more cloud types connected to balance loads. Most security responsibility falls on the client.
+
+### Security Responsibility
+
+Control exists on a continuum from public to private cloud. The less control the user has, the more dependent they are on provider-enforced separation controls.
+
+- Public cloud: user fully dependent on provider's controls. Must review terms of use. Must add own protections (e.g., encryption).
+- Private cloud: organization controls all security settings.
+
+Cloud security breaches commonly arise from:
+
+- Misconfiguration of security settings.
+- Lack of visibility into access settings and activity.
+- Problems with identity and access management (IAM).
+
+### Cloud Security Threats
+
+Objectives remain: **confidentiality**, **integrity**, **availability**. Attack surface is dramatically larger than on-premises.
+
+**Data breaches** — unauthorized access to cloud-stored data. Difficult to manage due to shared resources and many ingress points. Large data volumes increase exposure.
+
+**Misconfiguration** — users often retain excess privileges. Default settings are opaque. Hackers exploit over-privileged accounts.
+
+**Account hijacking** — strong authentication not mandated by default. Decommissioning of unused accounts is often poorly controlled.
+
+**Limited visibility** — no regulation requires cloud usage visibility, especially in SaaS. Unauthorized access is hard to detect.
+
+**Insecure interfaces and APIs** — no standard security specification for cloud APIs. ~⅓ of cloud security incidents (5-year study) caused by insecure interfaces/APIs.
+
+**Denial-of-service (DoS) attacks** — cloud services remain vulnerable despite resilience design.
+
+### Security and Deployment Model Interaction
+
+|Model|Provider Responsibility|Client Responsibility|
+|---|---|---|
+|SaaS|Infrastructure + software|User access control|
+|PaaS|Infrastructure + platform|Application security|
+|IaaS|Infrastructure|Applications, OS-level config|
+|Private|Varies (may be outsourced)|Full ownership and control|
+|Public|Full setup and management|Awareness, encryption, cleanup|
+|Hybrid|Partial|Majority|
+
+### Cloud Security Management Responses
+
+- Data protection in transit and at rest.
+- Identity and access management (IAM) for cloud users.
+- Security management of cloud services.
+- Data management and business continuity under attack.
+- Legal compliance.
+
+### Cloud Migration Risk Analysis
+
+Steps:
+
+1. Identify assets.
+2. Determine vulnerabilities.
+3. Estimate likelihood of exploitation.
+4. Compute expected loss.
+5. Survey and select new controls.
+6. Project savings.
+
+### Cloud Provider Assessment
+
+Security criteria to evaluate:
+
+- Authentication, authorization, and access control options.
+- Encryption options.
+- Audit logging capabilities.
+- Incident response capabilities.
+- Reliability and uptime.
+
+Assessment frameworks:
+
+- **FedRAMP** — US federal cloud security program.
+- **PCI DSS** — payment card industry data security standard.
+- **CSA STAR** — Cloud Security Alliance Security, Trust, Assurance, and Risk registry.
+
+### Security Benefits of Cloud Services
+
+**Geographic diversity** — data mirrored across dispersed data centers. Protection from local or natural disasters.
+
+**Platform and infrastructure diversity** — different platforms have different bugs. Single attack less likely to compromise entire system. Useful for diversifying a technology stack.
+
+### Cloud-Based Security Functions
+
+**Email filtering** — cloud-based filter inserted as an SMTP hop. Low overhead.
+
+**DDoS protection** — cloud provider proxies traffic via DNS record update. Absorbs flood traffic with high-bandwidth infrastructure.
+
+**Network monitoring** — cloud solutions reduce hardware requirements. Provides monitoring and incident response expertise.
+
+### Cloud Storage Security
+
+Default behavior: data stored unencrypted or encrypted with a single shared key — weak confidentiality.
+
+Better options:
+
+- Per-user key generation based on password or secret.
+- **TNO (Trust No One)** model — provider does not hold decryption keys. Maximum confidentiality.
+
+### Data Loss Prevention (DLP)
+
+**DLP** — solution that identifies and prevents unsafe sharing, transfer, or use of sensitive data.
+
+Harder in cloud than on-premises — less control over data ingress/egress points.
+
+DLP strategies for cloud-based corporate data:
+
+- Route all access through a corporate **VPN**.
+- Install DLP agents on corporate end-user systems.
+- In IaaS: insert a DLP server as a proxy between user systems and cloud servers.
+
+### Cloud Application Security
+
+**Attacks against shared resources** — shared computing environments allow one vulnerable application to compromise others. Includes cryptographic side-channel attacks targeting shared-resource environments.
+
+**Attacks against insecure APIs** — known broken APIs have been widely used by cloud vendors. ~⅓ of cloud incidents traced to insecure interfaces/APIs. Major vulnerabilities found in SSL libraries of providers including Amazon and PayPal.
+
