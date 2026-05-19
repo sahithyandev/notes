@@ -1,0 +1,51 @@
+---
+title: Source Code Management
+sidebar:
+  order: 10
+dateCreated: 2026-05-19T09:50:19.304Z
+lastUpdatedOn: 2026-05-19T13:49:07.847Z
+slug: s4/software-engineering/source-code-management
+prev: true
+next: true
+---
+
+Aka. SCM. Software-supported practices for managing an evolving codebase. Used to track who did what in a codebase, manage multiple people working on the same feature or different feature simultaneously.
+
+### Repository
+
+Shared store for all versioned project artifacts.
+
+Stores:
+
+- All source code versions
+- Configuration files, build scripts, shared libraries, toolchains
+- Database of version info: who changed what, when, and why
+
+## Types
+
+### Centralized
+
+Single server holds the authoritative repository. Developers check out and check in files.
+
+Examples are CVS and Subversion.
+
+### Distributed
+
+Each developer holds a full clone of the repository locally. Files are changed through a shared remote. There could be many remotes for a single project. And it can be self-hosted.
+
+One example is git.
+
+Benefits of distributed management over centralized:
+
+- Resilience  
+  Clones survive server failure; offline work possible.
+- Speed  
+  Local commits require no network transfer.
+- Flexibility  
+  Local experimentation without exposing work to others.
+
+## Branching
+
+A branch is an independent, stand-alone version of the codebase. Created by a developer, to work on a feature independent of the master branch.
+
+Branch files become the repository files when they are _merged_. Thorough testing is done before merging a branch.
