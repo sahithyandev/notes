@@ -1,0 +1,64 @@
+---
+title: Virtual Private Network
+sidebar:
+  order: 15
+dateCreated: 2026-05-21T04:36:21.616Z
+lastUpdatedOn: 2026-05-21T06:14:14.472Z
+slug: s4/computer-networks/vpn
+prev: true
+next: true
+---
+
+Enterprise VPNs are mostly used to extend local area networks. Consumer VPNs are mostly used as a layer of privacy. Both work on the same concepts.
+
+Original packet gets encrypted and wrapped by a new packet. The outer packet travels through the internet normally. VPN gateway unwraps, decrypts and delivers the original packet correctly. In enterprise VPNs that would be the local area network; In consumer VPNs that would be another service.
+
+## Tunneling
+
+Act of wrapping one network protocol's packets inside another. Provides network extension.
+
+A "tunnel" is the logical pipe this creates between two endpoints. Everything inside is invisible to anyone watching the path.
+
+Usually all packets are routed through the VPN gateway. It is not a problem in consumer VPNs but might not be desirable in enterprise VPNs.
+
+### Split Tunneling
+
+Lets the client decide which packets should go through VPN. Achieved through routing table manipulation. VPN client injects specific routes rather than a default route.
+
+Security-conscious organizations disable split tunneling because it means traffic to untrusted networks bypasses their corporate firewall and DLP controls.
+
+## Encryption
+
+Provides confidentiality. Optional (GRE tunnels does not have encryption).
+
+## Types
+
+### Layer 2 VPN
+
+Tunnels Ethernet frames. Both ends behave as if they are on the same local area network. They can be on the same subnet, broadcast to each other, run ARP. Transparent. Not scalable because of Ethernet overhead. High risk. High complexity.
+
+### Layer 3 VPN
+
+Tunnels IP packets. Separate networks on either ends. Routing tables are involved. Requires routing configurations at the edges. Scalable. Used in consumer VPNs.
+
+## IPSec Protocol
+
+Has 2 modes:
+
+- Transport mode  
+  Only the _payload_ is encrypted; the original IP header stays visible. Useful between two hosts on the same network.
+- Tunnel mode  
+  The entire original packet (header + payload) is encrypted and wrapped in a new outer IP packet. This is what site-to-site VPNs use.
+
+Uses Internet Key Exchange (IKE) protocol to negotiate and establish the Security Association. Both ends agree on cipher suites and exchange keys. Encapsulating Security Payload (ESP) does the actual encryption per-packet.
+
+### Connection Establishment
+
+1. Phase 1 (IKE SA)  
+   The two gateways authenticate each other (certificates or pre-shared key) and negotiate a secure channel to talk on. Diffie-Hellman key exchange (neither side ever transmits the session key directly) happens usually.
+2. Phase 2 (IPSec SA)  
+   Using the Phase 1 channel, they negotiate the actual tunnel parameters: encryption algorithm (AES-256), integrity algorithm (SHA-256), lifetime, etc. A _Security Association (SA)_ is created here.
+3. Tunnel operation  
+   Every outgoing packet gets encrypted with the agreed key and ESP-encapsulated. The receiving side looks up the SA (indexed by an Security Parameter Index in the ESP header), decrypts, and delivers.
+4. Key rekeying  
+   After a configurable number of bytes or time, IKE renegotiates keys for security purposes.

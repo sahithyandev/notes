@@ -3,7 +3,7 @@ title: Virtual LAN
 sidebar:
   order: 13
 dateCreated: 2026-05-06T04:56:36.623Z
-lastUpdatedOn: 2026-05-18T06:17:23.158Z
+lastUpdatedOn: 2026-05-21T06:14:14.470Z
 slug: s4/computer-networks/vlan
 prev: true
 next: true
@@ -24,8 +24,11 @@ Switches are used to create and manage VLANs.
 Each VLAN is identified by a 12-bit _VLAN ID_.
 
 - 0 is used to denote that there are no VLAN
-- 1 - 4094 is the usable range
+- 1 - 1005 is the normal VLAN id range
+- 1006 - 4094 is the extended VLAN id range
 - 4095 is used for internal switch use
+
+The 1005 boundary for normal vs. extended VLANs are not a mathematical boundary. It was a design decision by Cisco for management purposes.
 
 In switches where VLAN is supported, by default, all ports are assigned to the VLAN 1 which is the default.
 
