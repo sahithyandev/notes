@@ -1,0 +1,72 @@
+---
+import { titleize } from "../utils";
+
+interface SubjectItem {
+  subject: string;
+  href: string;
+  count: number;
+  active?: boolean;
+}
+
+interface Props {
+  subjects: SubjectItem[];
+}
+
+const { subjects } = Astro.props;
+---
+
+<div class="sb-group-title">Subjects</div>
+{
+  subjects.map(({ subject, href, count, active }) => (
+    <a href={href} class={`sb-item${active ? " active" : ""}`}>
+      {titleize(subject)}
+      <span class="sb-item-count">{count}</span>
+    </a>
+  ))
+}
+
+<style>
+  .sb-group-title {
+    padding: 10px 16px 4px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .sb-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 16px;
+    font-size: 0.78125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    transition:
+      background 0.1s,
+      color 0.1s,
+      border-color 0.1s;
+    line-height: 1.35;
+  }
+
+  .sb-item:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  .sb-item.active {
+    background: var(--sem-dim);
+    color: var(--sem);
+    border-left-color: var(--sem);
+    font-weight: 700;
+  }
+
+  .sb-item-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--text-muted);
+  }
+</style>

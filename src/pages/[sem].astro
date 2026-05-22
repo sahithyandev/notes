@@ -6,6 +6,7 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 import { titleize } from "../utils";
 import NoteCard from "../components/note-card.astro";
 import TocRail from "../components/toc-rail.astro";
+import ModulesList from "../components/modules-list.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -94,6 +95,13 @@ const semesters = [...semesterNums]
 
 const description = `Semester ${semNum} notes covering ${Object.keys(subjectTrees).map(titleize).join(", ")}.`;
 const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --sem-border: var(--s${semNum}-border); --sem-text: var(--s${semNum}); --sem-dim: var(--s${semNum}-bg); --link: var(--s${semNum});`;
+
+const subjectsList = Object.keys(subjectTrees).map((subject) => {
+  const { direct, modules } = subjectTrees[subject];
+  const firstNote = direct[0] ?? Object.values(modules).flat()[0];
+  const href = firstNote ? `/${firstNote.slug}` : `#${subject}`;
+  return { subject, href, count: grouped[subject].length };
+});
 ---
 
 <Layout
@@ -211,20 +219,7 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
         </div>
       </div>
 
-      <div class="sb-group-title">Subjects</div>
-      {
-        Object.keys(subjectTrees).map((subject) => {
-          const { direct, modules } = subjectTrees[subject];
-          const firstNote = direct[0] ?? Object.values(modules).flat()[0];
-          const href = firstNote ? `/${firstNote.slug}` : `#${subject}`;
-          return (
-            <a href={href} class="sb-item">
-              {titleize(subject)}
-              <span class="sb-item-count">{grouped[subject].length}</span>
-            </a>
-          );
-        })
-      }
+      <ModulesList subjects={subjectsList} />
 
       <div class="sb-rule"></div>
       <a href="/license" class="sb-item"> License </a>
@@ -614,15 +609,6 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
     letter-spacing: -0.2px;
   }
 
-  .sb-group-title {
-    padding: 10px 16px 4px;
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
-
   .sb-item {
     display: flex;
     align-items: center;
@@ -642,13 +628,6 @@ const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --se
   .sb-item:hover {
     background: var(--surface-2);
     color: var(--text-primary);
-  }
-
-  .sb-item-count {
-    margin-left: auto;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    color: var(--text-muted);
   }
 
   .sb-rule {

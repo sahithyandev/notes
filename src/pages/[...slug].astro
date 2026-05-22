@@ -11,6 +11,7 @@ import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 import { titleize } from "../utils";
 import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
 import TocRail from "../components/toc-rail.astro";
+import ModulesList from "../components/modules-list.astro";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -354,22 +355,16 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
         </div>
       </div>
 
-      <div class="sb-group-title">Subjects</div>
-      {
-        Object.entries(
+      <ModulesList
+        subjects={Object.entries(
           sidebarData.grouped[sidebarData.currentSemester] || {},
-        ).map(([subject, notes]) => (
-          <a
-            href={`/${sidebarData.currentSemester}/${subject}`}
-            class={`sb-item ${subject === sidebarData.currentSubject ? "active" : ""}`}
-          >
-            {subject
-              .replace(/-/g, " ")
-              .replace(/\b\w/g, (l) => l.toUpperCase())}
-            <span class="sb-item-count">{notes.length}</span>
-          </a>
-        ))
-      }
+        ).map(([subject, notes]) => ({
+          subject,
+          href: `/${sidebarData.currentSemester}/${subject}`,
+          count: notes.length,
+          active: subject === sidebarData.currentSubject,
+        }))}
+      />
 
       {
         (sidebarData.currentSubjectTree.direct.length > 0 ||
