@@ -7,12 +7,10 @@ slug: s4/graph-theory/introduction
 prev: false
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-05-25T11:39:41.834Z
+lastUpdatedOn: 2026-05-25T12:19:30.320Z
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/graph
 ---
-
-For all the definitions below, consider a graph $G$ with non-empty vertex set $V$ and edge set $E$.
 
 ## Vertex
 
@@ -41,6 +39,21 @@ Denoted by a line.
 ### Loop
 
 An edge that connects a vertex to itself.
+
+### Multi-edge
+
+More than one edge connecting 2 vertices.
+
+## Pseudograph
+
+A pseudograph consists of a set of vertices ($V$) and some pairs of these are connected by edges ($E$). Denoted as $G(V,E)$.
+
+For all the definitions below, consider a graph $G$ with non-empty vertex set $V$ and edge set $E$.
+
+2 types:
+- Multi-graph   
+  May include multi-edges or loops.
+- Simple graph 
 
 ## Adjacency
 
@@ -72,90 +85,3 @@ Aka. inverse. For a simple graph $G$, its complement graph has:
 - An edge between two vertices **iff** they are **not** adjacent in $G$.
 
 Denoted by $G^c$.
-
-## Preliminary Definitions
-
-### Walk
-
-A finite alternating sequence of vertices and edges, which begins and ends with a vertex, so that each edge is incident with the vertices preceding and following it.
-
-### Trail
-
-A walk with no repeating edges. Vertices may repeat.
-
-### Circuit
-
-Aka. closed trail. A trial with the same starting and ending vertices. A walk with no repeating edges, that start and end in the same vertex.
-
-### Path
-
-A trail with no repeating vertices (except the starting and ending pair). A walk with no repeating edges or vertices.
-
-In a connected graph with $n \ge 2$ vertices, any two vertices are connected by a path of length $k$ where $k \le n − 1$.
-
-<Note title="Proof Hint">
-
-- Suppose $G$ is connected and has $n \ge 2$ vertices
-- Suppose $P^*$ is the minimum-edge path from $u$ to $v$.
-- $P^*$ is a simple path
-	- If not, a vertex appears twice along the path.
-	- The vertex can be short-circuited to produce a shorter path
-- $P^*$ visits each vertex at most once. It has $m-1$ edges if it visits $m$ vertices.
-- Maximum number of vertices is $n$. Hence $P^*$ has a maximum length of $n-1$.
-
-</Note>
-
-### Cycle
-
-A closed path. Starts and ends in the same vertex. No repeating vertices and no repeating edges.
-
-All cycles with the same vertices and edges, are considered a single cycle, even if written in a different order.
-
-Length of a cycle is defined as:
-
-- number of edges in unweighted graph
-- sum of weights of edges in weighted graph
-
-### Euler Path
-
-A trail that traverses every edge. No repeating edges. Vertices may repeat.
-
-<Note title='Euler "Path"?' type="caution">
-
-_Euler Path_ is a misnomer. It should have been called Euler "trail" since vertices can repeat. Refer to [the Venn diagram below](#comparison) for more clarity.
-
-</Note>
-
-### Euler Circuit
-
-A closed Euler path. Starts and ends in the same vertex.
-
-### Hamiltonian Path
-
-Aka. traceable path. A path that contains every vertex of the graph. No repeating edges and no repeating vertices.
-
-### Hamiltonian Cycle
-
-Aka. Hamiltonian Circuit. A closed Hamiltonian path.
-
-### Comparison
-
-<WalksVennDiagram />
-
-| -                                                         | Repeating Vertices | Repeating Edges | Same Start and End |
-| --------------------------------------------------------- | ------------------ | --------------- | ------------------ |
-| Walk                                                      | Yes                | Yes             | No                 |
-| Closed Walk                                               | Yes                | Yes             | Yes                |
-| Trail / Euler Path<strong>\*</strong>                     | Yes                | No              | No                 |
-| Circuit (Closed Trail) / Euler Circuit<strong>\*</strong> | Yes                | No              | Yes                |
-| Path / Hamiltonian Path<strong>\*\*</strong>              | No                 | No              | No                 |
-| Closed Path / Hamiltonian Circuit<strong>\*\*</strong>    | No                 | No              | Yes                |
-
-<strong>\*</strong>must traverse every edge. <strong>\*\*</strong>must traverse
-every vertex.
-
-<Note>
-
-There's no such thing where repeating vertices are not allowed but repeating edges are allowed. If edges repeat, then vertices must repeat as well.
-
-</Note>

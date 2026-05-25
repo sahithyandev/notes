@@ -1,0 +1,57 @@
+---
+title: Planar Graph
+sidebar:
+  order: 8
+dateCreated: 2026-05-25T11:56:20.071Z
+lastUpdatedOn: 2026-05-25T12:19:30.323Z
+slug: s4/graph-theory/planar-graph
+prev: true
+next: true
+---
+
+A graph that can be drawn on a plane without any edges crossing.
+
+A drawing of the graph without edge crossings is called a planar representation or planar embedding. A graph can have multiple planar representations.
+
+## Euler’s Formula for Planar Graphs
+
+For a connected planar graph:
+
+$$
+v - e + f = 2
+$$
+
+Here:
+
+- $v$ – number of vertices
+- $e$ – number of edges
+- $f$ – number of regions (faces), including the outer region.
+
+<Note>
+
+Euler's identity for polyhedra is proved by representing a polyhedron using a planer graph.
+
+</Note>
+
+### Corollary of Euler’s Formula
+
+For a connected planar simple graph with $v \ge 3$, the graph must satisfy $e \le 3v - 6$.
+
+If a graph violates this inequality, it cannot be planar.
+
+## Non-Planar Graph
+
+Certain graphs cannot be drawn without edge crossings.
+
+Examples:
+
+- $K_5$  
+  Complete graph with 5 vertices. Does not satisfy the corollary of Euler’s formula for planar graphs, thus non-planar.
+- $K_{3,3}$  
+  Complete bipartite graph with partitions of size 3. Satisfies the corollary of Euler’s formula, but is still non-planar. It can be shown that it contains a subgraph homeomorphic to $K_5$.
+
+These are the smallest non-planar graphs.
+
+### Kuratowski’s Theorem
+
+A graph is non-planar **iff** it contains a subgraph homeomorphic to $K_5$ or $K_{3,3}$.
