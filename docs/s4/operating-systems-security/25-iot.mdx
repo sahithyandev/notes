@@ -1,11 +1,124 @@
 ---
-title: Iot
+title: Internet of Things
 sidebar:
   order: 25
 dateCreated: 2026-05-17T22:27:37.385Z
-lastUpdatedOn: 2026-05-18T06:17:23.158Z
+lastUpdatedOn: 2026-05-25T04:57:58.577Z
 slug: s4/operating-systems-security/iot
 prev: true
 next: false
+prereqs:
+  - s4/iot/introduction
 ---
 
+## Deployment Contexts
+
+### Civic & Industrial
+
+Deployed across civic and industrial systems.
+
+- Lighting, refuse collection, traffic control, utility provision.
+- Banking and food supply chains.
+- Workplace: HVAC, security systems, building access, production, stock management.
+
+Examples:
+- Smart Home   
+  Lights, security cameras, door locks, air-conditioners and many other devices connected together and controlled from an app.
+- Urban environment using cloud-connected IoT for intelligent, interconnected services such as transport and monitoring.
+
+### Medical
+
+Medical IoT devices that are placed on or inside a human body. Originally closed systems with no external data transfer. Internet-connected for monitoring and updates propagation. If compromised, could cause severe issues.
+
+Examples are pacemakers, insulin pumps, blood glucose monitors, bone-anchored hearing systems.
+
+## Security Weaknesses
+
+IoT devices are basically computers and their attack surface is very large. Because:
+
+- Not-so-secure OSes   
+  Open-source OSes are battle-tested by their community. That's not the case with proprietary OSes. And they might ship with legacy OSes with known vulnerabilities.
+- Poor or absent software update mechanisms   
+  Often due to resource constraints.
+- Hardwired, unchangeable default passwords.
+- No physical hardening   
+  They are consumer facing and not behind traditional perimeter defenses.
+
+### Vulnerability Classes
+
+- Poor access control   
+  Weak authentication which is susceptible to brute force, session hijacking.
+- Specialist management gap   
+  Owners and developers lack security expertise.
+- Physical exposure   
+  Devices are deployed close to customers without physical protection. Susceptible to tampering.
+- Resource constraints   
+  Limit cryptographic capability and patch deployment.
+- Battery drain attacks   
+  DoS targeting energy exhaustion rather than availability.
+- Weak interfaces and APIs   
+  Insufficient memory protection; exposed control surfaces.
+
+### Ecosystem Security
+
+No centralized standardization effort. Fragmented standards and regulations.
+
+- Differing security requirements across vendors.
+- Lack of interoperability between devices.
+- Unclear liability assignment for incidents.
+- Developers prioritize functionality over failure modes.
+
+## Threats
+
+### Malicious
+
+- Eavesdropping / wiretapping on communications.
+- Theft, tampering, unauthorized modification or use.
+- Forced failure into insecure state → unauthorized access.
+
+### Accidental / Systemic
+
+- Lack of security capability in constrained devices.
+- Ambiguous maintenance responsibility; absent vendor support post-deployment.
+- Obsolete or unsupported technology.
+- Hardware failure; software errors; user/operator error.
+- Environmental incidents; electrical supply interruption.
+
+### Botnets
+
+A collection of compromised devices controlled via a command and control (C2) server.
+
+Botnets existed even before IoT was a thing. With IoT devices, as they are not perceived as computers by most owners, botnet recruitment pool is much bigger now.
+
+Compromised IoT devices can be used for:
+
+- Snooping   
+  Harvesting behavioral data (e.g., media consumption habits).
+- Cryptocurrency mining   
+  Exploiting collective compute across many devices.
+- Click fraud   
+  Generating illegitimate ad revenue.
+
+## Security Responses
+
+### Hardening
+
+Restrict device access to authorized entities only.
+
+Required controls:
+
+- Secure boot process.
+- Secure debugging interfaces.
+- Reverse-engineering and tamper prevention.
+- Cryptographic process protection.
+- Secure CPU and testing interfaces.
+
+Software controls must be:
+
+- Tailored to resource constraints.
+- Deployed via automated remote update — no human interaction assumed.
+- Designed for minimal footprint.
+
+### Proactive threat detection
+
+Necessary due to ecosystem complexity.

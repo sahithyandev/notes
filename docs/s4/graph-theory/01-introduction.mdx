@@ -7,7 +7,7 @@ slug: s4/graph-theory/introduction
 prev: false
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-05-18T06:17:23.158Z
+lastUpdatedOn: 2026-05-25T04:57:58.575Z
 ---
 
 For all the definitions below, consider a graph $G$ with non-empty vertex set $V$ and edge set $E$.
@@ -75,9 +75,7 @@ Denoted by $G^c$.
 
 ### Walk
 
-A finite alternating sequence of vertices and edges, which begins and ends with a vertex, so that each edge is incident with the vertices preceding and following it, and any vertex or edge can appear more than once.
-
-If $A$ is the adjacency matrix of $G$, entry $(i, j)$ of $A^m$ is equal to the number of walks of length m from $v_i$ to $v_j$.
+A finite alternating sequence of vertices and edges, which begins and ends with a vertex, so that each edge is incident with the vertices preceding and following it.
 
 ### Trail
 
@@ -91,7 +89,19 @@ Aka. closed trail. A trial with the same starting and ending vertices. A walk wi
 
 A trail with no repeating vertices (except the starting and ending pair). A walk with no repeating edges or vertices.
 
-In a connected graph with $n$ vertices, any two vertices are connected by a path of length $k$ where $k \le n − 1$.
+In a connected graph with $n \ge 2$ vertices, any two vertices are connected by a path of length $k$ where $k \le n − 1$.
+
+<Note title="Proof Hint">
+
+- Suppose $G$ is connected and has $n \ge 2$ vertices
+- Suppose $P^*$ is the minimum-edge path from $u$ to $v$.
+- $P^*$ is a simple path
+	- If not, a vertex appears twice along the path.
+	- The vertex can be short-circuited to produce a shorter path
+- $P^*$ visits each vertex at most once. It has $m-1$ edges if it visits $m$ vertices.
+- Maximum number of vertices is $n$. Hence $P^*$ has a maximum length of $n-1$.
+
+</Note>
 
 ### Cycle
 
@@ -110,7 +120,7 @@ A trail that traverses every edge. No repeating edges. Vertices may repeat.
 
 <Note title='Euler "Path"?' type="caution">
 
-_Euler Path_ is a misnomer. It should have been called Euler "Trail" since vertices can repeat. Refer to [the Venn diagram below](#comparison) for more clarity.
+_Euler Path_ is a misnomer. It should have been called Euler "trail" since vertices can repeat. Refer to [the Venn diagram below](#comparison) for more clarity.
 
 </Note>
 
