@@ -1,12 +1,12 @@
 ---
 title: Representations
 sidebar:
-  order: 9
+  order: 8
 slug: s4/graph-theory/representations
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.622Z
-lastUpdatedOn: 2026-05-25T17:06:29.132Z
+lastUpdatedOn: 2026-05-25T17:58:46.102Z
 prereqs:
   - s1/mathematics/matrices/introduction
 ---
@@ -45,6 +45,8 @@ For simple graphs:
 
 If $A$ is the adjacency matrix of $G$, entry $(i, j)$ of $A^m$ is equal to the number of walks of length $m$ from $v_i$ to $v_j$.
 
+Useful for dense graphs (close to the maximum number of edges).
+
 ## Incidence Matrix
 
 Shows vertex-edge relationships.
@@ -63,13 +65,17 @@ is defined as:
 
 Rows correspond to vertices. Columns correspond to edges.
 
-Useful for edge-based algorithms. Useful when the graph is sparse.
+Useful for edge-based algorithms. Useful for sparse graphs.
 
 ### For Directed Graphs
 
 Let $e_j$ be an edge from tail $u$ to head $v$. Then:
 
-- $a_{ij} = 1$ if $v_i$ is the tail of $e_j$
-- $a_{ij} = -1$ if $v_i$ is the head of $e_j$
-- $a_{ij} = 2$ if $e_j$ is a loop at $v_i$
-- $a_{ij} = 0$ otherwise
+$$
+a_{ij} = \begin{cases}
+1 & \text{if } v_i \text{ is the tail of } e_j \\
+-1 & \text{if } v_i \text{ is the head of } e_j \\
+2 & \text{if } e_j \text{ is a loop at } v_i \\
+0 & \text{otherwise}
+\end{cases}
+$$
