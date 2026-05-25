@@ -1,0 +1,43 @@
+---
+title: Bipartite Graph
+sidebar:
+  order: 7
+dateCreated: 2026-05-25T14:19:57.210Z
+lastUpdatedOn: 2026-05-25T17:06:29.132Z
+slug: s4/graph-theory/bipartite-graph
+prev: true
+next: true
+---
+
+A graph where vertices can be split into disjoint sets $V_1$ and $V_2$ such that:
+
+- All edges go between $V_1$ and $V_2$,
+- No edges exist inside $V_1$ or inside $V_2$.
+
+Complete graphs are **not** bipartite.
+
+<Note title="Proof Hint">
+
+All vertices are connected to all remaining vertices. Hence there cannot be 2 sets. 
+
+</Note>
+
+If a graph contains a cycle of odd length, it is not bipartite.
+
+<Note title="Proof Hint">
+
+- Label the vertices in the cycle as $1,2,\dots,2k-1$
+- Each $k$ vertex is directly connected to $k+1$. And $2k-1$ is connected to $1$.
+- Odd numbers and even numbers cannot be in the same set. $1$ and $2k-1$ cannot be in the same set.
+
+</Note>
+
+### Bipartition Set
+
+The disjoint sets ($V_1$ and $V_2$) in the above process.
+
+## Complete Bipartite Graph
+
+Every vertex in $V_1$ is connected to every vertex in $V_2$. Denoted by $K_{m,n}$. $m,n \in \mathbb{N}$.
+
+Has $m \times n$ edges.

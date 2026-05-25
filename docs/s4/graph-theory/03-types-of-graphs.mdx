@@ -1,0 +1,62 @@
+---
+title: Types of Graphs
+sidebar:
+  order: 3
+slug: s4/graph-theory/types-of-graphs
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.622Z
+lastUpdatedOn: 2026-05-25T17:06:29.131Z
+---
+
+## Simple Graph
+
+A graph with no loops and no multiple edges between the same pair of vertices.
+
+## Regular Graph
+
+A graph where all vertices have the same degree ($r$). Aka. $r$-regular graph.
+
+## Null Graph
+
+A graph with no edges. All vertices are isolated.
+
+## Directed Graph
+
+Aka. digraph. $G=(V,E)$ where $E$ is a set of ordered pairs of vertices. Edges of a directed graph are called arcs or directed edges or arrows or directed lines.
+
+For a directed edge:
+- Head   
+  Where the arrow points to.
+- Tail   
+  Where the arrow starts from.
+
+In directed graphs, 2 degrees are defined.  
+- In-degree   
+  Denoted as $\text{indeg}(v)$. Number of incoming edges.
+- Out-degree   
+  Denoted as $\text{outdeg}(v)$. Number of outgoing edges.
+ 
+Loops contribute 1 to both in-degree and out-degree.
+
+$$
+\text{deg}(v) = \text{indeg}(v) + \text{outdeg}(v)
+$$
+
+## Cyclic Graph
+
+A graph with at least 1 cycle.
+
+A simple graph consisting of only a cycle with $n$ vertices, is called $n$-cyclic graph and denoted as $C_n$.
+
+$C_2$ is only possible as a multigraph. Otherwise it will be a open path and not a cycle.
+
+## Acyclic Graph
+
+A graph with no cycles. All subgraphs of an acyclic graph are also acyclic.
+
+## Weighted Graph
+
+A graph in which each edge is assigned a numerical value (aka. weight). 3-tuples, where the third element is a weight function, $w: E \to \mathbb{R}$.
+
+Weights often represent distance, cost, time, or capacity. Used in road networks, computer network routing, project scheduling, etc.
