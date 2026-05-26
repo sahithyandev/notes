@@ -3,7 +3,7 @@ title: Planar Graph
 sidebar:
   order: 14
 dateCreated: 2026-05-25T11:56:20.071Z
-lastUpdatedOn: 2026-05-26T05:52:55.063Z
+lastUpdatedOn: 2026-05-26T10:17:45.737Z
 slug: s4/graph-theory/planar-graph
 prev: true
 next: true
@@ -11,21 +11,55 @@ next: true
 
 A graph that can be drawn on a plane without any edges crossing.
 
-A drawing of the graph without edge crossings is called a planar representation or planar embedding. A graph can have multiple planar representations.
+### Planar Representation
 
-## Euler’s Formula for Planar Graphs
+Aka. planar embedding. A drawing of the graph without edge crossings. A graph can have 0 or 1 or more planar representations.
 
-For a connected planar graph:
+### Face
+
+A region in the planar representation of a graph. Outer region of the graph is a single face.
+
+### Face Degree
+
+Number of edges surrounding a face, in a planar representation of a graph. Greater than or equal to 3.
+
+$$
+
+\sum {\text{fdeg} (f)} = 2|E| \ge 3 |F|
+
+$$
+
+In case of bipartite graph: $2|E| \ge 4|F|$.
+
+### Edge Degree
+
+Number of faces surrounding an edge, in a planar representation of a graph. Either 1 or 2.
+
+## Euler’s Formula
+
+For a connected planar graph $G=(V,E)$ with $|V|=v$ and $|E|=e$:
 
 $$
 v - e + f = 2
 $$
 
-Here:
+Here $f$ is the number of faces.
 
-- $v$ – number of vertices
-- $e$ – number of edges
-- $f$ – number of regions (faces), including the outer region.
+<Note title="Proof Hint">
+
+Use induction on $v$ and then $e$.
+
+</Note>
+
+For a disconnected graph with $k$ components, the equation becomes $v-e+f=k-1$. 
+
+<Note title="Proof Hint">
+
+Use the formula for each component.
+
+</Note>
+
+All planar representations of a graph has the same number of regions.
 
 <Note>
 
@@ -37,7 +71,11 @@ Euler's identity for polyhedra is proved by representing a polyhedron using a pl
 
 For a connected planar simple graph with $v \ge 3$, the graph must satisfy $e \le 3v - 6$.
 
-If a graph violates this inequality, it cannot be planar.
+<Note title="Proof Hint">
+
+Use the above conclusion: $2 |E| \ge 3|F|
+
+</Note>
 
 ## Non-Planar Graph
 

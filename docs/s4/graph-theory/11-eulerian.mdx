@@ -3,7 +3,7 @@ title: Eulerian
 sidebar:
   order: 11
 dateCreated: 2026-05-25T11:51:50.978Z
-lastUpdatedOn: 2026-05-26T05:52:55.062Z
+lastUpdatedOn: 2026-05-26T10:17:45.737Z
 slug: s4/graph-theory/eulerian
 prev: true
 next: true
@@ -13,9 +13,27 @@ A graph is said to be Eulerian or Euler Graph **iff** it's connected and contain
 
 A graph is Eulerian **iff** every vertex has an even degree. Whenever a walk enters a vertex, it must leave via another edge. Thus edges are used in pairs, making the vertex degree even.
 
+Let $G$ be a connected graph.
+
 $$
 G\;\text{is Eulerian} \iff \forall v \in V(G),\;\text{deg}(v) \equiv 0 \mod 2
 $$
+
+<Note title="Proof Hint">
+
+1. Eulerian $\implies$ all degrees are even.
+   - Suppose $v \in V(G)$
+   - An Eulerian circuit exists. Every time an edge arrives at $v$, another edge leaves $v$.
+   - Therefore $\text{deg}(v)$ is even.
+2. All degrees are even $\implies$ Eulerian
+   - All maximal trails starting from $v \in V(G)$ must end at $v$ (say $W$) (if not maximal).
+   - Suppose $H = G - W$ (edges) and $H$ has at least 1 edge ($\set{x,y}$).
+   - By the same argument above, all maximal trails of $H$ starting from $x$ must end at $x$ (say $X$)
+   - Since $G$ is connected, $x$ must be connected with some vertex in $W$ (if not connectedness is lost).
+   - Now $W$ can be extended with $X$ to produce a bigger maximal trail.
+   - Repeat until all edges are used.
+
+</Note>
 
 Examples:
 
