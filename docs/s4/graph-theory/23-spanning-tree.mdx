@@ -6,7 +6,7 @@ slug: s4/graph-theory/spanning-tree
 prev: true
 next: true
 dateCreated: 2026-04-27T04:57:01.895Z
-lastUpdatedOn: 2026-05-25T17:06:29.134Z
+lastUpdatedOn: 2026-05-26T18:26:32.665Z
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/spanning-tree
   - s2/data-structures-and-algorithms/algorithms/breadth-first-search
@@ -23,7 +23,19 @@ $$
 
 <Note title="Proof Hint">
 
-TODO.
+1. $G$ is connected $\implies$ $G$ has a spanning tree
+
+- Take the minimal spanning subgraph of $G$ as $H$ ($V(H) = V(G)$)
+- $T$ is acyclic (otherwise cycle can be eliminated for a smaller spanning subgraph)
+- $Hence $T$ is a spanning tree of $G$
+
+2. $G$ has a spanning tree $\implies$ $G$ is connected
+
+- Suppose $T$ is a spanning tree of $G$.
+- $T$ is connected with $V(T) = V(G)$ and $E(T) \subseteq E(G)$.
+- For $u, v \in V(G)$, $u,v \in V(T)$. Hence they have a path between them in $T$.
+- $E(T) \subseteq E(G)$ hence the path exists in $G$
+- Hence $G$ is connected
 
 </Note>
 

@@ -6,7 +6,7 @@ slug: s4/graph-theory/edge-coloring
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-05-25T17:06:29.133Z
+lastUpdatedOn: 2026-05-26T18:26:32.664Z
 ---
 
 The assignment of colors to edges so that adjacent edges have different colors. If $m$ colors used, then referred to as $m$-edge coloring.
@@ -15,12 +15,31 @@ The assignment of colors to edges so that adjacent edges have different colors. 
 
 The minimum number of colors required for proper edge coloring. Denoted by $\chi'(G)$.
 
-```math
+For $C_n$ where $n\gt 2$:
+
+$$
+\chi'(C_n) = \chi(C_n) = \begin{cases}
+2 & \text{if }n\text{ is even} \\
+3 & \text{if }n\text{ is odd}
+\end{cases}
+$$
+
+For a complete graph $K_n$:
+
+$$
 \chi'(K_n) = \begin{cases}
 n - 1 & \text{if }n\text{ is even} \\
 n & \text{if }n\text{ is odd}
 \end{cases}
-```
+$$
+
+<Note title="Proof Hint">
+
+- Each vertex has $n-1$ degree. Hence $n-1$ different colors are required.
+
+</Note>
+
+If $G$ is bipartite then $\chi '(G)=\Delta (G)$. $\chi'{K_{m,n}}$.
 
 ## Applications
 

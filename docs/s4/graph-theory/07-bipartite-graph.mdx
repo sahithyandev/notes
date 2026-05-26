@@ -3,7 +3,7 @@ title: Bipartite Graph
 sidebar:
   order: 7
 dateCreated: 2026-05-25T14:19:57.210Z
-lastUpdatedOn: 2026-05-25T17:06:29.132Z
+lastUpdatedOn: 2026-05-26T18:26:32.664Z
 slug: s4/graph-theory/bipartite-graph
 prev: true
 next: true
@@ -18,7 +18,7 @@ Complete graphs are **not** bipartite.
 
 <Note title="Proof Hint">
 
-All vertices are connected to all remaining vertices. Hence there cannot be 2 sets. 
+All vertices are connected to all remaining vertices. Hence there cannot be 2 sets.
 
 </Note>
 
@@ -29,6 +29,41 @@ If a graph contains a cycle of odd length, it is not bipartite.
 - Label the vertices in the cycle as $1,2,\dots,2k-1$
 - Each $k$ vertex is directly connected to $k+1$. And $2k-1$ is connected to $1$.
 - Odd numbers and even numbers cannot be in the same set. $1$ and $2k-1$ cannot be in the same set.
+
+</Note>
+
+Subgraph of a bipartite graph is also bipartite.
+
+<Note title="Proof Hint">
+
+- Suppose $G$ has $G_1$ and $G_2$ biparitions. And $H$ be a subgraph of $G$.
+- Every edge in $G$ has one endpoint in $G_1$ and other in $G_2$
+- $V(H) \subseteq V(G)$
+- Suppose $A = G_1 \cap V(H)$ and $B = G_2 \cap V(H)$
+- $A$ and $B$ are a valid parition pair.
+
+$$
+A' = A \cap V(H), \qquad B' = B \cap V(H)
+$$
+
+**Claim:** $(A', B')$ is a valid bipartition of $H$.
+
+**Verification**
+
+**(1) They partition $V(H)$:**
+Since every vertex of $H$ belongs to $V \subseteq A \cup B$, it lies in exactly one of $A'$ or $B'$. So $A' \cup B' = V(H)$ and $A' \cap B' = \emptyset$. ✓
+
+**(2) Every edge of $H$ goes between $A'$ and $B'$:**
+
+Take any edge $e = (u, v) \in E(H)$. Since $E(H) \subseteq E$, this edge also belongs to $G$. Since $G$ is bipartite with partition $(A, B)$, one endpoint lies in $A$ and the other in $B$ — say $u \in A$, $v \in B$.
+
+Since $u \in V(H)$ and $u \in A$, we have $u \in A'$. Similarly, $v \in B'$.
+
+So every edge of $H$ crosses between $A'$ and $B'$. ✓
+
+**Conclusion**
+
+$H$ admits the bipartition $(A', B')$, so $H$ is bipartite. $\blacksquare$
 
 </Note>
 

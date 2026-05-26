@@ -6,10 +6,20 @@ slug: s4/graph-theory/vertex-coloring
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-05-25T17:06:29.133Z
+lastUpdatedOn: 2026-05-26T18:26:32.664Z
 ---
 
 Aka. proper vertex coloring. The assignment of colors to vertices such that no two adjacent vertices have the same color. If a maximum of $m$ colors are used, then referred to as $m$-coloring.
+
+## k-Colorable Graph
+
+A graph is $k$-colorable **iff** it can be colored using $k$ colors.
+
+$$
+G\text{ is }k\text{-Colorable} \implies G\text{ is }{j}\text{-Colorable}\quad \forall k \lt j \le |V(G)|
+$$
+
+**If** a graph is 2-colorable, **then** it is bipartite.
 
 ## Chromatic Number
 
@@ -26,6 +36,15 @@ $$
 \end{cases}
 $$
 
+For $\chi{K_{m,n}} = 2$. One color for each bipartite group.
+
+Suppose $G$ and $H$ are undirected simple connected graphs with at least 2 vertices. Then:
+
+- **If** $I$ = $G$ and $H$ joined with a single edge **then** $\chi(I) = \text{max}(\chi(H), \chi(G))$
+- **If** $I = G \triangledown H$ = all verties of $G$ are connected with all vertices of $H$ **then** $\chi(I) = \chi(H) + \chi(G)$.
+
+Every graph can be colored with one more color than the maximum vertex degree.
+
 ## Chromatic Polynomial
 
 A polynomial representing the number of proper vertex colorings of a graph for $x$ number of colors. Denoted as $P(G, x)$. Depends on graph structure.
@@ -41,6 +60,16 @@ For a [null graph](/s4/graph-theory/types-of-graphs/#null-graph) with $n$ vertic
 $$
 P(G,x) = x^n
 $$
+
+For $K_n$:
+
+$$
+P(G,x) = \frac{x!}{(x-n)!}
+$$
+
+For a path of $n$ vertices: $P(G,x) = x(x-1)^{n-1}$.
+
+For $K_{m,n}$, $P(G,x)=x(x-1)^{m+n-1}$.
 
 For a graph with multiple connected components $\set{ G_1, G_2, \dots, G_k }$,
 
