@@ -1,0 +1,81 @@
+---
+title: Connectedness
+sidebar:
+  order: 13
+slug: s4/graph-theory/connectedness
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.623Z
+lastUpdatedOn: 2026-05-26T05:52:55.063Z
+---
+
+## Connected Graph
+
+An undirected graph is connected **iff** every pair of vertices is connected by a path. Otherwise the graph is disconnected.
+
+For directed graph, all directionality is dropped and connectivity is checked.
+
+A graph is disconnected **iff** its vertex set can be split into 2 disjoint non-empty sets with no edges between them.
+
+<Note title="Proof Hint">
+
+1. Disconnected $\implies$ dijoint non-empty sets
+   - Disconnected $\implies \exists u,v \in V(G)$ such that there are no paths between $u$ and $v$.
+   - Choose $V_1 = \set {u}$ and $V_2 = \set {v}$ and add all of their neighbours into both.
+   - $V_1 \cap V_2 = \null$, otherwise $u$ and $v$ would have a path through them.
+   - $V_1 \cup V_2$ as all vertices are added.
+   - There are no paths between $V_1$ and $V_2$, otherwise $u$ and $v$ would have been connected through that path. 
+2. Disjoint non-empty sets $\implies$ disconnected
+   - Suppose $V_1$ and $V_2$ are the 2 sets
+   - Take $u \in V_1$ and $v \in V_2$
+   - There is no path between $u$ and $v$
+   - Hence disconnected
+
+</Note>
+
+A graph is connected **iff** every entry of $A + A^2 + \dots + A^{n-1}$ is non-zero.
+
+In a connected graph with $n \ge 2$ vertices, any two vertices are connected by a path of length $k$ where $k \le n − 1$.
+
+<Note title="Proof Hint">
+
+- Suppose $G$ is connected and has $n \ge 2$ vertices
+- Suppose $P^*$ is the minimum-edge path from $u$ to $v$.
+- $P^*$ is a simple path
+	- If not, a vertex appears twice along the path.
+	- The vertex can be short-circuited to produce a shorter path
+- $P^*$ visits each vertex at most once. It has $m-1$ edges if it visits $m$ vertices.
+- Maximum number of vertices is $n$. Hence $P^*$ has a maximum length of $n-1$.
+
+</Note>
+
+## Connected Component
+
+A maximal connected subgraph. Every pair of vertices inside are connected. No connection to outside vertices. Each component is an isolated piece of a graph.
+
+A connected graph has exactly 1 connected component which is itself. A disconnected graph has more than 2 components.
+
+## Distance
+
+Length of the shortest path between two vertices. Denoted as $\text{dist}(u, v)$. if no path exists, $dist(u, v) = \infty$. If a path exists between $u,v$, then $\text{dist}(u,v) \le n - 1$.
+
+Properties:
+
+- Non-negativity: $\text{dist}(u, v) \ge 0$
+- Identity: $\text{dist}(u, v) = 0 ⇔ u = v$
+- Symmetry: $\text{dist}(u, v) = \text{dist}(v, u)$
+- Triangle inequality: $\text{dist}(u, w) \le \text{dist}(u, v) + \text{dist}(v, w)$
+
+For $K_n$, $\text{dist}(u,v)=1$ for any $u,v$ pair.
+
+## Diameter
+
+Maximum distance between any two vertices. Denoted as $\text{diam}(G)$.
+
+$$
+\text{diam}(G) = \text{max} \set{\text{dist}(u, v) | \forall u, v \in V(G)}
+$$
+
+Measures the _largest shortest path_ in the graph.
+
+For $K_n$, $\text{diam}(u,v)=1$.
