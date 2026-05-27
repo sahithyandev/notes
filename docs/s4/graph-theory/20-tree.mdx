@@ -6,7 +6,7 @@ slug: s4/graph-theory/tree
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-05-25T17:06:29.133Z
+lastUpdatedOn: 2026-05-27T01:45:12.980Z
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/tree
 ---
@@ -79,7 +79,7 @@ Then prove: $(3) => (4)$
   - Contradiction
 - Case 2: $k \lt |V(T)|$
   - $|V(T)| - k$ vertices are outside the cycle
-  - They each require an edge to be connected to the graph (|V(T)| - k$ additional edges)
+  - They each require an edge to be connected to the graph ($|V(T)| - k$ additional edges)
   - Total number of edges becomes $|V(T)|$
   - Contradiction
 
@@ -104,6 +104,6 @@ Any tree with 2 or more vertices, contains at least 2 leaves.
 - Case 1: 0 leaves. Then all vertices have 0 or 2+ degree.
   - Case 1.1: All vertices have 0 degree. Means disconnected graph. Contradiction.
   - Case 1.2: All vertices have 2 or more degree. $\sum \text{deg}(v) = 2 |E(T)| = 2|V(T)| - 2 \ge 2|V(T)|$. Contradiction.
-- Case 2: Only 1 leaf. Then $\sum \text{deg}(v) = 2 |E(T)| \ge 2 (|V(T)| - 1) + 1$. That's also a contradiction.
+- Case 2: Only 1 leaf. All other vertices have 2+ degree (0 degree not possible). Then $\sum \text{deg}(v) = 2 |E(T)| = 2|V(T)| - 2 \ge 2 (|V(T)| - 1) + 1$ (2+ degree for $|V|-1$ vertices and $1$ degree for the leaf vertex). Contradiction.
 
 </Note>
