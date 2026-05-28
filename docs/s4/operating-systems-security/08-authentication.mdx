@@ -1,15 +1,23 @@
 ---
 title: Authentication
 sidebar:
-  order: 7
+  order: 8
 slug: s4/operating-systems-security/authentication
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.629Z
-lastUpdatedOn: 2026-05-04T09:51:20.276Z
+lastUpdatedOn: 2026-05-28T17:03:17.880Z
 ---
 
 The process of proving that the identity of a person or device they are claiming to be.
+
+## Identity
+
+A digital identity includes all the information about an individual, organization, or device. 
+
+Identifiers are attributes and activities of an entity. An identity may have one or more identifiers.
+
+Examples are names, email addresses, or medical history.
 
 ### Identity Theft
 
@@ -42,17 +50,17 @@ Aka. possession factor. Devices like smart cards, tokens, or a phone with SMS co
 
 Require server-side validation which involves a database lookup.
 
-Example: OTP.
-
 Instantly revocable. Can be updated without reissuing. Not good for scalable and distributed environments.
+
+Example: OTP.
 
 #### Passive Tokens
 
 Self-contained. Stateless. Do nothing. Server checks for integrity of the token (using no external information).
 
-Example: Photo IDs.
+Works well in scalable and distributed environments. However, they can be lost, stolen, or duplicated. Can be instantly revocable through specific techniques.
 
-Works well in scalable and distributed environments. However, they can be lost, stolen, or duplicated. Can be instantly revocable (through specific techniques).
+Example: Photo IDs.
 
 #### Hybrid Tokens
 
@@ -66,9 +74,25 @@ While biometrics are increasingly used for convenience, they remain unsuitable f
 
 Expensive, intrusive, false readings (false positives/negatives), and potential forgery.
 
-High chance of false positives (incorrectly accepting an unauthorized user) and false negatives (incorrectly rejecting an authorized user). This can lead to security breaches or user frustration.
 
 Examples: fingerprints, retina scans, or facial recognition.
+
+For certain reasons users may be reluctant to use biometric authentication.
+
+- Privacy concerns   
+  Biometric data is highly personal and users fear whether the data is shared with anyone.
+- Irreversibility   
+  Stolen fingerprint or iris scan cannot be revoked ever.
+- Data Breach Risk   
+  Centralized biometric databases are high-value targets
+- Accuracy Issues   
+  High chance of false positives (incorrectly accepting an unauthorized user) and false negatives (incorrectly rejecting an authorized user).
+- Slowness   
+  Certain biometrics require more time to process and verify the authenticity (e.g. face unlock). 
+- Consent & Coercion
+  Biometrics can be forcibly obtained (e.g. pressing someone's finger to a sensor). No legal _right to remain silent_ equivalent for biometrics in many jurisdictions.
+- Trust issues
+  Users may not trust the company/government storing their data to secure it properly or use it ethically.
 
 ## Multi-Factor Authentication (MFA)
 
@@ -78,15 +102,32 @@ Examples: password + SMS code, or password + fingerprint.
 
 ## Federated Identity Management
 
-Aka. FIM. Allows users to use a single set of credentials across multiple systems or organizations. It relies on trust relationships between identity providers (IdPs) and service providers (SPs) to enable seamless access.
+Aka. FIM. A framework where organizations establish mutual trust, allowing one organization (identity provider) to authenticate users and share identity attributes on behalf of another (service provider), across organizational boundaries.
 
-### Single Sign-On
+Organizations (service prodivders) trust and rely on 1 or more organizations (identity provider) to authenticate users.
 
-Aka. SSO. Lets users log in once and access multiple applications without re-authenticating. Works with federated identity management systems to unify authentication across different platforms.
+## Single Sign-On
+
+Aka. SSO. A mechanism that allows a user to authenticate once and gain access to multiple applications or services within the same organization, without being prompted to log in again.
+
+Lets users log in once and access multiple applications of a single organization without re-authenticating.
+
+Cross-org SSO is achieved through FIM.
+
+<Note title="FIM vs. SSO">
+
+Both FIM and SSO:
+- Allow users to repeatedly authenticate when moving between systems
+- Reduce repeated authentication
+- Rely on a central identity authority
+- Use tokens/assertions to prove identity between systems
+- Both can use the same protocols (SAML, OIDC, OAuth)
+
+</Note>
 
 ## Computer-Computer Authentication
 
-Computers do not _remember_. They store information. Stored authentication credentials could be stolen by malware and reused by attackers.
+Stored authentication credentials could be stolen by malware and reused by attackers.
 
 ### Continuous Authentication
 

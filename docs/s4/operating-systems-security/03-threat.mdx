@@ -1,0 +1,106 @@
+---
+title: Threat
+sidebar:
+  order: 3
+slug: s4/operating-systems-security/threat
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.628Z
+lastUpdatedOn: 2026-05-28T17:03:17.879Z
+---
+
+A potential to cause loss or harm to a computing system.
+
+### Types of Harm
+
+- Modification  
+  Unauthorized changes to data.
+- Fabrication  
+  Creation of counterfeit data or objects.
+- Interception  
+  Unauthorized access to data.
+- Interruption  
+  Making data unavailable or unusable.
+
+## Types
+
+### Human or not
+
+Whether caused by human or not (natural).
+
+Natural threats are:
+
+- earthquake
+- fire
+
+Human threats are:
+
+- human error
+- impersonation
+
+### Intent
+
+Defined only for human threats. Refers to the purpose or motivation behind the threat. Classified as malicious or benign.
+
+#### Malicious
+
+Deliberately trying to cause harm. Planned and deceptive.
+
+Examples:
+
+- launching a malware attack
+- stealing sensitive data
+- performing denial-of-service (DoS) attacks
+
+#### Benign
+
+No deliberate intention to cause harm. Can still cause harm). Often due to human error. Typically associated with normal users or system processes
+
+Examples:
+
+- accidental deletion of files
+- misconfiguration of a server
+- sending data to the wrong recipient
+
+### Directed or Random
+
+#### Directed
+
+Threats for specific target(s).
+
+#### Random
+
+Not directed for specific target(s).
+
+### Active or Passive
+
+#### Active
+
+Where changes are caused (or can be caused) in the system.
+
+#### Passive
+
+Where changes are not caused (and cannot be caused) in the system.
+
+## Examples
+
+### Advanced Persistent Threat
+
+Aka. APTs. Well-organized, patient, and financed attacks. Targets are often high-priority and cannot be easily protected.
+
+Caused by humans, directed, malicious threats.
+
+### Type x Harm Combinations
+
+Real-world examples for each combination of threat type and harm type.
+
+| Type      | Modification                                                          | Fabrication                                                                  | Interception                                                                               | Interruption                                                                 |
+| --------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Human     | Admin runs `UPDATE` without a `WHERE` clause, overwriting all records | Developer accidentally inserts duplicate entries into a production database  | IT staff reads employee emails without authorization                                       | Sysadmin mistakenly deletes a critical service configuration                 |
+| Natural   | Power surge corrupts database files on a live server                  | Cosmic-ray bit-flips generate phantom entries in memory                      | EM leakage from unshielded cables exposes data (Van Eck phreaking)                         | Earthquake destroys a data center's power infrastructure                     |
+| Malicious | SQL injection alters financial transaction records                    | DNS spoofing inserts fake records to redirect user traffic                   | Man-in-the-middle attack captures HTTPS credentials in transit                             | DDoS flood renders a web server completely unavailable                       |
+| Benign    | Buggy migration script overwrites valid rows with default values      | Caching bug inserts duplicate records into a database                        | Debug logging inadvertently records sensitive API tokens to a log file                     | Misconfigured firewall rule accidentally blocks all inbound traffic          |
+| Directed  | Attacker edits a specific bank's audit logs to conceal fraud          | Forged SSL certificate created for a targeted executive phishing campaign    | Wiretap placed on a specific organization's network uplink                                 | Targeted DDoS against an e-commerce site timed to a major sale               |
+| Random    | Worm modifies arbitrary files on every system it infects              | Spam bots register fake accounts across random public websites               | Wardriving captures unencrypted Wi-Fi traffic from nearby networks                         | Internet worm consumes bandwidth on every reachable host indiscriminately    |
+| Active    | Ransomware encrypts files in real time, altering their content        | ARP poisoning injects forged replies to redirect traffic through an attacker | Session hijacking replays a stolen authentication token to impersonate a user              | SYN flood exhausts a server's TCP connection table, blocking new connections |
+| Passive   | —                                                                     | —                                                                            | Packet sniffer quietly captures traffic on a shared network segment without injecting data | —                                                                            |
