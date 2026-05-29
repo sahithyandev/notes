@@ -12,6 +12,11 @@ import { titleize } from "../utils";
 import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
 import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
+import NoteFeedback from "../components/note-feedback.astro";
+import { getVoteCounts } from "../lib/supabase";
+
+// ISR: revalidate note pages every 5 minutes so server-rendered vote counts stay fresh.
+export const revalidate = 300;
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -33,6 +38,7 @@ if (!notesEntry) {
 }
 
 const { Content, headings } = await render(notesEntry);
+const voteCounts = await getVoteCounts(slug);
 
 const prereqEntries = notesEntry.data.prereqs
   ? (
@@ -505,6 +511,8 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
           components={{ Note, WalksVennDiagram, TreePropertiesProofs }}
         />
       </article>
+
+      <NoteFeedback slug={slug} initialUp={voteCounts.up} initialDown={voteCounts.down} />
 
       {
         notesEntry.data.prev || notesEntry.data.next ? (

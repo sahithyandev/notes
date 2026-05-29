@@ -100,7 +100,6 @@ export default defineConfig({
       defaultColor: false,
     },
   },
-
   vite: {
     plugins: [tailwindcss()],
     build: {
