@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/web-browsers
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.630Z
-lastUpdatedOn: 2026-05-28T17:03:17.881Z
+lastUpdatedOn: 2026-05-29T14:30:05.869Z
 ---
 
 A software that connects to web servers, retrieves web content, displays it to users, and sends user data back to websites. Main gateway to the internet.
@@ -46,13 +46,24 @@ Common browser attack vectors:
 
 ## Browser Attack Types
 
+### Man-in-the-Middle (MitM)
+
+An attacker secretly sits between two parties relaying and potentially altering communication.
+
+Classified based on where the attack is and what they intercept.
+
+- Browser-in-the-Middle (BitM)   
+  Attacker is between victim's browser and real website. Uses a real browser to proxy the real website.
+- User-in-the-Middle (UitM)   
+  Attacker is between victim and a service. Attacker tricks the victim into authenticating for them.
+- Page-in-the-Middle (PitM)   
+  Attack is between the victim and a legitimate page. Fake content is injected into a real page through XSS or malicious browser extension or some other way. Works with HTTPs. Can be controlled by using Content Security Policy.
+
 ### Man-in-the-Browser (MITB)
 
 Inserts malicious code into the browser to intercept and manipulate communication between the user and a website.
 
-Often installed via plug-ins or malware. Captures login credentials. Can bypass HTTPS protections.
-
-Alters transaction data. Steals authentication information.
+Often installed via plug-ins or malware. Captures login credentials. Can bypass HTTPS protections. Alters transaction data. Steals authentication information.
 
 ### Keystroke Logger
 
@@ -60,17 +71,9 @@ Records every key typed on a keyboard. Can be done either through a hardware dev
 
 Not limited to browsers, may affect the entire system.
 
-### Page-in-the-Middle
-
-Redirects users to a malicious page while appearing to access the legitimate one. Intercepts user input. Similar to MITB behavior.
-
 ### Program Download Substitution
 
 An attack where legitimate software downloads are replaced with malware.
-
-### User-in-the-Middle
-
-Manipulates users into performing actions for attackers. Clickbait tricks users into solving CAPTCHAs for spammers.
 
 ### Clickjacking
 
