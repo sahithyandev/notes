@@ -1,0 +1,59 @@
+---
+title: Implementation
+sidebar:
+  order: 10
+dateCreated: 2026-05-29T16:23:00.681Z
+lastUpdatedOn: 2026-05-29T16:59:06.246Z
+slug: s4/software-engineering/implementation
+prev: true
+next: true
+---
+
+The process of realizing the design as a working program.
+
+## Reuse
+
+Use existing components, objects, or systems where possible.
+
+Levels:
+
+- **Abstraction** — reuse of design knowledge (e.g., patterns).
+- **Object** — reuse of library objects directly.
+- **Component** — reuse collections of objects/classes.
+- **System** — reuse entire applications.
+
+Reuse costs: search time, purchase cost, adaptation cost, integration cost.
+
+## Configuration Management
+
+The process of managing a changing software system. Supports controlled access, change tracking, and component integration.
+
+Activities:
+
+- **Version management** — track component versions; coordinate multi-developer work.
+- **System integration** — define component versions per system build; automate compilation and linking.
+- **Problem tracking** — report bugs; track resolution status.
+
+## Host-Target Development
+
+Software developed on a host, executed on a separate target. A **platform** includes OS, database systems, and (for development) an IDE. Host and target platforms often differ in architecture and installed software.
+
+### Development Platform Tools
+
+Standard tools in a development environment:
+
+- Integrated compiler + syntax-directed editor.
+- Language debugger.
+- Graphical editing tools (e.g., UML editors).
+- Testing tools (e.g., JUnit).
+- Project support tools.
+
+**IDE (Integrated Development Environment)** — unified toolset supporting multiple aspects of development under a common interface. Typically language-specific.
+
+## Component Deployment
+
+Factors:
+
+- Hardware or software dependencies → must deploy on matching platform.
+- High availability → deploy on multiple platforms for failover.
+- High inter-component traffic → co-locate components to minimize latency.

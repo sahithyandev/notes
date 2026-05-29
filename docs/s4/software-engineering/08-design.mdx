@@ -1,0 +1,86 @@
+---
+title: Design
+sidebar:
+  order: 8
+dateCreated: 2026-05-29T15:48:19.433Z
+lastUpdatedOn: 2026-05-29T16:59:06.246Z
+prereqs:
+  - /s2/program-construction/design-patterns/introduction
+slug: s4/software-engineering/design
+prev: true
+next: true
+---
+
+The process of identifying components of a software system and their relationships from requirements. Creative activity. Design and implementation activities are inter-leaved.
+
+COTS (Commercial Off-The-Shelf) systems can substitute custom development. For them, the design process focuses on configuring the system to meet requirements rather than building from scratch.
+
+## Object-Oriented Design Process
+
+A structured approach to OO design that produces multiple system models. High overhead — cost-effective only for large systems. Models serve as a communication mechanism across teams.
+
+The process has five stages, each covered below:
+
+1. Define system context and modes of use.
+2. Design system architecture.
+3. Identify principal system objects.
+4. Develop design models.
+5. Specify object interfaces.
+
+### System Context
+
+Relationships between the software being designed and its external environment. Determines required functionality and communication structure. System boundaries are established here — defines which features belong to the system and which to associated systems.
+
+Two model types used:
+
+- **System context model** — structural; shows other systems in the environment.
+- **Interaction model** — dynamic; shows how the system interacts with its environment during use.
+
+### Architectural Design
+
+Follows context and interaction analysis. Identifies major components and their interactions. Components are organized using an architectural pattern — e.g., layered or client-server.
+
+Example (weather station): independent subsystems communicate by broadcasting on a shared communication link. Subsystems: Fault Manager, Configuration Manager, Power Manager, Communications, Data Collection, Instruments.
+
+### Object Class Identification
+
+No formula for object identification. Relies on designer skill, experience, and domain knowledge. Identification is iterative.
+
+Approaches:
+
+- **Grammatical** — parse natural language description; nouns → objects.
+- **Tangible things** — base identification on real-world entities in the domain.
+- **Behavioural** — identify objects by participation in system behaviours.
+- **Scenario-based** — extract objects, attributes, and methods from each use case scenario.
+
+### Design Models
+
+#### Static Model
+
+Describe static structure.
+
+Class models, generalization models, and association models are examples.
+
+#### Dynamic Model
+
+Describe runtime interactions between objects.
+
+[Sequence diagrams](/s4/software-engineering/uml-diagrams#sequence-diagram) and [state diagrams](/s4/software-engineering/uml-diagrams#state-diagram) are examples.
+
+#### Subsystem Model
+
+Logical groupings of objects into coherent subsystems. Represented in UML using packages (encapsulation constructs). Logical model only — actual runtime organization may differ.
+
+UML packages are used to represent subsystem models.
+
+### Interface Specification
+
+Object interfaces must be specified before parallel development can proceed. Internal representation is hidden — only the interface is exposed. Objects may expose multiple interfaces.
+
+UML tool: **interface stereotype** in class diagrams. Java interfaces also used.
+
+## Design Patterns
+
+Reusable solution template for a recurring design problem. Described abstractly; instantiated in specific contexts.
+
+Covered extensively in [Design Patterns - Semester 2](/s2/program-construction/design-patterns/introduction).

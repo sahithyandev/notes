@@ -1,0 +1,110 @@
+---
+title: Software Licensing
+sidebar:
+  order: 12
+dateCreated: 2026-05-29T15:57:08.349Z
+lastUpdatedOn: 2026-05-29T16:59:06.246Z
+slug: s4/software-engineering/licensing
+prev: true
+next: true
+---
+
+A software license is a legal instrument governing use, modification, and distribution of software. The author retains copyright by default; a license grants specific rights to others.
+
+Source being freely available does not imply unrestricted use.
+
+Without a license, software is legally unusable by anyone other than its author — even if publicly hosted.
+
+## Why Licenses Matter
+
+- Define what users and developers may legally do with the software.
+- Protect authors from liability.
+- Determine compatibility when combining components.
+- Govern commercial use and redistribution.
+- Trigger compliance obligations when shipping products.
+
+## Proprietary Licenses
+
+Software distributed without source code. Rights are reserved; users may run the software but not inspect, modify, or redistribute it.
+
+Common grant types:
+
+- **Per-seat** — one license per installation or user. Common in enterprise tools (e.g. Microsoft Office, JetBrains IDEs).
+- **Subscription** — time-limited access; software stops functioning or updates cease when the subscription lapses (e.g. Adobe Creative Cloud).
+- **OEM** — bundled with hardware; license is non-transferable and tied to the device.
+- **Trial / Freemium** — core features free; advanced features require payment (e.g. Slack, Zoom).
+- **SaaS** — software is never distributed; access is provided as a hosted service. License governs usage of the service, not a local binary.
+
+### Proprietary Workflow
+
+Typical obligations when using a proprietary component:
+
+- Purchase the appropriate license tier before deployment.
+- Track seat count and renewal dates.
+- Restrict access to licensed users only.
+- Comply with audit rights clauses — vendors may inspect compliance.
+- Review redistribution terms before shipping the component inside a product.
+
+## Open Source Licenses
+
+Source code is published and redistribution is permitted. Two broad categories: **copyleft** and **permissive**.
+
+### Copyleft Licenses
+
+Require derivative works to carry the same license.
+
+- **GPL (GNU General Public License)** — any system that incorporates GPL code and is distributed must release its source under GPL. Applies to the entire combined work.
+- **LGPL (GNU Lesser GPL)** — weaker form of GPL. Allows proprietary software to dynamically link to an LGPL library without the proprietary code becoming open source. Static linking still triggers copyleft.
+- **AGPL (Affero GPL)** — extends GPL to network use; a service that runs AGPL code must publish its source even if no binary is distributed. Targets SaaS loopholes.
+
+Examples:
+
+- Linux kernel (GPL v2)
+- MySQL (GPL; proprietary dual-license also available)
+- MongoDB (AGPL, then relicensed to SSPL)
+
+### Permissive Licenses
+
+Allow use in proprietary products without requiring source disclosure.
+
+- **MIT** — attribution required; no other restrictions. Simplest and most widely used.
+- **BSD (Berkeley Standard Distribution)** — similar to MIT; the 3-clause variant adds a non-endorsement clause (the licensor's name may not be used to promote derived products).
+- **Apache 2.0** — permissive; additionally grants an explicit patent license from contributors. Provides protection against patent claims.
+
+Examples:
+
+- React, Vue (MIT)
+- FreeBSD OS (BSD)
+- Kubernetes, Android (Apache 2.0)
+
+<Note>
+
+MIT and BSD are compatible with GPL — MIT/BSD code can be incorporated into a GPL project, but not the reverse.
+
+</Note>
+
+### Dual Licensing
+
+A project releases under both an open source license and a commercial license. Open source use is free; proprietary use requires purchasing the commercial license.
+
+Examples: MySQL (GPL + proprietary), Qt (LGPL + commercial).
+
+## Open Source Workflow
+
+Obligations when incorporating an open source component:
+
+- Identify the license before integration.
+- Distribute a copy of the license with the binary.
+- Attribute the author if the license requires it (MIT, BSD, Apache).
+- Publish modified source if using a copyleft license (GPL, AGPL).
+- Not use the author's name in promotion if using 3-clause BSD or Apache 2.0.
+- Verify license compatibility before mixing components with different licenses.
+
+## License Management
+
+- Maintain records of all open source components used.
+- Understand license type before use.
+- Track component evolution — license can change between versions.
+- Educate the team on compliance obligations.
+- Maintain auditing systems (tools: FOSSA, Black Duck, Snyk).
+- Participate in the open source community.
