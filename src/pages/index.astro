@@ -5,7 +5,7 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/nav.astro";
 import SemesterCard from "../components/semester-card.astro";
 import { getCollection } from "astro:content";
-import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION, CGPA } from "../utils/values";
 
 interface SemesterInfo {
   number: number;
@@ -141,6 +141,10 @@ const recentNotes = await getRecentNotes();
   <Nav />
   <Hero semestersCount={semestersData.length} />
 
+  <p class="gpa-band">
+    This website holds all my notes, and helped me achieve {CGPA} CGPA across 3 semesters.
+  </p>
+
   <section id="semesters">
     <h2 class="section-title">All Semesters</h2>
     <div
@@ -199,6 +203,28 @@ const recentNotes = await getRecentNotes();
     width: var(--body-width);
     padding: 40px 0 24px;
     margin: 0 auto;
+  }
+
+  .gpa-band {
+    width: 42ch;
+    max-width: var(--body-width);
+    text-balance: pretty;
+    margin-left: var(--body-margin-x);
+    padding-top: 24px;
+    text-align: left;
+    font-size: 1.3rem;
+  }
+
+  .gpa-chip {
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+
+  .gpa-sep {
+    color: var(--text-muted);
+    font-family: inherit;
+    font-weight: 400;
   }
 
   /* ── SECTION WRAPPER ──────────────────────────────────────────── */
