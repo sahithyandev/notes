@@ -710,6 +710,13 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     });
   </script>
 
+  <script define:vars={{ slug, slugParts }}>
+    window.stonks?.event("note_view", "/" + slug, {
+      semester: slugParts[0] ?? "",
+      module: slugParts[1] ?? "",
+    });
+  </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("article pre").forEach((pre) => {

@@ -118,6 +118,7 @@ const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
           .then((data) => {
             if (data && typeof data.up === "number") {
               scoreEl.textContent = String(data.up - data.down);
+              window.stonks?.event("vote", "/" + slug, { vote });
             }
           })
           .catch(() => {})

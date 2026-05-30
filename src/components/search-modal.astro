@@ -187,6 +187,7 @@
       groups.get(parsed.groupKey)!.push({ parsed, data });
     }
     renderResults(groups, query);
+    window.stonks?.event("search_query", { query, result_count: top5.length });
   }
 
   input.addEventListener("input", () => {
@@ -208,10 +209,19 @@
       e.preventDefault();
       const href = items[selectedIndex].getAttribute("href");
       if (href) {
+        window.stonks?.event("search_result_click", href, { query: input.value.trim(), position: selectedIndex });
         closeModal();
         window.location.href = href;
       }
     }
+  });
+
+  resultsEl.addEventListener("click", (e: MouseEvent) => {
+    const item = (e.target as HTMLElement).closest<HTMLAnchorElement>(".sr-item");
+    if (!item) return;
+    const items = getItems();
+    const position = items.indexOf(item);
+    window.stonks?.event("search_result_click", item.href, { query: input.value.trim(), position });
   });
 
   modal.addEventListener("click", (e: MouseEvent) => {
