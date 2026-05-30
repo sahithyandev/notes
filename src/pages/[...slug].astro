@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import { getEntry } from "astro:content";
 import Nav from "../components/nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
-import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+import { SITE_NAME, SITE_HOST_URL, EXAM_PERIODS } from "../utils/values";
 import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 import { titleize } from "../utils";
@@ -29,6 +29,8 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const notesEntry = await getEntry("notes", slug);
 const slugParts = slug.split("/");
+const semesterNumber = parseInt(slugParts[0]?.match(/^s(\d)$/)?.[1] ?? "0");
+const semesterExamPeriod = semesterNumber > 0 ? EXAM_PERIODS[semesterNumber - 1] : null;
 
 if (!notesEntry) {
   return new Response(null, {
@@ -316,6 +318,10 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     data-pagefind-body
     class="grid grid-cols-[auto_1fr_auto]"
     style={`--sem: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-bg: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg); --sem-border: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-border); --sem-text: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-dim: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg); --link: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"});`}
+    data-exam-start-month={semesterExamPeriod?.start.month}
+    data-exam-start-day={semesterExamPeriod?.start.day}
+    data-exam-end-month={semesterExamPeriod?.end.month}
+    data-exam-end-day={semesterExamPeriod?.end.day}
   >
     <aside class="sidebar">
       <div class="sb-sem-wrap">
@@ -506,6 +512,21 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
         )
       }
 
+      {semesterExamPeriod && (
+        <div
+          class="exam-banner"
+          id="exam-banner"
+          hidden
+        >
+          <div class="exam-banner-stripe" aria-hidden="true"></div>
+          <div class="exam-banner-body">
+            <span class="exam-banner-label">Exam Season</span>
+            <span class="exam-banner-text">All the best on your exams!</span>
+          </div>
+          <div class="exam-banner-stripe" aria-hidden="true"></div>
+        </div>
+      )}
+
       <article data-pagefind-body>
         <Content
           components={{ Note, WalksVennDiagram, TreePropertiesProofs }}
@@ -576,6 +597,26 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
 
     <TocRail headings={tocHeadings} />
   </main>
+
+  <script>
+    const main = document.querySelector("main");
+    const banner = document.getElementById("exam-banner");
+    if (main?.dataset.examStartMonth) {
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const startMonth = parseInt(main.dataset.examStartMonth);
+      const startDay = parseInt(main.dataset.examStartDay ?? "0");
+      const endMonth = parseInt(main.dataset.examEndMonth ?? "0");
+      const endDay = parseInt(main.dataset.examEndDay ?? "0");
+      const afterStart = month > startMonth || (month === startMonth && day >= startDay);
+      const beforeEnd = month < endMonth || (month === endMonth && day <= endDay);
+      if (afterStart && beforeEnd) {
+        main.classList.add("exam-season");
+        if (banner) banner.hidden = false;
+      }
+    }
+  </script>
 
   <script>
     // Semester switcher toggle
@@ -750,7 +791,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
 <style>
   :root {
     --sidebar-w: 280px;
-    --toc-w: 250px;
+    --toc-w: 280px;
     --nav-h: 54px;
     --pip-size: 16px;
   }
@@ -758,6 +799,15 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
   main {
     height: calc(100dvh - var(--nav-h));
     overflow: hidden;
+  }
+
+  main.exam-season {
+    background-image:
+      repeating-linear-gradient(-45deg, #f5b800 0px, #f5b800 2px, #1a1200 2px, #1a1200 6px),
+      repeating-linear-gradient(-45deg, #f5b800 0px, #f5b800 2px, #1a1200 2px, #1a1200 6px);
+    background-size: 3px 100%, 3px 100%;
+    background-position: var(--sidebar-w) 0, calc(100% - var(--toc-w)) 0;
+    background-repeat: no-repeat;
   }
 
   section:has(article) {
@@ -1157,11 +1207,11 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     flex-shrink: 0;
     overflow-y: auto;
     background: var(--surface);
-    border-right: 1px solid var(--border);
     padding: 0;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
+
 
   .sidebar::-webkit-scrollbar {
     width: 3px;
@@ -1633,6 +1683,65 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     background: var(--shiki-dark-bg);
     border-color: var(--border);
     color: var(--shiki-dark);
+  }
+
+  /* ── EXAM SEASON BANNER ───────────────────────────────────────── */
+  .exam-banner {
+    --warn: #f5b800;
+    --warn-dark: #1a1200;
+    display: flex;
+    align-items: stretch;
+    margin-top: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1.5px solid var(--warn);
+    box-shadow: 0 0 0 4px rgba(245, 184, 0, 0.12);
+  }
+
+  .exam-banner-stripe {
+    flex-shrink: 0;
+    width: 28px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--warn) 0px,
+      var(--warn) 5px,
+      #1a1200 5px,
+      #1a1200 12px
+    );
+  }
+
+  .exam-banner-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 18px;
+    background: rgba(245, 184, 0, 0.07);
+  }
+
+  .exam-banner-label {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #b38600;
+  }
+
+  .exam-banner-text {
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  [data-theme="dark"] .exam-banner-label {
+    color: var(--warn);
+  }
+
+  [data-theme="dark"] .exam-banner-body {
+    background: rgba(245, 184, 0, 0.05);
   }
 
   [data-theme="dark"] .note-nav-btn:hover {
