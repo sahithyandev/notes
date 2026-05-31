@@ -6,7 +6,7 @@ slug: s3/differential-equations/fourier-series
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.702Z
-lastUpdatedOn: 2026-05-31T13:38:52.601Z
+lastUpdatedOn: 2026-05-31T13:49:07.992Z
 ---
 
 Used to decompose periodic non-sinusoidal waveforms into a sum of sinusoidal ones.
@@ -19,28 +19,28 @@ $$
 
 ### Useful trigonometric integrals
 
-```math
+$$
 \int_{\tau}^{\tau + T} \cos(nx)\, \text{d}x =
 \int_{\tau}^{\tau + T} \sin(nx)\, \text{d}x = 0
-```
+$$
 
 $$
 \int_{\tau}^{\tau + T} \sin(nx) \cos(mx) \, \text{d}t = 0
 $$
 
-```math
+$$
 \int_{\tau}^{\tau + T} \sin(nx) \sin(mx) \, \text{d}x = \begin{cases}
 \frac{T}{2} & \text{if } n = m \\
 0 & \text{otherwise}
 \end{cases}
-```
+$$
 
-```math
+$$
 \int_{\tau}^{\tau + T} \cos(nx) \cos(mx) \, \text{d}x = \begin{cases}
 \frac{T}{2} & \text{if } n = m \\
 0 & \text{otherwise}
 \end{cases}
-```
+$$
 
 ## Unknown coefficients
 
@@ -70,11 +70,11 @@ $$
 
 The fourier series of an even waveform contains only cosine terms.
 
-```math
+$$
 a_n = \frac{4}{T} \int_{\tau}^{\tau + T/2} f(x)\cos(nx) \, \text{d}x
 \;\;\text{and}\;\;
 b_n = 0
-```
+$$
 
 ### Odd Symmetry
 
@@ -86,11 +86,11 @@ $$
 
 The fourier series of an odd waveform contains only sine terms.
 
-```math
+$$
 a_0 = a_n = 0
 \;\;\text{and}\;\;
 b_n = \frac{4}{T} \int_{\tau}^{\tau + T/2} f(x)\sin(nx) \, \text{d}x
-```
+$$
 
 <Note>
 
@@ -106,28 +106,28 @@ Product of even and odd functions is even or odd function similar to the even an
 
 When a wave repeats itself with a reversal of sign after half a period.
 
-```math
+$$
 f(x) = -f\left(t + \frac{T}{2}\right)
 = -f\left(t - \frac{T}{2}\right)
-```
+$$
 
 The coefficients can be found by:
 
-```math
+$$
 a_n =
 \begin{cases}
 \frac{4}{T} \int_{\tau}^{\tau + T/2} f(x)\cos(nx) \, \text{d}x & \text{if } n \text{ is odd} \\
 0 & \text{if } n \text{ is even}
 \end{cases}
-```
+$$
 
-```math
+$$
 b_n =
 \begin{cases}
 \frac{4}{T} \int_{\tau}^{\tau + T/2} f(x)\sin(nx) \, \text{d}x & \text{if } n \text{ is odd} \\
 0 & \text{if } n \text{ is even}
 \end{cases}
-```
+$$
 
 <Note>
 
@@ -137,21 +137,21 @@ For odd and half-wave symmetry, the Fourier series does not contain a DC offset.
 
 Half-wave symmetry can co-exist with odd symmetry or even symmetry. In that case:
 
-```math
+$$
 a_n =
 \begin{cases}
 \frac{8}{T} \int_{\tau}^{\tau + T/4} f(x)\cos(nx) \, \text{d}x & \text{if } n \text{ is odd} \\
 0 & \text{if } n \text{ is even}
 \end{cases}
-```
+$$
 
-```math
+$$
 b_n =
 \begin{cases}
 \frac{8}{T} \int_{\tau}^{\tau + T/4} f(x)\sin(nx) \, \text{d}x & \text{if } n \text{ is odd} \\
 0 & \text{if } n \text{ is even}
 \end{cases}
-```
+$$
 
 ## Dirichlet Conditions
 
@@ -176,17 +176,17 @@ $$
 
 Suppose:
 
-```math
+$$
 f(x) =
 \begin{cases}
 \rho(x) & 0\lt x \lt c \\
 \theta(x) & c \lt x \lt 2\pi
 \end{cases}
-```
+$$
 
 then compute coefficients by splitting integrals:
 
-```math
+$$
 \begin{equation}
 \nonumber
 \begin{split}
@@ -195,7 +195,7 @@ a_n & =\frac{1}{\pi}\left[\int_0^cρ(x)\cos nx\,dx+\int_c^{2\pi}θ(x)\cos nx\,dx
 b_n & =\frac{1}{\pi}\left[\int_0^cρ(x)\sin nx\,dx+\int_c^{2\pi}θ(x)\sin nx\,dx\right]
 \end{split}
 \end{equation}
-```
+$$
 
 ## Half-Range Series
 
@@ -205,7 +205,7 @@ Used when a function is defined only on (0,π). Extend the function to (−π,π
 
 The function is extended as an even function.
 
-```math
+$$
 \begin{equation}
 \nonumber
 \begin{split}
@@ -213,7 +213,7 @@ a_0 & =\frac{2}{\pi}\int_0^\pi f(x)\,dx \\
 a_n & =\frac{2}{\pi}\int_0^\pi f(x)\cos nx\,dx
 \end{split}
 \end{equation}
-```
+$$
 
 And $b_n = 0$.
 

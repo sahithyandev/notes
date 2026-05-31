@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/mdp
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-05-18T06:17:23.156Z
+lastUpdatedOn: 2026-05-31T13:49:07.992Z
 ---
 
 Aka. MDP. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
@@ -85,7 +85,7 @@ Here:
 
 States that the optimal value of a state equals the maximum expected return obtainable by choosing the best action now and then behaving optimally thereafter. Recursively defined.
 
-```math
+$$
 \begin{equation}
 \nonumber
 \begin{split}
@@ -93,7 +93,7 @@ Q^*(s,a) & = \sum_{s'} T(s, a, s') \Big[ R(s,a,s') + \gamma V^*(s') \Big] \\
 V^*(s) \quad & =  \max_a Q^*(s,a)
 \end{split}
 \end{equation}
-```
+$$
 
 Here:
 
@@ -143,16 +143,16 @@ A fixed point method. Computes the optimal state-value function $V*$ by iterativ
 
 Initial states:
 
-```math
+$$
 \begin{aligned}
 V_0(s) &= 0, &\forall s \in S,\\
 Q_0(s,a) &= 0, &\forall s \in S,\; a \in A.
 \end{aligned}
-```
+$$
 
 For all $s \in S$, the below updates are performed, until maximum change across states is below a small threshold $\theta$:
 
-```math
+$$
 \begin{equation}
 \nonumber
 \begin{split}
@@ -160,7 +160,7 @@ Q_{k+1}(s,a) & = \sum_{s'} T(s, a, s') \Big[ R(s,a,s') + \gamma V_k(s') \Big] \\
 V_{k+1}(s) \quad & = \max_a Q_{k+1}(s)
 \end{split}
 \end{equation}
-```
+$$
 
 Here:
 

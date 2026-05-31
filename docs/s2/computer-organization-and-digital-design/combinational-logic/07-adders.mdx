@@ -6,7 +6,7 @@ slug: s2/computer-organization-and-digital-design/combinational-logic/adders
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.582Z
-lastUpdatedOn: 2026-05-10T07:10:02.668Z
+lastUpdatedOn: 2026-05-31T13:49:07.988Z
 ---
 
 import FullAdder from "./images/full-adder.svg";
@@ -16,13 +16,13 @@ import FullAdder from "./images/full-adder.svg";
 A digital circuit component that adds 2 bits. Outputs 2 bits: sum bit and carry
 bit.
 
-```math
+$$
 S = A \oplus B
 \;\;
 \text{ and }
 \;\;
 C = A \cdot B
-```
+$$
 
 ## Full Adder
 
@@ -30,13 +30,13 @@ A digital circuit component that adds 3 bits. Outputs 2 bits: sum bit and carry
 bit. An extension of the half adder where the carry bit of a half adder is input
 to another half adder. Built using 2 half adders.
 
-```math
+$$
 S =
 \overline{A}\cdot \overline{B} C_\text{in} +
 \overline{A} {B} \overline{C_\text{in}} +
 {A} \overline{B}\cdot \overline{C_\text{in}} +
 {A} B C_\text{in}
-```
+$$
 
 $$
 C_\text{out} = \overline{A} B C_\text{in} + A B + A\overline{B}C_\text{in}
@@ -75,17 +75,17 @@ a CLA:
 
 ![Carry Lookahead Adder](./images/carry-lookahead-adder.jpg)
 
-```math
+$$
 P_i = A_i \oplus B_i
 \;\;\;\;
 G_i = A_i B_i
-```
+$$
 
-```math
+$$
 S_i = P_i \oplus C_i
 \;\;\;\;
 C_{i+1} = G_i + P_i C_i
-```
+$$
 
 The CLA can be used to create n-bit adders which only have 3 level delay. Faster than RCA.
 

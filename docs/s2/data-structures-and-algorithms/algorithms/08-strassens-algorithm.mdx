@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/strassens-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-05-29T14:30:05.867Z
+lastUpdatedOn: 2026-05-31T13:49:07.988Z
 prereqs:
   - s1/mathematics/matrices/matrix-multiplication
 ---
@@ -19,14 +19,14 @@ Suppose 2 $n \times n$ matrices $A$ and $B$ are given. $C = A \cdot B$ is to be 
 
 1. Divide the matrices $A$ and $B$ into four $n/2 \times n/2$ submatrices:
 
-```math
+$$
 A = \begin{bmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{bmatrix} \quad
 B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix}
-```
+$$
 
 2. Compute the following 7 products (Strassen's formulas):
 
-   ```math
+   $$
    \begin{aligned}[c]
    M_1 &= (A_{11} + A_{22})(B_{11} + B_{22})
    &
@@ -43,17 +43,17 @@ B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix}
    M_4 &= A_{22}(B_{21} - B_{11})
    & \\
    \end{aligned}
-   ```
+   $$
 
 3. Combine the results to compute the submatrices of $C$:
-   ```math
+   $$
    \begin{aligned}
    C_{11} &= M_1 + M_4 - M_5 + M_7 \\
    C_{12} &= M_3 + M_5 \\
    C_{21} &= M_2 + M_4 \\
    C_{22} &= M_1 - M_2 + M_3 + M_6 \\
    \end{aligned}
-   ```
+   $$
 4. Reconstruct the resulting matrix $C$:
 
 $$
