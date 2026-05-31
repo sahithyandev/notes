@@ -1,0 +1,106 @@
+---
+title: Network Management
+sidebar:
+  order: 21
+dateCreated: 2026-05-31T09:42:00.342Z
+lastUpdatedOn: 2026-05-31T11:09:30.505Z
+slug: s4/computer-networks/network-management
+prev: true
+next: true
+---
+
+The process of monitoring and control of network components to ensure operational continuity. Covers fault detection, performance measurement, configuration tracking, and access control.
+
+Large networks contain different type of components such as routers, switches, hosts, links. Hence many failure modes:
+- Component malfunctions
+- Misconfiguration
+- Overusage
+
+## High-Availability Techniques
+
+Reduces failure rates. Increase cost and management complexity. No universal self-rectifying mechanism exists.
+
+### Clustering
+
+Grouping of multiple nodes to function as a single logical unit. All units working in parallel. Provides load distribution. If one node fails, others continue serving requests. Failure is masked from clients.
+
+### Redundancy
+
+Duplication of critical components so a backup exists if the primary fails. When one fails, another backup component (which was on standby mode or idle), takes up the workload.
+
+## Approaches
+
+### ICMP-based Tools
+
+Sufficient for small networks. Insufficient for large-scale management because of lack of timely, structured information.
+
+Examples:
+- ping   
+  Sends ICMP Echo Request packets to a target host and waits for ICMP Echo Reply packets. Round-trip time and packet loss are measured from the exchange.
+- traceroute   
+  Sends packets with incrementally increasing TTL or hop values, causing each successive router to discard the packet and return an ICMP Time Exceeded message. The source address of each returned message reveals the path taken to the destination.
+
+### Network Management Tools
+
+Modern networks require:
+- Proactive and structured notification from components
+- Timely data collection
+- Interface/device failure alarms
+- Operational status of hosts and devices
+- Resource utilisation and running mode
+- Traffic loads per network segment
+- Routing tables and change history
+- Performance metrics (e.g., CIR)
+- Detection of suspicious or abnormal behaviour
+
+Examples:
+- Open source: Nagios, MRTG
+- Commercial: CiscoWorks, HP OpenView
+
+## ISO Network Management Model
+
+Aka. FCAPS. Five functional areas each with a distinct discipline.
+
+- Fault management   
+  Log, detect, respond to failures.
+- Configuration management   
+  Track device configurations.
+- Accounting management   
+  Log access, enforce quotas, apply charges.
+- Performance management   
+  Quantify, measure, report, analyse, control component performance.
+- Security management   
+  Control access to network resources.
+
+## Network Management Architecture
+
+### Managing Entity
+
+Application running in the Network Operations Centre (NOC). Controls and queries managed devices via the network management protocol.
+
+### Managed Device
+
+Network equipment (routers, switches, hosts) in the managed network. Contains:
+- Managed objects   
+- Management Information Base (MIB)   
+- Network management agent   
+
+### Managed Object
+
+Specific manageable elements of a managed device.
+
+### Management Information Base
+Aka. MIB. Structured store of managed object data. Each object has version, status and counters (one counter per trackable event type).
+
+Structure of Mangement Information (SMI) is the data definition language for MIB.
+
+### Network Management Agent
+Software on the device that communicates with the managing entity.
+
+### Network Management Protocol
+
+Handles communication between managing entity and managed devices.
+
+### Proxy
+
+Intermediary agent. Enables management of devices that cannot run a native agent.
