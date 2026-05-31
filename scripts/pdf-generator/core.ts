@@ -176,36 +176,46 @@ export async function generateModulePdf(moduleId: string) {
     "\\pretocmd{\\subsubsection}{\\Needspace*{0.15\\textheight}}{}{}",
   ];
 
-  const moduleName = titleize(moduleId.split("/")[1]);
-
-  const semesterName = titleize(moduleId.split("/")[0]);
-
-  const noteCount = sortedFiles.length;
+  const moduleIdParts = moduleId.split("/")
+  const moduleName = titleize(moduleIdParts[1]);
+  const semesterNumber = moduleIdParts[0].charAt(1);
 
   docLines.push("\\begin{document}");
   docLines.push(
     "\\begin{titlepage}",
-    "  \\begin{tikzpicture}[remember picture, overlay]",
-    "    \\fill[black!85] (current page.north west) rectangle ([yshift=-2.2in]current page.north east);",
-    "    \\fill[black!85] (current page.south west) rectangle ([yshift=0.6in]current page.south east);",
-    "  \\end{tikzpicture}",
-    "  \\centering",
-    "  \\vspace*{0.6in}",
-    `  {\\fontsize{36}{44}\\bfseries\\color{white} ${moduleName}\\par}`,
-    "  \\vspace{1.6in}",
-    "  \\begin{minipage}{0.75\\linewidth}",
-    "    \\centering",
-    "    {\\color{black!40}\\rule{\\linewidth}{0.4pt}}\\par",
-    "    \\vspace{0.25in}",
-    "    {\\Large\\itshape Prepared for examination reference\\par}",
-    "    \\vspace{0.2in}",
-    "    {\\normalsize Sahithyan K.\\par}",
-    "    \\vspace{0.15in}",
-    "    {\\color{black!40}\\rule{\\linewidth}{0.4pt}}\\par",
-    "  \\end{minipage}",
-    "  \\vfill",
-    `  {\\large\\color{white} ${semesterName}\\par}`,
-    "  \\vspace{0.15in}",
+    "\\begin{tikzpicture}[remember picture,overlay]",
+    "",
+    "\\fill[black!85]",
+    "    (current page.north west) rectangle ([yshift=-2.4in]current page.north east);",
+    "",
+    "\\fill[black!85]",
+    "    (current page.south west) rectangle ([yshift=1in]current page.south east);",
+    "",
+    "\\node[",
+    "    align=center,",
+    "    text=white,",
+    "    font=\\bfseries\\fontsize{38}{44}\\selectfont,",
+    "    text width=0.9\\paperwidth",
+    `] at ([yshift=-1.3in]current page.north) {${moduleName.replaceAll(" ", "\\\\[0.2em]")}};`,
+    "",
+    "\\node[",
+    "    align=center,",
+    "    text=black!70,",
+    "    font=\\itshape\\Large,",
+    "    text width=0.7\\paperwidth",
+    "] at (current page.center) {%",
+    "    \\rule{\\linewidth}{0.6pt}\\\\[0.4cm]",
+    "    Prepared for Examination Reference\\\\[0.5cm]",
+    "    {\\normalsize Sahithyan K.}\\\\[0.4cm]",
+    "    \\rule{\\linewidth}{0.6pt}",
+    "};",
+    "",
+    "\\node[",
+    "    text=white,",
+    "    font=\\large",
+    `] at ([yshift=0.5in]current page.south) {Semester ${semesterNumber.padStart(2, "0")}};`,
+    "",
+    "\\end{tikzpicture}",
     "\\end{titlepage}",
     "",
   );
