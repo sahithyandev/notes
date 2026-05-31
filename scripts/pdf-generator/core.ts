@@ -152,6 +152,10 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage[export]{adjustbox}",
     "\\usepackage{centernot}",
     "\\usepackage{amsmath}",
+    "\\usepackage{xcolor}",
+    "\\usepackage{tikz}",
+    "\\usepackage{lmodern}",
+    "\\usepackage[T1]{fontenc}",
     "",
     "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
     "\\newcommand{\\lt}{<}",
@@ -160,11 +164,37 @@ export async function generateModulePdf(moduleId: string) {
 
   const moduleName = titleize(moduleId.split("/")[1]);
 
-  // META
-  docLines.push(`\\title{${moduleName}}`);
-  docLines.push("\\date{}");
+  const semesterName = titleize(moduleId.split("/")[0]);
 
-  docLines.push("\\begin{document}", "\\maketitle", "");
+  const noteCount = sortedFiles.length;
+
+  docLines.push("\\begin{document}");
+  docLines.push(
+    "\\begin{titlepage}",
+    "  \\begin{tikzpicture}[remember picture, overlay]",
+    "    \\fill[black!85] (current page.north west) rectangle ([yshift=-2.2in]current page.north east);",
+    "    \\fill[black!85] (current page.south west) rectangle ([yshift=0.6in]current page.south east);",
+    "  \\end{tikzpicture}",
+    "  \\centering",
+    "  \\vspace*{0.6in}",
+    `  {\\fontsize{36}{44}\\bfseries\\color{white} ${moduleName}\\par}`,
+    "  \\vspace{1.6in}",
+    "  \\begin{minipage}{0.75\\linewidth}",
+    "    \\centering",
+    "    {\\color{black!40}\\rule{\\linewidth}{0.4pt}}\\par",
+    "    \\vspace{0.25in}",
+    "    {\\Large\\itshape Prepared for examination reference\\par}",
+    "    \\vspace{0.2in}",
+    "    {\\normalsize Sahithyan K.\\par}",
+    "    \\vspace{0.15in}",
+    "    {\\color{black!40}\\rule{\\linewidth}{0.4pt}}\\par",
+    "  \\end{minipage}",
+    "  \\vfill",
+    `  {\\large\\color{white} ${semesterName}\\par}`,
+    "  \\vspace{0.15in}",
+    "\\end{titlepage}",
+    "",
+  );
 
   let lastChapter = null;
   let lastNote = null;
