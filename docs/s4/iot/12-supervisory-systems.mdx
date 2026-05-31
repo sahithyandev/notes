@@ -1,0 +1,45 @@
+---
+title: Supervisory Systems
+sidebar:
+  order: 12
+slug: s4/iot/supervisory-systems
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-05-31T16:41:13.712Z
+---
+
+## Supervisory Circuits
+
+Independent hardware that monitors the main processor.
+
+Monitors:
+
+- Clock speed
+- Temperature
+- RAM operation
+- System health
+
+Can:
+
+- Restart the processor
+- Shut down the system
+- Generate alarms
+
+## Watchdog Timer
+
+One of the most important supervisory features.
+
+A counter continuously increments. The running program must periodically reset it. If not reset, the counter reaches its limit and the processor automatically restarts.
+
+Detects:
+
+- Infinite loops
+- Software crashes
+- Unresponsive programs
+
+<Note>
+
+A common bug is repeated restarts caused by omitting the watchdog reset in program code.
+
+</Note>

@@ -1,0 +1,79 @@
+---
+title: Reliability and Fault Tolerance
+sidebar:
+  order: 11
+slug: s4/iot/reliability
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-05-31T16:41:13.711Z
+---
+
+## Reliable vs Fail-Safe
+
+**Reliable**: a system that rarely fails. No system can be made completely failure-free.
+
+**Fail-safe**: a system that enters a safe state when it fails. Failure must not create danger.
+
+These are independent properties. A system can be reliable without being fail-safe, and vice versa.
+
+### Railway Crossing Example
+
+Option A: warning light normally OFF. On failure, the light goes dark, which looks like no train is coming. Dangerous.
+
+Option B: green light normally ON. On failure, the light goes dark, interpreted as unsafe. Safe.
+
+Option B is fail-safe.
+
+### Headlight Flash Convention
+
+International standard: flash means "I am stopping, you go." If both drivers flash, both stop.
+
+Opposite convention: flash means "I am coming." If both flash, both proceed, risking collision.
+
+The first convention is fail-safe; the second is not.
+
+## Fault Tolerance
+
+A fault-tolerant system continues operating after a component failure. Achieved through redundancy.
+
+### Active-Active Redundancy
+
+Both systems operate simultaneously.
+
+- Both are continuously verified
+- No switchover delay
+
+### Active-Passive Redundancy
+
+One system active, one on standby.
+
+- Lower operating cost
+- Standby unit may fail unnoticed
+
+### Aircraft Autopilot Example
+
+Typical setup:
+
+- 1 active autopilot
+- 1 supervisory autopilot
+- 3 standby autopilots
+
+Different manufacturers may be used to avoid common software bugs.
+
+## Reliability Metrics
+
+**MTBF** (Mean Time Between Failures): average time between failures. Higher MTBF means better reliability.
+
+**MTTF** (Mean Time To Failure): average time before the first failure.
+
+## Component Count Rule
+
+Every component:
+
+- Consumes power
+- Costs money
+- Occupies space
+- Adds failure probability
+
+IoT design rule: use the fewest components possible.

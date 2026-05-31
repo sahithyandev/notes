@@ -1,0 +1,87 @@
+---
+title: Computer Architecture
+sidebar:
+  order: 10
+slug: s4/iot/computer-architecture
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-05-31T16:41:13.711Z
+---
+
+## Three Main Buses
+
+### Address Bus
+
+Specifies the memory location or device being accessed.
+
+### Data Bus
+
+Transfers actual data between components.
+
+### Control Bus
+
+Controls read and write operations.
+
+## Speed Hierarchy
+
+Different devices operate at different speeds.
+
+| Device | Typical Speed |
+| ------ | ------------- |
+| Keyboard | ~200 ms |
+| Screen | 40–100 ms |
+| USB / Ethernet / HDD | 16–132 MHz |
+| PCI Devices | 250–266 MHz |
+| RAM | 266–512 MHz |
+| CPU Front Side Bus | 400–466 MHz |
+
+### North Bridge
+
+Handles fast components: RAM and the graphics card. Runs at CPU-like speeds; located close to the CPU.
+
+### South Bridge
+
+Handles slower devices: USB, Ethernet, hard drives, keyboard, and serial ports. Connected to the North Bridge through an internal bus.
+
+## Memory Hierarchy
+
+From fastest to slowest:
+
+- Cache: inside the CPU, fastest memory
+- Main RAM: holds running programs
+- BIOS/ROM: used during startup, slowest
+
+### BIOS Shadowing
+
+At startup, BIOS is stored in ROM, then copied into RAM. Execution continues from RAM for higher speed.
+
+## Buffered I/O
+
+CPUs are much faster than I/O devices. Buffers are temporary storage areas where data waits before processing.
+
+Computer systems are generally not real-time. Screen updates, for example, may be delayed slightly. This delay is acceptable for computers but unacceptable for many IoT systems.
+
+## Instruction Set Architectures
+
+### CISC
+
+**CISC** (Complex Instruction Set Computer) prioritizes high performance, large capacity, expandability, and general-purpose operation.
+
+- Over 1000 instructions
+- Broad capability
+
+Examples: Intel and AMD processors.
+
+### RISC
+
+**RISC** (Reduced Instruction Set Computer) prioritizes real-time operation, low power, reliability, simplicity, and low cost.
+
+- Around 35 instructions
+- Highly optimized
+- Efficient execution
+- Lower power consumption
+
+Examples: PIC, AVR, ARM.
+
+IoT systems use RISC architectures to guarantee response times with minimal components.

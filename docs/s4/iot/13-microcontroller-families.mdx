@@ -1,0 +1,80 @@
+---
+title: Microcontroller Families
+sidebar:
+  order: 13
+slug: s4/iot/microcontroller-families
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-05-31T16:41:13.712Z
+---
+
+## Computer vs Microcontroller
+
+| Feature | Intel CPU | Microcontroller |
+| ------- | --------- | --------------- |
+| Power | >95 W | ~0.25 W |
+| Clock | ~5 GHz | ~4 MHz |
+| Instructions | 1000+ | ~35 |
+| Architecture | CISC | RISC |
+| Purpose | Computing | Control |
+
+Microcontrollers are complete systems on a chip. All components connect through a single bus: CPU, clock, RAM, ROM, I/O devices, analog peripherals, [supervisory circuit](/s4/iot/supervisory-systems), and power management.
+
+### Power Management
+
+Can slow or stop the clock completely. Stopping the clock places the device into sleep or hibernate mode.
+
+## PIC
+
+- Up to 20 MHz
+- Up to 16 KB ROM
+- ~500 B RAM
+- 33 I/O pins
+- Built-in ADC
+- Memory cannot be expanded
+
+## Intel 8051
+
+- 8-bit architecture
+- 4 KB ROM
+- 128 B RAM
+- 32 I/O pins
+- Can connect external memory
+- No built-in ADC
+
+## AVR
+
+Used in Arduino Uno (ATmega328).
+
+- Internal clock
+- 32 KB ROM
+- 32 KB RAM
+- 24 I/O pins
+- Built-in ADC
+
+### AVR Internal Components
+
+CPU core contains: ALU, registers, program counter, instruction decoder, and control unit.
+
+Built-in peripherals:
+
+- ADC: converts analog signals to digital values
+- Analog comparator: compares two voltages
+- USART: serial communication
+- SPI: programming and communication
+- Watchdog timer: automatic recovery from software failures
+- EEPROM: permanent program storage
+- JTAG: debug interface
+
+## ARM
+
+- 32-bit architecture
+- External RAM
+- High performance
+
+Examples: Raspberry Pi, modern embedded systems.
+
+## Debugging Constraints
+
+IoT devices usually lack screens, keyboards, and direct debugging tools. Debugging typically requires JTAG or special external interfaces. Hardware development is often easier than software development for this reason.
