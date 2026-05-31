@@ -1,4 +1,4 @@
-import { readdir, stat, readFile } from "node:fs/promises";
+import { readdir, stat, readFile, mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
@@ -235,15 +235,19 @@ export async function generateModulePdf(moduleId: string) {
 
   docLines.push("", "\\end{document}");
 
-  const outputDirectory = ".tmp";
-  const latexOutputPath = resolve(
-    outputDirectory,
+  const texOutputPath = resolve(
+    ".tmp/tex",
     moduleId.replace("/", "-").concat(".tex"),
   );
-  const latexOutputFile = Bun.file(latexOutputPath);
+  const latexOutputFile = Bun.file(texOutputPath);
   await latexOutputFile.write(docLines.join("\n"));
 
-  exec(`tectonic ${latexOutputPath}`, (error, stdout, stderr) => {
-    console.log(error, stdout, stderr);
-  });
+  await mkdir(".tmp/pdf", { recursive: true });
+
+  exec(
+    `tectonic --outdir .tmp/pdf ${texOutputPath}`,
+    (error, stdout, stderr) => {
+      console.log(error, stdout, stderr);
+    },
+  );
 }
