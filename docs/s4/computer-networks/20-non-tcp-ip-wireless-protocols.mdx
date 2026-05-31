@@ -1,0 +1,187 @@
+---
+title: Non TCP/IP Wireless Protocols
+sidebar:
+  order: 20
+dateCreated: 2026-05-31T14:51:47.466Z
+lastUpdatedOn: 2026-05-31T15:06:59.384Z
+slug: s4/computer-networks/non-tcp-ip-wireless-protocols
+prev: true
+next: true
+---
+
+Designed for specific low-power, short-range use cases. They trades off data rate, range, and power against complexity. Protocol selection is application-driven.
+
+TCP/IP has high footprint, not always suitable.
+
+Legacy non-IP protocols: SNA, DECNet, Novell Netware, NetBEUI, WAP. Current relevant protocols: Bluetooth, ZigBee, NFC, Fiber Channel.
+
+## Bluetooth
+
+Short-range wireless protocol for cable replacement, multiparty data exchange, and personal trusted device connectivity. Developed by Ericsson and managed by Bluetooth Special Interest Group. IEEE 802.15.1 standard.
+
+- Frequency: 2.4–2.48 GHz ISM band.
+- Range: ~10 m.
+- Bandwidth: 2.1 Mbps shared (v2.0).
+- Version 4.0 includes: Classic Bluetooth, Bluetooth High Speed (Wi-Fi-based), Bluetooth Low Energy (BLE).
+
+### Bluetooth Protocol Stack
+
+Divided into Transport Protocol group and Middleware Protocol group.
+
+Transport Protocol layers:
+- Bluetooth Radio   
+  Radio signal modulation and transmission.
+- Baseband   
+  Frequency-hopping and time-division multiplexing between master and slaves.
+- Link Manager Protocol (LMP)   
+  Establishment of logical channels, authentication, power management.
+- Host Controller Interface (HCI)   
+  Software interface to baseband and link manager; exposes hardware status and registers.
+- L2CAP (Logical Link Control and Adaptation Protocol)   
+  Multiplexes multiple logical connections over Bluetooth; provides segmentation and reassembly of on-air packets. Key layer from application developer's perspective.
+
+Middleware Protocol layers:
+- RFCOMM   
+  Cable replacement protocol; emulates EIA-232 (RS-232) serial interface.
+- SDP (Service Discovery Protocol)   
+  Discovers services offered by other Bluetooth devices.
+- TCS-BIN (Telephony Control Specification, Binary)   
+  Establishes speech and data calls between master and slave.
+- OBEX (Object Exchange Protocol)   
+  Exchanges structured data objects: calendars, vCards.
+- Audio   
+  Supports audio communication directly on top of baseband.
+
+### Bluetooth Piconet and Scatternet
+
+#### Piconet
+
+Basic Bluetooth network topology. All communications go through master. No direct slave-to-slave communication. Up to 7 active slaves and up to 255 parked slaves.
+
+#### Scatternet
+
+Formed by connecting 2+ piconets. A device can act as slave in one piconet and master in another.
+
+### Bluetooth Profile
+
+A set of application-layer protocols defining behaviors for specific use cases. Resides on top of Bluetooth core specification.
+
+Examples:
+- HFP — Hands-Free Profile.
+- BPP — Basic Printing Profile.
+- AVRCP — Audio/Video Remote Control Profile.
+- FTP — File Transfer Profile.
+- HID — Human Interface Device Profile.
+- PAN — Personal Area Networking Profile.
+- GOEP — Generic Object Exchange Profile (uses OBEX).
+
+## Near Field Communication
+
+Aka. NFC. Short-range wireless communication based on magnetic field induction between readers and tags in RFID systems. Initiated in 2004 by Nokia, Philips, and Sony.
+
+- Frequency: 13.56 MHz.
+- Range: ≤10 cm.
+- Data rate: 106–424 Kbps.
+
+Has 2 modes of operation:
+- Active Mode   
+  Both devices generate electromagnetic fields and exchange data.
+- Passive Mode   
+  One active device generates field; passive device uses that field to exchange data.
+
+Application patterns: Touch & Go, Touch & Confirm, Touch & Connect.
+
+Convenient, low cost, low energy, no search/pair procedure, minimal configuration, better security. Low range and low data rate.
+
+Used in mobile payments, public transportation, mobile identification, mobile marketing, social networking, check-in.
+
+### NFC Protocol Stack
+
+Three operational modes, each with distinct stack components:
+
+- Card Emulation Mode   
+  Smart card capability for mobile devices.
+- Peer-to-Peer Mode   
+  LLCP (Logical Link Control Protocol) + NFC Forum Protocol Bindings (IP, OBEX).
+- Reader/Writer Mode   
+  RTD (Record Type Definition) + NDEF (NFC Data Exchange Format) + Tag Types 1–4.
+
+Underlying RF layer: ISO 18092 + ISO 14443 Type A, Type B + FeliCa.
+
+## ZigBee
+
+Low-power, low-data-rate wireless protocol by ZigBee Alliance. Targets sensor networks and IoT applications.
+
+- Very low power consumption — months to years of battery life.
+- Low data rate — max 250 Kbps.
+- Low circuit complexity — low cost.
+
+### ZigBee Protocol Stack
+
+Built on IEEE 802.15.4 (physical + MAC layers for low-rate WPAN).
+
+ZigBee adds:
+- Network Layer (NWK)   
+  Routing, route discovery, route maintenance.
+- Application Support Sub-Layer (APS)   
+  Service binding and message routing between application objects.
+- Application Layer (APL)   
+  Application Objects + ZigBee Device Objects.
+
+### IEEE 802.15.4 Device Types
+
+- **FFD (Full Functional Device)** — can operate as PAN coordinator, coordinator, or simple device. Communicates with FFD or RFD.
+- **RFD (Reduced Functional Device)** — communicates only with a specific FFD. Suited for low-volume, simple applications.
+
+### ZigBee Topologies
+
+**Star Topology**
+- Central PAN coordinator; all devices connect directly to it.
+- Pros: easy synchronization, low latency.
+- Cons: small scale only.
+
+**Mesh / Peer-to-Peer (P2P) Topology**
+- Devices communicate directly with any in-range device.
+- Pros: robust multi-hop communication, multi-path routing, flexible, lower latency.
+- Cons: costly route discovery, requires routing table storage.
+
+**Cluster Tree Topology**
+- Hierarchical arrangement of coordinators and devices.
+- Pros: low routing cost, multi-hop, scalable.
+- Cons: costly route reconstruction, potentially high latency, root node is a single point of failure.
+
+### ZigBee Traffic Modes
+
+**Beacon Mode**
+- Coordinator periodically broadcasts beacon.
+- Both coordinator and end device can sleep between beacons.
+- Lowest energy consumption.
+- Requires precise timing.
+- Beacon period: milliseconds to minutes.
+
+**Non-Beacon Mode**
+- Coordinator/routers must remain awake continuously.
+- Supports heterogeneous networks.
+- Asymmetric power requirements.
+
+### ZigBee Route Discovery
+
+Broadcast-based. Protocol:
+1. Source broadcasts **RREQ (Routing Request)** packet.
+2. Intermediate nodes generate routing table entries back to source.
+3. Endpoint router responds with **RREP (Routing Response)** packet.
+4. Source generates routing table entry to destination.
+
+Route maintenance: tracks failed deliveries to neighbors; initiates route repair at threshold. On total connectivity loss: orphaning procedure followed by re-association.
+
+### Comparative Summary
+
+| Parameter        | Low Energy Bluetooth | ZigBee               | NFC          | Low Power WiFi |
+| ---------------- | -------------------- | -------------------- | ------------ | -------------- |
+| Frequency        | 2402–2482 MHz        | 868/915 MHz, 2.4 GHz | 13.56 MHz    | 2400–2500 MHz  |
+| Max Data Rate    | 1 Mbps               | 250 Kbps             | 424 Kbps     | 54 Mbps        |
+| Range            | 10 m                 | 100+ m               | 10 cm        | 30 m           |
+| Power Profile    | Days                 | Months/Years         | Months/Years | Hours          |
+| Max Nodes/Master | 7                    | 65,000               | 1+1          | —              |
+| Complexity       | Complex              | Simple               | Simple       | Complex        |
+| Extendibility    | No                   | Yes                  | No           | Yes            |
