@@ -3,11 +3,45 @@ import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import linkValidator from "./src/integrations/link-validator/index.ts";
+import remarkGfm from "remark-gfm";
+import katex from "katex";
+import { visit } from "unist-util-visit";
+import "katex/contrib/mhchem";
+
+function render(value, displayMode) {
+  return katex.renderToString(value, {
+    displayMode,
+    throwOnError: false,
+    trust: true,
+    strict: false,
+  });
+}
+
+export function remarkKatexMhchem() {
+  return (tree) => {
+    visit(tree, (node, index, parent) => {
+      if (!parent || typeof index !== "number") return;
+
+      if (node.type === "inlineMath") {
+        parent.children[index] = {
+          type: "html",
+          value: render(node.value, false),
+        };
+      }
+
+      if (node.type === "math") {
+        parent.children[index] = {
+          type: "html",
+          value: render(node.value, true),
+        };
+      }
+    });
+  };
+}
 
 // Only note files carry a numeric prefix; semester / module / submodule
 // directory names do not.
@@ -90,8 +124,8 @@ export default defineConfig({
   redirects: buildModuleRedirects(),
   integrations: [mdx(), linkValidator()],
   markdown: {
-    rehypePlugins: [rehypeKatex],
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkGfm, remarkMath, remarkKatexMhchem],
+    rehypePlugins: [],
     shikiConfig: {
       themes: {
         light: "snazzy-light",
