@@ -201,6 +201,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage[T1]{fontenc}",
     "\\usepackage{needspace}",
     "\\usepackage{etoolbox}",
+    "\\usepackage[version=4]{mhchem}",
     "",
     "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
     "\\newcommand{\\lt}{<}",
