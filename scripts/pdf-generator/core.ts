@@ -72,6 +72,9 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[max width=\\linewidth]{${imgPath}}\n  \\caption{${node.alt ?? ""}}\n\\end{figure}`;
     }
 
+    case "blockquote":
+      return `\\begin{quote}\n${children(node, baseDir).join("\n\n")}\n\\end{quote}`;
+
     case "inlineCode":
       return `\\texttt{${node.value}}`;
 
@@ -79,7 +82,13 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       return `\\begin{verbatim}\n${node.value}\n\\end{verbatim}`;
 
     case "yaml":
-      return ""; // frontmatter — skip
+    case "mdxjsEsm":
+    case "mdxTextExpression":
+    case "mdxFlowExpression":
+      return "";
+
+    case "break":
+      return "\\\\";
 
     case "thematicBreak":
       return "\\hrule";
@@ -98,10 +107,9 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     }
 
     default:
-      console.log("default", node);
-      // fallback: recurse if possible
-      if ((node as Parent).children)
-        return children(node, baseDir).join("\n\n");
+      console.error("default", node);
+      process.exit(1);
+      // throw new Error("no defaults");
       return node.value ? `% [${node.type}] ${node.value}` : `% [${node.type}]`;
   }
 }
