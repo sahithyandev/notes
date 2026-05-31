@@ -799,6 +799,8 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     --toc-w: 280px;
     --nav-h: 54px;
     --pip-size: 16px;
+    --stripe-fg: #f5b800;
+    --stripe-bg: #1a1200;
   }
 
   main {
@@ -810,17 +812,17 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     background-image:
       repeating-linear-gradient(
         -45deg,
-        #f5b800 0px,
-        #f5b800 2px,
-        #1a1200 2px,
-        #1a1200 6px
+        var(--exam-stripe-fg) 0px,
+        var(--exam-stripe-fg) 2px,
+        var(--exam-stripe-bg) 2px,
+        var(--exam-stripe-bg) 6px
       ),
       repeating-linear-gradient(
         -45deg,
-        #f5b800 0px,
-        #f5b800 2px,
-        #1a1200 2px,
-        #1a1200 6px
+        var(--exam-stripe-fg) 0px,
+        var(--exam-stripe-fg) 2px,
+        var(--exam-stripe-bg) 2px,
+        var(--exam-stripe-bg) 6px
       );
     background-size:
       3px 100%,
@@ -1707,14 +1709,12 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
 
   /* ── EXAM SEASON BANNER ───────────────────────────────────────── */
   .exam-banner {
-    --warn: #f5b800;
-    --warn-dark: #1a1200;
     display: flex;
     align-items: stretch;
     margin-top: 28px;
     border-radius: 6px;
     overflow: hidden;
-    border: 1.5px solid var(--warn);
+    border: 1.5px solid var(--stripe-fg);
     box-shadow: 0 0 0 4px rgba(245, 184, 0, 0.12);
   }
 
@@ -1723,10 +1723,10 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     width: 28px;
     background-image: repeating-linear-gradient(
       -45deg,
-      var(--warn) 0px,
-      var(--warn) 5px,
-      #1a1200 5px,
-      #1a1200 12px
+      var(--exam-stripe-fg) 0px,
+      var(--exam-stripe-fg) 5px,
+      var(--exam-stripe-bg) 5px,
+      var(--exam-stripe-bg) 12px
     );
   }
 
