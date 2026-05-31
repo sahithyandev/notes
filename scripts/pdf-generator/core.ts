@@ -7,7 +7,7 @@ import remarkMath from "remark-math";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import { exec } from "node:child_process";
-import type { MdNode, Parent } from "./types";
+import type { MdNode } from "./types";
 import { titleize } from "../../src/utils";
 
 const mdxParser = unified()
@@ -19,6 +19,18 @@ const mdxParser = unified()
 
 function children(node: MdNode, baseDir: string): string[] {
   return (node.children ?? []).map((c) => mdNodetoLatex(c, baseDir));
+}
+
+function escapeTextForLatex(text: string): string {
+  return text
+    .replace(/—/g, "---")
+    .replace(/–/g, "--")
+    .replace(/[&%$#_{}~^\\]/g, (c) => {
+      if (c === "\\") return "\\textbackslash{}";
+      if (c === "~") return "\\textasciitilde{}";
+      if (c === "^") return "\\textasciicircum{}";
+      return `\\${c}`;
+    });
 }
 
 function mdNodetoLatex(node: MdNode, baseDir: string): string {
@@ -36,15 +48,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       return children(node, baseDir).join("");
 
     case "text":
-      return (node.value ?? "")
-        .replace(/—/g, "---")
-        .replace(/–/g, "--")
-        .replace(/[&%$#_{}~^\\]/g, (c) => {
-          if (c === "\\") return "\\textbackslash{}";
-          if (c === "~") return "\\textasciitilde{}";
-          if (c === "^") return "\\textasciicircum{}";
-          return `\\${c}`;
-        });
+      return escapeTextForLatex(node.value ?? "");
 
     case "inlineMath":
       return `$${node.value}$`;
@@ -74,14 +78,22 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       const imgPath = node.url?.startsWith(".")
         ? resolve(baseDir, node.url)
         : (node.url ?? "");
-      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[max width=\\linewidth]{${imgPath}}\n  \\caption{${node.alt ?? ""}}\n\\end{figure}`;
+      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[max width=\\linewidth]{${imgPath}}\n  \\caption{${escapeTextForLatex(node.alt ?? "")}}\n\\end{figure}`;
     }
 
     case "blockquote":
       return `\\begin{quote}\n${children(node, baseDir).join("\n\n")}\n\\end{quote}`;
 
-    case "inlineCode":
-      return `\\texttt{${node.value}}`;
+    case "inlineCode": {
+      const escaped = (node.value ?? "")
+        .replace(/\\/g, "\\textbackslash{}")
+        .replace(/[%&$#_{}~^]/g, (c) => {
+          if (c === "~") return "\\textasciitilde{}";
+          if (c === "^") return "\\textasciicircum{}";
+          return `\\${c}`;
+        });
+      return `\\texttt{${escaped}}`;
+    }
 
     case "code":
       return `\\begin{verbatim}\n${node.value}\n\\end{verbatim}`;
@@ -213,7 +225,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\pretocmd{\\subsubsection}{\\Needspace*{0.15\\textheight}}{}{}",
   ];
 
-  const moduleIdParts = moduleId.split("/")
+  const moduleIdParts = moduleId.split("/");
   const moduleName = titleize(moduleIdParts[1]);
   const semesterNumber = moduleIdParts[0].charAt(1);
 
