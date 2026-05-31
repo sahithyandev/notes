@@ -156,10 +156,16 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{tikz}",
     "\\usepackage{lmodern}",
     "\\usepackage[T1]{fontenc}",
+    "\\usepackage{needspace}",
+    "\\usepackage{etoolbox}",
     "",
     "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
     "\\newcommand{\\lt}{<}",
     "\\newcommand{\\gt}{>}",
+    "",
+    "\\pretocmd{\\section}{\\Needspace*{0.40\\textheight}}{}{}",
+    "\\pretocmd{\\subsection}{\\Needspace*{0.25\\textheight}}{}{}",
+    "\\pretocmd{\\subsubsection}{\\Needspace*{0.15\\textheight}}{}{}",
   ];
 
   const moduleName = titleize(moduleId.split("/")[1]);
