@@ -30,7 +30,8 @@ const { slug } = Astro.params;
 const notesEntry = await getEntry("notes", slug);
 const slugParts = slug.split("/");
 const semesterNumber = parseInt(slugParts[0]?.match(/^s(\d)$/)?.[1] ?? "0");
-const semesterExamPeriod = semesterNumber > 0 ? EXAM_PERIODS[semesterNumber - 1] : null;
+const semesterExamPeriod =
+  semesterNumber > 0 ? EXAM_PERIODS[semesterNumber - 1] : null;
 
 if (!notesEntry) {
   return new Response(null, {
@@ -512,20 +513,18 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
         )
       }
 
-      {semesterExamPeriod && (
-        <div
-          class="exam-banner"
-          id="exam-banner"
-          hidden
-        >
-          <div class="exam-banner-stripe" aria-hidden="true"></div>
-          <div class="exam-banner-body">
-            <span class="exam-banner-label">Exam Season</span>
-            <span class="exam-banner-text">All the best on your exams!</span>
+      {
+        semesterExamPeriod && (
+          <div class="exam-banner" id="exam-banner" hidden>
+            <div class="exam-banner-stripe" aria-hidden="true" />
+            <div class="exam-banner-body">
+              <span class="exam-banner-label">Exam Season</span>
+              <span class="exam-banner-text">All the best on your exams!</span>
+            </div>
+            <div class="exam-banner-stripe" aria-hidden="true" />
           </div>
-          <div class="exam-banner-stripe" aria-hidden="true"></div>
-        </div>
-      )}
+        )
+      }
 
       <article data-pagefind-body>
         <Content
@@ -533,7 +532,11 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
         />
       </article>
 
-      <NoteFeedback slug={slug} initialUp={voteCounts.up} initialDown={voteCounts.down} />
+      <NoteFeedback
+        slug={slug}
+        initialUp={voteCounts.up}
+        initialDown={voteCounts.down}
+      />
 
       {
         notesEntry.data.prev || notesEntry.data.next ? (
@@ -609,8 +612,10 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       const startDay = parseInt(main.dataset.examStartDay ?? "0");
       const endMonth = parseInt(main.dataset.examEndMonth ?? "0");
       const endDay = parseInt(main.dataset.examEndDay ?? "0");
-      const afterStart = month > startMonth || (month === startMonth && day >= startDay);
-      const beforeEnd = month < endMonth || (month === endMonth && day <= endDay);
+      const afterStart =
+        month > startMonth || (month === startMonth && day >= startDay);
+      const beforeEnd =
+        month < endMonth || (month === endMonth && day <= endDay);
       if (afterStart && beforeEnd) {
         main.classList.add("exam-season");
         if (banner) banner.hidden = false;
@@ -803,10 +808,26 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
 
   main.exam-season {
     background-image:
-      repeating-linear-gradient(-45deg, #f5b800 0px, #f5b800 2px, #1a1200 2px, #1a1200 6px),
-      repeating-linear-gradient(-45deg, #f5b800 0px, #f5b800 2px, #1a1200 2px, #1a1200 6px);
-    background-size: 3px 100%, 3px 100%;
-    background-position: var(--sidebar-w) 0, calc(100% - var(--toc-w)) 0;
+      repeating-linear-gradient(
+        -45deg,
+        #f5b800 0px,
+        #f5b800 2px,
+        #1a1200 2px,
+        #1a1200 6px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        #f5b800 0px,
+        #f5b800 2px,
+        #1a1200 2px,
+        #1a1200 6px
+      );
+    background-size:
+      3px 100%,
+      3px 100%;
+    background-position:
+      var(--sidebar-w) 0,
+      calc(100% - var(--toc-w)) 0;
     background-repeat: no-repeat;
   }
 
@@ -1211,7 +1232,6 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
-
 
   .sidebar::-webkit-scrollbar {
     width: 3px;
