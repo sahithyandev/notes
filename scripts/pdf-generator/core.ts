@@ -19,7 +19,6 @@ function children(node: MdNode, baseDir: string): string[] {
   return (node.children ?? []).map((c) => mdNodetoLatex(c, baseDir));
 }
 
-
 function mdNodetoLatex(node: MdNode, baseDir: string): string {
   switch (node.type) {
     case "root":
@@ -70,7 +69,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       const imgPath = node.url?.startsWith(".")
         ? resolve(baseDir, node.url)
         : (node.url ?? "");
-      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics{${imgPath}}\n  \\caption{${node.alt ?? ""}}\n\\end{figure}`;
+      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[max width=\\linewidth]{${imgPath}}\n  \\caption{${node.alt ?? ""}}\n\\end{figure}`;
     }
 
     case "inlineCode":
@@ -110,7 +109,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
 async function compileMdxFile(filePath: string) {
   const content = await readFile(filePath);
   const tree = mdxParser.parse(content) as MdNode;
-	return mdNodetoLatex(tree, dirname(filePath));
+  return mdNodetoLatex(tree, dirname(filePath));
 }
 
 export async function generateModulePdf(moduleId: string) {
@@ -150,57 +149,55 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{amsmath, amssymb}",
     "\\usepackage{hyperref}",
     "\\usepackage{graphicx}",
-		"\\usepackage{centernot}",
-		"\\usepackage{amsmath}",
+    "\\usepackage[export]{adjustbox}",
+    "\\usepackage{centernot}",
+    "\\usepackage{amsmath}",
     "",
-		"\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
-		"\\newcommand{\\lt}{<}",
-"\\newcommand{\\gt}{>}"
+    "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
+    "\\newcommand{\\lt}{<}",
+    "\\newcommand{\\gt}{>}",
   ];
-	
-	const moduleName = titleize(moduleId.split("/")[1]);
-	
-	// META
-	docLines.push(`\\title{${moduleName}}`);
-	docLines.push("\\date{}");
 
-	docLines.push(
-    "\\begin{document}",
-    "\\maketitle",
-    "",
-	);
-	
-	let lastChapter = null;
-	let lastNote = null;
+  const moduleName = titleize(moduleId.split("/")[1]);
 
-	// CONTENT
-	for (const file of sortedFiles) {
-		const parts = file.split("/")
-		const hasSections = parts.length > 1;
-		if (hasSections) {
-			if (lastChapter !== parts[0]) {
-				const sectionName = titleize(parts[0]);
-				docLines.push(`\\chapter{${sectionName}}`);
-				lastChapter = parts[0];
-			}
-		}
-		const noteName = parts.at(-1)!.replace(".mdx", "").split("-").slice(1).join(" ");
-		
-		if (lastNote !== noteName) {
-			const noteDisplayName = titleize(noteName);
-			docLines.push(`\\section{${noteDisplayName}}`);
-			lastNote = noteName;
-		}
-	
-  	const compiled = await compileMdxFile(resolve(modulePath, file));
-		docLines.push(compiled);
-	}
-	
-	docLines.push(
-    "",
-    "\\end{document}",
-	);
+  // META
+  docLines.push(`\\title{${moduleName}}`);
+  docLines.push("\\date{}");
 
+  docLines.push("\\begin{document}", "\\maketitle", "");
+
+  let lastChapter = null;
+  let lastNote = null;
+
+  // CONTENT
+  for (const file of sortedFiles) {
+    const parts = file.split("/");
+    const hasSections = parts.length > 1;
+    if (hasSections) {
+      if (lastChapter !== parts[0]) {
+        const sectionName = titleize(parts[0]);
+        docLines.push(`\\chapter{${sectionName}}`);
+        lastChapter = parts[0];
+      }
+    }
+    const noteName = parts
+      .at(-1)!
+      .replace(".mdx", "")
+      .split("-")
+      .slice(1)
+      .join(" ");
+
+    if (lastNote !== noteName) {
+      const noteDisplayName = titleize(noteName);
+      docLines.push(`\\section{${noteDisplayName}}`);
+      lastNote = noteName;
+    }
+
+    const compiled = await compileMdxFile(resolve(modulePath, file));
+    docLines.push(compiled);
+  }
+
+  docLines.push("", "\\end{document}");
 
   const outputDirectory = ".tmp";
   const latexOutputPath = resolve(
