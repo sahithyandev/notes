@@ -6,7 +6,7 @@ slug: s3/operating-systems/bankers-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.708Z
-lastUpdatedOn: 2026-04-24T03:19:45.179Z
+lastUpdatedOn: 2026-05-31T19:40:41.096Z
 ---
 
 An algorithm to avoid deadlocks when multiple-instance resources are allowed.
@@ -92,11 +92,11 @@ def request_resources(i, Request, Available, Allocation, Max):
     Need = [[Max[p][r] - Allocation[p][r] for r in range(R)]
             for p in range(P)]
 
-    # 1. Check Request[i] ≤ Need[i]
+    # 1. Check Request[i] \le Need[i]
     if any(Request[r] > Need[i][r] for r in range(R)):
         return False, "Error: exceeds declared maximum"
 
-    # 2. Check Request[i] ≤ Available
+    # 2. Check Request[i] \le Available
     if any(Request[r] > Available[r] for r in range(R)):
         return False, "Wait: not enough available resources"
 

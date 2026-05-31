@@ -3,7 +3,7 @@ title: Minimum Spanning Tree
 sidebar:
   order: 24
 dateCreated: 2026-05-09T13:36:38.203Z
-lastUpdatedOn: 2026-05-25T17:06:29.134Z
+lastUpdatedOn: 2026-05-31T19:40:41.096Z
 slug: s4/graph-theory/minimum-spanning-tree
 prev: true
 next: true
@@ -25,7 +25,7 @@ For a weighted connected undirected graph $G$, finds a minimum spanning tree. St
 ```
 Prim(G):                        // G: weighted connected undirected, n vertices
   T := minimum-weight edge
-  for i := 1 to n − 2:
+  for i := 1 to n - 2:
     e := min-weight edge incident to a vertex in T, not forming a simple circuit in T
     T := T with e added
   return T
@@ -40,7 +40,7 @@ Builds the MST by selecting globally minimum-weight edges one at a time, that do
 ```
 Kruskal(G):                     // G: weighted connected undirected, n vertices
   T := empty graph
-  for i := 1 to n − 1:
+  for i := 1 to n - 1:
     e := any edge in G with smallest weight not forming a simple circuit in T
     T := T with e added
   return T
