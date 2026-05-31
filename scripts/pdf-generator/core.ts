@@ -34,12 +34,15 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       return children(node, baseDir).join("");
 
     case "text":
-      return (node.value ?? "").replace(/[&%$#_{}~^\\]/g, (c) => {
-        if (c === "\\") return "\\textbackslash{}";
-        if (c === "~") return "\\textasciitilde{}";
-        if (c === "^") return "\\textasciicircum{}";
-        return `\\${c}`;
-      });
+      return (node.value ?? "")
+        .replace(/—/g, "---")
+        .replace(/–/g, "--")
+        .replace(/[&%$#_{}~^\\]/g, (c) => {
+          if (c === "\\") return "\\textbackslash{}";
+          if (c === "~") return "\\textasciitilde{}";
+          if (c === "^") return "\\textasciicircum{}";
+          return `\\${c}`;
+        });
 
     case "inlineMath":
       return `$${node.value}$`;
@@ -109,8 +112,6 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     default:
       console.error("default", node);
       process.exit(1);
-      // throw new Error("no defaults");
-      return node.value ? `% [${node.type}] ${node.value}` : `% [${node.type}]`;
   }
 }
 
@@ -170,6 +171,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
     "\\newcommand{\\lt}{<}",
     "\\newcommand{\\gt}{>}",
+    "\\newcommand{\\degree}{\\ensuremath{^\\circ}}",
     "",
     "\\pretocmd{\\section}{\\Needspace*{0.40\\textheight}}{}{}",
     "\\pretocmd{\\subsection}{\\Needspace*{0.25\\textheight}}{}{}",
