@@ -1,5 +1,6 @@
 import { readdir, rename, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { autoSlug } from "./auto-slug";
 import { hyphenCaseToTitleCase } from "./utils";
 
 /**
@@ -85,6 +86,9 @@ async function insertPage(args: string[]) {
   }
   if (!isDryRun) {
     await writeFile(newFileLocation, lines.join("\n"));
+    const allFiles = (await readdir(directory)).map((f) => join(directory, f));
+    allFiles.sort();
+    await autoSlug(allFiles);
   }
 }
 
