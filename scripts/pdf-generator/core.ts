@@ -1,0 +1,201 @@
+import { readdir, stat, readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkMdx from "remark-mdx";
+import remarkMath from "remark-math";
+import remarkFrontmatter from "remark-frontmatter";
+import { exec } from "node:child_process";
+import type { MdNode, Parent } from "./types";
+import { titleize } from "../../src/utils";
+
+const mdxParser = unified()
+  .use(remarkParse)
+  .use(remarkMath)
+  .use(remarkFrontmatter)
+  .use(remarkMdx);
+
+function children(node: MdNode, baseDir: string): string[] {
+  return (node.children ?? []).map((c) => mdNodetoLatex(c, baseDir));
+}
+
+function mdNodetoLatex(node: MdNode, baseDir: string): string {
+  switch (node.type) {
+    case "root":
+      return children(node, baseDir).join("\n\n");
+
+    case "heading": {
+      const cmds = ["", "\\subsection", "\\subsubsection"];
+      const cmd = cmds[Math.min((node.depth ?? 1) - 1, cmds.length - 1)];
+			console.log("heading", node, cmd)
+      return `${cmd}{${children(node, baseDir).join("")}}`;
+    }
+
+    case "paragraph":
+      return children(node, baseDir).join("");
+
+    case "text":
+      return node.value ?? "";
+
+    case "inlineMath":
+      return `$${node.value}$`;
+
+    case "math":
+      return `\\[\n${node.value}\n\\]`;
+
+    case "strong":
+      return `\\textbf{${children(node, baseDir).join("")}}`;
+
+    case "emphasis":
+      return `\\textit{${children(node, baseDir).join("")}}`;
+
+    case "list": {
+      const env = node.ordered ? "enumerate" : "itemize";
+      const items = children(node, baseDir).join("\n");
+      return `\\begin{${env}}\n${items}\n\\end{${env}}`;
+    }
+
+    case "listItem":
+      return `  \\item ${children(node, baseDir).join("").trim()}`;
+
+    case "link":
+      return `\\href{${node.url}}{${children(node, baseDir).join("")}}`;
+
+    case "image": {
+      const imgPath = node.url?.startsWith(".")
+        ? resolve(baseDir, node.url)
+        : (node.url ?? "");
+      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics{${imgPath}}\n  \\caption{${node.alt ?? ""}}\n\\end{figure}`;
+    }
+
+    case "inlineCode":
+      return `\\texttt{${node.value}}`;
+
+    case "code":
+      return `\\begin{verbatim}\n${node.value}\n\\end{verbatim}`;
+
+    case "yaml":
+      return ""; // frontmatter — skip
+
+    case "thematicBreak":
+      return "\\hrule";
+
+    case "html":
+      return `% [raw html omitted]`;
+
+    // MDX JSX elements — treat as a labeled block
+    case "mdxJsxFlowElement":
+    case "mdxJsxTextElement": {
+      const n = node as MdNode & { name?: string };
+      const inner = children(node, baseDir).join("\n\n");
+      return inner
+        ? `% <${n.name}>\n${inner}\n% </${n.name}>`
+        : `% <${n.name} />`;
+    }
+
+    default:
+      console.log("default", node);
+      // fallback: recurse if possible
+      if ((node as Parent).children)
+        return children(node, baseDir).join("\n\n");
+      return node.value ? `% [${node.type}] ${node.value}` : `% [${node.type}]`;
+  }
+}
+
+async function compileMdxFile(filePath: string) {
+  console.log("compiling", filePath);
+  const content = await readFile(filePath);
+  const tree = mdxParser.parse(content) as MdNode;
+	return mdNodetoLatex(tree, dirname(filePath));
+}
+
+export async function generateModulePdf(moduleId: string) {
+  const parts = moduleId.split("/");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    throw new Error(
+      `Invalid moduleId "${moduleId}": expected "<semester-dir>/<module-dir>" (e.g. "s1/maths")`,
+    );
+  }
+
+  const modulePath = resolve("./docs", moduleId);
+
+  try {
+    await stat(modulePath);
+  } catch (error) {
+    // does not exist
+    throw new Error(`Non existent module: ${moduleId}`);
+  }
+
+  console.log("generating PDF for", moduleId);
+
+  const files = await readdir(modulePath, { recursive: true });
+
+  const sortedFiles: Array<string> = new Array(files.length);
+  let i = 0;
+  for (const file of files) {
+    if (!file.endsWith(".mdx")) continue;
+    sortedFiles[i] = file;
+    i++;
+  }
+  sortedFiles.splice(i);
+  sortedFiles.sort();
+
+  const docLines = [
+    "\\documentclass{book}",
+    "\\usepackage[paperwidth=6in,paperheight=9in,top=0.75in,bottom=0.75in,left=0.75in,right=0.75in]{geometry}",
+    "\\usepackage{amsmath, amssymb}",
+    "\\usepackage{hyperref}",
+    "\\usepackage{graphicx}",
+    "",
+  ];
+	
+	const moduleName = titleize(moduleId.split("/")[1]);
+	
+	// META
+	docLines.push(`\\title{${moduleName}}`);
+	docLines.push("\\date{}");
+
+	docLines.push(
+    "\\begin{document}",
+    "\\maketitle",
+    "",
+	);
+
+	// CONTENT
+	i = 0;
+	for (const file of sortedFiles) {
+		const parts = file.split("/")
+		const hasSections = parts.length > 1;
+		if (hasSections) {
+			const sectionName = titleize(parts[0]);
+			docLines.push(`\\chapter{${sectionName}}`);
+		}
+		const noteName = parts.at(-1)!.replace(".mdx", "").split("-").at(-1)!;
+		const noteDisplayName = titleize(noteName);
+		
+		docLines.push(`\\section{${noteDisplayName}}`);
+	
+  	const compiled = await compileMdxFile(resolve(modulePath, file));
+		i++;
+		docLines.push(compiled);
+		if (i == 1) break;
+	}
+	
+	docLines.push(
+    "",
+    "\\end{document}",
+	);
+
+
+  const outputDirectory = ".tmp";
+  const latexOutputPath = resolve(
+    outputDirectory,
+    moduleId.replace("/", "-").concat(".tex"),
+  );
+  const latexOutputFile = Bun.file(latexOutputPath);
+  await latexOutputFile.write(docLines.join("\n"));
+
+  exec(`tectonic ${latexOutputPath}`, (error, stdout, stderr) => {
+    console.log(error, stdout, stderr);
+  });
+}
