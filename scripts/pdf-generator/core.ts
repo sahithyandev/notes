@@ -5,6 +5,7 @@ import remarkParse from "remark-parse";
 import remarkMdx from "remark-mdx";
 import remarkMath from "remark-math";
 import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
 import { exec } from "node:child_process";
 import type { MdNode, Parent } from "./types";
 import { titleize } from "../../src/utils";
@@ -13,6 +14,7 @@ const mdxParser = unified()
   .use(remarkParse)
   .use(remarkMath)
   .use(remarkFrontmatter)
+  .use(remarkGfm)
   .use(remarkMdx);
 
 function children(node: MdNode, baseDir: string): string[] {
@@ -95,6 +97,38 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
 
     case "thematicBreak":
       return "\\hrule";
+
+    case "table": {
+      const rows = (node.children ?? []) as MdNode[];
+      const headerRow = rows[0];
+      const bodyRows = rows.slice(1);
+      const colCount = (headerRow?.children ?? []).length;
+      const colSpec = Array(colCount).fill("l").join(" | ");
+
+      const renderRow = (row: MdNode) =>
+        (row.children ?? [])
+          .map((cell) => children(cell, baseDir).join(""))
+          .join(" & ") + " \\\\";
+
+      const header = headerRow ? renderRow(headerRow) : "";
+      const body = bodyRows.map(renderRow).join("\n");
+
+      return [
+        `\\begin{center}`,
+        `\\begin{tabular}{| ${colSpec} |}`,
+        `\\hline`,
+        header,
+        `\\hline`,
+        body,
+        `\\hline`,
+        `\\end{tabular}`,
+        `\\end{center}`,
+      ].join("\n");
+    }
+
+    case "tableRow":
+    case "tableCell":
+      return children(node, baseDir).join("");
 
     case "html":
       return `% [raw html omitted]`;
