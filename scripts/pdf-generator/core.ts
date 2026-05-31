@@ -19,6 +19,7 @@ function children(node: MdNode, baseDir: string): string[] {
   return (node.children ?? []).map((c) => mdNodetoLatex(c, baseDir));
 }
 
+
 function mdNodetoLatex(node: MdNode, baseDir: string): string {
   switch (node.type) {
     case "root":
@@ -27,7 +28,6 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     case "heading": {
       const cmds = ["", "\\subsection", "\\subsubsection"];
       const cmd = cmds[Math.min((node.depth ?? 1) - 1, cmds.length - 1)];
-			console.log("heading", node, cmd)
       return `${cmd}{${children(node, baseDir).join("")}}`;
     }
 
@@ -35,7 +35,12 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       return children(node, baseDir).join("");
 
     case "text":
-      return node.value ?? "";
+      return (node.value ?? "").replace(/[&%$#_{}~^\\]/g, (c) => {
+        if (c === "\\") return "\\textbackslash{}";
+        if (c === "~") return "\\textasciitilde{}";
+        if (c === "^") return "\\textasciicircum{}";
+        return `\\${c}`;
+      });
 
     case "inlineMath":
       return `$${node.value}$`;
@@ -103,7 +108,6 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
 }
 
 async function compileMdxFile(filePath: string) {
-  console.log("compiling", filePath);
   const content = await readFile(filePath);
   const tree = mdxParser.parse(content) as MdNode;
 	return mdNodetoLatex(tree, dirname(filePath));
@@ -146,7 +150,12 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{amsmath, amssymb}",
     "\\usepackage{hyperref}",
     "\\usepackage{graphicx}",
+		"\\usepackage{centernot}",
+		"\\usepackage{amsmath}",
     "",
+		"\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
+		"\\newcommand{\\lt}{<}",
+"\\newcommand{\\gt}{>}"
   ];
 	
 	const moduleName = titleize(moduleId.split("/")[1]);
@@ -160,25 +169,31 @@ export async function generateModulePdf(moduleId: string) {
     "\\maketitle",
     "",
 	);
+	
+	let lastChapter = null;
+	let lastNote = null;
 
 	// CONTENT
-	i = 0;
 	for (const file of sortedFiles) {
 		const parts = file.split("/")
 		const hasSections = parts.length > 1;
 		if (hasSections) {
-			const sectionName = titleize(parts[0]);
-			docLines.push(`\\chapter{${sectionName}}`);
+			if (lastChapter !== parts[0]) {
+				const sectionName = titleize(parts[0]);
+				docLines.push(`\\chapter{${sectionName}}`);
+				lastChapter = parts[0];
+			}
 		}
-		const noteName = parts.at(-1)!.replace(".mdx", "").split("-").at(-1)!;
-		const noteDisplayName = titleize(noteName);
+		const noteName = parts.at(-1)!.replace(".mdx", "").split("-").slice(1).join(" ");
 		
-		docLines.push(`\\section{${noteDisplayName}}`);
+		if (lastNote !== noteName) {
+			const noteDisplayName = titleize(noteName);
+			docLines.push(`\\section{${noteDisplayName}}`);
+			lastNote = noteName;
+		}
 	
   	const compiled = await compileMdxFile(resolve(modulePath, file));
-		i++;
 		docLines.push(compiled);
-		if (i == 1) break;
 	}
 	
 	docLines.push(
