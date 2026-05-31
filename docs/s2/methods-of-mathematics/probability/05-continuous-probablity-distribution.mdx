@@ -6,14 +6,14 @@ slug: s2/methods-of-mathematics/probability/continuous-probablity-distribution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.596Z
-lastUpdatedOn: 2026-05-18T06:17:23.155Z
+lastUpdatedOn: 2026-05-31T13:38:52.597Z
 ---
 
 Describes a continuous random variable.
 
 ### Probability Density Function
 
-Denoted by $f$. Does not give the probability at an exact point (which is always 0 for continuous variables). Instead, gives the relative likelihood of the random variable taking on a value in a small interval around a point. $ $
+Denoted by $f$. Does not give the probability at an exact point (which is always 0 for continuous variables). Instead, gives the relative likelihood of the random variable taking on a value in a small interval around a point.
 
 The probability of an event is the integral of the PDF over the region corresponding to the event:
 
@@ -28,7 +28,7 @@ $$
 $$
 
 <Note>
-**If** $X$ follows a standard normal distribution, **then** its PDF is: $ $
+**If** $X$ follows a standard normal distribution, **then** its PDF is:
 
 $$
 f(x) = \frac{1}{\sqrt{2\pi}}\exp\bigg(-\frac{x^2}{2}\bigg)
@@ -44,7 +44,7 @@ $$
 E(X) = \mu = \int_{-\infty}^{\infty} x \cdot f(x) \, dx
 $$
 
-Here $f(x)$ is the probability density function. $ $
+Here $f(x)$ is the probability density function.
 
 ### Variance
 
@@ -72,7 +72,7 @@ $$
 
 ## Example
 
-Consider a continuous random variable $X$ that follows a uniform distribution over the interval [0, 4], with probability density function: $ $
+Consider a continuous random variable $X$ that follows a uniform distribution over the interval [0, 4], with probability density function:
 
 ```math
 f(x) = \begin{cases}
@@ -81,9 +81,9 @@ f(x) = \begin{cases}
 \end{cases}
 ```
 
-The mean would be: $E(X) = \int_{0}^{4} x \cdot \frac{1}{4} \, dx = \frac{1}{4} \cdot \frac{x^2}{2} \bigg|_{0}^{4} = \frac{1}{4} \cdot \frac{16}{2} = 2$. $ $
+The mean would be: $E(X) = \int_{0}^{4} x \cdot \frac{1}{4} \, dx = \frac{1}{4} \cdot \frac{x^2}{2} \bigg|_{0}^{4} = \frac{1}{4} \cdot \frac{16}{2} = 2$.
 
-The variance would be: $\text{Var}(X) = \int_{0}^{4} (x-2)^2 \cdot \frac{1}{4} \, dx = \frac{1}{4} \cdot \frac{16}{12} = \frac{4}{3} \approx 1.33$. $ $
+The variance would be: $\text{Var}(X) = \int_{0}^{4} (x-2)^2 \cdot \frac{1}{4} \, dx = \frac{1}{4} \cdot \frac{16}{12} = \frac{4}{3} \approx 1.33$.
 
 ## Types
 
@@ -118,7 +118,7 @@ F(x) = \begin{cases}
 
 ### Normal distribution
 
-Describes data that clusters around a mean value, forming a symmetric bell-shaped curve. Denoted by $N(\mu, \sigma^2)$. Has PDF: $ $
+Describes data that clusters around a mean value, forming a symmetric bell-shaped curve. Denoted by $N(\mu, \sigma^2)$. Has PDF:
 
 $$
 f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp{\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)}
@@ -172,7 +172,7 @@ Used in tests like the Chi-square goodness-of-fit test and tests for independenc
 A more conservative form of the standard normal distribution. Has heavier tails than the standard normal distribution.
 Denoted by $X \sim t(v)$. Here the parameter $v$ is the degrees of freedom, and is often $v=n-1$. Gets close to standard normal distribution as $v \to \infty$. Centered at zero.
 
-For a Student's t-distribution, with $v \gt 2$: $ $
+For a Student's t-distribution, with $v \gt 2$:
 
 $$
 \text{Var}(X) = \frac{v}{v-2}

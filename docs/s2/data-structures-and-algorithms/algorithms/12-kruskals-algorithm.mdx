@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/kruskals-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-05-18T05:39:18.070Z
+lastUpdatedOn: 2026-05-31T13:38:52.594Z
 ---
 
 A [greedy algorithm](/s2/data-structures-and-algorithms/algorithms/introduction#greedy-algorithm) to find [MST](/s2/data-structures-and-algorithms/data-structures/spanning-tree#minimum-spanning-tree) of a [graph](/s2/data-structures-and-algorithms/data-structures/graph/). Sorts all edges by increasing weights and adds them one by one to the MST, ensuring that no cycles are formed.
@@ -148,11 +148,11 @@ The resulting MST will have the edges: (A-B, 1), (B-C, 2), (A-E, 3), (A-D, 4),
 1. Sorting all edges: Takes $O(E \log E)$. Since $E \log E$ is equivalent to $O(E \log V)$ in a connected graph, this step dominates the overall complexity.
 2. Union-Find operations: The union-find data structure is used to detect cycles and merge sets. Each union or find operation has an amortized time complexity of $O(\alpha(V))$, where $\alpha(V)$ is the inverse Ackermann function, which grows extremely slowly. For $E$ edges, the total complexity of union-find operations is $O(E \alpha(V))$.
 
-Thus, the overall time complexity of Kruskal's Algorithm is: $O(E \log E + E \alpha(V)) \approx O(E \log V)$. $ $
+Thus, the overall time complexity of Kruskal's Algorithm is: $O(E \log E + E \alpha(V)) \approx O(E \log V)$.
 
 ### Space Complexity
 
 1. Edge list: $O(E)$ is required to store all edges.
 2. Union-Find data structure: The parent and rank arrays used in the union-find operations require $O(V)$ space.
 
-Therefore, the total space complexity is: $O(E + V)$. $ $
+Therefore, the total space complexity is: $O(E + V)$.
