@@ -1,0 +1,93 @@
+---
+title: Cloud-based Software
+sidebar:
+  order: 16
+dateCreated: 2026-06-01T09:34:22.607Z
+lastUpdatedOn: 2026-06-01T18:49:04.776Z
+slug: s4/software-engineering/cloud-based-software
+prev: true
+next: true
+---
+
+Software that runs on rented virtual servers hosted in large remote data centers.
+
+A **cloud** is a large pool of remote virtual servers available for rent. Servers are implemented in software and started/stopped on demand. Customers rent servers, access them over the internet, install required software, and use them.
+
+## Characteristics
+
+Three defining properties:
+
+- Scalability: ability to maintain performance as user load increases, achieved by automatic adaptation.
+- Elasticity: superset of scalability; supports both scale-out and scale-in, with servers added or removed dynamically.
+- Resilience: ability to maintain service when a server fails, achieved by running concurrent software copies.
+
+## Architecture Decisions
+
+Three interdependent architectural decisions:
+
+1. Database organization: multi-tenant or multi-instance?
+2. Scalability and resilience: what are the load and fault-tolerance requirements?
+3. Software structure: monolithic or service-oriented?
+
+These three inform the cloud platform selection.
+
+Choosing DB organization — decision factors:
+
+| Factor               | Favors multi-instance if…                                                    |
+| -------------------- | ---------------------------------------------------------------------------- |
+| Target customers     | Customers need different schemas or have DB-sharing security objections.     |
+| Transactions         | ACID guarantees required at strong consistency.                              |
+| DB size/connectivity | Many different customer schemas; complex inter-schema data transfer.         |
+| System structure     | Service-oriented architecture in use: use containerized multi-instance DBs. |
+
+Multi-tenant preferred for very large, uniform databases where optimization effort is centralized.
+
+### Scalability and Resilience
+
+Scaling-out: add more server replicas. Normal approach in cloud systems.
+
+Scaling-up: increase power of existing server. Less common.
+
+Scaling-out requirement: software components must be stateless and replicable, runnable in parallel.
+
+Resilience via redundancy:
+
+- Software and data replicas at multiple physical locations.
+- Database mirroring: standby DB kept in sync with operational DB.
+- System monitor: detects failures and triggers automatic failover to standby.
+- Hot standby: active system replicated at same location.
+- Cool standby: standby at different location, not yet running.
+
+### Software Structure
+
+#### Monolithic Architecture
+Large components, shared database, client-server model. Traditional multi-tier structure.
+
+#### Microservices Architecture
+
+Aka. service-oriented architecture. System decomposed into fine-grained, stateless services. Each service independently replicable, distributable, and migratable. Suited to cloud deployment. Each service runs in containers.
+
+### Cloud Platform Selection
+
+No universally best platform. Selection based on context.
+
+Types of platforms:
+
+- General-purpose (AWS, Azure, GCP).
+- Application-specific (SAP Business Technology Platform).
+- Smaller national providers: fewer services, more customer adaptability.
+
+Technical selection factors:
+
+- Expected load and load predictability.
+- Resilience guarantees.
+- Supported cloud services (databases, queues, auth).
+- Privacy and data protection compliance.
+
+Business selection factors:
+
+- Cost.
+- Developer experience with the platform.
+- Target customer expectations.
+- Service-level agreements.
+- Portability and cloud migration risk.

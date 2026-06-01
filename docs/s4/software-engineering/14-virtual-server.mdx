@@ -1,0 +1,57 @@
+---
+title: Virtual Server
+sidebar:
+  order: 14
+dateCreated: 2026-06-01T09:56:07.338Z
+lastUpdatedOn: 2026-06-01T18:49:04.774Z
+slug: s4/software-engineering/virtual-server
+prev: true
+next: true
+---
+
+A virtual server is an OS plus server software packages running on physical hardware. No external dependencies and portable across any cloud hardware. They provide the same interface as a physical server.
+
+## Hypervisor-based Virtualization
+
+### Hypervisor
+
+Provides hardware emulation.
+- Type I
+  Runs directly on hardware.
+- Type II   
+  Run on top of a host OS.
+  
+### Virtual Machine
+
+A software emulation of a physical computer. Runs its own guest OS and applications isolated from the host system.
+
+A single physical machine can run multiple VMs simultaneously. Portable to any compatible hypervisor.
+
+Managed by a hypervisor.
+
+## Container-based Virtualization
+
+### Container
+
+OS-level virtualization unit. Multiple independent servers share the host OS kernel via a container manager.
+
+Compared to VMs: less size, faster startup, shares the host OS instead of a full guest OS.
+
+Used for providing isolated application instances per user, all using the same OS.
+
+### Docker
+
+A mainstream open-source container management system.
+
+Components:
+
+| Element       | Function                                                                  |
+| ------------- | ------------------------------------------------------------------------- |
+| Docker daemon | Process on host; builds, starts, stops, monitors containers and images.   |
+| Docker client | Interface for developers/admins to define and control containers.         |
+| Dockerfile    | Script defining the software to be included in an image.                  |
+| Image         | Compiled Dockerfile. Runnable directory with software and data installed. |
+| Container     | Executing image. Can be moved between servers without modification.       |
+| Docker hub    | Public registry of images. Reusable as bases for new images.              |
+
+Docker images have a base layer and custom software layers on top. Updates ship only changed layers.
