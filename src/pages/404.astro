@@ -1,0 +1,144 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/nav.astro";
+import Footer from "../components/footer.astro";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+
+const semesters = [
+  { label: "Semester 1", href: "/s1" },
+  { label: "Semester 2", href: "/s2" },
+  { label: "Semester 3", href: "/s3" },
+  { label: "Semester 4", href: "/s4" },
+];
+---
+
+<Layout
+  title={`Page not found | ${SITE_NAME}`}
+  description="The page you were looking for doesn't exist. Find your way back to Sahithyan's engineering notes."
+  image={`${SITE_HOST_URL}/og/default`}
+  canonical={SITE_HOST_URL}
+>
+  <Nav />
+
+  <main class="not-found-page">
+    <section class="not-found-content">
+      <p class="error-code">404</p>
+      <h1>This page took a wrong turn.</h1>
+      <p class="description">
+        You've wandered off the map. This site is a collection of engineering
+        notes — clearly written, carefully structured — but whatever you were
+        looking for isn't here.
+      </p>
+
+      <nav class="links-grid" aria-label="Useful pages">
+        <a href="/" class="link-card link-card--primary">
+          <span class="link-label">Home</span>
+          <span class="link-desc">All semesters and notes</span>
+        </a>
+        {
+          semesters.map((sem) => (
+            <a href={sem.href} class="link-card">
+              <span class="link-label">{sem.label}</span>
+              <span class="link-desc">Browse modules</span>
+            </a>
+          ))
+        }
+        <a href="/license" class="link-card">
+          <span class="link-label">License</span>
+          <span class="link-desc">How you may use this content</span>
+        </a>
+      </nav>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  :root {
+    --nav-h: 54px;
+  }
+
+  .not-found-page {
+    min-height: calc(100dvh - var(--nav-h) - 60px);
+    width: var(--body-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: calc(8 * var(--spacing)) 0;
+  }
+
+  .not-found-content {
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .error-code {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+
+  .not-found-content h1 {
+    font-family: var(--font-ui);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin: 0 0 20px;
+  }
+
+  .description {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin: 0 0 36px;
+  }
+
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .link-card:hover {
+    border-color: var(--accent);
+    background: var(--surface-2);
+  }
+
+  .link-card--primary {
+    grid-column: 1 / -1;
+  }
+
+  .link-label {
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .link-desc {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+</style>
