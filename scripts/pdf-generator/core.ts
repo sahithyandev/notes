@@ -10,6 +10,37 @@ import { exec } from "node:child_process";
 import type { MdNode } from "./types";
 import { titleize } from "../../src/utils";
 
+const SEMESTER_COLORS: Record<string, string> = {
+  "1": "3348c8",
+  "2": "6b38a0",
+  "3": "1a7a4a",
+  "4": "8a5a18",
+  "5": "4f3ac0",
+  "6": "a0245a",
+  "7": "0e7a96",
+  "8": "944018",
+};
+
+const CONNECTOR_WORDS = new Set([
+  "and", "or", "of", "the", "in", "for", "to", "a", "an", "at", "by", "with",
+]);
+
+function groupTitleWords(title: string): string[] {
+  const words = title.split(" ");
+  const groups: string[] = [];
+  let current: string[] = [];
+  for (const word of words) {
+    if (CONNECTOR_WORDS.has(word.toLowerCase())) {
+      if (current.length) { groups.push(current.join(" ")); current = []; }
+      groups.push(word);
+    } else {
+      current.push(word);
+    }
+  }
+  if (current.length) groups.push(current.join(" "));
+  return groups;
+}
+
 const mdxParser = unified()
   .use(remarkParse)
   .use(remarkMath)
@@ -17,8 +48,10 @@ const mdxParser = unified()
   .use(remarkGfm)
   .use(remarkMdx);
 
-function children(node: MdNode, baseDir: string): string[] {
-  return (node.children ?? []).map((c) => mdNodetoLatex(c, baseDir));
+interface RenderCtx { baseDir: string; inTableCell?: boolean }
+
+function children(node: MdNode, ctx: RenderCtx): string[] {
+  return (node.children ?? []).map((c) => mdNodetoLatex(c, ctx));
 }
 
 function escapeTextForLatex(text: string): string {
@@ -33,56 +66,66 @@ function escapeTextForLatex(text: string): string {
     });
 }
 
-function mdNodetoLatex(node: MdNode, baseDir: string): string {
+function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
+  const { baseDir } = ctx;
   switch (node.type) {
     case "root":
-      return children(node, baseDir).join("\n\n");
+      return children(node, ctx).join("\n\n");
 
     case "heading": {
       const cmds = ["", "\\subsection", "\\subsubsection"];
       const cmd = cmds[Math.min((node.depth ?? 1) - 1, cmds.length - 1)];
-      return `${cmd}{${children(node, baseDir).join("")}}`;
+      return `${cmd}{${children(node, ctx).join("")}}`;
     }
 
     case "paragraph":
-      return children(node, baseDir).join("");
+      return children(node, ctx).join("");
 
     case "text":
       return escapeTextForLatex(node.value ?? "");
 
     case "inlineMath":
-      return `$${node.value}$`;
+      return `$${(node.value ?? "").replace(/%/g, "\\%")}$`;
 
-    case "math":
-      return `\\[\n${node.value}\n\\]`;
+    case "math": {
+      const escaped = (node.value ?? "").replace(/%/g, "\\%");
+      const val = escaped.trimStart();
+      const standaloneEnvs = /^\\begin\{(equation|align|gather|multline|flalign|alignat)\*?\}/;
+      if (standaloneEnvs.test(val)) return val;
+      return `\\[\n${escaped}\n\\]`;
+    }
 
     case "strong":
-      return `\\textbf{${children(node, baseDir).join("")}}`;
+      return `\\textbf{${children(node, ctx).join("")}}`;
 
     case "emphasis":
-      return `\\textit{${children(node, baseDir).join("")}}`;
+      return `\\textit{${children(node, ctx).join("")}}`;
 
     case "list": {
       const env = node.ordered ? "enumerate" : "itemize";
-      const items = children(node, baseDir).join("\n");
+      const items = children(node, ctx).join("\n");
       return `\\begin{${env}}[noitemsep, topsep=4pt, partopsep=0pt]\n${items}\n\\end{${env}}`;
     }
 
     case "listItem":
-      return `  \\item ${children(node, baseDir).join("").trim()}`;
+      return `  \\item ${children(node, ctx).join("").trim()}`;
 
     case "link":
-      return `\\href{${node.url}}{${children(node, baseDir).join("")}}`;
+      return `\\href{${node.url}}{${children(node, ctx).join("")}}`;
 
     case "image": {
       const imgPath = node.url?.startsWith(".")
         ? resolve(baseDir, node.url)
         : (node.url ?? "");
-      return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[max width=\\linewidth]{${imgPath}}\n  \\caption{${escapeTextForLatex(node.alt ?? "")}}\n\\end{figure}`;
+      const alt = escapeTextForLatex(node.alt ?? "");
+      const graphic = `\\includegraphics[max width=\\linewidth]{${imgPath}}`;
+      if (ctx.inTableCell) return graphic;
+      if (!alt) return `\\begin{center}\n${graphic}\n\\end{center}`;
+      return `\\begin{figure}[H]\n  \\centering\n  ${graphic}\n  \\caption{${alt}}\n\\end{figure}`;
     }
 
     case "blockquote":
-      return `\\begin{quote}\n${children(node, baseDir).join("\n\n")}\n\\end{quote}`;
+      return `\\begin{quote}\n${children(node, ctx).join("\n\n")}\n\\end{quote}`;
 
     case "inlineCode": {
       const escaped = (node.value ?? "")
@@ -116,10 +159,11 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
       const bodyRows = rows.slice(1);
       const colCount = (headerRow?.children ?? []).length;
       const colSpec = Array(colCount).fill("l").join(" | ");
+      const cellCtx: RenderCtx = { baseDir, inTableCell: true };
 
       const renderRow = (row: MdNode) =>
         (row.children ?? [])
-          .map((cell) => children(cell, baseDir).join(""))
+          .map((cell) => children(cell, cellCtx).join(""))
           .join(" & ") + " \\\\";
 
       const header = headerRow ? renderRow(headerRow) : "";
@@ -140,7 +184,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
 
     case "tableRow":
     case "tableCell":
-      return children(node, baseDir).join("");
+      return children(node, ctx).join("");
 
     case "html":
       return `% [raw html omitted]`;
@@ -150,15 +194,14 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     // out the rest of the line, swallowing subsequent & separators).
     case "mdxJsxFlowElement": {
       const n = node as MdNode & { name?: string };
-      const inner = children(node, baseDir).join("\n\n");
+      const inner = children(node, ctx).join("\n\n");
       return inner
         ? `% <${n.name}>\n${inner}\n% </${n.name}>`
         : `% <${n.name} />`;
     }
     case "mdxJsxTextElement": {
       const n = node as MdNode & { name?: string };
-      const inner = children(node, baseDir).join("");
-      return inner;
+      return children(node, ctx).join("");
     }
 
     default:
@@ -170,7 +213,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
 async function compileMdxFile(filePath: string) {
   const content = await readFile(filePath);
   const tree = mdxParser.parse(content) as MdNode;
-  return mdNodetoLatex(tree, dirname(filePath));
+  return mdNodetoLatex(tree, { baseDir: dirname(filePath) });
 }
 
 export async function generateModulePdf(moduleId: string) {
@@ -220,6 +263,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{needspace}",
     "\\usepackage{etoolbox}",
     "\\usepackage[version=4]{mhchem}",
+    "\\usepackage{float}",
     "\\usepackage{enumitem}",
     "\\usepackage{titlesec}",
     "\\titlespacing*{\\subsection}{0pt}{1.8ex plus .2ex}{0.8ex plus .1ex}",
@@ -238,28 +282,34 @@ export async function generateModulePdf(moduleId: string) {
   const moduleIdParts = moduleId.split("/");
   const moduleName = titleize(moduleIdParts[1]);
   const semesterNumber = moduleIdParts[0].charAt(1);
+  const semColor = SEMESTER_COLORS[semesterNumber] ?? "3348c8";
 
+  const maxGroupLen = Math.max(...groupTitleWords(moduleName).map((g) => g.length));
+  const titleFontSize = maxGroupLen <= 12 ? 38 : maxGroupLen <= 18 ? 32 : maxGroupLen <= 24 ? 26 : 22;
+  const titleLineHeight = Math.round(titleFontSize * 1.15);
+
+  docLines.push(`\\definecolor{semaccent}{HTML}{${semColor}}`);
   docLines.push("\\begin{document}");
   docLines.push(
     "\\begin{titlepage}",
     "\\begin{tikzpicture}[remember picture,overlay]",
     "",
-    "\\fill[black!85]",
-    "    (current page.north west) rectangle ([yshift=-2.4in]current page.north east);",
+    "\\fill[semaccent]",
+    "    (current page.north west) rectangle ([yshift=-3.2in]current page.north east);",
     "",
-    "\\fill[black!85]",
+    "\\fill[semaccent]",
     "    (current page.south west) rectangle ([yshift=1in]current page.south east);",
     "",
     "\\node[",
     "    align=center,",
     "    text=white,",
-    "    font=\\bfseries\\fontsize{38}{44}\\selectfont,",
+    `    font=\\bfseries\\fontsize{${titleFontSize}}{${titleLineHeight}}\\selectfont,`,
     "    text width=0.9\\paperwidth",
-    `] at ([yshift=-1.3in]current page.north) {${moduleName.replaceAll(" ", "\\\\[0.2em]")}};`,
+    `] at ([yshift=-1.6in]current page.north) {${groupTitleWords(moduleName).join("\\\\[0.2em]")}};`,
     "",
     "\\node[",
     "    align=center,",
-    "    text=black!70,",
+    "    text=semaccent!60!black,",
     "    font=\\itshape\\Large,",
     "    text width=0.7\\paperwidth",
     "] at (current page.center) {%",
@@ -281,6 +331,11 @@ export async function generateModulePdf(moduleId: string) {
 
   let lastChapter = null;
   let lastNote = null;
+
+  const hasSubdirectories = sortedFiles.some((f) => f.includes("/"));
+  if (!hasSubdirectories) {
+    docLines.push(`\\chapter{${moduleName}}`);
+  }
 
   // CONTENT
   for (const file of sortedFiles) {
@@ -324,9 +379,12 @@ export async function generateModulePdf(moduleId: string) {
   await mkdir(".tmp/pdf", { recursive: true });
 
   exec(
-    `tectonic --outdir .tmp/pdf ${texOutputPath}`,
+    `tectonic --chatter minimal --outdir .tmp/pdf ${texOutputPath}`,
     (error, stdout, stderr) => {
-      console.log(error, stdout, stderr);
+      if (error) {
+        console.error("tectonic failed:", stderr || stdout);
+        process.exit(1);
+      }
     },
   );
 }

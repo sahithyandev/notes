@@ -12,7 +12,11 @@ function getAllModuleIds(): string[] {
     readdirSync(resolve(docsPath, sem), { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => `${sem}/${d.name}`),
-  );
+  ).sort((a, b) => {
+    const semNum = (id: string) => parseInt(id.replace(/^s(\d+)\/.*/, "$1"), 10);
+    const diff = semNum(a) - semNum(b);
+    return diff !== 0 ? diff : a.localeCompare(b);
+  });
 }
 
 (async () => {
