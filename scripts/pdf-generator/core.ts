@@ -12,9 +12,9 @@ import { titleize } from "../../src/utils";
 
 const SEMESTER_COLORS: Record<string, string> = {
   "1": "3348c8",
-  "2": "6b38a0",
+  "2": "b83060",
   "3": "1a7a4a",
-  "4": "8a5a18",
+  "4": "962030",
   "5": "4f3ac0",
   "6": "a0245a",
   "7": "0e7a96",
