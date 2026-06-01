@@ -65,7 +65,7 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     case "list": {
       const env = node.ordered ? "enumerate" : "itemize";
       const items = children(node, baseDir).join("\n");
-      return `\\begin{${env}}\n${items}\n\\end{${env}}`;
+      return `\\begin{${env}}[noitemsep, topsep=4pt, partopsep=0pt]\n${items}\n\\end{${env}}`;
     }
 
     case "listItem":
@@ -220,6 +220,10 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{needspace}",
     "\\usepackage{etoolbox}",
     "\\usepackage[version=4]{mhchem}",
+    "\\usepackage{enumitem}",
+    "\\usepackage{titlesec}",
+    "\\titlespacing*{\\subsection}{0pt}{1.8ex plus .2ex}{0.8ex plus .1ex}",
+    "\\titlespacing*{\\subsubsection}{0pt}{1.4ex plus .2ex}{0.6ex plus .1ex}",
     "",
     "\\newcommand{\\set}[1]{\\left\\{ #1 \\right\\}}",
     "\\newcommand{\\lt}{<}",
