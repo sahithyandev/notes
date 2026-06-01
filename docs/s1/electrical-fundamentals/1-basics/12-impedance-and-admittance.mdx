@@ -1,0 +1,124 @@
+---
+title: Impedance & Admittance
+slug: s1/electrical-fundamentals/basics/impedance-and-admittance
+sidebar:
+  order: 12
+prev: true
+next: true
+dateCreated: 2026-04-22T07:07:02.549Z
+lastUpdatedOn: 2026-06-01T03:58:53.132Z
+---
+
+### Impedance (Z)
+
+$$
+Z=\frac{V}{I}=R+jX
+$$
+
+Here:
+
+- $R$: Resistance
+- $X$: Reactance
+
+<Note>
+
+When mentioning the reactance of an element, the $j$ should not be included.
+
+</Note>
+
+### Admittance (Y)
+
+Inverse of impedance.
+
+$$
+Y=\frac{1}{Z}=\frac{I}{V}=G+jB
+$$
+
+Here:
+
+- $G$: Conductance
+- $B$: Susceptance
+
+From the definitions:
+
+$$
+G=\frac{R}{R^2+X^2}
+\;\land
+B=-\frac{X}{R^2+X^2}
+$$
+
+## For simple circuit elements
+
+### Resistor
+
+Let $i=I_m\sin{(\omega t + \phi_0)}$ is applied across a resistor with
+resistance $R$. From Ohm's law:
+
+$$
+v=RI_m\sin{(\omega t + \phi_0)}
+\implies
+Z_R = R
+$$
+
+No changes in frequency, phase angle. $v$ is in phase with $i$. $R$ doesn't have
+reactance.
+
+### Inductor
+
+Let $i=I_m\sin{(\omega t + \phi_0)}$ is applied across an inductor with
+inductance $L$.
+
+$$
+v=L\omega I_m\sin{\bigg(\omega t + \Big(\phi_0+\frac{\pi}{2}\Big)\bigg)}
+\implies
+Z_L = j\omega L
+$$
+
+Reactance of the inductor is $X_L=L\omega$.
+
+<Note>
+
+$v$ leads $i$ by $\frac{\pi}{2}$. No changes in frequency.
+
+</Note>
+
+### Capacitor
+
+Let $i=I_m\sin{(\omega t + \phi_0)}$ is applied across an capacitor with
+capacitance $c$.
+
+$$
+v=\frac{I_m}{c\omega}
+\sin{(\omega t + (\phi_0 - \frac{\pi}{2}))}
+\implies
+Z_C = -j\frac{1}{c\omega}
+$$
+
+Reactance of the capacitor (capacitive reactance) is $X_c=-\frac{1}{c\omega}$.
+$
+$
+
+<Note>
+
+$v$ lags $i$ by $\frac{\pi}{2}$. No changes in frequency.
+
+</Note>
+
+<Note>
+
+If $v$:
+
+- lags $i$ - circuit is capacitive
+- leads $i$ - circuit is inductive
+
+</Note>
+
+## For complex circuit elements
+
+### For a series circuit
+
+Resultant impedance is the sum of each component's impedance.
+
+### For a parallel circuit
+
+Resultant admittance is the sum of each component's admittance.

@@ -1,0 +1,60 @@
+---
+title: Query Processing
+sidebar:
+  order: 18
+slug: s3/database-systems/basics/query-processing
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.697Z
+lastUpdatedOn: 2026-06-01T03:58:53.202Z
+---
+
+The process of converting a high-level query into an efficient execution plan that retrieves the required data from storage.
+
+### Execution Plan
+
+Annotated expression specifying detailed evaluation strategy. Defines exactly what algorithm is used for each
+operation, and how the execution of the operations is coordinated.
+
+## Parsing and Translation
+
+SQL query is parsed into an internal representation. Then converted into relational algebra form. Syntax and schema (table/attribute names) are verified.
+
+## Optimization
+
+Multiple equivalent algebraic expressions exist. DBMS finds the most efficient strategy for executing a query among many logically equivalent alternatives.
+
+Example:
+
+$$
+σ_{\text{balance}<2500}(π_\text{balance}(\text{account}))
+≡ π_{\text{balance}}(σ_{\text{balance}<2500}(\text{account}))
+$$
+
+Cost estimation is done using statistics from the database catalog such as:
+
+- Number of tuples.
+- Size of tuples.
+- Distinct values in attributes.
+- Expected size of intermediate results.
+
+### Measures of Query Cost
+
+Generally the total time to answer query.
+
+Factors:
+
+- Disk I/O (dominant factor)  
+  Write cost is higher than read cost. Because of verification after write.
+- CPU
+- Network delay (in distributed systems)
+
+Estimated as:
+
+$$
+\text{Cost} = (\text{Seeks} × \text{SeekCost}) + (\text{BlocksRead} × \text{ReadCost}) + (\text{BlocksWritten} × \text{WriteCost})
+$$
+
+## Evaluation
+
+The query execution engine runs the chosen plan. Produces the result to the user or application.

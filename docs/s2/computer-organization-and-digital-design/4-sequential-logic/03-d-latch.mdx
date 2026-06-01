@@ -1,0 +1,34 @@
+---
+title: D Latch
+sidebar:
+  order: 3
+slug: s2/computer-organization-and-digital-design/sequential-logic/d-latch
+prev: true
+next: true
+dateCreated: 2026-04-22T07:07:02.586Z
+lastUpdatedOn: 2026-06-01T03:58:53.171Z
+---
+
+import DLatch from "./images/d-latch.svg";
+
+Aka. data or delay latch. Has 2 inputs: $D$ and $En$. Has 1 output: $Q$. An
+extension of SR latch. Can be made with NAND or NOR gates.
+
+<DLatch />
+
+When $En$ is LOW, $Q$ is the stored value. When $En$ is HIGH, $Q=D$. If NOR
+gates were used instead, a NOT gate will be added to the $En$ input, and NOT
+gate of D input will be switched.
+
+Generally less common than
+[D flip-flops](/s2/computer-organization-and-digital-design/sequential-logic/d-flip-flop)
+in modern synchronous designs due to their level-sensitive behavior which can
+lead to timing issues.
+
+## Truth Table
+
+| $\text{En}$ | $D$ | $Q_\text{next}$ |
+| ----------- | --- | --------------- |
+| 0           | x   | Q               |
+| 1           | 0   | 0               |
+| 1           | 1   | 1               |

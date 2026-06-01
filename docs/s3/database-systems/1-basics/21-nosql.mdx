@@ -1,0 +1,98 @@
+---
+title: NoSQL
+sidebar:
+  order: 21
+slug: s3/database-systems/basics/nosql
+prev: true
+next: false
+dateCreated: 2026-04-22T07:09:10.697Z
+lastUpdatedOn: 2026-06-01T03:58:53.203Z
+---
+
+Refers to _Not Only SQL_. Any database that is not a relational database. Designed to handle large volumes of data, high request rates, distributed architectures, flexible schemas, and specialized data models. NoSQL systems trade off certain relational features to gain scalability, performance, or simplicity for particular workloads.
+
+### Limiations of RDBMS
+
+RDBMS were designed in the 1970s for structured, relational data with ACID transactions. As data and applications evolved, several limitations became apparent:
+
+- Rigid schemas  
+  Altering table schemas is costly and complex.
+- Semi-structured data  
+  JSON, XML, and other flexible formats don’t fit well into tables.
+- Centralized design  
+  RDBMS were designed with centralized systems in mind. Modern applications are distributed, requiring high availability and partition tolerance.
+- Scaling challenges  
+  Vertical scaling (bigger servers) is expensive; horizontal scaling is hard due to joins and consistency.
+
+### Why NoSQL Became Popular
+
+- Flexible: Can handle semi-structured data
+- No fixed schema: Can evolve data models easily
+- Scalability: Can be scaled and distributed easily
+- Supports massive data volumes
+- Can be more performant for specific workloads
+
+### Disadvantages
+
+- No standardization  
+  RDBMS use SQL which is standardized. Each NoSQL database has its own APIs, query languages, and data models. Makes it hard to switch between systems or use multiple NoSQL databases together.
+- Limited query capabilities  
+  Can't easily do joins, complex filters, or aggregations across collections.
+- No validations or constraints  
+  Does not enforce data types, relationships, or constraints at the database level. Applications must handle this.
+- Temporary inconsistencies
+  Must be handled at the application-level for good UX.
+- Insufficient access control  
+  Fine-grained access control, roles, and auditing are weaker or missing compared to RDBMS
+
+## Brewer's CAP Theorem
+
+A distributed database can guarantee at most two of Consistency, Availability, and Partition tolerance.
+
+### Consistency
+
+All nodes see the same data at the same time.
+
+### Availablility
+
+Node failures do not prevent survivors from continuing to operate.
+
+### Partition Tolerance
+
+Dropped messages doesn't disrupt the system's operation.
+
+## Properties
+
+### BASE
+
+Opposite of [ACID](/s3/database-systems/basics/introduction#acid-properties) in RDBMS. Aligns with availability and partition tolerance of CAP theorem.
+
+- Basically Available: Guarantees availability
+- Soft state: State may change over time, even without input
+- Eventual consistency: Will become consistent over time
+
+## Types
+
+### Key‑Value stores
+
+Stores a mapping of alpha-numeric keys and values. Implemented using hash tables. Used in caches, session stores, simple lookups.
+
+Examples: Redis.
+
+### Document stores
+
+Stores JSON-like documents. Queryable by fields. Used in content management, user profiles, event storage.
+
+Examples: MongoDB, Couchbase.
+
+### Column-family (wide-column) stores
+
+Stores rows with dynamic columns grouped into column families. Optimized for large write/read throughput. Used in time series, telemetry, big data tables.
+
+Examples: Apache Cassandra, HBase.
+
+### Graph databases
+
+Stores graphs. Optimized for traversals. Used in social networks, recommendation engines, fraud detection.
+
+Examples: Neo4j, JanusGraph.

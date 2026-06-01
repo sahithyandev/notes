@@ -91,7 +91,9 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
     if (!file.data.sidebar) {
       file.data.sidebar = {};
     }
-    const orderMatched = slugSection.match(PATTERN_TITLE_PREFIX);
+    // Derive sidebar.order from the filename only (not directory prefix).
+    const fileBaseName = basename(newFilePath);
+    const orderMatched = fileBaseName.match(PATTERN_TITLE_PREFIX);
     if (orderMatched) {
       const orderNumber = safeParseInt(orderMatched[1]);
       if (orderNumber !== undefined) {

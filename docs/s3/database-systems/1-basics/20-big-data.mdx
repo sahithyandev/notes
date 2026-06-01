@@ -1,0 +1,84 @@
+---
+title: Big Data
+sidebar:
+  order: 20
+slug: s3/database-systems/basics/big-data
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.697Z
+lastUpdatedOn: 2026-06-01T03:58:53.203Z
+---
+
+Refers to datasets that are too large, fast, or complex for traditional databases to manage efficiently.
+
+### Characteristics
+
+- Volume: in the scale of terabytes or petabytes.
+- Velocity: high ingest/update rates and need for low-latency ingestion or real-time processing.
+- Variety: structured, semi-structured, and unstructured data (logs, JSON, images, time series).
+- Veracity: data quality and trustworthiness issues at scale.
+- Value: extracting meaningful analytics or driving applications from the data.
+
+## Big Data Storage Systems
+
+### Distributed File Systems (DFS)
+
+Stores data across many machines. Offers a single logical view. Provides redundancy via replication to handle failures.
+
+Example: Google FS, Hadoop HDFS.
+
+Hadoop HDFS features:
+
+- NameNode: stores metadata (file → block mapping).
+- DataNode: stores actual block data.
+- Block size: typically 64 MB.
+- Write-once-read-many model.
+
+### Sharding
+
+Partitions data using a shard key.
+Improves scalability but adds complexity:
+
+- Application must route queries manually.
+- Rebalancing shards is difficult.
+- Increases failure points → more replicas needed.
+
+## Parallel & Distributed Databases
+
+Use multiple nodes to run queries in parallel. When data is stored on multiple nodes, replication ensures availability.
+
+### MapReduce
+
+Programming model for large-scale parallel computation. Allows fault-tolerant processing of data.
+
+- `map()` – transforms input into key–value pairs.
+- `reduce()` – aggregates values by key.
+
+## Algebraic Operations & Spark
+
+- Modern systems (Spark, Tez) extend MapReduce with **relational-like operations**.
+- **RDD (Resilient Distributed Dataset)**: fault-tolerant, distributed data abstraction.
+- Supports transformations like map, filter, reduce, join.
+
+## Streaming Data
+
+- Continuous data flow (stocks, sensors, IoT).
+- **Queries on streams** use **windows** (time/tuple-based).
+- **Window types:**
+  - Tumbling (non-overlapping)
+  - Hopping (fixed-size overlap)
+  - Sliding (moving window)
+  - Session (per user session)
+
+### Architectures
+
+- **Lambda architecture:** stream + batch layers for processing.
+- **Pub-Sub systems:** e.g., **Apache Kafka** for topic-based streaming.
+
+## 11. Graph Data Model
+
+- Represents entities and their relationships as nodes and edges.
+- Equivalent to ER model in structure.
+- **Graph Databases:** e.g., Neo4J.
+  - Enable efficient edge traversal queries.
+  - Use languages like **Cypher** for pattern-based queries.

@@ -1,0 +1,144 @@
+---
+title: Mobile Computing Databases
+sidebar:
+  order: 16
+slug: s3/database-systems/basics/mobile-computing-databases
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.696Z
+lastUpdatedOn: 2026-06-01T03:58:53.200Z
+---
+
+Mobiles operates in environments with wireless communication, limited bandwidth, and intermittent connectivity.
+
+Consists of:
+
+- Mobile hosts: laptops, phones, or tablets.
+- Wired hosts: servers or fixed systems.
+- Communication network: Wi-Fi, 4G, 5G, Bluetooth.
+
+Communication can either be:
+
+- Through [base stations](/s3/data-communication-and-networking/mobile-telecom/#base-station)
+- Direct host-to-host
+
+### Database Issues
+
+Applications which rely on a database must handle:
+
+- Query optimization: minimize data transferred and network cost.
+- Energy consumption: transmission uses more energy than receiving.
+- Location services: queries depend on device location.
+- Data broadcast: base stations broadcast shared data.
+- Disconnection: must maintain cached local data and sync later.
+- Consistency: local copies can become outdated.
+
+## Routing and Query Processing
+
+Optimization balances:
+
+- User time: query response delay.
+- Communication cost: data transfer charges.
+- Energy: minimize transmission usage. Reception requires much less energy than transmission.
+- Timing: off-peak vs peak network costs.
+
+## Data Broadcast
+
+- Base station broadcasts frequently accessed data.
+- Clients listen instead of sending requests → saves power.
+- Supports devices without transmit capability.
+- Broadcasts can be scheduled (fixed or adaptive).
+- Noise or signal loss handled by redundancy (parity bits).
+
+## Disconnectivity and Consistency
+
+When devices are offline:
+
+- Local updates may conflict when reconnecting.
+- Cached data may become stale.
+
+Challenges:
+
+- Recoverability: updates may be lost.
+- Consistency: local data may not match server state.
+
+## Mobile Updates
+
+- If only one host updates → simple sync.
+- If multiple hosts update → conflicts occur.
+- Version numbering used to track document versions.
+- Sometimes manual reconciliation is required.
+
+## Detecting Inconsistent Updates — Version Vector Scheme
+
+Each host maintains a version vector per document.
+
+For host `i` and document `d`:
+
+- `Vd,i[k]` = version number of `d` at host `k` known to `i`.
+
+Rules:
+
+If all vectors equal → copies are identical.
+If all `Vd,i[k] \le Vd,j[k]` and not equal → `i`’s copy is older.
+If some elements are higher/lower on both sides → inconsistent copies (conflict).
+
+Used in distributed and mobile systems to detect divergence.
+
+## Handling Inconsistent Updates
+
+- Automatic merge is complex.
+- Manual resolution often needed.
+- Applied in mobile DBs and distributed file systems.
+- Works if inconsistencies are rare or predictable.
+
+## Commercial Embedded Databases (Oracle)
+
+Oracle offers several embedded database products for different scenarios.
+
+### TimesTen
+
+- In-memory RDBMS for real-time, high-throughput applications.
+- Used in telecom, finance, and CRM.
+- Can serve as standalone DB or cache for Oracle DB.
+- Features replication and high availability.
+
+| Feature       | Oracle 10g    | TimesTen         |
+| ------------- | ------------- | ---------------- |
+| Optimization  | Disk-centric  | Memory-centric   |
+| Deployment    | Database tier | Application tier |
+| Response time | ms            | µs               |
+| Data capacity | TBs           | GBs              |
+
+### Berkeley DB
+
+- Open-source, high-performance embedded key–value store.
+- No SQL layer; accessed via API.
+- Runs in-process with the application.
+- Used by Amazon as a high-speed cache in front of Oracle Database.
+
+Key features:
+
+- ACID transactions.
+- Low latency and high throughput.
+- Minimal hardware requirements.
+
+### Oracle Database Lite
+
+- Designed for mobile and field-force environments.
+- Provides secure offline access and syncs when connected.
+- Synchronization: async, event-driven, conflict-aware.
+- Supports automatic reconciliation and device management.
+
+Architecture:
+
+- Embedded client DB + Mobile server for sync and provisioning.
+- Sync uses In-Queue (upload) and Out-Queue (download) model.
+
+## Summary
+
+- Embedded databases run inside applications, require no DBA, and have small footprints.
+- Two architectures: lightly embedded (external engine) and deeply embedded (in-process).
+- Mobile databases face challenges with energy, connectivity, and consistency.
+- Version vectors help detect conflicts after disconnections.
+- Oracle’s embedded solutions—TimesTen, Berkeley DB, and Database Lite—illustrate different deployment and synchronization models.

@@ -65,6 +65,20 @@ function getSemesterInfo(slugParts: string[]) {
   };
 }
 
+// Parse the numeric prefix of a topic-group directory from a note's filePath.
+// e.g. "docs/s1/fluid-mechanics/3-statics/01-intro.mdx" → 3
+// Returns Infinity when no prefixed dir segment is found.
+function moduleOrderFromFilePath(filePath: string | undefined): number {
+  if (!filePath) return Infinity;
+  const parts = filePath.split("/");
+  // parts: ["docs","s1","fluid-mechanics","3-statics","01-intro.mdx"]
+  // The topic-group dir is at index 3 (when 4 parts after "docs/" exist)
+  const topicDir = parts[3];
+  if (!topicDir) return Infinity;
+  const m = topicDir.match(/^(\d+)-/);
+  return m ? parseInt(m[1], 10) : Infinity;
+}
+
 async function getSidebarData(currentSlug: string) {
   const allNotes = await getCollection("notes");
   const currentSlugParts = currentSlug.split("/");
@@ -87,6 +101,7 @@ async function getSidebarData(currentSlug: string) {
       title: note.data.title,
       label: note.data.sidebar?.label || note.data.title,
       order: note.data.sidebar?.order || 999,
+      moduleOrder: moduleOrderFromFilePath(note.filePath),
     });
   });
 
@@ -119,8 +134,12 @@ async function getSidebarData(currentSlug: string) {
     }
   });
 
-  // Sort modules alphabetically by key
-  const sortedModules = Object.keys(currentSubjectTree.modules).sort();
+  // Sort modules by their numeric dir prefix (moduleOrder)
+  const sortedModules = Object.keys(currentSubjectTree.modules).sort((a, b) => {
+    const orderA = currentSubjectTree.modules[a][0]?.moduleOrder ?? Infinity;
+    const orderB = currentSubjectTree.modules[b][0]?.moduleOrder ?? Infinity;
+    return orderA - orderB;
+  });
 
   // Calculate prev/next navigation within current module
   let prevNote: any = null;

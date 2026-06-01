@@ -145,14 +145,20 @@ function mdNodetoLatex(node: MdNode, baseDir: string): string {
     case "html":
       return `% [raw html omitted]`;
 
-    // MDX JSX elements — treat as a labeled block
-    case "mdxJsxFlowElement":
-    case "mdxJsxTextElement": {
+    // MDX JSX elements — block elements get a comment marker; inline elements
+    // return empty string to avoid breaking table-cell alignment (% comments
+    // out the rest of the line, swallowing subsequent & separators).
+    case "mdxJsxFlowElement": {
       const n = node as MdNode & { name?: string };
       const inner = children(node, baseDir).join("\n\n");
       return inner
         ? `% <${n.name}>\n${inner}\n% </${n.name}>`
         : `% <${n.name} />`;
+    }
+    case "mdxJsxTextElement": {
+      const n = node as MdNode & { name?: string };
+      const inner = children(node, baseDir).join("");
+      return inner;
     }
 
     default:
@@ -278,7 +284,9 @@ export async function generateModulePdf(moduleId: string) {
     const hasSections = parts.length > 1;
     if (hasSections) {
       if (lastChapter !== parts[0]) {
-        const sectionName = titleize(parts[0]);
+        // Strip numeric prefix (e.g. "3-statics" → "statics") before titleizing
+        const rawSection = parts[0].replace(/^\d+-/, "");
+        const sectionName = titleize(rawSection);
         docLines.push(`\\chapter{${sectionName}}`);
         lastChapter = parts[0];
       }

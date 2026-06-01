@@ -23,7 +23,17 @@ const semNum = sem.match(/^s(\d)$/)?.[1] || "1";
 
 const allNotes = await getCollection("notes");
 
-type NoteItem = { slug: string; label: string; order: number };
+// Parse the numeric prefix of a topic-group directory from a note's filePath.
+function moduleOrderFromFilePath(filePath: string | undefined): number {
+  if (!filePath) return Infinity;
+  const parts = filePath.split("/");
+  const topicDir = parts[3];
+  if (!topicDir) return Infinity;
+  const m = topicDir.match(/^(\d+)-/);
+  return m ? parseInt(m[1], 10) : Infinity;
+}
+
+type NoteItem = { slug: string; label: string; order: number; moduleOrder: number };
 
 const grouped: Record<string, NoteItem[]> = {};
 allNotes.forEach((note) => {
@@ -35,6 +45,7 @@ allNotes.forEach((note) => {
     slug: note.data.slug,
     label: note.data.sidebar?.label || note.data.title,
     order: note.data.sidebar?.order ?? 999,
+    moduleOrder: moduleOrderFromFilePath(note.filePath),
   });
 });
 
@@ -66,7 +77,11 @@ Object.keys(grouped)
     });
     const sortedMods: Record<string, NoteItem[]> = {};
     Object.keys(tree.modules)
-      .sort()
+      .sort((a, b) => {
+        const orderA = tree.modules[a][0]?.moduleOrder ?? Infinity;
+        const orderB = tree.modules[b][0]?.moduleOrder ?? Infinity;
+        return orderA - orderB;
+      })
       .forEach((k) => (sortedMods[k] = tree.modules[k]));
     tree.modules = sortedMods;
     subjectTrees[subject] = tree;

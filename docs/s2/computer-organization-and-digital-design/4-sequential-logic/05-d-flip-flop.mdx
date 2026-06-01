@@ -1,0 +1,40 @@
+---
+title: D Flip-flop
+sidebar:
+  order: 5
+slug: s2/computer-organization-and-digital-design/sequential-logic/d-flip-flop
+prev: true
+next: true
+dateCreated: 2026-04-22T07:07:02.586Z
+lastUpdatedOn: 2026-06-01T03:58:53.172Z
+---
+
+import DFlipFlop from "./images/d-flip-flop.svg";
+
+Aka. data or delay flip-flop. Input is captured at rising edges of clock. Has 2
+inputs: $D$ and $Clk$ and 1 output: $Q$. Built using 2 D latches.
+
+<DFlipFlop />
+
+To build a D flip-flop that's triggered by falling edge of clock, the first NOT
+gate should be removed.
+
+## Characteristics
+
+### Characteristic tabl
+
+| D   | Clk | Comment   |
+| --- | --- | --------- |
+| 0   | ↑   | Reset     |
+| 1   | ↑   | Set       |
+| X   | 0   | No change |
+| X   | 1   | No change |
+
+### Excitation table
+
+| Current State (Q) | Next State (Q+) | D   |
+| ----------------- | --------------- | --- |
+| 0                 | 0               | 0   |
+| 0                 | 1               | 1   |
+| 1                 | 0               | 0   |
+| 1                 | 1               | 1   |
