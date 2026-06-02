@@ -1,9 +1,9 @@
 ---
 title: Operating System
 sidebar:
-  order: 18
+  order: 17
 dateCreated: 2026-05-16T16:07:46.260Z
-lastUpdatedOn: 2026-05-28T17:03:17.881Z
+lastUpdatedOn: 2026-06-02T10:52:00.721Z
 slug: s4/operating-systems-security/operating-system
 prev: true
 next: true
@@ -39,9 +39,9 @@ The process of keeping each user's objects apart from all others.
 - Physical separation  
   Different processes use different physical objects.
 - Temporal separation  
-  Different-security processes run at different times.
+  Different security processes run at different times.
 - Logical separation  
-  OS constrains program access; process unaware of others.
+  OS constrains program access, process unaware of others.
 - Cryptographic separation  
   Processes conceal data/computations from outside.
 
@@ -52,7 +52,7 @@ There are different modes of sharing with different difficulty and granularity.
 1. Do not protect  
    Appropriate for time-separated runs.
 2. Isolate  
-   Processes unaware of each other; own address space.
+   Processes unaware of each other, own address space.
 3. Share all or share nothing  
    Public or private designation.
 4. Share but limit access  
@@ -73,17 +73,17 @@ Boundary confining user to one memory side and OS on other. Implemented as fixed
 Pair defining valid address range for a process.
 
 - Base register  
-  Lower bound (starting address); all addresses are offsets from base.
+  Lower bound (starting address), all addresses are offsets from base.
 - Bound register  
   Upper address limit. Prevents buffer overflows.
 
-Contiguous ranges only; all-or-nothing sharing.
+Contiguous ranges only, all-or-nothing sharing.
 
 There can be multiple pairs for base/bounds registers to separate code, read-only, writeable data.
 
 ### Tagged architecture
 
-Extra bits are stored per memory location specifying access rights (R, RW, X). Set by privileged instructions only; checked on every access. Allows adjacent locations to have different rights.
+Extra bits are stored per memory location specifying access rights (R, RW, X). Set by privileged instructions only, checked on every access. Allows adjacent locations to have different rights.
 
 ## Virtual Memory
 
@@ -93,7 +93,7 @@ The process of dividing program into logical, separately relocatable pieces or _
 
 OS maintains a segment translation table per-process to translate segment names to real base address. Adds offset to get true address.
 
-Every address reference checked again segment bounds. Each segment can have different protection classes per process.
+Every address reference checked against segment bounds. Each segment can have different protection classes per process.
 
 Each segment is shared completely or not shared at all.
 
@@ -151,8 +151,8 @@ Introduces a performance overhead. No guarantee of completeness. Can grow large 
 - Permission-based (fail-safe defaults)  
   Access granted only by explicit permission, and not by default. A missing rule means no access, not open access.
 - Separation of privilege  
-  Require two independent conditions to grant access rather than one. Example: two-person rule for sensitive operations; compromising one factor is insufficient.
+  Require two independent conditions to grant access rather than one. Example: two-person rule for sensitive operations, compromising one factor is insufficient.
 - Least common mechanism  
-  Minimize shared mechanisms between users. Shared resources create covert channels; less sharing = less leakage risk.
+  Minimize shared mechanisms between users. Shared resources create covert channels, less sharing = less leakage risk.
 - Ease of use  
   Security interface must be simple enough that users comply naturally. A cumbersome mechanism gets bypassed or disabled, defeating its purpose entirely.

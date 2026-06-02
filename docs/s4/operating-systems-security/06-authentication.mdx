@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/authentication
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.629Z
-lastUpdatedOn: 2026-05-29T16:59:12.447Z
+lastUpdatedOn: 2026-06-02T10:52:00.720Z
 ---
 
 The process of proving that the identity of a person or device they are claiming to be.
@@ -103,7 +103,7 @@ Examples: password + SMS code, or password + fingerprint.
 
 Aka. FIM. A framework where organizations establish mutual trust, allowing one organization (identity provider) to authenticate users and share identity attributes on behalf of another (service provider), across organizational boundaries.
 
-Organizations (service prodivders) trust and rely on 1 or more organizations (identity provider) to authenticate users.
+Organizations (service providers) trust and rely on 1 or more organizations (identity provider) to authenticate users.
 
 ## Single Sign-On
 
@@ -117,13 +117,27 @@ Cross-org SSO is achieved through FIM.
 
 Both FIM and SSO:
 
-- Allow users to repeatedly authenticate when moving between systems
-- Reduce repeated authentication
+- Allow users to authenticate only once when moving between systems
 - Rely on a central identity authority
 - Use tokens/assertions to prove identity between systems
 - Both can use the same protocols (SAML, OIDC, OAuth)
 
 </Note>
+
+## Authentication vs. Identification
+
+- Authentication   
+  Verifying that a claimant is who they say they are. One comparison: "Is this person X?"
+- Identification   
+  Determining who a person is from authenticating data. Requires $n$ comparisons across the full database.
+
+Identification is harder: subject may not be in the database; partial matches are ambiguous.
+
+### Confusion Between Authentication and Identification
+
+Privacy violations arise when data items serve multiple roles.
+
+Example: the U.S. Social Security Number was intended as an identifier but is now used as authenticator, database key, and identifier simultaneously. Acquiring it for one purpose enables use for others.
 
 ## Computer-Computer Authentication
 

@@ -1,9 +1,9 @@
 ---
 title: Networks
 sidebar:
-  order: 20
+  order: 19
 dateCreated: 2026-05-17T09:01:38.545Z
-lastUpdatedOn: 2026-05-28T17:03:17.882Z
+lastUpdatedOn: 2026-06-02T10:52:00.721Z
 slug: s4/operating-systems-security/networks
 prev: true
 next: true
@@ -28,9 +28,9 @@ Networks are very vulnerable because of:
 - System complexity  
   Heterogeneous OSes and purposes compound risk.
 - Unknown perimeter  
-  Network boundaries shift; bridged networks blur scope.
+  Network boundaries shift, bridged networks blur scope.
 - Unknown path  
-  Multiple routes exist; some are untrustworthy.
+  Multiple routes exist, some are untrustworthy.
 
 ## Threats
 
@@ -90,11 +90,11 @@ Reconnaissance technique — not strictly an attack. Reveals: open ports, protoc
 
 ### Wireless Network Vulnerabilities
 
-- **Integrity** — higher signal strength wins; attackers spoof clients and boost signal to hijack sessions.
+- **Integrity** — higher signal strength wins, attackers spoof clients and boost signal to hijack sessions.
 - **Availability** — session hijacking, forced disassociation, jamming.
 - **Unauthorized access** — requires cryptographic controls.
 - **Hidden SSID discovery** — client probe requests expose SSIDs even without beacon.
-- **SSID in all frames** — SSID embedded in communication frames; sniffable post-association.
+- **SSID in all frames** — SSID embedded in communication frames, sniffable post-association.
 
 ## Wi-Fi
 
@@ -104,12 +104,12 @@ And clients auto-connect to known SSIDs. Attackers can spoof trusted names.
 
 ### WEP
 
-Aka. Wired Equivalent Privacy. Introduced with 802.11. Broken by 2001; fully crackable within minutes.
+Aka. Wired Equivalent Privacy. Introduced with 802.11. Broken by 2001, fully crackable within minutes.
 
 Authentication mechanism:
 
 1. Client and AP share a pre-shared key.
-2. AP sends random challenge; client encrypts and returns it.
+2. AP sends random challenge, client encrypts and returns it.
 3. AP decrypts and verifies match.
 4. Subsequent traffic encrypted with shared key.
 
@@ -117,9 +117,9 @@ Authentication mechanism:
 
 - Key size: 64- or 128-bit total, but 24 bits reserved for Initialization Vector (IV) - effective key 40 or 104 bits.
 - Keys are user-typed passphrases — vulnerable to dictionary attacks.
-- Static key — unchanged for months; one key covers entire session history.
+- Static key — unchanged for months, one key covers entire session history.
 - RC4 used incorrectly — allows decryption of large message portions.
-- Only ~16 million IV values; non-random distribution accelerates cracking.
+- Only ~16 million IV values, non-random distribution accelerates cracking.
 - Integrity check (CRC) does not detect malicious modification.
 - No client authentication — any client knowing SSID and MAC is accepted.
 
@@ -129,17 +129,17 @@ Aka. WiFi Protected Access. WPA was introduced in 2003, WPA2 in 2004 and WPA3 in
 
 Improvements over WEP:
 
-- Non-static keys — key hierarchy; new keys per session; encryption key rotated per packet.
+- Non-static keys — key hierarchy, new keys per session, encryption key rotated per packet.
 - Authentication — password, token, or certificate.
 - Strong encryption — AES support (vs. broken RC4).
 - Integrity protection — 64-bit cryptographic integrity check.
-- Session initiation — four-way handshake; separate encryption and integrity keys per direction.
+- Session initiation — four-way handshake, separate encryption and integrity keys per direction.
 
 ## Defenses
 
 ### Link Encryption
 
-Encryption applied at OSI Layer 1 (Physical). Data decrypted at each intermediate node; re-encrypted for next link. Appropriate when transmission link is primary vulnerability.
+Encryption applied at OSI Layer 1 (Physical). Data decrypted at each intermediate node, re-encrypted for next link. Appropriate when transmission link is primary vulnerability.
 
 ### End-to-End Encryption
 
@@ -147,9 +147,7 @@ Data encrypted through to destination — intermediate nodes cannot decrypt. App
 
 ### SSL / TLS
 
-SSL stands for Secure Sockets Layer and TLS stands for Transport Layer Security. Works at OSI Layer 4, the transport layer. Designed 1990s.
-
-TLS stands for Transport Layer Security. Introduced in 1999. Currently used standard.
+SSL stands for Secure Sockets Layer. TLS stands for Transport Layer Security. Works at OSI Layer 4, the transport layer. Designed 1990s.
 
 SSL certificate contains domain, owner, issuing CA, validity dates and fingerprints. Trust propagates from root CAs to intermediate CAs to leaf certificate. Browsers trust certificates **iff** root CA is in its trusted store.
 

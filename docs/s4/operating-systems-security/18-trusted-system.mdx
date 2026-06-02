@@ -1,0 +1,103 @@
+---
+title: Trusted System
+sidebar:
+  order: 18
+dateCreated: 2026-05-17T03:19:04.725Z
+lastUpdatedOn: 2026-06-02T10:52:00.721Z
+slug: s4/operating-systems-security/trusted-system
+prev: true
+next: true
+---
+
+A system with evidence substantiating that it implements a security function or policy. Requires objective, rational basis, not mere assertion.
+
+Three characteristics:
+
+- Defined policy  
+  Specifies what security qualities are enforced.
+- Measures and mechanisms  
+  Adequate to enforce the policy.
+- Independent scrutiny  
+  Mechanisms correctly selected and implemented.
+
+Degrees of trust exist; trust is not binary.
+
+## Audit
+
+Trusted OS tracks all security-relevant changes. Audit log must be:
+
+- Protected against tampering, modification, and deletion (admin-only).
+- Active throughout operation.
+- System shuts down if audit medium fills.
+
+## Trusted Software
+
+Rigorously developed and analyzed. Does what is expected and nothing more. Characteristics:
+
+- Functional correctness  
+  Performs its specified function correctly.
+- Enforcement of integrity  
+  Maintains data correctness even when given erroneous or unauthorized commands.
+- Limited privilege  
+  Access to secure data is minimized; access rights and data are not passed to untrusted programs or callers.
+- Appropriate confidence level  
+  Examined and rated at a level commensurate with the sensitivity of data it handles.
+
+## Trusted Computing Base
+
+Aka. TCB. Everything in the trusted OS necessary to enforce security policy: hardware, processes, primitive files, protected memory, IPC primitives.
+
+TCB still correctly enforces policy even if all non-TCB code is written by malicious programmers.
+
+TCB monitors four interactions:
+
+- Process activation  
+  Register, relocation, and access list changes on context switch.
+- Execution domain switching  
+  Process invokes another domain.
+- Memory protection  
+  All memory references checked per domain.
+- I/O operations  
+  Cross all domains; must be mediated.
+
+TCB runs in a protected state, separate from non-TCB code. Non-TCB code can change freely without affecting security enforcement.
+
+### Object Reuse
+
+Object reuse failure: a malicious user claims freed space and reads the previous occupant's data before writing.
+
+Prevention: OS overwrites (clears) all space before reassigning it.
+
+#### Magnetic Remanence
+
+In magnetic media, previous data remains recoverable using precise equipment even after an overwrite.
+
+## Trusted Path
+
+Unforgeable connection confirming the user communicates directly with the OS, not a forged intermediate.
+
+- Classic Windows: Ctrl+Alt+Delete trapped by the keyboard driver, transferring directly to the authentication routine.
+- Required for all security-critical operations (login, password change).
+
+## Evaluation Criteria
+
+### Orange Book
+
+Aka. TCSEC. A U.S. DoD standard. First codification of trusted system requirements.
+
+6 levels (lowest to highest): C1, C2, B1, B2, B3, A1.
+
+Each level bundles features and assurance. Designed around stand-alone multiuser mainframes only. Did not gain traction in the commercial market.
+
+### Common Criteria
+
+International standard superseding the Orange Book.
+
+7 assurance levels from EAL1 (lowest) to EAL7 (highest). Higher levels require independent testing lab verification.
+
+Key advances over Orange Book:
+
+- Separated functions from assurance  
+  Developer selects feature set and assurance level independently.
+- Open-ended protection profiles  
+  Allows new product types (firewalls, IDSes) to be covered.
