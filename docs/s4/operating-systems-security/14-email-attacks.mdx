@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/email-attacks
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.630Z
-lastUpdatedOn: 2026-05-29T14:30:05.869Z
+lastUpdatedOn: 2026-06-02T18:48:59.871Z
 ---
 
 ## Spam
@@ -37,13 +37,40 @@ A targeted phishing attack aimed at specific individuals or organizations. Uses 
 - Use antivirus software.
 - Never share passwords through email.
 
-## DMARC
+## Email Authentication Protocols
 
-Stands for Domain-based Message Authentication, Reporting and Conformance. Verifies that an email sender is legitimate.
+Mechanisms used to verify that an email sender is legitimate. Prevent email spoofing and reduce phishing attacks.
 
-Technologies used:
+### SPF
 
-- Sender Policy Framework (SPF)
-- DomainKeys Identified Mail (DKIM)
+Short for Sender Policy Framework. A DNS record that lists which mail servers are authorized to send email on behalf of a domain. Works at SMTP layer.
 
-Prevents email spoofing. Protects organizational reputation. Reduces phishing attacks.
+Checks whether the sending server's IP is listed in the sending domain's DNS. Fails if not. Checks the `Return-Path` address only. Blind to `From` (visible to users) header spoofing.
+
+### DKIM
+
+Short for DomainKeys Identified Mail. Adds a cryptographic signature to outgoing emails. Works at the message layer.
+
+Email headers and body are signed using a private key before sending. Public key is published in DNS. Verifies the signature of received emails. If signature verification fails, the email was altered in transit or was not signed.
+
+Does not verify that the signing server is authorized. A compromised private key can still produce valid signatures.
+
+### DMARC
+
+Short for Domain-based Message Authentication, Reporting and Conformance. Builds on SPF and DKIM. Enforces alignment between the visible `From` domain and the domain verified by SPF or DKIM.
+
+At least one of SPF or DKIM must pass and align. If both are aligned, better.
+
+- SPF alignment closes `From` spoofing.
+- DKIM alignment closes it only if the private key is uncompromised. DKIM-only leaves the compromised key risk open.
+
+When an email fails authentication, DMARC instructs the receiving server to apply one of three policies:
+
+- `none`  
+  Take no action. Only collect reports.
+- `quarantine`  
+  Deliver to spam/junk folder.
+- `reject`  
+  Discard the email entirely.
+
+Domain owners receive aggregate reports about authentication failures based on matching `From` domain.

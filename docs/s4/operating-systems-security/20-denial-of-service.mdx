@@ -3,7 +3,7 @@ title: Denial of Service
 sidebar:
   order: 20
 dateCreated: 2026-05-17T10:39:21.053Z
-lastUpdatedOn: 2026-06-02T10:52:00.722Z
+lastUpdatedOn: 2026-06-02T18:48:59.871Z
 slug: s4/operating-systems-security/denial-of-service
 prev: true
 next: true
@@ -17,9 +17,9 @@ Aka. Distributed Denial of Service. DoS via a botnet. Attacker plants malware (C
 
 ### DDoS Botnet Structure
 
-Hierarchy: Attacker → Masters → C&C nodes → Bots → Victim. Redundant — loss of one master or C&C does not stop attack.
+Hierarchy: Attacker → Masters → C&C nodes → Bots → Victim. Redundant: loss of one master or C&C node does not stop the attack.
 
-**Botnets** — networks of compromised machines running malicious code under remote control. Often undetected, minimal harm to host machine. Attacker separated from bots by multiple layers — difficult to trace.
+A botnet is a network of compromised machines running malicious code under remote control. Often undetected, with minimal harm to the host machine. Attacker separated from bots by multiple layers, making attribution difficult.
 
 ## DoS Attack Types
 
@@ -38,7 +38,7 @@ Exhausts network layer tablespace.
 Examples:
 
 - SYN flood  
-  Attacker sends SYN packets with spoofed source IPs. Target sends SYN-ACK to non-existent addresses. Half-open connections queue until timeout. Queue exhausted and legitimate connections rejected.
+  Attacker sends SYN packets with spoofed source IPs. Target's half-open connection queue fills until timeout; legitimate connections rejected.
 
 ### Smurf Attack
 

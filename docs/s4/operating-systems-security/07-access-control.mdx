@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/access-control
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.628Z
-lastUpdatedOn: 2026-06-02T10:52:00.720Z
+lastUpdatedOn: 2026-06-02T18:48:59.871Z
 ---
 
 Mechanism that regulates who can access what, in what way. Protects system resources. Enforces [CIA](/s4/operating-systems-security/cia-triad).
@@ -45,21 +45,21 @@ Must be:
 
 ### Access Control Matrix
 
-Permissions stored as a matrix, subjects as rows and objects as columns. Each cell lists the permissions granted. Conceptually simple, but results in a large, sparse matrix. Inefficient in space, rarely used in practice.
+Permissions stored as a matrix, subjects as rows and objects as columns. Each cell lists the permissions granted.
+
+Conceptually simple. Large and sparse in real life. Inefficient in terms of space. Does not scale. Rarely used in practice.
 
 ### Access Control Directory
 
 Per-user directories listing the objects each user can access. Users control permissions on objects they own, but cannot modify their own directory entry.
 
-Issues:
-
-- scalability (too many objects)
-- revocation complexity
-- rights propagation
+Easy to enumerate all objects accessible by a user. Revocation is hard. Does not scale. Rights propagation is hard to track.
 
 ### Access Control List
 
 Aka. ACL. Permissions stored per object — each object holds a list of (user, rights) pairs. Equivalent to a column in the Access Control Matrix.
+
+Easy to determine who can access a given object. Revocation per object is straightforward. Hard to enumerate all permissions a user holds. User deletion requires scanning and updating every object's ACL.
 
 Common in file systems (UNIX, Windows).
 
@@ -67,12 +67,20 @@ Common in file systems (UNIX, Windows).
 
 An unforgeable token granting access rights to a specific object. May be encrypted. Can be passed to others to delegate access.
 
-Hard to revoke.
+Delegation is simple. Access check is fast. Hard to revoke once distributed. Difficult to audit all current holders.
 
 ### Procedure-Oriented Access Control
 
-Access is mediated through procedures that enforce rules before granting access. Flexible. May introduce performance overhead.
+Access is mediated through procedures that enforce rules before granting access.
+
+Can encode complex, context-sensitive rules.
+
+May introduce performance overhead. Harder to reason about and audit than declarative policies.
 
 ### Role-Based Access Control
 
-Aka. RBAC. Permissions are assigned to roles rather than individual users. Roles can be hierarchical. Simplifies permission management in large systems.
+Aka. RBAC. Permissions are assigned to roles rather than individual users. Roles can be hierarchical.
+
+Reduced admin overhead. Roles reflect organisational structure naturally.
+
+Role explosion in large systems. Not fine-grained; may grant too few or too high permissions.

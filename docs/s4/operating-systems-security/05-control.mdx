@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/control
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.628Z
-lastUpdatedOn: 2026-05-28T17:03:17.879Z
+lastUpdatedOn: 2026-06-02T18:48:59.870Z
 ---
 
 Aka. countermeasure. Protective measure to remove or reduce 1 or more vulnerabilities. Must know as much as threats to establish control for each.
@@ -15,31 +15,30 @@ Control mechanism changes based on kind of threats, control types and what they 
 
 ## Effectiveness
 
-Determined by:
+A control's effectiveness depends on:
 
-### Awareness
-
-People must know a control exists and why it matters. Controls that go unnoticed are ignored or bypassed.
-
-### Usage Preference
-
-Even aware users may avoid a control if it takes too much space, time, or effort. Adoption depends on how lightweight the control feels.
-
-### Usage
-
-A control applied incorrectly or inconsistently leaves gaps. Correct and consistent use is required for it to work.
-
-### Periodic Review
-
-Threats and systems change over time. Regular reassessment ensures controls stay relevant and effective.
-
-### Overlapping Vulnerabilities
-
-A single control may be applied to multiple vulnerabilities. The more, the better.
+- Awareness  
+  Users must know the control exists and why it matters. Unnoticed controls are ignored or bypassed.
+- Usage Preference  
+  Users avoid controls that cost too much in time, space, or effort.
+- Correct Usage  
+  Incorrect or inconsistent application leaves gaps.
+- Periodic Review  
+  Threats evolve. Controls must be reassessed regularly to stay relevant.
+- Overlapping Coverage  
+  A control that addresses multiple vulnerabilities provides greater protection.
 
 ## Principle of Weakest Link
 
-Security is only as strong as the weakest link.
+Overall security is bounded by the least secure component in the system.
+
+Attackers target the weakest point, not the average. A system with strong controls everywhere except one gap will be exploited through that gap.
+
+Implications:
+
+- Every component must be secured, not just the critical ones.
+- Strengthening already-strong controls yields no benefit if weaker ones remain.
+- A chain of controls fails at its first weak point.
 
 ## Types
 
@@ -49,22 +48,18 @@ Preventing the physical systems from being reached. Locking the server room, for
 
 ### Technical
 
-Can either be software or hardware.
+Controls enforced by technology, either hardware or software.
 
-Examples:
-
-- Encryption
-- Hardware
-  Devices like encryption cards, locks, and firewalls.
+- Hardware  
+  Physical devices that enforce security: firewalls, encryption cards, hardware security modules.
 - Software  
-  Includes program security, access controls, and antivirus tools.
+  Programs that protect systems or data: antivirus tools, access control systems, encryption software.
 
 ### Administrative
 
-#### Policies & Procedures
+Controls enforced through organizational rules and human behavior rather than technology.
 
-Organizational practices like password changes and regular audits.
-
-#### Access Control
-
-Policy defines who can access what resources and how.
+- Policies and Procedures  
+  Written rules governing how people interact with systems: password requirements, audit schedules, incident response steps.
+- Access Control  
+  Defines which users or roles can access which resources, and under what conditions. Typically follows least-privilege: grant only what is needed.
