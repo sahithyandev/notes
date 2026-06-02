@@ -3,7 +3,7 @@ title: Design
 sidebar:
   order: 8
 dateCreated: 2026-05-29T15:48:19.433Z
-lastUpdatedOn: 2026-05-29T16:59:06.246Z
+lastUpdatedOn: 2026-06-02T13:27:48.115Z
 prereqs:
   - /s2/program-construction/design-patterns/introduction
 slug: s4/software-engineering/design
@@ -79,8 +79,118 @@ Object interfaces must be specified before parallel development can proceed. Int
 
 UML tool: **interface stereotype** in class diagrams. Java interfaces also used.
 
+## Architectural Design
+
+Architectural design identifies the sub-systems making up a system and the framework for sub-system control and communication. It is the earliest stage of the design process.
+
+### 4+1 View Model
+
+- Logical  
+  Key abstractions as objects or object classes.
+- Process  
+  How the system is composed of interacting processes at run-time.
+- Development  
+  How the software is decomposed for development.
+- Physical  
+  System hardware and how software is distributed across processors.
+- Use case  
+  Scenarios that drive and validate the other four views.
+
+### Architecture and System Characteristics
+
+| Concern         | Architectural approach                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Performance     | Localise critical operations; use large-grain components to reduce communication overhead. |
+| Security        | Layered architecture; place critical assets in inner layers.                               |
+| Safety          | Localise safety-critical features in a small number of sub-systems.                        |
+| Availability    | Include redundant components with fault-tolerant support.                                  |
+| Maintainability | Use fine-grain, replaceable components; avoid sharing data structures.                     |
+
+### Key Architectural Patterns
+
+#### MVC
+
+Separates presentation and interaction from system data. Model manages data; View manages presentation; Controller manages user interaction.
+
+Use when: multiple ways to view or interact with data are needed.
+
+Advantages:
+
+- Data and representation change independently.
+
+Disadvantages:
+
+- Extra complexity when data model is simple.
+
+#### Layered
+
+Organises the system into layers; lower layers provide core services.
+
+Use when: building on existing systems, or when multi-level security is needed.
+
+Advantages:
+
+- Entire layers can be replaced if the interface is preserved.
+
+Disadvantages:
+
+- Clean separation is often difficult; performance overhead.
+
+#### Repository
+
+All data managed in a central repository; components access it directly rather than communicating with each other.
+
+Use when: large volumes of data must be stored long-term.
+
+Advantages:
+
+- Independent components; consistent data management.
+
+Disadvantages:
+
+- Single point of failure; hard to distribute.
+
+#### Client-Server
+
+Servers provide specific services; clients call on those services.
+
+Use when: a shared database is accessed from many locations.
+
+Advantages:
+
+- Servers can be distributed.
+
+Disadvantages:
+
+- Single point of failure; unpredictable performance.
+
+#### Pipe and Filter
+
+Each processing component (filter) carries out one type of data transformation; data flows through pipes between components.
+
+Use when: data processing applications (batch and transaction-based).
+
+Advantages:
+
+- Easy to understand; transformation reuse; sequential or concurrent execution possible.
+
+Disadvantages:
+
+- Common data format must be agreed; parsing overhead.
+
 ## Design Patterns
 
-Reusable solution template for a recurring design problem. Described abstractly; instantiated in specific contexts.
+Reusable solution template for a recurring design problem. Described abstractly; instantiated in specific contexts. Elements: Name · Problem description · Solution description (template, not concrete) · Consequences.
+
+Common patterns:
+
+- Observer  
+  Separates display of object state from the object itself. All registered displays notified on state change. Use when multiple displays of state are needed.
+- Façade  
+  Provides a simplified interface to a set of related objects.
+- Iterator  
+  Provides a standard way to access collection elements sequentially.
+- Decorator  
+  Extends class functionality at run-time by wrapping the object.
 
 Covered extensively in [Design Patterns - Semester 2](/s2/program-construction/design-patterns/introduction).

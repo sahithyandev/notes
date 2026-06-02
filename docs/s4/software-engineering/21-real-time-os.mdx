@@ -3,7 +3,7 @@ title: Real Time OS
 sidebar:
   order: 21
 dateCreated: 2026-05-04T09:25:34.261Z
-lastUpdatedOn: 2026-06-01T18:49:04.777Z
+lastUpdatedOn: 2026-06-02T13:27:48.116Z
 slug: s4/software-engineering/real-time-os
 prev: true
 next: false
@@ -13,7 +13,16 @@ prereqs:
   - s3/operating-systems/process
 ---
 
-Aka. RTOS. Lightweight platforms providing minimal features for real-time software.
+## Real-Time Systems
+
+A real-time system is one whose correct functioning depends on both the results produced and the time at which those results are produced.
+
+- Hard real-time  
+  An operation is incorrect if its timing constraints are not met. Examples: vehicle braking, insulin pump control, missile guidance.
+- Soft real-time  
+  An operation is degraded but not incorrect if timing is not met. Examples: weather stations, video streaming, UI response.
+
+RTOS (Real-Time Operating System): lightweight platforms providing minimal features for real-time software.
 
 Examples:
 
@@ -82,9 +91,40 @@ Differ across three dimensions:
 
 May use [non-preemptive](/s3/operating-systems/cpu-scheduling#non-preemptive) or [preemptive scheduling](/s3/operating-systems/cpu-scheduling#preemptive).
 
-Algorithms applicable under both strategies:
+Algorithms:
 
 - Round robin.
+- Rate monotonic (processes with shorter periods get higher priority).
 - Shortest deadline first.
 
 The resource manager and dispatcher operate in sequence after scheduling.
+
+## Architectural Patterns for Embedded Systems
+
+Three common patterns:
+
+- Observe and React  
+  Monitors sensors; triggers an alarm or action on exceptional condition. Used in monitoring systems.
+- Environmental Control  
+  Analyses sensor data and actuator state; sends control signals to change the environment. Used in control systems.
+- Process Pipeline  
+  Data moves sequentially through processes linked by synchronized buffers. Used in data acquisition and multimedia systems.
+
+## Timing Analysis
+
+Three key factors for each process:
+
+- Deadline  
+  The time by which the stimulus must be processed.
+- Frequency  
+  How many times per second the process must execute.
+- Execution time  
+  How long it takes to process the stimulus.
+
+Timing analysis results determine process scheduling in the RTOS. All processes must meet their deadlines given their frequency and execution time.
+
+<Note title="Example">
+
+Equipment damage occurs at 50 ms. Battery backup activates after 16 ms. Checking process runs every 4 ms; failure triggered after 3 sustained readings. Worst case: 3×4 ms + 16 ms = 28 ms, within the 50 ms deadline.
+
+</Note>

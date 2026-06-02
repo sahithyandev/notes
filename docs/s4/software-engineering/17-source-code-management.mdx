@@ -3,13 +3,30 @@ title: Source Code Management
 sidebar:
   order: 17
 dateCreated: 2026-05-19T09:50:19.304Z
-lastUpdatedOn: 2026-06-01T18:49:04.776Z
+lastUpdatedOn: 2026-06-02T13:27:48.115Z
 slug: s4/software-engineering/source-code-management
 prev: true
 next: true
 ---
 
-Aka. SCM. Software-supported practices for managing an evolving codebase. Used to track who did what in a codebase, manage multiple people working on the same feature or different feature simultaneously.
+Aka. SCM or Configuration Management (CM). Concerned with the policies, processes, and tools for managing changing software systems. Needed because it is easy to lose track of what changes and component versions have been incorporated into each system version.
+
+## Key Terminology
+
+- Configuration Item (SCI)  
+  Anything placed under configuration control. Has a unique name; may exist in multiple versions.
+- Version  
+  An instance of a configuration item that differs from other instances. Identified by name and version number.
+- Baseline  
+  A collection of component versions making up a system. Controlled: component versions cannot be changed. The system can always be recreated from a baseline.
+- Codeline  
+  A set of versions of a software component and its dependencies. Shows evolution history.
+- Mainline  
+  A sequence of baselines representing different versions of a system.
+- Branch  
+  A new codeline created from an existing version for independent development.
+- Merge  
+  A new version created by combining separate codeline versions.
 
 ### Repository
 
@@ -33,7 +50,7 @@ Examples are CVS and Subversion.
 
 Each developer holds a full clone of the repository locally. Files are changed through a shared remote. There could be many remotes for a single project. And it can be self-hosted.
 
-One example is git.
+One example is git. Created by Linus Torvalds in 2005 to manage the Linux kernel source.
 
 Benefits of distributed management over centralized:
 
@@ -49,3 +66,26 @@ Benefits of distributed management over centralized:
 A branch is an independent, stand-alone version of the codebase. Created by a developer, to work on a feature independent of the master branch.
 
 Branch files become the repository files when they are _merged_. Thorough testing is done before merging a branch.
+
+## System Building
+
+The process of creating an executable system by compiling and linking components.
+
+Three environments:
+
+- Development system  
+  Development tools; developers check out code into a private workspace.
+- Build server  
+  Builds definitive executable versions. Developers check in code before building. May use external libraries not in VCS.
+- Target environment  
+  The platform on which the system executes. May differ in hardware or OS from the development system.
+
+### Minimizing Recompilation
+
+Build tools compare modification timestamps (or checksums) of source vs. compiled files:
+
+- Compiled newer than source → no recompilation needed.
+- Source newer than compiled → recompile source.
+- A dependency (e.g., header or class definition) newer than compiled → recompile the dependent.
+
+Checksums allow parallel builds; timestamps may not.

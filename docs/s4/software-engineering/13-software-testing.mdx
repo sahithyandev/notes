@@ -6,14 +6,14 @@ slug: s4/software-engineering/software-testing
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-05-29T16:59:06.246Z
+lastUpdatedOn: 2026-06-02T13:27:48.115Z
 ---
 
-In software testing, a program is executed with artificial data to check for errors, anomalies, or non-functional issues. Testing can reveal the presence of bugs/errors, but NOT their absence. Dynamic verification.
+In software testing, a program is executed with artificial data to check for errors, anomalies, or non-functional issues. Dynamic verification.
 
-Easily reproducible.
+Testing can reveal the **presence** of errors, but NOT their absence.
 
-Certain errors may be masked by other errors.
+Easily reproducible. However, certain errors may be masked by other errors.
 
 ## Goals
 
@@ -49,11 +49,11 @@ Performance testing gradually increases load until the system degrades. Stress t
 
 ## Partition Testing
 
-Inputs are grouped into equivalence partitions. Test cases are picked from each group.
+Inputs are grouped into equivalence partitions: groups of inputs the program treats equivalently. Test cases are picked from each group. One representative per partition is sufficient.
 
 ## Guideline-based Testing
 
-uses experience of common programmer errors to select test cases.
+Uses experience of common programmer errors to select test cases. For sequences: test single values, sequences of different sizes, access first/middle/last elements, test zero-length sequences.
 
 ## Stages of Testing
 
@@ -81,3 +81,22 @@ Involves actual users. Includes:
 ## Test-Driven Development
 
 Tests are written before the code. The tests function as the specification initially and then as the regression test suite.
+
+TDD cycle:
+
+1. Identify a small increment of functionality.
+2. Write an automated test that initially fails.
+3. Implement code to pass the test.
+4. Re-run all tests; refactor if needed.
+5. Move to the next increment.
+
+Benefits:
+
+- Code coverage  
+  Every code segment has at least one test.
+- Regression testing  
+  The incremental test suite prevents regressions.
+- Simplified debugging  
+  A failing test points directly to the new code.
+- Documentation  
+  Tests describe what the code should do.

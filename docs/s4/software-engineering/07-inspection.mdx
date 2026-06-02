@@ -6,7 +6,7 @@ slug: s4/software-engineering/inspection
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-05-29T16:59:06.245Z
+lastUpdatedOn: 2026-06-02T13:27:48.115Z
 ---
 
 Source code is examined without running the system for verification. Can be done early, even on incomplete systems. Static verification of the software.
@@ -16,3 +16,36 @@ May be applied to any representation of the system such as requirements, design,
 Can be done without additional cost. Can be done before the completion of implementation. Can uncover chain of errors.
 
 Cannot check for non-functional characteristics.
+
+## Inspection Checklist Areas
+
+Defects are looked for in these categories:
+
+- Data faults  
+  Uninitialized variables, wrong array bounds, type mismatches.
+- Control faults  
+  Incorrect conditions, missing break statements, infinite loops.
+- I/O faults  
+  Incorrect format specifiers, missing file closures.
+- Interface faults  
+  Wrong parameter types, incorrect counts, mismatched assumptions.
+- Storage management faults  
+  Unfreed memory, corrupt pointers.
+- Exception management faults  
+  Missing or wrong exception handlers.
+
+## Inspections vs Testing
+
+Inspections and testing are complementary; both should be used.
+
+Advantages of inspections:
+
+- A single inspection finds multiple errors; one test finds one at a time.
+- Incomplete versions of the system can be inspected.
+- Can check adherence to standards, portability, and maintainability.
+- Can be applied before implementation, to design and specification documents.
+
+Limitations:
+
+- Cannot check non-functional characteristics such as performance or usability.
+- Cannot confirm the system satisfies the user's real requirements, only the specification.
