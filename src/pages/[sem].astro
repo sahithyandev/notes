@@ -33,7 +33,12 @@ function moduleOrderFromFilePath(filePath: string | undefined): number {
   return m ? parseInt(m[1], 10) : Infinity;
 }
 
-type NoteItem = { slug: string; label: string; order: number; moduleOrder: number };
+type NoteItem = {
+  slug: string;
+  label: string;
+  order: number;
+  moduleOrder: number;
+};
 
 const grouped: Record<string, NoteItem[]> = {};
 allNotes.forEach((note) => {
