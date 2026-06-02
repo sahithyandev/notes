@@ -100,7 +100,9 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
 
     case "heading": {
       if (node.depth === 1) {
-        console.warn(`${c.yellow}warning:${c.reset} h1 found in ${ctx.baseDir}`);
+        console.warn(
+          `${c.yellow}warning:${c.reset} h1 found in ${ctx.baseDir}`,
+        );
       }
       const cmds = ["", "\\subsection", "\\subsubsection"];
       const cmd = cmds[Math.min((node.depth ?? 1) - 1, cmds.length - 1)];
@@ -416,7 +418,9 @@ export async function generateModulePdf(moduleId: string) {
   const titleLineHeight = Math.round(titleFontSize * 1.15);
 
   docLines.push(`\\definecolor{semaccent}{HTML}{${semColor}}`);
-  docLines.push("\\hypersetup{linkcolor=semaccent,urlcolor=semaccent,citecolor=semaccent}");
+  docLines.push(
+    "\\hypersetup{linkcolor=semaccent,urlcolor=semaccent,citecolor=semaccent}",
+  );
   docLines.push("\\begin{document}");
   docLines.push(
     "\\begin{titlepage}",
@@ -498,7 +502,10 @@ export async function generateModulePdf(moduleId: string) {
 
     if (lastNote !== noteName) {
       const rawName = title ?? titleize(noteName);
-      const shortenedName = rawName.replace(/^Introduction to .+$/i, "Introduction");
+      const shortenedName = rawName.replace(
+        /^Introduction to .+$/i,
+        "Introduction",
+      );
       const noteDisplayName = escapeTextForLatex(shortenedName);
       // Label uses the URL slug: last path segment of the file without numeric prefix
       const noteSlug = parts.at(-1)!.replace(".mdx", "").replace(/^\d+-/, "");
