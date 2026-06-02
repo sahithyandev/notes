@@ -234,6 +234,22 @@ async function compileMdxFile(filePath: string) {
   return mdNodetoLatex(tree, { baseDir: dirname(filePath) });
 }
 
+const c = {
+  reset: "\x1b[0m",
+  bold: "\x1b[1m",
+  dim: "\x1b[2m",
+  cyan: "\x1b[36m",
+  gray: "\x1b[90m",
+  yellow: "\x1b[33m",
+};
+const fmt = (ms: number) =>
+  ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${Math.round(ms)}ms`;
+const step = (label: string, ms?: number) =>
+  console.log(
+    `  ${c.dim}›${c.reset}  ${label.padEnd(30)}` +
+      (ms !== undefined ? `  ${c.gray}${fmt(ms)}${c.reset}` : ""),
+  );
+
 export async function generateModulePdf(moduleId: string) {
   const parts = moduleId.split("/");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
@@ -251,8 +267,9 @@ export async function generateModulePdf(moduleId: string) {
     throw new Error(`Non existent module: ${moduleId}`);
   }
 
-  console.log("generating PDF for", moduleId);
+  console.log(`${c.bold}${c.cyan}${moduleId}${c.reset}`);
 
+  const t0 = performance.now();
   const files = await readdir(modulePath, { recursive: true });
 
   const sortedFiles: Array<string> = new Array(files.length);
@@ -264,6 +281,8 @@ export async function generateModulePdf(moduleId: string) {
   }
   sortedFiles.splice(i);
   sortedFiles.sort();
+
+  step(`found ${sortedFiles.length} files`);
 
   const docLines = [
     "\\documentclass{book}",
@@ -365,6 +384,7 @@ export async function generateModulePdf(moduleId: string) {
   }
 
   // CONTENT
+  const tCompile = performance.now();
   for (const file of sortedFiles) {
     const parts = file.split("/");
     const hasSections = parts.length > 1;
@@ -393,6 +413,7 @@ export async function generateModulePdf(moduleId: string) {
     const compiled = await compileMdxFile(resolve(modulePath, file));
     docLines.push(compiled);
   }
+  step("compile mdx", performance.now() - tCompile);
 
   docLines.push("", "\\end{document}");
 
@@ -401,17 +422,29 @@ export async function generateModulePdf(moduleId: string) {
     moduleId.replace("/", "-").concat(".tex"),
   );
   const latexOutputFile = Bun.file(texOutputPath);
+  const tTex = performance.now();
   await latexOutputFile.write(docLines.join("\n"));
+  step(`write ${texOutputPath}`, performance.now() - tTex);
 
   await mkdir(".tmp/pdf", { recursive: true });
 
-  exec(
-    `tectonic --chatter minimal --outdir .tmp/pdf ${texOutputPath}`,
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error("tectonic failed:", stderr || stdout);
-        process.exit(1);
-      }
-    },
-  );
+  const tTectonic = performance.now();
+  await new Promise<void>((res, rej) => {
+    exec(
+      `tectonic --chatter minimal --outdir .tmp/pdf ${texOutputPath}`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(
+            `${c.yellow}tectonic failed:${c.reset}`,
+            stderr || stdout,
+          );
+          rej(error);
+        } else {
+          step("tectonic", performance.now() - tTectonic);
+          step(`total`, performance.now() - t0);
+          res();
+        }
+      },
+    );
+  });
 }
