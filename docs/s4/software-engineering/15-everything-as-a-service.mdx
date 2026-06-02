@@ -3,7 +3,7 @@ title: Everything as a Service
 sidebar:
   order: 15
 dateCreated: 2026-06-01T09:34:22.607Z
-lastUpdatedOn: 2026-06-01T18:49:04.775Z
+lastUpdatedOn: 2026-06-02T05:23:47.402Z
 slug: s4/software-engineering/everything-as-a-service
 prev: true
 next: true
@@ -37,7 +37,7 @@ The platform handles scaling, load balancing, patching, and availability automat
 
 Advantages:
 
-- Faster development   
+- Faster development  
   No infrastructure setup required.
 - Automatic scaling and patching managed by provider.
 - Reduced operational overhead, freeing developers to focus on application logic.
@@ -57,6 +57,7 @@ Examples: AWS Elastic Beanstalk, Google App Engine, Heroku, Azure App Service.
 Software product runs on provider's servers. Customers access remotely over the internet. Customers usually pay a subscription for the service.
 
 Releases are less painful because:
+
 - Customers do not have to explicitly update the software.
 - All customers are on the same version.
 
@@ -68,15 +69,15 @@ Customers get multi-device access, no upfront cost, immediate updates, reduced m
 
 Five primary concerns:
 
-- Local/remote processing   
+- Local/remote processing  
   Partition computation between client and server. Local execution reduces network traffic but increases client power consumption.
-- Authentication   
+- Authentication  
   Use provider-managed credentials, federated auth (delegating to the user's employer), or third-party identity providers.
-- Information leakage   
+- Information leakage  
   Multi-user systems risk cross-tenant data exposure. Requires careful security architecture.
-- Multi-tenant vs. multi-instance database   
+- Multi-tenant vs. multi-instance database  
   Fundamental architectural decision.
-- Customization   
+- Customization  
   Business customers may require custom authentication (federated auth), branding, business rules, data schemas, and access control models. Per-company profile objects wrap the central application so users interact through their organization's profile.
 
 ### Multi-tenant System
@@ -85,19 +86,20 @@ A system where a single database instance is used which is shared by all custome
 
 In the database, each record is tagged with a tenant identifier. Logical isolation is implemented at the access layer.
 
-Easier update management and central resource management for providers. 
+Easier update management and central resource management for providers.
 
 Provider controls and optimizes all resources centrally, a single codebase needs to be patched, and a single update propagates to all tenants simultaneously.
 
 Less customization options for tenants. 2 ways to implement customizations:
-- Extension fields   
+
+- Extension fields  
   Extra columns per table. Per-tenant profile maps extra columns to meanings. Does not scale well. Breaks [1NF of database](/s3/database-systems/basics/normalization#1st-normal-form-1nf). Increases query complexity.
-- Extension tables   
+- Extension tables  
   Field metadata is stored in one table per tenant. Field values are stored per record in a separate table. Increases query complexity.
 
 A breach affects all tenants simultaneously. Multi-user management logic has high potential for bugs. Single point of failure.
 
-Tenant data could be encrypted at rest to prevent cross-tenant exposure on failure or breach. 
+Tenant data could be encrypted at rest to prevent cross-tenant exposure on failure or breach.
 
 ### Multi-instance System
 
@@ -105,12 +107,11 @@ A system where each customer has a separate application and database instance. P
 
 2 types:
 
-- VM-based multi-instance   
+- VM-based multi-instance  
   One VM per customer. All users within that customer share one database.
-- Container-based multi-instance   
+- Container-based multi-instance  
   One container set per user. Isolated database per user. Suited to low-data-sharing workloads and individual users.
 
 No cross-tenant data leakage possible. Resource management per customer (or user). No single point of failure.
 
 Increased cost. Each instance must be updated separately which is complex for tailored instances.
-

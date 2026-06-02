@@ -22,7 +22,18 @@ const SEMESTER_COLORS: Record<string, string> = {
 };
 
 const CONNECTOR_WORDS = new Set([
-  "and", "or", "of", "the", "in", "for", "to", "a", "an", "at", "by", "with",
+  "and",
+  "or",
+  "of",
+  "the",
+  "in",
+  "for",
+  "to",
+  "a",
+  "an",
+  "at",
+  "by",
+  "with",
 ]);
 
 function groupTitleWords(title: string): string[] {
@@ -31,7 +42,10 @@ function groupTitleWords(title: string): string[] {
   let current: string[] = [];
   for (const word of words) {
     if (CONNECTOR_WORDS.has(word.toLowerCase())) {
-      if (current.length) { groups.push(current.join(" ")); current = []; }
+      if (current.length) {
+        groups.push(current.join(" "));
+        current = [];
+      }
       groups.push(word);
     } else {
       current.push(word);
@@ -48,7 +62,10 @@ const mdxParser = unified()
   .use(remarkGfm)
   .use(remarkMdx);
 
-interface RenderCtx { baseDir: string; inTableCell?: boolean }
+interface RenderCtx {
+  baseDir: string;
+  inTableCell?: boolean;
+}
 
 function children(node: MdNode, ctx: RenderCtx): string[] {
   return (node.children ?? []).map((c) => mdNodetoLatex(c, ctx));
@@ -85,12 +102,13 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
       return escapeTextForLatex(node.value ?? "");
 
     case "inlineMath":
-      return `$${(node.value ?? "").replace(/%/g, "\\%")}$`;
+      return `$${(node.value ?? "").replace(/(?<!\\)%/g, "\\%")}$`;
 
     case "math": {
-      const escaped = (node.value ?? "").replace(/%/g, "\\%");
+      const escaped = (node.value ?? "").replace(/(?<!\\)%/g, "\\%");
       const val = escaped.trimStart();
-      const standaloneEnvs = /^\\begin\{(equation|align|gather|multline|flalign|alignat)\*?\}/;
+      const standaloneEnvs =
+        /^\\begin\{(equation|align|gather|multline|flalign|alignat)\*?\}/;
       if (standaloneEnvs.test(val)) return val;
       return `\\[\n${escaped}\n\\]`;
     }
@@ -284,8 +302,17 @@ export async function generateModulePdf(moduleId: string) {
   const semesterNumber = moduleIdParts[0].charAt(1);
   const semColor = SEMESTER_COLORS[semesterNumber] ?? "3348c8";
 
-  const maxGroupLen = Math.max(...groupTitleWords(moduleName).map((g) => g.length));
-  const titleFontSize = maxGroupLen <= 12 ? 38 : maxGroupLen <= 18 ? 32 : maxGroupLen <= 24 ? 26 : 22;
+  const maxGroupLen = Math.max(
+    ...groupTitleWords(moduleName).map((g) => g.length),
+  );
+  const titleFontSize =
+    maxGroupLen <= 12
+      ? 38
+      : maxGroupLen <= 18
+        ? 32
+        : maxGroupLen <= 24
+          ? 26
+          : 22;
   const titleLineHeight = Math.round(titleFontSize * 1.15);
 
   docLines.push(`\\definecolor{semaccent}{HTML}{${semColor}}`);

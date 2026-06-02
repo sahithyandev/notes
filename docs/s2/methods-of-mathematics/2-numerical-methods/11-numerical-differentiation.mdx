@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/numerical-methods/numerical-differentiation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.594Z
-lastUpdatedOn: 2026-06-01T03:58:53.189Z
+lastUpdatedOn: 2026-06-02T05:23:47.401Z
 ---
 
 Approximate numerical formulae can be derived using [Taylor series](https://s1.sahithyan.dev/mathematics/real-analysis/taylor-series/).
@@ -85,8 +85,8 @@ $$
 
 $$
 f^{(2)}(x_0) =
-\frac{1}{h^2} \Big[ f(x_0 + h) - 2f(x_0) + f(x_0 - h) \Big]
-+ O(h^2)
+\frac{1}{h^2} \Big[ f(x_0 + h) - 2f(x_0) + f(x_0 - h) \Big]+
+O(h^2)
 $$
 
 ## Higher Order Derivatives
@@ -97,28 +97,25 @@ For $n$-th derivative, Taylor series is truncated after $n^{\text{th}}$ derivati
 
 $$
 f^{(n)}(x)
-=
-\frac{1}{h^n}
-\sum_{i=0}^{n} (-1)^{n-i} \binom{n}{i} f(x + ih)
-+ O(h)
+=\frac{1}{h^n}
+\sum_{i=0}^{n} (-1)^{n-i} \binom{n}{i} f(x + ih)+
+O(h)
 $$
 
 ### n-th backward difference formula
 
 $$
-f^{(n)}(x) =
-\frac{1}{h^n}
-\sum_{i=0}^{n} (-1)^i \binom{n}{i} f(x - ih)
-+ O(h)
+f^{(n)}(x)=\frac{1}{h^n}
+\sum_{i=0}^{n} (-1)^i \binom{n}{i} f(x - ih)+
+O(h)
 $$
 
 ### n-th centered difference formula
 
 $$
-f^{(n)}(x)=
-\frac{1}{h^n}
-\sum_{i=0}^{n} (-1)^i \binom{n}{i} f\left(x + \left(\frac{n}{2} - i\right)h\right)
-+ O(h^2)
+f^{(n)}(x)=\frac{1}{h^n}
+\sum_{i=0}^{n} (-1)^i \binom{n}{i} f\left(x + \left(\frac{n}{2} - i\right)h\right)+
+O(h^2)
 $$
 
 ## Accuracy
@@ -127,7 +124,6 @@ The accuracy of these divided difference formulas can be increased by including 
 
 $$
 f'(x_0) =
-
 \frac{1}{h} \left[
 -\frac{3}{2}
 f(x_0)

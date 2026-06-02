@@ -3,7 +3,7 @@ title: Cloud-based Software
 sidebar:
   order: 16
 dateCreated: 2026-06-01T09:34:22.607Z
-lastUpdatedOn: 2026-06-01T18:49:04.776Z
+lastUpdatedOn: 2026-06-02T05:23:47.402Z
 slug: s4/software-engineering/cloud-based-software
 prev: true
 next: true
@@ -33,11 +33,11 @@ These three inform the cloud platform selection.
 
 Choosing DB organization — decision factors:
 
-| Factor               | Favors multi-instance if…                                                    |
-| -------------------- | ---------------------------------------------------------------------------- |
-| Target customers     | Customers need different schemas or have DB-sharing security objections.     |
-| Transactions         | ACID guarantees required at strong consistency.                              |
-| DB size/connectivity | Many different customer schemas; complex inter-schema data transfer.         |
+| Factor               | Favors multi-instance if…                                                   |
+| -------------------- | --------------------------------------------------------------------------- |
+| Target customers     | Customers need different schemas or have DB-sharing security objections.    |
+| Transactions         | ACID guarantees required at strong consistency.                             |
+| DB size/connectivity | Many different customer schemas; complex inter-schema data transfer.        |
 | System structure     | Service-oriented architecture in use: use containerized multi-instance DBs. |
 
 Multi-tenant preferred for very large, uniform databases where optimization effort is centralized.
@@ -61,6 +61,7 @@ Resilience via redundancy:
 ### Software Structure
 
 #### Monolithic Architecture
+
 Large components, shared database, client-server model. Traditional multi-tier structure.
 
 #### Microservices Architecture
