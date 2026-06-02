@@ -18,11 +18,12 @@ function fmt(ms: number): string {
   return ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${Math.round(ms)}ms`;
 }
 
-function getAllModuleIds(): string[] {
+function getAllModuleIds(semFilter?: string): string[] {
   const docsPath = resolve("./docs");
   const semesters = readdirSync(docsPath, { withFileTypes: true })
     .filter((d) => d.isDirectory() && !d.name.includes(".obsidian"))
-    .map((d) => d.name);
+    .map((d) => d.name)
+    .filter((s) => !semFilter || s === semFilter);
 
   return semesters
     .flatMap((sem) =>
@@ -41,8 +42,10 @@ function getAllModuleIds(): string[] {
 (async () => {
   const args = process.argv.slice(2);
 
-  if (args.includes("--all")) {
-    const moduleIds = getAllModuleIds();
+  const semGlob = args[0]?.match(/^(s\d+)\/\*$/)?.[1];
+
+  if (args.includes("--all") || semGlob) {
+    const moduleIds = getAllModuleIds(semGlob);
     console.log(
       `${c.bold}${c.cyan}pdf-generator${c.reset}  generating ${c.bold}${moduleIds.length}${c.reset} modules in parallel\n`,
     );
