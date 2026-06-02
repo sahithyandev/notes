@@ -1,428 +1,109 @@
 ---
-title: Software Proces
+title: Software Process
 slug: s4/software-engineering/software-process
 prev: true
 next: true
 sidebar:
   order: 2
 dateCreated: 2026-04-23T17:39:39.630Z
-lastUpdatedOn: 2026-06-02T13:27:48.112Z
+lastUpdatedOn: 2026-06-02T14:01:11.162Z
 ---
 
-A structured set of activities required to develop a
-software system.
+A structured set of activities required to develop a software system.
 
-### Core activities
+Core activities:
 
-- Specification – defining what the system should do
-- Design and implementation – designing and coding the system
-- Validation – checking the system meets requirements
-- Evolution – changing the system to meet new needs
+- Specification  
+  Defining what the system should do.
+- Design and implementation  
+  Designing and coding the system.
+- Validation  
+  Checking the system meets requirements.
+- Evolution  
+  Changing the system to meet new needs.
 
-These activities cannot be rearranged as they depend on each other.
+These activities depend on each other and cannot be reordered.
 
 ## Types
 
-### Plan driven
+### Plan-driven
 
-Based on assumptions.
-
-- All activities planned in advance
-- Progress measured against the plan
+- All activities planned in advance.
+- Progress measured against the plan.
 
 ### Agile
 
-- Incremental planning
-- Easier to accommodate changing requirements
+- Incremental planning.
+- Easier to accommodate changing requirements.
 
-More flexible than plan-driven.
+A combination of both is used in practice.
 
-A combination of both models are used in real life.
+## Process Descriptions
 
-## Software Process Model
+Process descriptions explain what activities are done and in what order.
 
-An **abstract representation** of a software process from a particular
-perspective.
+Components:
 
-### The Waterfall Model
+- Activities  
+  e.g., UI design, data modeling.
+- Products  
+  Outputs of activities: documents, code, models.
+- Roles  
+  Responsibilities of people involved.
+- Pre/post-conditions  
+  Conditions before and after each activity.
 
-A plan-driven model with clearly separated phases.
+## Coping with Change
 
-#### Phases
+Change is driven by business changes, new technologies, and platform changes. Cost = rework + implementation effort.
 
-1. Requirements analysis and definition
-2. System and software design
-3. Implementation and unit testing
-4. Integration and system testing
-5. Operation and maintenance
+Two strategies to reduce rework costs:
 
-### Major drawback
+- Change avoidance  
+  Anticipate change early using prototyping.
+- Change tolerance  
+  Design the process to allow low-cost changes; incremental development supports this.
 
-- Difficult to accommodate changes once development has started
-
-### Suitable when
-
-- Requirements are well understood
-- Changes are minimal
-- Large, distributed system projects
-
-### Incremental Development
-
-Development is done in small increments with feedback (using waterfall model) at each stage.
-
-### Key characteristics
-
-- Specification, development, and validation are interleaved
-- Each increment delivers working software
-
-### Benefits
-
-- Lower cost of change
-- Early customer feedback
-- Faster delivery of useful software
-
-### Problems
-
-- Process visibility is low
-- System structure may degrade without refactoring
-
-## 2. Software Process Descriptions
-
-### Introduction
-
-Process descriptions explain _what activities are done_ and _in what order_.
-
-### Process descriptions include
-
-- **Activities** – e.g., UI design, data modeling
-- **Products** – outputs of activities (documents, code, models)
-- **Roles** – responsibilities of people involved
-- **Pre-conditions / Post-conditions** – conditions before and after activities
-
-## 7. Reuse-Oriented Software Engineering
-
-### Definition
-
-Systems are built by integrating **existing components** or **COTS systems**.
-
-### Process stages
-
-- Component analysis
-- Requirements modification
-- System design with reuse
-- Development and integration
-
-### Types of reusable components
-
-- Web services
-- Component packages (e.g., .NET, J2EE)
-- Stand-alone COTS systems
-
----
-
-## 8. Process Activities
-
-### Introduction
-
-Real processes mix technical, collaborative, and managerial activities.
-
-### Four fundamental activities
-
-- Specification
-- Development
-- Validation
-- Evolution
-
-### Organization
-
-- Sequential in waterfall
-- Interleaved in incremental processes
-
----
-
-## 9. Software Specification
-
-### Definition
-
-The process of establishing system services and operational constraints.
-
-### Requirements engineering stages
-
-- **Feasibility study** – technical and financial viability
-- **Requirements elicitation and analysis** – stakeholder needs
-- **Requirements specification** – detailed definition
-- **Requirements validation** – checking correctness
-
----
-
-## 10. Software Design and Implementation
-
-### Design
-
-Defines the structure that realizes the specification.
-
-### Implementation
-
-Transforms the design into executable code.
-
-### Key point
-
-Design and implementation are **closely related** and often interleaved.
-
----
-
-## 11. Design Activities
-
-### Major activities
-
-- **Architectural design** – overall structure and subsystems
-- **Interface design** – interactions between components
-- **Component design** – internal behavior of components
-- **Database design** – data structures and storage
-
----
-
-## 12. Software Validation
-
-### Definition
-
-Verification and validation (V&V) ensure the system meets specifications and
-customer needs.
-
-### Validation methods
-
-- Reviews and inspections
-- System testing
-
-### Testing is the **most common** V&V activity.
-
----
-
-## 13. Stages of Testing
-
-### Development (Component) Testing
-
-- Individual components tested independently
-
-### System Testing
-
-- Entire system tested
-- Emergent properties checked
-
-### Acceptance Testing
-
-- Testing with customer data
-- Confirms system meets user needs
-
----
-
-## 14. Software Evolution
-
-### Introduction
-
-Software must change to remain useful.
-
-### Key points
-
-- Business and technology changes drive evolution
-- Development and maintenance are increasingly blurred
-- Most systems evolve rather than being completely new
-
----
-
-## 15. Coping with Change
-
-### Why change occurs
-
-- Business changes
-- New technologies
-- Platform changes
-
-### Cost of change
-
-- Rework + implementation effort
-
----
-
-## 16. Reducing Rework Costs
-
-### Change avoidance
-
-- Anticipate change early (e.g., prototyping)
-
-### Change tolerance
-
-- Design process to allow low-cost changes
-- Incremental development supports this
-
----
-
-## 17. Software Prototyping
-
-### Definition
+## Software Prototyping
 
 A prototype is an initial system version used to explore ideas and requirements.
 
-### Uses
+Uses:
 
 - Requirements elicitation and validation
 - UI and design exploration
 - Testing experiments
 
-### Benefits
+Benefits:
 
 - Better usability
 - Closer match to user needs
 - Reduced development effort
 
----
+Prototypes should **not** evolve into production systems: they have poor non-functional qualities, lack documentation, and degraded structure.
 
-## 18. Throw-Away Prototypes
+## Incremental Delivery
 
-### Key idea
+System delivered in multiple increments instead of one release. High-priority requirements are delivered first; requirements are frozen per increment.
 
-Prototypes should **not** evolve into production systems.
-
-### Reasons
-
-- Poor non-functional qualities
-- Lack of documentation
-- Degraded structure
-- Do not meet quality standards
-
----
-
-## 19. Incremental Delivery
-
-### Definition
-
-System is delivered in multiple increments instead of one release.
-
-### Key features
-
-- High-priority requirements delivered first
-- Requirements frozen per increment
-
-### Advantages
+Advantages:
 
 - Early customer value
 - Lower project risk
 - Better testing of critical features
 
-### Problems
+Problems:
 
-- Hard to identify common system facilities
-- Conflicts with fixed-specification contracts
+- Hard to identify common system facilities.
+- Conflicts with fixed-specification contracts.
 
----
+## Software Evolution
 
-## 20. Boehm’s Spiral Model
+Software must change to remain useful. The majority of software budget in large companies is devoted to evolving existing software, not developing new software.
 
-### Introduction
-
-A risk-driven iterative process model.
-
-### Characteristics
-
-- Represented as a spiral
-- Each loop is a process phase
-- Risks explicitly identified and reduced
-
-### Spiral sectors
-
-- Objective setting
-- Risk assessment and reduction
-- Development and validation
-- Planning
-
-### Exam note
-
-Influential conceptually, but rarely used exactly as defined.
-
----
-
-## 21. Rational Unified Process (RUP)
-
-### Introduction
-
-A modern generic process combining major process models.
-
-### Perspectives
-
-- **Dynamic** – phases over time
-- **Static** – workflows and activities
-- **Practice** – recommended best practices
-
----
-
-## 22. RUP Phases
-
-### Inception
-
-- Establish business case
-
-### Elaboration
-
-- Understand problem and architecture
-
-### Construction
-
-- Design, coding, and testing
-
-### Transition
-
-- Deployment to users
-
-### Iteration
-
-- Within phases
-- Across phases
-
----
-
-## 23. Static Workflows in RUP
-
-### Core workflows
-
-- Business modeling
-- Requirements
-- Analysis and design
-- Implementation
-- Testing
-- Deployment
-
-### Supporting workflows
-
-- Configuration and change management
-- Project management
-- Environment setup
-
----
-
-## 24. RUP Good Practices
-
-### Key practices
-
-- Iterative development
-- Requirements management
-- Component-based architecture
-- Visual modeling using UML
-- Quality verification
-- Controlled change management
-
----
-
-## 25. Final Key Points (Exam Focus)
-
-- Software processes define how systems are built.
-- Waterfall, incremental, and reuse-oriented models are fundamental.
-- Change is inevitable and must be managed.
-- Prototyping and incremental delivery reduce risk.
-- RUP is a modern, structured, iterative process model.
-
-## Software Evolution in Practice
-
-The majority of software budget in large companies is devoted to changing and evolving existing software, not developing new software.
+- Business and technology changes drive evolution.
+- Development and maintenance are increasingly blurred.
+- Most systems evolve rather than being completely new.
 
 ### Life-Cycle Stages
 
@@ -444,26 +125,26 @@ The majority of software budget in large companies is devoted to changing and ev
 
 ### Lehman's Laws of Software Evolution
 
-| Law                         | Description                                                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Continuing Change           | A program in real-world use must change or become progressively less useful.                                       |
-| Increasing Complexity       | As a program evolves, its structure becomes more complex; extra resources needed to preserve simplicity.           |
-| Large Program Evolution     | Program evolution is self-regulating: size, release intervals, and errors are approximately invariant per release. |
-| Organizational Stability    | Development rate is approximately constant over lifetime, independent of resources devoted.                        |
-| Conservation of Familiarity | Incremental change in each release is approximately constant over lifetime.                                        |
-| Continuing Growth           | Functionality must continually increase to maintain user satisfaction.                                             |
-| Declining Quality           | Quality declines unless the system is modified to reflect changes in the operational environment.                  |
-| Feedback System             | Evolution processes are multiagent, multiloop feedback systems.                                                    |
+| Law | Description |
+| --- | --- |
+| Continuing Change | A program in real-world use must change or become progressively less useful. |
+| Increasing Complexity | As a program evolves, its structure becomes more complex; extra resources needed to preserve simplicity. |
+| Large Program Evolution | Program evolution is self-regulating: size, release intervals, and errors are approximately invariant per release. |
+| Organizational Stability | Development rate is approximately constant over lifetime, independent of resources devoted. |
+| Conservation of Familiarity | Incremental change in each release is approximately constant over lifetime. |
+| Continuing Growth | Functionality must continually increase to maintain user satisfaction. |
+| Declining Quality | Quality declines unless the system is modified to reflect changes in the operational environment. |
+| Feedback System | Evolution processes are multiagent, multiloop feedback systems. |
 
-### Reengineering
+## Reengineering
 
 Re-structuring or rewriting part or all of a legacy system without changing its functionality. Applied after maintenance costs have risen. Uses automated tools. Lower risk and cost than full redevelopment.
 
-### Refactoring
+## Refactoring
 
 Continuous improvement throughout development and evolution. Slows structural degradation without adding functionality.
 
-Common "bad smells" that prompt refactoring:
+Common bad smells that prompt refactoring:
 
 - Duplicate code
 - Long methods
@@ -471,11 +152,11 @@ Common "bad smells" that prompt refactoring:
 - Data clumping
 - Speculative generality
 
-### Legacy System Strategy
+## Legacy System Strategy
 
-| Quality | Business Value | Strategy                         |
-| ------- | -------------- | -------------------------------- |
-| Low     | Low            | Scrap the system                 |
-| Low     | High           | Re-engineer or replace           |
-| High    | Low            | Replace with COTS or scrap       |
-| High    | High           | Continue with normal maintenance |
+| Quality | Business Value | Strategy |
+| ------- | -------------- | -------- |
+| Low | Low | Scrap the system |
+| Low | High | Re-engineer or replace |
+| High | Low | Replace with COTS or scrap |
+| High | High | Continue with normal maintenance |
