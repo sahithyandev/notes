@@ -121,6 +121,7 @@ function buildModuleRedirects() {
 
 // https://astro.build/config
 export default defineConfig({
+  output: "server",
   redirects: buildModuleRedirects(),
   integrations: [mdx(), linkValidator()],
   markdown: {
@@ -142,5 +143,9 @@ export default defineConfig({
       },
     },
   },
-  adapter: vercel(),
+  adapter: vercel({
+    isr: {
+      expiration: 60 * 60 * 24, // 24 hours default; per-page revalidate overrides this
+    },
+  }),
 });
