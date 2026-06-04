@@ -156,6 +156,18 @@ async function getSidebarData(currentSlug: string) {
     if (currentIndex < moduleNotes.length - 1) {
       nextNote = moduleNotes[currentIndex + 1];
     }
+  } else if (slugParts.length === 3) {
+    const directNotes = currentSubjectTree.direct;
+    const currentIndex = directNotes.findIndex(
+      (note) => note.slug === currentSlug,
+    );
+
+    if (currentIndex > 0) {
+      prevNote = directNotes[currentIndex - 1];
+    }
+    if (currentIndex < directNotes.length - 1) {
+      nextNote = directNotes[currentIndex + 1];
+    }
   }
 
   // Build semester switcher list: each semester -> first note slug
@@ -538,7 +550,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       />
 
       {
-        notesEntry.data.prev || notesEntry.data.next ? (
+        sidebarData.prevNote || sidebarData.nextNote ? (
           <div class="note-nav">
             {sidebarData.prevNote && (
               <a
