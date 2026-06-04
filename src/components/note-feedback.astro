@@ -87,11 +87,21 @@ const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
       });
     }
 
-    // Restore prior vote highlight from localStorage (counts are server-rendered)
+    // Restore prior vote highlight from localStorage
     const stored = localStorage.getItem(storageKey);
     if (stored === "1" || stored === "-1") {
       markActive(Number(stored));
     }
+
+    // Fetch live counts on load (static build bakes in stale zeros)
+    fetch(`/api/votes?slug=${encodeURIComponent(slug)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && typeof data.up === "number") {
+          scoreEl.textContent = String(data.up - data.down);
+        }
+      })
+      .catch(() => {});
 
     btns.forEach((btn) => {
       btn.addEventListener("click", () => {
