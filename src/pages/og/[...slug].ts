@@ -78,7 +78,6 @@ for (const entry of entries) {
 }
 
 for (const semester of semesters) {
-  console.log(`sem-${semester.slice(1)}`);
   pages[`sem-${semester.slice(1)}`] = {
     data: {
       title: `Semester ${semester.slice(1)}`,

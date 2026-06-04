@@ -6,34 +6,231 @@ slug: s4/computer-networks/data-link-layer
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-06-04T14:41:47.356Z
+lastUpdatedOn: 2026-06-04T19:53:54.362Z
+prereqs:
+  - s3/data-communication-and-networking/information-redundancy
+  - s3/data-communication-and-networking/mac-protocols
 ---
 
-Layer 2 of the OSI model. Handles data communication through a single link, between adjacent nodes.
+Layer 2 of the OSI model. Handles data communication through a single link between adjacent nodes.
 
-Handles synchronisation, error control, flow control, data compression, and encryption. For shared media, it also manages media access control and logical link control.
+The bit stream arriving at the receiver is continuous.
+
+Responsibilities:
+
+- Data compression
+- Encryption
+- Media access control (shared media)
+- Logical link control (shared media)
 
 ## Synchronisation
 
-Identifies the start and end of data units. Can be fixed-length (bytes or cells) or variable-length (frames). Frames encapsulate network-layer packets and are delimited by character count, character-oriented (STX/ETX), or bit-oriented (flag sequences) methods. Byte stuffing and bit stuffing prevent flag patterns from appearing in data.
+The mechanism by which the receiver locates the boundaries of each data unit within that stream. Data units are either fixed-length (bytes or cells) or variable-length (frames).
+
+Frames wrap network-layer packets. The receiver must detect frame boundaries. 3 delimiting methods.
+
+### Character count
+
+Frame begins with a length prefix. Receiver reads that many bytes. If that's corrupted, the receiver loses synchronisation.
+
+### Character-oriented
+
+Special control characters such as Start of Text (STX) and End of Text (ETX) are used.
+
+Byte stuffing is done to avoid flag patterns from appearing inside frame data. Before transmission, sender scans the payload and insert escape characters before any occurence of control or escape characters.
+
+### Bit-oriented
+
+Special flag bit pattern defines the boundary.
+
+Bit stuffing is done to avoid flag bit patterns occurring in the payload. Before transmission, sender scans the payload and insert escape sequences before any occurence of the special flag sequence.
 
 ## Error Control
 
-Physical transmission causes missing, inserted, or changed bits, often in bursts. Detection methods include parity, checksum, and CRC — all have residual error rates.
+Physical transmission causes missing, inserted, or changed bits, often in bursts.
 
-Correction approaches:
+### Parity
 
-- Forward Error Correction — adds redundancy to recover data without retransmission; suits simplex links, CDs, high-latency or low-latency-sensitive streams like voice/video
-- ARQ — either idle (stop-and-wait, low link utilisation) or continuous (sliding window using V(S)/V(R) counters, with Go-Back-N or Selective Reject on errors)
+Covered in [Information Redundancy](/s3/data-communication-and-networking/information-redundancy).
+
+### Checksum
+
+The data is divided into fixed-size segments (typically 16-bit words).
+
+Sender:
+
+1. Sum all segments using one's complement addition.
+2. Take the one's complement of the result to produce the checksum.
+3. Append the checksum to the data.
+
+Receiver:
+
+1. Sum all received segments including the checksum using one's complement addition.
+2. A result of all 1-bits (i.e. $\text{0xFFFF}$) indicates no error.
+
+One's complement addition wraps any carry out of the most significant bit back into the least significant bit (end-around carry). In two's complement the carry is discarded; here it feeds back in, which preserves the all-1-bits invariant at the receiver.
+
+Example with 8-bit words $\text{0xB2}$ + $\text{0xD4}$:
+
+```
+  1011 0010   (0xB2)
++ 1101 0100   (0xD4)
+-----------
+1 1000 0110   ← carry out
++          1  ← wrap carry back in
+-----------
+  1000 0111   (0x87)
+```
+
+Swapping 2 segments cancels out and goes undetected.
+
+### CRC
+
+Short for Cyclic Redundancy Check. The data block is treated as a polynomial $M(x)$. A generator polynomial $G(x)$ of degree $r$ is agreed on by both sides.
+
+The sender appends $r$ zeros to $M(x)$, divides by $G(x)$ using modulo-2 arithmetic, and replaces the zeros with the remainder $R(x)$. The transmitted frame $T(x) = M(x) \cdot x^r + R(x)$ is exactly divisible by $G(x)$.
+
+The receiver divides the received frame by $G(x)$. A non-zero remainder signals an error.
+
+Detects:
+
+- All single-bit errors
+- All double-bit errors (for suitable $G(x)$)
+- All odd number of errors (if $G(x)$ contains $(x+1)$ as a factor)
+- All burst errors of length $\leq r$
+
+### Forward Error Correction
+
+Enough redundancy is added so the receiver reconstructs correct data without retransmission.
+
+[Hamming distance](/s3/data-communication-and-networking/information-redundancy) between two codewords: number of bit positions where they differ. A code with minimum Hamming distance $d$:
+
+- Detects up to $d-1$ errors
+- Corrects up to $\big\lfloor \frac{d-1}{2} \big\rfloor$ errors
+
+[Hamming code](/s3/data-communication-and-networking/information-redundancy) is covered in Information Redundancy. Given $r$ redundant bits, up to $2^r - r - 1$ data bits can be protected.
+
+Suited to simplex links, storage media, and latency-sensitive streams where retransmission is impractical.
+
+### ARQ
+
+Short for Automatic Repeat reQuest. The receiver detects errors and requests retransmission. Requires a duplex link.
+
+Sender and receiver maintain send and receive windows. Window state is tracked with sequence number counters $V(S)$ and $V(R)$ (for send and receive).
+
+#### Stop-and-Wait ARQ
+
+Aka. idle ARQ. Window size 1 in both directions. Sender transmits one frame then waits for ACK (Acknowledgement) or NAK (Negative Acknowledgement) before sending the next.
+
+- ACK received: advance $V(S)$, send next frame.
+- NAK or timeout: retransmit current frame.
+
+Link is idle for the full propagation round-trip per frame.
+
+#### Go-Back-N ARQ
+
+Sender window size $W_s = 2^n - 1$. Receiver window size $W_r = 1$.
+
+Sender transmits up to $W_s$ frames without waiting. On error or timeout, the sender retransmits the errored frame and all subsequent frames, regardless of whether those later frames arrived correctly.
+
+The receiver discards all frames received after a gap; it only accepts in-order frames.
+
+Wasteful when errors are infrequent (as infrequent errors cause a huge number of correct frames to be discarded). Wastage increases with increased sender window size.
+
+#### Selective Reject ARQ
+
+Sender window size $W_s \leq 2^{n-1}$; receiver window size $W_r = W_s$.
+
+Only the specific errored frame is retransmitted. The receiver buffers out-of-order frames and delivers them in sequence once the gap is filled.
+
+More efficient than Go-Back-N. Requires more receiver buffer memory.
+
+Go-Back-N ARQ and Selective Reject ARQ are continuous ARQ typed.
 
 ## Flow Control
 
-Managed in-band via X-ON/X-OFF, out-of-band via RTS/CTS, or through sliding window size manipulation.
+Prevents a fast sender from overwhelming the receiver's buffer. Different methods exist for receiver to signal sender when to pause and resume.
+
+### In-band
+
+Control signals travel within the same channel as the data. X-OFF (ASCII DC3, `0x13`) pauses the sender; X-ON (ASCII DC1, `0x11`) resumes it. Ambiguous if the payload contains these bytes.
+
+### Out-of-band
+
+Control signals travel on a separate channel, outside the data stream. Sender asserts Request To Send (RTS). Receiver asserts Clear To Send (CTS) when buffer space is available. No ambiguity with payload content.
+
+### Sliding window
+
+The window is the range of sequence numbers the sender may use without waiting for acknowledgement. Its size equals the maximum number of unacknowledged frames allowed in flight at once.
+
+The receiver advertises its current window size based on available buffer space. The sender may slow down as receiver's window size reduces. The sender may not transmit frames beyond the advertised window. Advertising a window size of 0 halts the sender completely.
 
 ## Medium Access Control
 
-Primary/secondary systems use polling (stop-and-wait or ARQ) or non-polling methods (RTS/CTS, TDMA). TDMA assigns time-slots via a master reference station.
+Coordinates access to a shared transmission medium among multiple nodes.
 
-Peer-to-peer systems include TDM (pre-assigned slots), ALOHA (transmit freely, detect and retry on collision), CSMA (listen before transmitting), CSMA/CD (abort on detected collision, wait random time before retry), collision-free carrier sense (timer/arbiter logic), Token Ring (pass a token; hold it to transmit, release after), and Token Bus (virtual ring over a physical bus).
+### Primary/Secondary
 
-Token Ring is fairer and more efficient than CSMA/CD under heavy load but adds complexity and token-wait delays.
+One node (aka. primary node) controls the medium. Other nodes (aka. secondary nodes) transmit only when permitted.
+
+- Polling  
+  Primary node explicitly invites each secondary node to transmit in turn. Uses stop-and-wait or ARQ.
+- Non-polling  
+  Secondary node requests permission to transmit. Primary grants it via RTS/CTS or assigns slots via TDMA.
+
+### Peer-to-Peer
+
+All nodes have equal status.
+
+#### TDM
+
+Time divided into fixed slots, one pre-assigned per node. No collisions. Bandwidth wasted when a node has nothing to send.
+
+#### ALOHA
+
+Nodes transmit without sensing the medium. Collision detected via missing or corrupt ACK; sender waits a random backoff and retransmits.
+
+Slotted ALOHA restricts transmission to slot boundaries, halving the collision window relative to pure ALOHA.
+
+Performance degrades with high traffic.
+
+#### CSMA
+
+Short for Carrier Sense Multiple Access. Node senses the medium before transmitting; waits if busy.
+
+Collisions still possible due to propagation delay. 2 nodes may sense idle simultaneously and both transmit.
+
+3 persistence strategies:
+
+- 1-persistent  
+  Transmit immediately when medium becomes idle.
+- Non-persistent  
+  Wait a random time before re-sensing if medium is busy.
+- $p$-persistent  
+  Transmit with probability $p$ when idle.
+
+#### CSMA/CD
+
+Short for Carrier Sense Multiple Access with Collision Detection. Extends CSMA: node monitors the channel while transmitting.
+
+On detecting a collision, aborts and broadcasts a jam signal, then waits a random backoff before retrying. Backoff interval doubles per successive collision (binary exponential backoff).
+
+Used in Ethernet (IEEE 802.3). Not usable on wireless links where a transmitting node cannot simultaneously receive.
+
+#### Collision-free carrier sense
+
+Eliminates collisions rather than recovering from them. Nodes claim transmission rights in a controlled, contention-free order via a timer or arbiter. No collisions.
+
+#### Token Ring
+
+A token (special bit pattern) circulates around a logical ring of nodes. A node captures the free token to transmit; releases it once done.
+
+Deterministic access with a bounded wait per ring-traversal period.
+
+More fairer and efficient than CSMA/CD under heavy load. Adds complexity and token-wait delays.
+
+#### Token Bus
+
+Logical token-passing ring overlaid on a physical bus. Token passed among nodes in a predetermined order, independent of physical position.
+
+Combines Token Ring determinism with bus physical simplicity.
