@@ -78,7 +78,8 @@ for (const entry of entries) {
 }
 
 for (const semester of semesters) {
-  pages[semester] = {
+  console.log(`sem-${semester.slice(1)}`);
+  pages[`sem-${semester.slice(1)}`] = {
     data: {
       title: `Semester ${semester.slice(1)}`,
       slug: semester,
@@ -114,7 +115,7 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       };
     }
 
-    // Handle semester-specific OG images (e.g., s1, s2)
+    // Handle semester-specific OG images (e.g., sem-s1, sem-s2)
     if (page.data.slug.match(/^s\d$/)) {
       const colors = semesterColors[page.data.slug] || semesterColors.s1;
       const semesterNum = page.data.slug.replace("s", "");
