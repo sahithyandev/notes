@@ -6,7 +6,7 @@ slug: s4/computer-networks/network-design
 prev: true
 next: true
 dateCreated: 2026-05-03T09:06:32.051Z
-lastUpdatedOn: 2026-05-31T15:06:59.388Z
+lastUpdatedOn: 2026-06-04T20:58:06.730Z
 ---
 
 The process of planning and structuring communication infrastructure. Driven by business goals, security requirements, and traffic behaviour.
@@ -70,77 +70,90 @@ The networking equipment becomes outdated in ~3 years. Cables last longer. If st
 
 ## Design Strategies
 
-### Function (Application) Based Design
+### Function-Based Design
 
-Aka. **business-IT alignment based design.**
+Also called business-IT alignment-based design.
 
-Align IT infrastructure to business applications and data.
+Aligns IT infrastructure to business applications and data.
 
 Key layers:
 
 - Business drivers → business apps & data → servers → storage.
-- IT environment includes: data centre, security, systems management, disaster recovery, IT organization and processes.
+- IT environment: data centre, security, systems management, disaster recovery, IT organization and processes.
 
-<Note>
-  Different organization types require different network forms — driven by their
-  application and data profiles.
-</Note>
+Different organization types require different network forms, driven by their application and data profiles.
 
-### Security Based Design
+### Security-Based Design
 
 Addresses threats at multiple levels.
 
-**Threat types:**
+Threat types:
 
-- Physical threats.
-- Network-based threats.
+- Physical.
+- Network-based.
 
-**Access policies:**
+Access policies:
 
-- _Limited access (imposed)_ — proxies, NAT. Also mitigates IP address depletion.
-- _Privileged access_ — VPNs; user/role-based access (directors, managers, third parties).
+- Limited access (imposed)  
+  Proxies, NAT. Also mitigates IP address depletion.
+- Privileged access  
+  VPNs; user/role-based access (directors, managers, third parties).
 
-**Critical node protection:**
+Critical node protection:
 
 - Server farms, VLANs.
-- Firewalls, **IDS** (Intrusion Detection Systems), **IDP** (Intrusion Detection and Prevention).
+- Firewalls, IDS (Intrusion Detection Systems), IDP (Intrusion Detection and Prevention).
 
-**Application-level communications:**
+Application-level communications:
 
 - Multi-tier architectures.
-- Mail relays, DNS servers, **AAA servers**.
-- Applications lacking SSL or cryptography support → isolate → additional subnets and firewall interfaces.
+- Mail relays, DNS servers, AAA servers.
+- Applications lacking SSL or cryptography support: isolate with additional subnets and firewall interfaces.
 
-### Topology (Technology/Protocol) Based Design
+### Topology-Based Design
 
 Network type selection based on constraints.
 
-- Covers: LANs, WLANs, WANs.
-- Factors: speed differences, technology differences, budgetary constraints, environmental constraints.
+Technologies covered:
 
-**Extended networks:**
+- LAN  
+  High-speed, short-range. Ethernet, Wi-Fi.
+- WLAN  
+  Wireless extension of LAN; hot-spots, office coverage.
+- WAN  
+  Long-range, lower speed, higher latency. Leased lines, MPLS, public internet.
 
-- VPNs and tunnels — security over WANs; LAN extension.
-- **PPTP** — Point-to-Point Tunnelling Protocol.
-- **L2TP** — Layer 2 Tunnelling Protocol.
+Selection factors:
 
-### Traffic Based Design
+- Speed requirements.
+- Technology availability.
+- Budgetary constraints.
+- Environmental constraints (physical layout, interference).
+
+Extended networks:
+
+- VPNs and tunnels  
+  Security over WANs; LAN extension.
+- PPTP  
+  Point-to-Point Tunnelling Protocol.
+- L2TP  
+  Layer 2 Tunnelling Protocol.
+
+### Traffic-Based Design
 
 Network behaviour under load.
 
-- **Queuing** — priority traffic handling; congestion avoidance.
-- Application delay tolerance — must be assessed per application.
-- **Switching** — wire-speed switching requirements.
-- **Load balancing** — distributes traffic; depends on server capability.
-- **Redundant paths** — reliability and availability.
-- **QoS** — latency, throughput parameters.
-- Medium trade-offs — satellite vs. fibre optics.
-
-## Summary
-
-- Four design strategies: function-based, security-based, topology-based, traffic-based.
-- Security design operates at physical, network, access policy, node, and application levels.
-- Topology design selects technology (LAN/WAN/WLAN) based on speed, budget, and environment; VPNs extend networks securely.
-- Traffic design addresses QoS, queuing, redundancy, and load balancing.
-- Structured cabling reduces long-term management cost.
-- Architecture should match current need — avoid over-provisioning for uncertain future scale.
+- Queuing  
+  Priority traffic handling; congestion avoidance.
+- Application delay tolerance  
+  Must be assessed per application.
+- Switching  
+  Wire-speed switching requirements.
+- Load balancing  
+  Distributes traffic; depends on server capability.
+- Redundant paths  
+  Reliability and availability.
+- QoS  
+  Latency, throughput parameters.
+- Medium trade-offs  
+  Satellite vs. fibre optics.

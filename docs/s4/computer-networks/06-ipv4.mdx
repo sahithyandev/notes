@@ -6,27 +6,63 @@ slug: s4/computer-networks/ipv4
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-05-14T15:23:51.114Z
+lastUpdatedOn: 2026-06-04T20:58:06.729Z
 prereqs:
   - s3/data-communication-and-networking/ip
 ---
 
 ## Datagram
 
-The basic unit of data transferred in the network layer. Includes:
+The basic unit of data transferred in the network layer.
 
-- Header (control information)  
-  Defines how packets are routed and handled across networks. Includes:
-  - source IP address
-  - destination IP address
-  - TTL (Time To Live)
-  - protocol (TCP/UDP)
-  - checksum (error detection)
-  - fragmentation fields
-- Payload (data from transport layer)  
-  Typically contains TCP or UDP segment
+```
+ 0               1               2               3
+ 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Version|  IHL  |    DSCP/ToS   |          Total Length         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Identification        |Flags|     Fragment Offset     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      TTL      |   Protocol    |        Header Checksum        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Source IP Address                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Destination IP Address                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Options (variable)                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
 
-The header format defines how packets are routed and handled across networks.
+Header fields:
+
+- Version (4 bits)  
+  IP version. Set to `4` for IPv4.
+- IHL — Internet Header Length (4 bits)  
+  Header size in 32-bit words. Minimum `5` = 20 bytes.
+- DSCP/ToS (8 bits)  
+  Quality of service classification.
+- Total Length (16 bits)  
+  Full packet size in bytes, header included. Maximum $65{,}535$ bytes.
+- Identification (16 bits)  
+  Groups fragments belonging to the same original datagram.
+- Flags (3 bits)  
+  Reserved, Don't Fragment (DF), More Fragments (MF).
+- Fragment Offset (13 bits)  
+  Position of this fragment within the original datagram, in 8-byte units.
+- TTL (8 bits)  
+  Decremented by each router. Packet dropped when it reaches $0$.
+- Protocol (8 bits)  
+  Transport-layer protocol: `6` = TCP, `17` = UDP.
+- Header Checksum (16 bits)  
+  Error detection for the header only. Recomputed at each hop.
+- Source IP Address (32 bits)  
+  Sender's IP address.
+- Destination IP Address (32 bits)  
+  Receiver's IP address.
+- Options (0–40 bytes)  
+  Present only if IHL > 5. Rarely used in practice.
+
+Payload carries the transport-layer segment (TCP or UDP).
 
 ## Network and Host Parts
 
@@ -37,84 +73,67 @@ An IP address is divided into network and host portions.
 - Host part  
   Identifies the device within the network.
 
-Hosts with same network part belong to the same network and can communicate without a router.
+Hosts with the same network part belong to the same network and can communicate without a router.
 
 ### Network Size
 
-Depends on number of bits allocated to host portion. More bits on the host portion means larger network.
-
-This controls how many devices a network can support.
+Depends on the number of bits allocated to the host portion. More host bits means a larger network.
 
 ## IP Address Allocation
 
-IP addresses are assigned to hosts and networks.
-
-• host assignment:
-
-- manually configured
-- dynamically via DHCP
-
-• network assignment:
-
-- ISP → allocates address block
-- ISP gets addresses from RIR (e.g., APNIC)
-- RIR gets addresses from ICANN
+- Host assignment  
+  Manually configured, or dynamically via DHCP.
+- Network assignment  
+  ISP allocates an address block. ISP gets blocks from a RIR (e.g. APNIC). RIR gets blocks from ICANN.
 
 ## Dynamic Host Configuration Protocol
 
-Aka. DHCP. A protocol for dynamically assigning IP addresses to hosts. DHCP server assigns IP address to hosts.
+Aka. DHCP. Dynamically assigns IP addresses to hosts. Allows automatic configuration, address reuse, and host mobility.
 
-Allows automatic configuration, reuse of IP addresses and mobility.
-
-Uses DORA exchange mechanism:
+Uses the DORA exchange:
 
 - Discover  
-  Host sends a broadcast message to discover DHCP servers.
-- Offer
-- Request
-- Ack
-
-- Host is discovered by the DHCP server
-- DHCP server offers a
-
-- discover → offer → request → ack
+  Client broadcasts to locate available DHCP servers.
+- Offer  
+  Server responds with an available IP address and lease terms.
+- Request  
+  Client broadcasts a request for the offered address.
+- Ack  
+  Server confirms the lease; client configures the address.
 
 ## Packet Forwarding
 
-Forwarding is the process of moving packets toward destination.
+Moving a packet toward its destination hop by hop.
 
-• routers use forwarding tables
-• decision based on destination network
+- Same network: direct delivery.
+- Different network: forward to the next-hop router.
 
-• cases:
-
-- same network → direct delivery
-- different network → send to next-hop router
-
-Datagram remains unchanged except for certain fields (e.g., TTL).
+Routers use forwarding tables keyed on destination network. The datagram is unchanged except for mutable fields (e.g. TTL, checksum).
 
 ## Address Resolution Protocol
 
-Aka. ARP. Maps IP addresses to MAC addresses in a local network. Works by broadcasting query over the network and the target replies its MAC address.
+Aka. ARP. Maps IP addresses to MAC addresses within a local network. Works by broadcasting a query; the target host replies with its MAC address.
 
-Used only within local network. Cannot work in bigger networks because of broadcasting.
+Cannot operate beyond the local network because it relies on broadcast.
 
 ## Longest Prefix Match
 
-Aka. LPM. Routers have to find the most specific matching prefix in their routing table when forwarding packets.
+Aka. LPM. When forwarding a packet, a router selects the most specific (longest) matching prefix in its routing table.
 
-If done using software (tree search), it's slow but space-efficient. If done using hardware (TCAM), it's fast but expensive and power-hungry.
+- Software implementation: tree search, slow but space-efficient.
+- Hardware implementation: TCAM, fast but expensive and power-hungry.
 
 ## Hop-by-Hop Fragmentation
 
-In IPv4, if a packet is too big for a link, any router can split the packet into smaller chunks. This adds processing overhead at each hop.
+In IPv4, any router can fragment a packet that exceeds a link's MTU. Reassembly happens only at the destination. Adds processing overhead at each hop.
 
 ## Issues
 
 - Restricted address space  
-  IPv4 has only 32 bits, limiting the number of available addresses to about 4.3 billion.
-- Huge routing table  
-  IPv4 follows flat addressing. As the internet grew, global BGP routing tables became too large (more than 1 million rows) to manage efficiently. TCAM (Ternary Content-Addressable Memory) is used to store these routing tables, which is expensive, power-hungry, and physically limited.
-- Longest Prefix Match searches take a lot of time
+  32-bit addresses limit the pool to ~4.3 billion. Exhausted by growth of connected devices.
+- Huge routing tables  
+  Flat addressing caused global BGP tables to exceed 1 million entries. Stored in TCAM, which is expensive, power-hungry, and physically limited.
+- Slow LPM  
+  Longest prefix match over large tables is costly even with TCAM.
 - Convergence delays  
-  If routing tables are huge, when network topology changes, it takes longer for routers to converge and update their routing tables.
+  Topology changes take longer to propagate when routing tables are large.

@@ -6,7 +6,9 @@ slug: s4/computer-networks/man-and-wan
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.318Z
-lastUpdatedOn: 2026-05-03T07:56:35.318Z
+lastUpdatedOn: 2026-06-04T20:58:06.728Z
+prereqs:
+  - s3/data-communication-and-networking/network
 ---
 
 Different technologies are used for MAN and WAN networks.
@@ -16,58 +18,54 @@ Different technologies are used for MAN and WAN networks.
 A dedicated, full-time point-to-point link between 2 entities. Always available. Not shared.
 
 - Fixed carrying capacity: 64 kb/s, 2 Mb/s, or 155 Mb/s.
-- Fixed monthly cost — independent of usage.
+- Fixed monthly cost; not usage-based.
 - Types: analog or digital. Most modern lines are digital.
 - Common speeds: 64 kb/s (few computers), 2 Mb/s (large office).
 
 Used in:
 
-- Voice: tie lines between PBXs.
+- Voice: tie lines between PBXs (Private Branch Exchanges, private telephone switches inside organizations that manage internal calls and connect to the public phone network). Tie lines are dedicated links between two PBXs so inter-office calls bypass the public phone network.
 - Data: corporate networks, Internet access.
 - Combined voice + data.
 
 ## X.25
 
-**X.25** — ITU standard for user interface to a packet data network.
+International Telecommunication Union (ITU) standard for user interface to a packet data network. ITU is the UN agency that sets global telecom standards.
 
 - Introduced: 1960s. Became standard for data communication.
 - Used by: banks, airlines.
 - Speed: ~64 kb/s.
 - Very expensive relative to modern networks.
 
----
-
-### Frame Relay
+## Frame Relay
 
 WAN virtual-circuit technology. Replacement for X.25. Designed in late 1980s. Widely deployed in 1990s.
 
-- Relays frames point-to-point. Carries IP datagrams — acts as link layer for IP.
-- No error control — assumes network is reliable.
+- Relays frames point-to-point. Carries IP datagrams; acts as link layer for IP.
+- No error control; assumes network is reliable.
 - End-to-end congestion control.
 
 Virtual circuit model:
 
-- Permanent VCs (PVCs) — aggregate traffic between two routers.
+- Permanent VCs (PVCs): aggregate traffic between two routers.
 - Multiple VCs per physical link.
-- **CIR** (Committed Information Rate) — guaranteed data rate per VC. Negotiated at setup. Customer billed per CIR.
+- **CIR** (Committed Information Rate): guaranteed data rate per VC. Negotiated at setup. Customer billed per CIR.
 
----
+## ATM
 
-### ATM (Asynchronous Transfer Mode)
-
-**ATM** — cell-switched WAN technology. Fixed 53-byte cells (5-byte header, 48-byte data).
+Cell-switched WAN technology. Fixed 53-byte cells (5-byte header, 48-byte data).
 
 Why cells:
 
-- Uniform size → fast hardware processing.
-- Simple header → low switching delay.
+- Uniform size: fast hardware processing.
+- Simple header: low switching delay.
 - Suitable for voice, video, and data on a single network.
 - X.25/Frame Relay switching delay unacceptable for real-time traffic.
 
 Properties:
 
 - Scalable and flexible.
-- Charging based on cell count — not fixed bandwidth tiers.
+- Charging based on cell count; not fixed bandwidth tiers.
 - Transmission medium: optical fiber.
 
 Deployment reality:
@@ -75,9 +73,9 @@ Deployment reality:
 - Original vision: end-to-end desktop-to-desktop ATM.
 - Actual use: ATM as switched link layer connecting IP backbone routers.
 
-**Virtual circuits in ATM:**
+Virtual circuits:
 
-- Each cell carries a VC identifier — not destination address.
+- Each cell carries a VC identifier, not a destination address.
 - Every switch on the path maintains per-connection state.
 - Resources (bandwidth, buffers) allocated per VC.
 
@@ -86,9 +84,7 @@ Addressing:
 - **VPI** (Virtual Path Identifier) + **VCI** (Virtual Circuit Identifier).
 - Two-part addressing speeds up routing and switching.
 
----
-
-### Technology Comparison
+## Technology Comparison
 
 | Feature              | X.25 | Frame Relay | ATM |
 | -------------------- | ---- | ----------- | --- |
@@ -99,14 +95,12 @@ Addressing:
 | Permanent VCs        | Yes  | Yes         | Yes |
 | Multicasting         | No   | No          | Yes |
 
----
+## MPLS
 
-### MPLS (Multi-Protocol Label Switching)
-
-**MPLS** — connection-oriented switching using labels applied at the edge of an MPLS domain. "Multiprotocol" — applicable to any Layer 2 protocol.
+Connection-oriented switching using labels applied at the edge of an MPLS domain. Applicable to any Layer 2 protocol.
 
 - Based on IP and routing protocols: BGP-4, OSPF, IS-IS.
-- Resides in service provider/carrier networks only — not private networks.
+- Resides in service provider/carrier networks only; not private networks.
 - IP used to signal MPLS connections.
 
 Protocol stack (bottom to top):
@@ -135,29 +129,33 @@ Principle: _Route at the edge; switch at the core._
 
 Convergence benefit: MPLS enables a single IP/MPLS network to consolidate PSTN, IP, Frame Relay, and ATM networks.
 
----
+## Metro Ethernet
 
-### Metro Ethernet / Ethernet First Mile (EFM)
+Connects homes and offices via Ethernet. IEEE 802.3ah standard.
 
-**EFM** — connects homes and offices via Ethernet. IEEE 802.3ah standard.
-
-**EFMC** (EFM over Copper):
+EFM over Copper (EFMC):
 
 - Uses DSL modulation with Ethernet frames.
 - EFMC SR: 10 Mb/s at 750 m.
 - EFMC LR: 2 Mb/s at 2,700 m.
 
-**EFMF** (EFM over Fibre):
+EFM over Fibre (EFMF):
 
 - Point-to-point or Passive Optical Networks (PON).
 - Dual-fiber standards: 100BASE-LX10, 1000BASE-LX10.
 - Single-fiber standards: 100BASE-BX10, 1000BASE-BX10.
 
----
+## Summary
 
-- **X.25** — early standard; slow (~64 kb/s); expensive.
-- **Frame Relay** — X.25 replacement; virtual circuits; no error control; CIR billing.
-- **ATM** — fixed 53-byte cells; low delay; supports voice/video/data; VPI+VCI addressing.
-- **MPLS** — label switching at provider core; supports traffic engineering, VPNs, scalability; hybrid of IP flexibility and ATM performance.
-- **EFM** — Ethernet to the home/office over copper (DSL) or fibre (PON).
-- Dominant trend: MPLS and Ethernet replacing legacy WAN technologies.
+- X.25  
+  Early standard; slow (~64 kb/s); expensive.
+- Frame Relay  
+  X.25 replacement; virtual circuits; no error control; CIR billing.
+- ATM  
+  Fixed 53-byte cells; low delay; supports voice/video/data; VPI+VCI addressing.
+- MPLS  
+  Label switching at provider core; supports traffic engineering, VPNs, scalability.
+- EFM  
+  Ethernet to the home/office over copper (DSL) or fibre (PON).
+
+Dominant trend: MPLS and Ethernet replacing legacy WAN technologies.

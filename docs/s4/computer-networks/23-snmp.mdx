@@ -3,7 +3,7 @@ title: SNMP
 sidebar:
   order: 23
 dateCreated: 2026-05-31T10:36:54.509Z
-lastUpdatedOn: 2026-05-31T15:06:59.390Z
+lastUpdatedOn: 2026-06-04T20:58:06.731Z
 slug: s4/computer-networks/snmp
 prev: true
 next: false
@@ -13,9 +13,29 @@ Aka. Simple Network Management Protocol. A network management protocol. Operates
 
 In [FCAPS](/s4/computer-networks/network-management#iso-network-management-model), SNMP handles performance and fault management acceptably; configuration management partially. Accounting and security management use separate techniques.
 
-### Versions
+## Versions
 
-SNMP v2 adds communities and proxies. SNMP v3 adds security enhancements.
+### SNMP v2
+
+Added communities and proxies.
+
+#### Community
+
+An administrative relationship between SNMP managers and agents. Serves as the primary mechanism for access control and authentication.
+Defines which managers are permitted to interact with which agents, and with what level of access.
+All managers and agents that share the same community string belong to the same community and can communicate under its permissions.
+
+Identified by a community string which is a plaintext string. Included in every SNMP message as _Community_ field.
+
+Considered weak security since the string is transmitted in plaintext.
+
+#### Proxy
+
+An SNMP entity that acts as an intermediary to provide interoperability between different network management domains or protocol versions.
+
+### SNMP v3
+
+Added security enhancements related to authentication, encryption and replay protection.
 
 ## Transport
 
@@ -27,13 +47,6 @@ Uses UDP over:
 ## Structure
 
 Master agents and sub-agents run on managed devices. Management stations run the managing entity side.
-
-Communities and proxies are additional mechanisms:
-
-- Communities  
-  Strings used for administration and access control (read-only vs read-write).
-- Proxy  
-  Enable management of devices that cannot run a native SNMP agent.
 
 MIB is accessed through agents.
 
