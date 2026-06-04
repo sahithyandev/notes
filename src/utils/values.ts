@@ -5,4 +5,3 @@ export const SITE_DESCRIPTION =
   "Sahithyan's engineering notes and study materials";
 
 export const CGPA = 3.82;
-

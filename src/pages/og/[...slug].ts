@@ -68,13 +68,13 @@ pages["default"] = {
 const semesters = new Set<string>();
 
 for (const entry of entries) {
-  const { data, id } = entry;
-  const _id = id.replace(".md", "").replace(/\d+-/, "");
-  if (typeof _id !== "string" || _id.endsWith("summary")) {
+  const { data } = entry;
+  const slug = data.slug;
+  if (!slug || slug.endsWith("summary")) {
     continue;
   }
-  pages[_id] = { data };
-  semesters.add(_id.split("/")[0]);
+  pages[slug] = { data };
+  semesters.add(slug.split("/")[0]);
 }
 
 for (const semester of semesters) {
@@ -89,6 +89,7 @@ for (const semester of semesters) {
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
   param: "slug",
+  getSlug: (path) => path,
   getImageOptions: (_path, page: (typeof pages)[number]) => {
     // Handle default homepage OG image
     if (page.data.slug === "default") {
