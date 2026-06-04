@@ -3,15 +3,13 @@ title: Networks
 sidebar:
   order: 19
 dateCreated: 2026-05-17T09:01:38.545Z
-lastUpdatedOn: 2026-06-02T10:52:00.721Z
+lastUpdatedOn: 2026-06-04T05:37:58.599Z
 slug: s4/operating-systems-security/networks
 prev: true
 next: true
 prereqs:
   - /s4/computer-networks/osi-model
 ---
-
-Network security threats and countermeasures for remote networks. Two-part structure: attack taxonomy followed by defensive controls
 
 Network transmission media such as cable, optical fibre and microwave are all vulnerable for attacks regardless of their physical properties.
 
@@ -70,11 +68,16 @@ Can happen due to:
 
 ### Network Perimeter Components
 
-- **Border router** — last router under organizational control before untrusted network.
-- **Firewall** — enforces allow/deny rules on traffic.
-- **IDS (Intrusion Detection System)** — detects and alerts on suspicious activity.
-- **IPS (Intrusion Prevention System)** — detects and auto-responds without admin intervention.
-- **DMZ / Screened Subnet** — small network of public-facing services, protected by firewall.
+- Border router  
+  Last router under organizational control before untrusted network.
+- Firewall  
+  Enforces allow/deny rules on traffic.
+- IDS  
+  Detects and alerts on suspicious activity.
+- IPS  
+  Detects and auto-responds without admin intervention.
+- DMZ / Screened Subnet  
+  Small network of public-facing services, protected by firewall.
 
 ### Port Scanning
 
@@ -90,11 +93,16 @@ Reconnaissance technique — not strictly an attack. Reveals: open ports, protoc
 
 ### Wireless Network Vulnerabilities
 
-- **Integrity** — higher signal strength wins, attackers spoof clients and boost signal to hijack sessions.
-- **Availability** — session hijacking, forced disassociation, jamming.
-- **Unauthorized access** — requires cryptographic controls.
-- **Hidden SSID discovery** — client probe requests expose SSIDs even without beacon.
-- **SSID in all frames** — SSID embedded in communication frames, sniffable post-association.
+- Integrity  
+  Higher signal strength wins; attackers spoof clients and boost signal to hijack sessions.
+- Availability  
+  Session hijacking, forced disassociation, jamming.
+- Unauthorized access  
+  Requires cryptographic controls.
+- Hidden SSID discovery  
+  Client probe requests expose SSIDs even without beacon.
+- SSID in all frames  
+  SSID embedded in communication frames, sniffable post-association.
 
 ## Wi-Fi
 
@@ -113,15 +121,22 @@ Authentication mechanism:
 3. AP decrypts and verifies match.
 4. Subsequent traffic encrypted with shared key.
 
-**Weaknesses:**
+Weaknesses:
 
-- Key size: 64- or 128-bit total, but 24 bits reserved for Initialization Vector (IV) - effective key 40 or 104 bits.
-- Keys are user-typed passphrases — vulnerable to dictionary attacks.
-- Static key — unchanged for months, one key covers entire session history.
-- RC4 used incorrectly — allows decryption of large message portions.
-- Only ~16 million IV values, non-random distribution accelerates cracking.
-- Integrity check (CRC) does not detect malicious modification.
-- No client authentication — any client knowing SSID and MAC is accepted.
+- Key size  
+  64- or 128-bit total, but 24 bits reserved for IV; effective key 40 or 104 bits.
+- User-typed passphrases  
+  Vulnerable to dictionary attacks.
+- Static key  
+  Unchanged for months; one key covers entire session history.
+- RC4 misuse  
+  Allows decryption of large message portions.
+- IV space  
+  Only ~16 million values; non-random distribution accelerates cracking.
+- CRC integrity check  
+  Does not detect malicious modification.
+- No client authentication  
+  Any client knowing SSID and MAC is accepted.
 
 ### WPA
 
@@ -129,11 +144,16 @@ Aka. WiFi Protected Access. WPA was introduced in 2003, WPA2 in 2004 and WPA3 in
 
 Improvements over WEP:
 
-- Non-static keys — key hierarchy, new keys per session, encryption key rotated per packet.
-- Authentication — password, token, or certificate.
-- Strong encryption — AES support (vs. broken RC4).
-- Integrity protection — 64-bit cryptographic integrity check.
-- Session initiation — four-way handshake, separate encryption and integrity keys per direction.
+- Non-static keys  
+  Key hierarchy; new keys per session, encryption key rotated per packet.
+- Authentication  
+  Password, token, or certificate.
+- Strong encryption  
+  AES replaces broken RC4.
+- Integrity protection  
+  64-bit cryptographic integrity check.
+- Session initiation  
+  Four-way handshake; separate encryption and integrity keys per direction.
 
 ## Defenses
 

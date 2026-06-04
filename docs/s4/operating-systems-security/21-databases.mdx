@@ -3,7 +3,7 @@ title: Databases
 sidebar:
   order: 21
 dateCreated: 2026-05-17T18:12:05.694Z
-lastUpdatedOn: 2026-06-02T10:52:00.722Z
+lastUpdatedOn: 2026-06-04T05:37:58.600Z
 slug: s4/operating-systems-security/databases
 prev: true
 next: true
@@ -66,12 +66,12 @@ Categories:
   Classified documents, anonymous donor names.
 - Sensitive by record  
   Salary field in employment database.
-- Sensitive in relation to other disclosed data  
-  Encrypted file combined with its key.
+- Sensitive in relation to other data  
+  Encrypted file combined with its decryption key.
 
 ### Types of Disclosure
 
-Disclosure modes beyond direct query:
+Sensitive data can be disclosed through means beyond direct query:
 
 - Exact data  
   Direct retrieval of a sensitive value.
@@ -80,42 +80,42 @@ Disclosure modes beyond direct query:
 - Negative result  
   Confirm what a value is not.
 - Existence  
-  Confirm a field or record exists.
+  Confirm a field or record exists without revealing its value.
 - Probable value  
-  Probability that element has a specific value.
-- Direct inference  
-  Derive sensitive data without querying it directly.
+  State the probability that an element has a specific value.
+- Inference  
+  Derive sensitive data logically from permitted query results.
 - Inference by arithmetic  
-  Deduce values from sums, averages, counts.
+  Deduce individual values from aggregates: sums, averages, counts.
 - Aggregation  
-  Combine non-sensitive items to produce sensitive results.
+  Combine individually non-sensitive items to reveal sensitive information.
 - Hidden data attributes  
-  Metadata leakage via file tags, geotags.
+  Metadata leakage via file tags, geotags, or timestamps.
 
 ### Preventing Disclosure
 
-No complete solution exists for inference and aggregation.
+No complete solution exists for inference and aggregation attacks.
 
 Techniques:
 
 - Suppression  
-  Reject queries that would reveal sensitive data, responses withheld but correct.
+  Reject queries whose results would disclose sensitive data; correct data exists but is withheld.
 - Concealment  
-  Return approximate values, reduces precision, increases coverage.
+  Return approximate values instead of exact ones; trades precision for coverage.
 - Random perturbation  
-  Add/subtract small error values from actual values.
+  Add or subtract a small random error to returned values.
 - Rounding  
-  Return values rounded to a specified granularity.
+  Return values rounded to a fixed granularity.
 - Swapping  
-  Exchange values across records, preserves aggregate statistics.
+  Exchange values between records; preserves aggregate statistics but breaks individual accuracy.
 - Limited response suppression  
-  Omit low-frequency elements from results.
+  Omit low-frequency categories from results.
 - Blocking small sample sizes  
-  Refuse queries over populations below a threshold.
+  Refuse queries whose population falls below a minimum threshold.
 - Query analysis  
-  Analyze query implications before returning results.
+  Evaluate query implications before returning results; reject queries that enable inference.
 
-**Security vs. precision tradeoff** — maximizing concealment reduces data utility, maximizing precision increases disclosure risk.
+Security vs. precision tradeoff: maximizing concealment reduces data utility; maximizing precision increases disclosure risk.
 
 ## Inference
 

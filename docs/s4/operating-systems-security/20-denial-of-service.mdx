@@ -3,7 +3,7 @@ title: Denial of Service
 sidebar:
   order: 20
 dateCreated: 2026-05-17T10:39:21.053Z
-lastUpdatedOn: 2026-06-02T18:48:59.871Z
+lastUpdatedOn: 2026-06-04T05:37:58.599Z
 slug: s4/operating-systems-security/denial-of-service
 prev: true
 next: true
@@ -13,13 +13,20 @@ Any attack targeting availability. Single attacker node.
 
 ## DDoS
 
-Aka. Distributed Denial of Service. DoS via a botnet. Attacker plants malware (C2 software) on compromised hosts, issues coordinated attack command.
+Distributed Denial of Service. DoS via a botnet. 
 
-### DDoS Botnet Structure
+Attacker plants malware on compromised hosts and issues a coordinated attack command. Compromised hosts are often undetected, with minimal harm to the host machine. Attacker is separated from bots by multiple layers, making attribution difficult.
 
-Hierarchy: Attacker → Masters → C&C nodes → Bots → Victim. Redundant: loss of one master or C&C node does not stop the attack.
+### Botnet
+A network of compromised machines running malicious code under remote control.
 
-A botnet is a network of compromised machines running malicious code under remote control. Often undetected, with minimal harm to the host machine. Attacker separated from bots by multiple layers, making attribution difficult.
+### Master
+
+A compromised machine directly controlled by the attacker. Relays attack commands down to C&C nodes. Multiple masters exist; loss of one does not stop the attack.
+
+### C&C Node
+
+Short for Command and Control node. Aka. C2 node. Receives commands from masters. Directly instructs bots: targets, timing, and method. Multiple C&C nodes exist; loss of one does not stop the attack.
 
 ## DoS Attack Types
 
@@ -42,15 +49,23 @@ Examples:
 
 ### Smurf Attack
 
-Amplification attack.
+Amplification and reflection attack. Attacker never sends traffic directly to the victim.
 
-1. Attacker sends ICMP request to broadcast address with victim's spoofed source IP.
-2. All devices behind router reply to victim.
-3. Amplification factor = number of devices behind router.
+1. Attacker sends ICMP echo request to a network's broadcast address, spoofing the source IP as the victim's.
+2. Every host on that network sends an ICMP echo reply to the spoofed source (the victim).
+3. Victim is flooded with as many replies as there are hosts on the intermediary network.
+
+Modern routers disable directed broadcast by default (RFC 2644), making Smurf attacks largely ineffective on current networks.
 
 ### Teardrop Attack
 
-Sends packet fragments with conflicting reassembly offsets. OS cannot reassemble, can cause full OS lockup.
+Exploits a bug in IP fragment reassembly.
+
+Large IP packets are split into fragments. Each fragment carries an offset field indicating where it fits in the original packet. The OS buffers incoming fragments and reassembles them in order using these offsets.
+
+Teardrop sends fragments with overlapping or malformed offsets: fragment 2 claims to start before fragment 1 ends, or a fragment's offset plus its length underflows. The reassembly code cannot resolve the conflict, corrupting the buffer. On vulnerable kernels, this causes a crash or full OS lockup.
+
+Only affects older kernels (Windows NT/95, Linux before 2.1.63).
 
 ### DNS Spoofing
 
@@ -62,4 +77,28 @@ Aka. BGP/routing poisoning. Attacker or misconfigured router advertises false ro
 
 ### Session Hijacking
 
-Attacker monitors sequence numbers, injects forged packet with correct sequence number, sends RST to legitimate sender, takes over session.
+Attacker takes over an established TCP session between a client and server.
+
+TCP packets carry sequence numbers to ensure ordered delivery. The server accepts the next packet only if its sequence number matches the expected value.
+
+1. Attacker sniffs traffic to learn the current sequence number.
+2. Sends a forged packet with the correct sequence number, spoofing the client's IP.
+3. Sends a RST packet to the legitimate client, terminating its connection.
+4. Server now communicates with the attacker, believing it is the original client.
+
+The RST packet desynchronizes client and server: each holds a different expected sequence number. Legitimate client retransmissions are rejected. Attacker holds exclusive control of the server-side session.
+
+Variants:
+
+- Active  
+  Attacker injects data into the live session in real time. Requires on-path position or reliable IP spoofing.
+- Passive  
+  Attacker monitors without modifying traffic. Used for credential and data capture.
+- Blind  
+  Attacker cannot observe traffic and must guess sequence numbers. Randomized ISNs make this largely impractical on modern systems.
+
+Countermeasures:
+
+- TLS encrypts payload and authenticates both endpoints; a captured sequence number alone cannot produce a valid injection.
+- Randomized ISNs reduce sequence number predictability, defeating blind hijacking.
+- IDS: duplicate sequence numbers arriving from different source IPs indicate an active hijack attempt.

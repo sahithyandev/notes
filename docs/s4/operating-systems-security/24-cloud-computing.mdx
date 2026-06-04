@@ -3,7 +3,7 @@ title: Cloud Computing
 sidebar:
   order: 24
 dateCreated: 2026-05-17T22:27:32.986Z
-lastUpdatedOn: 2026-06-02T18:48:59.872Z
+lastUpdatedOn: 2026-06-04T05:37:58.600Z
 slug: s4/operating-systems-security/cloud-computing
 prev: true
 next: true
@@ -13,7 +13,7 @@ prereqs:
 
 A form of distributed computing. Promotes availability via high-speed broadband and distributed servers. Introduces new security threats. Security responsibility is split between provider and client.
 
-### Characteristics
+## Characteristics
 
 - On-demand self-service  
   Resources added or removed as needed.
@@ -48,8 +48,10 @@ Two or more cloud types connected to balance loads. Most security responsibility
 
 Control exists on a continuum from public to private cloud. The less control the user has, the more dependent they are on provider-enforced separation controls.
 
-- Public cloud: user fully dependent on provider's controls. Must review terms of use. Must add own protections (e.g., encryption).
-- Private cloud: organization controls all security settings.
+- Public cloud  
+  User fully dependent on provider's controls. Must review terms of use. Must add own protections (e.g., encryption).
+- Private cloud  
+  Organization controls all security settings.
 
 Cloud security breaches commonly arise from:
 
@@ -59,7 +61,7 @@ Cloud security breaches commonly arise from:
 
 ## Cloud Security Threats
 
-Objectives remain: **confidentiality**, **integrity**, **availability**. Attack surface is dramatically larger than on-premises.
+Objectives remain: confidentiality, integrity, availability. Attack surface is dramatically larger than on-premises.
 
 ### Data breaches
 
@@ -80,10 +82,6 @@ No regulation requires cloud usage visibility, especially in SaaS. Unauthorized 
 ### Insecure interfaces and APIs
 
 No standard security specification for cloud APIs. ~⅓ of cloud security incidents (5-year study) caused by insecure interfaces/APIs.
-
-### Denial-of-service (DoS) attacks
-
-Cloud services remain vulnerable despite resilience design.
 
 ### Security and Deployment Model Interaction
 
@@ -124,47 +122,54 @@ Security criteria to evaluate:
 
 Assessment frameworks:
 
-- **FedRAMP** — US federal cloud security program.
-- **PCI DSS** — payment card industry data security standard.
-- **CSA STAR** — Cloud Security Alliance Security, Trust, Assurance, and Risk registry.
+- FedRAMP  
+  US federal cloud security program.
+- PCI DSS  
+  Payment card industry data security standard.
+- CSA STAR  
+  Cloud Security Alliance Security, Trust, Assurance, and Risk registry.
 
-### Security Benefits of Cloud Services
+## Security Benefits
 
-**Geographic diversity** — data mirrored across dispersed data centers. Protection from local or natural disasters.
+- Geographic diversity  
+  Data mirrored across dispersed data centers. Protection from local or natural disasters.
+- Platform and infrastructure diversity  
+  Different platforms have different bugs. Single attack less likely to compromise entire system. Useful for diversifying a technology stack.
 
-**Platform and infrastructure diversity** — different platforms have different bugs. Single attack less likely to compromise entire system. Useful for diversifying a technology stack.
+## Cloud-Based Security Functions
 
-### Cloud-Based Security Functions
+- Email filtering  
+  Cloud-based filter inserted as an SMTP hop. Low overhead.
+- DDoS protection  
+  Cloud provider proxies traffic via DNS record update. Absorbs flood traffic with high-bandwidth infrastructure.
+- Network monitoring  
+  Cloud solutions reduce hardware requirements. Provides monitoring and incident response expertise.
 
-**Email filtering** — cloud-based filter inserted as an SMTP hop. Low overhead.
+## Cloud Storage Security
 
-**DDoS protection** — cloud provider proxies traffic via DNS record update. Absorbs flood traffic with high-bandwidth infrastructure.
+Default behavior: data stored unencrypted or encrypted with a single shared key. Weak confidentiality.
 
-**Network monitoring** — cloud solutions reduce hardware requirements. Provides monitoring and incident response expertise.
-
-### Cloud Storage Security
-
-Default behavior: data stored unencrypted or encrypted with a single shared key — weak confidentiality.
-
-Better options:
+Encryption approaches:
 
 - Per-user key generation based on password or secret.
-- **TNO (Trust No One)** model — provider does not hold decryption keys. Maximum confidentiality.
+- TNO model  
+  Trust No One: provider does not hold decryption keys. Maximum confidentiality.
 
-### Data Loss Prevention (DLP)
+## Data Loss Prevention
 
-A solution that identifies and prevents unsafe sharing, transfer, or use of sensitive data.
+A solution that identifies and prevents unsafe sharing, transfer, or use of sensitive data. Harder in cloud than on-premises: less control over data ingress/egress points.
 
-Harder in cloud than on-premises — less control over data ingress/egress points.
+Strategies:
 
-DLP strategies for cloud-based corporate data:
-
-- Route all access through a corporate **VPN**.
+- Route all access through a corporate VPN.
 - Install DLP agents on corporate end-user systems.
 - In IaaS: insert a DLP server as a proxy between user systems and cloud servers.
 
 ## Cloud Application Security
 
-**Attacks against shared resources** — shared computing environments allow one vulnerable application to compromise others. Includes cryptographic side-channel attacks targeting shared-resource environments.
+Shared cloud infrastructure introduces attack vectors not present in dedicated deployments.
 
-**Attacks against insecure APIs** — known broken APIs have been widely used by cloud vendors. ~⅓ of cloud incidents traced to insecure interfaces/APIs. Major vulnerabilities found in SSL libraries of providers including Amazon and PayPal.
+- Attacks against shared resources  
+  Shared computing environments allow one vulnerable application to compromise others. Includes cryptographic side-channel attacks targeting shared-resource environments.
+- Attacks against insecure APIs  
+  Known broken APIs have been widely used by cloud vendors. ~⅓ of cloud incidents traced to insecure interfaces/APIs. Major vulnerabilities found in SSL libraries of providers including Amazon and PayPal.
