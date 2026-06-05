@@ -1,0 +1,104 @@
+---
+title: LAN
+sidebar:
+  order: 4
+dateCreated: 2026-06-05T11:23:49.837Z
+lastUpdatedOn: 2026-06-05T13:23:45.810Z
+slug: s4/computer-networks/lan
+prev: true
+next: true
+prereqs:
+  - s3/data-communication-and-networking/local-area-network
+  - s3/data-communication-and-networking/ethernet
+---
+
+A privately owned network interconnecting stations over short distances (few meters to several hundred meters). Operates at high bit rates (1 Mbps to 100 Mbps) and very low error rate ($1 in 10^8$) compared to WAN ($1 in 10^5$ or more).
+
+Structured around IEEE 802 standards, which split the Data Link layer into LLC and MAC sublayers.
+
+## Transmission Modes
+
+### Baseband
+
+Digital technology. Driver introduces voltage levels. Supports TDM for multiple access.
+
+### Broadband
+
+Analogue technology. Uses modems. Uses FDM with multiple carriers and sub-channels on a single path.
+
+## IEEE 802 Standards
+
+| Standard | Description                  |
+| -------- | ---------------------------- |
+| 802.1    | Higher layers and management |
+| 802.2    | Logical Link Control (LLC)   |
+| 802.3    | CSMA/CD                      |
+| 802.4    | Token Bus                    |
+| 802.5    | Token Ring                   |
+
+The Data Link layer from OSI model is split into 2 sublayers in 802.
+
+## Logical Link Control
+
+Aka. LLC. Upper sublayer. Subset of HDLC. Common across 802.x variants.
+
+### LLC Classes of Service
+
+- Type 1  
+  Connectionless. No ACKs, no flow control, no error control. Higher-level protocols handle these.
+- Type 2  
+  Connection-oriented. Provides ACKs, flow control, and error control. Optional.
+
+### LLC Protocol Data Unit
+
+`| DSAP Address | SSAP Address | Control | Information |`
+
+- DSAP  
+  Destination Service Access Point.
+- SSAP  
+  Source Service Access Point.
+- Control  
+  Carries HDLC commands and responses. Differece based on the service type.
+
+In ring networks, DSAP and SSAP can identify a specific ring and node.
+
+## Media Access Control
+
+Aka. MAC. Lower sublayer. Media-specific. Encompasses 802.3, 802.4, 802.5.
+
+### MAC Protocol Data Unit
+
+`| Preamble | Starting Frame Delimiter | Dest. Address | Source Address | LLC PDU or PAD | FCS | Ending Delimiter |`
+
+### Token Ring
+
+Priority-based scheme. A token circulates the ring indicating free/busy status. Standardized as IEEE 802.5.
+
+Operation:
+
+1. Station wishing to transmit captures an empty token.
+2. Modifies token to include start-of-frame identifier plus data and control fields.
+3. Sends to next station.
+4. Each intermediate station regenerates the token. Copies data if addressed to it.
+5. Originating station frees the token on return.
+
+Ring formats: Token, Abort Token, Token-and-Data.
+
+### Token Bus
+
+Physical bus topology with a logical ring determined by numeric address order. Standardized as IEEE 802.4.
+
+Four MAC functions:
+
+- IFM  
+  Interface machine.
+- ACM  
+  Access Control machine.
+- RxM  
+  Receive machine.
+- TxM  
+  Transmit machine.
+- RRM  
+  Regenerative Repeater machine. Optional.
+
+Frame identical to 802.5 except it lacks access control and frame status fields. Token sender waits for the successor to transmit the next frame as confirmation. If no confirmation, a new successor is established.

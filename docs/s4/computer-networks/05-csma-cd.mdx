@@ -1,0 +1,116 @@
+---
+title: CSMA/CD
+sidebar:
+  order: 5
+dateCreated: 2026-06-05T12:13:57.238Z
+lastUpdatedOn: 2026-06-05T13:23:45.810Z
+slug: s4/computer-networks/csma-cd
+prev: true
+next: true
+---
+
+Carrier Sense Multiple Access with Collision Detection. Controls LAN access on a bus structure. Non-priority scheme. Standardized as IEEE 802.3.
+
+Defines two layers:
+
+- MAC layer  
+  Media independent. Handles framing and collision management.
+- Physical layer  
+  Media dependent. Handles encoding and signal sensing.
+
+DLL functions:
+
+- Encapsulation and decapsulation (addresses, error detection fields).
+- Media access management (frame transmission/reception, buffering, collision handling).
+
+Physical layer functions:
+
+- Data encoding/decoding. Binary to Manchester code and vice versa. Preamble provides synchronization.
+- Channel access. Introduces signals onto the channel. Carrier sensing and collision detection.
+
+History: Developed by Xerox. Jointly specified by Xerox, Intel, and DEC in 1980.
+
+## IEEE 802.3 Supplements
+
+| Supplement | Year | Description                                     |
+| ---------- | ---- | ----------------------------------------------- |
+| 802.3a     | 1985 | 10BASE-2 Thin Ethernet                          |
+| 802.3i     | 1990 | 10BASE-T Twisted Pair                           |
+| 802.3u     | 1995 | 100BASE-T Fast Ethernet + Auto Negotiation      |
+| 802.3x     | 1997 | Full-Duplex Standard                            |
+| 802.3z     | 1998 | 1000BASE-X Gigabit Ethernet (SX, LX, CX)        |
+| 802.3ab    | 1999 | 1000BASE-T Gigabit Ethernet over Twisted Pair   |
+| 802.3ac    | 1998 | Frame size extension to 1522 bytes for VLAN tag |
+| 802.3ad    | 2000 | Link Aggregation for Parallel Links             |
+
+## Media Access Control Rules
+
+1. A signal being transmitted on the channel = **carrier**.
+2. Station waits until channel is idle (absence of carrier) before transmitting.
+3. After channel goes idle, station waits an Inter Frame Gap (IFG) then transmits.
+4. If two stations transmit simultaneously, both detect the collision and reschedule.
+
+## Back-off Algorithm
+
+**IFG** is 96 bit times. Brief recovery time between frames.
+
+- 10 Mbps: IFG = 9.6 µs
+- 100 Mbps: IFG = 960 ns
+
+Steps:
+
+1. If no carrier and no-carrier period exceeds IFG, transmit immediately.
+2. If channel busy, listen until carrier ceases, wait IFG, then transmit.
+3. If collision detected, continue transmitting 32-bit **jam signal** (ensures all stations detect the collision).
+4. After jam, wait a random back-off period then return to Step 1.
+5. Back-off duration increases with each successive collision attempt.
+
+Back-off formula:
+
+$$0 \leq r < 2^k, \quad k = \min(n, 10)$$
+
+- $n$: number of transmission attempts
+
+Maximum retries = 16. After 16 failures, transmission failure reported to higher layers. Back-off counter resets after a successful transmission.
+
+## Slot Time
+
+The window within which a collision must be detected. 512 bits for 10/100 Mbps.
+
+- 10 Mbps: 512 bit time covers 2800 m on coaxial.
+- 100 Mbps: 512 bit time covers ~205 m. Acceptable with switches/hubs on twisted pair (max 100 m).
+- 1000 Mbps: 512 bit time covers only 20 m. Slot time extended to 4096 bits via **carrier extension**.
+
+Minimum data field = 46 bytes (required to fill 512 bits).
+
+## Gigabit Ethernet Half Duplex
+
+Signaling 10× faster than Fast Ethernet. Effective network diameter shrinks to 20 m. Slot time extended to 4096 bits (512 bytes). Smaller frames padded with **carrier extension** (non-data symbols).
+
+**Frame Bursting** allows a station to send multiple smaller frames consecutively.
+
+- First frame transmitted normally. If no collision, burst frames follow.
+- IFG between burst frames filled with extension symbols. Channel held throughout.
+- Improves efficiency for small frames to >90%.
+
+Frame burst limit: 65,536 bits.
+
+## Full Duplex Ethernet
+
+Simultaneous bidirectional transmission on a point-to-point link (twisted pair or fibre optic). Standardized as IEEE 802.3x.
+
+- Independent transmit and receive paths.
+- No collision detection (or ignored).
+- No multiple access. One station at each end.
+- IFG still present between frames.
+- Effective throughput doubled (e.g., 100 Mbps fast Ethernet → 200 Mbps aggregate).
+- No shared-medium timing constraints. Only media signal-carrying limits apply.
+- Full bandwidth usage confined to backbone connections in practice.
+
+Supported media types: 10BASE-T, 10BASE-FL, 100BASE-T, 100BASE-FX, 1000BASE-SX/LX/CX, 1000BASE-T.
+
+Gigabit Ethernet cable length limits:
+
+- Twisted pair: 100 m (same as 10/100BASE-T).
+- Multi-mode fibre: up to 2 km (full duplex). ~412 m on some fibres (half duplex).
+- Single-mode fibre: 20 km or more.

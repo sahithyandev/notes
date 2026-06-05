@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/ethernet
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.692Z
-lastUpdatedOn: 2026-05-03T07:56:35.316Z
+lastUpdatedOn: 2026-06-05T13:23:45.809Z
 ---
 
 Introduced in 1973 by Robert Metcalfe in his PhD thesis. Named after _ether_ the imaginary substance. Became the IEEE 802.3 Standard. Used in all 3 types of networks.
@@ -19,26 +19,21 @@ Dominant in the industry because:
 
 ## Frame structure
 
-Includes:
+Maximum 1518 bytes, excluding preamble.
 
-- preamble
-- destination address
-- source address
-- type/length field
-- data/payload
-- frame check sequence (FCS)
+`| Preamble (64 bits) | Dest Addr (48 bits) | Source Addr (48 bits) | Type/Length (16 bits) | Data (46–1500 bytes) | FCS/CRC (32 bits) |`
 
 ### Preamble
 
-7 bytes with pattern 10101010 followed by one byte with pattern 10101011. Used to synchronize receiver, sender clock rates.
+56 bits alternating 1s and 0s, followed by SFD (Start Frame Delimiter): 8 bits `10101011`. Used to synchronize receiver and sender clock rates.
 
 ### Address
 
-6 byte source and destination MAC addresses are included.
+6 byte source and destination MAC addresses.
 
-### Type
+### Type/Length
 
-Indicates the higher layer protocol.
+Value ≤1518 indicates frame length. Value >1518 indicates higher-layer protocol number assigned by IEEE.
 
 Examples: IP, Novell IPX, AppleTalk.
 

@@ -1,12 +1,12 @@
 ---
 title: Quality of Service
 sidebar:
-  order: 12
+  order: 14
 slug: s4/computer-networks/quality-of-service
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.621Z
-lastUpdatedOn: 2026-06-05T09:20:43.894Z
+lastUpdatedOn: 2026-06-05T13:23:45.812Z
 ---
 
 Ensures network performance meets the requirements of different applications.
@@ -42,13 +42,16 @@ Methods used to achieve QoS:
 
 ### Integrated Services
 
-Aka. IntServ. Resources reserved per individual flow. Guarantees QoS for each flow. Does not scale in large networks.
+Aka. IntServ. Resources are reserved per individual flow before transmission begins.
 
-Example:
+Properties:
 
-- Resource Reservation Protocol (RSVP)
+- Guarantees QoS per individual flow.
+- Does not scale in large networks (per-flow state at every router).
 
-Used in applications requiring strict performance guarantees:
+Protocol: Resource Reservation Protocol (RSVP).
+
+Used in:
 
 - Real-time video conferencing
 - VoIP calls
@@ -58,11 +61,15 @@ Used in applications requiring strict performance guarantees:
 
 Aka. DiffServ. Divides traffic into classes with different priorities.
 
-Each class receives different bandwidth, delay, and priority. Scales well in large networks. Does not guarantee QoS for individual flows.
+Properties:
 
-Uses the Differentiated Services (DS) field in the IP header. An 8-bit field. Includes:
+- Each class receives different bandwidth, delay, and priority treatment.
+- Scales well in large networks.
+- Does not guarantee QoS for individual flows.
 
-- Differentiated Services Code Point (DSCP) field  
-  6-bit field. Indicates the QoS class or priority level of a packet.
-- Explicit Congestion Notification (ECN) field  
-  2-bit field. Signals network congestion without dropping packets. ECN-capable transports adjust sending rates in response.
+Uses the Differentiated Services (DS) field in the IP header, an 8-bit field:
+
+- DSCP (6 bits)  
+  Indicates the QoS class or priority level of a packet.
+- ECN (2 bits)  
+  Signals congestion without dropping packets. ECN-capable transports adjust their sending rate in response.

@@ -1,12 +1,12 @@
 ---
 title: Network Design
 sidebar:
-  order: 22
+  order: 24
 slug: s4/computer-networks/network-design
 prev: true
 next: true
 dateCreated: 2026-05-03T09:06:32.051Z
-lastUpdatedOn: 2026-06-05T09:20:43.895Z
+lastUpdatedOn: 2026-06-05T13:23:45.813Z
 ---
 
 The process of planning and structuring communication infrastructure. Driven by business goals, security requirements, and traffic behaviour.
@@ -109,6 +109,23 @@ Application-level communications:
 - Multi-tier architectures.
 - Mail relays, DNS servers, AAA servers.
 - Applications lacking SSL or cryptography support: isolate with additional subnets and firewall interfaces.
+
+### High-Security Zone
+
+A network segment isolated to protect the most sensitive resources.
+
+Typical residents:
+
+- Databases with confidential data.
+- Authentication and AAA servers.
+- Financial and billing systems.
+
+Characteristics:
+
+- Sits behind one or more dedicated firewall tiers, beyond the DMZ.
+- Default-deny policy: only explicitly whitelisted traffic is permitted inbound.
+- Stricter logging and auditing than the general intranet.
+- Accessed only by other internal zones with a proven need.
 
 ### Topology-Based Design
 

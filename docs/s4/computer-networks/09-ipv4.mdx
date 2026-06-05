@@ -1,12 +1,12 @@
 ---
 title: IPv4
 sidebar:
-  order: 7
+  order: 9
 slug: s4/computer-networks/ipv4
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-06-05T09:20:43.894Z
+lastUpdatedOn: 2026-06-05T13:23:45.811Z
 prereqs:
   - s3/data-communication-and-networking/ip
 ---
@@ -37,8 +37,8 @@ Header fields:
 
 - Version (4 bits)  
   IP version. Set to `4` for IPv4.
-- IHL — Internet Header Length (4 bits)  
-  Header size in 32-bit words. Minimum `5` = 20 bytes.
+- IHL (4 bits)  
+  Internet Header Length. Header size in 32-bit words. Minimum `5` = 20 bytes.
 - DSCP/ToS (8 bits)  
   Quality of service classification.
 - Total Length (16 bits)  
@@ -66,29 +66,27 @@ Payload carries the transport-layer segment (TCP or UDP).
 
 ## Network and Host Parts
 
-An IP address is divided into network and host portions.
+An IPv4 address is divided into a network part and a host part.
 
 - Network part  
   Identifies the network.
 - Host part  
   Identifies the device within the network.
 
-Hosts with the same network part belong to the same network and can communicate without a router.
+Hosts sharing the same network part belong to the same subnet and communicate without a router. The boundary between parts is set by the subnet mask.
 
-### Network Size
-
-Depends on the number of bits allocated to the host portion. More host bits means a larger network.
+Network size is determined by the number of bits in the host part. More host bits means more addressable hosts but fewer subnets from the same block.
 
 ## IP Address Allocation
 
 - Host assignment  
   Manually configured, or dynamically via DHCP.
 - Network assignment  
-  ISP allocates an address block. ISP gets blocks from a RIR (e.g. APNIC). RIR gets blocks from ICANN.
+  ISP allocates an address block. ISPs receive blocks from a RIR (e.g. APNIC). RIRs receive blocks from ICANN.
 
 ## Dynamic Host Configuration Protocol
 
-Aka. DHCP. Dynamically assigns IP addresses to hosts. Allows automatic configuration, address reuse, and host mobility.
+Aka. DHCP. Dynamically assigns IP addresses to hosts. Enables automatic configuration, address reuse, and host mobility.
 
 Uses the DORA exchange:
 
@@ -99,41 +97,53 @@ Uses the DORA exchange:
 - Request  
   Client broadcasts a request for the offered address.
 - Ack  
-  Server confirms the lease; client configures the address.
+  Server confirms the lease. Client configures the address.
 
 ## Packet Forwarding
 
-Moving a packet toward its destination hop by hop.
+Moving a packet toward its destination, hop by hop.
 
-- Same network: direct delivery.
-- Different network: forward to the next-hop router.
+- Same network  
+  Direct delivery to the destination host.
+- Different network  
+  Forward to the next-hop router.
 
-Routers use forwarding tables keyed on destination network. The datagram is unchanged except for mutable fields (e.g. TTL, checksum).
+Routers use forwarding tables keyed on destination network prefix. The datagram is unchanged except for mutable fields (TTL, checksum).
 
 ## Address Resolution Protocol
 
-Aka. ARP. Maps IP addresses to MAC addresses within a local network. Works by broadcasting a query; the target host replies with its MAC address.
+Aka. ARP. Maps IP addresses to MAC addresses within a local network. The sender broadcasts a query. The target host replies with its MAC address.
 
-Cannot operate beyond the local network because it relies on broadcast.
+ARP cannot operate beyond the local network because broadcasts do not cross routers.
 
 ## Longest Prefix Match
 
-Aka. LPM. When forwarding a packet, a router selects the most specific (longest) matching prefix in its routing table.
+Aka. LPM. A router selects the most specific (longest) matching prefix in its routing table when forwarding a packet.
 
-- Software implementation: tree search, slow but space-efficient.
-- Hardware implementation: TCAM, fast but expensive and power-hungry.
+- Software implementation  
+  Tree search. Slow but space-efficient.
+- Hardware implementation  
+  TCAM. Fast but expensive and power-hungry.
 
-## Hop-by-Hop Fragmentation
+## Fragmentation
 
-In IPv4, any router can fragment a packet that exceeds a link's MTU. Reassembly happens only at the destination. Adds processing overhead at each hop.
+In IPv4, any router can fragment a packet that exceeds a link's MTU. Reassembly happens only at the destination.
 
-## Issues
+The Identification, Flags, and Fragment Offset header fields coordinate fragment reassembly. The MF flag marks all fragments except the last. Fragment Offset gives the fragment's position in the original datagram.
 
-- Restricted address space  
-  32-bit addresses limit the pool to ~4.3 billion. Exhausted by growth of connected devices.
-- Huge routing tables  
-  Flat addressing caused global BGP tables to exceed 1 million entries. Stored in TCAM, which is expensive, power-hungry, and physically limited.
-- Slow LPM  
+<Note>
+
+IPv6 eliminates per-hop fragmentation. Only the source host may fragment, reducing router overhead.
+
+</Note>
+
+## Limitations
+
+- Address exhaustion  
+  32-bit addresses cap the pool at ~$4.3$ billion. Insufficient for the number of connected devices.
+- Routing table growth  
+  Flat addressing caused global BGP tables to exceed 1 million entries. TCAM storage is expensive, power-hungry, and physically limited.
+- LPM cost  
   Longest prefix match over large tables is costly even with TCAM.
-- Convergence delays  
-  Topology changes take longer to propagate when routing tables are large.
+- Convergence delay  
+  Topology changes propagate slowly when routing tables are large.

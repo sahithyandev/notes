@@ -1,0 +1,59 @@
+---
+title: Packet Switching
+sidebar:
+  order: 11
+slug: s4/computer-networks/packet-switching
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.621Z
+lastUpdatedOn: 2026-06-05T13:23:45.811Z
+---
+
+A communication method where a data stream is divided into smaller packets and transmitted independently through the network. More efficient than [leased lines](/s4/computer-networks/man-and-wan#leased-lines).
+
+Each packet contains a header and a data payload.
+
+Steps:
+
+1. Data is divided into packets.
+2. Each packet is transmitted independently.
+3. Routers forward packets hop by hop.
+4. Packets reassemble at the destination host.
+
+Packets from the same data stream may follow different routes. Two approaches exist: connectionless and connection-oriented.
+
+## Connectionless
+
+Packets transmitted without establishing a connection beforehand. Also called a **datagram service**.
+
+Properties:
+
+- Each packet carries the full destination address.
+- Routing decisions are made independently per packet.
+- No connection setup required.
+- No router state per connection.
+- No built-in error control or QoS guarantees.
+- Node failures have minimal effect; packets are rerouted independently.
+
+### Forwarding
+
+Switching a packet from an input line to an output line. Each router maintains a forwarding table mapping destination addresses to next hops.
+
+## Connection-Oriented
+
+A virtual circuit is established between source and destination before any packets are transmitted. Also called a **connection-oriented network**.
+
+Properties:
+
+- Connection setup required before data transfer.
+- All packets follow the same pre-determined path.
+- Packets addressed by CID, not full destination address.
+- Routers maintain per-connection state.
+- Network may provide error control and QoS guarantees.
+- Node failure terminates all virtual circuits through that node.
+
+### Connection Identifier
+
+Aka. CID. A unique identifier assigned to each virtual circuit on a given link. Used in place of full destination addresses for faster forwarding.
+
+Each router maintains a forwarding table mapping incoming CIDs to outgoing CIDs. Packets are forwarded based on CID lookup alone.
