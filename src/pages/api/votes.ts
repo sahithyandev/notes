@@ -2,8 +2,12 @@
  * /api/votes — serverless API route (runs on Vercel, never prerendered).
  *
  * GET  /api/votes?slug=<slug>  → { up: number, down: number }
- * POST /api/votes              ← JSON { slug: string, vote: 1 | -1 }
+ * POST /api/votes              ← JSON { slug: string, vote: 1 | -1 | 0 }
  *                              → { up: number, down: number }
+ *
+ *  vote: 1  = thumbs up
+ *  vote: -1 = thumbs down
+ *  vote: 0  = remove / undo previous vote
  *
  * Spam control:
  *  - One vote per (slug, hashed IP). The PK on the note_votes table enforces
@@ -69,7 +73,8 @@ export const POST: APIRoute = async ({ request }) => {
     typeof (body as Record<string, unknown>).slug !== "string" ||
     !(
       (body as Record<string, unknown>).vote === 1 ||
-      (body as Record<string, unknown>).vote === -1
+      (body as Record<string, unknown>).vote === -1 ||
+      (body as Record<string, unknown>).vote === 0
     )
   ) {
     return new Response(JSON.stringify({ error: "Invalid body" }), {
@@ -78,7 +83,7 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  const { slug, vote } = body as { slug: string; vote: 1 | -1 };
+  const { slug, vote } = body as { slug: string; vote: 1 | -1 | 0 };
   if (!SLUG_RE.test(slug)) {
     return new Response(JSON.stringify({ error: "Invalid slug" }), {
       status: 400,
@@ -88,20 +93,36 @@ export const POST: APIRoute = async ({ request }) => {
 
   const supabase = getSupabase();
   const ip_hash = hashIp(clientIp(request));
-  const now = new Date().toISOString();
 
-  const { error: upsertError } = await supabase
-    .from("note_votes")
-    .upsert(
-      { slug, ip_hash, vote, updated_at: now },
-      { onConflict: "slug,ip_hash" },
-    );
+  if (vote === 0) {
+    // Undo: remove the vote row entirely
+    const { error: deleteError } = await supabase
+      .from("note_votes")
+      .delete()
+      .eq("slug", slug)
+      .eq("ip_hash", ip_hash);
 
-  if (upsertError) {
-    return new Response(JSON.stringify({ error: "Database error" }), {
-      status: 502,
-      headers: { "Content-Type": "application/json" },
-    });
+    if (deleteError) {
+      return new Response(JSON.stringify({ error: "Database error" }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  } else {
+    const now = new Date().toISOString();
+    const { error: upsertError } = await supabase
+      .from("note_votes")
+      .upsert(
+        { slug, ip_hash, vote, updated_at: now },
+        { onConflict: "slug,ip_hash" },
+      );
+
+    if (upsertError) {
+      return new Response(JSON.stringify({ error: "Database error" }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   }
 
   const counts = await getVoteCounts(slug);

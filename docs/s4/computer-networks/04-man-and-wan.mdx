@@ -6,36 +6,53 @@ slug: s4/computer-networks/man-and-wan
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.318Z
-lastUpdatedOn: 2026-06-04T20:58:06.728Z
+lastUpdatedOn: 2026-06-05T09:05:13.947Z
 prereqs:
   - s3/data-communication-and-networking/network
 ---
 
 Different technologies are used for MAN and WAN networks.
 
+### PBX
+
+Short for Private Branch Exchange. A telephone switching system used inside an organization.
+
+Handles internal calls between extensions within the organization and connects to the public telephone network for external calls. Manages a shared pool of lines and routes calls internally.
+
 ## Leased Lines
 
-A dedicated, full-time point-to-point link between 2 entities. Always available. Not shared.
+A dedicated, full-time point-to-point link between 2 entities. Always available. Not shared. Provided by a telecom provider.
 
-- Fixed carrying capacity: 64 kb/s, 2 Mb/s, or 155 Mb/s.
-- Fixed monthly cost; not usage-based.
-- Types: analog or digital. Most modern lines are digital.
-- Common speeds: 64 kb/s (few computers), 2 Mb/s (large office).
+Fixed carrying capacity: 64 kb/s, 2 Mb/s, or 155 Mb/s. Common speeds: 64 kb/s (few computers), 2 Mb/s (large office).
 
-Used in:
+Very high fixed monthly cost. Bandwidth is wasted when there is no data communication.
 
-- Voice: tie lines between PBXs (Private Branch Exchanges, private telephone switches inside organizations that manage internal calls and connect to the public phone network). Tie lines are dedicated links between two PBXs so inter-office calls bypass the public phone network.
-- Data: corporate networks, Internet access.
-- Combined voice + data.
+Both analog and digital variants exist. Analog is old and less common today. Digital is dominant today.
+
+Used in tie lines of PBXs (leased lines between 2 PBXs), corporate networks.
 
 ## X.25
 
-International Telecommunication Union (ITU) standard for user interface to a packet data network. ITU is the UN agency that sets global telecom standards.
+An International Telecommunication Union (ITU, the UN agency that sets global telecom standards) standard. Defines the interface between a user's equipment and a public packet-switched data network. Introduced in 1960s. Became the dominant standard for wide-area data communication. Speed: ~64 kb/s.
 
-- Introduced: 1960s. Became standard for data communication.
-- Used by: banks, airlines.
-- Speed: ~64 kb/s.
-- Very expensive relative to modern networks.
+Data is broken into packets, and they are sent into a shared network. The network forwards each packet intermediate nodes until it reaches the destination. Multiple customers' traffic shares the same physical infrastructure, which is more efficient than leasing a full circuit.
+
+Connection-oritented. Uses virtual circuits. Before data transfer begins, a logical path is established through the network. All packets for a given session follow that same path.
+
+Very reliable. When X.25 was designed, physical transmission links were unreliable. It performs error detection and retransmission at every node. Every intermediate switch checks the packet for errors and requests retransmission if needed before forwarding it onward. Introduces significant processing overhead and delay at each hop.
+
+Very expensive relative to modern networks. As physical links became more reliable, excessive error checking became unnecessary.
+
+Was used heavily by banks, airlines and similar industries. Not used as much nowadays.
+
+**Specs and limitations:**
+
+- Maximum speed: ~64 kb/s
+- Max packet payload: 128 bytes
+- Supports permanent virtual circuits (PVCs)
+- Does **not** support multicasting
+- Very expensive compared to later technologies
+- The per-node error checking made it too slow for voice or video — only suitable for non-real-time data
 
 ## Frame Relay
 
