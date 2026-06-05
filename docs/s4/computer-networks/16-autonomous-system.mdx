@@ -1,0 +1,34 @@
+---
+title: Autonomous System
+sidebar:
+  order: 16
+dateCreated: 2026-06-05T15:43:35.352Z
+lastUpdatedOn: 2026-06-05T16:39:48.486Z
+slug: s4/computer-networks/autonomous-system
+prev: true
+next: true
+---
+
+A collection of IP networks and routers under the control of one administrative entity.
+
+- Identified by a unique AS Number (ASN), assigned by IANA.
+- Contains multiple routers and uplinks to other ASes.
+- The boundary between AS domains defines the boundary between Intra-AS and Inter-AS routing.
+
+## Routing
+
+### Intra-AS
+
+Operates within a single AS. Aka. Interior Gateway Protocol (IGP).
+
+### Inter-AS Routing
+
+Operates between different ASes. Aka. Exterior Gateway Protocol (EGP).
+
+| Scope    | Principle       | Protocols   |
+| -------- | --------------- | ----------- |
+| Intra-AS | Distance Vector | RIP         |
+| Intra-AS | Link State      | OSPF, IS-IS |
+| Inter-AS | Path Vector     | BGP         |
+
+See [Routing](/s4/computer-networks/routing) for algorithm details.

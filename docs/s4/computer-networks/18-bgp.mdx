@@ -1,0 +1,63 @@
+---
+title: BGP
+sidebar:
+  order: 18
+dateCreated: 2026-06-05T15:59:54.238Z
+lastUpdatedOn: 2026-06-05T16:39:48.486Z
+slug: s4/computer-networks/bgp
+prev: true
+next: true
+---
+
+Short for Border Gateway Protocol. [Path vector](/s4/computer-networks/routing#path-vector-routing) [EGP](/s4/computer-networks/autonomous-system#inter-as) routing protocol of the Internet. Runs over TCP port 179.
+
+Each route advertisement carries the full AS-PATH, an ordered list of ASes the route has traversed.
+
+## Path Vector Algorithm
+
+Each border router (speaker node) advertises to peers the full sequence of ASes on the path to a destination.
+
+$$
+\text{Path}(X, Z) = X, Y_1, Y_2, \ldots, Z
+$$
+
+If a router $W$ accepts a path advertised by $X$, $W$ prepends itself and re-advertises to its own peers:
+
+$$
+\text{Path}(W, Z) = W, \text{Path}(X, Z)
+$$
+
+A router discards any route whose AS-PATH contains its own AS number to prevent loops.
+
+## Session Types
+
+### iBGP
+
+Sessions between routers within the same AS.
+
+### eBGP
+
+Sessions between routers in different ASes.
+
+## Route Selection
+
+Attributes evaluated in order:
+
+- LOCAL-PREF  
+  Preferred exit for outbound traffic within the AS. Higher value preferred.
+- AS-PATH  
+  Shorter path preferred after LOCAL-PREF ties.
+- MED  
+  Multi-Exit Discriminator. Hint to neighboring ASes for inbound traffic. Lower value preferred.
+- NEXT-HOP  
+  IP address of the next-hop router for the advertised prefix.
+
+## Traffic Control
+
+An AS controls incoming traffic by selectively advertising routes. Withholding a route advertisement to a peer AS blocks traffic from or through that AS.
+
+## Properties
+
+- Does not compute shortest paths. Selects routes based on policy.
+- Convergence is deliberately slow. Stability preferred over speed.
+- A full Internet routing table carries over 900,000 IPv4 prefixes.

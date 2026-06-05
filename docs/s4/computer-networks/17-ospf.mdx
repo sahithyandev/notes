@@ -1,0 +1,24 @@
+---
+title: OSPF
+sidebar:
+  order: 17
+dateCreated: 2026-06-05T15:59:48.522Z
+lastUpdatedOn: 2026-06-05T16:39:48.486Z
+slug: s4/computer-networks/ospf
+prev: true
+next: true
+---
+
+Short for Open Shortest Path First. A [link-state](/s4/computer-networks/routing#link-state-routing) [IGP](/s4/computer-networks/autonomous-system#intra-as) standardized in RFC 2328.
+
+Each router builds a complete topology map of its area, then runs Dijkstra's algorithm to compute optimal routes.
+
+Operates over IP directly using protocol number 89. Open standard. Supports VLSM and CIDR. Faster convergence than RIP.
+
+Recommended for multi-vendor environments.
+
+### Cost Metric
+
+$$
+\text{cost} = \frac{10^8}{\text{bandwidth (bps)}}
+$$

@@ -1,12 +1,12 @@
 ---
 title: Routing
 sidebar:
-  order: 12
+  order: 15
 slug: s4/computer-networks/routing
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.621Z
-lastUpdatedOn: 2026-06-05T13:23:45.811Z
+lastUpdatedOn: 2026-06-05T16:39:48.486Z
 ---
 
 Determining the path used to deliver packets from source to destination.
@@ -43,7 +43,7 @@ Fairness and optimality can conflict. A globally optimal flow may starve low-pri
 Defined by a cost metric assigned to each link or path. Common cost factors:
 
 - Number of hops
-- Bandwidth (inverse — higher bandwidth = lower cost)
+- Bandwidth (inverse: higher bandwidth = lower cost)
 - Delay / latency
 - Error rate
 - Congestion level
@@ -60,7 +60,8 @@ Properties:
 
 - Simple to implement and reason about.
 - No protocol overhead.
-- Not adaptive: does not react to failures or congestion.
+- Not adaptive  
+  Does not react to failures or congestion.
 - Requires manual update whenever topology changes.
 - Does not scale beyond small networks.
 
@@ -88,7 +89,8 @@ Properties:
 
 - Generates very high traffic volume.
 - Without loop prevention, packets circulate indefinitely.
-- Loop prevention uses sequence numbers. Routers discard packets whose sequence number has already been seen.
+- Loop prevention uses sequence numbers.
+- Routers discard packets whose sequence number has already been seen.
 
 ### Broadcast Routing
 
@@ -96,29 +98,11 @@ Packets are sent to all nodes in the network. Guaranteed delivery. Higher overhe
 
 ### Shortest Path Routing
 
-Models the network as a weighted graph. Computes the minimum-cost path between every pair of nodes. The weights represent the chosen cost metric.
-
-Each router has a complete view of the network topology and computes least-cost paths to all other nodes using Dijkstra's algorithm:
-
-1. Assign cost $0$ to the source node and $\infty$ to all others.
-2. Select the unvisited node with the smallest known cost.
-3. Update cost estimates for its unvisited neighbors.
-4. Mark the node visited. Repeat from step 2 until all nodes are visited.
-
-Produces the shortest path tree rooted at the source.
+Models the network as a weighted graph. Each router runs Dijkstra's algorithm on a full topology view to compute the minimum-cost path to every destination.
 
 ### Distance Vector Routing
 
-Each router maintains a table of estimated distances to every destination. Routers periodically share their tables with direct neighbors. Each router updates its own table using the received vectors (Bellman-Ford).
-
-Properties:
-
-- Distributed: no router has a global view.
-- Converges incrementally as updates propagate.
-- Susceptible to the count-to-infinity problem when a link fails.  
-  Count-to-infinity occurs when two routers increment each other's stale route indefinitely after a link goes down. Split horizon and route poisoning are standard mitigations.
-
-Each router updates its table using the Bellman-Ford equation:
+Each router maintains a distance table to every destination. Tables are shared with direct neighbors periodically. Each router updates its own table using the Bellman-Ford equation:
 
 $$
 D(x, y) = \min_{v} \bigl\{ c(x, v) + D(v, y) \bigr\}
@@ -129,26 +113,35 @@ $$
 - $v$: neighbor of $x$
 - $c(x, v)$: link cost from $x$ to $v$
 
-Example: Routing Information Protocol (RIP), limited to 15 hops to bound the count-to-infinity problem.
+No router has a global topology view. Susceptible to the count-to-infinity problem when a link fails.
+
+<Note>
+
+Count-to-infinity: two routers increment each other's stale route indefinitely after a link goes down. Mitigated by split horizon or route poisoning. RIP caps hops at 15 to bound the problem.
+
+</Note>
+
+Example: Routing Information Protocol (RIP).
+
+### Path Vector Routing
+
+Extension of distance vector routing. Each router tracks the full path to each destination, not just the distance. Loops are detected by checking whether the receiving router's ID already appears in the path.
+
+- Policy-aware  
+  Routers can reject paths that traverse unwanted networks.
+- No count-to-infinity problem.
+
+Example: [Border Gateway Protocol (BGP)](/s4/computer-networks/bgp), used for inter-AS routing on the Internet.
 
 ### Link State Routing
 
-Each router floods information about its directly connected links to every other router. Every router independently builds a complete topology map and runs Dijkstra's algorithm to compute shortest paths.
-
-Each link state advertisement contains:
-
-- Neighbor router ID
-- Link status (up or down)
-- Link cost
-- Link identifier
-
-Properties:
+Each router floods its directly connected link states to every other router. Every router independently builds a full topology map and runs Dijkstra's algorithm.
 
 - Faster convergence than distance vector routing.
-- Requires more memory and CPU (full topology stored at each router).
 - No count-to-infinity problem.
+- Higher memory and CPU usage.
 
-Example: Open Shortest Path First (OSPF).
+Example: [Open Shortest Path First (OSPF)](/s4/computer-networks/ospf).
 
 ### Source Routing
 
@@ -170,8 +163,10 @@ In multicast routing, packets are forwarded to multiple outgoing links. Routers 
 
 Each router stores a forwarding table mapping destination prefixes to outgoing interfaces. The table is derived from the routing table but optimized for fast lookup.
 
-Routing table: computed by routing protocols, stores full path information.
-Forwarding table: used per-packet, stores only next-hop and interface.
+- Routing table  
+  Computed by routing protocols. Stores full path information.
+- Forwarding table  
+  Used per-packet. Stores only next-hop and interface.
 
 ### Queueing
 
@@ -185,9 +180,9 @@ Different queue disciplines apply different rules per traffic class.
 
 ## Inter-Router Configuration
 
-A `/30` subnet is the conventional choice for point-to-point links between two routers. It provides exactly two usable host addresses — one per router interface.
+A `/30` subnet is the conventional choice for point-to-point links between two routers. Provides exactly two usable host addresses, one per router interface.
 
-If two non-adjacent routers $A$ and $B$ connect through intermediaries, they may reuse the same subnet address on their inter-router interfaces. This is avoided in medium to large networks to prevent address ambiguity.
+If two non-adjacent routers $A$ and $B$ connect through intermediaries, they may reuse the same subnet address on their inter-router interfaces. Avoided in medium to large networks to prevent address ambiguity.
 
 By convention, the address assigned to a router interface on a `/30` link is either:
 
