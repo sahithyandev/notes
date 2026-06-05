@@ -15,6 +15,7 @@ import ModulesList from "../components/modules-list.astro";
 import NoteFeedback from "../components/note-feedback.astro";
 import { getVoteCounts } from "../lib/supabase";
 
+export const prerender = true;
 // ISR: revalidate note pages every 5 minutes so server-rendered vote counts stay fresh.
 export const revalidate = 300;
 

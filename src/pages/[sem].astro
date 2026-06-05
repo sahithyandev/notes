@@ -8,6 +8,8 @@ import NoteCard from "../components/note-card.astro";
 import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
 
+export const prerender = true;
+
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
   const sems = new Set<string>();
