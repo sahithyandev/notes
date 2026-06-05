@@ -6,7 +6,7 @@ slug: s4/computer-networks/man-and-wan
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.318Z
-lastUpdatedOn: 2026-06-05T09:05:13.947Z
+lastUpdatedOn: 2026-06-05T09:20:43.892Z
 prereqs:
   - s3/data-communication-and-networking/network
 ---
@@ -18,6 +18,10 @@ Different technologies are used for MAN and WAN networks.
 Short for Private Branch Exchange. A telephone switching system used inside an organization.
 
 Handles internal calls between extensions within the organization and connects to the public telephone network for external calls. Manages a shared pool of lines and routes calls internally.
+
+### PON
+
+Short for Passive Optical Network. A single fiber from the provider splits passively into multiple fibers serving separate customers. No active electronics between the provider and customer.
 
 ## Leased Lines
 
@@ -33,146 +37,127 @@ Used in tie lines of PBXs (leased lines between 2 PBXs), corporate networks.
 
 ## X.25
 
-An International Telecommunication Union (ITU, the UN agency that sets global telecom standards) standard. Defines the interface between a user's equipment and a public packet-switched data network. Introduced in 1960s. Became the dominant standard for wide-area data communication. Speed: ~64 kb/s.
+ITU standard defining the interface between user equipment and a public packet-switched data network. Introduced in the 1960s. Became the dominant standard for wide-area data communication.
 
-Data is broken into packets, and they are sent into a shared network. The network forwards each packet intermediate nodes until it reaches the destination. Multiple customers' traffic shares the same physical infrastructure, which is more efficient than leasing a full circuit.
+Data is broken into packets and forwarded hop-by-hop through a shared network. Multiple customers' traffic shares the same physical infrastructure.
 
-Connection-oritented. Uses virtual circuits. Before data transfer begins, a logical path is established through the network. All packets for a given session follow that same path.
+Connection-oriented. A virtual circuit (logical path) is established before data transfer begins. All packets for a session follow that path.
 
-Very reliable. When X.25 was designed, physical transmission links were unreliable. It performs error detection and retransmission at every node. Every intermediate switch checks the packet for errors and requests retransmission if needed before forwarding it onward. Introduces significant processing overhead and delay at each hop.
+Every intermediate switch checks each packet for errors and retransmits before forwarding. Designed for unreliable physical links. Introduces significant processing overhead and delay at each hop. Became a liability once physical links improved.
 
-Very expensive relative to modern networks. As physical links became more reliable, excessive error checking became unnecessary.
+Supports both:
 
-Was used heavily by banks, airlines and similar industries. Not used as much nowadays.
+- Permanent Virtual Circuits  
+  Aka. PVCs. The virtual circuit is configured once between 2 routers and stays up indefinitely.
+- Switched Virtual Circuits  
+  Aka. SVCs. The circuit is established on-demand. Used for the duration of a session, then torn down. More common in X.25
 
-**Specs and limitations:**
+Specs:
 
 - Maximum speed: ~64 kb/s
 - Max packet payload: 128 bytes
 - Supports permanent virtual circuits (PVCs)
-- Does **not** support multicasting
-- Very expensive compared to later technologies
-- The per-node error checking made it too slow for voice or video — only suitable for non-real-time data
+- No multicast support
+- Per-node checking makes it unsuitable for real-time traffic. Only suitable for non-real-time data.
+
+Less expensive than leased lines.
+
+Very expensive compared to later technologies. Does not support multicasting. Used heavily by banks and airlines. Largely obsolete today.
 
 ## Frame Relay
 
-WAN virtual-circuit technology. Replacement for X.25. Designed in late 1980s. Widely deployed in 1990s.
+Direct replacement for X.25. Operates at the data link layer. Designed in the late 1980s. Widely deployed through the 1990s.
 
-- Relays frames point-to-point. Carries IP datagrams; acts as link layer for IP.
-- No error control; assumes network is reliable.
-- End-to-end congestion control.
+Per-node error checking removed. Delegated to upper-layer protocols. Frames forwarded hop-to-hop without per-node verification.
 
-Virtual circuit model:
+Connection-oriented. Uses virtual circuits. Most deployments use PVCs over SVCs.
 
-- Permanent VCs (PVCs): aggregate traffic between two routers.
-- Multiple VCs per physical link.
-- **CIR** (Committed Information Rate): guaranteed data rate per VC. Negotiated at setup. Customer billed per CIR.
-
-## ATM
-
-Cell-switched WAN technology. Fixed 53-byte cells (5-byte header, 48-byte data).
-
-Why cells:
-
-- Uniform size: fast hardware processing.
-- Simple header: low switching delay.
-- Suitable for voice, video, and data on a single network.
-- X.25/Frame Relay switching delay unacceptable for real-time traffic.
+Does not support multicasting.
 
 Properties:
 
-- Scalable and flexible.
-- Charging based on cell count; not fixed bandwidth tiers.
-- Transmission medium: optical fiber.
+- Acts as link layer for IP. Carries IP datagrams.
+- No per-node error control. Assumes reliable links.
+- End-to-end congestion control only.
+- Designed purely for data. Inter-frame delay is unpredictable.
+- Not suitable for voice or video.
 
-Deployment reality:
+Specs:
 
-- Original vision: end-to-end desktop-to-desktop ATM.
-- Actual use: ATM as switched link layer connecting IP backbone routers.
+- Max speed: 2 Mb/s
+- Max payload: 1600 bytes
 
-Virtual circuits:
+### Committed Information Rate
 
-- Each cell carries a VC identifier, not a destination address.
-- Every switch on the path maintains per-connection state.
-- Resources (bandwidth, buffers) allocated per VC.
+Aka. CIR. The data rate a provider guarantees for a specific virtual circuit. Negotiated at VC setup. Billed on CIR, not actual usage. Traffic may burst above the CIR, but only the CIR is guaranteed.
 
-Addressing:
+## ATM
 
-- **VPI** (Virtual Path Identifier) + **VCI** (Virtual Circuit Identifier).
-- Two-part addressing speeds up routing and switching.
+Short for Asynchronous Transfer Mode. Cell-switched. Charged based on cell count. Uses optical fiber as transmission medium. Developed in 1980s and 1990s.
 
-## Technology Comparison
+Speed is typically 155 Mb/s. Suitable for voice, video and data on a single network. Fixes X.25 and Frame Relay's switching delay unacceptable for real-time traffic.
 
-| Feature              | X.25 | Frame Relay | ATM |
-| -------------------- | ---- | ----------- | --- |
-| Connection-oriented  | Yes  | Yes         | Yes |
-| Typical speed (Mb/s) | 0.64 | 2           | 155 |
-| Switched             | Yes  | Yes         | Yes |
-| Max payload (bytes)  | 128  | 1600        | 48  |
-| Permanent VCs        | Yes  | Yes         | Yes |
-| Multicasting         | No   | No          | Yes |
+Connection-oriented. Every switch on the path maintains per-connection state. Supports both PVCs and SVCs.
 
-## MPLS
+Scalable. Flexible. Supports multicasting. Does not support variable-length frames.
 
-Connection-oriented switching using labels applied at the edge of an MPLS domain. Applicable to any Layer 2 protocol.
+ATM was designed to be a universal networking technology that would replace everything. Originally intended to operate at Layer 3, replacing IP. However when ATM was being deployed, Ethernet was already widely used. And was getting faster. Ethernet was cheaper, simpler, and already familiar to everyone.
 
-- Based on IP and routing protocols: BGP-4, OSPF, IS-IS.
-- Resides in service provider/carrier networks only; not private networks.
-- IP used to signal MPLS connections.
+ATM ended up being used only to interconnect IP backbone routers across WANs. Demoted to Layer 2, acting purely as a high-speed, connection-oriented link layer between backbone routers. The routers don't care about ATM's QoS classes or VC structure in any meaningful way; they just see a fast link.
 
-Protocol stack (bottom to top):
+### Cell
 
-1. Physical
-2. Layer 2 (PPP, ATM, Frame Relay, …)
-3. MPLS
-4. IP or Multi-Service
-5. Application
+Fixed size of 53-bytes. 5-byte header and 48-byte data. Simple header enables faster switching.
 
-Major applications:
+Fixed size cells enable faster processing at hardware level. This enables bounded delay. Inefficient for large data transfers. Constant 10% overhead per cell.
 
-- Network scalability.
-- Traffic engineering.
-- VPNs.
+Each cell carries:
 
-Additional capabilities: IP Multicast, IP CoS, RSVP.
+- Virtual Path Identifier  
+  Aka. VPI. Identifies a virtual path. A bundle of virtual circuits sharing the same physical route through the network. Switches route based on VPI alone at intermediate nodes.
+- Virtual Circuit Identifier  
+  Aka. VCI. Identifies a specific virtual circuit within a virtual path. Only meaningful in the context of a VPI.
 
-MPLS hybrid position:
+At each switch, the VPI/VCI pair is replaced with a new pair on the outgoing link. Separating path-level from circuit-level routing lets intermediate nodes forward on VPI alone, without inspecting individual VCIs. Enables faster switching.
 
-| IP                                               | MPLS   | ATM/FR                                                               |
-| ------------------------------------------------ | ------ | -------------------------------------------------------------------- |
-| Scalable, flexible, dynamic routing, inexpensive | Hybrid | Performance, connection-oriented, traffic engineering, security, QoS |
+### Quality of Service
 
-Principle: _Route at the edge; switch at the core._
+Supports per-VC QoS guarantees via service classes.
 
-Convergence benefit: MPLS enables a single IP/MPLS network to consolidate PSTN, IP, Frame Relay, and ATM networks.
+- Constant Bit Rate (CBR)  
+  Fixed, guaranteed bandwidth for a given virtual circuit. Used for uncompressed voice and video.
+- Variable Bit Rate (VBR)  
+  Bandwidth varies within defined bounds. Peak and sustained rates are both specified. 2 sub-classes: real-time VBR and non-real-time VBR.
+- Available Bit Rate (ABR)  
+  No guaranteed bandwidth. Sender adjusts rate based on congestion feedback from the network.
+- Unspecified Bit Rate (UBR)  
+  No guarantees. Best-effort delivery. Cells dropped under congestion.
 
 ## Metro Ethernet
 
-Connects homes and offices via Ethernet. IEEE 802.3ah standard.
+Ethernet technology extended to MAN and WAN distances. Provided by telecom carriers as a managed service. IEEE 802.3ah standard.
 
-EFM over Copper (EFMC):
+As LANs, MANs, and WANs use the same technology, requirement for separate WAN hardware and expertise is eliminated. Customer's existing Ethernet switches and routers connect directly. Lower cost. Higher speeds (10 Mbps to 10Gbps or more).
 
-- Uses DSL modulation with Ethernet frames.
-- EFMC SR: 10 Mb/s at 750 m.
-- EFMC LR: 2 Mb/s at 2,700 m.
+### Ethernet First Mile
 
-EFM over Fibre (EFMF):
+Aka. EFM. IEEE 802.3ah. A set of physical layer standards defining how Ethernet signals are carried over the link between the carrier's network and the customer's premises.
 
-- Point-to-point or Passive Optical Networks (PON).
-- Dual-fiber standards: 100BASE-LX10, 1000BASE-LX10.
-- Single-fiber standards: 100BASE-BX10, 1000BASE-BX10.
+Called "first mile" because it's the segment where the provider's service begins, from the user's perspective.
 
-## Summary
+### EFM over Copper
 
-- X.25  
-  Early standard; slow (~64 kb/s); expensive.
-- Frame Relay  
-  X.25 replacement; virtual circuits; no error control; CIR billing.
-- ATM  
-  Fixed 53-byte cells; low delay; supports voice/video/data; VPI+VCI addressing.
-- MPLS  
-  Label switching at provider core; supports traffic engineering, VPNs, scalability.
-- EFM  
-  Ethernet to the home/office over copper (DSL) or fibre (PON).
+Aka. EFMC. Runs Ethernet over existing copper telephone lines. DSL modulation encodes Ethernet frames so they can travel over copper at MAN distances without requiring new cabling.
 
-Dominant trend: MPLS and Ethernet replacing legacy WAN technologies.
+- EFMC short range: 10 Mb/s at 750 m.
+- EFMC long range: 2 Mb/s at 2,700 m.
+
+### EFM over Fibre
+
+Aka. EFMF. Fiber-based connections to customer premises. Supports point-to-point links and [PONs](#pon).
+
+
+- Dual-fiber  
+  Separate fibers for TX and RX. Standards: 100BASE-LX10, 1000BASE-LX10.
+- Single-fiber  
+  One fiber for both directions using separate wavelengths. Standards: 100BASE-BX10, 1000BASE-BX10.

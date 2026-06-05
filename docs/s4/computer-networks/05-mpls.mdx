@@ -1,0 +1,75 @@
+---
+title: MPLS
+sidebar:
+  order: 5
+dateCreated: 2026-06-05T07:25:36.609Z
+lastUpdatedOn: 2026-06-05T09:20:43.893Z
+slug: s4/computer-networks/mpls
+prev: true
+next: true
+---
+
+Multi-Protocol Label Switching. A forwarding mechanism, not a routing protocol. Sits between Layer 2 and Layer 3 ("Layer 2.5"). Resides in service provider/carrier networks only.
+
+Standard IP routing requires every router to perform a full destination-IP lookup per packet. Expensive at scale. ATM/Frame Relay switch faster using short labels (VCI/DLCI) but lack IP's scalability. MPLS combines label-based switching speed with IP's dynamic routing.
+
+Routing protocols (OSPF, BGP-4, IS-IS) still determine paths. MPLS handles forwarding only.
+
+## Label Header
+
+Inserted between the Layer 2 and IP headers. 32 bits total:
+
+```
+|      Label (20)      | TC (3) | S (1) |    TTL (8)    |
+```
+
+- Label: 20 bits forwarding identifier
+- Traffic Class (TC): 3 bits QoS priority
+- Bottom of Stack (S): 1 bit set on the innermost label in a stack
+- TTL: 8 bits same semantics as IP TTL
+
+Multiple labels can be stacked. LSRs read only the outermost label.
+
+## Mechanism
+
+### Label Switched Path
+
+A predetermined sequence of LSRs from ingress to egress LER. Established before traffic flows.
+
+A virtual circuit. Can be permanent or dynamically established via RSVP-TE or LDP.
+
+### Label Edge Router
+
+Aka. LER. Entry and exit points of a MPLS network. Inspects IP header of incoming packets, attaches label, determines LSP. Strips label from the outgoing packet and delivers normal IP packet.
+
+### Label Switch Router
+
+Aka. LSR. Core router. Swaps label at each hop. Never inspects the IP header.
+
+## Applications
+
+- Network scalability  
+  Core routers skip per-packet IP lookups. Only edge routers consult IP routing tables.
+- Traffic engineering  
+  Paths explicitly controlled, independent of dynamic routing. Provider load-balances and routes by priority or latency.
+- VPNs  
+  Layer 3 VPNs via label stacking. Inner label identifies the customer circuit, outer label routes through the provider core. Customers are logically isolated on shared infrastructure.
+- IP Multicast  
+  Multicast traffic carried along pre-established branching LSPs. Avoids per-router group membership state.
+- IP CoS  
+  TC field in the label header marks packets with priority. LSRs queue and forward based on priority class.
+- RSVP  
+  Signalling protocol for bandwidth reservation along a path. RSVP-TE establishes LSPs with guaranteed bandwidth and QoS.
+
+## Convergence
+
+A single MPLS network carries ATM, Frame Relay, TDM, and IP traffic. Consolidates previously separate networks into one infrastructure.
+
+## Hybrid Position
+
+Principle of MPLS is _route at the edge, switch at the core_.
+
+- From IP  
+  Scalable, flexible, dynamic routing, inexpensive.
+- From ATM/FR  
+  Performance, connection-oriented forwarding, traffic engineering, QoS, security.
