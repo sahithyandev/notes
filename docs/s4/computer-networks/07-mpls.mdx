@@ -3,7 +3,7 @@ title: MPLS
 sidebar:
   order: 7
 dateCreated: 2026-06-05T07:25:36.609Z
-lastUpdatedOn: 2026-06-05T13:23:45.810Z
+lastUpdatedOn: 2026-06-05T15:40:04.731Z
 slug: s4/computer-networks/mpls
 prev: true
 next: true
@@ -19,9 +19,57 @@ Routing protocols (OSPF, BGP-4, IS-IS) still determine paths. MPLS handles forwa
 
 Inserted between the Layer 2 and IP headers. 32 bits total:
 
-```
-|      Label (20)      | TC (3) | S (1) |    TTL (8)    |
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="20"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Label
+        </td>
+        <td
+          colspan="3"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          TC
+        </td>
+        <td
+          colspan="1"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          S
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          TTL
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 - Label: 20 bits forwarding identifier
 - Traffic Class (TC): 3 bits QoS priority

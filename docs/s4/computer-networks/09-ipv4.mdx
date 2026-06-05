@@ -6,7 +6,7 @@ slug: s4/computer-networks/ipv4
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-06-05T13:23:45.811Z
+lastUpdatedOn: 2026-06-05T15:40:04.733Z
 prereqs:
   - s3/data-communication-and-networking/ip
 ---
@@ -15,23 +15,132 @@ prereqs:
 
 The basic unit of data transferred in the network layer.
 
-```
- 0               1               2               3
- 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Version|  IHL  |    DSCP/ToS   |          Total Length         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Identification        |Flags|     Fragment Offset     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      TTL      |   Protocol    |        Header Checksum        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                       Source IP Address                       |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Destination IP Address                     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                       Options (variable)                      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Version
+        </td>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          IHL
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          DSCP / ToS
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Total Length
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Identification
+        </td>
+        <td
+          colspan="3"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Flags
+        </td>
+        <td
+          colspan="13"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Fragment Offset
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          TTL
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Protocol
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Header Checksum
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Source IP Address
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Destination IP Address
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px dashed var(--border-strong);padding:6px 2px"
+        >
+          Options (0–40 bytes)
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px dashed var(--border-strong);padding:6px 2px"
+        >
+          Payload (0-65,536 bytes)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Header fields:
 
@@ -42,7 +151,7 @@ Header fields:
 - DSCP/ToS (8 bits)  
   Quality of service classification.
 - Total Length (16 bits)  
-  Full packet size in bytes, header included. Maximum $65{,}535$ bytes.
+  Full packet size in bytes, header included.
 - Identification (16 bits)  
   Groups fragments belonging to the same original datagram.
 - Flags (3 bits)  
@@ -54,7 +163,7 @@ Header fields:
 - Protocol (8 bits)  
   Transport-layer protocol: `6` = TCP, `17` = UDP.
 - Header Checksum (16 bits)  
-  Error detection for the header only. Recomputed at each hop.
+  Error detection for the header only. Verified and recomputed at each hop because TTL changes with each hop.
 - Source IP Address (32 bits)  
   Sender's IP address.
 - Destination IP Address (32 bits)  
@@ -62,7 +171,7 @@ Header fields:
 - Options (0–40 bytes)  
   Present only if IHL > 5. Rarely used in practice.
 
-Payload carries the transport-layer segment (TCP or UDP).
+Maximum size of a IPv4 packet is $65{,}535$ bytes. Payload carries the transport-layer segment ([TCP](/s4/computer-networks/tcp) or [UDP](/s4/computer-networks/udp)). As most equipment cannot handle very big packets, usually the maximum transmission unit is capped at 1500 bytes. In that case, the IPv4 payload's maximum size is 1480 bytes.
 
 ## Network and Host Parts
 

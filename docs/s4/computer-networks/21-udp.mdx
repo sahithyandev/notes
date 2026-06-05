@@ -3,7 +3,7 @@ title: UDP
 sidebar:
   order: 21
 dateCreated: 2026-05-14T12:24:44.126Z
-lastUpdatedOn: 2026-06-05T13:23:45.812Z
+lastUpdatedOn: 2026-06-05T15:40:04.734Z
 slug: s4/computer-networks/udp
 prev: true
 next: true
@@ -13,19 +13,70 @@ Aka. User Datagram Protocol or Unreliable Datagram Protocol. Connectionless. Def
 
 ## Segment Format
 
-```
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Source Port          |       Destination Port        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            Length             |           Checksum            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                         Data (Payload)                        |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Source Port
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Destination Port
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Length
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Checksum
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px dashed var(--border-strong);padding:6px 2px"
+        >
+          Data (Payload)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Total header size is fixed at 8 bytes. Smallest possible transport header.
 
@@ -67,16 +118,70 @@ If only UDP header and data is used to calculate the checksum, it cannot detect 
 
 Hence pseudo-header is included for checksum calculation (and no other reasons). Not transmitted.
 
-```
-0                                                               32
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                       Source IP Address                       |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Destination IP Address                     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      Zero     |  Protocol=17  |         UDP Length            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Source IP Address
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Destination IP Address
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Zero
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Protocol = 17
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          UDP Length
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Pseudo-header structure differs in IPv6.
 

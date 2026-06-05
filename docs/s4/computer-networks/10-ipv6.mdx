@@ -6,7 +6,7 @@ slug: s4/computer-networks/ipv6
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.319Z
-lastUpdatedOn: 2026-06-05T13:23:45.811Z
+lastUpdatedOn: 2026-06-05T15:40:04.733Z
 ---
 
 Uses 128-bit addresses. Consists of 8 groups of 4 hexadecimal digits separated by colons.
@@ -50,7 +50,16 @@ Identifies devices on the same link. Prefix `fe80::/10`; next 54 bits are zero; 
 
 #### Site-local
 
-Intended for use within an organization. Prefix `fec0::/10`. Deprecated in 2004 because the spec did not clearly define a _site_. Replaced by Unique Local Addresses.
+Intended for use within an organization. Prefix `fec0::/10`.
+
+Deprecated in 2004. Deprecated because _site_ was never formally defined (RFC 3879).
+
+- Ambiguous scope  
+  Routers had no clear rule for where to stop forwarding. Implementations drew the boundary differently.
+- Non-unique addresses  
+  Two organizations can use the same `fec0::/10` space internally. Conflicts arise on interconnection.
+
+Replaced by Unique Local Addresses.
 
 #### Unique Local Address
 
@@ -75,7 +84,7 @@ Identifies a group of interfaces. Prefix `FF00::/8`.
 - `FF02::1` refers to all hosts on the local network.
 - `FF02::2` refers to all routers on the local network.
 
-Replaces IPv4 broadcast. No addresses are wasted on network or broadcast addresses.
+Replaces IPv4 broadcast. Broadcast forces every device on the network to interrupt and process the packet, even when irrelevant. Multicast is selective: only interfaces that have joined the multicast group process the packet. No addresses are wasted on network or broadcast addresses.
 
 ### Anycast
 
@@ -124,11 +133,7 @@ EUI-64 exposes device identity, enabling cross-network tracking. Privacy address
 
 Stateful alternative to SLAAC. Requires a server. Supports DNS. Best for servers and fixed devices.
 
-<Note>
-
 Most DHCPv6 implementations assume a `/64` network prefix. Using a longer prefix may cause issues.
-
-</Note>
 
 ## P2P Link
 
@@ -149,13 +154,13 @@ Structured hierarchy enables route aggregation and reduces routing table size.
 
 IANA controls the full address space. Blocks of `/12` to `/23` are assigned to the 5 RIRs.
 
-| RIR      | Region                            |
-| -------- | --------------------------------- |
-| ARIN     | North America                     |
-| RIPE NCC | Europe, Middle East, Central Asia |
-| APNIC    | Asia-Pacific                      |
-| LACNIC   | Latin America & Caribbean         |
-| AFRINIC  | Africa                            |
+| RIR      | Region                            | Prefix      |
+| -------- | --------------------------------- | ----------- |
+| ARIN     | North America                     | `2600::/12` |
+| RIPE NCC | Europe, Middle East, Central Asia | `2a00::/12` |
+| APNIC    | Asia-Pacific                      | `2400::/12` |
+| LACNIC   | Latin America & Caribbean         | `2800::/12` |
+| AFRINIC  | Africa                            | `2c00::/12` |
 
 RIRs assign `/32` prefixes to ISPs ($2^{32}$ subnets of `/64` each). ISPs delegate `/48` to organizations ($2^{16}$ subnets). Residential customers typically receive `/56` or `/64`.
 
@@ -166,31 +171,98 @@ RIRs assign `/32` prefixes to ISPs ($2^{32}$ subnets of `/64` each). ISPs delega
 | `::1/128`       | Loopback                                 |
 | `fe80::/10`     | Link-local (auto-assigned, not routable) |
 | `fc00::/7`      | Unique-local (private, like RFC 1918)    |
-| `ff00::/8`      | Multicast (replaces IPv4 broadcast)      |
+| `ff00::/8`      | Multicast                                |
 | `2000::/3`      | Global unicast (public internet)         |
 | `2001:db8::/32` | Documentation and examples only          |
 
 ## Header
 
-IPv6 header is always 40 bytes (fixed length). No checksum.
+IPv6 header is fixed at 40 bytes.
 
-```
- 0               1               2               3
- 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Version| Traffic Class |           Flow Label                  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Payload Length        |  Next Header  |   Hop Limit   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-+                       Source Address                          +
-|                         (128 bits)                            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-+                    Destination Address                        +
-|                         (128 bits)                            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Version
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Traffic Class
+        </td>
+        <td
+          colspan="20"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Flow Label
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Payload Length
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Next Header
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Hop Limit
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Source Address (128 bits)
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Destination Address (128 bits)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Header fields:
 
@@ -214,6 +286,146 @@ Header checksum is removed. Error detection is delegated to other layers.
 ## Extension Header
 
 Inserted between the base header and the payload. Optional. Each starts with its own Next Header field and length in 8-byte units.
+
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Next Header
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Hdr Ext Len
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Options / Type-specific
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Options / Type-specific data (variable)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+- Next Header (8 bits)  
+  Identifies the next extension header or transport protocol.
+- Hdr Ext Len (8 bits)  
+  Length in 8-byte units, not counting the first 8 bytes. Zero means 8 bytes total.
+
+The Fragmentation extension header has a fixed structure:
+
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Next Header
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Reserved
+        </td>
+        <td
+          colspan="13"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Fragment Offset
+        </td>
+        <td
+          colspan="2"
+          style="border:1px solid var(--border-strong);padding:6px 2px;font-size:.85em"
+        >
+          Res
+        </td>
+        <td
+          colspan="1"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          M
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Identification (32 bits)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+- Fragment Offset (13 bits)  
+  Byte offset of this fragment within the original payload, in units of 8 bytes.
+- M flag (1 bit)  
+  `1` if more fragments follow. `0` on the last fragment.
+- Identification (32 bits)  
+  Shared by all fragments of the same original packet.
 
 - Hop-by-Hop Options  
   Must be first if present. Processed by every router.

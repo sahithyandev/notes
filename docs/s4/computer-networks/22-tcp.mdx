@@ -3,7 +3,7 @@ title: TCP
 sidebar:
   order: 22
 dateCreated: 2026-05-14T12:24:50.329Z
-lastUpdatedOn: 2026-06-05T13:23:45.813Z
+lastUpdatedOn: 2026-06-05T15:40:04.734Z
 slug: s4/computer-networks/tcp
 prev: true
 next: true
@@ -15,27 +15,122 @@ Treats data as an ordered byte-stream.
 
 ## Segment Format
 
-```
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Source Port          |       Destination Port        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                        Sequence Number                        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Acknowledgment Number                      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Data |       |C|E|U|A|P|R|S|F|                               |
-| Offset|  Res. |W|C|R|C|S|S|Y|I|            Window             |
-|       |       |R|E|G|K|H|T|N|N|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Checksum            |         Urgent Pointer        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Options (variable)                         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                         Data (Payload)                        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          24
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Source Port
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Destination Port
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Sequence Number
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Acknowledgment Number
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Data Offset
+        </td>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Res.
+        </td>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:4px 2px;font-size:.85em"
+        >
+          CWR ECE URG ACK
+          <br />
+          PSH RST SYN FIN
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Window
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Checksum
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Urgent Pointer
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px dashed var(--border-strong);padding:6px 2px"
+        >
+          Options (variable)
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px dashed var(--border-strong);padding:6px 2px"
+        >
+          Data (Payload)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 Minimum header size: 20 bytes (no options). **Data Offset** field encodes actual header length in 32-bit words.
 
