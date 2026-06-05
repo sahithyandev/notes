@@ -3,7 +3,7 @@ title: TCP
 sidebar:
   order: 25
 dateCreated: 2026-05-14T12:24:50.329Z
-lastUpdatedOn: 2026-06-05T16:39:48.487Z
+lastUpdatedOn: 2026-06-05T23:03:30.359Z
 slug: s4/computer-networks/tcp
 prev: true
 next: true
@@ -184,13 +184,13 @@ Receiver buffers out-of-order segments and delivers in-order to applications. Lo
 Retransmission timeout (RTO) is estimated from measured round trip time (RTT).
 
 $$
-\text{SRTT} = (1-\alpha)\cdot\text{SRTT} + \alpha \cdot \text{RTT}_\text{sample}
+\begin{align*}
+\text{SRTT} &= (1-\alpha)\cdot\text{SRTT} + \alpha \cdot \text{RTT}_\text{sample} \\
+\text{RTO} &= \beta \cdot \text{SRTT}
+\end{align*}
 $$
 
-Here:
-
-- SRTT stands for smoothed round trip time
-- Typically $\alpha = 0.125$
+Here SRTT stands for smoothed round trip time. Typically $\alpha = 0.125$ and $\beta > 1$.
 
 ### Flow Control
 
@@ -213,14 +213,66 @@ Congestion is inferred from packet loss in TCP.
 
 4 algorithms operate together:
 
-- Slow Start  
-  cwnd begins at 1 MSS; doubles each RTT until ssthresh.
-- Congestion Avoidance  
-  cwnd grows linearly (additive increase) above ssthresh.
-- Fast Retransmit  
-  3 duplicate ACKs trigger immediate retransmit without waiting for timeout.
-- Fast Recovery  
-  After fast retransmit, halve cwnd (multiplicative decrease) instead of restarting slow start.
+#### Slow Start
+
+cwnd begins at 1 MSS, doubles at each acknowledgements. On timeout cwnd is reset to 1 MSS. Inefficient. Low throughput.
+
+#### Congestion Avoidance
+
+cwnd begins at 1 MSS, doubles at each acknowledgements. Above ssthresh (a custom threshold defined initially), grows linearly. Drops to 1 MSS on timeout. ssthresh redefined to be 1/2 of min(cwnd, rwnd).
+
+#### Fast Retransmit
+
+3 duplicate ACKs trigger immediate retransmit without waiting for timeout.
+
+#### Fast Recovery
+
+After fast retransmit, $\text{cwnd}$ stays near threshold instead of resetting to 1 MSS.
+
+Steps:
+
+1. Set $\text{ssthresh} = \frac{1}{2} \times \min(\text{cwnd}, \text{rwnd})$.
+2. Set $\text{cwnd} = \text{ssthresh} + 3 \times \text{MSS}$.  
+   Each of the 3 duplicate ACKs confirms a segment cleared the network. Those still occupy pipe space.
+3. Per additional duplicate ACK, increment $\text{cwnd}$ by $\text{MSS}$.  
+   Each duplicate ACK confirms another segment left the network.
+4. On first new ACK, set $\text{cwnd} = \text{ssthresh}$.  
+   Inflation clears. Congestion avoidance resumes.
+
+Duplicate ACKs indicate a single lost segment, not network collapse. Resetting $\text{cwnd}$ to 1 MSS would be an overreaction.
+
+## Problems
+
+### Small Packet Problem
+
+Sending many small segments wastes bandwidth. Header-to-data ratio is high when payload is small.
+
+Two causes:
+
+- Sender-side  
+  Application writes data in small chunks. Each write triggers a separate segment.
+- Receiver-side  
+  Application reads buffer in small increments. Advertised window stays small. Sender fills it with tiny segments. Known as Silly Window Syndrome.
+
+### Silly Window Syndrome
+
+A self-reinforcing cycle of small window advertisements and small segment transmissions. Receiver advertises a few bytes of free space. Sender fills it immediately with a tiny segment. Receiver delivers those bytes to the application. A few more bytes free up. Cycle repeats. Each segment carries 20-40 bytes of header for a handful of bytes of payload.
+
+Either side can initiate the cycle:
+
+- Receiver-driven  
+  Application reads buffer in small increments. Window never grows large.
+- Sender-driven  
+  Application produces data in small writes. Each write is sent immediately.
+
+Both solutions must be deployed together. If only one side is fixed, the other can still sustain the cycle.
+
+Solutions:
+
+- Nagle's Algorithm  
+  Addresses sender-driven cause. New data is buffered while unacknowledged data exists. Sender flushes when an ACK arrives or the buffer holds one full MSS.
+- Clark's Solution  
+  Addresses receiver-driven cause. Receiver suppresses window updates until it can offer space for one MSS or half the total receive buffer.
 
 ## Connection Establishment
 
@@ -279,3 +331,72 @@ File transfer cannot tolerate data losses.
 ### SSH
 
 Used to create a secure shell to a remote server. Byte-stream with ordering guarantees is required.
+
+## Router Queue Management
+
+### FIFO
+
+Routers queue packets in FIFO order and drop at the tail when the queue is full. TCP senders detect congestion only after timeout or missing ACKs. Congestion is addressed after damage occurs, not before.
+
+### Random Early Detection
+
+RED drops packets before the queue fills, signalling congestion early. Average queue length is compared against two thresholds: $\text{MIN}$ and $\text{MAX}$.
+
+Zones:
+
+- Below $\text{MIN}$  
+  Queue length is low. All packets accepted.
+- Between $\text{MIN}$ and $\text{MAX}$  
+  Drop probability increases linearly as queue length rises toward $\text{MAX}$. Drops are random across flows. Flows sending more packets are proportionally more likely to be dropped.
+- Above $\text{MAX}$  
+  Every arriving packet is dropped.
+
+Average queue length is used instead of instantaneous. Instantaneous values fluctuate due to bursty traffic and would trigger drops during transient bursts that don't represent sustained congestion.
+
+## Explicit Congestion Notification
+
+Both FIFO and RED signal congestion through packet loss. The packet is destroyed to send the signal.
+
+ECN allows a router to set a bit in the IP header when the queue is building, without dropping the packet. The receiver forwards the ECN signal to the sender via an ACK. The sender reduces $\text{cwnd}$ as it would for a loss.
+
+Marking happens in the forwarding path at the router level. The receiver must be ECN-aware to forward the signal back.
+
+## Wireless TCP
+
+TCP's congestion control assumes packet loss means congestion. On wireless networks, loss occurs due to signal interference and fading, not queue overflow. TCP cannot distinguish the two causes.
+
+On timeout over a wireless link, TCP invokes slow start and reduces $\text{cwnd}$. The loss was not caused by congestion. The throughput reduction is unnecessary.
+
+Immediate retransmission does not solve it. On a lossy wireless segment, retransmissions add more traffic. In a heterogeneous network, those retransmissions traverse the wired portion and can cause real congestion there.
+
+### Problem in Heterogeneous Networks
+
+When a path spans wired and wireless segments, retransmissions triggered by wireless loss re-enter the wired network. Load is added to wired routers already handling original traffic. Real congestion can develop in the wired portion.
+
+### Indirect TCP
+
+The connection splits at the base station into two separate TCP connections: one wired TCP between sender and base station, one wireless-optimised TCP between base station and mobile host.
+
+Drawback: violates end-to-end semantics. An ACK reaching the sender only confirms delivery to the base station, not the destination.
+
+### Snooping Agent
+
+A snooping agent at the base station intercepts traffic transparently. The end-to-end TCP connection between sender and mobile host is preserved.
+
+The agent:
+
+- Caches segments destined for the mobile host for local retransmission on wireless loss.
+- Retransmits locally when an ACK from the mobile host is missing.
+- Removes duplicate ACKs to prevent the sender from misinterpreting wireless loss as congestion.
+- Issues selective repeat requests for segments lost on the wireless link.
+
+## Transactional TCP
+
+RPC needs a short request-reply exchange. Neither transport fits well:
+
+- UDP  
+  No reliability. Works only if request and reply each fit in one packet and the operation is idempotent.
+- TCP  
+  3-way handshake and teardown add multiple round trips before any data is exchanged.
+
+Transactional TCP combines connection setup with data transfer. The request is piggybacked onto the SYN. The reply is sent with the SYN-ACK. The connection tears down immediately after. TCP-level reliability without the overhead of a persistent connection.

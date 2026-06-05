@@ -6,7 +6,7 @@ slug: s4/computer-networks/ipv6
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.319Z
-lastUpdatedOn: 2026-06-05T15:40:04.733Z
+lastUpdatedOn: 2026-06-05T23:03:30.358Z
 ---
 
 Uses 128-bit addresses. Consists of 8 groups of 4 hexadecimal digits separated by colons.
@@ -128,6 +128,12 @@ Hardcoded to produce 64-bit IDs. SLAAC with EUI-64 cannot use prefixes longer th
 ### Privacy Address
 
 EUI-64 exposes device identity, enabling cross-network tracking. Privacy addresses replace the EUI-64 interface ID with a random number, regenerated per network.
+
+Uniqueness is verified via Duplicate Address Detection before the address is used:
+
+1. Host sends a Neighbor Solicitation (ICMPv6 Type 135) to the solicited-node multicast address of the candidate address.
+2. If a Neighbor Advertisement is received, the address is already in use. A new random ID is generated and the process repeats.
+3. If no reply arrives within a timeout, the address is unique and assigned.
 
 ### DHCPv6
 
