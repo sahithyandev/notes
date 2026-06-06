@@ -1,0 +1,46 @@
+---
+title: RIP
+sidebar:
+  order: 18
+dateCreated: 2026-06-06T06:35:35.279Z
+lastUpdatedOn: 2026-06-06T07:03:21.629Z
+slug: s4/computer-networks/rip
+prev: true
+next: true
+---
+
+Short for Routing Information Protocol. A [distance vector routing](/s4/computer-networks/routing#distance-vector-routing) protocol. Uses hop count as its sole metric. Runs over UDP port $520$.
+
+Suitable only for small networks. Does not scale beyond $15$ hops.
+
+## Infinity and Hop Limit
+
+Infinity is defined as $16$ hops. Any route reaching $16$ is declared unreachable and purged. Maximum usable hop count is $15$.
+
+The cap bounds the [count-to-infinity](/s4/computer-networks/count-to-infinity) problem: once a failing route reaches $16$, it is removed rather than incrementing indefinitely.
+
+## Timers
+
+- Update timer  
+  $30$ s. Routers broadcast their full routing table to all neighbors every $30$ s.
+- Invalid timer  
+  $180$ s. If no update is received for a route within $180$ s, the route is marked invalid (metric set to $16$).
+- Flush timer  
+  $240$ s. Invalid routes are removed from the table after $240$ s total since the last update.
+
+## Versions
+
+### RIPv1
+
+Classful. Does not include subnet masks in updates. All routes assumed to use the natural class boundary. Cannot support VLSM or CIDR. Broadcasts updates to `255.255.255.255`.
+
+### RIPv2
+
+Classless. Includes subnet masks in updates. Supports VLSM and CIDR. Multicasts updates to `224.0.0.9`. Supports simple password authentication.
+
+## Limitations
+
+- Metric is hop count only. Does not consider bandwidth, delay, or reliability.
+- Slow convergence. Full table broadcast every $30$ s; invalid timer adds up to $180$ s of stale route propagation.
+- Hard limit of $15$ hops makes it unsuitable for large networks.
+- High bandwidth overhead from full table broadcasts.

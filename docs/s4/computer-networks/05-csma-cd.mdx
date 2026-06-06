@@ -3,7 +3,7 @@ title: CSMA/CD
 sidebar:
   order: 5
 dateCreated: 2026-06-05T12:13:57.238Z
-lastUpdatedOn: 2026-06-05T13:23:45.810Z
+lastUpdatedOn: 2026-06-06T07:03:21.628Z
 slug: s4/computer-networks/csma-cd
 prev: true
 next: true
@@ -11,7 +11,7 @@ next: true
 
 Carrier Sense Multiple Access with Collision Detection. Controls LAN access on a bus structure. Non-priority scheme. Standardized as IEEE 802.3.
 
-Defines two layers:
+Two layers:
 
 - MAC layer  
   Media independent. Handles framing and collision management.
@@ -20,13 +20,17 @@ Defines two layers:
 
 DLL functions:
 
-- Encapsulation and decapsulation (addresses, error detection fields).
-- Media access management (frame transmission/reception, buffering, collision handling).
+- Encapsulation and decapsulation  
+  Addresses, error detection fields.
+- Media access management  
+  Frame transmission/reception, buffering, collision handling.
 
 Physical layer functions:
 
-- Data encoding/decoding. Binary to Manchester code and vice versa. Preamble provides synchronization.
-- Channel access. Introduces signals onto the channel. Carrier sensing and collision detection.
+- Data encoding/decoding  
+  Binary to Manchester code and vice versa. Preamble provides synchronization.
+- Channel access  
+  Introduces signals onto the channel. Carrier sensing and collision detection.
 
 History: Developed by Xerox. Jointly specified by Xerox, Intel, and DEC in 1980.
 
@@ -46,54 +50,65 @@ History: Developed by Xerox. Jointly specified by Xerox, Intel, and DEC in 1980.
 ## Media Access Control Rules
 
 1. A signal being transmitted on the channel = **carrier**.
-2. Station waits until channel is idle (absence of carrier) before transmitting.
+2. Station waits until channel is idle before transmitting.
 3. After channel goes idle, station waits an Inter Frame Gap (IFG) then transmits.
 4. If two stations transmit simultaneously, both detect the collision and reschedule.
 
+## Slot Time
+
+The window within which a collision must be detected. $512$ bit times for $10$/$100$ Mbps.
+
+- $10$ Mbps: $512$ bit times covers $2800$ m on coaxial.
+- $100$ Mbps: $512$ bit times covers ~$205$ m. Acceptable with switches/hubs on twisted pair (max $100$ m).
+- $1000$ Mbps: $512$ bit times covers only $20$ m. Slot time extended to $4096$ bit times via **carrier extension**.
+
+Minimum data field = $46$ bytes (required to fill $512$ bit times).
+
 ## Back-off Algorithm
 
-**IFG** is 96 bit times. Brief recovery time between frames.
+**IFG** is $96$ bit times. Brief recovery time between frames.
 
-- 10 Mbps: IFG = 9.6 µs
-- 100 Mbps: IFG = 960 ns
+- $10$ Mbps: IFG = $9.6$ µs
+- $100$ Mbps: IFG = $960$ ns
 
 Steps:
 
 1. If no carrier and no-carrier period exceeds IFG, transmit immediately.
 2. If channel busy, listen until carrier ceases, wait IFG, then transmit.
-3. If collision detected, continue transmitting 32-bit **jam signal** (ensures all stations detect the collision).
+3. If collision detected, transmit 32-bit **jam signal**.
 4. After jam, wait a random back-off period then return to Step 1.
 5. Back-off duration increases with each successive collision attempt.
 
+<Note>
+
+Jam signal: non-data bit pattern transmitted after collision detection. Ensures all stations recognize the collision before back-off begins.
+
+</Note>
+
 Back-off formula:
 
-$$0 \leq r < 2^k, \quad k = \min(n, 10)$$
+$$
+0 \leq r < 2^k, \quad k = \min(n, 10)
+$$
 
+Here:
+
+- $r$: randomly chosen integer back-off delay, in slot times
 - $n$: number of transmission attempts
 
-Maximum retries = 16. After 16 failures, transmission failure reported to higher layers. Back-off counter resets after a successful transmission.
-
-## Slot Time
-
-The window within which a collision must be detected. 512 bits for 10/100 Mbps.
-
-- 10 Mbps: 512 bit time covers 2800 m on coaxial.
-- 100 Mbps: 512 bit time covers ~205 m. Acceptable with switches/hubs on twisted pair (max 100 m).
-- 1000 Mbps: 512 bit time covers only 20 m. Slot time extended to 4096 bits via **carrier extension**.
-
-Minimum data field = 46 bytes (required to fill 512 bits).
+Maximum retries = $16$. After $16$ failures, transmission failure reported to higher layers. Back-off counter resets after a successful transmission.
 
 ## Gigabit Ethernet Half Duplex
 
-Signaling 10× faster than Fast Ethernet. Effective network diameter shrinks to 20 m. Slot time extended to 4096 bits (512 bytes). Smaller frames padded with **carrier extension** (non-data symbols).
+Signaling $10\times$ faster than Fast Ethernet. Effective network diameter shrinks to $20$ m. Slot time extended to $4096$ bits ($512$ bytes). Smaller frames padded with **carrier extension** (non-data symbols).
 
-**Frame Bursting** allows a station to send multiple smaller frames consecutively.
+**Frame bursting** allows a station to send multiple smaller frames consecutively.
 
 - First frame transmitted normally. If no collision, burst frames follow.
 - IFG between burst frames filled with extension symbols. Channel held throughout.
 - Improves efficiency for small frames to >90%.
 
-Frame burst limit: 65,536 bits.
+Frame burst limit: $65{,}536$ bits.
 
 ## Full Duplex Ethernet
 
@@ -103,14 +118,14 @@ Simultaneous bidirectional transmission on a point-to-point link (twisted pair o
 - No collision detection (or ignored).
 - No multiple access. One station at each end.
 - IFG still present between frames.
-- Effective throughput doubled (e.g., 100 Mbps fast Ethernet → 200 Mbps aggregate).
+- Effective throughput doubled (e.g., $100$ Mbps Fast Ethernet → $200$ Mbps aggregate).
 - No shared-medium timing constraints. Only media signal-carrying limits apply.
 - Full bandwidth usage confined to backbone connections in practice.
 
-Supported media types: 10BASE-T, 10BASE-FL, 100BASE-T, 100BASE-FX, 1000BASE-SX/LX/CX, 1000BASE-T.
+Supported media: 10BASE-T, 10BASE-FL, 100BASE-T, 100BASE-FX, 1000BASE-SX/LX/CX, 1000BASE-T.
 
 Gigabit Ethernet cable length limits:
 
-- Twisted pair: 100 m (same as 10/100BASE-T).
-- Multi-mode fibre: up to 2 km (full duplex). ~412 m on some fibres (half duplex).
-- Single-mode fibre: 20 km or more.
+- Twisted pair: $100$ m (same as 10/100BASE-T).
+- Multi-mode fibre: up to $2$ km (full duplex). ~$412$ m on some fibres (half duplex).
+- Single-mode fibre: $20$ km or more.

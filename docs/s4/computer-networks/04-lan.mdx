@@ -3,7 +3,7 @@ title: LAN
 sidebar:
   order: 4
 dateCreated: 2026-06-05T11:23:49.837Z
-lastUpdatedOn: 2026-06-05T13:23:45.810Z
+lastUpdatedOn: 2026-06-06T07:03:21.626Z
 slug: s4/computer-networks/lan
 prev: true
 next: true
@@ -12,9 +12,9 @@ prereqs:
   - s3/data-communication-and-networking/ethernet
 ---
 
-A privately owned network interconnecting stations over short distances (few meters to several hundred meters). Operates at high bit rates (1 Mbps to 100 Mbps) and very low error rate ($1 in 10^8$) compared to WAN ($1 in 10^5$ or more).
+A privately owned network interconnecting stations over short distances (few meters to several hundred meters). Operates at high bit rates ($1$ Mbps to $100$ Mbps). Error rate: $10^{-8}$, compared to WAN at $10^{-5}$ or worse.
 
-Structured around IEEE 802 standards, which split the Data Link layer into LLC and MAC sublayers.
+IEEE 802 standards split the Data Link layer into LLC and MAC sublayers.
 
 ## Transmission Modes
 
@@ -36,8 +36,6 @@ Analogue technology. Uses modems. Uses FDM with multiple carriers and sub-channe
 | 802.4    | Token Bus                    |
 | 802.5    | Token Ring                   |
 
-The Data Link layer from OSI model is split into 2 sublayers in 802.
-
 ## Logical Link Control
 
 Aka. LLC. Upper sublayer. Subset of HDLC. Common across 802.x variants.
@@ -58,9 +56,13 @@ Aka. LLC. Upper sublayer. Subset of HDLC. Common across 802.x variants.
 - SSAP  
   Source Service Access Point.
 - Control  
-  Carries HDLC commands and responses. Differece based on the service type.
+  Carries HDLC commands and responses. Differs based on service type.
 
-In ring networks, DSAP and SSAP can identify a specific ring and node.
+<Note>
+
+In ring networks, DSAP and SSAP identify a specific ring and node.
+
+</Note>
 
 ## Media Access Control
 
@@ -80,25 +82,29 @@ Operation:
 2. Modifies token to include start-of-frame identifier plus data and control fields.
 3. Sends to next station.
 4. Each intermediate station regenerates the token. Copies data if addressed to it.
-5. Originating station frees the token on return.
+5. Originating station recognizes its own frame by source address, removes it from the ring, and frees the token.
 
-Ring formats: Token, Abort Token, Token-and-Data.
+Ring formats:
+
+- Token
+- Abort Token
+- Token-and-Data
 
 ### Token Bus
 
 Physical bus topology with a logical ring determined by numeric address order. Standardized as IEEE 802.4.
 
-Four MAC functions:
+MAC machines:
 
 - IFM  
   Interface machine.
 - ACM  
-  Access Control machine.
+  Access control machine.
 - RxM  
   Receive machine.
 - TxM  
   Transmit machine.
 - RRM  
-  Regenerative Repeater machine. Optional.
+  Regenerative repeater machine. Optional.
 
-Frame identical to 802.5 except it lacks access control and frame status fields. Token sender waits for the successor to transmit the next frame as confirmation. If no confirmation, a new successor is established.
+Frame structure matches 802.5. Access control and frame status fields are absent. Token sender waits for the successor to transmit the next frame as confirmation. If no confirmation, a new successor is established.
