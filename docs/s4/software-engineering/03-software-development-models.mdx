@@ -3,13 +3,13 @@ title: Software Development Models
 sidebar:
   order: 3
 dateCreated: 2026-06-02T13:45:08.912Z
-lastUpdatedOn: 2026-06-02T14:01:11.164Z
+lastUpdatedOn: 2026-06-07T15:52:23.196Z
 slug: s4/software-engineering/software-development-models
 prev: true
 next: true
 ---
 
-An **abstract representation** of a software process from a particular perspective.
+An abstract representation of a software process from a particular perspective.
 
 ## Waterfall Model
 
@@ -21,7 +21,7 @@ A plan-driven model with clearly separated, sequential phases.
 4. Integration and system testing
 5. Operation and maintenance
 
-Drawback: difficult to accommodate changes once development has started.
+Difficult to accommodate changes once development has started.
 
 Suitable when:
 
@@ -31,35 +31,52 @@ Suitable when:
 
 ## Incremental Development
 
-Development done in small increments with feedback at each stage. Specification, development, and validation are interleaved; each increment delivers working software.
+Development done in small increments with feedback at each stage. Specification, development, and validation are interleaved. Each increment delivers working software. Can be plan-driven or agile.
 
-Benefits:
+Change cost is lower. Only the current increment needs reconsidering when changes arise. Working software is delivered earlier. Customers gain access to functional parts before the full system is built. Early access generates feedback while changes are still cheap.
 
-- Lower cost of change.
-- Early customer feedback.
-- Faster delivery of useful software.
-
-Problems:
-
-- Process visibility is low.
-- System structure may degrade without refactoring.
+Process visibility is low. Progress is typically measured through formal deliverables. Producing updated documentation for every version is not cost-effective. Managers therefore lack concrete artifacts to assess true project status. Without deliberate refactoring, each increment degrades system structure. Dependencies tangle, architecture drifts, and subsequent changes become progressively harder.
 
 ## Reuse-Oriented Software Engineering
 
-Systems built by integrating **existing components** or COTS systems.
+Integration of pre-existing software is focused more compared to writing new code from scratch. Driven by cost and schedule pressures, especially for commercial and internet-based systems.
 
 Process stages:
 
-- Component analysis
-- Requirements modification
-- System design with reuse
-- Development and integration
+1. Requirements specification  
+   Initial requirements defined as in other models.
+2. Component analysis  
+   Search for components providing needed functionality. Typically no exact match.
+3. Requirements modification  
+   Requirements re-evaluated against available components. May be modified to fit a component. If unacceptable, the component is rejected and analysis resumes.
+4. System design with reuse  
+   Framework designed (or reused). New modules only where reusable components are unavailable.
+5. Development and integration  
+   Custom software built for gaps, then all components integrated.
+6. System validation  
+   Integrated system validated against requirements.
 
 Types of reusable components:
 
-- Web services
-- Component packages (e.g., .NET, J2EE)
-- Stand-alone COTS systems
+- Web services  
+  Remote functionality accessed over a network (REST, SOAP). Invoked at runtime rather than compiled in.
+- Component packages (.NET, J2EE)  
+  Objects/classes packaged for integration within a component framework. Component-level reuse.
+- Stand-alone [COTS](/s4/software-engineering/introduction#cots) systems  
+  Complete application systems configured for a specific environment. Design shifts from building to configuring. System-level reuse.
+
+Reuse levels:
+
+- Abstraction  
+  Design knowledge (patterns, architectural styles), not artifacts.
+- Object  
+  Library objects/classes used directly in code.
+- Component  
+  Collections of objects/classes as deployable units.
+- System  
+  Entire application systems (COTS).
+
+Key tension: requirements compromise vs. development cost. Available components rarely match requirements exactly. Some loss of functionality is unavoidable. Development and integration cost is substantially reduced.
 
 ## Boehm's Spiral Model
 

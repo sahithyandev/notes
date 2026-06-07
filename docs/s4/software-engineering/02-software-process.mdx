@@ -6,7 +6,7 @@ next: true
 sidebar:
   order: 2
 dateCreated: 2026-04-23T17:39:39.630Z
-lastUpdatedOn: 2026-06-02T18:48:59.872Z
+lastUpdatedOn: 2026-06-07T15:52:23.194Z
 ---
 
 A structured set of activities required to develop a software system.
@@ -22,47 +22,112 @@ Core activities:
 - Evolution  
   Changing the system to meet new needs.
 
-These activities depend on each other and cannot be reordered.
-
 ## Types
 
 ### Plan-driven
 
-- All activities planned in advance.
-- Progress measured against the plan.
+All activities are planned before development begins. Each phase produces documented outputs consumed by the next phase. Progress is measured against the plan.
+
+Suited for:
+
+- Stable, well-understood requirements
+- Large teams distributed across sites
+- Safety-critical systems requiring extensive documentation
+
+Risk: requirements errors are not discovered until late in the process.
 
 ### Agile
 
-- Incremental planning.
-- Easier to accommodate changing requirements.
+Planning is incremental and continuous. Requirements and plans are updated as understanding improves. Customer involvement is sustained throughout development.
 
-A combination of both is used in practice.
+Suited for:
+
+- Evolving or unclear requirements
+- Small, co-located teams
+- Business systems where rapid delivery matters
+
+<Note>
+
+Most real projects combine both. Plan-driven for high-level structure; agile for iteration within phases.
+
+</Note>
+
+## Rational Unified Process
+
+A process model that brings together best practices from iterative development, component-based architecture, and visual modelling. Combines plan-driven and agile elements. Described from three perspectives:
+
+- Dynamic  
+  Phases over time, each ending at a project milestone.
+- Static  
+  Process activities (workflows) performed regardless of phase.
+- Practice  
+  6 recommended good practices.
+
+### Phases
+
+Each phase can contain multiple iterations. Phases are management milestones, not sequential steps.
+
+- Inception  
+  Establish business case. Identify risks and scope. Estimate resources. Decide whether to proceed.
+- Elaboration  
+  Define and analyse requirements. Design the architecture. Produce a project plan. Identify key risks.
+- Construction  
+  Develop components. Integrate and test the system against defined requirements.
+- Transition  
+  Deploy to users. Train users. Beta test and fix defects. Release to production.
+
+### Static Workflows
+
+Core workflows executed across phases:
+
+- Business modelling
+- Requirements
+- Analysis and design
+- Implementation
+- Test
+- Deployment
+- Configuration and change management
+- Project management
+- Environment
+
+### Good Practices
+
+1. Develop software iteratively
+2. Manage requirements explicitly
+3. Use component-based architectures
+4. Model software visually (UML)
+5. Verify software quality continuously
+6. Control changes to software
 
 ## Process Descriptions
 
-Process descriptions explain what activities are done and in what order.
+Captures what activities are performed, in what order, and under what conditions.
 
 Components:
 
 - Activities  
-  e.g., UI design, data modeling.
+  Work steps that transform inputs into outputs (e.g. UI design, data modelling).
 - Products  
-  Outputs of activities: documents, code, models.
+  Outputs of activities: documents, code, test results, models.
 - Roles  
-  Responsibilities of people involved.
-- Pre/post-conditions  
-  Conditions before and after each activity.
+  Responsibilities of people involved. Defines who performs each activity.
+- Pre-conditions  
+  State that must hold before an activity can begin.
+- Post-conditions  
+  State that must hold after an activity completes.
+
+Process descriptions exist at varying levels of abstraction. High-level descriptions outline major activities; detailed descriptions specify individual tasks and decision points.
 
 ## Coping with Change
 
-Change is driven by business changes, new technologies, and platform changes. Cost = rework + implementation effort.
+Change is driven by business changes, new technologies, and platform changes. Change cost includes rework plus implementation effort.
 
 Two strategies to reduce rework costs:
 
 - Change avoidance  
   Anticipate change early using prototyping.
 - Change tolerance  
-  Design the process to allow low-cost changes; incremental development supports this.
+  Design the process to allow low-cost changes. Incremental development supports this.
 
 ## Software Prototyping
 
@@ -80,11 +145,11 @@ Benefits:
 - Closer match to user needs
 - Reduced development effort
 
-Prototypes should **not** evolve into production systems: they have poor non-functional qualities, lack documentation, and degraded structure.
+Prototypes must not evolve into production systems: they have poor non-functional qualities, lack documentation, and degraded structure.
 
 ## Incremental Delivery
 
-System delivered in multiple increments instead of one release. High-priority requirements are delivered first; requirements are frozen per increment.
+System delivered in multiple increments instead of one release. High-priority requirements are delivered first. Requirements are frozen per increment.
 
 Advantages:
 
@@ -96,67 +161,3 @@ Problems:
 
 - Hard to identify common system facilities.
 - Conflicts with fixed-specification contracts.
-
-## Software Evolution
-
-Software must change to remain useful. The majority of software budget in large companies is devoted to evolving existing software, not developing new software.
-
-- Business and technology changes drive evolution.
-- Development and maintenance are increasingly blurred.
-- Most systems evolve rather than being completely new.
-
-### Life-Cycle Stages
-
-- Evolution  
-  System in operational use; new requirements proposed and implemented.
-- Servicing  
-  Only bug fixes and environment adaptations; no new functionality.
-- Phase-out  
-  Software may still be used but no further changes are made.
-
-### Types of Maintenance
-
-- Fault repair  
-  Correcting deficiencies in how the system meets its requirements.
-- Adaptive maintenance  
-  Changing the system to operate in a different environment.
-- Perfective maintenance  
-  Modifying the system to satisfy new or changed requirements.
-
-### Lehman's Laws of Software Evolution
-
-| Law                         | Description                                                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Continuing Change           | A program in real-world use must change or become progressively less useful.                                       |
-| Increasing Complexity       | As a program evolves, its structure becomes more complex; extra resources needed to preserve simplicity.           |
-| Large Program Evolution     | Program evolution is self-regulating: size, release intervals, and errors are approximately invariant per release. |
-| Organizational Stability    | Development rate is approximately constant over lifetime, independent of resources devoted.                        |
-| Conservation of Familiarity | Incremental change in each release is approximately constant over lifetime.                                        |
-| Continuing Growth           | Functionality must continually increase to maintain user satisfaction.                                             |
-| Declining Quality           | Quality declines unless the system is modified to reflect changes in the operational environment.                  |
-| Feedback System             | Evolution processes are multiagent, multiloop feedback systems.                                                    |
-
-## Reengineering
-
-Re-structuring or rewriting part or all of a legacy system without changing its functionality. Applied after maintenance costs have risen. Uses automated tools. Lower risk and cost than full redevelopment.
-
-## Refactoring
-
-Continuous improvement throughout development and evolution. Slows structural degradation without adding functionality.
-
-Common bad smells that prompt refactoring:
-
-- Duplicate code
-- Long methods
-- Switch statements
-- Data clumping
-- Speculative generality
-
-## Legacy System Strategy
-
-| Quality | Business Value | Strategy                         |
-| ------- | -------------- | -------------------------------- |
-| Low     | Low            | Scrap the system                 |
-| Low     | High           | Re-engineer or replace           |
-| High    | Low            | Replace with COTS or scrap       |
-| High    | High           | Continue with normal maintenance |
