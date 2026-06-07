@@ -7,6 +7,7 @@ import { titleize } from "../utils";
 import NoteCard from "../components/note-card.astro";
 import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
+import RightSidebar from "../components/right-sidebar.astro";
 
 export const prerender = true;
 
@@ -295,7 +296,9 @@ const subjectsList = Object.keys(subjectTrees).map((subject) => {
       </article>
     </section>
 
-    <TocRail headings={tocHeadings} />
+    <RightSidebar>
+      <TocRail headings={tocHeadings} />
+    </RightSidebar>
   </main>
 
   <script>

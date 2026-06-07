@@ -8,7 +8,7 @@ const { headings } = Astro.props;
 
 {
   headings.length > 0 && (
-    <aside class="toc-rail">
+    <>
       <div class="toc-title">On this page</div>
       <div class="toc-trail">
         {headings.map((heading, index) => (
@@ -30,7 +30,7 @@ const { headings } = Astro.props;
         </a>
       ))}
       {headings.length > 5 && <div class="toc-rule" />}
-    </aside>
+    </>
   )
 }
 
@@ -101,17 +101,15 @@ const { headings } = Astro.props;
 
     tocLinks.forEach((link) => {
       link.addEventListener("click", (e) => {
-        e.preventDefault();
         const href = link.getAttribute("href");
-        if (href) {
-          const targetId = href.substring(1);
-          const targetElement = document.getElementById(targetId);
-          if (targetElement) {
-            targetElement.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }
+        if (!href) return;
+        const targetId = href.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
         }
       });
     });
@@ -119,15 +117,6 @@ const { headings } = Astro.props;
 </script>
 
 <style>
-  .toc-rail {
-    width: var(--toc-w);
-    flex-shrink: 0;
-    overflow: hidden;
-    padding: 32px 16px 32px 0;
-    border-left: 1px solid var(--border);
-    position: relative;
-  }
-
   .toc-title {
     font-size: 0.625rem;
     font-weight: 700;

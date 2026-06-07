@@ -14,6 +14,7 @@ import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
 import NoteFeedback from "../components/note-feedback.astro";
 import { getVoteCounts } from "../lib/supabase";
+import RightSidebar from "../components/right-sidebar.astro";
 
 export const prerender = true;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
@@ -610,7 +611,12 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
       }
     </section>
 
-    <TocRail headings={tocHeadings} />
+    <RightSidebar>
+      <TocRail headings={tocHeadings} />
+      <!-- TODO: if the current slug starts with s4/theory-of-computing,
+       add link to https://sahithyan.dev/tools/regex-compiler. It is a Regex to Automaton converter and visualizer tool that I made.
+       It will help with understanding the logic behind the conversion. -->
+    </RightSidebar>
   </main>
 
   <script>
