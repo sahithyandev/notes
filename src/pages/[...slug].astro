@@ -22,19 +22,19 @@ import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note-sidebar.astro";
 import { titleize, calculateReadTime, generateDescription } from "../utils";
 
-export const prerender = true;
+export const prerender = false;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
 export const revalidate = 3000;
 
-export async function getStaticPaths() {
-  const notes = await getCollection("notes");
-  return notes.map((note) => ({
-    params: { slug: note.data.slug },
-    props: { note },
-  }));
+const { slug } = Astro.params;
+
+if (slug === undefined) {
+  return new Response(null, {
+    status: 404,
+    statusText: "Not Found",
+  });
 }
 
-const { slug } = Astro.params;
 const notesEntry = await getEntry("notes", slug);
 const slugParts = slug.split("/");
 
