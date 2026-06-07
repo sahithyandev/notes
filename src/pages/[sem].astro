@@ -8,6 +8,7 @@ import NoteCard from "../components/note-card.astro";
 import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
 import RightSidebar from "../components/right-sidebar.astro";
+import type { ModuleItem } from "../utils/types";
 
 export const prerender = true;
 
@@ -116,14 +117,15 @@ const semesters = [...semesterNums]
   .sort((a, b) => a - b)
   .map((number) => ({ number, label: `Semester ${number}` }));
 
-const description = `Semester ${semNum} notes covering ${Object.keys(subjectTrees).map(titleize).join(", ")}.`;
+const subjectTreesKeys = Object.keys(subjectTrees);
+const description = `Semester ${semNum} notes covering ${subjectTreesKeys.map(titleize).join(", ")}.`;
 const semStyle = `--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --sem-border: var(--s${semNum}-border); --sem-text: var(--s${semNum}); --sem-dim: var(--s${semNum}-bg); --link: var(--s${semNum});`;
 
-const subjectsList = Object.keys(subjectTrees).map((subject) => {
+const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
   const { direct, modules } = subjectTrees[subject];
   const firstNote = direct[0] ?? Object.values(modules).flat()[0];
   const href = firstNote ? `/${firstNote.slug}` : `#${subject}`;
-  return { subject, href, count: grouped[subject].length };
+  return { module: subject, href, count: grouped[subject].length };
 });
 ---
 
@@ -243,7 +245,7 @@ const subjectsList = Object.keys(subjectTrees).map((subject) => {
         </div>
       </div>
 
-      <ModulesList subjects={subjectsList} />
+      <ModulesList modules={subjectsList} />
 
       <div class="sb-rule"></div>
       <a href="/license" class="sb-item"> License </a>
