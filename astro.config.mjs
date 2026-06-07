@@ -131,7 +131,12 @@ function buildModuleRedirects() {
 export default defineConfig({
   output: "server",
   redirects: buildModuleRedirects(),
-  integrations: [mdx(), linkValidator()],
+  integrations: [
+    mdx({
+      optimize: true,
+    }),
+    linkValidator(),
+  ],
   markdown: {
     processor: unified({
       remarkPlugins: [remarkGfm, remarkMath, remarkKatexMhchem],
