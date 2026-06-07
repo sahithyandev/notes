@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/state-minimization
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.634Z
-lastUpdatedOn: 2026-05-10T07:10:02.690Z
+lastUpdatedOn: 2026-06-07T00:14:12.191Z
 ---
 
 The process of reducing the number of states in a DFA. The equivalent DFA with the minimum number of states is called the minimal DFA. For a regular language, its minimal DFA is unique up to state renaming.
@@ -56,43 +56,37 @@ Implies that for all language $L$ there exists a unique minimal DFA with a numbe
 Two strings $x$ and $y$ are equivalent with respect to a language $L$ **iff**:
 
 $$
-\forall z \ in L, xz \in L \iff yz \in L
+\forall z \in L,\; xz \in L \iff yz \in L
 $$
 
 ## Table Filling Algorithm
 
 A systematic procedure used to identify distinguishable states and determine equivalent states.
 
-### Step 1 — Construct the State Pair Table
+### Step 1: Construct the State Pair Table
 
 List all unordered pairs of states.
 
-Example:
+Example: $(q_0,q_1), (q_0,q_2), (q_1,q_2)$.
 
-| Pair    |
-| ------- |
-| (q0,q1) |
-| (q0,q2) |
-| (q1,q2) |
-
-### Step 2 — Mark Final vs. Non-Final Pairs
+### Step 2: Mark Final vs. Non-Final Pairs
 
 Mark pairs where one state is final and the other is non-final. These states are immediately distinguishable.
 
-### Step 3 — Check Transitions
+### Step 3: Check Transitions
 
 For each unmarked pair $(p,q)$, examine transitions for every input symbol
 
 $$
-\delta(p, a) = r \text{ and } \delta(q, a) = s
+\delta(p, a) = r\;\text{ and }\;\delta(q, a) = s
 $$
 
 If pair $(r,s)$ is already marked, then $(p,q)$ must also be marked.
 
-### Step 4 — Repeat Until Stable
+### Step 4: Repeat Until Stable
 
 Continue marking pairs until no new pairs can be marked.
 
-### Step 5 — Identify Equivalent States
+### Step 5: Identify Equivalent States
 
 All unmarked pairs represent equivalent states. Merge these states and adjust transitions accordingly to obtain the minimal DFA.
