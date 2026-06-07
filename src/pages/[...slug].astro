@@ -160,130 +160,19 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   </main>
 
   <script>
-    // Mobile drawer toggles
-    const openSidebarBtn = document.getElementById("open-sidebar");
-    const openTocBtn = document.getElementById("open-toc");
-    const backdrop = document.getElementById("drawer-backdrop");
-    const sidebarEl = document.querySelector(".sidebar");
-    const tocEl = document.querySelector(".toc-rail");
-    const root = document.documentElement;
-
-    const closeDrawers = () => {
-      root.classList.remove("sidebar-open", "toc-open");
-      document.body.style.overflow = "";
-    };
-    const openSidebar = () => {
-      root.classList.add("sidebar-open");
-      root.classList.remove("toc-open");
-      document.body.style.overflow = "hidden";
-    };
-    const openToc = () => {
-      root.classList.add("toc-open");
-      root.classList.remove("sidebar-open");
-      document.body.style.overflow = "hidden";
-    };
-
-    openSidebarBtn?.addEventListener("click", openSidebar);
-    openTocBtn?.addEventListener("click", openToc);
-    backdrop?.addEventListener("click", closeDrawers);
-
-    document.addEventListener("keydown", (e) => {
-      if (
-        e.key === "Escape" &&
-        (root.classList.contains("sidebar-open") ||
-          root.classList.contains("toc-open"))
-      ) {
-        closeDrawers();
-      }
-    });
-
-    // Close drawer when a link inside is tapped (before navigation completes)
-    sidebarEl?.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("a")) closeDrawers();
-    });
-    tocEl?.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("a")) closeDrawers();
-    });
-
-    // Close drawers when crossing back to desktop
-    const mqDesktop = window.matchMedia("(min-width: 48rem)");
-    mqDesktop.addEventListener("change", (e) => {
-      if (e.matches) closeDrawers();
-    });
-
-    // Enable drawer transitions only after initial paint, so the closed
-    // state doesn't briefly animate in on page load / navigation.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => root.classList.add("drawers-ready"));
-    });
+    import "../scripts/drawers";
   </script>
-
   <script>
-    function formatRelativeTime(isoDate: string): string {
-      const lastUpdated = new Date(isoDate);
-      const now = new Date();
-      const diffTime = Math.abs(now.getTime() - lastUpdated.getTime());
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 0) return "today";
-      if (diffDays === 1) return "yesterday";
-      if (diffDays < 7) return `${diffDays} days ago`;
-
-      const weeks = Math.floor(diffDays / 7);
-      if (weeks < 4) return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
-
-      const months = Math.floor(diffDays / 30);
-      return `${months} month${months > 1 ? "s" : ""} ago`;
-    }
-
-    // Update relative time label on page load
-    document.addEventListener("DOMContentLoaded", () => {
-      const metaElement = document.querySelector(".note-meta-item[data-date]");
-      if (metaElement) {
-        const isoDate = metaElement.getAttribute("data-date");
-        if (isoDate) {
-          metaElement.textContent = "Updated " + formatRelativeTime(isoDate);
-        }
-      }
-    });
+    import "../scripts/relative-time";
   </script>
-
-  <script define:vars={{ slug, slugParts }}>
+  <script define:vars={{ slug, slugParts }} is:inline>
     window.stonks?.event("note_view", "/" + slug, {
       semester: slugParts[0] ?? "",
       module: slugParts[1] ?? "",
     });
   </script>
-
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("article pre").forEach((pre) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "copy-btn";
-        btn.setAttribute("aria-label", "Copy code");
-        btn.textContent = "Copy";
-
-        btn.addEventListener("click", () => {
-          const code = pre.querySelector("code");
-          const text = code?.innerText ?? "";
-          navigator.clipboard.writeText(text).then(
-            () => {
-              btn.textContent = "Copied";
-              setTimeout(() => (btn.textContent = "Copy"), 1500);
-            },
-            () => {
-              btn.textContent = "Failed";
-              setTimeout(() => (btn.textContent = "Copy"), 1500);
-            },
-          );
-        });
-
-        pre.appendChild(btn);
-      });
-    });
+    import "../scripts/copy-code";
   </script>
 </Layout>
 
