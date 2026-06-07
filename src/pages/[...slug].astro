@@ -89,20 +89,20 @@ async function getSidebarData(currentSlug: string) {
   const allNotes = await getCollection("notes");
   const currentSlugParts = currentSlug.split("/");
   const currentSemester = currentSlugParts[0];
-  const currentSubject = currentSlugParts[1];
+  const currentModule = currentSlugParts[1];
 
-  // Group notes by semester and subject
+  // Group notes by semester and module
   const grouped: Record<string, Record<string, any[]>> = {};
 
   allNotes.forEach((note) => {
     const parts = note.data.slug.split("/");
     const sem = parts[0];
-    const subj = parts[1];
+    const mod = parts[1];
 
     if (!grouped[sem]) grouped[sem] = {};
-    if (!grouped[sem][subj]) grouped[sem][subj] = [];
+    if (!grouped[sem][mod]) grouped[sem][mod] = [];
 
-    grouped[sem][subj].push({
+    grouped[sem][mod].push({
       slug: note.data.slug,
       title: note.data.title,
       label: note.data.sidebar?.label || note.data.title,
@@ -111,39 +111,39 @@ async function getSidebarData(currentSlug: string) {
     });
   });
 
-  // Sort each subject's notes by order
+  // Sort each module's notes by order
   Object.keys(grouped).forEach((sem) => {
-    Object.keys(grouped[sem]).forEach((subj) => {
-      grouped[sem][subj].sort((a, b) => a.order - b.order);
+    Object.keys(grouped[sem]).forEach((mod) => {
+      grouped[sem][mod].sort((a, b) => a.order - b.order);
     });
   });
 
-  // Build current subject tree with nested modules
-  const currentSubjectNotes = grouped[currentSemester]?.[currentSubject] || [];
-  const currentSubjectTree = {
+  // Build current module tree with nested topics
+  const currentModuleNotes = grouped[currentSemester]?.[currentModule] || [];
+  const currentModuleTree = {
     direct: [] as any[],
-    modules: {} as Record<string, any[]>,
+    topics: {} as Record<string, any[]>,
   };
 
-  currentSubjectNotes.forEach((note) => {
+  currentModuleNotes.forEach((note) => {
     const parts = note.slug.split("/");
     if (parts.length === 3) {
-      // s1/subject/note - direct note under subject
-      currentSubjectTree.direct.push(note);
+      // s1/module/note - direct note under module
+      currentModuleTree.direct.push(note);
     } else if (parts.length >= 4) {
-      // s1/subject/module/... - nested under module
-      const module = parts[2];
-      if (!currentSubjectTree.modules[module]) {
-        currentSubjectTree.modules[module] = [];
+      // s1/module/topic/... - nested under topic
+      const topic = parts[2];
+      if (!currentModuleTree.topics[topic]) {
+        currentModuleTree.topics[topic] = [];
       }
-      currentSubjectTree.modules[module].push(note);
+      currentModuleTree.topics[topic].push(note);
     }
   });
 
-  // Sort modules by their numeric dir prefix (moduleOrder)
-  const sortedModules = Object.keys(currentSubjectTree.modules).sort((a, b) => {
-    const orderA = currentSubjectTree.modules[a][0]?.moduleOrder ?? Infinity;
-    const orderB = currentSubjectTree.modules[b][0]?.moduleOrder ?? Infinity;
+  // Sort topics by their numeric dir prefix (moduleOrder)
+  const sortedTopics = Object.keys(currentModuleTree.topics).sort((a, b) => {
+    const orderA = currentModuleTree.topics[a][0]?.moduleOrder ?? Infinity;
+    const orderB = currentModuleTree.topics[b][0]?.moduleOrder ?? Infinity;
     return orderA - orderB;
   });
 
@@ -153,20 +153,20 @@ async function getSidebarData(currentSlug: string) {
   const slugParts = currentSlug.split("/");
 
   if (slugParts.length >= 4) {
-    const currentModule = slugParts[2];
-    const moduleNotes = currentSubjectTree.modules[currentModule] || [];
-    const currentIndex = moduleNotes.findIndex(
+    const currentTopic = slugParts[2];
+    const topicNotes = currentModuleTree.topics[currentTopic] || [];
+    const currentIndex = topicNotes.findIndex(
       (note) => note.slug === currentSlug,
     );
 
     if (currentIndex > 0) {
-      prevNote = moduleNotes[currentIndex - 1];
+      prevNote = topicNotes[currentIndex - 1];
     }
-    if (currentIndex < moduleNotes.length - 1) {
-      nextNote = moduleNotes[currentIndex + 1];
+    if (currentIndex < topicNotes.length - 1) {
+      nextNote = topicNotes[currentIndex + 1];
     }
   } else if (slugParts.length === 3) {
-    const directNotes = currentSubjectTree.direct;
+    const directNotes = currentModuleTree.direct;
     const currentIndex = directNotes.findIndex(
       (note) => note.slug === currentSlug,
     );
@@ -218,13 +218,13 @@ async function getSidebarData(currentSlug: string) {
 
   return {
     currentSemester,
-    currentSubject,
+    currentModule,
     grouped,
     semesters,
-    currentSubjectTree: {
-      ...currentSubjectTree,
-      modules: Object.fromEntries(
-        sortedModules.map((key) => [key, currentSubjectTree.modules[key]]),
+    currentModuleTree: {
+      ...currentModuleTree,
+      topics: Object.fromEntries(
+        sortedTopics.map((key) => [key, currentModuleTree.topics[key]]),
       ),
     },
     prevNote,
@@ -344,29 +344,29 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       </div>
 
       <ModulesList
-        subjects={Object.entries(
+        modules={Object.entries(
           sidebarData.grouped[sidebarData.currentSemester] || {},
-        ).map(([subject, notes]) => ({
-          subject,
-          href: `/${sidebarData.currentSemester}/${subject}`,
+        ).map(([module, notes]) => ({
+          module,
+          href: `/${sidebarData.currentSemester}/${module}`,
           count: notes.length,
-          active: subject === sidebarData.currentSubject,
+          active: module === sidebarData.currentModule,
         }))}
       />
 
       {
-        (sidebarData.currentSubjectTree.direct.length > 0 ||
-          Object.keys(sidebarData.currentSubjectTree.modules).length > 0) && (
+        (sidebarData.currentModuleTree.direct.length > 0 ||
+          Object.keys(sidebarData.currentModuleTree.topics).length > 0) && (
           <>
             <div class="sb-rule" />
             <div class="sb-group-title">
-              {sidebarData.currentSubject
+              {sidebarData.currentModule
                 .replace(/-/g, " ")
                 .replace(/\b\w/g, (l) => l.toUpperCase())}
             </div>
 
-            {/* Direct notes under subject */}
-            {sidebarData.currentSubjectTree.direct.map((note: any) => (
+            {/* Direct notes under module */}
+            {sidebarData.currentModuleTree.direct.map((note: any) => (
               <a
                 href={`/${note.slug}`}
                 class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
@@ -375,16 +375,16 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
               </a>
             ))}
 
-            {/* Nested modules */}
-            {Object.entries(sidebarData.currentSubjectTree.modules).map(
-              ([moduleKey, moduleNotes]) => (
+            {/* Nested topics */}
+            {Object.entries(sidebarData.currentModuleTree.topics).map(
+              ([topicKey, topicNotes]) => (
                 <>
                   <div class="sb-module-title">
-                    {moduleKey
+                    {topicKey
                       .replace(/-/g, " ")
                       .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </div>
-                  {moduleNotes.map((note: any) => (
+                  {topicNotes.map((note: any) => (
                     <a
                       href={`/${note.slug}`}
                       class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
