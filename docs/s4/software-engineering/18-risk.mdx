@@ -3,61 +3,101 @@ title: Risk
 sidebar:
   order: 18
 dateCreated: 2026-05-19T15:00:56.689Z
-lastUpdatedOn: 2026-06-07T14:45:59.607Z
+lastUpdatedOn: 2026-06-07T18:40:36.453Z
 slug: s4/software-engineering/risk
 prev: true
 next: true
 ---
 
-Probability that an adverse circumstance will occur.
+Probability that an adverse circumstance will occur, combined with its potential impact on the project.
 
-3 categories:
+## Categories
 
-- Project risks — affect schedule or resources.
-- Product risks — affect quality or performance.
-- Business risks — affect the developing or procuring organisation.
+### By impact area
+
+- Project risk  
+  Affects schedule or resources.
+- Product risk  
+  Affects quality or performance of the delivered software.
+- Business risk  
+  Affects the developing or procuring organisation.
+
+### By source
+
+- Technology risks  
+  Risks from the software or hardware technologies used (e.g. new database technology with unknown performance characteristics).
+- People risks  
+  Risks associated with team members (e.g. unavailability of specialist staff, lack of relevant skills).
+- Organizational risks  
+  Risks from the organisational environment (e.g. funding restructures, management changes).
+- Requirements risks  
+  Risks from changing or poorly understood requirements (e.g. customer-driven requirement changes late in the project).
+- Estimation risks  
+  Risks from inaccurate estimates of resources or schedule (e.g. underestimating development time for complex components).
+
+## Risk indicator
+
+Predefined metric used to detect early signs that a risk is materialising.
+
+Examples:
+
+- Staff turnover rate (people risk indicator)
+- Number of unresolved requirements changes (requirements risk indicator)
+- Ratio of actual to estimated effort per module (estimation risk indicator)
 
 ## Risk Management
 
-4 sequential and circular stages.
-
-1. **Risk identification** → produces list of potential risks.
-2. **Risk analysis** → produces prioritized risk list.
-3. **Risk planning** → produces avoidance and contingency plans.
-4. **Risk monitoring** → produces risk assessment; feeds back to identification.
+A proactive process of identifying, analyzing, and controlling risks before they become problems. Operates in 4 sequential stages that loop back continuously throughout the project.
 
 ### Risk Identification
 
-Identifying a list of risks. Identification sources could be:
+Identifying a list of risks that could threaten the project. Identification sources:
 
-- team activity
+- team brainstorming activity
 - individual manager experience
+- historical data from similar projects
 
-A checklist of risk categories helps enumeration:
-
-- Technology risks
-- People risks
-- Organizational risks
-- Requirements risks
-- Estimation risks
+The [by source categories](#by-source) serve as a checklist for systematic enumeration.
 
 ### Risk Analysis
 
-Assessing probability and seriousness of each identified risk. Usually 3 or 4 or 5 levels of probability scale and consequence scale are used.
+Assessing probability and seriousness of each identified risk. A probability scale and a consequence scale are each divided into 3, 4, or 5 discrete levels.
+
+Typical probability levels: very low, low, moderate, high, very high.
+
+Typical consequence levels: insignificant, tolerable, serious, catastrophic.
+
+Each risk is entered into a risk register with:
+
+- A description of the risk
+- Probability level
+- Consequence level
+- An overall severity rating (often probability × consequence)
+
+Risks above a severity threshold are flagged for active management. The output is a prioritized risk list ordered by severity, focusing planning effort on the highest-severity risks first.
 
 ### Risk Planning
 
-Developing strategies for each prioritized risks.
-
-Strategies can be split into 3 types:
+Developing strategies for each prioritized risk. Strategies split into 3 types:
 
 - Avoidance strategies  
-  Reduce probability the risk arises.
+  Reduce the probability the risk arises (e.g. buy commercial off-the-shelf components to reduce technology risk).
 - Minimization strategies  
-  Reduce impact if the risk occurs.
+  Reduce the impact if the risk occurs (e.g. cross-train staff to minimize the impact of key-person absence).
 - Contingency plans  
-  Predefined responses if the risk materializes.
+  Predefined responses to execute if the risk materializes (e.g. have a backup supplier contracted in advance).
+
+Each high-severity risk should have at least one strategy. Avoidance is preferred where cost-effective; contingency plans cover residual risk.
+
+When an indicator exceeds a threshold, the corresponding contingency plan is activated.
 
 ### Risk Monitoring
 
-Regular assessment of each risk throughout the project. Assess whether the probability has changed (increased or decreased), whether consequences have changed.
+Regular assessment of each risk throughout the project. Performed at each project milestone or on a fixed schedule.
+
+Each review checks:
+
+- Whether risk probability has changed
+- Whether consequences have changed
+- Whether new risks have emerged
+- Whether planned strategies are still adequate
