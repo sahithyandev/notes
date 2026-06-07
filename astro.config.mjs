@@ -56,7 +56,7 @@ function isDir(p) {
 /** @param {string} dir @returns {string[]} */
 function subdirs(dir) {
   return readdirSync(dir).filter(
-    (name) => !EXCLUDED.has(name) && isDir(join(dir, name))
+    (name) => !EXCLUDED.has(name) && isDir(join(dir, name)),
   );
 }
 
@@ -82,7 +82,11 @@ function firstNote(dir) {
     let candidate;
     if (isDir(full)) {
       const sub = firstNote(full);
-      if (sub) candidate = { order: sub.order, slug: `${stripDirPrefix(name)}/${sub.slug}` };
+      if (sub)
+        candidate = {
+          order: sub.order,
+          slug: `${stripDirPrefix(name)}/${sub.slug}`,
+        };
     } else {
       const m = FILE_PREFIX.exec(name);
       if (m) candidate = { order: Number(m[1]), slug: m[2] };
@@ -116,7 +120,8 @@ function buildModuleRedirects() {
         const subSlug = stripDirPrefix(sub);
         const subFirst = firstNote(join(modDir, sub));
         if (subFirst) {
-          redirects[`/${sem}/${mod}/${subSlug}`] = `/${sem}/${mod}/${subSlug}/${subFirst.slug}`;
+          redirects[`/${sem}/${mod}/${subSlug}`] =
+            `/${sem}/${mod}/${subSlug}/${subFirst.slug}`;
           count++;
         }
       }
