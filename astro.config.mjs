@@ -129,8 +129,8 @@ export default defineConfig({
     rehypePlugins: [],
     shikiConfig: {
       themes: {
-        light: "snazzy-light",
-        dark: "rose-pine-moon",
+        light: "github-light",
+        dark: "catppuccin-macchiato",
       },
       defaultColor: false,
     },
