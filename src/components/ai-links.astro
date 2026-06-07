@@ -1,0 +1,84 @@
+---
+import ChatGptIcon from "./icons/ChatGptIcon.astro";
+import ClaudeIcon from "./icons/ClaudeIcon.astro";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+
+interface Props {
+  slug: string;
+  topic: string;
+  sectionLabel: string | null;
+}
+
+const { slug, topic, sectionLabel } = Astro.props;
+const currentURL = `${SITE_HOST_URL}/${slug}`;
+
+const tutorPrompt = `I'm working through the "${topic}" section${sectionLabel ? ` under ${sectionLabel}` : ""}: ${currentURL} on ${SITE_NAME} at ${currentURL}
+
+Please help me use it effectively:
+- Explain any concept I mention (from the notes or topic) in clear, simple English as if you're a lecturer.
+- Provide examples (numeric, diagrammatic, or step-by-step) drawn from or inspired by the material.
+- Help me debug my understanding or answer conceptual questions I raise.
+- If the notes reference a figure, table, or diagram, help me interpret it, annotate it, and connect it clearly to the concept.
+- Offer "Check Your Understanding" quick questions (with answers or hints) based on the material so I can test myself.
+
+I'll specify which concept / page / figure I'm on, and you'll respond accordingly.`;
+const encodedPrompt = encodeURIComponent(tutorPrompt);
+const chatgptUrl = `https://chatgpt.com/?q=${encodedPrompt}`;
+const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
+---
+
+<div class="flex gap-3">
+  <a
+    class="note-action-btn"
+    href={chatgptUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Open in ChatGPT"
+  >
+    <span>Open in ChatGPT</span>
+    <ChatGptIcon />
+  </a>
+  <a
+    class="note-action-btn"
+    href={claudeUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Open in Claude"
+  >
+    <span>Open in Claude</span>
+    <ClaudeIcon />
+  </a>
+</div>
+
+<style>
+  .note-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    text-decoration: none;
+    transition:
+      background 0.12s ease,
+      border-color 0.12s ease,
+      color 0.12s ease;
+  }
+
+  .note-action-btn svg {
+    flex-shrink: 0;
+    color: currentColor;
+    opacity: 0.85;
+  }
+
+  .note-action-btn:hover {
+    color: var(--sem);
+    background: var(--sem-bg);
+    border-color: var(--sem-border);
+  }
+</style>
