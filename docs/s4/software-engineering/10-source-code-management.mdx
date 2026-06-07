@@ -3,7 +3,7 @@ title: Source Code Management
 sidebar:
   order: 10
 dateCreated: 2026-05-19T09:50:19.304Z
-lastUpdatedOn: 2026-06-07T14:45:59.606Z
+lastUpdatedOn: 2026-06-07T17:59:38.177Z
 slug: s4/software-engineering/source-code-management
 prev: true
 next: true
@@ -11,24 +11,20 @@ next: true
 
 Aka. SCM or Configuration Management (CM). Concerned with the policies, processes, and tools for managing changing software systems. Needed because it is easy to lose track of what changes and component versions have been incorporated into each system version.
 
-## Key Terminology
-
 - Configuration Item (SCI)  
-  Anything placed under configuration control. Has a unique name; may exist in multiple versions.
+  Any artifact placed under configuration control. Covers source files, build scripts, configuration files, shared libraries, and tool versions. Has a unique name. The repository stores all historical states, not just the current state.
 - Version  
-  An instance of a configuration item that differs from other instances. Identified by name and version number.
+  A distinct recorded state of an SCI. Each submission after modification creates a new version rather than overwriting the previous one. Identified by item name and version number (e.g., `C1.0`, `C1.1`, `C1.2`).
 - Baseline  
-  A collection of component versions making up a system. Controlled: component versions cannot be changed. The system can always be recreated from a baseline.
+  A fixed, named snapshot of a complete set of component versions forming a working system at a point in time. Immutable once established. Any change to a component produces a new version belonging to a new baseline. Guarantees exact reproducibility of any past system state.
 - Codeline  
-  A set of versions of a software component and its dependencies. Shows evolution history.
+  The full version history of a component and its dependencies. A component version compatible with one dependency version may not be compatible with another.
 - Mainline  
-  A sequence of baselines representing different versions of a system.
-- Branch  
-  A new codeline created from an existing version for independent development.
-- Merge  
-  A new version created by combining separate codeline versions.
+  The authoritative sequential progression of baselines over time. Branches diverge for isolated work and merge back to produce the next baseline.
 
-### Repository
+Versions are instances of SCIs. A Baseline locks a specific set of versions into a coherent system snapshot. The Mainline is the ordered sequence of such baselines. A Codeline is the per-component view of version history, including dependencies.
+
+## Repository
 
 Shared store for all versioned project artifacts.
 
@@ -38,28 +34,45 @@ Stores:
 - Configuration files, build scripts, shared libraries, toolchains
 - Database of version info: who changed what, when, and why
 
+## Version Control
+
+The practice of tracking and managing changes to software artefacts over time.
+
+### Version Control System
+
+Aka. VCS. Records each modification to source files with:
+
+- Timestamp
+- Author identity
+- Descriptive message
+
+Enables:
+
+- Retrieving any historical version.
+- Comparing differences between versions.
+- Reverting to a prior state if a defect is introduced.
+
 ## Types
 
 ### Centralized
 
 Single server holds the authoritative repository. Developers check out and check in files.
 
+Access control per path is simple to enforce because all reads and writes pass through one server. Administrators have a single audit log, a single backup target, and one authoritative state to reason about. Linear history is the natural default, which simplifies release tracking.
+
+A single point of failure. Cannot work offline as every commit, diff, and history query requires network access. Branching in early implementations copies the entire tree on the server, making it expensive for large codebases.
+
 Examples are CVS and Subversion.
 
 ### Distributed
 
-Each developer holds a full clone of the repository locally. Files are changed through a shared remote. There could be many remotes for a single project. And it can be self-hosted.
+Each developer holds a full clone of the repository locally. Files are shared through a remote. There could be many remotes for a single project. And remotes can be self-hosted.
+
+Full repository history, commits, diffs, and log queries can be executed locally. No single point of failure. Multiple remotes let independent workflows, forks, and mirrors coexist without central coordination.
+
+The initial clone transfers the entire history, which is expensive for large repositories. Binary assets accumulate as separate snapshots without delta compression, causing disproportionate storage growth over time. Managing multiple remotes and non-linear histories demands a steeper learning curve than a single-server model.
 
 One example is git. Created by Linus Torvalds in 2005 to manage the Linux kernel source.
-
-Benefits of distributed management over centralized:
-
-- Resilience  
-  Clones survive server failure; offline work possible.
-- Speed  
-  Local commits require no network transfer.
-- Flexibility  
-  Local experimentation without exposing work to others.
 
 ## Branching
 

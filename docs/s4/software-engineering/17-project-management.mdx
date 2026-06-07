@@ -3,7 +3,7 @@ title: Project Management
 sidebar:
   order: 17
 dateCreated: 2026-05-19T13:49:41.069Z
-lastUpdatedOn: 2026-06-07T14:45:59.607Z
+lastUpdatedOn: 2026-06-07T17:59:38.178Z
 slug: s4/software-engineering/project-management
 prev: true
 next: true
@@ -155,60 +155,6 @@ Price is not equal to development cost. Broader factors influence final price:
   Price raised if requirements are likely to change.
 - Financial health  
   Contract may be under-priced to improve cash flow.
-
-### Cost Estimation Approaches
-
-- Expert judgment  
-  Estimate based on experience with comparable past projects. Prone to optimism bias.
-- Estimation by analogy  
-  Compare to a similar completed project; adjust the estimate by difference factors.
-- Algorithmic cost modelling  
-  Mathematical formula using quantified software metrics as inputs. COCOMO II is the primary example.
-- Parkinson's Law  
-  Work expands to fill available time and budget. Not an estimation method; explains overruns.
-- Price to Win  
-  Estimate set to secure the contract, independent of actual cost. Leads to loss-making contracts.
-
-### COCOMO II
-
-COCOMO II (COnstructive COst MOdel) estimates effort in person-months.
-
-| Model                   | When Used                                                                           |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| Application Composition | Prototyping and reuse-heavy projects. Formula: PM = (NAP × (1 − %reuse/100)) / PROD |
-| Early Design            | After requirements agreed, before design starts. Formula: PM = A × Size^B × M       |
-| Reuse Model             | Computing effort to integrate reusable components (black-box vs white-box reuse).   |
-| Post-Architecture       | After architecture designed; most accurate. Uses 17 multipliers.                    |
-
-Key multipliers (M): RCPX (reliability/complexity), RUSE (reuse required), PDIF (platform difficulty), PREX (personnel experience), PERS (personnel capability), SCED (required schedule), FCIL (team support facilities).
-
-Project duration:
-
-$$
-TDEV = 3 \times (PM)^{0.33 + 0.2 \times (B - 1.01)}
-$$
-
-Time required is independent of the number of people. Adding people to a late project makes it later due to communication overhead.
-
-### Function Point Analysis
-
-Measures software size by counting user-visible functions rather than lines of code. Language-independent.
-
-Five function types:
-
-- External inputs
-- External outputs
-- External inquiries
-- Internal logical files
-- External interface files
-
-Each function is rated simple, average, or complex to produce an unadjusted function count (UFC). UFC is then scaled by a complexity adjustment factor (CAF) derived from 14 general system characteristics.
-
-$$
-FP = UFC \times CAF
-$$
-
-Function points can be converted to estimated LOC using a language-specific conversion factor.
 
 ### Agile Planning
 
