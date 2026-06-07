@@ -1,0 +1,118 @@
+---
+interface Note {
+  slug: string;
+  label: string;
+  [key: string]: unknown;
+}
+
+interface Props {
+  currentModule: string;
+  direct: Note[];
+  topics: Record<string, Note[]>;
+  currentSlug: string;
+}
+
+const { currentModule, direct, topics, currentSlug } = Astro.props;
+
+const hasContent = direct.length > 0 || Object.keys(topics).length > 0;
+---
+
+{
+  hasContent && (
+    <>
+      <div class="sb-rule" />
+      <div class="sb-group-title">
+        {currentModule
+          .replace(/-/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase())}
+      </div>
+
+      {direct.map((note) => (
+        <a
+          href={`/${note.slug}`}
+          class={`sb-item sb-item-sub ${note.slug === currentSlug ? "active" : ""}`}
+        >
+          {note.label}
+        </a>
+      ))}
+
+      {Object.entries(topics).map(([topicKey, topicNotes]) => (
+        <>
+          <div class="sb-module-title">
+            {topicKey
+              .replace(/-/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase())}
+          </div>
+          {topicNotes.map((note) => (
+            <a
+              href={`/${note.slug}`}
+              class={`sb-item sb-item-sub ${note.slug === currentSlug ? "active" : ""}`}
+            >
+              {note.label}
+            </a>
+          ))}
+        </>
+      ))}
+    </>
+  )
+}
+
+<style>
+  .sb-rule {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+  }
+
+  .sb-group-title {
+    padding: 10px 16px 4px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .sb-module-title {
+    padding: 8px 16px 2px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .sb-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 16px;
+    font-size: 0.78125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    transition:
+      background 0.1s,
+      color 0.1s,
+      border-color 0.1s;
+    line-height: 1.35;
+  }
+
+  .sb-item:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  .sb-item.active {
+    background: var(--sem-dim);
+    color: var(--sem);
+    border-left-color: var(--sem);
+    font-weight: 700;
+  }
+
+  .sb-item-sub {
+    padding-left: 28px;
+    font-size: 0.75rem;
+  }
+</style>

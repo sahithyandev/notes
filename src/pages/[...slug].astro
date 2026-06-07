@@ -22,6 +22,7 @@ import ChevronDown from "../components/icons/ChevronDown.astro";
 import MenuIcon from "../components/icons/MenuIcon.astro";
 import TocIcon from "../components/icons/TocIcon.astro";
 import NoteNav from "../components/note-nav.astro";
+import ModuleTree from "../components/module-tree.astro";
 
 export const prerender = true;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
@@ -349,50 +350,12 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
         }))}
       />
 
-      {
-        (sidebarData.currentModuleTree.direct.length > 0 ||
-          Object.keys(sidebarData.currentModuleTree.topics).length > 0) && (
-          <>
-            <div class="sb-rule" />
-            <div class="sb-group-title">
-              {sidebarData.currentModule
-                .replace(/-/g, " ")
-                .replace(/\b\w/g, (l) => l.toUpperCase())}
-            </div>
-
-            {/* Direct notes under module */}
-            {sidebarData.currentModuleTree.direct.map((note: any) => (
-              <a
-                href={`/${note.slug}`}
-                class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
-              >
-                {note.label}
-              </a>
-            ))}
-
-            {/* Nested topics */}
-            {Object.entries(sidebarData.currentModuleTree.topics).map(
-              ([topicKey, topicNotes]) => (
-                <>
-                  <div class="sb-module-title">
-                    {topicKey
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </div>
-                  {topicNotes.map((note: any) => (
-                    <a
-                      href={`/${note.slug}`}
-                      class={`sb-item sb-item-sub ${note.slug === slug ? "active" : ""}`}
-                    >
-                      {note.label}
-                    </a>
-                  ))}
-                </>
-              ),
-            )}
-          </>
-        )
-      }
+      <ModuleTree
+        currentModule={sidebarData.currentModule}
+        direct={sidebarData.currentModuleTree.direct}
+        topics={sidebarData.currentModuleTree.topics}
+        currentSlug={slug}
+      />
 
       <div class="sb-rule"></div>
       <a href="/license" class="sb-item sb-license-link"> License </a>
@@ -770,25 +733,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.2px;
-  }
-
-  .sb-group-title {
-    padding: 10px 16px 4px;
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
-
-  .sb-module-title {
-    padding: 8px 16px 2px;
-    font-size: 0.625rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    opacity: 0.8;
   }
 
   .sb-item {
