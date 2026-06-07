@@ -1,0 +1,264 @@
+---
+title: Cost Estimation
+sidebar:
+  order: 19
+dateCreated: 2026-06-07T00:00:00.000Z
+lastUpdatedOn: 2026-06-07T00:00:00.000Z
+slug: s4/software-engineering/cost-estimation
+prev: true
+next: true
+---
+
+Predicting the effort and schedule required to deliver a software project before development begins.
+
+## Approaches
+
+- Algorithmic cost modelling  
+  Mathematical formula using quantified software metrics as inputs.
+- Expert judgment  
+  Estimate based on experience with comparable past projects. Prone to optimism bias.
+- Estimation by analogy  
+  Compare to a similar completed project; adjust by difference factors.
+- Price to Win  
+  Estimate set to secure the contract, independent of actual cost. Leads to loss-making contracts.
+
+## Judgement Issues
+
+### Planning Fallacy
+
+The tendency to plan from best-case scenarios even when historical data shows those scenarios rarely occur. Developers estimate how long a task should take (idealized) rather than how long it will take (realistic, including interruptions, debugging, reviews, meetings).
+
+### Optimism Bias
+
+Cognitive bias causing estimators to systematically underestimate cost, effort, and duration while overestimating the likelihood of success.
+
+Manifestations in software estimation:
+
+- Best-case assumptions  
+  No integration problems, no rework, no staff unavailability assumed by default.
+- Underweighted risks  
+  Known risk events treated as unlikely even when probability is non-trivial.
+- Happy path as expected path  
+  Edge cases and failure modes excluded from estimates.
+- Complexity underestimation  
+  Unfamiliar work underestimated due to unknown unknowns.
+
+The bias is systematic, not random. Estimates skew consistently too low. Averaging across multiple estimators does not correct it when all estimators share the same bias.
+
+### Reference Class Forecasting
+
+A mitigation for planning fallacy and optimism bias. Anchor on what comparable past projects actually took (outside view) rather than decomposing the current project from scratch (inside view).
+
+## Time estimation
+
+### Padding
+
+Buffer period deliberately added to an estimate beyond the expected task duration to absorb uncertainty or protect against overruns.
+
+### Parkinson's Law
+
+> Work expands to fill the time available for its completion.  
+> — C. Northcote Parkinson (1955)
+
+Suppose a task that could be done in 3 days is allocated 5 days. It tends to take all 5 days to be completed through:
+
+- Over-engineering  
+  Solutions are made more general or robust than the requirements warrant.
+- Excessive refinement  
+  Already-working code is polished, restructured, or documented beyond necessity.
+- Scope creep at the individual level  
+  Developers add features or improvements not asked for, absorbing remaining time.
+- Reduced urgency  
+  Perceived slack in the schedule lowers the pace of work.
+
+### Ratchet Effect
+
+Consumed buffer is never recovered, and the incentive to finish early erodes over time.
+
+- Consumed regardless of complexity  
+  Buffer gets absorbed even when the underlying task is straightforward.
+- Weakened incentive to finish early  
+  Delivering ahead of schedule is penalized by immediate reassignment, or the developer knows buffer exists.
+- Inflated future estimates  
+  If managers are cutting padded estimates, developers will inflate future estimates.
+
+The consequence for estimation accuracy: padding does not accumulate as time savings. Projects rarely finish early even when tasks are estimated generously.
+
+### Agile Timeboxing
+
+Fixes the iteration duration and treats scope as the variable. Used in agile. A sprint ends on schedule regardless of how much work remains. Instead of deadline, the incomplete work is deferred. Overcomes Parkinson's Law issue.
+
+## COCOMO
+
+Original algorithmic cost model by Barry Boehm (1981). Estimates effort in person-months from source code size.
+
+Three project modes:
+
+- Organic  
+  Small team, familiar domain, flexible requirements.
+- Semi-detached  
+  Mixed experience, some novel aspects, moderate constraints.
+- Embedded  
+  Tight constraints, large team, complex requirements.
+
+Effort formula:
+
+$$
+\text{PM} = a \times (\text{KDSI})^{b}
+$$
+
+Here:
+
+- $\text{PM}$: effort in person-months
+- $\text{KDSI}$: thousands of delivered source instructions
+- $a$, $b$: constants that vary by mode
+
+Schedule formula:
+
+$$
+\text{TDEV} = c \times (\text{PM})^{d}
+$$
+
+Here:
+
+- $\text{TDEV}$: time to develop, in months.
+- $c,d$: constants that vary by mode.
+
+| Mode          | $a$ | $b$  | $c$ | $d$  |
+| ------------- | --- | ---- | --- | ---- |
+| Organic       | 2.4 | 1.05 | 2.5 | 0.38 |
+| Semi-detached | 3.0 | 1.12 | 2.5 | 0.35 |
+| Embedded      | 3.6 | 1.20 | 2.5 | 0.32 |
+
+3 levels of detail:
+
+- Basic  
+  Uses $\text{KDSI}$ only.
+- Intermediate  
+  Adds 15 Effort Adjustment Factors (cost driver multipliers).
+- Detailed  
+  Phase-level effort multipliers applied per module.
+
+## COCOMO II
+
+Algorithmic cost model developed by Barry Boehm (2000). Supersedes COCOMO. Updated to cover object-oriented development, reuse, and non-sequential processes.
+
+Core effort equation:
+
+$$
+\text{Effort} = A \times (\text{Size})^{B} \times \prod \text{EM}_i
+$$
+
+Here:
+
+- $A$: calibration constant. ≈2.94 in the standard model. Calibrated from the organization's historical project data.
+- $\text{Size}$: measured in KSLOC (thousands of source lines of code) or function points
+- $B$: scaling exponent. $B = 0.91 + 0.01 \times \sum \text{SF}_i$, where $\text{SF}_i$ is each [Scale Factor](#scale-factor)'s rating.
+- $\text{EM}_i$: effort multipliers (17 cost drivers)
+
+Project duration:
+
+$$
+\text{TDEV} = 3 \times (\text{PM})^{0.33 + 0.2 \times (B - 1.01)}
+$$
+
+Time required is independent of the number of people. Adding people to a late project makes it later due to communication overhead.
+
+### Scale Factor
+
+5 factors that determine $B$. Each rated on a 6-point scale (0 or very high – 5 or extra low). Higher scores indicate weaker project attributes, producing a larger $B$ and steeper scaling penalty.
+
+- Precedentedness (PREC)  
+  How similar the project is to prior work. Novel domain or type scores higher.
+- Development flexibility (FLEX)  
+  Degree of conformance to pre-established requirements and external interfaces. Strict constraints score higher.
+- Architecture/risk resolution (RESL)  
+  Thoroughness of risk analysis and architecture definition before implementation begins.
+- Team cohesion (TEAM)  
+  How well team members collaborate and share a common process vision.
+- Process maturity (PMAT)  
+  Maturity of the organization's software process, based on CMM/CMMI level.
+
+### Effort Multipliers
+
+Coefficients applied to the base effort estimate that scale it up or down based on project attributes.
+
+17 cost drivers split into four groups:
+
+- Product  
+  Reliability, complexity, documentation requirements.
+- Platform  
+  Execution time constraints, storage constraints.
+- Personnel  
+  Analyst capability, programmer capability, experience.
+- Project  
+  Tool use, multisite development, schedule pressure.
+
+### Sub-models
+
+Variants of COCOMO II applied at different stages of development. Each uses a different size measure and multiplier set, trading accuracy for the information available at that stage.
+
+| Sub-model               | When used                                                                                |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| Application Composition | Prototyping and reuse-heavy projects. Uses object points.                                |
+| Early Design            | After requirements agreed, before design starts. Uses function points and 7 multipliers. |
+| Reuse Model             | Computing effort to integrate reusable components (black-box vs white-box reuse).        |
+| Post-Architecture       | After architecture designed; most accurate. Uses SLOC and all 17 multipliers.            |
+
+### Key Multipliers
+
+The 7 multipliers used in the Early Design sub-model, before full architecture is defined:
+
+- RCPX  
+  Product reliability and complexity.
+- RUSE  
+  Degree of reuse required across products.
+- PDIF  
+  Platform difficulty: execution time, storage, and volatility constraints.
+- PREX  
+  Personnel experience with the platform, language, and tools.
+- PERS  
+  Combined analyst and programmer capability.
+- SCED  
+  Schedule compression or expansion relative to nominal.
+- FCIL  
+  Team support facilities: tools, infrastructure, and communication channels.
+
+<Note>
+
+COCOMO II requires calibration against an organization's own historical project data. Uncalibrated, it produces only rough-order-of-magnitude estimates.
+
+</Note>
+
+## Function Point Analysis
+
+Measures software size by counting user-visible functions rather than lines of code. Language-independent.
+
+Five function types:
+
+- External inputs
+- External outputs
+- External inquiries
+- Internal logical files
+- External interface files
+
+Each function is rated simple, average, or complex to produce an unadjusted function count (denoted as $\text{UFC}$). Then scaled by a complexity adjustment factor ($\text{CAF}$) derived from 14 general system characteristics.
+
+$$
+\text{FP} = \text{UFC} \times \text{CAF}
+$$
+
+Function points can be converted to estimated LOC using a language-specific conversion factor.
+
+## Other Models
+
+- SLIM  
+  Developed by Lawrence Putnam. Models effort distribution over time using a Rayleigh curve, based on the Norden-Rayleigh manpower-loading model.
+- SEER-SEM  
+  Commercial parametric model by Galorath. Uses a knowledge-base of historical projects. Common in defense.
+- Use Case Points  
+  Derives size from use case complexity and actor weights. Less validated than COCOMO II.
+- Analogy-based Estimation  
+  Derives effort from structurally similar completed projects. Case-based reasoning approach.
+- Planning Poker  
+  Agile context. Team-based relative sizing using story points rather than absolute effort.
