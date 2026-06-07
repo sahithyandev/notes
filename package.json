@@ -14,12 +14,17 @@
     "astro": "astro",
     "prepare": "husky",
     "script:update-frontmatter": "bun scripts/update-frontmatter.ts",
+    "script:auto-slug": "bun scripts/auto-slug.ts",
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
   "lint-staged": {
     "docs/**/*.{md,mdx}": [
+      "bun run script:auto-slug",
       "bun run script:update-frontmatter"
+    ],
+    "**/*.{js,ts,astro,css,json,xml,md,mdx}": [
+      "prettier --write"
     ]
   },
   "dependencies": {
