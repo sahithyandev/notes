@@ -37,6 +37,23 @@ const ABBREVIATIONS: Record<string, string> = {
   dns: "DNS",
 };
 
+export function calculateReadTime(content: string): number {
+  const words = content.trim().split(/\s+/).length;
+  return Math.ceil(words / 200);
+}
+
+export function generateDescription(content: string): string {
+  const firstParagraph = content.split("\n\n")[0];
+  const cleanText = firstParagraph
+    .replace(/[#*`_\[\]]/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
+    .trim();
+  return cleanText.length > 160
+    ? cleanText.substring(0, 157) + "..."
+    : cleanText;
+}
+
 export function titleize(s: string): string {
   if (ABBREVIATIONS[s]) return ABBREVIATIONS[s];
   return s

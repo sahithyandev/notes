@@ -22,7 +22,7 @@ import TocIcon from "../components/icons/TocIcon.astro";
 import NoteNav from "../components/note-nav.astro";
 import ModuleTree from "../components/module-tree.astro";
 import { getSidebarData, getSemesterInfo } from "../lib/sidebar";
-import { titleize } from "../utils";
+import { titleize, calculateReadTime, generateDescription } from "../utils";
 
 export const prerender = true;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
@@ -67,29 +67,6 @@ const tocHeadings = headings.filter(
 
 // Pass raw ISO date for client-side calculation
 const lastUpdatedIso = notesEntry.data.lastUpdatedOn;
-
-// Calculate read time based on word count
-function calculateReadTime(content: string): number {
-  const words = content.trim().split(/\s+/).length;
-  const wordsPerMinute = 200;
-  return Math.ceil(words / wordsPerMinute);
-}
-
-// Generate description from first paragraph
-function generateDescription(content: string): string {
-  const firstParagraph = content.split("\n\n")[0];
-  // Remove markdown formatting
-  const cleanText = firstParagraph
-    .replace(/[#*`_\[\]]/g, "")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove markdown links
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "") // Remove images
-    .trim();
-
-  // Truncate to ~160 characters
-  return cleanText.length > 160
-    ? cleanText.substring(0, 157) + "..."
-    : cleanText;
-}
 
 const readTime = calculateReadTime(notesEntry.body || "");
 const description = generateDescription(notesEntry.body || "");
