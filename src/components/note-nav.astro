@@ -1,0 +1,140 @@
+---
+import ArrowLeft from "./icons/ArrowLeft.astro";
+import ArrowRight from "./icons/ArrowRight.astro";
+
+interface NoteLink {
+  slug: string;
+  label: string;
+}
+
+interface Props {
+  prevNote?: NoteLink | null;
+  nextNote?: NoteLink | null;
+}
+
+const { prevNote, nextNote } = Astro.props;
+---
+
+{
+  (prevNote || nextNote) && (
+    <div class="note-nav">
+      {prevNote && (
+        <a href={`/${prevNote.slug}`} class="note-nav-btn left">
+          <ArrowLeft class="note-nav-icon" />
+          <div class="note-nav-content">
+            <span class="note-nav-dir">Previous</span>
+            <span class="note-nav-title">{prevNote.label}</span>
+          </div>
+        </a>
+      )}
+      {nextNote && (
+        <a href={`/${nextNote.slug}`} class="note-nav-btn right">
+          <ArrowRight class="note-nav-icon" />
+          <div class="note-nav-content">
+            <span class="note-nav-dir">Next</span>
+            <span class="note-nav-title">{nextNote.label}</span>
+          </div>
+        </a>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .note-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: calc(6 * var(--spacing)) 0;
+  }
+
+  .note-nav-btn {
+    flex: 1;
+    max-width: 320px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-decoration: none;
+    transition:
+      border-color 0.12s ease,
+      background 0.12s ease,
+      color 0.12s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .note-nav-btn:hover {
+    border-color: var(--sem-border);
+    background: var(--sem-bg);
+  }
+
+  :global(.note-nav-icon) {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: color 0.12s ease;
+  }
+
+  .note-nav-btn:hover :global(.note-nav-icon) {
+    color: var(--sem);
+  }
+
+  .note-nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .note-nav-dir {
+    font-family: var(--font-ui);
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .note-nav-title {
+    font-family: var(--font-ui);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .note-nav-btn:hover .note-nav-title {
+    color: var(--sem);
+  }
+
+  .note-nav-btn.right {
+    flex-direction: row-reverse;
+    margin-left: auto;
+  }
+
+  .note-nav-btn.right .note-nav-content {
+    align-items: flex-end;
+  }
+
+  [data-theme="dark"] .note-nav-btn:hover {
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (max-width: 47.99rem) {
+    .note-nav {
+      flex-direction: column;
+    }
+
+    .note-nav-btn,
+    .note-nav-btn.right {
+      max-width: 100%;
+      margin-left: 0;
+    }
+  }
+</style>
