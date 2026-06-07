@@ -43,79 +43,86 @@ export function remarkKatexMhchem() {
   };
 }
 
-// Only note files carry a numeric prefix; semester / module / submodule
-// directory names do not.
 const FILE_PREFIX = /^(\d+)-(.+)\.mdx?$/;
+const DIR_PREFIX = /^(\d+)-(.+)$/;
 const EXCLUDED = new Set(["images", "summary"]);
 
+/** @param {string} p */
+function isDir(p) {
+  return statSync(p).isDirectory();
+}
+
+/** @param {string} dir @returns {string[]} */
+function subdirs(dir) {
+  return readdirSync(dir).filter(
+    (name) => !EXCLUDED.has(name) && isDir(join(dir, name))
+  );
+}
+
+/** @param {string} name @returns {string} */
+function stripDirPrefix(name) {
+  const m = DIR_PREFIX.exec(name);
+  return m ? m[2] : name;
+}
+
 /**
- * Recursively find the note (.mdx/.md) under `dir` with the lowest numeric
- * prefix anywhere in the tree. Returns { order, slugTail } where slugTail is
- * the path from `dir` to the file with prefixes stripped, or null if none.
- *
+ * Recursively finds the slug of the lowest-order note under `dir`.
  * @param {string} dir
- * @returns {{ order: number, slugTail: string } | null}
+ * @returns {{ order: number, slug: string } | null}
  */
 function firstNote(dir) {
+  /** @type {{ order: number, slug: string } | null} */
   let best = null;
+
   for (const name of readdirSync(dir)) {
     if (EXCLUDED.has(name)) continue;
     const full = join(dir, name);
-    const stat = statSync(full);
-    if (stat.isDirectory()) {
+
+    let candidate;
+    if (isDir(full)) {
       const sub = firstNote(full);
-      if (sub && (!best || sub.order < best.order)) {
-        best = { order: sub.order, slugTail: `${name}/${sub.slugTail}` };
-      }
+      if (sub) candidate = { order: sub.order, slug: `${stripDirPrefix(name)}/${sub.slug}` };
     } else {
       const m = FILE_PREFIX.exec(name);
-      if (!m) continue;
-      const order = Number(m[1]);
-      if (!best || order < best.order) {
-        best = { order, slugTail: m[2] };
-      }
+      if (m) candidate = { order: Number(m[1]), slug: m[2] };
     }
+
+    if (candidate && (!best || candidate.order < best.order)) best = candidate;
   }
+
   return best;
 }
 
 function buildModuleRedirects() {
   const docsRoot = join(process.cwd(), "docs");
-  /**
-   * @type {Record<string, import('astro').RedirectConfig>}
-   */
+  /** @type {Record<string, import('astro').RedirectConfig>} */
   const redirects = {};
-  for (const sem of readdirSync(docsRoot)) {
+  let count = 0;
+
+  for (const sem of subdirs(docsRoot)) {
     const semDir = join(docsRoot, sem);
-    if (!statSync(semDir).isDirectory()) continue;
-    const moduleNames = readdirSync(semDir)
-      .filter((name) => {
-        if (EXCLUDED.has(name)) return false;
-        return statSync(join(semDir, name)).isDirectory();
-      })
-      .sort((a, b) => a.localeCompare(b));
 
-    for (const moduleName of moduleNames) {
-      const moduleDir = join(semDir, moduleName);
+    for (const mod of subdirs(semDir).sort()) {
+      const modDir = join(semDir, mod);
 
-      const modFirst = firstNote(moduleDir);
+      const modFirst = firstNote(modDir);
       if (modFirst) {
-        redirects[`/${sem}/${moduleName}`] =
-          `/${sem}/${moduleName}/${modFirst.slugTail}`;
+        redirects[`/${sem}/${mod}`] = `/${sem}/${mod}/${modFirst.slug}`;
+        count++;
       }
 
-      for (const sub of readdirSync(moduleDir)) {
-        const subDir = join(moduleDir, sub);
-        if (EXCLUDED.has(sub)) continue;
-        if (!statSync(subDir).isDirectory()) continue;
-        const subFirst = firstNote(subDir);
+      for (const sub of subdirs(modDir)) {
+        const subSlug = stripDirPrefix(sub);
+        const subFirst = firstNote(join(modDir, sub));
         if (subFirst) {
-          redirects[`/${sem}/${moduleName}/${sub}`] =
-            `/${sem}/${moduleName}/${sub}/${subFirst.slugTail}`;
+          redirects[`/${sem}/${mod}/${subSlug}`] = `/${sem}/${mod}/${subSlug}/${subFirst.slug}`;
+          count++;
         }
       }
     }
   }
+
+  console.log(`Adding ${count} module redirects`);
   return redirects;
 }
 
