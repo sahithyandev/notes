@@ -1,14 +1,12 @@
 ---
-import { render } from "astro:content";
+import { getCollection, render } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import { getCollection } from "astro:content";
 import { getEntry } from "astro:content";
 import Nav from "../components/nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
 import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
-import { titleize } from "../utils";
 import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
 import TocRail from "../components/toc-rail.astro";
 import ModulesList from "../components/modules-list.astro";
@@ -23,6 +21,8 @@ import MenuIcon from "../components/icons/MenuIcon.astro";
 import TocIcon from "../components/icons/TocIcon.astro";
 import NoteNav from "../components/note-nav.astro";
 import ModuleTree from "../components/module-tree.astro";
+import { getSidebarData, getSemesterInfo } from "../lib/sidebar";
+import { titleize } from "../utils";
 
 export const prerender = true;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
@@ -57,176 +57,6 @@ const prereqEntries = notesEntry.data.prereqs
       )
     ).filter((e): e is NonNullable<typeof e> => !!e)
   : [];
-
-// Helper functions to generate sidebar data
-function getSemesterInfo(slugParts: string[]) {
-  const match = slugParts[0].match(/^s(\d)$/);
-  if (match) {
-    const n = match[1];
-    return {
-      label: `Semester ${n}`,
-    };
-  }
-  return {
-    label: "Unknown",
-  };
-}
-
-// Parse the numeric prefix of a topic-group directory from a note's filePath.
-// e.g. "docs/s1/fluid-mechanics/3-statics/01-intro.mdx" → 3
-// Returns Infinity when no prefixed dir segment is found.
-function moduleOrderFromFilePath(filePath: string | undefined): number {
-  if (!filePath) return Infinity;
-  const parts = filePath.split("/");
-  // parts: ["docs","s1","fluid-mechanics","3-statics","01-intro.mdx"]
-  // The topic-group dir is at index 3 (when 4 parts after "docs/" exist)
-  const topicDir = parts[3];
-  if (!topicDir) return Infinity;
-  const m = topicDir.match(/^(\d+)-/);
-  return m ? parseInt(m[1], 10) : Infinity;
-}
-
-async function getSidebarData(currentSlug: string) {
-  const allNotes = await getCollection("notes");
-  const currentSlugParts = currentSlug.split("/");
-  const currentSemester = currentSlugParts[0];
-  const currentModule = currentSlugParts[1];
-
-  const grouped: Record<string, Record<string, any[]>> = {};
-  const semesterMap: Record<
-    number,
-    Record<string, { slug: string; order: number }[]>
-  > = {};
-
-  // Single pass: build grouped and semesterMap together
-  allNotes.forEach((note) => {
-    const parts = note.data.slug.split("/");
-    const sem = parts[0];
-    const mod = parts[1];
-    const order = note.data.sidebar?.order ?? 999;
-
-    if (!grouped[sem]) grouped[sem] = {};
-    if (!grouped[sem][mod]) grouped[sem][mod] = [];
-    grouped[sem][mod].push({
-      slug: note.data.slug,
-      title: note.data.title,
-      label: note.data.sidebar?.label || note.data.title,
-      order,
-      moduleOrder: moduleOrderFromFilePath(note.filePath),
-    });
-
-    const match = sem.match(/^s(\d)$/);
-    if (match) {
-      const n = parseInt(match[1]);
-      const moduleKey = mod ?? "general";
-      if (!semesterMap[n]) semesterMap[n] = {};
-      if (!semesterMap[n][moduleKey]) semesterMap[n][moduleKey] = [];
-      semesterMap[n][moduleKey].push({ slug: note.data.slug, order });
-    }
-  });
-
-  // Sort each module's notes by order
-  Object.keys(grouped).forEach((sem) => {
-    Object.keys(grouped[sem]).forEach((mod) => {
-      grouped[sem][mod].sort((a, b) => a.order - b.order);
-    });
-  });
-
-  // Build current module tree with nested topics
-  const currentModuleNotes = grouped[currentSemester]?.[currentModule] || [];
-  const currentModuleTree = {
-    direct: [] as any[],
-    topics: {} as Record<string, any[]>,
-  };
-
-  currentModuleNotes.forEach((note) => {
-    const parts = note.slug.split("/");
-    if (parts.length === 3) {
-      // s1/module/note - direct note under module
-      currentModuleTree.direct.push(note);
-    } else if (parts.length >= 4) {
-      // s1/module/topic/... - nested under topic
-      const topic = parts[2];
-      if (!currentModuleTree.topics[topic]) {
-        currentModuleTree.topics[topic] = [];
-      }
-      currentModuleTree.topics[topic].push(note);
-    }
-  });
-
-  // Sort topics by their numeric dir prefix (moduleOrder)
-  const sortedTopics = Object.keys(currentModuleTree.topics).sort((a, b) => {
-    const orderA = currentModuleTree.topics[a][0]?.moduleOrder ?? Infinity;
-    const orderB = currentModuleTree.topics[b][0]?.moduleOrder ?? Infinity;
-    return orderA - orderB;
-  });
-
-  // Calculate prev/next navigation within current module
-  let prevNote: any = null;
-  let nextNote: any = null;
-  const slugParts = currentSlug.split("/");
-
-  if (slugParts.length >= 4) {
-    const currentTopic = slugParts[2];
-    const topicNotes = currentModuleTree.topics[currentTopic] || [];
-    const currentIndex = topicNotes.findIndex(
-      (note) => note.slug === currentSlug,
-    );
-
-    if (currentIndex > 0) {
-      prevNote = topicNotes[currentIndex - 1];
-    }
-    if (currentIndex < topicNotes.length - 1) {
-      nextNote = topicNotes[currentIndex + 1];
-    }
-  } else if (slugParts.length === 3) {
-    const directNotes = currentModuleTree.direct;
-    const currentIndex = directNotes.findIndex(
-      (note) => note.slug === currentSlug,
-    );
-
-    if (currentIndex > 0) {
-      prevNote = directNotes[currentIndex - 1];
-    }
-    if (currentIndex < directNotes.length - 1) {
-      nextNote = directNotes[currentIndex + 1];
-    }
-  }
-
-  // Build semester switcher list: each semester -> first note slug
-  const semesters = Object.keys(semesterMap)
-    .map((n) => parseInt(n))
-    .sort((a, b) => a - b)
-    .map((number) => {
-      const modules = semesterMap[number];
-      const firstModuleKey = Object.keys(modules).sort((a, b) =>
-        titleize(a).localeCompare(titleize(b)),
-      )[0];
-      const firstNote = [...modules[firstModuleKey]].sort(
-        (a, b) => a.order - b.order,
-      )[0];
-      return {
-        number,
-        label: `Semester ${number}`,
-        firstSlug: firstNote.slug,
-      };
-    });
-
-  return {
-    currentSemester,
-    currentModule,
-    grouped,
-    semesters,
-    currentModuleTree: {
-      ...currentModuleTree,
-      topics: Object.fromEntries(
-        sortedTopics.map((key) => [key, currentModuleTree.topics[key]]),
-      ),
-    },
-    prevNote,
-    nextNote,
-  };
-}
 
 const sidebarData = await getSidebarData(slug);
 
