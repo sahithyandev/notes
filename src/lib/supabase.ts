@@ -30,15 +30,10 @@ export async function getVoteCounts(
 ): Promise<{ up: number; down: number }> {
   const client = makeClient();
   if (!client) return { up: 0, down: 0 };
-  const { data } = await client
+  const { data } = (await client
     .from("note_votes")
-    .select("vote")
-    .eq("slug", slug);
-  let up = 0;
-  let down = 0;
-  for (const row of data ?? []) {
-    if (row.vote === 1) up++;
-    else if (row.vote === -1) down++;
-  }
-  return { up, down };
+    .select("up:vote.eq.1.count(), down:vote.eq.-1.count()")
+    .eq("slug", slug)
+    .single()) as { data: { up: number; down: number } | null };
+  return { up: data?.up ?? 0, down: data?.down ?? 0 };
 }
