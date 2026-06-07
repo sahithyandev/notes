@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
 import "katex/contrib/mhchem";
+import { unified } from "@astrojs/markdown-remark";
 
 function render(value, displayMode) {
   return katex.renderToString(value, {
@@ -132,8 +133,9 @@ export default defineConfig({
   redirects: buildModuleRedirects(),
   integrations: [mdx(), linkValidator()],
   markdown: {
-    remarkPlugins: [remarkGfm, remarkMath, remarkKatexMhchem],
-    rehypePlugins: [],
+    processor: unified({
+      remarkPlugins: [remarkGfm, remarkMath, remarkKatexMhchem],
+    }),
     shikiConfig: {
       themes: {
         light: "github-light",
