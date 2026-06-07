@@ -16,6 +16,7 @@ import NoteFeedback from "../components/note-feedback.astro";
 import { getVoteCounts } from "../lib/supabase";
 import RightSidebar from "../components/right-sidebar.astro";
 import Article from "../components/article.astro";
+import ChevronDown from "../components/icons/ChevronDown.astro";
 
 export const prerender = true;
 // ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
@@ -364,19 +365,7 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
           <div class="sb-sem-info">
             <span class="sb-sem-name">{getSemesterInfo(slugParts).label}</span>
           </div>
-          <svg
-            class="sb-sem-chev"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
+          <ChevronDown class="sb-sem-chev" />
         </button>
         <div class="sb-sem-menu" id="sem-switcher-menu" hidden role="listbox">
           {
@@ -867,19 +856,12 @@ const claudeUrl = `https://claude.ai/new?q=${encodedPrompt}`;
     color: var(--sem);
   }
 
-  .sb-sem .sb-sem-chev {
+  .sb-sem :global(.sb-sem-chev) {
     color: var(--sem);
     opacity: 0.7;
   }
 
-  .sb-sem-chev {
-    margin-left: auto;
-    color: var(--text-muted);
-    transition: transform 0.15s ease;
-    flex-shrink: 0;
-  }
-
-  .sb-sem[aria-expanded="true"] .sb-sem-chev {
+  .sb-sem[aria-expanded="true"] :global(.sb-sem-chev) {
     transform: rotate(180deg);
   }
 
