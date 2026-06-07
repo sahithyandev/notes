@@ -369,6 +369,42 @@
       color: var(--accent);
     }
 
+    a {
+      color: var(--link, var(--sem));
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s ease;
+    }
+
+    a:hover {
+      border-bottom-color: var(--link, var(--sem));
+    }
+
+    a[href^="/s1"] {
+      --link: var(--s1);
+    }
+    a[href^="/s2"] {
+      --link: var(--s2);
+    }
+    a[href^="/s3"] {
+      --link: var(--s3);
+    }
+    a[href^="/s4"] {
+      --link: var(--s4);
+    }
+    a[href^="/s5"] {
+      --link: var(--s5);
+    }
+    a[href^="/s6"] {
+      --link: var(--s6);
+    }
+    a[href^="/s7"] {
+      --link: var(--s7);
+    }
+    a[href^="/s8"] {
+      --link: var(--s8);
+    }
+
     blockquote {
       font-size: 1rem;
       font-weight: 500;
