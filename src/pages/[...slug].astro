@@ -23,8 +23,8 @@ import NoteSidebar from "../components/note-sidebar.astro";
 import { titleize, calculateReadTime, generateDescription } from "../utils";
 
 export const prerender = false;
-// ISR: revalidate note pages every 50 minutes so server-rendered vote counts stay fresh.
-export const revalidate = 3000;
+// ISR: revalidate note pages every 120 minutes so server-rendered vote counts stay fresh.
+export const revalidate = 120 * 60;
 
 const { slug } = Astro.params;
 
