@@ -91,24 +91,37 @@ async function getSidebarData(currentSlug: string) {
   const currentSemester = currentSlugParts[0];
   const currentModule = currentSlugParts[1];
 
-  // Group notes by semester and module
   const grouped: Record<string, Record<string, any[]>> = {};
+  const semesterMap: Record<
+    number,
+    Record<string, { slug: string; order: number }[]>
+  > = {};
 
+  // Single pass: build grouped and semesterMap together
   allNotes.forEach((note) => {
     const parts = note.data.slug.split("/");
     const sem = parts[0];
     const mod = parts[1];
+    const order = note.data.sidebar?.order ?? 999;
 
     if (!grouped[sem]) grouped[sem] = {};
     if (!grouped[sem][mod]) grouped[sem][mod] = [];
-
     grouped[sem][mod].push({
       slug: note.data.slug,
       title: note.data.title,
       label: note.data.sidebar?.label || note.data.title,
-      order: note.data.sidebar?.order || 999,
+      order,
       moduleOrder: moduleOrderFromFilePath(note.filePath),
     });
+
+    const match = sem.match(/^s(\d)$/);
+    if (match) {
+      const n = parseInt(match[1]);
+      const moduleKey = mod ?? "general";
+      if (!semesterMap[n]) semesterMap[n] = {};
+      if (!semesterMap[n][moduleKey]) semesterMap[n][moduleKey] = [];
+      semesterMap[n][moduleKey].push({ slug: note.data.slug, order });
+    }
   });
 
   // Sort each module's notes by order
@@ -180,24 +193,6 @@ async function getSidebarData(currentSlug: string) {
   }
 
   // Build semester switcher list: each semester -> first note slug
-  const semesterMap: Record<
-    number,
-    Record<string, { slug: string; order: number }[]>
-  > = {};
-  allNotes.forEach((note) => {
-    const parts = note.data.slug.split("/");
-    const match = parts[0].match(/^s(\d)$/);
-    if (!match) return;
-    const n = parseInt(match[1]);
-    const moduleKey = parts[1] ?? "general";
-    if (!semesterMap[n]) semesterMap[n] = {};
-    if (!semesterMap[n][moduleKey]) semesterMap[n][moduleKey] = [];
-    semesterMap[n][moduleKey].push({
-      slug: note.data.slug,
-      order: note.data.sidebar?.order ?? 999,
-    });
-  });
-
   const semesters = Object.keys(semesterMap)
     .map((n) => parseInt(n))
     .sort((a, b) => a - b)
