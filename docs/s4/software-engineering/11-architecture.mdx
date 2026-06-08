@@ -1,0 +1,121 @@
+---
+title: Architecture
+sidebar:
+  order: 11
+dateCreated: 2026-06-08T19:16:10.824Z
+lastUpdatedOn: 2026-06-08T20:24:40.766Z
+slug: s4/software-engineering/architecture
+prev: true
+next: true
+---
+
+System architecture defines the structure, components, and interactions of a system.
+
+_Architecture in the large_ concerns the overall structure of a complex system composed of many subsystems: how subsystems interact, share data, and coordinate to fulfill system goals.
+
+_Architecture in the small_ concerns the detailed architecture of individual components or modules: internal structure, interfaces, and intra-component interactions.
+
+Architecture is important for:
+
+- Stakeholder communication  
+  Architecture is a high-level representation that all stakeholders can discuss before implementation commits.
+- System analysis  
+  Architectural choices directly affect non-functional properties (such as performance, reliability, security, and maintainability). Early identification of deficiencies avoids costly rework.
+- Large-scale reuse  
+  Entire architectures can be reused across similar products (product lines).
+
+## View
+
+A part of an architectural model. Addresses a set of stakeholders.
+
+- Logical view  
+  Key abstractions as objects or classes. Shows functional requirements and domain concepts.
+- Process view  
+  Runtime decomposition: processes, threads, and their interactions. Addresses concurrency and performance.
+- Development view  
+  Software decomposition as seen by developers: modules, packages, subsystems, and build dependencies.
+- Physical view  
+  Mapping of software onto hardware: servers, networks, deployment topology.
+- Scenarios view  
+  Aka. use cases view. Added by 4+1 model. Ties the above 4 structural views together by showing how they collaborate to fulfill key requirements.
+
+## Patterns
+
+A generic, reusable solution to a recurring structural problem. Describes how to organize any system. Can be applied to any system or subsystem regardless of domain.
+
+### Layered
+
+System organized into layers. Each layer provides services only to the layer above and depends only on the layer below.
+
+One layer can be replaced without affecting others. Incremental development and testing per layer.
+
+### Repository
+
+Components interact via a shared central data store. Components do not communicate directly with each other.
+
+The central data store works as a single source of truth which provides data consistency. Easy to add new components that read or write the store.
+
+Examples: compiler toolchains, IDEs, database-backed systems.
+
+### Client-Server
+
+System structured as a set of services offered by servers and consumed by clients. Clients initiate requests; servers fulfill them.
+
+Advantages:
+
+- Services are accessible over a network from anywhere.
+- Servers can be replicated independently of clients.
+
+Examples: web applications, file servers.
+
+### Pipe and Filter
+
+Processing structured as a sequence of filters connected by pipes. Easy to reason about data transformations.
+
+A filter transforms its input and passes output downstream. Independent. Reusable. Replacable.
+
+A pipe takes input from one end and passes to the other end.
+
+Examples: Unix shell pipelines, signal processing chains, ETL pipelines.
+
+### Model-View-Controller
+
+System decomposed into 3 components.
+
+- Model  
+  Application data and business logic. No knowledge of the UI.
+- View  
+  Renders the model for the user. Multiple views of the same model are possible.
+- Controller  
+  Handles user input, updates the model, selects the view.
+
+UI and logic are independently changeable. Supports multiple simultaneous views of the same data.
+
+## Application Architectures
+
+A domain-specific template for an entire system, including its characteristic components and workflows. Describes what a specific category of system looks like.
+
+### Transaction Processing System
+
+Centered on a database. User requests are treated as transactions: each must complete atomically or not at all.
+
+Components:
+
+- Input handler: receives and validates user requests.
+- Transaction dispatcher: routes requests to the correct processing logic.
+- Database: persistent store with transaction guarantees.
+
+Examples: banking systems, reservation systems, e-commerce checkouts.
+
+### Language Processing System
+
+Convert one language or representation into another. Follow a pipeline structure.
+
+Components:
+
+- Lexical analyzer: tokenizes input.
+- Parser: derives syntax tree from token stream.
+- Semantic analyzer: checks meaning and type correctness.
+- Code generator: produces target output.
+
+Examples: compilers, interpreters, query processors.
