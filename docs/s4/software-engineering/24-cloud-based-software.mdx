@@ -3,7 +3,7 @@ title: Cloud-based Software
 sidebar:
   order: 24
 dateCreated: 2026-06-01T09:34:22.607Z
-lastUpdatedOn: 2026-06-08T01:02:45.444Z
+lastUpdatedOn: 2026-06-08T10:41:10.167Z
 slug: s4/software-engineering/cloud-based-software
 prev: true
 next: true
@@ -64,9 +64,35 @@ Resilience via redundancy:
 
 Large components, shared database, client-server model. Traditional multi-tier structure.
 
+Strengths:
+
+- Simple to develop and deploy initially.
+- Easier testing and debugging: all code runs in one process.
+- Lower operational overhead.
+- Better performance due to in-process method calls.
+- Suited to small and medium-sized systems.
+
 #### Microservices Architecture
 
 Aka. service-oriented architecture. System decomposed into fine-grained, stateless services. Each service independently replicable, distributable, and migratable. Suited to cloud deployment. Each service runs in containers.
+
+Strengths:
+
+- Independent deployment per service.
+- Per-service scalability rather than scaling the whole application.
+- Fault isolation limits the blast radius of failures.
+- Teams can develop and release services independently.
+- Polyglot development: each service can use a different language or runtime.
+
+### Monolith vs Microservices
+
+| Factor      | Monolith          | Microservices         |
+| ----------- | ----------------- | --------------------- |
+| Complexity  | Low               | High                  |
+| Deployment  | Single unit       | Independent services  |
+| Scalability | Whole application | Per service           |
+| Team size   | Small teams       | Large teams           |
+| Maintenance | Easier initially  | Easier at large scale |
 
 ### Cloud Platform Selection
 

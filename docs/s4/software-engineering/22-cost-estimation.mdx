@@ -3,7 +3,7 @@ title: Cost Estimation
 sidebar:
   order: 22
 dateCreated: 2026-06-07T00:00:00.000Z
-lastUpdatedOn: 2026-06-08T01:02:45.443Z
+lastUpdatedOn: 2026-06-08T10:41:10.167Z
 slug: s4/software-engineering/cost-estimation
 prev: true
 next: true
@@ -88,6 +88,26 @@ The consequence for estimation accuracy: padding does not accumulate as time sav
 
 Fixes the iteration duration and treats scope as the variable. Used in agile. A sprint ends on schedule regardless of how much work remains. Instead of deadline, the incomplete work is deferred. Overcomes Parkinson's Law issue.
 
+## Estimation Uncertainty
+
+Uncertainty varies by SDLC phase. Early phases have the least information, so estimates are least reliable.
+
+| SDLC Phase     | Uncertainty             |
+| -------------- | ----------------------- |
+| Requirements   | Very high (±50–100%)    |
+| Analysis       | High                    |
+| Design         | Moderate                |
+| Implementation | Lower                   |
+| Testing        | Lower                   |
+| Maintenance    | Depends on change scope |
+
+Sources of variability:
+
+- Incomplete or changing requirements.
+- Unknown technical risks.
+- Team capability differences.
+- Technology uncertainty.
+
 ## COCOMO
 
 Original algorithmic cost model by Barry Boehm (1981). Estimates effort in person-months from source code size.
@@ -129,6 +149,45 @@ Here:
 | Organic       | 2.4 | 1.05 | 2.5 | 0.38 |
 | Semi-detached | 3.0 | 1.12 | 2.5 | 0.35 |
 | Embedded      | 3.6 | 1.20 | 2.5 | 0.32 |
+
+### Effort Scaling
+
+Because $b > 1$ in all modes, effort grows superlinearly with size. Doubling project size more than doubles the estimated effort.
+
+For Organic mode ($a = 2.4$, $b = 1.05$):
+
+| Size (KDSI) | Effort (PM) |
+| ----------- | ----------- |
+| 50          | ≈ 145       |
+| 1000        | ≈ 3388      |
+
+A 20× size increase produces a >23× effort increase.
+
+<Note>
+
+The absolute PM difference between high-productivity and low-productivity teams grows with project size, even when the relative productivity ratio stays fixed.
+
+</Note>
+
+### Productivity Adjustment
+
+Modifies a base COCOMO estimate to reflect a team or tooling scenario that differs from the calibration baseline.
+
+$$
+\text{PM}_{adjusted} = \text{PM}_{base} \times m
+$$
+
+Here:
+
+- $\text{PM}_{base}$: effort from the COCOMO formula with standard mode parameters
+- $m$: productivity multiplier
+
+Multiplier direction:
+
+- $m > 1$: lower productivity (inexperienced team, constrained tooling)
+- $m < 1$: higher productivity (experienced team, AI-assisted or advanced CASE tooling)
+
+To compare two scenarios at a given size: compute $\text{PM}_{base}$ once, then apply each scenario's multiplier. To assess how the gap changes with scale: recompute $\text{PM}_{base}$ at the larger size and apply the same multipliers. The absolute gap grows because of the superlinear exponent.
 
 3 levels of detail:
 
@@ -179,7 +238,7 @@ Time required is independent of the number of people. Adding people to a late pr
 - Process maturity (PMAT)  
   Maturity of the organization's software process, based on CMM/CMMI level.
 
-### Effort Multipliers
+### Effort Multiplie
 
 Coefficients applied to the base effort estimate that scale it up or down based on project attributes.
 
@@ -223,6 +282,35 @@ The 7 multipliers used in the Early Design sub-model, before full architecture i
   Schedule compression or expansion relative to nominal.
 - FCIL  
   Team support facilities: tools, infrastructure, and communication channels.
+
+### Post-Architecture Model
+
+The most detailed COCOMO II sub-model. Applied once architecture is established and full project detail is available.
+
+Uses SLOC (or function points) together with all 5 scale factors and all 17 effort multipliers.
+
+More accurate than earlier sub-models because architectural decisions and detailed project context are factored into every driver.
+
+Primary uses:
+
+- Resource allocation
+- Staffing
+- Scheduling
+
+### Uncertainty Reduction
+
+COCOMO II reduces estimation uncertainty progressively as the project advances.
+
+Mechanisms:
+
+- Iterative estimation  
+  Each sub-model is applied at the appropriate SDLC stage. Estimates are refined as more detail becomes available rather than locked in at requirements.
+- [Scale Factors](#scale-factor)  
+  Model project complexity and precedentedness, capturing uncertainty from novel or unconstrained work.
+- [Effort Multipliers](#efford-multiplier)  
+  Adjust for personnel capability, tooling, and platform constraints, covering the main sources of team-level variability.
+- Reuse and component support  
+  Dedicated sub-models for reuse-heavy and component-based projects prevent overestimation caused by treating integrated components as new development.
 
 <Note>
 

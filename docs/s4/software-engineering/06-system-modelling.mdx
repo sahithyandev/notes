@@ -6,10 +6,19 @@ slug: s4/software-engineering/system-modelling
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-06-08T07:12:15.081Z
+lastUpdatedOn: 2026-06-08T10:41:10.166Z
 ---
 
 The process of creating abstract representations of a system. Different models show a different perspective of the system. Represents systems using graphical models (commonly UML). Used to understand system functionality and help communicate system design to stakeholders.
+
+Models serve two roles in the software lifecycle:
+
+- Analysis  
+  Clarifying what the system must do.
+- Design  
+  Specifying how the system will be structured and behave.
+
+No model is fully accurate. Each is a selective simplification, and the omitted details may themselves be critical.
 
 ## Perspectives
 
@@ -34,6 +43,8 @@ Context models describe the environment in which the system operates, showing ex
 
 Helps determine how the system interacts with its environment. Useful during requirements engineering.
 
+Limitation: excludes internal behaviour. A complete-looking context model reveals nothing about how the system processes what passes through its boundaries.
+
 ## System Boundaries
 
 Defines what is inside the system and what lies outside it.
@@ -51,6 +62,8 @@ Used to:
 - Identify user requirements.
 - Detect communication issues between systems.
 - Evaluate system structure performance.
+
+Limitation: use case models do not capture non-functional requirements such as response time, concurrency, or security policies. A use case model that appears complete may mask constraints that only surface in later phases. Sequence diagrams model the happy path; exceptional flows and unavailability scenarios are not directly represented.
 
 ## Generalization
 
@@ -84,6 +97,8 @@ Represent system behavior using \*tates and transitions triggered by events.
 - States – system conditions.
 - Transitions – changes triggered by events.
 
+Limitation: models one object in isolation. Interactions between concurrent state machines are not directly captured and must be inferred from sequence diagrams.
+
 ## Model-Driven Engineering
 
 A software development approach where models are the main artifacts and code is generated automatically from them.
@@ -112,3 +127,16 @@ Model Types:
 
 3. Platform Specific Model (PSM)  
    Adds platform-specific implementation details.
+
+## Complementary Models
+
+No single model is sufficient. Each model type excludes some aspect of reality:
+
+- Context models exclude internal behaviour.
+- Use case models exclude non-functional properties.
+- Class diagrams exclude time and concurrency.
+- Sequence diagrams exclude exceptional flows.
+- Architectural diagrams exclude platform specifics.
+- State models exclude cross-object concurrency.
+
+Effective practice requires multiple complementary models at each lifecycle stage. Gaps between models are where defects most commonly reside.

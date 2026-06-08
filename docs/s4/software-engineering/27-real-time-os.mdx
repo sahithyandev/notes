@@ -3,26 +3,67 @@ title: Real Time OS
 sidebar:
   order: 27
 dateCreated: 2026-05-04T09:25:34.261Z
-lastUpdatedOn: 2026-06-08T01:02:45.445Z
+lastUpdatedOn: 2026-06-08T10:41:10.167Z
 slug: s4/software-engineering/real-time-os
 prev: true
-next: false
+next: true
 prereqs:
   - s3/operating-systems/cpu-scheduling
   - s3/operating-systems/interrupt-driven-io
   - s3/operating-systems/process
+  - s3/operating-systems/real-time-cpu-scheduling
 ---
 
 ## Real-Time Systems
 
-A real-time system is one whose correct functioning depends on both the results produced and the time at which those results are produced.
+A real-time system is one whose correctness depends on both the results produced and the time at which those results are produced. Implemented as sets of communicating processes reacting to environmental stimuli.
 
 - Hard real-time  
-  An operation is incorrect if its timing constraints are not met. Examples: vehicle braking, insulin pump control, missile guidance.
+  Incorrect operation if timing constraints are not met. Examples: vehicle braking, insulin pump control, missile guidance.
 - Soft real-time  
-  An operation is degraded but not incorrect if timing is not met. Examples: weather stations, video streaming, UI response.
+  Degraded but not incorrect operation if timing is not met. Examples: weather stations, video streaming, UI response.
 
-RTOS (Real-Time Operating System): lightweight platforms providing minimal features for real-time software.
+### Embedded Systems
+
+Software component of a hardware/software system that reacts to environmental events. Stored in ROM. Issues control signals in response to stimuli. Normally also a real-time system.
+
+### Stimuli
+
+Inputs that trigger system responses.
+
+- Periodic  
+  Occur at predictable, fixed time intervals.
+- Aperiodic  
+  Occur at unpredictable times. Signalled via interrupt.
+
+### System Elements
+
+Three process classes in a general embedded real-time model:
+
+- Sensor control processes  
+  Collect and optionally buffer data from sensors.
+- Data processor  
+  Computes system response from collected data.
+- Actuator control processes  
+  Issue control signals to actuators.
+
+### Modelling
+
+State models are the primary design representation. A stimulus triggers a state transition. [UML state diagrams](/s4/software-engineering/uml) show states as nodes and events as arcs.
+
+### Design Process
+
+1. Platform selection
+2. Stimuli/response identification
+3. Timing analysis
+4. Process design
+5. Algorithm design
+6. Data design
+7. Process scheduling
+
+### RTOS
+
+A Real-Time Operating System (RTOS) is a lightweight platform providing minimal features for real-time software.
 
 Examples:
 
@@ -30,14 +71,15 @@ Examples:
 - Windows CE
 - Apache Nuttx
 
-### RTOS vs. Conventional OS
+#### RTOS vs. Conventional OS
 
 Conventional OSes (such as Linux and macOS) are:
 
 - complex
 - feature-rich
 - large disk footprint
-  They provide file systems, runtime process management. Has coarse-grained process scheduling control.
+
+They provide file systems and runtime process management. Coarse-grained process scheduling control.
 
 RTOS strips non-essential features. Omits file management. Optimized for deterministic, fine-grained scheduling.
 
@@ -49,13 +91,13 @@ Provides periodic time ticks for process scheduling.
 
 ### Interrupt Handler
 
-Manages aperiodic or out-of-frequency requests.
+Manages aperiodic or out-of-frequency requests. On interrupt, control transfers to a predetermined memory address containing a jump to the interrupt service routine (ISR). Further interrupts disabled during ISR execution. ISRs must be short, simple, and fast.
 
 ### Scheduler
 
-Selects the next process for execution. Inputs: clock ticks + interrupt signals.
+Selects the next process for execution. Driven by clock ticks and interrupt signals.
 
-### Resource manager
+### Resource Manager
 
 Allocates processor and memory to scheduled processes.
 
@@ -67,18 +109,20 @@ Initiates execution of the selected process on available hardware.
 
 Manages concurrent periodic and aperiodic processes. Scheduling based on execution period and deadline.
 
-2 priority levels:
+Three priority levels:
 
 1. Interrupt level  
    Highest. Reserved for time-critical interrupts.
 2. Clock level  
    Allocated to periodic processes.
+3. Background  
+   Lower-priority work.
 
-How interrupts are handled is already explained in [Interrupt Driven IO - Operating Systems from S3](/s3/operating-systems/interrupt-driven-io).
+Interrupt handling is covered in [Interrupt Driven IO](/s3/operating-systems/interrupt-driven-io).
 
 ### Periodic Processes
 
-Differ across three dimensions:
+Characterized by three dimensions:
 
 - Period  
   Time between successive executions.
@@ -87,15 +131,18 @@ Differ across three dimensions:
 - Deadline  
   Completion deadline for each instance.
 
+Real-time clock ticks periodically. Each tick generates an interrupt, triggering the process manager for periodic processes.
+
 ### Scheduling Strategies
 
 May use [non-preemptive](/s3/operating-systems/cpu-scheduling#non-preemptive) or [preemptive scheduling](/s3/operating-systems/cpu-scheduling#preemptive).
 
 Algorithms:
 
-- Round robin.
-- Rate monotonic (processes with shorter periods get higher priority).
-- Shortest deadline first.
+- Round robin
+- Rate monotonic  
+  Processes with shorter periods get higher priority.
+- Shortest deadline first
 
 The resource manager and dispatcher operate in sequence after scheduling.
 
@@ -104,9 +151,9 @@ The resource manager and dispatcher operate in sequence after scheduling.
 Three common patterns:
 
 - Observe and React  
-  Monitors sensors; triggers an alarm or action on exceptional condition. Used in monitoring systems.
+  Monitors sensors. Triggers alarm or action on exceptional condition. Used in monitoring systems.
 - Environmental Control  
-  Analyses sensor data and actuator state; sends control signals to change the environment. Used in control systems.
+  Analyses sensor data and actuator state. Sends control signals to change the environment. Used in control systems.
 - Process Pipeline  
   Data moves sequentially through processes linked by synchronized buffers. Used in data acquisition and multimedia systems.
 
@@ -115,7 +162,7 @@ Three common patterns:
 Three key factors for each process:
 
 - Deadline  
-  The time by which the stimulus must be processed.
+  Time by which the stimulus must be processed.
 - Frequency  
   How many times per second the process must execute.
 - Execution time  
@@ -123,8 +170,19 @@ Three key factors for each process:
 
 Timing analysis results determine process scheduling in the RTOS. All processes must meet their deadlines given their frequency and execution time.
 
+Processor utilisation must satisfy:
+
+$$
+U = \sum_{i} \frac{C_i}{T_i} \leq 1
+$$
+
+Here:
+
+- $C_i$: execution time of process $i$
+- $T_i$: period of process $i$
+
 <Note title="Example">
 
-Equipment damage occurs at 50 ms. Battery backup activates after 16 ms. Checking process runs every 4 ms; failure triggered after 3 sustained readings. Worst case: 3×4 ms + 16 ms = 28 ms, within the 50 ms deadline.
+Equipment damage occurs at 50 ms. Battery backup activates after 16 ms. Checking process runs every 4 ms. Failure triggered after 3 sustained readings. Worst case: 3×4 ms + 16 ms = 28 ms, within the 50 ms deadline.
 
 </Note>

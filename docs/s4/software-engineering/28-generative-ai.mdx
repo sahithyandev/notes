@@ -1,0 +1,64 @@
+---
+title: Generative AI
+slug: s4/software-engineering/generative-ai
+sidebar:
+  order: 28
+prev: true
+next: false
+dateCreated: 2026-06-08T00:00:00.000Z
+lastUpdatedOn: 2026-06-08T10:41:10.168Z
+---
+
+Automates significant portions of SE phases traditionally driven by human cognitive effort. The engineer's role shifts from producer to supervisor and validator.
+
+## Impact by Phase
+
+### Requirements
+
+AI can process stakeholder inputs at scale and generate candidate requirement sets. Accelerates elicitation and reduces omissions.
+
+Requirements must still be precisely specified as AI input.
+
+### Design
+
+AI-assisted tools generate architectural alternatives from high-level specifications, augmenting model-driven approaches. Generated architectures must still be validated for non-functional properties.
+
+#### xUML Integration
+
+[Executable UML](/s4/software-engineering/uml#executable-uml) is constrained to formal model inputs. Natural language specifications cannot be processed directly. Generative AI addresses this by translating natural language or semi-formal specifications into well-formed xUML models.
+
+3-layer architecture:
+
+- AI-Mediated Requirements and Modelling Layer  
+  Generative AI accepts natural language requirements and produces xUML models. Handles requirement interpretation, ambiguity resolution, and OCL constraint generation.
+- xUML Model Validation and Transformation Layer  
+  Generated models pass through a validation engine checking formal consistency, completeness, and constraint satisfaction. A model-to-code transformer applies PSM translations to produce deployable code.
+- Automated Build, Test, and Deployment Layer  
+  A CI/CD pipeline executes AI-generated test suites derived from the use cases in the original xUML models and deploys the validated system. No human intervention required. Governance checkpoints are enforced programmatically.
+
+Extends MDA by replacing the human modeller with a generative AI agent, enabling end-to-end automation from natural language intent to deployed software.
+
+### Implementation
+
+Code-generation tools drastically reduce manual coding effort. Generated code still requires correctness verification.
+
+### Testing
+
+AI generates test cases from specifications, improving coverage without proportional human effort. Risk of subtle defects in AI-generated code makes testing discipline more critical, not less.
+
+## Repositioning of SE Methods
+
+Generative AI does not eliminate SE methods. It repositions them.
+
+New responsibilities introduced:
+
+- Validation of AI-generated artefacts
+- Prompt engineering as a formal skill
+- Governance of AI-assisted processes
+- Quality gates suitable for AI-produced outputs
+
+## Future Practice
+
+Hybrid model: generative AI handles high-volume, pattern-based generation. Human engineers exercise judgment, ethical oversight, and correctness assurance.
+
+SE methods that fail to integrate AI tooling become inefficient. SE methods that do integrate AI must develop new validation disciplines.

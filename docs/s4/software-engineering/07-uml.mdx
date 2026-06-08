@@ -6,7 +6,7 @@ slug: s4/software-engineering/uml
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-06-08T01:02:45.434Z
+lastUpdatedOn: 2026-06-08T10:41:10.166Z
 prereqs:
   - s2/program-construction/basics/object-oriented-paradigm
 ---
@@ -40,11 +40,33 @@ Aka. xUML. A subset of UML that allows automatic transformation of models into e
 
 Core model types:
 
-- Domain models
-- Class models
-- State models
+- Domain models  
+  Partition the system into subject-matter areas; define what entities exist and how they relate.
+- Class models  
+  Define objects within a domain: attributes, operations, and associations.
+- State models  
+  Capture the lifecycle of each class through states and transitions triggered by events.
 
 Supporting technologies:
 
-- Object Constraint Language (OCL)
-- UML action language
+- Object Constraint Language (OCL)  
+  Formal language for specifying constraints, invariants, and queries on UML models.
+- UML action language  
+  Specifies the behavior of operations and state machine actions in executable form.
+
+Constrained to structured, formal model inputs. Natural language specifications cannot be processed directly.
+
+Disadvantages:
+
+- Steep learning curve  
+  Requires mastery of both UML modeling and formal action language before any executable output is possible.
+- Model complexity mirrors code complexity  
+  For large systems, xUML models grow as large and as difficult to maintain as the code they replace.
+- Generated code inefficiency  
+  Automatically generated code is typically less optimized than hand-written code for the target platform.
+- Narrow domain fit  
+  Works well only for well-bounded, formally specifiable domains. Ill-suited to systems with heavy UI, hardware integration, or emergent behavior.
+- Incomplete models block compilation  
+  Every state, transition, and action must be fully specified. Partial models cannot produce output, unlike informal UML diagrams.
+- Limited tool support  
+  Few mature, production-grade xUML compilers exist compared to mainstream development toolchains.
