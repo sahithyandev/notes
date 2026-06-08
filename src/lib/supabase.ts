@@ -6,12 +6,13 @@
  * Astro API routes (prerender = false) or page frontmatter that runs server-side.
  */
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./supabase.types";
 
 function makeClient() {
   const url = import.meta.env.SUPABASE_URL;
   const key = import.meta.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
+  return createClient<Database>(url, key, { auth: { persistSession: false } });
 }
 
 /** Returns the client or throws — use in API routes where the DB is required. */
@@ -30,10 +31,10 @@ export async function getVoteCounts(
 ): Promise<{ up: number; down: number }> {
   const client = makeClient();
   if (!client) return { up: 0, down: 0 };
-  const { data } = (await client
-    .from("note_votes")
-    .select("up:vote.eq.1.count(), down:vote.eq.-1.count()")
-    .eq("slug", slug)
-    .single()) as { data: { up: number; down: number } | null };
+  const { data, error } = await client
+    .rpc("get_vote_counts", { p_slug: slug })
+    .single();
+
+  if (error) throw new Error(error.message);
   return { up: data?.up ?? 0, down: data?.down ?? 0 };
 }
