@@ -95,6 +95,7 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     const current = (root.dataset.themePref as Pref) || "auto";
     const next = order[(order.indexOf(current) + 1) % order.length];
     apply(next);
+    (window as any).stonks?.("event", "theme_change", { theme: next });
   });
 </script>
 
