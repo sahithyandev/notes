@@ -1,0 +1,146 @@
+---
+title: Behaviour Diagram
+sidebar:
+  order: 9
+dateCreated: 2026-06-07T23:49:09.227Z
+lastUpdatedOn: 2026-06-08T01:02:45.438Z
+slug: s4/software-engineering/behaviour-diagram
+prev: true
+next: true
+---
+
+Describe how a system behaves in response to stimuli or events over time.
+
+Types of stimuli:
+
+- Data stimuli  
+  Input data that triggers processing.
+- Event stimuli  
+  Discrete events that trigger actions.
+
+## Use Case Diagram
+
+Shows system functionality from an actor's perspective. Captures what the system does, not how.
+
+### Actor
+
+An entity that interacts with the system from outside. Drawn as a stick figure for human users. Drawn as a rectangle labeled `<<actor>>` for external systems.
+
+### Use Case
+
+A single piece of observable functionality. Drawn as an oval with a short verb-phrase label.
+
+### Association
+
+A solid line between an actor and a use case. Means the actor participates in that use case.
+
+### System Boundary
+
+A rectangle enclosing all use cases. The system name is written at the top.
+
+Actors must be outside the system boundary.
+
+### Relationships Between Use Cases
+
+- `<<include>>`  
+  The base use case unconditionally and explicitly calls the included use case as a mandatory step. Included use case has no knowledge of the base. Drawn as a dashed arrow pointing from base to included (base --> included) which means base depends on the included.
+- `<<extend>>`  
+  Extended use case conditionally injects behaviour into base use case at a declared extension point. Base does not know about extending one. Drawn as a dashed arrow pointing from the extending use case to the base (extending --> base) which means extending use case depends on the base.
+
+### Generalization
+
+A use case or actor inherits from another. Drawn as a solid line with a hollow triangle arrowhead pointing to the parent. Identical in notation to class inheritance.
+
+- Between Actors  
+  Child actor inherits all use case associations of parent. May have additional ones of its own.
+- Between Use Cases  
+  Child use case inherits the behaviour and meaning of the parent. May override or extend it.
+
+## State Diagram
+
+Shows all states an object can occupy and the transitions between them triggered by events. Models the lifecycle of a single class instance.
+
+### State
+
+A rounded rectangle with the state name centered inside.
+
+### Transition
+
+A directed arrow from a source state to a target state.
+
+Transition label syntax: `event [guard] / action`
+
+- `event`: the trigger that fires the transition.
+- `[guard]`: optional boolean condition that must hold.
+- `/action`: optional behavior executed during the transition.
+
+All three parts are optional. A transition with no label fires automatically when the source state's `do` activity completes.
+
+### Initial Pseudostate
+
+A solid filled circle. Has no name. One outgoing transition leads to the first real state.
+
+### Final State
+
+A solid filled circle surrounded by a thin ring. Represents the end of the object's lifecycle.
+
+### Internal Activities
+
+Written inside the state box below the state name, separated by a thin line:
+
+- `entry / action`: runs once when the state is entered.
+- `exit / action`: runs once when the state is exited.
+- `do / activity`: runs continuously while the object remains in the state. Interruptible by transitions.
+
+### Composite State
+
+A state containing a nested state machine. Drawn as a rounded rectangle with sub-states inside. Used when a state has complex internal behavior that needs its own states and transitions.
+
+On entry, the composite state's own initial pseudostate is activated unless a transition enters directly to a specific sub-state.
+
+### History Pseudostate
+
+A small circle labeled `H` inside a composite state. When re-entering the composite state via the history pseudostate, control resumes at the last active sub-state rather than at the initial pseudostate.
+
+Deep history (`H*`) applies this behavior recursively through all nesting levels.
+
+## Activity Diagram
+
+Models step-by-step workflows, decision logic, and concurrent execution. Used for business processes, algorithms, and use case internals. Equivalent to an enhanced flowchart.
+
+### Initial Node
+
+A solid filled circle. Marks the single entry point of the workflow. One per diagram (one per region in partitioned diagrams).
+
+### Activity
+
+A rounded rectangle labeled with a verb phrase. Represents one discrete step or task. Control enters via an incoming flow and leaves via an outgoing flow when the step completes.
+
+### Decision
+
+A diamond with one incoming flow and two or more outgoing flows. Each outgoing flow carries a guard condition in square brackets. Exactly one guard evaluates to true at runtime; that flow is taken.
+
+### Merge
+
+A diamond with two or more incoming flows and one outgoing flow. No guard conditions. Passes control through as soon as any one incoming flow arrives. Does not synchronize concurrent flows.
+
+### Fork
+
+A thick vertical or horizontal bar with one incoming flow and two or more outgoing flows. All outgoing flows activate simultaneously, creating parallel threads of execution.
+
+### Join
+
+A thick horizontal (or vertical) bar with two or more incoming flows and one outgoing flow. Waits until all incoming flows have arrived before passing control forward. Synchronizes the parallel threads started by a Fork.
+
+### Final Node
+
+2 variants:
+
+- Activity final  
+  A filled circle inside a thin ring. Terminates all flows in the entire diagram when reached.
+- Flow final  
+  A circle with an `X` inside. Terminates only the one flow that reaches it; other concurrent flows continue.
+
+### Swimlanes
+
+Named rectangular partitions (horizontal or vertical) that divide the diagram. Each partition is labeled with the actor, role, or component responsible for the activities inside it. A flow crossing a swimlane boundary indicates a hand-off between parties.

@@ -1,0 +1,92 @@
+---
+title: Structure Diagram
+sidebar:
+  order: 8
+dateCreated: 2026-06-07T23:47:42.057Z
+lastUpdatedOn: 2026-06-08T01:02:45.437Z
+slug: s4/software-engineering/structure-diagram
+prev: true
+next: true
+---
+
+Represent the static organization of a system. Capture relationships between components at a point in time.
+
+## Class Diagram
+
+Represents classes, their attributes, methods, and relationships. The primary artifact of object-oriented design.
+
+### Class Notation
+
+A class is drawn as a rectangle split into three horizontal compartments:
+
+1. Class name, centered. Abstract class names are italicized
+2. Attributes  
+   Attribute syntax: `visibility name: type [multiplicity] = defaultValue`
+3. Operations (methods)  
+   Operation syntax: `visibility name(paramName: type): returnType`
+
+Visibility symbols:
+
+- `+` - public
+- `-` - private
+- `#` - protected
+- `~` - package
+
+Static members are underlined. Abstract members are italicized.
+
+An interface is drawn as a class rectangle with `<<interface>>` above the name. Attributes are omitted; only operation signatures appear.
+
+### Relationships
+
+| Relationship | Line   | Marker                                 | Meaning                                                                                                                                                                                                                                                  |
+| ------------ | ------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Association  | Solid  | Open arrowhead (optional)              | One class holds a reference to another. Arrow tip shows which direction navigation is possible. Does not imply ownership.                                                                                                                                |
+| Aggregation  | Solid  | Hollow diamond at the whole end        | Whole holds references to parts instantiated outside it. Parts retain independent identity, can be shared, and survive destruction of the whole.                                                                                                         |
+| Composition  | Solid  | Filled diamond at the whole end        | Whole creates and destroys its parts. Parts cannot exist without the whole, cannot be shared, and are destroyed when the whole is destroyed.                                                                                                             |
+| Inheritance  | Solid  | Hollow triangle pointing to superclass | Subclass acquires all attributes and operations of the superclass and may override or extend them. Triangle points toward the superclass.                                                                                                                |
+| Realization  | Dashed | Hollow triangle pointing to interface  | Class provides concrete implementations for all operations declared by the interface. Dashed because no implementation is inherited, only the contract.                                                                                                  |
+| Dependency   | Dashed | Open arrowhead at supplier             | Client depends on supplier transiently (as a method parameter, local variable, or return type) but never stores a reference. Stereotypes: `<<use>>` for general use, `<<call>>` for operation invocation, `<<create>>` for supplier class instantiation. |
+
+### Multiplicity
+
+Written at each end of an association line:
+
+- `1` exactly one
+- `0..1` zero or one
+- `*` zero or more
+- `1..*` one or more
+- `n..m` between $n$ and $m$ inclusive
+
+## Package Diagram
+
+Organizes model elements into named groups and shows dependencies between groups. Used to enforce layering and manage large models.
+
+### Package
+
+Drawn as a large rectangle with a smaller tab on the upper-left corner. The package name goes in the tab, or centered in the body if the body contains no visible members.
+
+Elements inside a package are referenced as `PackageName::ElementName`. Nesting uses `Outer::Inner::Element`.
+
+### Dependency
+
+Packages can depend on one another. There cannot be circular dependencies.
+
+Denoted as a dashed arrow from the dependent package to the package it depends on. These stereotype labels denote the dependency type and go on the line.
+
+- `<<import>>`  
+  Public import. All public elements of the target become accessible in the source's namespace and are re-exported.
+- `<<access>>`  
+  Private import. Elements become accessible but are not re-exported.
+- `<<merge>>`  
+  The source package's content is merged with the target's. Used for profile extensions.
+
+## Other Structure Diagrams
+
+- Component Diagram  
+  Shows system components and their provided/required interfaces.
+- Deployment Diagram  
+  Shows how software artifacts are distributed across hardware nodes.
+- Object Diagram  
+  A snapshot of class instances and their links at one moment in time.
+- Composite Structure Diagram  
+  Shows the internal structure of a class and the collaborations it uses.

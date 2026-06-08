@@ -1,0 +1,160 @@
+---
+title: Interaction Diagram
+sidebar:
+  order: 10
+dateCreated: 2026-06-07T23:52:57.919Z
+lastUpdatedOn: 2026-06-08T01:02:45.440Z
+slug: s4/software-engineering/interaction-diagram
+prev: true
+next: true
+---
+
+A category of behavior diagrams that model message exchanges between objects. Each type presents the same underlying interaction in a different format.
+
+## Sequence Diagram
+
+Shows the chronological order of messages exchanged between participants for one specific scenario. One diagram per use case or scenario.
+
+### Lifeline
+
+A vertical dashed line representing one participant over time. A labeled rectangle sits at the top with the format `objectName: ClassName`. Object name is omitted if it's anonymous such as `: ClassName`.
+
+### Activation Bar
+
+A thin rectangle overlaid on a lifeline. Marks the period during which the object is actively executing.
+
+### Synchronous Message
+
+A solid arrow with a filled triangular arrowhead. The sender blocks until the receiver returns.
+
+### Return Message
+
+A dashed arrow pointing back from receiver to sender. Label with the return value when relevant.
+
+### Asynchronous Message
+
+A solid arrow with an open arrowhead. The sender does not wait for a return.
+
+### Self-Message
+
+An arrow that leaves and returns to the same lifeline. Represents a method calling itself or an internal call.
+
+### Create Message
+
+A dashed arrow labeled `<<create>>`. Points to the rectangle of a new lifeline that begins at that vertical position.
+
+### Destroy Message
+
+An arrow labeled `<<destroy>>`. The target lifeline ends with a large `X`.
+
+If the object is destroying itslef, destroy message points to itself.
+
+### Combined Fragments
+
+A rectangular frame drawn over 1 or more messages that groups them. Applies an interaction operator, specifying how that group of messages behaves (conditionally, repeatedly, in parallel, etc.).
+
+Top left corner has a small notched box (technically a pentagon), containing an operator. Common operators:
+
+- `alt`  
+  Alternatives. Divided by horizontal dashed lines. Each partition has a guard in square brackets. Only the partition whose guard is true executes.
+- `opt`  
+  Optional. Contains one partition. Executes only if the guard is true.
+- `loop`  
+  Repetition. Labeled `loop(min, max)` or with a guard condition. Repeats while the guard holds.
+- `par`  
+  Parallel. Each partition executes concurrently.
+- `ref`  
+  Reference. Contains the name of another sequence diagram. Represents a call to that diagram.
+- `break`  
+  On a true guard, executes its partition and then exits the enclosing fragment entirely.
+
+Guards are written in square brackets like `[condition]`.
+
+## Communication Diagram
+
+Shows the same information as a sequence diagram but emphasizes object structure rather than time ordering. Also called collaboration diagram.
+
+### Object
+
+A rectangle labeled `objectName: ClassName`.
+
+### Link
+
+A solid line between two objects that exchange messages.
+
+### Message
+
+A labeled arrow along a link. The label format is: `sequenceNumber: methodName(args)`.
+
+### Sequence Number
+
+An integer prefix that establishes message order: `1`, `2`, `3`. Sub-calls within a message use dotted notation: `1.1`, `1.2`, `1.1.1`.
+
+#### Condition
+
+Written in square brackets after the sequence number: `1 [x > 0]: update()`.
+
+### Iteration
+
+Written with an asterisk: `1*: process()`. Add a guard for the condition: `1* [i < n]: step()`.
+
+## Interaction Overview Diagram
+
+Shows the high-level control flow across multiple interaction scenarios. Each node is a sequence diagram, either drawn inline or referenced by name. Uses [activity diagram](/s4/software-engineering/behaviour-diagram#activity-diagram) notation for the control flow structure.
+
+Shows when and under what conditions each interaction occurs relative to the others. Message-level detail lives inside inline fragments or in referenced diagrams.
+
+### Node Types
+
+Both types are rectangles with a pentagon in the top-left corner.
+
+- Inline fragment  
+  The sequence diagram is drawn directly inside the node rectangle. Lifelines and messages are visible within it.
+- `ref` fragment  
+  Contains only a `ref` label and the name of a sequence diagram defined elsewhere. Used when the interaction is large or reused across multiple overview diagrams.
+
+### Control Flow
+
+| Activity Notation                                                       | Meaning                                                                      |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [Initial node](/s4/software-engineering/behaviour-diagram#initial-node) | Where the overall interaction begins                                         |
+| Control flow arrow                                                      | Next interaction runs after this one completes                               |
+| [Decision diamond](/s4/software-engineering/behaviour-diagram#decision) | Branch point. Guard conditions on outgoing arrows select which fragment runs |
+| [Final node](/s4/software-engineering/behaviour-diagram#final-node)     | Overall interaction ends                                                     |
+
+## Timing Diagram
+
+Shows state or condition changes of objects along a horizontal time axis. Used for real-time or time-constrained behavior.
+
+Each object occupies a horizontal swimlane. Time advances left to right. The diagram captures when transitions occur and how long each state lasts.
+
+### Horizontal Swimlane
+
+A horizontal lane labeled with the object name. Hosts the state timeline for that object.
+
+### State timeline
+
+A waveform-style line that shifts vertically at each transition. The current state is labeled at the level the line occupies.
+
+### Transition
+
+A vertical crossing on the waveform. Marks the instant a state change occurs.
+
+### Time axis
+
+The horizontal base. Carries absolute time values or relative offsets.
+
+### Time constraint
+
+Written as `{t1..t2}` between two transitions. Specifies the minimum and maximum duration allowed.
+
+### Message
+
+A vertical arrow from one lifeline to another at a specific time point. Represents a stimulus or response crossing between objects.
+
+### Diagram Forms
+
+- Waveform notation  
+  A single line shifts between vertical levels, each level corresponding to a named state. Compact; used for discrete state machines.
+- General notation  
+  States are shown as labeled horizontal bands. The active state is highlighted. More readable when many states exist.
