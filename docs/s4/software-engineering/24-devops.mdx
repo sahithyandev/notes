@@ -1,0 +1,137 @@
+---
+title: DevOps
+sidebar:
+  order: 24
+dateCreated: 2026-05-19T09:49:29.555Z
+lastUpdatedOn: 2026-06-08T18:04:26.963Z
+slug: s4/software-engineering/devops
+prev: true
+next: true
+---
+
+Amalgamation of Development and Operations. Unified model where one team builds, deploys, and supports software.
+
+Traditionally separate teams handle development, release, and support teams. Has communication bottlenecks and delays.
+
+### Reasons for DevOps
+
+- Agile development outpaced traditional release pipelines.
+- Amazon's same-team service model demonstrated reliability gains.  
+  Teams that build a service also operate it, creating direct accountability for reliability.
+- Cloud delivery eliminated physical distribution.
+
+## Agile vs DevOps
+
+Both practices improve software delivery but operate at different scopes.
+
+[Agile](/s4/software-engineering/agile-models) focuses on iterative development. It improves development through sprint-based delivery focused on customer value.
+
+DevOps focuses on integrating development with operations. It improves both development and operations through continuous delivery focused on deployment and reliability. Combining both removes bottlenecks across the full delivery pipeline.
+
+## Core principles
+
+- Everyone responsible for everything
+- Automate everything
+- Measure first, change later  
+  Decision are based on collected data; not intuition.
+
+## Benefits
+
+- Faster deployment  
+  As it is automated where possible.
+- Reduced risk  
+  Due to small increments and automations.
+- Faster repair  
+  No team-boundary delays.
+- Increased productivity  
+  Short feedback loops. No communication bottlenecks or delays.
+
+### DevOps Automation
+
+Reduces time and cost for integration, deployment, and delivery. Encoded in scripts and models which are version-able and stored in the repository.
+
+| Aspect                       | Description                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| Continuous integration (CI)  | Integrated build and tests run on every push to master.                        |
+| Continuous delivery          | Changed system tested in production-equivalent environment; ready for release. |
+| Continuous deployment (CD)   | New release deployed to users automatically on every master change.            |
+| Infrastructure as code (IaC) | Machine-readable infrastructure models; CM tools provision servers from them.  |
+
+## Continuous Integration
+
+Integrated system version built and tested on every push to shared repository. Bugs are found as soon as the changes are pushed. Faster and earlier diagnostics prevent issues in the production.
+
+### Breaking the build
+
+Pushing code that causes system tests to fail.
+
+To avoid this, it's considered a best practice to integrate and test locally before pushing.
+
+### Incremental Build
+
+Where only changed components and their dependents are recompiled. Dependency model specifies what must be rebuilt when a file changes. Build tool compares modification timestamps of source vs. compiled files and recompiles:
+
+- source if it's newer than compiled
+- dependent if it's dependency is newer than compiled
+
+## Continuous Delivery and Deployment
+
+Continuous delivery is the process of ensuring the system is ready for customer delivery after each change. Requires testing in a production-equivalent environment (aka. staging environment). Functionality, acceptance, load and performance tests are performed.
+
+When all tests are passing, install on production servers and switch operation to new version.
+
+Deployment steps:
+
+1. Momentarily stop new service requests.
+2. Let older version drain outstanding transactions.
+3. Switch to new version; resume processing.
+
+### Infrastructure as Code
+
+Aka. IaC. Machine-readable (and human-readable) model of servers, networks, and installed software.
+
+Certain tools only model the servers and networks such as Terraform. They are called provisioning tools or orchestration tools.
+
+Certain tools only model the installed software such as Ansible. They are called configuration management tools.
+
+Provisioning tools and configuration management tools are used together or independently. In some cases, both of these tools are called configuration management tools.
+
+### Containers
+
+[Containers](/s4/software-engineering/virtual-server) package an application with all its dependencies into a portable, OS-independent unit. Native fit for cloud and microservices deployments.
+
+## DevOps Measurement
+
+DevOps process must be continuously measured and improved with time. Automation should be applied to measurement as much as possible.
+
+### Process Measurement
+
+Collecting data about the development, testing and deployment processes. Can only be automated to some extent because everyone work and record their work differently.
+
+### Service Measurement
+
+Collecting data about performance, reliability, and customer acceptability of the software.
+
+### Usage Measurement
+
+Collecting data on how customers use the product. A monitoring system may be used to measure usage.
+
+### Business Success Measurement
+
+Collecting data on how the product contributes to overall success of the business.
+
+### Metrics Scorecard
+
+Payal Chakravarty from IBM suggests 9 metrics for cloud-delivered software.
+
+| Metric                                   | Type    | Desired Direction |
+| ---------------------------------------- | ------- | ----------------- |
+| Deployment frequency                     | Process | Increase          |
+| Change volume                            | Process | Increase          |
+| Lead time from development to deployment | Process | Decrease          |
+| Percentage of failed deployments         | Process | Decrease          |
+| Mean Time To Recovery (MTTR)             | Process | Decrease          |
+| Availability                             | Service | Stable/Increase   |
+| Performance                              | Service | Stable/Increase   |
+| Number of customer complaints            | Service | Decrease          |
+| Percentage increase in customer numbers  | Service | Increase          |

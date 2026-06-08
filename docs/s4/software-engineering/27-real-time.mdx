@@ -1,10 +1,10 @@
 ---
-title: Real Time OS
+title: Real-Time
 sidebar:
   order: 27
 dateCreated: 2026-05-04T09:25:34.261Z
-lastUpdatedOn: 2026-06-08T10:41:10.167Z
-slug: s4/software-engineering/real-time-os
+lastUpdatedOn: 2026-06-08T18:04:26.963Z
+slug: s4/software-engineering/real-time
 prev: true
 next: true
 prereqs:
@@ -38,7 +38,7 @@ Inputs that trigger system responses.
 
 ### System Elements
 
-Three process classes in a general embedded real-time model:
+3 process classes in a general embedded real-time model:
 
 - Sensor control processes  
   Collect and optionally buffer data from sensors.
@@ -49,7 +49,7 @@ Three process classes in a general embedded real-time model:
 
 ### Modelling
 
-State models are the primary design representation. A stimulus triggers a state transition. [UML state diagrams](/s4/software-engineering/uml) show states as nodes and events as arcs.
+State models are the primary design representation. A stimulus triggers a state transition. [UML state diagrams](/s4/software-engineering/behaviour-diagram#state-diagram) show states as nodes and events as arcs.
 
 ### Design Process
 
@@ -63,7 +63,7 @@ State models are the primary design representation. A stimulus triggers a state 
 
 ### RTOS
 
-A Real-Time Operating System (RTOS) is a lightweight platform providing minimal features for real-time software.
+Aka. Real-Time Operating System. A lightweight platform providing minimal features for real-time software.
 
 Examples:
 
@@ -73,13 +73,7 @@ Examples:
 
 #### RTOS vs. Conventional OS
 
-Conventional OSes (such as Linux and macOS) are:
-
-- complex
-- feature-rich
-- large disk footprint
-
-They provide file systems and runtime process management. Coarse-grained process scheduling control.
+Conventional OSes (such as Linux and macOS) are complex, feature-rich and have large disk footprint. They provide file systems and runtime process management. Coarse-grained process scheduling control.
 
 RTOS strips non-essential features. Omits file management. Optimized for deterministic, fine-grained scheduling.
 
@@ -109,7 +103,7 @@ Initiates execution of the selected process on available hardware.
 
 Manages concurrent periodic and aperiodic processes. Scheduling based on execution period and deadline.
 
-Three priority levels:
+3 priority levels:
 
 1. Interrupt level  
    Highest. Reserved for time-critical interrupts.
@@ -122,7 +116,7 @@ Interrupt handling is covered in [Interrupt Driven IO](/s3/operating-systems/int
 
 ### Periodic Processes
 
-Characterized by three dimensions:
+Characterized by 3 dimensions:
 
 - Period  
   Time between successive executions.
@@ -148,7 +142,7 @@ The resource manager and dispatcher operate in sequence after scheduling.
 
 ## Architectural Patterns for Embedded Systems
 
-Three common patterns:
+3 common patterns:
 
 - Observe and React  
   Monitors sensors. Triggers alarm or action on exceptional condition. Used in monitoring systems.
@@ -159,7 +153,7 @@ Three common patterns:
 
 ## Timing Analysis
 
-Three key factors for each process:
+3 key factors for each process:
 
 - Deadline  
   Time by which the stimulus must be processed.

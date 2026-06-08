@@ -6,7 +6,7 @@ next: true
 sidebar:
   order: 2
 dateCreated: 2026-04-23T17:39:39.630Z
-lastUpdatedOn: 2026-06-08T10:41:10.163Z
+lastUpdatedOn: 2026-06-08T18:04:26.960Z
 ---
 
 A structured set of activities required to develop a software system.
@@ -22,7 +22,7 @@ Core activities:
 - Evolution  
   Changing the system to meet new needs.
 
-## Why Use a Process
+### Why Use a Process
 
 Development within a defined process is systematic, traceable, and repeatable. Development without one is informal, unpredictable, and prone to compounding errors.
 
@@ -33,6 +33,25 @@ Without a process, developers move directly from a partial understanding of requ
 - Unpredictable delivery and high rework costs.
 
 Informal development may appear faster in very early stages of small projects. This advantage disappears as complexity grows.
+
+## Process Description
+
+A formal record of what activities are performed, in what order, and under what conditions.
+
+Components:
+
+- Activities  
+  Work steps that transform inputs into outputs (e.g. UI design, data modelling).
+- Products  
+  Outputs of activities: documents, code, test results, models.
+- Roles  
+  Responsibilities of people involved. Defines who performs each activity.
+- Pre-conditions  
+  State that must hold before an activity can begin.
+- Post-conditions  
+  State that must hold after an activity completes.
+
+Exists at varying levels of abstraction. High-level descriptions outline major activities; detailed descriptions specify individual tasks and decision points.
 
 ## Types
 
@@ -46,7 +65,7 @@ Suited for:
 - Large teams distributed across sites
 - Safety-critical systems requiring extensive documentation
 
-Risk: requirements errors are not discovered until late in the process.
+Requirement errors are only discovered very late in the process.
 
 ### Agile
 
@@ -64,72 +83,6 @@ Most real projects combine both. Plan-driven for high-level structure; agile for
 
 </Note>
 
-## Rational Unified Process
-
-A process model that brings together best practices from iterative development, component-based architecture, and visual modelling. Combines plan-driven and agile elements. Described from three perspectives:
-
-- Dynamic  
-  Phases over time, each ending at a project milestone.
-- Static  
-  Process activities (workflows) performed regardless of phase.
-- Practice  
-  6 recommended good practices.
-
-### Phases
-
-Each phase can contain multiple iterations. Phases are management milestones, not sequential steps.
-
-- Inception  
-  Establish business case. Identify risks and scope. Estimate resources. Decide whether to proceed.
-- Elaboration  
-  Define and analyse requirements. Design the architecture. Produce a project plan. Identify key risks.
-- Construction  
-  Develop components. Integrate and test the system against defined requirements.
-- Transition  
-  Deploy to users. Train users. Beta test and fix defects. Release to production.
-
-### Static Workflows
-
-Core workflows executed across phases:
-
-- Business modelling
-- Requirements
-- Analysis and design
-- Implementation
-- Test
-- Deployment
-- Configuration and change management
-- Project management
-- Environment
-
-### Good Practices
-
-1. Develop software iteratively
-2. Manage requirements explicitly
-3. Use component-based architectures
-4. Model software visually (UML)
-5. Verify software quality continuously
-6. Control changes to software
-
-## Process Descriptions
-
-Captures what activities are performed, in what order, and under what conditions.
-
-Components:
-
-- Activities  
-  Work steps that transform inputs into outputs (e.g. UI design, data modelling).
-- Products  
-  Outputs of activities: documents, code, test results, models.
-- Roles  
-  Responsibilities of people involved. Defines who performs each activity.
-- Pre-conditions  
-  State that must hold before an activity can begin.
-- Post-conditions  
-  State that must hold after an activity completes.
-
-Process descriptions exist at varying levels of abstraction. High-level descriptions outline major activities; detailed descriptions specify individual tasks and decision points.
-
 ## Coping with Change
 
 Change is driven by business changes, new technologies, and platform changes. Change cost includes rework plus implementation effort.
@@ -139,9 +92,9 @@ Two strategies to reduce rework costs:
 - Change avoidance  
   Anticipate change early using prototyping.
 - Change tolerance  
-  Design the process to allow low-cost changes. Incremental development supports this.
+  Design the process to allow low-cost changes. Incremental delivery supports this.
 
-## Software Prototyping
+### Software Prototyping
 
 A prototype is an initial system version used to explore ideas and requirements.
 
@@ -159,7 +112,7 @@ Benefits:
 
 Prototypes must not evolve into production systems: they have poor non-functional qualities, lack documentation, and degraded structure.
 
-## Incremental Delivery
+### Incremental Delivery
 
 System delivered in multiple increments instead of one release. High-priority requirements are delivered first. Requirements are frozen per increment.
 

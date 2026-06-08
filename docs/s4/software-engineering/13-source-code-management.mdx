@@ -3,7 +3,7 @@ title: Source Code Management
 sidebar:
   order: 13
 dateCreated: 2026-05-19T09:50:19.304Z
-lastUpdatedOn: 2026-06-08T01:02:45.441Z
+lastUpdatedOn: 2026-06-08T18:04:26.962Z
 slug: s4/software-engineering/source-code-management
 prev: true
 next: true
@@ -11,16 +11,25 @@ next: true
 
 Aka. SCM or Configuration Management (CM). Concerned with the policies, processes, and tools for managing changing software systems. Needed because it is easy to lose track of what changes and component versions have been incorporated into each system version.
 
-- Configuration Item (SCI)  
-  Any artifact placed under configuration control. Covers source files, build scripts, configuration files, shared libraries, and tool versions. Has a unique name. The repository stores all historical states, not just the current state.
-- Version  
-  A distinct recorded state of an SCI. Each submission after modification creates a new version rather than overwriting the previous one. Identified by item name and version number (e.g., `C1.0`, `C1.1`, `C1.2`).
-- Baseline  
-  A fixed, named snapshot of a complete set of component versions forming a working system at a point in time. Immutable once established. Any change to a component produces a new version belonging to a new baseline. Guarantees exact reproducibility of any past system state.
-- Codeline  
-  The full version history of a component and its dependencies. A component version compatible with one dependency version may not be compatible with another.
-- Mainline  
-  The authoritative sequential progression of baselines over time. Branches diverge for isolated work and merge back to produce the next baseline.
+### Configuration Item
+
+Aka. SCI. Any artifact placed under configuration control. Covers source code files, build scripts, configuration files, shared libraries, and tool versions. Has a unique name. The repository stores all historical states, not just the current state.
+
+### Version
+
+A distinct recorded state of an SCI. Each submission after modification creates a new version rather than overwriting the previous one. Identified by item name and version number (e.g., `C1.0`, `C1.1`, `C1.2`).
+
+### Baseline
+
+A locked snapshot of the entire system at one point in time. Every component pinned to a specific version. Like a git tag (e.g., `v1.0`). Immutable once established, so any past system state can be reproduced exactly.
+
+### Codeline
+
+The version history of a single component over time. A vertical stack of versions for one file or module. A version compatible with one dependency version may not be compatible with another.
+
+### Mainline
+
+The ordered sequence of baselines over time. The master timeline of the whole project. Branches diverge for isolated work and merge back to produce the next baseline on the mainline.
 
 Versions are instances of SCIs. A Baseline locks a specific set of versions into a coherent system snapshot. The Mainline is the ordered sequence of such baselines. A Codeline is the per-component view of version history, including dependencies.
 

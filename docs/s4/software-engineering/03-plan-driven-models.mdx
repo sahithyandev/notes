@@ -1,0 +1,136 @@
+---
+title: Plan-Driven Models
+sidebar:
+  order: 3
+dateCreated: 2026-06-02T13:45:08.912Z
+lastUpdatedOn: 2026-06-08T18:04:26.961Z
+slug: s4/software-engineering/plan-driven-models
+prev: true
+next: true
+---
+
+An abstract representation of a software process from a particular perspective.
+
+## Waterfall Model
+
+A plan-driven model with clearly separated, sequential phases.
+
+1. Requirements analysis and definition
+2. System and software design
+3. Implementation and unit testing
+4. Integration and system testing
+5. Operation and maintenance
+
+Difficult to accommodate changes once development has started.
+
+Suitable when:
+
+- Requirements are well understood.
+- Changes are minimal.
+- Large, distributed system projects.
+
+## Incremental Development
+
+Development done in small increments with feedback at each stage. Specification, development, and validation are interleaved. Each increment delivers working software. In the plan-driven variant, all process activities are planned in advance. The system is split into increments, each passing through the full phase sequence: requirements, design, implementation, and testing. Multiple working deliveries are produced over time. Scope and schedule for all increments are fixed upfront. Changes go through formal change control. For the agile variant, see [Agile Models](/s4/software-engineering/agile-models).
+
+Change cost is lower. Only the current increment needs reconsidering when changes arise. Working software is delivered earlier. Customers gain access to functional parts before the full system is built. Early access generates feedback while changes are still cheap.
+
+Process visibility is low. Progress is typically measured through formal deliverables. Producing updated documentation for every version is not cost-effective. Managers therefore lack concrete artifacts to assess true project status. Without deliberate refactoring, each increment degrades system structure. Dependencies tangle, architecture drifts, and subsequent changes become progressively harder.
+
+## Reuse-Oriented Software Engineering
+
+Integration of pre-existing software is focused more compared to writing new code from scratch. Driven by cost and schedule pressures, especially for commercial and internet-based systems. Available components rarely match requirements exactly. Requirements may have to be compromised a bit. Development and integration cost is substantially reduced.
+
+Process stages:
+
+1. Requirements specification  
+   Initial requirements defined as in other models.
+2. Component analysis  
+   Search for components providing needed functionality. Typically no exact match.
+3. Requirements modification  
+   Requirements re-evaluated against available components. May be modified to fit a component. If unacceptable, the component is rejected and analysis resumes.
+4. System design with reuse  
+   Framework designed (or reused). New modules only where reusable components are unavailable.
+5. Development and integration  
+   Custom software built for gaps, then all components integrated.
+6. System validation  
+   Integrated system validated against requirements.
+
+Reuse levels:
+
+- Abstraction  
+  Design knowledge (patterns, architectural styles), not artifacts.
+- Object  
+  Library objects/classes used directly in code.
+- Component  
+  Collections of objects/classes as deployable units. For example web services, .NET and J2EE.
+- System  
+  Entire application systems. Design shifts from building to configuring. For example standalone [COTS](/s4/software-engineering/introduction#generic-product) systems
+
+## Boehm's Spiral Model
+
+A risk-driven iterative process model. Progress is visualized as a spiral on a 2D plane.
+
+The plane is divided into 4 quadrants, one per sector. Each full loop of the spiral is one complete phase. The radial distance from the center is cumulative cost: early loops are small and cheap, later loops are larger and more expensive. Progress within a loop moves angularly through all four sectors in order.
+
+Sectors, traversed in order each loop:
+
+- Objective setting  
+  Goals, constraints, and alternatives for the current phase are defined.
+- Risk assessment and reduction  
+  Risks are identified, analyzed, and reduced. Prototypes are the primary reduction mechanism.
+- Development and validation  
+  A development sub-model suited to the current risk profile is chosen and executed. High risk favors prototyping; low risk favors waterfall-style development.
+- Planning  
+  Phase is reviewed. Decision to proceed to the next loop is made.
+
+Each loop ends with a management review. Early loops produce prototypes. Later loops produce the actual system. The spiral terminates when the product is delivered.
+
+Rarely used exactly as defined. Formal risk analysis every loop (listing risks, estimating probability and cost impact, ranking, devising mitigation) is too expensive for most projects. The core ideas (iterate, prototype to reduce uncertainty, assess risk before committing) influenced later models like RUP.
+
+## Rational Unified Process
+
+An iterative process model combining plan-driven structure with agile practices. Described from three perspectives:
+
+- Dynamic  
+  Time-based view. Four phases, each ending at a management milestone.
+- Static  
+  Activity-based view. Nine workflows that run in parallel across all phases.
+- Practice  
+  Six recommended engineering practices.
+
+### Phases
+
+Phases are management milestones, not sequential steps. Each phase spans one or more iterations.
+
+- Inception  
+  Establish business case. Define scope. Identify risks. Decide whether to proceed.
+- Elaboration  
+  Analyse requirements. Design architecture. Produce project plan. Resolve major risks.
+- Construction  
+  Develop and integrate components. Test against requirements.
+- Transition  
+  Deploy to users. Beta test. Fix defects. Release to production.
+
+### Workflows
+
+Nine workflows run in parallel across all phases, with varying emphasis per phase:
+
+- Business modelling
+- Requirements
+- Analysis and design
+- Implementation
+- Test
+- Deployment
+- Configuration and change management
+- Project management
+- Environment
+
+### Good Practices
+
+1. Develop software iteratively
+2. Manage requirements explicitly
+3. Use component-based architectures
+4. Model software visually using UML
+5. Verify software quality continuously
+6. Control changes to software

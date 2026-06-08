@@ -1,9 +1,9 @@
 ---
 title: Cloud-based Software
 sidebar:
-  order: 24
+  order: 25
 dateCreated: 2026-06-01T09:34:22.607Z
-lastUpdatedOn: 2026-06-08T10:41:10.167Z
+lastUpdatedOn: 2026-06-08T18:04:26.963Z
 slug: s4/software-engineering/cloud-based-software
 prev: true
 next: true
@@ -11,27 +11,30 @@ next: true
 
 Software that runs on rented virtual servers hosted in large remote data centers.
 
-A **cloud** is a large pool of remote virtual servers available for rent. Servers are implemented in software and started/stopped on demand. Customers rent servers, access them over the internet, install required software, and use them.
+A cloud is a large pool of remote virtual servers available for rent. Servers are implemented in software and started/stopped on demand. Customers rent servers, access them over the internet, install required software, and use them.
 
-## Characteristics
+### Characteristics
 
 Three defining properties:
 
-- Scalability: ability to maintain performance as user load increases, achieved by automatic adaptation.
-- Elasticity: superset of scalability; supports both scale-out and scale-in, with servers added or removed dynamically.
-- Resilience: ability to maintain service when a server fails, achieved by running concurrent software copies.
+- Scalability  
+  Ability to maintain performance as user load increases, achieved by automatic adaptation.
+- Elasticity  
+  Superset of scalability; supports both scale-out and scale-in, with servers added or removed dynamically.
+- Resilience  
+  Ability to maintain service when a server fails, achieved by running concurrent software copies.
 
-## Architecture Decisions
+### Architecture Decisions
 
-Three interdependent architectural decisions:
+3 interdependent architectural decisions:
 
-1. Database organization: multi-tenant or multi-instance?
-2. Scalability and resilience: what are the load and fault-tolerance requirements?
-3. Software structure: monolithic or service-oriented?
+- Database organization: multi-tenant or multi-instance?
+- Scalability and resilience: what are the load and fault-tolerance requirements?
+- Software structure: monolithic or service-oriented?
 
-These three inform the cloud platform selection.
+## Database Organization
 
-Choosing DB organization — decision factors:
+Decision factors:
 
 | Factor               | Favors multi-instance if…                                                   |
 | -------------------- | --------------------------------------------------------------------------- |
@@ -42,25 +45,41 @@ Choosing DB organization — decision factors:
 
 Multi-tenant preferred for very large, uniform databases where optimization effort is centralized.
 
-### Scalability and Resilience
+## Scalability
 
-Scaling-out: add more server replicas. Normal approach in cloud systems.
+### Scaling out
 
-Scaling-up: increase power of existing server. Less common.
+Add more server replicas. Normal approach in cloud systems. Software components must be stateless and replicable, runnable in parallel.
 
-Scaling-out requirement: software components must be stateless and replicable, runnable in parallel.
+### Scaling up
+
+Increase power of existing server. Less common.
+
+## Resilience
 
 Resilience via redundancy:
 
 - Software and data replicas at multiple physical locations.
 - Database mirroring: standby DB kept in sync with operational DB.
 - System monitor: detects failures and triggers automatic failover to standby.
-- Hot standby: active system replicated at same location.
-- Cool standby: standby at different location, not yet running.
 
-### Software Structure
+3 standby configurations.
 
-#### Monolithic Architecture
+### Hot standby
+
+Backup powered on and running in parallel with the primary. Immediate failover.
+
+### Cold standby
+
+Backup offline until needed. Slowest recovery, lowest resource cost.
+
+### Warm standby
+
+Backup in a low-power ready-to-operate state. Faster switching than cold standby, lower energy use than hot standby.
+
+## Software Structure
+
+### Monolithic Architecture
 
 Large components, shared database, client-server model. Traditional multi-tier structure.
 
@@ -72,7 +91,7 @@ Strengths:
 - Better performance due to in-process method calls.
 - Suited to small and medium-sized systems.
 
-#### Microservices Architecture
+### Microservices Architecture
 
 Aka. service-oriented architecture. System decomposed into fine-grained, stateless services. Each service independently replicable, distributable, and migratable. Suited to cloud deployment. Each service runs in containers.
 
@@ -82,19 +101,12 @@ Strengths:
 - Per-service scalability rather than scaling the whole application.
 - Fault isolation limits the blast radius of failures.
 - Teams can develop and release services independently.
-- Polyglot development: each service can use a different language or runtime.
 
-### Monolith vs Microservices
+#### Polyglot development
 
-| Factor      | Monolith          | Microservices         |
-| ----------- | ----------------- | --------------------- |
-| Complexity  | Low               | High                  |
-| Deployment  | Single unit       | Independent services  |
-| Scalability | Whole application | Per service           |
-| Team size   | Small teams       | Large teams           |
-| Maintenance | Easier initially  | Easier at large scale |
+Where each service can use a different language or runtime.
 
-### Cloud Platform Selection
+## Cloud Platform Selection
 
 No universally best platform. Selection based on context.
 
