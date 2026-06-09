@@ -3,7 +3,7 @@ title: Behaviour Diagram
 sidebar:
   order: 9
 dateCreated: 2026-06-07T23:49:09.227Z
-lastUpdatedOn: 2026-06-08T01:02:45.438Z
+lastUpdatedOn: 2026-06-09T07:09:38.084Z
 slug: s4/software-engineering/behaviour-diagram
 prev: true
 next: true
@@ -21,6 +21,207 @@ Types of stimuli:
 ## Use Case Diagram
 
 Shows system functionality from an actor's perspective. Captures what the system does, not how.
+
+<svg viewBox="0 0 500 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:1rem auto;font-family:inherit">
+  <defs>
+    <marker id="uc-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+{/* System boundary */}
+
+<rect
+  x="130"
+  y="30"
+  width="240"
+  height="260"
+  rx="4"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="250"
+  y="22"
+  textAnchor="middle"
+  fontSize="11"
+  fill="currentColor"
+  fontWeight="600"
+>
+  Online Store
+</text>
+
+{/* Use cases: ellipse cy values 90, 160, 240; rx=65 ry=20 */}
+
+<ellipse
+  cx="250"
+  cy="90"
+  rx="65"
+  ry="20"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="250"
+  y="90"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Browse Products
+</text>
+
+<ellipse
+  cx="250"
+  cy="160"
+  rx="65"
+  ry="20"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="250"
+  y="160"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Place Order
+</text>
+
+<ellipse
+  cx="250"
+  cy="240"
+  rx="65"
+  ry="20"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="250"
+  y="240"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Process Payment
+</text>
+
+{/* Customer actor — head center (55,140), body to 168, arms at 152, legs to 190 */}
+
+<circle
+  cx="55"
+  cy="130"
+  r="11"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="55"
+  y1="141"
+  x2="55"
+  y2="168"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="37"
+  y1="152"
+  x2="73"
+  y2="152"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="55"
+  y1="168"
+  x2="40"
+  y2="190"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="55"
+  y1="168"
+  x2="70"
+  y2="190"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text x="55" y="204" textAnchor="middle" fontSize="11" fill="currentColor">
+  Customer
+</text>
+
+{/* Payment System actor — right of boundary */}
+
+<rect
+  x="392"
+  y="222"
+  width="96"
+  height="36"
+  rx="3"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="440"
+  y="236"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="9"
+  fill="currentColor"
+  fontStyle="italic"
+>
+  &lt;&lt;actor&gt;&gt;
+</text>
+<text
+  x="440"
+  y="250"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="9"
+  fill="currentColor"
+>
+  Payment System
+</text>
+
+{/* Actor → use case associations */}
+{/* Customer to Browse Products: from right of head area to left edge of ellipse (250-65=185) */}
+
+<line x1="66" y1="120" x2="185" y2="92" stroke="currentColor" strokeWidth="1" />
+{/* Customer to Place Order */}
+<line
+  x1="66"
+  y1="148"
+  x2="185"
+  y2="158"
+  stroke="currentColor"
+  strokeWidth="1"
+/>
+{/* Payment System to Process Payment: left edge of actor rect to right edge of ellipse (250+65=315) */}
+<line
+  x1="392"
+  y1="240"
+  x2="315"
+  y2="240"
+  stroke="currentColor"
+  strokeWidth="1"
+/>
+
+{/* <<include>> dashed arrow: bottom of Place Order (cy+ry=180) to top of Process Payment (cy-ry=220) */}
+
+  <line x1="250" y1="180" x2="250" y2="220" stroke="currentColor" strokeWidth="1" strokeDasharray="5,3" markerEnd="url(#uc-arr)"/>
+  <text x="258" y="203" dominantBaseline="central" fontSize="9" fill="currentColor" fontStyle="italic">&lt;&lt;include&gt;&gt;</text>
+</svg>
 
 ### Actor
 
@@ -59,6 +260,292 @@ A use case or actor inherits from another. Drawn as a solid line with a hollow t
 ## State Diagram
 
 Shows all states an object can occupy and the transitions between them triggered by events. Models the lifecycle of a single class instance.
+
+<svg viewBox="0 0 420 370" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:420px;display:block;margin:1rem auto;font-family:inherit">
+  <defs>
+    <marker id="st-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+{/* Initial pseudostate at (210, 22) */}
+
+<circle cx="210" cy="22" r="10" fill="currentColor" />
+
+{/* Arrow: bottom of initial (y=32) to top of Idle rect (y=50) */}
+
+<line
+  x1="210"
+  y1="32"
+  x2="210"
+  y2="50"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#st-arr)"
+/>
+
+{/* Idle: rect x=150 y=50 width=120 height=36 rx=10; center=(210,68) */}
+
+<rect
+  x="150"
+  y="50"
+  width="120"
+  height="36"
+  rx="10"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="210"
+  y="68"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="12"
+  fill="currentColor"
+  fontWeight="600"
+>
+  Idle
+</text>
+
+{/* Arrow: bottom of Idle (y=86) to top of Processing (y=115) */}
+
+<line
+  x1="210"
+  y1="86"
+  x2="210"
+  y2="115"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#st-arr)"
+/>
+<text
+  x="218"
+  y="103"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  submit
+</text>
+
+{/* Processing: rect x=130 y=115 width=160 height=82 rx=10; center=(210,156) */}
+
+<rect
+  x="130"
+  y="115"
+  width="160"
+  height="82"
+  rx="10"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="210"
+  y="132"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="12"
+  fill="currentColor"
+  fontWeight="600"
+>
+  Processing
+</text>
+<line
+  x1="130"
+  y1="143"
+  x2="290"
+  y2="143"
+  stroke="currentColor"
+  strokeWidth="1"
+/>
+<text
+  x="140"
+  y="156"
+  dominantBaseline="central"
+  fontSize="9"
+  fill="currentColor"
+>
+  entry / show spinner
+</text>
+<text
+  x="140"
+  y="170"
+  dominantBaseline="central"
+  fontSize="9"
+  fill="currentColor"
+>
+  do / call API
+</text>
+<text
+  x="140"
+  y="184"
+  dominantBaseline="central"
+  fontSize="9"
+  fill="currentColor"
+>
+  exit / hide spinner
+</text>
+
+{/* success: right side of Processing (x=290,y=156) → right bend → top of Done (x=310,y=248) → Done left (x=290,y=248) */}
+{/* Done: rect x=150 y=248 width=120 height=36 rx=10; center=(210,266) */}
+
+<line
+  x1="290"
+  y1="156"
+  x2="330"
+  y2="156"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="330"
+  y1="156"
+  x2="330"
+  y2="266"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="330"
+  y1="266"
+  x2="270"
+  y2="266"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#st-arr)"
+/>
+<text
+  x="338"
+  y="210"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  success
+</text>
+
+{/* error: left side of Processing (x=130,y=156) → left bend → Error center y=266 */}
+{/* Error: rect x=10 y=248 width=110 height=36 rx=10; center=(65,266) */}
+
+<line
+  x1="130"
+  y1="156"
+  x2="90"
+  y2="156"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="90"
+  y1="156"
+  x2="90"
+  y2="266"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="90"
+  y1="266"
+  x2="120"
+  y2="266"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#st-arr)"
+/>
+<text
+  x="40"
+  y="210"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  error
+</text>
+
+<rect
+  x="10"
+  y="248"
+  width="110"
+  height="36"
+  rx="10"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="65"
+  y="266"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="12"
+  fill="currentColor"
+  fontWeight="600"
+>
+  Error
+</text>
+
+<rect
+  x="150"
+  y="248"
+  width="120"
+  height="36"
+  rx="10"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="210"
+  y="266"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="12"
+  fill="currentColor"
+  fontWeight="600"
+>
+  Done
+</text>
+
+{/* retry: top of Error (y=248) → up → right to top of Idle (y=50, right edge x=270) */}
+
+<line
+  x1="65"
+  y1="248"
+  x2="65"
+  y2="68"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  strokeDasharray="4,3"
+/>
+<line
+  x1="65"
+  y1="68"
+  x2="150"
+  y2="68"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  strokeDasharray="4,3"
+  markerEnd="url(#st-arr)"
+/>
+<text
+  x="22"
+  y="158"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  retry
+</text>
+
+{/* Final state at (210,330): outer ring r=11, inner dot r=6 */}
+
+  <line x1="210" y1="284" x2="210" y2="312" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#st-arr)"/>
+  <text x="224" y="296" dominantBaseline="central" fontSize="10" fill="currentColor">dismiss</text>
+  <circle cx="210" cy="330" r="11" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+  <circle cx="210" cy="330" r="6" fill="currentColor"/>
+</svg>
 
 ### State
 
@@ -107,6 +594,373 @@ Deep history (`H*`) applies this behavior recursively through all nesting levels
 ## Activity Diagram
 
 Models step-by-step workflows, decision logic, and concurrent execution. Used for business processes, algorithms, and use case internals. Equivalent to an enhanced flowchart.
+
+<svg viewBox="0 0 460 530" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:460px;display:block;margin:1rem auto;font-family:inherit">
+  <defs>
+    <marker id="ac-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+{/* Swimlane boxes */}
+
+<rect
+  x="5"
+  y="5"
+  width="220"
+  height="520"
+  rx="4"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1"
+  opacity="0.35"
+/>
+<rect
+  x="235"
+  y="5"
+  width="220"
+  height="520"
+  rx="4"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1"
+  opacity="0.35"
+/>
+<line
+  x1="5"
+  y1="28"
+  x2="455"
+  y2="28"
+  stroke="currentColor"
+  strokeWidth="1"
+  opacity="0.35"
+/>
+<text
+  x="115"
+  y="19"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+  fontWeight="600"
+  opacity="0.6"
+>
+  Customer
+</text>
+<text
+  x="345"
+  y="19"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+  fontWeight="600"
+  opacity="0.6"
+>
+  System
+</text>
+
+{/* Initial node at (115,52) */}
+
+<circle cx="115" cy="52" r="10" fill="currentColor" />
+<line
+  x1="115"
+  y1="62"
+  x2="115"
+  y2="82"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Browse catalogue: rect x=50 y=85 width=130 height=34 rx=17; center=(115,102) */}
+
+<rect
+  x="50"
+  y="85"
+  width="130"
+  height="34"
+  rx="17"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="115"
+  y="102"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Browse catalogue
+</text>
+<line
+  x1="115"
+  y1="119"
+  x2="115"
+  y2="139"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Decision diamond: top=(115,142) right=(145,167) bottom=(115,192) left=(85,167) */}
+
+<polygon
+  points="115,142 148,167 115,192 82,167"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="115"
+  y="167"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  found?
+</text>
+
+{/* [no] loop back: left vertex (82,167) → left bend → back to Browse */}
+
+<line
+  x1="82"
+  y1="167"
+  x2="22"
+  y2="167"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="22"
+  y1="167"
+  x2="22"
+  y2="102"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="22"
+  y1="102"
+  x2="50"
+  y2="102"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+<text
+  x="10"
+  y="138"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  [no]
+</text>
+
+{/* [yes] down: bottom vertex (115,192) → Add to cart */}
+
+<line
+  x1="115"
+  y1="192"
+  x2="115"
+  y2="212"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+<text
+  x="122"
+  y="204"
+  dominantBaseline="central"
+  fontSize="10"
+  fill="currentColor"
+>
+  [yes]
+</text>
+
+{/* Add to cart: rect x=50 y=215 width=130 height=34 rx=17; center=(115,232) */}
+
+<rect
+  x="50"
+  y="215"
+  width="130"
+  height="34"
+  rx="17"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="115"
+  y="232"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Add to cart
+</text>
+<line
+  x1="115"
+  y1="249"
+  x2="115"
+  y2="269"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Fork bar: y=272, x=50 to x=400 */}
+
+<rect x="50" y="272" width="350" height="7" rx="2" fill="currentColor" />
+{/* Fork left arrow → Enter payment */}
+<line
+  x1="115"
+  y1="279"
+  x2="115"
+  y2="299"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+{/* Fork right arrow → Validate stock */}
+<line
+  x1="345"
+  y1="279"
+  x2="345"
+  y2="299"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Enter payment: rect x=50 y=302 width=130 height=34 rx=17; center=(115,319) */}
+
+<rect
+  x="50"
+  y="302"
+  width="130"
+  height="34"
+  rx="17"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="115"
+  y="319"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Enter payment
+</text>
+<line
+  x1="115"
+  y1="336"
+  x2="115"
+  y2="363"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Validate stock: rect x=280 y=302 width=130 height=34 rx=17; center=(345,319) */}
+
+<rect
+  x="280"
+  y="302"
+  width="130"
+  height="34"
+  rx="17"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="345"
+  y="319"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Validate stock
+</text>
+<line
+  x1="345"
+  y1="336"
+  x2="345"
+  y2="363"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Join bar: y=366, x=50 to x=400 */}
+
+<rect x="50" y="366" width="350" height="7" rx="2" fill="currentColor" />
+{/* Single output from join center */}
+<line
+  x1="230"
+  y1="373"
+  x2="345"
+  y2="373"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<line
+  x1="345"
+  y1="373"
+  x2="345"
+  y2="393"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Confirm order: rect x=280 y=396 width=130 height=34 rx=17; center=(345,413) */}
+
+<rect
+  x="280"
+  y="396"
+  width="130"
+  height="34"
+  rx="17"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.5"
+/>
+<text
+  x="345"
+  y="413"
+  textAnchor="middle"
+  dominantBaseline="central"
+  fontSize="11"
+  fill="currentColor"
+>
+  Confirm order
+</text>
+<line
+  x1="345"
+  y1="430"
+  x2="345"
+  y2="458"
+  stroke="currentColor"
+  strokeWidth="1.5"
+  markerEnd="url(#ac-arr)"
+/>
+
+{/* Activity final: outer ring r=12, inner dot r=7 */}
+
+  <circle cx="345" cy="475" r="13" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+  <circle cx="345" cy="475" r="7" fill="currentColor"/>
+</svg>
 
 ### Initial Node
 
