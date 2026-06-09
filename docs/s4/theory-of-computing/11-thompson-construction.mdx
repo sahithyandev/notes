@@ -1,0 +1,56 @@
+---
+title: Thompson Construction
+sidebar:
+  order: 11
+slug: s4/theory-of-computing/thompson-construction
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.633Z
+lastUpdatedOn: 2026-06-09T08:25:32.544Z
+---
+
+An algorithm for converting a regular expression into an NFA-$\Lambda$. Aka. McNaughton-Yamada-Thompson algorithm.
+
+### Steps
+
+- Break the regular expression into subexpressions
+- Construct basic automata
+- Combine them using inductive rules
+
+## Basis Automata
+
+For $\set{a}, \set{ \Lambda }$, connect from the starting state to the accepting state for the input.
+
+![Thompson's Construction Basic](./images/thompson-construction-basic.jpg)
+
+For $\emptyset$, no diagrams.
+
+## Rules
+
+Suppose $N(s)$ and $N(t)$ are NFA-$\Lambda$ for $s$ and $t$ respectively.
+
+### Union
+
+For strings either $s$ or $t$.
+
+![Thompson's Construction Union](./images/thompson-construction-union.jpg)
+
+### Concatenation
+
+For strings $st$.
+
+![Thompson's Construction Concatenation](./images/thompson-construction-concat.jpg)
+
+### Kleene Star
+
+For strings $s*$.
+
+![Thompson's Construction Closure](./images/thompson-construction-closure.jpg)
+
+## Properties of Thompson Automata
+
+- Exactly one start state
+- Exactly one accept state
+- No incoming edges to start state
+- No outgoing edges from accept state
+- Number of states \le 2 × (operators + operands)

@@ -1,0 +1,65 @@
+---
+title: Moore vs. Mealy Machines
+sidebar:
+  order: 14
+slug: s4/theory-of-computing/moore-vs-mealy
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.633Z
+lastUpdatedOn: 2026-06-09T08:25:32.546Z
+---
+
+## Output Length
+
+Number of output symbols produced when the machine processes an input string.
+
+For an input string of length $n$:
+
+| Machine | Output Length | Description                                         |
+| ------- | ------------- | --------------------------------------------------- |
+| Moore   | $n+1$         | Initial state + outputs for each input symbol       |
+| Mealy   | $n$           | Outputs only for transitions based on input symbols |
+
+## Output for Empty String
+
+| Machine | Output         | Description                                    |
+| ------- | -------------- | ---------------------------------------------- |
+| Moore   | $\lambda(q_0)$ | Output associated with the initial state $q_0$ |
+| Mealy   | $\Lambda$      | No output, since no transitions                |
+
+## Moore–Mealy Equivalence
+
+Moore and Mealy machines are computationally equivalent models. Moore and Mealy machines are equivalent **iff** they produce the same output (ignoring the extra initial output) for the same input strings.
+
+For any Moore machine, an equivalent Mealy machine can be constructed. And vice versa.
+
+## Conversion
+
+### Moore to Mealy
+
+Move the state output of the destination state onto the transition leading to that state.
+
+Each transition $\delta(q_i, a) = q_j$ in the Moore machine, translates to:
+
+$$
+q_i \xrightarrow{a / \lambda(q_j)} q_j
+$$
+
+States remain the same. State outputs are moved to transitions.
+
+### Mealy to Moore
+
+From a state, transitions with different outputs, the state must be split into multiple states.
+
+For each transitions $q_i \xrightarrow{a / x} q_j$ in Mealy machine, translates into a new Moore state $(q_j, x)$ where:
+
+- state = destination state
+- output = transition output
+
+Steps:
+
+1. Create states based on (destination state, output).
+2. Assign each new state the corresponding output value.
+3. Redirect transitions accordingly.
+
+States may increase. Transition outputs are moved to states.

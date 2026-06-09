@@ -1,0 +1,239 @@
+---
+title: Turing Machine
+sidebar:
+  order: 29
+slug: s4/theory-of-computing/turing-machine
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.635Z
+lastUpdatedOn: 2026-06-09T08:25:32.558Z
+---
+
+Most powerful abstract model of computation. Can simulate any real computer (ignoring efficiency). Modelled by Alan Turing.
+
+A 5-tuple $T = (Q, \Sigma, \Gamma, q_0, \delta)$.
+
+Where:
+
+- $Q$ = finite set of states
+- $\Sigma \supset \set{ h_a, h_r }$ = input alphabet
+- $\Gamma \supset \set{ \Lambda }$ = tape alphabet
+- $q_0$ = start state
+- $δ: Q \times \Sigma \rightarrow Q \times \Gamma \times \set{L,R,S}$ = transition function
+
+## Components
+
+### Tape
+
+Consists of infinite cells. One dimensional. Works as memory.
+
+### Cell
+
+A component inside the tape. Can be read from or written to.
+
+### Symbol
+
+Element that can be written on a cell. $\Lambda$ means empty.
+
+### Tape Head
+
+Points to a cell. Reads from or writes to a cell. Can move left or right or stay at the current cell.
+
+### CPU
+
+Has internal state (from an finite set of states). Decides whether to move the tape head, in which direction to move, whether to write on the cell, what to write on the cell. Decisions based on current symbol and current state.
+
+## State
+
+State of the machine (or the CPU). Includes 2 halting states:
+
+- $h_a$: Accept
+- $h_r$ → Reject
+
+## Transition Function
+
+$$
+\delta(q, X) = (r, Y, D)
+$$
+
+It means, from state $q$, reading $X$:
+
+- Write $Y$
+- Move to state $r$
+- Move head $D \in {L, R, S}$
+
+## Configuration
+
+Represents the current status. $(q, x\underline{a}y) \in Q \times \Gamma^*$. Current symbol under tape head is underlined.
+
+For input string $x$, the machine starts at $(q_0, \Delta x)$.
+
+### Configuration Changes
+
+Turing machine changes from 1 configuration to another in each step. Can either move in:
+
+- Single step  
+  $(q, x\underline{a}y) \vdash_T (r, z\underline{b}w)$
+- Multiple steps  
+  $(q, x\underline{a}y) \vdash_T^* (r, z\underline{b}w)$
+
+## Halting
+
+Turing machine halts when it reaches either of the halting states. May run forever without halting.
+
+## Acceptance
+
+A string $x$ is accepted **iff** the machine reaches accepting state i.e. $(q_0, \Delta x) \vdash_T^* (h_a, yaz)$.
+
+## Examples
+
+### Regular Language
+
+$$
+L = (a|b)^*aba(a|b)^*
+$$
+
+TM behaves like FA. Moves right only. Does not modify the tape.
+
+### Ends with "aba"
+
+$$
+L = {x \mid x \text{ ends with } aba}
+$$
+
+Must read entire input before accepting.
+
+### Palindromes
+
+$$
+L = {x \mid x = x^R}
+$$
+
+Match first and last symbols. Replace them and repeat. Deterministic.
+
+## Functions
+
+TM can compute functions of the form $f: \Sigma^* \rightarrow \Gamma^*$.
+
+TM computes $f(x)$ **iff** $(q_0, \Delta x) \vdash_T^* (h_a, \Delta f(x))$.
+
+### Partial Functions
+
+When the function is undefined for certain inputs.
+
+TM will produce output only for valid inputs. Loop indefinitely otherwise.
+
+### Characteristic Function
+
+For a language $L$:
+
+$$
+f(x) =
+\begin{cases}
+1 & \text{if } x \in L \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+## Combination
+
+Suppose $T_1$ and $T_2$ are 2 Turing machines with disjoint non-halting states and transition functions.
+
+$T_1T_2$ denotes a new Turing machine that is a combination of the 2. It starts with the initial state of $T_1$ and executes $T_1$ first. For any move that halts in an accepting state of $T_1$, the machine moves to the initial state of $T_2$ and execute $T_2$. Can also be denoted as $T_1 \rightarrow T_2$.
+
+If either $T_1$ or $T_2$ rejects, $T_1T_2$ also rejects.
+
+## Variations
+
+Many minor variations can be defined such as:
+
+- A Turing machine that must move either left or right
+- A Turing machine that can either write a symbol or move but not both
+- A Turing machine with multiple tapes and multiple tape heads
+  However the ultimate computing power is unchanged.
+
+### n-tape Turing Machine
+
+A Turing machine with multiple tapes. Each tape has its own tape head.
+
+An $n$-tape Turing machine is a 6-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, F)$ where:
+
+- $Q$: finite set of states
+- $\Sigma$: input alphabet
+- $\Gamma$: tape alphabet ($\Sigma \subseteq \Gamma$)
+- $q_0$: initial state
+- $F$: set of accepting states
+- $\delta Q \times \Gamma^n \rightarrow Q \times \Gamma^n \times {L, R, S}^n$: transition function
+
+The machine reads n symbols (one from each tape). Based on the current state and these symbols:
+
+- It moves to a new state
+- Writes **n symbols** (one on each tape)
+- Moves each tape head independently (Left, Right, or Stay)
+
+## Non-deterministic TM
+
+Aka. NTM. Same as the deterministic TM except the transition function's output is a set of configurations.
+
+For any non-deterministic TM, there exists a deterministic TM that accept the same language.
+
+## Universal TM
+
+Denoted by $T_u$ A Turing machine that can run any arbitrary program with an arbitrary data set (input to the program).
+
+- The program is expressed as a string that specifies another special purpose TM, $T_1$
+- Data set is a string $w$ (input to $T_1$)
+
+$T_u$ simulates the processing of $w$ by $T_1$.
+
+## Church-Turing Thesis
+
+Formerly known as Church's thesis. Says that a TM is a general model of computation, i.e. any real-world computation can be translated into an equivalent computation involving a Turing machine.
+
+First formulated by Alonzo Church. Considered as a conjecture as well.
+
+It's generally accepted because:
+
+- no one has proposed a counterexample for 90+ years
+- other theoretical computation models have been proven to be equivalent to a Turing machine
+- enhanced Turing machines do not enhance the computing power
+- nature of Turing machine indicate all steps crucial to human computation
+
+## Characteristic Function
+
+For any language $L$ in $\Sigma^*$, its characteristic function $\chi_L: \Sigma^* \rightarrow \set{0,1}$ is defined as:
+
+$$
+\chi_L(x) = \begin{cases} 1 \quad \text{ if } x \in L &\\ 0 \quad \text{otherwise} \end{cases}
+$$
+
+Computing $\chi_L$ is the same as accepting a language.
+
+A Turing machine may distinguish between strings that are in $L$ and not in $L$ by either:
+
+- accepting or rejecting the string OR
+- accepting and ending up in either $(h_a,\Delta 0)$ or $(h_a, \Delta 1)$ configurations
+
+## Accept vs Decide
+
+A Turing machine $T$ accepts $L$ **iff** $T$ accepts all strings of $L$. For all strings of $L$, the Turing machine $T$ halts in an accepting state. But for other strings, it may:
+
+- Halt at a rejecting state OR
+- Loop forever
+
+A Turing machine $T$ decides $L$ **iff**:
+
+- $T$ halts in state $h_a$ and
+- calculates its characteristic function, for every string $x \in \Sigma^*$.
+
+$$
+T\text{ decides }L \implies T\text{ accepts }L
+$$
+
+## Limits
+
+Not all problems are solvable. Some problems are undecidable — no Turing machine can solve them.
+
+## Turing Completeness
+
+A system is said to Turing complete if it can simulate any Turing machines.

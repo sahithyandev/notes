@@ -1,0 +1,25 @@
+---
+title: Unrestricted Grammar
+sidebar:
+  order: 33
+slug: s4/theory-of-computing/unrestricted-grammar
+prev: true
+next: true
+dateCreated: 2026-04-30T05:32:24.846Z
+lastUpdatedOn: 2026-06-09T08:25:32.559Z
+---
+
+Aka. phrase-structure grammar. A 4-tuple $G = (V, \Sigma, S, P)$ where:
+
+- $V$ — non-terminals
+- $\Sigma$ — terminals  
+  $V$ and $\Sigma$ are disjoint.
+- $S$ — start symbol
+- $P$ — productions  
+  $\alpha \to \beta$ where $\alpha, \beta \in (V \cup \Sigma)^*$ and $\alpha$ contains $\geq 1$ non-terminal
+
+A relaxation over CFGs where, on LHS of productions, more than 1 non-terminals may occur.
+
+For any recursively-enumerable language $L$, there exists an unrestricted grammar $G$ generating $L$.
+
+For any unrestricted grammar $G$, there exists a Turing machine $T$ that accepts the same language.

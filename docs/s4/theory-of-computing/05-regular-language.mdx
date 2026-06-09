@@ -1,0 +1,75 @@
+---
+title: Regular Language
+sidebar:
+  order: 5
+slug: s4/theory-of-computing/regular-language
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.632Z
+lastUpdatedOn: 2026-06-09T08:25:32.542Z
+---
+
+Simplest class of languages in the [Chomsky hierarchy](/s4/theory-of-computing/chomsky-hierarchy).
+
+Built from [basic languages](/s4/theory-of-computing/language#basic-language) using simple operations:
+
+- Union
+- Concatenation
+- Kleene star
+
+Using only concatenation gives single-string languages. Union and `*` allow infinite languages.
+
+## Regular Expressions
+
+A regular expression is a symbolic representation of a regular language. Every regular language has a regular expression.
+
+A regular expression describes the _typical form_ of strings in the language.
+
+Example:
+$1*10$ means any number of $1$s followed by $10$.
+
+### Notation Rules
+
+- `{ }` are removed or replaced by `( )`
+- Union $\cup$ is written as $|$
+- `ab` means they are concatenated.
+
+### Recursive Definition of Regular Expressions
+
+Let $\Sigma$ be an alphabet.
+
+Regular expressions are defined as follows:
+
+1. $\varnothing$ is a regular expression and denotes $\varnothing$
+2. $\lambda$ is a regular expression and denotes $\set{\lambda}$
+3. For each $a \in \Sigma$, $a$ is a regular expression denoting $\set{a}$
+4. If $p$ and $q$ are regular expressions:
+   - $(p | q)$ denotes union
+   - $(pq)$ denotes concatenation
+   - $(p*)$ denotes Kleene star
+
+Only expressions formed using these rules are valid.
+
+## Operator Precedence
+
+To reduce parentheses:
+
+- $*$ has highest precedence
+- Concatenation has next highest
+- $|$ has lowest precedence
+
+Examples:
+
+- $a|((b*)c)$ → $a|b*c$
+- $((0(1*))|0)$ → $01*|0$
+
+## Equivalence of Regular Expressions
+
+2 regular expressions are equal **iff** they denote the same language.
+
+Examples:
+
+- $1*(1|Λ) = 1*$
+- $1*1* = 1*$
+- $0* | 1* ≠ (0|1)*$
+- $(0*1*)* = (0|1)*$

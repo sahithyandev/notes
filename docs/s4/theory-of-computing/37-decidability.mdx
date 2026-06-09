@@ -1,0 +1,141 @@
+---
+title: Decidability
+sidebar:
+  order: 37
+dateCreated: 2026-05-15T02:54:40.843Z
+lastUpdatedOn: 2026-06-09T08:25:32.566Z
+slug: s4/theory-of-computing/decidability
+prev: true
+next: false
+prereqs:
+  - s1/mathematics/real-analysis/countability
+  - s1/mathematics/real-analysis/set-theory
+---
+
+A property of a problem that denotes whether the problem is solvable using an algorithm. Hilbert's 10th problem, the formal notion of algorithm via Church-Turing Thesis, countable vs. uncountable sets via Cantor's diagonalization, and the resulting language hierarchy.
+
+## Key Concepts
+
+### Decidable Problem
+
+**Decidable problem** — a problem answerable yes/no after a finite number of algorithmic steps.
+
+**Undecidable problem** — no algorithm exists that halts with correct yes/no for all inputs.
+
+### Hilbert's 10th Problem
+
+Posed 1900 by David Hilbert. One of 23 challenge problems.
+
+- Task: devise an algorithm to test whether a polynomial has an **integral root** — an integer satisfying the polynomial.
+- Hilbert assumed an algorithm exists.
+- Shown algorithmically unsolvable in 1970.
+
+### Notion of Algorithm (Church-Turing Thesis)
+
+Formalized independently in 1936:
+
+- **Alan Turing** — defined algorithms via Turing machines.
+- **Alonzo Church** — defined algorithms via λ-calculus.
+- Both definitions shown equivalent. This equivalence is the **Church-Turing Thesis**.
+
+### Solving a Polynomial — Example
+
+Let $D = {p \mid p \text{ is a polynomial with an integral root}}$.
+
+$D$ is not decidable. It is Turing-acceptable (recognizable).
+
+Simpler case: $D_1 = {p \mid p \text{ is a polynomial over } x \text{ with an integral root}}$.
+
+TM $T_1$ that accepts $D_1$:
+
+> $T_1$ = "On input polynomial $p$ over variable $x$:
+>
+> 1. Evaluate $p$ with $x = 0, 1, -1, 2, -2, 3, -3, \ldots$
+> 2. If $p$ evaluates to $0$ at any point, **accept**."
+
+- If $p$ has an integral root: $T_1$ accepts.
+- If not: $T_1$ runs forever.
+
+$T_1$ is an **acceptor**, not a **decider**.
+
+<Note>
+  {" "}
+  $T_1$ can be converted to a decider for $D_1$: computable bounds exist for
+  single-variable polynomials. No such bounds exist for multivariable case — $D$
+  remains undecidable.{" "}
+</Note>
+
+### Connected Graphs — Example (Decidable)
+
+$A = {\langle G \rangle \mid G \text{ is a connected undirected graph}}$
+
+$A$ is decidable. TM $T$ that decides $A$:
+
+> $T$ = "On input $\langle G \rangle$:
+>
+> 1. Select the first node; mark it.
+> 2. Repeat: for each node, mark it if adjacent to an already-marked node.
+> 3. If all nodes marked, **accept**; else **reject**."
+
+$T$ always halts — it is a decider.
+
+### Countable vs. Uncountable Sets
+
+**Countable set** (Cantor) — a set that is either finite, or has the same cardinality as $\mathbb{N} = {1,2,3,\ldots}$. Equivalently: $\exists$ injective $f: S \to \mathbb{N}$.
+
+Examples:
+
+- Even/odd integers.
+- Positive rationals $\mathbb{Q}^+$.
+
+**Uncountable set** — no injective map to $\mathbb{N}$ exists.
+
+Example: $\mathbb{R}$ (real numbers).
+
+### Function Types (Set Theory)
+
+- **Injective** (one-to-one) — no two elements in $X$ map to the same element in $Y$.
+- **Surjective** (onto) — every $y \in Y$ has a preimage in $X$.
+- **Bijective** (one-to-one correspondence) — both injective and surjective. Exact pairing of elements.
+
+### Diagonalization Method
+
+Introduced by **Georg Cantor**. Compares sizes of infinite sets without counting.
+
+Core idea: construct a pairing (correspondence) between two sets. If a bijection exists, the sets have the same cardinality.
+
+Example 1: $|\mathbb{N}| = |E|$ where $E = {2,4,6,\ldots}$.
+
+- Correspondence: $f(n) = 2n$. Bijection exists.
+
+Example 2: $|\mathbb{Q}^+| = |\mathbb{N}|$.
+
+- List rationals in a matrix (row $m$, col $n$ → $m/n$). Traverse diagonally. Establishes a bijection.
+
+### Uncountability of $\mathbb{R}$
+
+$\mathbb{R}$ is uncountable — proved by Cantor using the diagonal argument.
+
+- Assume a listing of all reals. Construct a number differing from the $n$-th listed real at the $n$-th decimal digit. This number is not in the list — contradiction.
+
+### Implications for Languages and TMs
+
+- Turing machines are countable — encodable as strings over a finite alphabet; $\Sigma^*$ is countable.
+- The set of all languages is uncountable — subsets of $\Sigma^*$; $|\mathcal{P}(\Sigma^*)| > |\Sigma^*|$.
+- Therefore: there exist languages no TM can accept.
+
+### Classes of Languages
+
+Nested hierarchy (innermost ⊂ outermost):
+
+```
+Regular
+  ⊂ Context-free
+      ⊂ Decidable  (aka. Recursive)
+          ⊂ Turing-acceptable  (aka. Recursively Enumerable, RE)
+              ⊂ Universe of all languages
+```
+
+- **Decidable** (recursive) — a TM decider exists; always halts with accept/reject.
+- **Turing-acceptable** (RE) — a TM acceptor exists; may loop on non-members.
+- Languages outside RE — no TM accepts them.

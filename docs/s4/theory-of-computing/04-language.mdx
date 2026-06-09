@@ -1,0 +1,54 @@
+---
+title: Language
+sidebar:
+  order: 4
+dateCreated: 2026-06-09T07:42:31.048Z
+lastUpdatedOn: 2026-06-09T08:25:32.542Z
+slug: s4/theory-of-computing/language
+prev: true
+next: true
+---
+
+A set of strings.
+
+Any language over $\Sigma$ is a subset of $\Sigma^*$.
+
+## Operations
+
+Set operations can be applied to languages as they are basically sets.
+
+### Language Quotient
+
+Let $L \subseteq \Sigma^*$ and $x, y \in \Sigma^*$. Set of all strings $z$ such that $xz$ is in $L$.
+
+$$
+L/x = \set{ z \in \Sigma^* \mid xz \in L }
+$$
+
+### Repetition
+
+$L^k$ is concatenation of $L$ with itself $k$ times. $L^0 = \{\Lambda\}$.
+
+## Kleene Star and Plus
+
+### Kleene Star
+
+$L^*$ = zero or more concatenations of $L$.
+
+### Kleene Plus
+
+$L^+$ = one or more concatenations of $L$. Can also be written as $L^*L$ or $LL^*$.
+
+## Basic Language
+
+For a given alphabet $\Sigma$, its basic languages are:
+
+- $\set{a}$ for each symbol $a \in Σ$
+- $\varnothing$ (empty language)
+- $\set{\lambda}$ (language containing the null string)
+
+## Recognizing a Language
+
+Language recognition means deciding whether a given string belongs to a language.
+
+Recognition is done by reading input left to right in one pass.
