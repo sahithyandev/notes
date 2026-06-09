@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/finite-automaton
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.632Z
-lastUpdatedOn: 2026-06-09T08:25:32.542Z
+lastUpdatedOn: 2026-06-09T19:59:41.775Z
 ---
 
 Aka. FA. A machine with:
@@ -97,14 +97,15 @@ Language of palindromes over any alphabet $\Sigma$ is not regular because a FA h
 
 ## Set Operations on FA
 
-Suppose $M_1 = (Q_1, \Sigma, q_1, A, \delta_1)$ and $M_2=(Q_2, \Sigma, q_2, A, \delta_2)$ are FAs accepting languages $L_1$ and $L_2$ respectively.
+Suppose $M_1 = (Q_1, \Sigma, q_1, A_1, \delta_1)$ and $M_2=(Q_2, \Sigma, q_2, A_2, \delta_2)$ are FAs accepting languages $L_1$ and $L_2$ respectively.
 
-Let $M=(Q_1 \times Q_2, \Sigma, (q_1, q_2), A_1, \delta)$. Here $\delta((p,q), a) = (\delta_1(p, a), \delta_2(q, a))$. Based on how $A_1$ is defined, $M$ can accept different languages: $L_1 \cup L_2$ or $L_1 \cap L_2$ or $L_1 - L_2$.
+Let:
 
-## Distinguishing Strings
+$$
+\begin{aligned}
+M &=(Q_1 \times Q_2, \Sigma, (q_1, q_2), A, \delta) \\
+\delta((p,q), a) &= (\delta_1(p, a), \delta_2(q, a))
+\end{aligned}
+$$
 
-Two strings $x$ and $y$ are distinguishable with respect to a language $L$ if their [language quotients](/s4/theory-of-computing/introduction/#language-quotient) (with respect to $L$) are different.
-
-2 strings $x$ and $y$ are distinguishable with respect to $L$ **iff** $L/x \neq L/y$. Any string in one of these sets but not the other is said to distinguish $x$ and $y$ with respect to $L$.
-
-A string $z$ is an extension of $x$ with respect to $L$ if exactly one of $xz$ and $yz$ belongs to $L$.
+Based on how $A \subseteq A_1 \times A_2$ is defined, $M$ can accept different languages: $L_1 \cup L_2$ or $L_1 \cap L_2$ or $L_1 - L_2$.

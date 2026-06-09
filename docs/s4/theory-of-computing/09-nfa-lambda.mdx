@@ -6,28 +6,26 @@ slug: s4/theory-of-computing/nfa-lambda
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.633Z
-lastUpdatedOn: 2026-06-09T08:25:32.543Z
+lastUpdatedOn: 2026-06-09T19:59:41.776Z
 ---
 
-A variant of [NFA](/s4/theory-of-computing/non-deterministic-finite-automaton) where $\Lambda$-transitions are allowed. Denoted as NFA-$\Lambda$.
+A variant of [NFA](/s4/theory-of-computing/non-deterministic-finite-automaton) where [$\Lambda$-transitions](#lambda-transition) are allowed. Denoted as NFA-$\Lambda$.
 
-More flexible than an NFA. Does not increase computational power compared to DFA or NFA. Useful for simplifying automata construction, especially when building from regular expressions.
-
-### Lambda Transition
-
-A type of transition where the automaton can move from one state to another without consuming any input symbol. Referred to as "$\Lambda$-transition". Labelled as $\Lambda$ on the transition diagram.
-
-## Definition
-
-An NFA-$\Lambda$ is defined as a 5-tuple: $M = (Q, \Sigma, q_0, A, \delta)$ where:
+A 5-tuple: $M = (Q, \Sigma, q_0, A, \delta)$ where:
 
 - $Q$ - finite set of states
 - $\Sigma$ - input alphabet
 - $q_0$ - start state
 - $A$ - set of accepting states
-- $\delta: Q \times (Σ \cup {\Lambda}) \rightarrow 2^Q $ - transition function
+- $\delta: Q \times (\Sigma \cup {\Lambda}) \rightarrow 2^Q$ - transition function
 
 The only difference from a standard NFA is that the transition function $\delta$ can also take $\Lambda$ as input.
+
+More flexible than an NFA. Does not increase computational power compared to DFA or NFA. Useful for simplifying automata construction, especially when building from regular expressions.
+
+### Lambda Transition
+
+A type of transition where the automaton can move from one state to another without consuming any input symbol. Denoted as _$\Lambda$-transition_. Labelled as $\Lambda$ on the transition diagram.
 
 ## Lambda-Closure
 
@@ -40,7 +38,11 @@ Suppose $S$ is a set of states ($S \subset Q$). $\Lambda(S)$ satisfies:
 - $p \in \Lambda(S)$ **iff** $q \in S$ and $\delta(q, \Lambda) = p$
 - No other states are included
 
-## Extended Transition Function
+## Transition Function
+
+$\delta: Q \times (\Sigma \cup {\Lambda}) \rightarrow 2^Q$.
+
+### Extended Transition Function
 
 $$
 \delta^* : Q \times \Sigma^* \rightarrow 2^Q
@@ -51,8 +53,14 @@ Properties:
 - $\delta^*(q, \Lambda) = Λ(q)$
 - $\delta^*(q, ya) = Λ \left( \bigcup_{r \in δ^*(q,y)} δ(r,a) \right)$
 
-### Acceptance
+## Acceptance
 
-A string is accepted **iff** there exists a sequence of transitions (including $\Lambda$-transitions) from the start state to an accepting state that corresponds to the input string.
+A string is accepted **iff** there exists a sequence of transitions (including $\Lambda$-transitions) from the start state to an accepting state that corresponds to the input string. That is:
 
-A string $x$ is accepted **iff** $ \delta^{\*}(q_0, x) \cap A \neq \emptyset$.
+$$
+\delta^{*}(q_0, x) \cap A \neq \emptyset
+$$
+
+## Complement
+
+Convert to NFA and then to DFA, then [complement](/s4/theory-of-computing/deterministic-finite-automata#complement).

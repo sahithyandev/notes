@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/moore-vs-mealy
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.633Z
-lastUpdatedOn: 2026-06-09T08:25:32.546Z
+lastUpdatedOn: 2026-06-09T19:59:41.777Z
 ---
 
 ## Output Length
@@ -62,4 +62,26 @@ Steps:
 2. Assign each new state the corresponding output value.
 3. Redirect transitions accordingly.
 
-States may increase. Transition outputs are moved to states.
+Transition outputs are moved to states.
+
+For a Mealy machine with $p$ states and $q$ distinct outputs:
+
+$$
+p \leq |Q_\text{Moore}| \leq p \cdot q
+$$
+
+- Lower bound $p$  
+  Achieved when every state has exactly 1 distinct output on all its incoming transitions. No splitting needed.
+- Upper bound $p \cdot q$  
+  Achieved when every state has all $q$ distinct outputs on its incoming transitions. Every state splits into $q$ copies.
+
+$$
+|Q_\text{Mealy,min}| \le
+|Q_\text{Moore,min}|
+$$
+
+### Minimality
+
+Not preserved across conversion.
+
+Can be proven using the above inequality.

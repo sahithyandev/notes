@@ -7,7 +7,7 @@ slug: s4/theory-of-computing/deterministic-finite-automaton
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.632Z
-lastUpdatedOn: 2026-06-09T08:25:32.542Z
+lastUpdatedOn: 2026-06-09T19:59:41.776Z
 ---
 
 Aka. DFA. Has a single starting state.
@@ -25,14 +25,22 @@ Rules:
 - $\delta^*(q, \lambda) = q$
 - $\delta^*(q, ya) = \delta (\delta^*(q, y), a)$
 
-## Acceptance by a DFA
+## Acceptance
 
 Let $M = (Q, \Sigma, q_0, A, \delta)$.
 
 A string $x \in \Sigma^*$ is accepted **iff** $\delta^*(q_0, x) ∈ A$.
 
+## Incomplete
+
+A DFA is _incomplete_ **iff** $\delta(q,a)$ is undefined for some $q$ and $a$. Inputs with undefined transitions are implicitly rejected.
+
 ## Complement
 
-Complement of a complete DFA $M = (Q, \Sigma, q_0, A, \delta)$ is $\overline{M} = (Q, \Sigma, q_0, Q \setminus A, \delta)$.
+Complement of a complete DFA $M = (Q, \Sigma, q_0, A, \delta)$ is:
 
-For incomplete DFAs, if a dead/sink state $d$ and define $\delta(q, a) = d$ for all undefined transitions. Then we can apply the complement operation as above.
+$$
+\overline{M} = (Q, \Sigma, q_0, Q \setminus A, \delta)
+$$
+
+When complementing an incomplete DFA, a dead/sink state $d$ must be added. For all undefined transitions, $\delta(q, a) = d$ must be defined.

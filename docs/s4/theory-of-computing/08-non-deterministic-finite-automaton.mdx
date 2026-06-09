@@ -7,10 +7,10 @@ slug: s4/theory-of-computing/non-deterministic-finite-automaton
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.632Z
-lastUpdatedOn: 2026-06-09T08:25:32.542Z
+lastUpdatedOn: 2026-06-09T19:59:41.776Z
 ---
 
-Aka. NFA. Has multiple transitions for the same input symbol are allowed. Can have multiple possible starting states.
+Aka. NFA. Multiple transitions for the same input symbol are allowed. Can have multiple possible starting states.
 
 More flexible in terms of construction and may simplify the process of creating an FA for a regular language. Useful for theorem-proving.
 
@@ -34,10 +34,14 @@ Rules:
 - $\delta^*(q, ya) = \bigcup_{p \in \delta^*(q, y)} \delta(p, a)$  
   Union of the sets of states reachable from each state in $\delta^*(q, y)$ after reading symbol $a$.
 
-## Acceptance by a NFA
+## Acceptance
 
 Let $M = (Q, \Sigma, q_0, A, \delta)$.
 
 A string $x \in \Sigma^*$ is accepted **iff** $\delta^*(q_0, x) \cap A \neq \varnothing$.
 
 A string is accepted if at least one of the states reachable from the start state after reading the string is an accepting state.
+
+## NFA Complement
+
+Convert to DFA first, then [complement](/s4/theory-of-computing/deterministic-finite-automata#complement).
