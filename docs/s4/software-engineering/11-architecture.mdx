@@ -3,7 +3,7 @@ title: Architecture
 sidebar:
   order: 11
 dateCreated: 2026-06-08T19:16:10.824Z
-lastUpdatedOn: 2026-06-08T20:24:40.766Z
+lastUpdatedOn: 2026-06-09T03:05:56.965Z
 slug: s4/software-engineering/architecture
 prev: true
 next: true
@@ -20,9 +20,19 @@ Architecture is important for:
 - Stakeholder communication  
   Architecture is a high-level representation that all stakeholders can discuss before implementation commits.
 - System analysis  
-  Architectural choices directly affect non-functional properties (such as performance, reliability, security, and maintainability). Early identification of deficiencies avoids costly rework.
+  Architectural choices directly affect non-functional properties. Early identification of deficiencies avoids costly rework.
 - Large-scale reuse  
   Entire architectures can be reused across similar products (product lines).
+
+### Architecture and System Characteristics
+
+| Concern         | Architectural approach                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Performance     | Localise critical operations; use large-grain components to reduce communication overhead. |
+| Security        | Layered architecture; place critical assets in inner layers.                               |
+| Safety          | Localise safety-critical features in a small number of sub-systems.                        |
+| Availability    | Include redundant components with fault-tolerant support.                                  |
+| Maintainability | Use fine-grain, replaceable components; avoid sharing data structures.                     |
 
 ## View
 

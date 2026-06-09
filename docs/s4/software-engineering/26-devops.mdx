@@ -1,9 +1,9 @@
 ---
 title: DevOps
 sidebar:
-  order: 25
+  order: 26
 dateCreated: 2026-05-19T09:49:29.555Z
-lastUpdatedOn: 2026-06-08T20:24:40.771Z
+lastUpdatedOn: 2026-06-09T03:05:56.968Z
 slug: s4/software-engineering/devops
 prev: true
 next: true
@@ -69,10 +69,12 @@ To avoid this, it's considered a best practice to integrate and test locally bef
 
 ### Incremental Build
 
-Where only changed components and their dependents are recompiled. Dependency model specifies what must be rebuilt when a file changes. Build tool compares modification timestamps of source vs. compiled files and recompiles:
+Where only changed components and their dependents are recompiled. Dependency model specifies what must be rebuilt when a file changes. Build tool compares modification timestamps (or checksums) of source vs. compiled files and recompiles:
 
 - source if it's newer than compiled
 - dependent if it's dependency is newer than compiled
+
+Checksums allow parallel builds; timestamps may not.
 
 ## Continuous Delivery and Deployment
 

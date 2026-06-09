@@ -3,7 +3,7 @@ title: Source Code Management
 sidebar:
   order: 14
 dateCreated: 2026-05-19T09:50:19.304Z
-lastUpdatedOn: 2026-06-08T20:24:40.769Z
+lastUpdatedOn: 2026-06-09T03:05:56.966Z
 slug: s4/software-engineering/source-code-management
 prev: true
 next: true
@@ -101,13 +101,3 @@ Three environments:
   Builds definitive executable versions. Developers check in code before building. May use external libraries not in VCS.
 - Target environment  
   The platform on which the system executes. May differ in hardware or OS from the development system.
-
-### Minimizing Recompilation
-
-Build tools compare modification timestamps (or checksums) of source vs. compiled files:
-
-- Compiled newer than source → no recompilation needed.
-- Source newer than compiled → recompile source.
-- A dependency (e.g., header or class definition) newer than compiled → recompile the dependent.
-
-Checksums allow parallel builds; timestamps may not.

@@ -6,42 +6,39 @@ slug: s4/software-engineering/software-testing
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-06-08T20:24:40.770Z
+lastUpdatedOn: 2026-06-09T03:05:56.967Z
 ---
 
-In software testing, a program is executed with artificial data to check for errors, anomalies, or non-functional issues. Dynamic verification.
+Executes a program with artificial data to check for errors, anomalies, or non-functional issues. Dynamic [V&V](/s4/software-engineering/verification-and-validation).
 
-Testing can reveal the **presence** of errors, but NOT their absence.
-
-Easily reproducible. However, certain errors may be masked by other errors.
+Testing reveals the presence of errors, not their absence. Certain errors may be masked by other errors.
 
 ## Goals
 
 ### Validation Testing
 
-To demonstrate the system meets the requirements. Validation testing confirms the software meets its requirements. A successful test shows the system works as intended.
+Demonstrates that the system meets its requirements. A successful test shows the system works as intended.
 
 ### Defect Testing
 
-To discover situations where the system behaves incorrectly.
-Uncovers faults. A successful test is one that makes the system fail, exposing a defect.
+Discovers situations where the system behaves incorrectly. A successful test exposes a defect by making the system fail.
 
 ## Automated Testing
 
-Where software testing is done without manual intervention. Implemented through a testing framework such as JUnit or Vitest.
+Testing performed without manual intervention. Implemented through a testing framework such as JUnit or Vitest.
 
-Includes:
+Parts of an automated test:
 
-- Setup part  
-  The system is initialized with the test case, namely the inputs and expected outputs.
-- A call part  
-  Methods or functions to be tested, are called.
-- An assertion part  
-  Expected output and received output are compared. If the assertion evaluates to true, the test has been successful if false, then it has failed.
+- Setup  
+  Initialize the system with inputs and expected outputs.
+- Call  
+  Invoke the methods or functions under test.
+- Assertion  
+  Compare expected and actual output. Pass if equal, fail otherwise.
 
 ## Regression Testing
 
-Re-running all tests after changes to ensure nothing previously working is broken. Easy to do with automated testing.
+Re-runs all tests after changes to ensure previously working behavior is preserved. Most practical when automated.
 
 ## Performance and Stress Testing
 
@@ -49,45 +46,50 @@ Performance testing gradually increases load until the system degrades. Stress t
 
 ## Partition Testing
 
-Inputs are grouped into equivalence partitions: groups of inputs the program treats equivalently. Test cases are picked from each group. One representative per partition is sufficient.
+Inputs are grouped into equivalence partitions (sets of inputs the program treats identically). Test cases are selected from each partition. 1 representative per partition is sufficient.
 
-## Guideline-based Testing
+## Guideline-Based Testing
 
-Uses experience of common programmer errors to select test cases. For sequences: test single values, sequences of different sizes, access first/middle/last elements, test zero-length sequences.
+Uses experience of common programmer errors to select test cases.
 
 ## Stages of Testing
 
 ### Development Testing
 
-Done by the development team. Includes:
+Done by the development team.
 
 - Unit testing  
-  Individual components are tested in isolation. Defect testing process. Inheritance makes it difficult to test classes. If possible, unit testing must be automated.
-- Component testing (interfaces between integrated units)
-- System testing (the whole integrated system)
+  Test individual components in isolation. Automate where possible. Inheritance makes unit testing of classes more difficult.
+- Component testing  
+  Test interfaces between integrated units.
+- System testing  
+  Test the whole integrated system.
 
 ### Release Testing
 
-Done by a separate team. To validate the system before it goes to users. Checks functionality, performance, and dependability.
+Done by a separate team. Validates the system before it reaches users. Checks functionality, performance, and dependability.
 
 ### User Testing
 
-Involves actual users. Includes:
+Involves actual users.
 
-- Alpha testing (at developer's site)
-- Beta testing (released to users)
-- Acceptance testing (customer decides if system is deployable)
+- Alpha testing  
+  Conducted at the developer's site.
+- Beta testing  
+  Released to a subset of real users.
+- Acceptance testing  
+  Customer decides if the system is deployable.
 
 ## Test-Driven Development
 
-Tests are written before the code. The tests function as the specification initially and then as the regression test suite.
+Tests are written before the code. Tests serve as the specification up front and as the regression suite thereafter.
 
 TDD cycle:
 
 1. Identify a small increment of functionality.
 2. Write an automated test that initially fails.
 3. Implement code to pass the test.
-4. Re-run all tests; refactor if needed.
+4. Re-run all tests. Refactor if needed.
 5. Move to the next increment.
 
 Benefits:

@@ -6,46 +6,38 @@ slug: s4/software-engineering/system-modelling
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-06-08T10:41:10.166Z
+lastUpdatedOn: 2026-06-09T03:05:56.964Z
 ---
 
-The process of creating abstract representations of a system. Different models show a different perspective of the system. Represents systems using graphical models (commonly UML). Used to understand system functionality and help communicate system design to stakeholders.
+The process of creating abstract representations (named _models_) of a system. Each model shows a different perspective. [UML](/s4/software-engineering/uml) is used to illustrate the model. Models help clarify system functionality and communicate design to stakeholders.
 
-Models serve two roles in the software lifecycle:
+Models serve 2 roles:
 
 - Analysis  
   Clarifying what the system must do.
 - Design  
   Specifying how the system will be structured and behave.
 
-No model is fully accurate. Each is a selective simplification, and the omitted details may themselves be critical.
+No model is fully accurate. Each is a selective simplification. Omitted details may be critical.
 
 ## Perspectives
 
-System perspectives represent different viewpoints used to describe a system and its environment.
-
-- External perspective  
+- External  
   Shows system context.
-- Interaction perspective  
+- Interaction  
   Shows interactions between system components or external entities.
-- Structural perspective  
+- Structural  
   Shows system organization and data structure.
-- Behavioral perspective  
+- Behavioral  
   Shows system behavior over time.
 
 ## Context Modeling
 
-Context models describe the environment in which the system operates, showing external systems and relationships.
+Describes the environment in which a system operates. Shows system boundaries, external actors and relationships.
 
-- Identify external systems and actors.
-- Show system boundaries.
-- Often represented using system context diagrams.
+Often represented using system context diagrams.
 
-Helps determine how the system interacts with its environment. Useful during requirements engineering.
-
-Limitation: excludes internal behaviour. A complete-looking context model reveals nothing about how the system processes what passes through its boundaries.
-
-## System Boundaries
+### System Boundary
 
 Defines what is inside the system and what lies outside it.
 
@@ -55,7 +47,7 @@ Defines what is inside the system and what lies outside it.
 
 ## Interaction Modeling
 
-Interaction models describe how users or system components interact with the system. Illustrated using [use case diagrams](/s4/software-engineering/behaviour-diagram/#use-case-diagram) and [sequence diagrams](/s4/software-engineering/interaction-diagram/#sequence-diagram).
+Describes how users or system components interact with the system. Illustrated using [use case diagrams](/s4/software-engineering/behaviour-diagram/#use-case-diagram) and [sequence diagrams](/s4/software-engineering/interaction-diagram/#sequence-diagram).
 
 Used to:
 
@@ -63,74 +55,63 @@ Used to:
 - Detect communication issues between systems.
 - Evaluate system structure performance.
 
-Limitation: use case models do not capture non-functional requirements such as response time, concurrency, or security policies. A use case model that appears complete may mask constraints that only surface in later phases. Sequence diagrams model the happy path; exceptional flows and unavailability scenarios are not directly represented.
+<Note>
 
-## Generalization
+Use case models do not capture non-functional requirements such as response time, concurrency, or security policies. Sequence diagrams model the happy path. Exceptional flows and unavailability scenarios are not directly represented.
+
+</Note>
+
+## Structural Modeling
+
+Models class relationships in object-oriented systems.
+
+### Generalization
 
 A modeling technique where common features of multiple classes are abstracted into a superclass.
 
-Implements inheritance in object-oriented systems. Subclasses inherit attributes and methods from the superclass.
+- Implements inheritance in object-oriented systems.
+- Subclasses inherit attributes and methods from the superclass.
 
-## Aggregation
+### Aggregation
 
-Represents a whole–part relationship between classes.
+Represents a whole-part relationship between classes.
 
-Shows that a class is composed of other classes. Similar to part-of relationship in semantic models.
+- Shows that a class is composed of other classes.
+- Similar to part-of relationship in semantic models.
 
-## Data-Driven Modeling
+## Behavioral Modeling
 
-Represent systems where processing is controlled mainly by incoming data.
+Models system behavior driven by data or events.
 
-Characteristics:
+### Data-Driven Modeling
+
+Represents systems where processing is controlled mainly by incoming data.
 
 - Focus on data processing workflows.
 - Represent end-to-end processing.
 
-## Event-Driven Modeling
+### Event-Driven Modeling
 
-Describes systems where internal or external events trigger state changes. Used commonly in real-time systems and embedded systems.
+Describes systems where internal or external events trigger state changes. Used in real-time and embedded systems.
 
-## State Machine Models
+### State Machine Models
 
-Represent system behavior using \*tates and transitions triggered by events.
+Represent system behavior using states and transitions triggered by events.
 
-- States – system conditions.
-- Transitions – changes triggered by events.
+- States  
+  System conditions.
+- Transitions  
+  Changes triggered by events.
 
-Limitation: models one object in isolation. Interactions between concurrent state machines are not directly captured and must be inferred from sequence diagrams.
+<Note>
 
-## Model-Driven Engineering
+Models one object in isolation. Interactions between concurrent state machines are not directly captured and must be inferred from sequence diagrams.
 
-A software development approach where models are the main artifacts and code is generated automatically from them.
-
-Advantages:
-
-- Higher abstraction level.
-- Easier adaptation to new platforms.
-
-Limitations:
-
-- Developing model translators may be costly.
-- Models may not perfectly represent implementation details.
-
-### Model-Driven Architecture
-
-A model-based development approach using UML models at different abstraction levels.
-
-Model Types:
-
-1. Computation Independent Model (CIM)  
-   Describes domain concepts.
-
-2. Platform Independent Model (PIM)  
-   Describes system behavior without platform details.
-
-3. Platform Specific Model (PSM)  
-   Adds platform-specific implementation details.
+</Note>
 
 ## Complementary Models
 
-No single model is sufficient. Each model type excludes some aspect of reality:
+No single model is sufficient. Each excludes some aspect of reality:
 
 - Context models exclude internal behaviour.
 - Use case models exclude non-functional properties.

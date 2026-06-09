@@ -2,24 +2,20 @@
 title: Inspection
 sidebar:
   order: 16
+dateCreated: 2026-06-08T20:55:33.457Z
+lastUpdatedOn: 2026-06-09T03:05:56.967Z
 slug: s4/software-engineering/inspection
 prev: true
 next: true
-dateCreated: 2026-04-23T17:39:39.631Z
-lastUpdatedOn: 2026-06-08T20:24:40.770Z
 ---
 
-Source code is examined without running the system for verification. Can be done early, even on incomplete systems. Static verification of the software.
+Inspection examines software without execution. A form of [static V&V](/s4/software-engineering/verification-and-validation). May be applied to any representation of the system: requirements, design, configuration data, test data, etc.
 
-May be applied to any representation of the system such as requirements, design, configuration data, test data, etc.
+Can be applicable even on incomplete systems. No execution cost. Can uncover chains of errors.
 
-Can be done without additional cost. Can be done before the completion of implementation. Can uncover chain of errors.
+Can only be used for verification, not validation. Cannot check non-functional characteristics such as performance or usability.
 
-Cannot check for non-functional characteristics.
-
-## Inspection Checklist Areas
-
-Defects are looked for in these categories:
+## Defect Categories
 
 - Data faults  
   Uninitialized variables, wrong array bounds, type mismatches.
@@ -33,19 +29,3 @@ Defects are looked for in these categories:
   Unfreed memory, corrupt pointers.
 - Exception management faults  
   Missing or wrong exception handlers.
-
-## Inspections vs Testing
-
-Inspections and testing are complementary; both should be used.
-
-Advantages of inspections:
-
-- A single inspection finds multiple errors; one test finds one at a time.
-- Incomplete versions of the system can be inspected.
-- Can check adherence to standards, portability, and maintainability.
-- Can be applied before implementation, to design and specification documents.
-
-Limitations:
-
-- Cannot check non-functional characteristics such as performance or usability.
-- Cannot confirm the system satisfies the user's real requirements, only the specification.
