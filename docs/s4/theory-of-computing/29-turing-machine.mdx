@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/turing-machine
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-06-10T00:03:01.629Z
+lastUpdatedOn: 2026-06-10T04:52:55.370Z
 ---
 
 Most powerful abstract model of computation. Can simulate any real computer (ignoring efficiency). Modelled by Alan Turing.
@@ -113,9 +113,9 @@ Match first and last symbols. Replace them and repeat. Deterministic.
 
 ## Functions
 
-TM can compute functions of the form $f: \Sigma^* \rightarrow \Gamma^*$.
+A function $f: \Sigma^* \rightarrow \Gamma^*$ is Turing-computable **iff** a Turing machine $T$ exists that computes $f$.
 
-TM computes $f(x)$ **iff** $(q_0, \Delta x) \vdash_T^* (h_a, \Delta f(x))$.
+$T$ computes $f(x)$ **iff** $(q_0, \Delta x) \vdash_T^* (h_a, \Delta f(x))$.
 
 ### Partial Functions
 
@@ -180,6 +180,22 @@ Aka. NTM. Same as the deterministic TM except the transition function's output i
 
 For any non-deterministic TM, there exists a deterministic TM that accept the same language.
 
+## Encoding
+
+A TM can be represented as a finite string over a finite alphabet. This encoding, written $\langle T \rangle$ or $e(T)$, describes the TM's states, alphabets, and transition function.
+
+Encoding is what allows a TM to take another TM as input. Without it, a TM cannot reason about other TMs.
+
+### Example
+
+TM $T$ accepts $\{a\}$: states $q_0, q_1, h_a, h_r$; transitions $\delta(q_0, a) = (q_1, a, R)$ and $\delta(q_1, \Lambda) = (h_a, \Lambda, S)$.
+
+Each transition is encoded as a 5-tuple $(q,\, X,\, r,\, Y,\, D)$. Tuples are separated by `#`:
+
+$$\langle T \rangle = \texttt{q0,a,q1,a,R\#q1,B,ha,B,S}$$
+
+States, symbols, and directions are replaced with agreed-upon tokens. The exact scheme is arbitrary as long as it is consistent and decodable.
+
 ## Universal TM
 
 Denoted by $T_u$ A Turing machine that can run any arbitrary program with an arbitrary data set (input to the program).
@@ -191,15 +207,16 @@ $T_u$ simulates the processing of $w$ by $T_1$.
 
 ## Accept vs Decide
 
-A Turing machine $T$ accepts $L$ **iff** $T$ accepts all strings of $L$. For all strings of $L$, the Turing machine $T$ halts in an accepting state. But for other strings, it may:
+A language $L$ is Turing-acceptable **iff** a Turing machine $T$ exists that accepts $L$.
 
-- Halt at a rejecting state OR
+$T$ accepts $L$ **iff** $T$ halts in $h_a$ for every $x \in L$. For $x \notin L$, $T$ may:
+
+- Halt at $h_r$ OR
 - Loop forever
 
-A Turing machine $T$ decides $L$ **iff** for every string $x \in \Sigma^*$:
+A language $L$ is Turing-decidable **iff** a Turing machine $T$ exists that decides $L$.
 
-- $T$ halts in state $h_a$ AND
-- calculates its characteristic function
+$T$ decides $L$ **iff** for every $x \in \Sigma^*$, $T$ halts and computes $\chi_L(x)$.
 
 $$
 T\text{ decides }L \implies T\text{ accepts }L
@@ -208,7 +225,3 @@ $$
 ## Limits
 
 Not all problems are solvable. Some problems are undecidable — no Turing machine can solve them.
-
-## Turing Completeness
-
-A system is said to Turing complete if it can simulate any Turing machines.
