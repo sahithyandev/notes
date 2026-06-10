@@ -12,6 +12,14 @@ interface Props {
   nextNote?: NoteLink | null;
 }
 
+const LENGTH_CUTOFF = 26;
+
+function trimLabel(label: string): string {
+  if (label.length > LENGTH_CUTOFF)
+    return label.slice(0, LENGTH_CUTOFF).trim().concat("...");
+  return label;
+}
+
 const { prevNote, nextNote } = Astro.props;
 ---
 
@@ -19,20 +27,28 @@ const { prevNote, nextNote } = Astro.props;
   (prevNote || nextNote) && (
     <div class="note-nav">
       {prevNote && (
-        <a href={`/${prevNote.slug}`} class="note-nav-btn left">
+        <a
+          href={`/${prevNote.slug}`}
+          class="note-nav-btn left"
+          title={prevNote.label}
+        >
           <ArrowLeft class="note-nav-icon" />
           <div class="note-nav-content">
             <span class="note-nav-dir">Previous</span>
-            <span class="note-nav-title">{prevNote.label}</span>
+            <span class="note-nav-title">{trimLabel(prevNote.label)}</span>
           </div>
         </a>
       )}
       {nextNote && (
-        <a href={`/${nextNote.slug}`} class="note-nav-btn right">
+        <a
+          href={`/${nextNote.slug}`}
+          class="note-nav-btn right"
+          title={nextNote.label}
+        >
           <ArrowRight class="note-nav-icon" />
           <div class="note-nav-content">
             <span class="note-nav-dir">Next</span>
-            <span class="note-nav-title">{nextNote.label}</span>
+            <span class="note-nav-title">{trimLabel(nextNote.label)}</span>
           </div>
         </a>
       )}
