@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/ambiguity
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.634Z
-lastUpdatedOn: 2026-06-09T08:25:32.552Z
+lastUpdatedOn: 2026-06-10T00:03:01.626Z
 ---
 
 Property of a string or a grammar.
@@ -29,7 +29,7 @@ Some ambiguous grammars can be rewritten as an equivalent unambiguous grammar.
 
 ### Associativity
 
-Associativity defines how operators of the same precedence are grouped.
+Defines how operators of the same precedence are grouped.
 
 #### Left Associative
 
@@ -53,26 +53,90 @@ Examples:
 - Right associative  
   4^3^2 = $4^{3^2}$
 
+## Proving Ambiguity
+
+To prove a grammar is ambiguous, exhibit 1 string with 2 distinct leftmost derivations.
+
+### Approach
+
+- Identify productions with 2 or more non-terminals on the RHS. Split-point ambiguity can only arise there.
+- Determine what strings each non-terminal generates.
+- Find a string derivable from such a production where the split between adjacent non-terminals is not unique.
+- Construct 2 explicit leftmost derivations.
+
+### Example
+
+Grammar: $S \to a \mid Sa \mid bSS \mid SSb \mid SbS$
+
+From $S \to a$ and $S \to Sa$, $S$ generates all strings of 1 or more $a$s.
+
+The production $S \to bSS$ derives $b$ followed by 2 adjacent strings from $L(S)$. For the suffix $aaa$, 2 valid splits exist:
+
+- $a \mid aa$
+- $aa \mid a$
+
+So $baaa$ has 2 distinct leftmost derivations.
+
+Derivation 1:
+
+```
+S ⟹ bSS ⟹ bSaS ⟹ baaS ⟹ baaa
+```
+
+Derivation 2:
+
+```
+S ⟹ bSS ⟹ baS ⟹ baSa ⟹ baaa
+```
+
+Parse tree 1:
+
+```
+      S
+    / | \
+   b  S   S
+     / \  |
+    S   a a
+    |
+    a
+```
+
+Parse tree 2:
+
+```
+      S
+    / | \
+   b  S   S
+      |  / \
+      a  S  a
+         |
+         a
+```
+
 ## Examples
 
 ### Grammar of arithmetic
 
-$S → S+S\;|\;S-S\;|\;S*S\;|\;S/S\;|\;(S)\;|\;a$ is ambiguous because $a + a - a$ has 2 possible leftmost derivations.
+$$
+S → S+S\;|\;S-S\;|\;S*S\;|\;S/S\;|\;(S)\;|\;a
+$$
+
+Ambiguous because $a + a - a$ has 2 possible leftmost derivations.
 
 The above grammar can be made unambiguous, using precedence + associativity:
 
-- $S → S + T | T$
-- $T → T * F | F$
-- $F → (S) | a$
+- $S → S + T\;|\; S - T\; |\; T$
+- $T → T * F\;|\; T / F\; |\; F$
+- $F → (S)\; |\; a$
 
-Precedence is defined for $*$ and $+$ using $S$, $T$ and $F$.
+Each non-terminal corresponds to 1 precedence level. Operators at lower precedence sit closer to $S$ in the hierarchy, so they appear higher in any parse tree and bind less tightly. Left-recursion on each rule ($S \to S + T$, $T \to T * F$) enforces left associativity.
 
 ### Dangling Else
 
 Consider the grammar:
 
 ```
-<stmt> →
+<stmt> ->
     if (<expr>) <stmt>
   | if (<expr>) <stmt> else <stmt>
   | <other_stmt>
@@ -80,20 +144,20 @@ Consider the grammar:
 
 Example statement:
 
-```
+```c
 if (expr1) if (expr2) f(); else g();
 ```
 
 Two interpretations:
 
-```
+```c
 if (expr1) {
     if (expr2) f();
 }
 else g();
 ```
 
-```
+```c
 if (expr1) {
     if (expr2) f();
     else g();

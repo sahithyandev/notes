@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/turing-machine
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-06-09T08:25:32.558Z
+lastUpdatedOn: 2026-06-10T00:03:01.629Z
 ---
 
 Most powerful abstract model of computation. Can simulate any real computer (ignoring efficiency). Modelled by Alan Turing.
@@ -83,7 +83,7 @@ Turing machine halts when it reaches either of the halting states. May run forev
 
 ## Acceptance
 
-A string $x$ is accepted **iff** the machine reaches accepting state i.e. $(q_0, \Delta x) \vdash_T^* (h_a, yaz)$.
+A string $x$ is accepted **iff** the machine reaches accepting state i.e. $(q_0, \Delta x) \vdash_T^* (h_a, y\underline{a}z)$.
 
 ## Examples
 
@@ -98,7 +98,7 @@ TM behaves like FA. Moves right only. Does not modify the tape.
 ### Ends with "aba"
 
 $$
-L = {x \mid x \text{ ends with } aba}
+L = \{x \mid x \text{ ends with } aba\}
 $$
 
 Must read entire input before accepting.
@@ -125,15 +125,18 @@ TM will produce output only for valid inputs. Loop indefinitely otherwise.
 
 ### Characteristic Function
 
-For a language $L$:
+For any language $L$ in $\Sigma^*$, its characteristic function $\chi_L: \Sigma^* \rightarrow \set{0,1}$ is defined as:
 
 $$
-f(x) =
-\begin{cases}
-1 & \text{if } x \in L \\
-0 & \text{otherwise}
-\end{cases}
+\chi_L(x) = \begin{cases} 1 \quad \text{ if } x \in L &\\ 0 \quad \text{otherwise} \end{cases}
 $$
+
+Computing $\chi_L$ is the same as accepting a language.
+
+A Turing machine may distinguish between strings that are in $L$ and not in $L$ by either:
+
+- accepting or rejecting the string OR
+- accepting and ending up in either $(h_a,\Delta 0)$ or $(h_a, \Delta 1)$ configuration
 
 ## Combination
 
@@ -147,9 +150,9 @@ If either $T_1$ or $T_2$ rejects, $T_1T_2$ also rejects.
 
 Many minor variations can be defined such as:
 
-- A Turing machine that must move either left or right
-- A Turing machine that can either write a symbol or move but not both
-- A Turing machine with multiple tapes and multiple tape heads
+- A Turing machine that must move unidirectionally.
+- A Turing machine that can either write a symbol or move but not both.
+- A Turing machine with multiple tapes and multiple tape heads.  
   However the ultimate computing power is unchanged.
 
 ### n-tape Turing Machine
@@ -163,12 +166,12 @@ An $n$-tape Turing machine is a 6-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, F)
 - $\Gamma$: tape alphabet ($\Sigma \subseteq \Gamma$)
 - $q_0$: initial state
 - $F$: set of accepting states
-- $\delta Q \times \Gamma^n \rightarrow Q \times \Gamma^n \times {L, R, S}^n$: transition function
+- $\delta: Q \times \Gamma^n \rightarrow Q \times \Gamma^n \times \{L, R, S\}^n$: transition function
 
-The machine reads n symbols (one from each tape). Based on the current state and these symbols:
+The machine reads $n$ symbols (one from each tape). Based on the current state and these symbols:
 
 - It moves to a new state
-- Writes **n symbols** (one on each tape)
+- Writes $n$ symbols (one on each tape)
 - Moves each tape head independently (Left, Right, or Stay)
 
 ## Non-deterministic TM
@@ -186,34 +189,6 @@ Denoted by $T_u$ A Turing machine that can run any arbitrary program with an arb
 
 $T_u$ simulates the processing of $w$ by $T_1$.
 
-## Church-Turing Thesis
-
-Formerly known as Church's thesis. Says that a TM is a general model of computation, i.e. any real-world computation can be translated into an equivalent computation involving a Turing machine.
-
-First formulated by Alonzo Church. Considered as a conjecture as well.
-
-It's generally accepted because:
-
-- no one has proposed a counterexample for 90+ years
-- other theoretical computation models have been proven to be equivalent to a Turing machine
-- enhanced Turing machines do not enhance the computing power
-- nature of Turing machine indicate all steps crucial to human computation
-
-## Characteristic Function
-
-For any language $L$ in $\Sigma^*$, its characteristic function $\chi_L: \Sigma^* \rightarrow \set{0,1}$ is defined as:
-
-$$
-\chi_L(x) = \begin{cases} 1 \quad \text{ if } x \in L &\\ 0 \quad \text{otherwise} \end{cases}
-$$
-
-Computing $\chi_L$ is the same as accepting a language.
-
-A Turing machine may distinguish between strings that are in $L$ and not in $L$ by either:
-
-- accepting or rejecting the string OR
-- accepting and ending up in either $(h_a,\Delta 0)$ or $(h_a, \Delta 1)$ configurations
-
 ## Accept vs Decide
 
 A Turing machine $T$ accepts $L$ **iff** $T$ accepts all strings of $L$. For all strings of $L$, the Turing machine $T$ halts in an accepting state. But for other strings, it may:
@@ -221,10 +196,10 @@ A Turing machine $T$ accepts $L$ **iff** $T$ accepts all strings of $L$. For all
 - Halt at a rejecting state OR
 - Loop forever
 
-A Turing machine $T$ decides $L$ **iff**:
+A Turing machine $T$ decides $L$ **iff** for every string $x \in \Sigma^*$:
 
-- $T$ halts in state $h_a$ and
-- calculates its characteristic function, for every string $x \in \Sigma^*$.
+- $T$ halts in state $h_a$ AND
+- calculates its characteristic function
 
 $$
 T\text{ decides }L \implies T\text{ accepts }L

@@ -9,7 +9,7 @@ dateCreated: 2026-04-23T17:39:39.634Z
 lastUpdatedOn: 2026-06-09T08:25:32.548Z
 ---
 
-A formal system used to generate strings of a language using production rules. Denoted as CFG. Defined as a 4-tuple $(V, \Sigma, S, P)$ where:
+A formal system used to generate strings of a language using [production rules](#production-rule). Denoted as CFG. Defined as a 4-tuple $(V, \Sigma, S, P)$ where:
 
 - $V$ - finite set of variables (non-terminals)
 - $\Sigma$ - finite set of terminal symbols
@@ -18,7 +18,7 @@ A formal system used to generate strings of a language using production rules. D
 
 $V$ and $\Sigma$ are disjoint.
 
-### Production Rule
+## Production Rule
 
 A production has the form $A \rightarrow \alpha$ where:
 
@@ -29,15 +29,23 @@ This means a non-terminal (regardless of the surrounding) can be replaced by a s
 
 Example: $S → Λ\;|\;Sa\;|\;Sb$
 
-### Derivations
+### Unit Production
+
+Rules of the form $A \Rightarrow^* B$ where $A,B$ are non-terminals. Does not add new structure to derivations.
+
+### Λ-Production
+
+Aka. null production. Allow non-terminals to derive the empty string.
+
+## Derivations
 
 The process of generating strings from the start symbol using production rules.
 
-#### Single-step derivation
+### Single-step derivation
 
 Denoted as $\alpha \Rightarrow \beta$. Means $\beta$ is obtained from $\alpha$ using a production.
 
-#### Multi-step derivation
+### Multi-step derivation
 
 Denoted as $\alpha \Rightarrow^* \beta$. Means $\beta$ is derived from $\alpha$ in zero or more steps.
 

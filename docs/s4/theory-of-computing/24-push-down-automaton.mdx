@@ -6,10 +6,10 @@ slug: s4/theory-of-computing/push-down-automaton
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-06-09T08:25:32.553Z
+lastUpdatedOn: 2026-06-10T00:03:01.629Z
 ---
 
-An automaton with a stack used to recognize CFLs.
+An automaton with a stack. Used to recognize CFLs.
 
 A 7-tuple: $(Q, \Sigma, \Gamma, q_0, Z_0, A, \delta)$
 
@@ -37,11 +37,15 @@ Represents current machine state. Denoted by $(q, x, \alpha)$ where:
 - $x$: remaining input
 - $\alpha$: stack contents
 
+Element of $Q \times (\Sigma \cup {\Lambda}) \times \Gamma^*$.
+
 ## Transition
 
-$δ: Q \times (\Sigma \cup {\Lambda}) \times \Gamma \rightarrow \text{finite subsets of }Q \times \Gamma^*$
+$$
+δ: Q \times (\Sigma \cup {\Lambda}) \times \Gamma^* \rightarrow \text{finite subsets of }Q \times \Gamma^*
+$$
 
-Each transition maps a (state, input, stack) to a set of finite subsets of $Q\times \Gamma^*$.
+Each transition maps a configuration to a set of finite subsets of $Q\times \Gamma^*$.
 
 $\delta (q, a, X) = (p, \beta)$ means, when the PDA has $X$ on the stack top, and gets $a$ as input, it moves to $p$, replacing $X$ with $β$.
 
@@ -71,15 +75,9 @@ Both models of acceptance are equivalent. If a language is accepted by a PDA usi
 
 </Note>
 
-## Computation Tree
-
-Represents all possible PDA execution paths. Each node is a configuration. Each branch is a non-deterministic choice.
-
-An input string is accepted **iff** any paths reaches final state.
-
 ## Non-determinism
 
-When multiple transitions are possible from the same configuration. It could be:
+When multiple transitions are possible from the same configuration. It could:
 
 - consume input or not
 - consume input and multiple transitions for the same input
@@ -91,3 +89,9 @@ If not, the PDA is called a Deterministic PDA or DPDA in short. A CFL is called 
 Language of palindromes requires non-determinism in the PDA. Hence it's not a DCFL.
 
 </Note>
+
+An input string is accepted **iff** any paths reaches final state.
+
+## Computation Tree
+
+Represents all possible PDA execution paths. Each node is a configuration. Each branch is a non-deterministic choice.

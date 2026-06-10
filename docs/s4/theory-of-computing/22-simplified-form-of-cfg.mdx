@@ -6,35 +6,28 @@ slug: s4/theory-of-computing/simplified-form-of-cfg
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-06-09T08:25:32.552Z
+lastUpdatedOn: 2026-06-10T00:03:01.627Z
 ---
 
 Simplification removes unnecessary productions while preserving the language.
 
-## Λ-Productions
+## Removal of Λ-Productions
 
-Aka. null productions. Allow non-terminals to derive the empty string. Null productions are removed by adding alternative productions. All combinations of nullable symbols must be considered to preserve language.
-
-### Removal of null productions
+Removed by adding alternative productions. All combinations of nullable symbols must be considered to preserve language.
 
 For a given CFG $G=(V, \Sigma, S, P)$, an equivalent CFG $G_1=(V,\Sigma,S,P_1)$ (with no null-productions) can be derived using the following steps:
 
 - Initialize $P_1 = P$
-- Find all nullable non-terminals ($\subseteq V$) of $G$ using [FindNull algorithm](/s4/theory-of-computing/context-free-grammar/#findnull-algorithm)
+- Find all nullable non-terminals ($\subseteq V$) of $G$ using [FindNull algorithm](/s4/theory-of-computing/context-free-grammar/#findnull-algorithm).
 - For each $A\rightarrow \alpha$ in $P$:
   - Add all productions that can be obtained by deleting one or more occurences of nullable non-terminals in $\alpha$, to $P_1$
 - Remove $\Lambda$-productions and $A\rightarrow A$ productions from $P_1$
 
 Ambiguity is preserved after the elimination of null productions. May increase the number of productions significantly.
 
-## Unit Productions
+## Removal of Unit Productions
 
-Rules of the form $A \Rightarrow^* B$ where $A,B$ are non-terminals.
-
-Does not add new structure to derivations. Can be removed by substitution.
-
-### Removal of unit productions
-
+Removed by substitution.
 For a given CFG $G=(V, \Sigma, S, P)$, an equivalent CFG $G_1=(V,\Sigma,S,P_1)$ (with no unit-productions) can be derived using the following steps:
 
 - Initialize $P_1=P$
