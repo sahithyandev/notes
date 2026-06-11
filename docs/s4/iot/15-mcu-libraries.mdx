@@ -1,0 +1,54 @@
+---
+title: MCU Libraries
+sidebar:
+  order: 15
+slug: s4/iot/mcu-libraries
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-06-11T06:03:43.423Z
+---
+
+A library is a pre-compiled collection of functions and definitions that extends the capabilities of a microcontroller program without requiring the developer to write low-level code from scratch.
+
+## Why Libraries Are Used
+
+- Hardware abstraction  
+  Peripheral registers differ across MCU families. A library exposes a uniform API so the same function call works on different hardware.
+- Reduced development time  
+  Sensor drivers, protocol implementations, and signal processing routines are reused rather than rewritten per project.
+- Reduced bug surface  
+  Well-tested library code eliminates classes of bugs (bit-field errors, timing violations) that recur when developers write drivers manually.
+- Protocol complexity  
+  Protocols like I²C, SPI, and Wi-Fi involve multi-step handshakes, error recovery, and timing constraints. A library encapsulates this so application code only calls high-level functions.
+
+## Types of Libraries
+
+- Hardware abstraction libraries  
+  Wrap GPIO, ADC, timers, and communication peripherals. Example: Arduino's `Wire.h` for I²C, `SPI.h` for SPI.
+- Sensor driver libraries  
+  Translate raw register reads into calibrated physical values. Example: `DHT.h` for DHT11/DHT22 temperature and humidity sensors, `Adafruit_BMP280` for barometric pressure.
+- Communication protocol libraries  
+  Implement higher-level protocols on top of a serial interface. Example: `PubSubClient` for MQTT over TCP, `ESP8266HTTPClient` for HTTP.
+- Display libraries  
+  Drive character LCD or OLED displays. Example: `LiquidCrystal.h` for 16×2 HD44780 LCDs, `Adafruit_SSD1306` for I²C OLED displays.
+- Signal processing libraries  
+  FFT, filtering, and DSP routines. Example: `ArduinoFFT` for frequency analysis on ADC samples.
+- Real-time OS libraries  
+  Task scheduling, semaphores, and queues. Example: FreeRTOS (used on ESP32, STM32, and others).
+
+## HAL and Vendor Libraries
+
+MCU vendors supply Hardware Abstraction Layer libraries for their own silicon:
+
+- STM32 HAL (STMicroelectronics): `HAL_GPIO_WritePin()`, `HAL_UART_Transmit()`, etc.
+- AVR-libc (Atmel/Microchip): low-level C library for AVR; includes `<avr/io.h>`, `<avr/interrupt.h>`.
+- ESP-IDF (Espressif): full framework for ESP32 covering Wi-Fi, Bluetooth, flash, and peripherals.
+
+HAL libraries allow application code to be migrated to a different chip in the same family by changing the target in the build system without rewriting peripheral calls.
+
+<Note>
+
+Using a vendor HAL adds a code-size and performance overhead compared to direct register access. For space-constrained MCUs, direct register manipulation is sometimes preferred.
+
+</Note>

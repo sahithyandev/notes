@@ -1,0 +1,65 @@
+---
+title: System Modelling
+sidebar:
+  order: 16
+slug: s4/iot/system-modelling
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-06-11T06:03:43.423Z
+---
+
+Modelling describes a system at a level of abstraction above source code. Three primary modelling approaches are used in embedded and IoT design.
+
+## Behavioral Modelling
+
+Describes what the system does: its inputs, outputs, and how it responds to events or conditions. Does not specify the physical structure or internal implementation.
+
+Techniques:
+
+- Finite State Machine (FSM)  
+  Models the system as a set of discrete states and transitions triggered by events or conditions. Each state defines an output or action. Suitable for devices with well-defined operating modes (idle, sensing, transmitting, error).
+- UML State Diagram  
+  Graphical FSM notation with entry/exit actions and guard conditions on transitions.
+- Event-driven model  
+  System reacts to external events (interrupts, timer expiry, network message) rather than executing a fixed sequence. Lua/NodeMCU and RTOS callback architectures follow this model.
+- Pseudocode / algorithmic description  
+  Informal step-by-step logic with no syntax tied to a specific language.
+
+Behavioral modelling is the most common approach in IoT firmware design. The system's response to every event can be specified and verified before any code is written.
+
+## Structural Modelling
+
+Describes how the system is physically composed: which components exist and how they are connected.
+
+Techniques:
+
+- Block diagrams  
+  High-level boxes (MCU, sensor, radio, power supply) with arrows showing data or signal flow between them.
+- Schematics  
+  Precise electrical diagrams showing every component, pin, net, and value.
+- PCB layout  
+  Physical placement and routing of components on the board.
+
+Structural modelling does not say what the system does — only what it is made of and how parts connect. It is necessary for hardware design but does not capture timing or logic behaviour.
+
+## Dataflow Modelling
+
+Describes how data is transformed as it moves through the system. Focuses on data paths rather than control flow or physical structure.
+
+Techniques:
+
+- Data Flow Diagrams (DFD)  
+  Nodes represent processing operations; arrows represent data streams. Used to trace how sensor readings are filtered, aggregated, and forwarded through the IoT pipeline.
+- Signal Flow Graphs  
+  Mathematical representation of linear signal transformations. Used in control systems and signal processing design.
+- Pipeline models  
+  Stages of a processing chain (sample → filter → encode → transmit) with data passing between stages.
+
+Dataflow modelling is useful for the cloud and edge processing layers of an IoT system, where raw sensor data undergoes multiple transformation steps before storage or actuation.
+
+<Note>
+
+A complete IoT system design uses all three: behavioral modelling to specify device logic, structural modelling to design the hardware, and dataflow modelling to design the data pipeline.
+
+</Note>

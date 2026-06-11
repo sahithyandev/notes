@@ -1,0 +1,107 @@
+---
+title: Microcontroller Debugging
+sidebar:
+  order: 14
+slug: s4/iot/microcontroller-debugging
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-06-11T06:03:43.422Z
+---
+
+Aka. ICD (In-Circuit Debugging). Allows developers to observe and control program execution inside the microcontroller while it remains in the circuit.
+
+Capabilities:
+
+- Set and trigger breakpoints at specific instructions
+- Step through code instruction by instruction
+- Inspect and modify CPU registers
+- Read and write memory contents in real time
+
+Requires a hardware debugger probe connected between the host computer and the target MCU.
+
+<Note>
+
+IoT devices typically have no screen, keyboard, or OS-level error catching. ICD is often the only practical way to diagnose firmware bugs.
+
+</Note>
+
+## Debugger Interfaces
+
+Two standard interfaces connect a debugger probe to the MCU.
+
+### JTAG
+
+IEEE 1149.1 standard. Originally designed for PCB boundary-scan testing; now the primary in-circuit debug and programming interface for MCUs, SoCs, and FPGAs.
+
+Pins:
+
+- TCK  
+  Test clock — clocks the TAP state machine.
+- TMS  
+  Test mode select — controls state transitions in the TAP.
+- TDI  
+  Test data in — shifts data into the chip serially.
+- TDO  
+  Test data out — shifts data out of the chip serially.
+- TRST  
+  Test reset (optional) — resets the TAP asynchronously.
+
+The **Test Access Port (TAP)** is a state machine inside the chip. It controls access to internal **scan chains** — shift registers connected to CPU registers, memory, and peripherals. Clocking data through TDI/TDO reads or writes anything inside the chip.
+
+Capabilities:
+
+- Halt the CPU, set breakpoints and watchpoints
+- Read and write all CPU registers and memory
+- Single-step execution
+- Flash programming
+
+Multiple JTAG devices on a board are **daisy-chained**: TDO of one device feeds TDI of the next. A single JTAG connector reaches all devices on the chain.
+
+### SWD
+
+Serial Wire Debug. ARM proprietary protocol, part of the CoreSight debug architecture. ARM Cortex-M specific.
+
+Pins:
+
+- SWDIO  
+  Bidirectional data — carries both host-to-target and target-to-host data on a single wire, direction switching within each transaction.
+- SWDCLK  
+  Clock.
+- SWO  
+  Serial Wire Output (optional) — a third unidirectional pin for non-intrusive real-time trace from the target with no CPU involvement.
+
+SWD accesses the **Debug Port (DP)** and **Access Ports (APs)** of the CoreSight system. The DP handles the physical connection; APs expose the CPU halt/resume, register access, and memory-mapped access to peripherals.
+
+Functionally identical to JTAG for single-device debugging. Daisy-chaining is not supported.
+
+### JTAG vs SWD
+
+| Property       | JTAG              | SWD              |
+| -------------- | ----------------- | ---------------- |
+| Pin count      | 4–5               | 2 + optional SWO |
+| Architecture   | Universal         | ARM Cortex only  |
+| Daisy-chaining | Yes               | No               |
+| Trace output   | Separate ETM pins | SWO (1 pin)      |
+
+<Note>
+
+Most IoT MCUs (STM32, nRF52, RP2040) are ARM Cortex-based. SWD is the default choice on small PCBs where 2 debug pins are far cheaper than 4–5.
+
+</Note>
+
+## Debugger Probes
+
+Hardware circuit bridging the host computer to the target MCU over JTAG or SWD. The host runs a debug server (e.g. OpenOCD, J-Link GDB Server) that exposes a GDB-compatible interface.
+
+Common probes:
+
+- J-Link (SEGGER)
+- ST-Link (STMicroelectronics)
+- CMSIS-DAP compatible probes
+
+<Note>
+
+Some development boards include an onboard debug probe. STM32 Nucleo boards embed an ST-Link, so no external probe is needed.
+
+</Note>
