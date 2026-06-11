@@ -7,49 +7,213 @@ slug: s4/iot/can-protocol
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-11T06:18:39.632Z
+lastUpdatedOn: 2026-06-11T16:32:16.727Z
 ---
 
-A multi-master, message-oriented serial communication protocol that allows microcontrollers and devices to communicate without a host computer. Developed by Bosch in 1986 for automotive applications.
+A multi-master, message-oriented serial communication protocol for microcontroller and device communication without a host computer. Developed by Bosch in 1986 for automotive applications.
 
-Uses differential signaling on two wires: CAN_H and CAN_L. Bus topology with 120 Ω termination resistors at each end.
+- Asynchronous
+- Half duplex
+- Bus topology with $120\,\Omega$ termination resistors at each end
+- Differential signaling on 2 wires: CAN_H and CAN_L
+- Broadcast based
+
+## Bus State
+
+2 logical states on the differential bus.
+
+- Dominant  
+  Logic 0. A node actively drives CAN_H high and CAN_L low (~2V differential). Active drive state.
+- Recessive  
+  Logic 1. No node drives the bus. CAN_H and CAN_L sit at equal voltage via termination resistors (~0V differential). Passive state.
+
+The bus is wired-AND. Any node driving dominant overrides all nodes driving recessive. A node cannot force recessive against an active dominant driver.
 
 ## Message Priority
 
-Each message carries an identifier (11-bit in CAN 2.0A, 29-bit in CAN 2.0B). Lower identifier value means higher priority.
+Each message carries an identifier. 11-bit in CAN 2.0A, 29-bit in CAN 2.0B. Lower identifier value means higher priority.
 
-Non-destructive arbitration: the dominant bit (logic 0) wins. Losing nodes retransmit automatically.
+### Arbitration
+
+All nodes waiting to transmit begin simultaneously when the bus goes idle. Identifier bits are transmitted MSB first. While transmitting, every node reads back the actual bus state and compares it to the bit just sent.
+
+2 outcomes at each bit position:
+
+- Node sent dominant (0), bus reads dominant (0)  
+  Consistent. Node continues transmitting.
+- Node sent recessive (1), bus reads dominant (0)  
+  Inconsistent. A competing node transmitted dominant at this position. Node loses arbitration and stops immediately.
+
+The winning node sees no inconsistency and continues uninterrupted. It does not know arbitration occurred.
+
+### Priority Ordering
+
+IDs are transmitted MSB first. At the first differing bit between 2 competing IDs, the lower ID has 0 (dominant) and the higher ID has 1 (recessive). Dominant wins. The lower numerical ID always wins arbitration.
+
+Example: `0b00000000011` beats `0b00000000100`. At bit position 2, the first sends 0 (dominant) and the second sends 1 (recessive).
+
+### Arbitration Properties
+
+- Non-destructive  
+  The winning frame continues uninterrupted to completion. No collision in the Ethernet sense.
+- Deterministic  
+  The lowest-ID node always wins, with zero latency added to the winning frame.
+- Automatic retransmission  
+  A losing node waits for bus idle and re-enters arbitration. The frame is not discarded.
+- Priority inversion prevented  
+  A low-ID message cannot be blocked mid-arbitration. If a lower-priority frame is already mid-transmission, the higher-priority message waits only for that frame to finish before winning the next arbitration.
+
+## Addressing
+
+No source or destination address exists in a CAN frame.
+
+- Every node receives every frame.
+- Each node's CAN controller has a hardware acceptance filter that compares the incoming ID against a configured mask.
+- Frames that do not match are silently discarded.
+- The receiver is implicitly defined by filter configuration.
+- Multiple nodes may accept the same ID simultaneously.
+- Inherently broadcast.
+
+### Sender Identification
+
+The protocol provides no sender field. By convention, each message ID is statically assigned to exactly 1 transmitting node at system design time. Recipients identify the sender by the ID alone, not by any field in the frame.
+
+2 nodes transmitting the same ID simultaneously is a design bug. They would transmit identical bits, both win arbitration, and transmit concurrently, corrupting the bus.
+
+### Higher-Layer Addressing
+
+Higher-layer protocols implement device addressing within the data payload or identifier field.
+
+- CANopen  
+  Node-ID (1–127) embedded in the message ID field by convention, combined with a function code prefix.
+- SAE J1939  
+  Source and destination address encoded within the 29-bit extended identifier. Used in trucks and heavy vehicles.
+- ISO-TP  
+  Source and target addresses in data bytes. Basis for vehicle diagnostics (ISO 15765-2).
 
 ## Frame Types
 
 - Data frame  
   Carries data from a transmitter to receivers.
 - Remote frame  
-  Requests data from another node.
+  Requests data from another node. No data field. DLC specifies the expected response length.
 - Error frame  
-  Signals a detected error to all nodes.
+  6 dominant bits (error flag) followed by 8 recessive bits (error delimiter). Broadcast by any node detecting an error.
 - Overload frame  
-  Requests a delay between successive frames.
+  Requests a delay between successive frames. 6 dominant bits (overload flag) followed by 8 recessive bits (overload delimiter). Broadcast by any node detecting an error.
+
+## Frame Structure
+
+A data frame consists of:
+
+- Start of Frame  
+  1 dominant bit. Signals frame start and synchronises all nodes.
+- Identifier  
+  11 bits (CAN 2.0A) or 29 bits (CAN 2.0B). Identifies message type and determines bus priority.
+- RTR bit  
+  Remote Transmission Request. Dominant for data frames, recessive for remote frames.
+- Control field  
+  6 bits. Contains the Data Length Code (DLC) specifying payload size (0–8 bytes).
+- Data field  
+  0–8 bytes of payload. Absent in remote frames.
+- CRC field  
+  15-bit CRC sequence followed by a recessive delimiter.
+- ACK field  
+  2 bits: ACK slot and ACK delimiter. Receivers overwrite the slot dominant to acknowledge. Transmitter verifies at least 1 acknowledgement received.
+- End of Frame  
+  7 recessive bits marking frame end.
+
+## ACK Mechanism
+
+Only 1 frame can exist on the bus at a time. Arbitration guarantees this. The ACK slot is a fixed bit position within the frame currently being transmitted. There is no ambiguity about what is being acknowledged.
+
+The 2 bits of the ACK field:
+
+- ACK slot  
+  Transmitted as recessive (1) by the transmitter. Any correctly-receiving node overrides it dominant (0) inline, during that exact bit time.
+- ACK delimiter  
+  Must remain recessive. Acts as a boundary before the end-of-frame sequence.
+
+Every receiving node independently verifies the CRC as bits arrive. A CRC match triggers the node to pull the ACK slot dominant. The transmitter reads the ACK slot back via the same bus-monitoring mechanism used in arbitration. Dominant means at least 1 node received the frame correctly. Recessive means no node acknowledged.
+
+Multiple receivers pulling dominant simultaneously is expected. The transmitter cannot determine how many or which nodes acknowledged. Only the binary outcome is observable: acknowledged by at least 1 node, or not acknowledged.
+
+### No ACK
+
+If the ACK slot reads recessive, the transmitter raises an ACK error, transmits an error frame, and retransmits. Causes:
+
+- Transmitter is the only node on the bus.
+- All receivers detected a CRC mismatch and withheld their ACK.
 
 ## Error Detection
 
-- CRC check on each frame
-- Bit stuffing: after 5 consecutive identical bits, a complementary bit is inserted
-- ACK field: the transmitter expects at least one receiver to acknowledge
-- Bus monitoring: each node checks its own transmission against the bus state
+- CRC  
+  15-bit checksum computed over the frame. Mismatch triggers an error frame.
+- Bit stuffing  
+  After 5 consecutive identical bits, a complementary bit is inserted. A stuffing violation signals a Stuff Error.
+- ACK  
+  Transmitter expects at least 1 receiver to write dominant into the ACK slot. No acknowledgement triggers an error.
+- Bus monitoring  
+  Each node reads back its own transmitted bits. Any discrepancy triggers an error frame.
 
-Nodes maintain transmit and receive error counters. Excessive errors transition a node to error-passive or bus-off state.
+### Bit Stuffing Scope
+
+Bit stuffing covers only the region from SOF through the end of the CRC sequence. Fields after the CRC sequence are fixed-form and exempt from stuffing rules.
+
+| Field         | Bits | Prescribed value |
+| ------------- | ---- | ---------------- |
+| CRC delimiter | 1    | recessive        |
+| ACK slot      | 1    | any              |
+| ACK delimiter | 1    | recessive        |
+| End of Frame  | 7    | recessive        |
+
+When a receiver reaches the CRC delimiter, it stops applying stuffing logic and expects the fixed-form fields exactly as defined.
+
+2 distinct error types follow from this:
+
+- Stuff Error  
+  6 consecutive identical bits detected within the stuffed region (SOF through CRC).
+- Form Error  
+  A fixed-form field does not match its prescribed value. A dominant bit within EOF triggers a Form Error, not a Stuff Error.
+
+### Error States
+
+Each node maintains 2 counters: Transmit Error Counter (TEC) and Receive Error Counter (REC). Counter values drive state transitions.
+
+The 3 states distinguish transient errors from persistent faults. Counters are asymmetric. A transmit error adds 8 to TEC. A receive error adds 1 to REC. Faulty transmitters degrade faster because the transmitter is the likely fault source. Each successful frame decrements the relevant counter by 1, allowing recovery.
+
+- Error-active  
+  Default state. TEC and REC both below 128. Node transmits active error flags (6 dominant bits).
+- Error-passive  
+  TEC or REC reaches 128. Node transmits passive error flags (6 recessive bits) instead. Still participates in bus communication.
+- Bus-off  
+  TEC reaches 256. Node disconnects from the bus entirely. Recovery requires 128 occurrences of 11 consecutive recessive bits.
+
+## Node Limits
+
+Limits are electrical, not protocol-defined. Each node adds capacitive load to the bus. Beyond the limit, the differential voltage falls below the detection threshold and signal integrity fails.
+
+- Classic CAN  
+  Up to 127 nodes at 1 Mbps. Reducing bus length allows more nodes at the same bit rate, since shorter wire has lower distributed capacitance.
+- CAN FD  
+  Fewer nodes at the high data-phase bit rate. Each bit occupies less time, leaving less time for the bus to charge and discharge between transitions.
 
 ## Variants
 
 - Classic CAN  
-  Up to 1 Mbps. Max 127 nodes per bus.
+  Up to 1 Mbps. Max 127 nodes per bus. Payload up to 8 bytes per frame.
 - CAN FD  
-  Data phase up to 8 Mbps. Payload up to 64 bytes per frame.
+  Data phase up to 8 Mbps. Payload up to 64 bytes per frame. Backwards compatible with Classic CAN controllers in listen-only mode.
 
 ## Applications
 
-- Automotive ECU communication
-- Industrial automation
-- Medical devices
-- Robotics
+- Automotive ECU networks  
+  Engine control units, transmission controllers, ABS, airbag modules, and body control modules communicate over CAN. A modern vehicle may have 70+ ECUs distributed across multiple CAN buses segmented by function and bit rate.
+- Heavy vehicles  
+  Trucks, buses, and agricultural equipment use SAE J1939, a higher-layer protocol built on CAN's 29-bit extended ID. Standardises messages for engine diagnostics, transmission state, and brake systems across manufacturers.
+- Industrial automation  
+  PLCs, sensors, and actuators in factory automation use CANopen. Deterministic latency and fault tolerance make CAN suitable for time-sensitive control loops.
+- Medical devices  
+  Surgical robots, imaging equipment, and infusion systems use CAN for internal subsystem communication where reliability and error containment are required.
+- Robotics  
+  Joint controllers and sensor modules in industrial and research robots use CAN for low-latency, synchronised control across multiple axes.
