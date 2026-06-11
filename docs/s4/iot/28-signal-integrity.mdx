@@ -1,0 +1,175 @@
+---
+title: Signal Integrity
+sidebar:
+  order: 28
+dateCreated: 2026-06-12T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T21:00:25.906Z
+slug: s4/iot/signal-integrity
+prev: true
+next: true
+---
+
+## Pull-Up and Pull-Down Resistors
+
+A floating input pin has no external driver and reads an undefined voltage. The MCU input register samples whatever noise or leakage current is present, producing unpredictable HIGH or LOW readings.
+
+A pull resistor fixes this by tying the pin to a known voltage through a high-value resistor (typically $1\ \text{k}\Omega$–$100\ \text{k}\Omega$).
+
+- Pull-up resistor  
+  Connects the pin to $V_{CC}$. The pin reads HIGH when nothing drives it. A device that pulls the line LOW can override the resistor.
+- Pull-down resistor  
+  Connects the pin to GND. The pin reads LOW when nothing drives it. A device that pulls the line HIGH overrides the resistor.
+
+## Resistor Value Trade-off
+
+The pull resistor value must satisfy 2 conflicting constraints.
+
+The lower bound is set by current. When an external device drives the line to the opposite rail, current flows through the pull resistor from $V_{CC}$ to GND. For a pull-up with the line driven LOW:
+
+$$
+I = \frac{V_{CC}}{R}
+$$
+
+The current flows continuously while the line is asserted. A low resistance:
+
+- Wastes power. Critical in battery-powered IoT devices.
+- Stresses the driving transistor, which must sink the full resistor current in addition to any load current.
+- Heats the resistor.
+
+The resistor must be high enough to keep current within the drive capability of the weakest device on the line.
+
+The upper bound is set by voltage integrity. A pull resistor and the parasitic capacitance of the wire, pin, and connected devices form an RC circuit. When the line is released, the resistor must charge the parasitic capacitance $C_{line}$ back to the rail:
+
+$$
+\tau = R \times C_{line}
+$$
+
+A high resistance:
+
+- Slows the rising edge. The line takes many time constants to reach $V_{IH}$.
+- Extends the forbidden band crossing duration, causing metastability or spurious transitions at the receiver.
+- Prevents the line from fully reaching the rail before the next transition at high signal frequencies, reducing noise margins.
+
+Any leakage current produces a voltage error across a high resistance:
+
+$$
+V_{error} = I_{leakage} \times R
+$$
+
+A $100\ \text{nA}$ leakage across a $100\ \text{k}\Omega$ resistor produces a $10\ \text{mV}$ offset. The same leakage across $1\ \text{M}\Omega$ produces $100\ \text{mV}$, which can push the line into the forbidden band on a 3.3 V system.
+
+Typical values for most applications are $1\ \text{k}\Omega$ to $10\ \text{k}\Omega$:
+
+- $1\ \text{k}\Omega$ to $4.7\ \text{k}\Omega$: I²C buses and higher-speed signals (fast edges required).
+- $4.7\ \text{k}\Omega$ to $10\ \text{k}\Omega$: general-purpose GPIO, buttons, slow signals.
+
+Values above $10\ \text{k}\Omega$ are only suitable for ultra-low-power designs where signal speed is not a concern. Values below $1\ \text{k}\Omega$ draw excessive current.
+
+Most MCUs include configurable internal pull-up resistors (and sometimes pull-down) that can be enabled in software, eliminating the need for external components on simple inputs. Internal pull-ups are typically $20\ \text{k}\Omega$–$50\ \text{k}\Omega$, suitable for buttons but too high for I²C or high-speed lines.
+
+## Why Pull-Up Resistors Are Required for MCU Inputs
+
+- Undefined floating state  
+  An undriven MCU input has no connection to either rail. It picks up environmental noise and reads unpredictably. A pull-up clamps the idle voltage to $V_{CC}$, giving a defined HIGH when nothing actively drives the line.
+- No internal drive on digital inputs  
+  MCU input buffers are high-impedance. Any voltage, including the forbidden band, is a legal input to the pin hardware. Only the pull resistor enforces a valid default.
+- RC low-pass filter interaction  
+  Any capacitance on the input line forms an RC low-pass filter with the pull-up resistor. A large pull-up value combined with significant capacitance can round edges so severely that the signal lingers in the forbidden band, causing metastability. Pull-up values should stay within $1\ \text{k}\Omega$–$10\ \text{k}\Omega$. Unnecessary capacitance on input lines should be avoided.
+- Safe default on device disconnect  
+  If the connected sensor or peripheral loses power or is physically removed, the pull-up ensures the input stays at a known HIGH.
+
+A floating input pin has input impedance in the megaohm range. The high impedance makes the pin voltage extremely sensitive to stray charge.
+
+The pin, its internal traces, and the ESD protection circuitry form a small parasitic capacitance. Charge accumulates from:
+
+- Electromagnetic fields from nearby switching circuits (power supplies, motors, other ICs)
+- Capacitive coupling from adjacent PCB traces
+- RF signals in the environment
+
+With input impedance this high, even a tiny induced current builds enough voltage across the parasitic capacitance to exceed $V_{IH}$. No low-impedance path exists to drain the accumulated charge, so the pin voltage stays in the HIGH region.
+
+Most MCUs have weak internal pull-up resistors, or parasitic leakage paths from $V_{CC}$ through ESD protection diodes and input buffer transistors. These structures bias the floating pin toward $V_{CC}$ rather than GND.
+
+CMOS thresholds are asymmetric. $V_{IH} \approx 0.7 \times V_{CC}$. The HIGH region spans a wide voltage range, so any upward drift easily lands in it. The input flip-flop samples the pin on each clock cycle. With the voltage in the HIGH region, it latches a stable 1 for as long as nothing actively pulls the pin LOW.
+
+A pull-down resistor to GND provides a low-resistance path that drains induced charge and holds the pin at LOW by default. A pull-up to $V_{CC}$ defines the default as HIGH and only transitions LOW when a device actively drives the line there.
+
+## Logic Level Thresholds and the Forbidden Band
+
+Every logic family defines 4 voltage thresholds:
+
+- $V_{OL}$: maximum voltage an output guarantees when driving LOW
+- $V_{OH}$: minimum voltage an output guarantees when driving HIGH
+- $V_{IL}$: maximum voltage an input will reliably interpret as LOW
+- $V_{IH}$: minimum voltage an input will reliably interpret as HIGH
+
+The region between $V_{IL}$ and $V_{IH}$ is the forbidden band. A signal in this range is neither a valid LOW nor a valid HIGH. The input's output state is undefined. It may oscillate, latch at an intermediate voltage, or resolve differently on each device.
+
+No signal should ever sit in the forbidden band in steady state. The noise margins ($V_{IL} - V_{OL}$ for LOW, $V_{OH} - V_{IH}$ for HIGH) quantify how much voltage deviation the interface tolerates before entering the forbidden band.
+
+The threshold voltage $V_{th}$ is the nominal switching point of a gate. It lies inside the forbidden band.
+
+$V_{th}$ depends on the logic family:
+
+- CMOS: $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
+- TTL: $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
+
+$V_{th}$ is not a safe operating point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread. No 2 gates switch at exactly the same voltage, and temperature shifts it further.
+
+Signals pass through the forbidden band during transitions. A fast edge spends negligible time there. A slow edge, from a long cable, RC load, or weak driver, lingers in the band, causing the receiver to toggle unpredictably. Schmitt trigger inputs solve this.
+
+## Schmitt Trigger Inputs
+
+A standard digital input has a single switching threshold. A signal that crosses it slowly causes the output to toggle multiple times as noise kicks it back and forth across the threshold.
+
+A Schmitt trigger input replaces the single $V_{th}$ with 2 thresholds:
+
+- $V_{T+}$: upper threshold. Output switches HIGH when input rises above this.
+- $V_{T-}$: lower threshold. Output switches LOW when input falls below this.
+
+The hysteresis band is the voltage interval $[V_{T-},\ V_{T+}]$. Its width is:
+
+$$
+V_H = V_{T+} - V_{T-}
+$$
+
+Switching behaviour is history-dependent:
+
+- If the output is currently LOW, it switches HIGH only when input exceeds $V_{T+}$.
+- If the output is currently HIGH, it switches LOW only when input drops below $V_{T-}$.
+- While the input is inside $[V_{T-},\ V_{T+}]$, the output holds its last state regardless of input movement.
+
+The transfer characteristic forms a loop rather than a single crossing point. The same input voltage can correspond to 2 different output states depending on which direction the signal arrived from. Noise smaller than $V_H$ cannot cause any transition regardless of where it occurs on the input.
+
+A standard gate has 1 $V_{th}$. Any noise that crosses it toggles the output. A Schmitt trigger requires the signal to travel the full width of the hysteresis band before the output changes.
+
+Schmitt trigger inputs are tolerant of:
+
+- Slow-rising signals (RC-charged lines, long cables)
+- Noisy environments (motors, switching regulators near signal lines)
+- Mechanical switch bounce
+
+Many MCU GPIO pins have a Schmitt trigger option that can be enabled per pin. UART RX, external interrupt pins, and I²C lines typically use Schmitt trigger inputs by default.
+
+## Open-Collector Outputs
+
+A standard push-pull output drives the pin actively HIGH (connecting it to $V_{CC}$ through a transistor) or actively LOW (connecting it to GND through a transistor). Both rails are driven.
+
+An open-collector output has only the LOW-side transistor. It can pull the line to GND (asserted) or release it entirely (Hi-Z). It cannot actively drive the line HIGH.
+
+To produce a usable HIGH level, an external pull-up resistor connects the line to $V_{CC}$. When no device asserts the line, the resistor pulls it HIGH passively.
+
+Open-collector is used for:
+
+- Wired-AND bus  
+  Multiple open-collector devices share 1 wire. Any device can pull the line LOW independently. The line is HIGH only when all devices release it. I²C uses this: any device can hold SDA or SCL LOW to stall the bus, enabling clock stretching and multi-master arbitration.
+- Voltage level shifting  
+  The pull-up resistor connects to any supply voltage regardless of the MCU's own logic level. A 3.3 V MCU can drive a 5 V bus by using a 5 V pull-up. The open-collector transistor only needs to pull to GND.
+- Short-circuit safety  
+  If 2 devices simultaneously assert conflicting levels on a push-pull bus, a near-short circuit results. On an open-collector bus, 2 simultaneous LOW assertions are harmless. Both transistors pull to GND together.
+
+<Note>
+
+Open-drain is the MOSFET equivalent of open-collector and is the term used in modern datasheets. The behaviour is identical.
+
+</Note>
