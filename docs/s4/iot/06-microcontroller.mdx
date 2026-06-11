@@ -6,7 +6,7 @@ slug: s4/iot/microcontroller
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-06-11T16:39:02.402Z
+lastUpdatedOn: 2026-06-11T17:28:58.151Z
 prereqs:
   - s2/computer-organization-and-digital-design/basics/digital-logic-signals
 ---
@@ -1400,53 +1400,24 @@ NB-IoT and LTE-M are cellular standards designed for IoT:
 - Devices connect directly to cellular infrastructure without a local gateway
 - Used for mobile asset tracking, remote metering, and deployments in areas without Wi-Fi
 
-### Supervisory Modules
+## Examples
 
-Supervisory modules monitor system health and ensure correct processor operation.
+| Microcontroller | Clock Speed  | ROM         | RAM   | I/O Pins |
+| --------------- | ------------ | ----------- | ----- | -------- |
+| PIC             | up to 20 MHz | up to 16 KB |       | 33       |
+| Intel 8051      |              | 4 KB        | 128 B | 32       |
+| AVR             | 8 MHz        | 32 KB       | 32 KB |          |
+| ATmega328P      | 20 MHz       | 32 KB       | 2 KB  | 23       |
 
-#### Watchdog Timer
+PIC and AVR support many peripherals. AVR supports analog input/output. Intel 8051 is an older architecture with limited resources which uses 8-bit instruction set. ARM is a newer architecture with more powerful features and better performance, but it is more complex and consumes more power than PIC and AVR.
 
-A hardware timer that runs independently of the CPU. Resets the MCU if software fails to service it before the timeout expires.
-
-Operation:
-
-- Software must periodically write a specific value to the watchdog register ("kicking" or "petting" the watchdog)
-- If the software hangs, crashes, or enters an infinite loop, the kick never arrives
-- On timeout, the watchdog asserts a reset signal and restarts the MCU
-
-Timeout period is configurable, typically ranging from a few milliseconds to several seconds.
-
-<Note>
-
-Some MCUs implement a window watchdog: the kick must arrive within a defined time window. Kicking too early is treated the same as kicking too late, detecting timing faults as well as hangs.
-
-</Note>
-
-#### Burnout Detection
-
-Aka. Brown-out Detection (BOD). Continuously monitors the supply voltage. Holds the MCU in reset if voltage drops below a configured threshold.
-
-Prevents corrupt execution caused by insufficient supply voltage (e.g. during battery discharge or power instability). When voltage recovers above the threshold, the MCU is released from reset and restarts cleanly.
-
-Threshold voltage is configurable on most MCUs via fuse bits or configuration registers.
-
-#### Startup Delay
-
-Delays processor execution after power-up until supply voltage and peripheral power rails have stabilised. The MCU holds the CPU in reset for a fixed number of clock cycles (or a time period) before releasing it to execute the first instruction.
-
-Without this delay, the CPU may begin fetching instructions while voltage is still ramping up. Instructions executed during an unstable supply can produce unpredictable results: incorrect register values, corrupted peripheral state, or a partially-executed first instruction that puts the system into an unknown condition.
-
-#### Oscillator Delay
-
-Holds the CPU in reset after the oscillator is enabled until the clock signal is stable and at its correct frequency. Crystal oscillators and RC oscillators take time to reach their steady-state frequency after power is applied or after waking from sleep.
-
-If execution begins before the clock is stable, instruction timing is wrong: peripherals clocked from the same source may miss setup/hold windows, UART baud rates are incorrect, and timer periods are inaccurate. The oscillator delay ensures the first instruction executes at the correct clock frequency.
-
-#### Cold Start vs Hot Start
+## Startup State
 
 Describes the state of the MCU at the moment execution begins.
 
-Cold start: the MCU powers on from a fully unpowered state.
+### Cold Start
+
+MCU powers on from a fully unpowered state.
 
 - All RAM contents are undefined (or zero on some architectures)
 - All registers are at hardware reset values
@@ -1454,7 +1425,9 @@ Cold start: the MCU powers on from a fully unpowered state.
 - All peripherals must be initialised by software before use
 - Longest time-to-operational state
 
-Hot start: the MCU resumes from a low-power sleep mode with RAM and register state retained.
+### Hot Start
+
+MCU resumes from a low-power sleep mode with RAM and register state retained.
 
 - RAM contents preserved; no re-initialisation required
 - Oscillator may still be running or settles faster from a partially-warm state
@@ -1467,14 +1440,3 @@ Hot start: the MCU resumes from a low-power sleep mode with RAM and register sta
 The terms also apply to GPS receivers. A GPS cold start requires downloading the full satellite almanac and ephemeris from scratch (minutes to first fix). A GPS hot start uses cached almanac, ephemeris, and last-known position (seconds to first fix). The underlying principle is the same: how much prior state is available.
 
 </Note>
-
-## Examples
-
-| Microcontroller | Clock Speed  | ROM         | RAM   | I/O Pins |
-| --------------- | ------------ | ----------- | ----- | -------- |
-| PIC             | up to 20 MHz | up to 16 KB |       | 33       |
-| Intel 8051      |              | 4 KB        | 128 B | 32       |
-| AVR             | 8 MHz        | 32 KB       | 32 KB |          |
-| ATmega328P      | 20 MHz       | 32 KB       | 2 KB  | 23       |
-
-PIC and AVR support many peripherals. AVR supports analog input/output. Intel 8051 is an older architecture with limited resources which uses 8-bit instruction set. ARM is a newer architecture with more powerful features and better performance, but it is more complex and consumes more power than PIC and AVR.

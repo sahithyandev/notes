@@ -6,28 +6,52 @@ slug: s4/iot/supervisory-circuit
 prev: true
 next: true
 dateCreated: 2026-05-31T07:08:08.399Z
-lastUpdatedOn: 2026-06-11T16:39:02.431Z
+lastUpdatedOn: 2026-06-11T17:28:58.153Z
 ---
 
 Independent hardware component that monitors system health separately from the CPU. Can reset the processor, shut down the system, switch to a backup clock, or generate alarms.
 
 ## Watchdog Timer
 
-A counter that continuously increments. The programmer must write to the watchdog reset register in the main loop before the counter overflows. On overflow the processor resets automatically.
+A hardware timer that runs independently of the CPU. Resets the MCU if software fails to service it before the timeout expires.
 
-The reset instruction must be placed at a point reachable only if the entire expected execution path completed successfully. Placing it inside a sub-loop defeats the mechanism: if that sub-loop stalls, it keeps resetting the counter, the overflow never fires, and the fault goes undetected.
+Operation:
+
+- Software must periodically write a specific value to the watchdog register ("kicking" or "petting" the watchdog)
+- If the software hangs, crashes, or enters an infinite loop, the kick never arrives
+- On timeout, the watchdog asserts a reset signal and restarts the MCU
+
+Timeout period is configurable, typically ranging from a few milliseconds to several seconds.
+
+The kick must be placed at a point reachable only if the entire expected execution path completed successfully. Placing it inside a sub-loop defeats the mechanism: if that sub-loop stalls, it keeps resetting the counter, the overflow never fires, and the fault goes undetected.
+
+<Note>
+
+Some MCUs implement a window watchdog: the kick must arrive within a defined time window. Kicking too early is treated the same as kicking too late, detecting timing faults as well as hangs.
+
+</Note>
 
 ## Brown-out Reset
 
 Monitors $V_\text{cc}$. If it drops below a configurable threshold $V_\text{BOR}$, the processor is held in reset until the voltage recovers. Can fire repeatedly during operation. Without it, a processor executing during a slow ramp-down may corrupt non-volatile memory.
 
+Threshold voltage is configurable on most MCUs via fuse bits or configuration registers.
+
 ## Power-on Reset
 
 Holds the CPU in reset on power-up until $V_\text{cc}$ reaches a stable operating level. Ensures registers and peripherals are in defined states before execution begins. Fires once per power cycle.
 
+Without this, the CPU may begin fetching instructions while voltage is still ramping up, producing unpredictable results: incorrect register values, corrupted peripheral state, or a partially-executed first instruction.
+
+## Oscillator Delay
+
+Holds the CPU in reset after the oscillator is enabled until the clock signal is stable and at its correct frequency. Crystal and RC oscillators take time to reach their steady-state frequency after power is applied or after waking from sleep.
+
+If execution begins before the clock is stable, instruction timing is wrong: peripherals may miss setup/hold windows, UART baud rates are incorrect, and timer periods are inaccurate.
+
 ## Fail-Safe Clock Monitor
 
-Detects clock failure or out-of-range frequency. Switches the CPU to an internal backup oscillator and optionally triggers a reset or interrupt. Normal operation resumes only after the primary clock is re-established.
+Detects clock failure or out-of-range frequency during operation. Switches the CPU to an internal backup oscillator and optionally triggers a reset or interrupt. Normal operation resumes only after the primary clock is re-established.
 
 ## Stack Monitor
 
