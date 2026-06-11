@@ -3,7 +3,7 @@ title: Communication Interfaces
 sidebar:
   order: 26
 dateCreated: 2026-06-11T17:49:00.373Z
-lastUpdatedOn: 2026-06-11T19:04:16.241Z
+lastUpdatedOn: 2026-06-11T19:36:19.780Z
 slug: s4/iot/communication-interfaces
 prereqs:
   - s4/computer-networks/non-tcp-ip-wireless-protocols
@@ -14,6 +14,11 @@ next: true
 ### Interface
 
 Defines the physical layer such as electrical signals, wire count, voltage levels, on-chip hardware peripheral.
+
+2 types:
+
+- Serial
+- Parallel
 
 ### Protocol
 
@@ -145,18 +150,18 @@ Very low speed. Used where minimal pin count matters: temperature sensors (DS18B
 
 Aka. PSP. A parallel interface that allows an external master processor to read and write the MCU's internal registers directly over a multi-bit data bus.
 
-Unlike serial interfaces (UART, SPI, I²C), a PSP transfers a full byte (or word) simultaneously across multiple data lines.
+Unlike serial interfaces (UART, SPI, I²C), a PSP transfers a word simultaneously across multiple data lines.
 
 Pin groups:
 
 - Data bus  
-  8 (or 16) bidirectional data lines carrying one byte per transfer.
+  8 or 16 bidirectional data lines carrying one word per transfer.
 - Address lines  
   Select which internal register or memory location the master is targeting.
 - Control lines  
   CS (chip select), RD (read strobe), WR (write strobe). The master asserts these to initiate a transfer.
 
-Operation: the external master places an address on the address lines, asserts CS and RD or WR, and the MCU responds by placing data on the bus or latching the incoming byte.
+The external master places an address on the address lines, asserts CS and RD or WR, and the MCU responds by placing data on the bus or latching the incoming word.
 
 Use cases:
 
@@ -199,9 +204,9 @@ Used for: home automation, lighting control, dense sensor networks.
 
 ### LoRa / LoRaWAN
 
-Operates in sub-GHz ISM bands (868 MHz in Europe, 915 MHz in the Americas). Spread-spectrum modulation enables kilometre-range links at very low transmit power.
+Operates in sub-GHz ISM bands (868 MHz in Europe, 915 MHz in the Americas). Spread-spectrum modulation enables kilometre-range links at very low transmit power. Very low bandwidth (< 50 kbps).
 
-Very low bandwidth (< 50 kbps). Used for wide-area sensor deployments: agriculture, smart metering, asset tracking.
+Used for wide-area sensor deployments: agriculture, smart metering, asset tracking.
 
 ### Ethernet
 
@@ -213,9 +218,9 @@ Used in industrial IoT, building automation, and SBC-based devices (Raspberry Pi
 
 NB-IoT and LTE-M are cellular standards designed for IoT:
 
-- Low bandwidth, low power, wide area coverage
-- Devices connect directly to cellular infrastructure without a local gateway
-- Used for mobile asset tracking, remote metering, and deployments in areas without Wi-Fi
+Low bandwidth, low power, wide area coverage. Devices connect directly to cellular infrastructure without a local gateway.
+
+Used for mobile asset tracking, remote metering, and deployments in areas without Wi-Fi
 
 ## Comparison
 
