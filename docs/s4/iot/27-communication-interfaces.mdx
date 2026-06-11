@@ -3,11 +3,25 @@ title: Communication Interfaces
 sidebar:
   order: 27
 dateCreated: 2026-06-11T17:49:00.373Z
-lastUpdatedOn: 2026-06-11T17:55:00.874Z
+lastUpdatedOn: 2026-06-11T18:58:34.931Z
 slug: s4/iot/communication-interfaces
+prereqs:
+  - s4/computer-networks/non-tcp-ip-wireless-protocols
 prev: true
-next: false
+next: true
 ---
+
+### Interface
+
+Defines the physical layer such as electrical signals, wire count, voltage levels, on-chip hardware peripheral.
+
+### Protocol
+
+Defines the logical layer such as frame structure, addressing, timing rules, error signaling.
+
+These terms are used interchangeably for UART, SPI, and I²C because each standard defines both layers together.
+
+The distinction becomes meaningful when a higher-level protocol runs on top of a physical interface. For example, device-specific register maps carried over the I²C bus are a protocol layered above the I²C physical standard.
 
 ## Local
 
@@ -15,14 +29,27 @@ Short-range, board-level or chip-to-chip protocols for connecting an MCU to sens
 
 ### UART
 
-Universal Asynchronous Receiver/Transmitter. Asynchronous: no shared clock. Both ends must be configured to the same baud rate.
+Universal Asynchronous Receiver/Transmitter. Asynchronous: no shared clock. Both ends must be pre-configured to the same baud rate.
 
-Pins: TX (transmit) and RX (receive).
+Pins: `TX` (transmit) and `RX` (receive), crossed between devices.
+
+Frame structure:
+
+```
+[IDLE=HIGH] → [START=LOW] → [D0...D7] → [PARITY?] → [STOP=HIGH]
+```
+
+- Start bit (LOW) signals beginning of transmission.
+- 8 data bits follow.
+- Optional parity bit for basic error detection.
+- Stop bit (HIGH) returns the line to idle.
 
 Properties:
 
 - Full duplex
 - Point-to-point only (no bus topology)
+- No clock line: receiver samples based on its own internal clock
+- Clock drift is tolerated within a single frame but accumulates across many frames
 - Common baud rates: 9600, 115200 bps
 
 Used for: serial debug monitor, GPS modules, Bluetooth adapter modules, GSM modems.
@@ -31,28 +58,79 @@ Used for: serial debug monitor, GPS modules, Bluetooth adapter modules, GSM mode
 
 Serial Peripheral Interface. Synchronous: master generates the clock.
 
-Pins: MOSI (master out, slave in), MISO (master in, slave out), SCK (clock), CS (chip select, one per slave).
+Pins:
+
+- `SCLK`  
+  Serial clock, driven by master.
+- `MOSI`  
+  Master out, slave in.
+- `MISO`  
+  Master in, slave out.
+- `CS̄`  
+  Chip select, 1 per slave, active LOW.
+
+Transaction sequence:
+
+1. Master asserts `CS̄` LOW to select the target slave.
+2. Master generates clock pulses on `SCLK`.
+3. On each clock edge, 1 bit is driven on `MOSI` and 1 bit is sampled from `MISO`.
+4. After $N$ clock cycles, $N$ bits have been exchanged in both directions simultaneously.
+5. Master deasserts `CS̄` HIGH to end the transaction.
+
+Both master and slave hold a shift register. Each clock edge shifts 1 bit out and 1 bit in at the same time. After 8 edges, a full byte is exchanged in each direction. Sending and receiving cannot be decoupled. Every transmission is simultaneously a reception.
+
+Clock mode is controlled by 2 parameters:
+
+- CPOL  
+  Clock polarity. Idle state of `SCLK`. 0 = idle LOW, 1 = idle HIGH.
+- CPHA  
+  Clock phase. Which edge triggers data sampling. 0 = leading edge, 1 = trailing edge.
+
+4 modes result from the combination:
+
+| Mode | CPOL | CPHA | Sample edge |
+| ---- | ---- | ---- | ----------- |
+| 0    | 0    | 0    | Rising      |
+| 1    | 0    | 1    | Falling     |
+| 2    | 1    | 0    | Falling     |
+| 3    | 1    | 1    | Rising      |
+
+Master and slave must use the same mode. Mode 0 is the most common default.
 
 Properties:
 
-- Full duplex
-- Single master, multiple slaves (each slave requires a dedicated CS line)
-- Fast: up to tens of MHz depending on hardware
-- No addressing — CS line selects the active slave
+- Full duplex: 1 bit shifted out on `MOSI` and 1 bit shifted in on `MISO` per clock edge simultaneously
+- Single master, multiple slaves (each slave requires a dedicated `CS̄` line)
+- No addressing: `CS̄` selects the active slave
+- No ACK: master cannot detect if a slave is absent or has failed
+- Fast: typically 10–100+ MHz
+- Pin count scales with slave count: $N$ slaves require $N + 3$ pins total
 
 Used for: displays, SD cards, external ADC/DAC chips, flash memory.
 
 ### I²C
 
-Inter-Integrated Circuit. Synchronous. Two-wire open-drain bus requiring pull-up resistors on both lines.
+Inter-Integrated Circuit. Synchronous. 2-wire open-drain bus requiring pull-up resistors on both lines.
 
-Pins: SDA (bidirectional data), SCL (clock).
+Pins: `SDA` (bidirectional data), `SCL` (clock).
+
+Any device can pull a line LOW. The pull-up resistor pulls it HIGH when no device is driving it.
+
+Transaction sequence:
+
+1. START condition: `SDA` goes LOW while `SCL` is HIGH.
+2. Master sends 7-bit device address + 1 R/W bit.
+3. Addressed slave responds with ACK (pulls `SDA` LOW).
+4. Data bytes transferred, each followed by ACK from receiver.
+5. STOP condition: `SDA` goes HIGH while `SCL` is HIGH.
 
 Properties:
 
 - Half duplex
-- Multi-master, multi-slave on the same two wires
-- Each device has a unique 7-bit (or 10-bit) address sent at the start of each transaction
+- Multi-master, multi-slave on the same 2 wires
+- Up to 127 devices in 7-bit mode, limited by address space and electrical loading
+- Each device has a unique 7-bit (or 10-bit) address
+- Built-in ACK on every byte
 - Standard mode: 100 kHz. Fast mode: 400 kHz. Fast-plus: 1 MHz
 
 Used for: IMUs, temperature and pressure sensors, EEPROMs, real-time clocks.
@@ -88,7 +166,7 @@ Use cases:
 
 <Note>
 
-PSP requires many pins (8 data + address + control). It is only practical when pin count is not constrained and transfer speed justifies it. Most modern IoT designs prefer SPI or I²C.
+PSP requires many pins (8 data + address + control). Only practical when pin count is not constrained and transfer speed justifies it. Most modern IoT designs prefer SPI or I²C.
 
 </Note>
 
@@ -115,9 +193,9 @@ Range: approximately 10–100 m depending on environment.
 
 ### Zigbee
 
-IEEE 802.15.4. Operates at 2.4 GHz. Very low power. Supports mesh networking: devices relay packets for each other, extending range without infrastructure.
+Low-power wireless mesh protocol. Protocol stack, device types, and topologies covered in [Non-TCP/IP Wireless Protocols](/s4/computer-networks/non-tcp-ip-wireless-protocols).
 
-Low bandwidth (~250 kbps). Used for home automation, lighting control, and dense sensor networks.
+Used for: home automation, lighting control, dense sensor networks.
 
 ### LoRa / LoRaWAN
 
@@ -138,3 +216,15 @@ NB-IoT and LTE-M are cellular standards designed for IoT:
 - Low bandwidth, low power, wide area coverage
 - Devices connect directly to cellular infrastructure without a local gateway
 - Used for mobile asset tracking, remote metering, and deployments in areas without Wi-Fi
+
+## Comparison
+
+| Property     | UART          | SPI             | I²C               |
+| ------------ | ------------- | --------------- | ----------------- |
+| Wire count   | 2 (TX, RX)    | 4 + 1/slave     | 2 (always)        |
+| Clock        | None (async)  | Shared (master) | Shared (master)   |
+| Speed        | Low to medium | High            | Low to medium     |
+| Duplex       | Full          | Full            | Half              |
+| Multi-device | No            | Yes (via CS̄)    | Yes (via address) |
+| Addressing   | None          | Physical (CS̄)   | Software (7-bit)  |
+| ACK          | No            | No              | Yes (per byte)    |
