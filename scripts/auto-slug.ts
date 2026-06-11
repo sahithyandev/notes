@@ -52,7 +52,10 @@ async function renumberFiles(
       const currentNum = parseInt(base.match(PATTERN_TITLE_PREFIX)![1]);
       if (currentNum === expected) continue;
 
-      const newBase = base.replace(PATTERN_TITLE_PREFIX, `${expected}-`);
+      const newBase = base.replace(
+        PATTERN_TITLE_PREFIX,
+        `${expected.toString().padStart(2, "0")}-`,
+      );
       const newPath = join(dirname(file), newBase);
       if (dryRun) {
         console.log(`[DRY RUN] renumber: ${file} -> ${newPath}`);
