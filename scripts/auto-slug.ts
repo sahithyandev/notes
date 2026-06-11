@@ -18,7 +18,56 @@ function safeParseInt(
   return parsed;
 }
 
+async function renumberFiles(
+  filePaths: string[],
+  dryRun: boolean,
+): Promise<string[]> {
+  const byDir = new Map<string, string[]>();
+  for (const p of filePaths) {
+    if (p.includes("/summary/") || p.includes("/images/")) continue;
+    if (!p.endsWith(".md") && !p.endsWith(".mdx")) continue;
+    if (!PATTERN_TITLE_PREFIX.test(basename(p))) continue;
+    const dir = dirname(p);
+    if (!byDir.has(dir)) byDir.set(dir, []);
+    byDir.get(dir)!.push(p);
+  }
+
+  const renames = new Map<string, string>();
+
+  for (const [, files] of byDir) {
+    files.sort((a, b) => {
+      const na = parseInt(basename(a).match(PATTERN_TITLE_PREFIX)![1]);
+      const nb = parseInt(basename(b).match(PATTERN_TITLE_PREFIX)![1]);
+      return na - nb;
+    });
+
+    const firstNum = parseInt(
+      basename(files[0]).match(PATTERN_TITLE_PREFIX)![1],
+    );
+
+    for (let i = 0; i < files.length; i++) {
+      const expected = firstNum + i;
+      const file = files[i];
+      const base = basename(file);
+      const currentNum = parseInt(base.match(PATTERN_TITLE_PREFIX)![1]);
+      if (currentNum === expected) continue;
+
+      const newBase = base.replace(PATTERN_TITLE_PREFIX, `${expected}-`);
+      const newPath = join(dirname(file), newBase);
+      if (dryRun) {
+        console.log(`[DRY RUN] renumber: ${file} -> ${newPath}`);
+      } else {
+        await rename(file, newPath);
+      }
+      renames.set(file, newPath);
+    }
+  }
+
+  return filePaths.map((p) => renames.get(p) ?? p);
+}
+
 export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
+  mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
     if (filePath.includes("/summary/") || filePath.includes("/images/"))
