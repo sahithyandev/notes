@@ -1,88 +1,17 @@
 ---
-title: Reliability and Fault Tolerance
+title: Reliability
 sidebar:
   order: 24
 slug: s4/iot/reliability
 prev: true
 next: true
 dateCreated: 2026-05-31T07:08:08.399Z
-lastUpdatedOn: 2026-06-11T06:18:39.634Z
+lastUpdatedOn: 2026-06-11T10:58:24.920Z
 ---
 
-## Reliable vs Fail-Safe
+A system is reliable when it rarely fails. No system can be made completely failure-free.
 
-**Reliable**: a system that rarely fails. No system can be made completely failure-free.
-
-**Fail-safe**: a system that enters a safe state when it fails. Failure must not create danger.
-
-These are independent properties. A system can be reliable without being fail-safe, and vice versa.
-
-### Railway Crossing Example
-
-Option A: warning light normally OFF. On failure, the light goes dark, which looks like no train is coming. Dangerous.
-
-Option B: green light normally ON. On failure, the light goes dark, interpreted as unsafe. Safe.
-
-Option B is fail-safe.
-
-### Headlight Flash Convention
-
-International standard: flash means "I am stopping, you go." If both drivers flash, both stop.
-
-Opposite convention: flash means "I am coming." If both flash, both proceed, risking collision.
-
-The first convention is fail-safe; the second is not.
-
-## Fail-Stop
-
-A fail-stop system halts completely when a fault is detected rather than continuing in a degraded or undefined state.
-
-Stopping is preferable to degraded operation because:
-
-- Wrong output is worse than no output  
-  Downstream systems and human operators can handle absence of data. They cannot safely handle incorrect data presented as correct.
-- Corrupt state propagates  
-  An MCU executing with corrupted memory or wrong sensor readings spreads errors through every system that depends on it.
-- Degraded behaviour is often undetectable  
-  A system that appears to be running hides the fault. A stopped system makes the fault immediately visible and diagnosable.
-- Undefined states cause unpredictable physical effects  
-  An actuator commanded by corrupted logic may drive a motor, open a valve, or apply a brake in an unintended way. The physical consequence of wrong action exceeds the consequence of no action in most safety-critical contexts.
-
-<Note>
-
-Fail-stop is distinct from fail-safe. Fail-safe means the halted state itself is safe (e.g. a barrier that defaults to closed). A system can fail-stop without being fail-safe if the stopped state is still dangerous.
-
-</Note>
-
-## Fault Tolerance
-
-A fault-tolerant system continues operating after a component failure. Achieved through redundancy.
-
-### Active-Active Redundancy
-
-Both systems operate simultaneously.
-
-- Both are continuously verified
-- No switchover delay
-
-### Active-Passive Redundancy
-
-One system active, one on standby.
-
-- Lower operating cost
-- Standby unit may fail unnoticed
-
-### Aircraft Autopilot Example
-
-Typical setup:
-
-- 1 active autopilot
-- 1 supervisory autopilot
-- 3 standby autopilots
-
-Different manufacturers may be used to avoid common software bugs.
-
-## Reliability Metrics
+## Metrics
 
 ### MTTF
 

@@ -1,0 +1,49 @@
+---
+title: Fail Safe
+sidebar:
+  order: 25
+dateCreated: 2026-06-11T10:51:14.259Z
+lastUpdatedOn: 2026-06-11T10:58:24.923Z
+slug: s4/iot/fail-safe
+prev: true
+next: true
+---
+
+## Fail-Stop
+
+A fail-stop system halts completely when a fault is detected rather than continuing in a degraded or undefined state.
+
+Stopping is preferable to degraded operation because:
+
+- Wrong output is worse than no output  
+  Downstream systems and human operators can handle absence of data. They cannot safely handle incorrect data presented as correct.
+- Corrupt state propagates  
+  An MCU executing with corrupted memory or wrong sensor readings spreads errors through every system that depends on it.
+- Degraded behaviour is often undetectable  
+  A system that appears to be running hides the fault. A stopped system makes the fault immediately visible and diagnosable.
+- Undefined states cause unpredictable physical effects  
+  An actuator commanded by corrupted logic may drive a motor, open a valve, or apply a brake in an unintended way. The physical consequence of wrong action exceeds the consequence of no action in most safety-critical contexts.
+
+<Note>
+
+Fail-stop is distinct from fail-safe. Fail-safe means the halted state itself is safe (e.g. a barrier that defaults to closed). A system can fail-stop without being fail-safe if the stopped state is still dangerous.
+
+</Note>
+
+## Examples
+
+### Railway Crossing Example
+
+Option A: warning light normally OFF. On failure, the light goes dark, which looks like no train is coming. Dangerous.
+
+Option B: green light normally ON. On failure, the light goes dark, interpreted as unsafe. Safe.
+
+Option B is fail-safe.
+
+### Headlight Flash Convention
+
+International standard: flash means "I am stopping, you go." If both drivers flash, both stop.
+
+Opposite convention: flash means "I am coming." If both flash, both proceed, risking collision.
+
+The first convention is fail-safe; the second is not.

@@ -1,0 +1,38 @@
+---
+title: Fault Tolerance
+sidebar:
+  order: 26
+slug: s4/iot/fault-tolerance
+prev: true
+next: true
+dateCreated: 2026-06-11T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T10:58:24.923Z
+---
+
+A system is fault-tolerant **iff** the system continues operating correctly even when a component fails. Achieved by using redundancy.
+
+## Redundancy Configuration
+
+### Active-Active Redundancy
+
+All redundant units operate simultaneously, sharing the load. When one fails, the remaining units absorb the load.
+
+Health of all units is continuously observable. No switchover delay.
+
+### Active-Passive Redundancy
+
+One unit operates. one unit is on standby and idle. Standby unit takes over on failure.
+
+Lower operating cost. Switching delay exists. Standby unit may fail unnoticed.
+
+## Examples
+
+### Aircraft Autopilot Example
+
+Typical setup:
+
+- 1 active autopilot
+- 1 supervisory autopilot
+- 3 standby autopilots
+
+Different manufacturers may be used to avoid common software bugs.
