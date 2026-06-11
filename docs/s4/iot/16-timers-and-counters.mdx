@@ -3,7 +3,7 @@ title: Timers and Counters
 sidebar:
   order: 16
 dateCreated: 2026-06-11T05:49:22.856Z
-lastUpdatedOn: 2026-06-11T18:25:18.254Z
+lastUpdatedOn: 2026-06-11T19:03:36.128Z
 slug: s4/iot/timers-and-counters
 prev: true
 next: true
@@ -59,7 +59,17 @@ Edge selection options:
 - Rising edge only
 - Falling edge only
 - Every edge (alternating)  
-  Captures both transitions of a pulse
+  Captures both transitions of a pulse.
+- Every 4th rising edge  
+  PIC built-in 1:4 prescaler. Reduces capture rate for slower periodic signals.
+- Every 16th rising edge  
+  PIC built-in 1:16 prescaler.
+
+<Note>
+
+Polling cannot replace hardware capture for fast signals. Catching a 1 MHz signal in software requires sampling every 500 ns, faster than any interrupt-driven loop can sustain. Capture records the exact timer value at the moment the edge arrives, independent of CPU load.
+
+</Note>
 
 Measurements derived from 2 successive captures $t_1$ and $t_2$:
 
@@ -75,18 +85,24 @@ $$
 T_{pulse} = \bigl((t_2 - t_1) + N_{ov} \times (TOP + 1)\bigr) \times \frac{P}{f_{clk}}
 $$
 
-Common measurements:
+The timestamp is latched in hardware. No polling latency. The CPU can read the value any time before the next capture overwrites it.
+
+Applications:
 
 - Pulse width  
-  Capture rising then falling edge on the same channel
+  Capture rising then falling edge. Subtract timestamps.
 - Period  
-  Capture 2 consecutive rising edges
+  Capture 2 consecutive rising edges.
 - Frequency  
-  $f = 1 / T_{period}$
+  $f = 1 / T_{period}$.
 - Duty cycle  
   $D = T_{pulse} / T_{period}$. Requires 2 channels or both edges on 1 channel.
-
-The timestamp is latched in hardware. No polling latency. The CPU can read the value any time before the next capture overwrites it.
+- Distance measurement  
+  Capture pulse width from an ultrasonic sensor (HC-SR04). Convert count to distance via speed of sound.
+- Rotational speed  
+  Capture timestamp on each Hall-effect sensor pulse. Time between successive pulses gives RPM.
+- Event timestamp  
+  Log exact arrival time of RF or IR pulses with microsecond precision regardless of CPU activity.
 
 ### Compare Mode
 
@@ -100,6 +116,19 @@ The timer continuously runs. When the counter value matches the compare register
 | No output | Interrupt or DMA trigger only |
 
 After a compare match, software loads the next target value into the compare register to schedule the following event. Compare matches chain to produce arbitrary waveforms or precise periodic interrupts without blocking the CPU.
+
+PIC compare modules include a Special Event Trigger output. On match, TMR1 resets and ADCON0.GO is set automatically, starting an ADC conversion at the exact clock cycle with no CPU code.
+
+Applications:
+
+- Precise output pulse  
+  Load target count → pin asserts on match → reload with new target → pin deasserts. No jitter from software overhead.
+- Periodic ADC sampling  
+  Use Special Event Trigger. Every match resets TMR1 and starts an ADC conversion at a fixed interval.
+- Periodic interrupt  
+  Reload compare register inside the ISR. Creates a time base independent of main-loop timing.
+- Motor commutation  
+  Assert stator coil transitions at exact counter values. Software timing jitter causes torque ripple.
 
 PWM is a special case. The timer resets at a period compare match. A second compare match controls the duty cycle transition. See [Pulse Width Modulation](/s4/iot/signal-conversion#pulse-width-modulation).
 
@@ -116,6 +145,12 @@ $$
 $$
 \text{Duty Cycle} = \frac{(CCPRxL : CCPxCON\langle5:4\rangle)}{4 \times (PR2 + 1)}
 $$
+
+<Note>
+
+Capture and compare modes share TMR1 and CCPR1. A single module cannot run both simultaneously. Designs requiring concurrent capture and compare, or multiple capture channels, need separate CCP module instances. Available CCP count is a microcontroller selection criterion: a 4-wheel ABS system needs 4 capture channels.
+
+</Note>
 
 ## Prescaler
 
