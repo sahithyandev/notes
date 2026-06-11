@@ -1,0 +1,55 @@
+---
+title: Controller Area Network
+sidebar:
+  order: 18
+  label: CAN Protocol
+slug: s4/iot/can-protocol
+prev: true
+next: true
+dateCreated: 2026-06-06T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T06:00:31.089Z
+---
+
+A multi-master, message-oriented serial communication protocol that allows microcontrollers and devices to communicate without a host computer. Developed by Bosch in 1986 for automotive applications.
+
+Uses differential signaling on two wires: CAN_H and CAN_L. Bus topology with 120 Ω termination resistors at each end.
+
+## Message Priority
+
+Each message carries an identifier (11-bit in CAN 2.0A, 29-bit in CAN 2.0B). Lower identifier value means higher priority.
+
+Non-destructive arbitration: the dominant bit (logic 0) wins. Losing nodes retransmit automatically.
+
+## Frame Types
+
+- Data frame  
+  Carries data from a transmitter to receivers.
+- Remote frame  
+  Requests data from another node.
+- Error frame  
+  Signals a detected error to all nodes.
+- Overload frame  
+  Requests a delay between successive frames.
+
+## Error Detection
+
+- CRC check on each frame
+- Bit stuffing: after 5 consecutive identical bits, a complementary bit is inserted
+- ACK field: the transmitter expects at least one receiver to acknowledge
+- Bus monitoring: each node checks its own transmission against the bus state
+
+Nodes maintain transmit and receive error counters. Excessive errors transition a node to error-passive or bus-off state.
+
+## Variants
+
+- Classic CAN  
+  Up to 1 Mbps. Max 127 nodes per bus.
+- CAN FD  
+  Data phase up to 8 Mbps. Payload up to 64 bytes per frame.
+
+## Applications
+
+- Automotive ECU communication
+- Industrial automation
+- Medical devices
+- Robotics

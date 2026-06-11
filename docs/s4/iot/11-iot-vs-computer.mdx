@@ -1,0 +1,98 @@
+---
+title: IoT vs Computer
+sidebar:
+  order: 11
+slug: s4/iot/iot-vs-computer
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+---
+
+An IoT device is not a smaller computer. It is designed for a specific purpose and optimized around that purpose.
+
+## Design Philosophy
+
+| Computer                         | IoT Device                 |
+| -------------------------------- | -------------------------- |
+| General purpose                  | Task-specific              |
+| High performance                 | Sufficient performance     |
+| Expandable                       | Minimal hardware           |
+| Power consumption less important | Power consumption critical |
+| User present                     | Often unattended           |
+| Optimized for flexibility        | Optimized for efficiency   |
+
+Specialization yields:
+
+- Lower cost
+- Lower power consumption
+- Simpler maintenance
+- Higher reliability
+- Fewer failure points
+
+## I/O Ports
+
+Computer I/O targets flexibility. A single USB port handles keyboards, cameras, charging, and accessories.
+
+IoT I/O ports are dedicated to specific functions:
+
+- Analog signal input
+- Digital signal input/output
+- Timing and capture signals
+- Sensor interfaces
+
+A motion detector may only need the timestamp of when motion occurred. A dedicated timing input records this directly.
+
+## Power Consumption
+
+Power efficiency is the primary design objective in IoT.
+
+Every design decision is influenced by energy consumption.
+
+Examples:
+
+- Smart refrigerators reduce electricity consumption
+- Inverter air conditioners adjust compressor speed to save power
+
+These are fundamentally different design philosophies, not just different sizes of the same thing.
+
+**General-purpose computer philosophy:**
+
+- Designed for data-intensive computing
+- Maximise capacity and performance
+- Large, hierarchical memory and many I/O devices (USB, Display, Audio — generic, multi-purpose)
+- Multiple buses operating at different speeds
+- Buffered I/O — data is queued, not processed immediately
+- Energy consumption is an afterthought
+- Reliable, but not necessarily fail-safe (a person is nearby to intervene)
+- General-purpose, expandable
+- CISC processors (1000+ instructions; breadth over depth)
+
+**IoT device philosophy:**
+
+- Designed for interaction with the physical environment
+- Limited processing power — by design, only needs to handle specific I/O
+- Small program, but must execute in **real-time** — no buffering. When a signal arrives, it must be acted upon immediately
+- **Guaranteed response time** — even if the device cannot process correctly, it must output an error condition within a fixed time window (e.g., 10 µs). This is a hard constraint, not a performance target
+- Energy saving is central — often battery-powered with limited capacity
+- Fail-safe operation is mandatory
+- Minimum components — every added component increases failure probability, power draw, cost, and board space
+- Simple or headless UI; diverse, specialised I/O (analog sensors, high-energy actuators, noisy connections)
+- RISC processors (~35 instructions; depth over breadth)
+
+**The hardware-software boundary in IoT** is especially tight. Almost anything implementable in hardware can be done in software and vice versa (e.g., LED blinking via hardware timer vs. software delay loop). However, in production at scale, hardware solutions tend to be more reliable and energy-efficient. Every additional software-emulated function that could be done in dedicated hardware is a trade-off decision. The IoT developer must understand the full stack — from physical interfaces to cloud — because IoT does not permit the specialisation that web development does.
+
+The real challenge is software, not hardware. Writing for a microcontroller means controlling the physical world in real-time, with no screen for debugging, no OS to catch errors, and no human in the loop.
+
+**CISC vs. RISC:**
+
+|                   | CISC                                      | RISC                                          |
+| ----------------- | ----------------------------------------- | --------------------------------------------- |
+| Full name         | Complex Instruction Set Computer          | Reduced Instruction Set Computer              |
+| Instruction count | 1000+                                     | ~35                                           |
+| Optimisation      | Breadth — can do almost anything          | Depth — each instruction highly optimised     |
+| Used in           | General-purpose computers (Intel, AMD)    | IoT microcontrollers (AVR, PIC, ARM Cortex-M) |
+| Execution         | Variable-length instructions, multi-cycle | Fixed-length, single-cycle execution          |
+| IoT suitability   | Poor — excess complexity, higher power    | High — predictable timing, energy efficient   |
+
+RISC's predictable, single-cycle execution is what enables the guaranteed real-time response times that IoT requires. CISC's variable-cycle instructions make timing guarantees much harder to achieve.

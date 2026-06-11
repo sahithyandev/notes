@@ -1,0 +1,70 @@
+---
+title: IoT Programming Languages
+sidebar:
+  order: 15
+slug: s4/iot/programming-languages
+prev: true
+next: true
+dateCreated: 2026-06-07T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+---
+
+## C and C++
+
+C dominated early MCU firmware and is still used for low-level driver code. Declining for application-layer work because:
+
+- No object model makes hardware abstraction layers hard to maintain as complexity grows
+- C++ with Wiring/Arduino provides equivalent performance with cleaner abstractions
+- Scripting languages (Lua, MicroPython) enable faster prototyping on capable MCUs
+
+C++ is the primary language for Arduino development via the Wiring framework.
+
+## Java
+
+Targeted embedded devices through Java ME. Not used on typical MCUs because:
+
+- JVM requires RAM and flash well beyond typical MCU budgets
+- Garbage collector introduces non-deterministic pauses, violating real-time constraints
+- JIT compilation adds latency on low-clock processors
+
+## Lua
+
+Designed for embedded systems. Used on ESP chips via the NodeMCU firmware.
+
+Properties:
+
+- Lightweight interpreter (~256 KB flash footprint)
+- Dynamic typing
+- Garbage collected via mark-and-sweep
+- Event-driven programming model using callbacks
+
+Advantages over C/C++ for ESP:
+
+- Shorter code
+- Lower memory requirements
+- Interactive REPL for rapid testing
+- No compile-flash cycle: scripts run directly from the interpreter
+
+<Note>
+
+The garbage collector can introduce brief pauses. Hard real-time tasks should use C/C++ firmware instead.
+
+</Note>
+
+## MicroPython
+
+Python subset designed for microcontrollers. Runs on ESP32, RP2040 (Raspberry Pi Pico), STM32, and others.
+
+Properties:
+
+- Interactive REPL over serial
+- Dynamic typing and garbage collection
+- Standard Python syntax with reduced standard library
+- Modules for GPIO, I²C, SPI, UART, Wi-Fi, and timers
+
+Tradeoffs vs C/C++:
+
+- Slower execution (interpreted, not compiled to native code)
+- Higher memory footprint than Lua
+- Unsuitable for hard real-time tasks
+- Significantly faster prototyping and iteration

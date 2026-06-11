@@ -6,10 +6,20 @@ slug: s4/iot/system-architecture
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-04-24T03:19:45.183Z
+lastUpdatedOn: 2026-06-11T06:00:31.085Z
 ---
 
 An IoT solution consists of interconnected hardware and software components that collect data, transmit it, and process it for decision making.
+
+The IoT architecture is structured in three layers:
+
+**Edge Layer** — the physical layer. Contains sensors, actuators, and hardware interfaces. Characteristics: low computing power, low energy consumption, lower reliability per unit, but deployed in large volumes. Responsible for raw data collection and direct physical-world interaction. This is where embedded processing happens.
+
+**Fog Layer** — the intermediate processing layer. Sits between edge and cloud. Handles local computation, local decision-making, and data pre-processing. The purpose of the fog layer is to reduce latency (processing locally rather than sending everything to the cloud) and to reduce bandwidth load on the network. It handles tasks that require fast responses but don't need the full compute resources of cloud infrastructure.
+
+**Cloud Layer** — the back-end infrastructure (Google Cloud, AWS, Azure, Huawei Cloud, etc.). Capabilities: high-power compute, large-scale data storage, big data analytics, AI/ML workloads, computer vision, voice recognition, NLP. Cloud is where long-term data storage, training of models, and high-complexity analytics occur. Not suitable for latency-sensitive decisions.
+
+The full component chain reads: Sensors → Actuators → H/W Interfaces → Microcontrollers → Software → Communication → Cloud/Central Servers → Big Data Analytics → AI/ML.
 
 ## Major Components
 

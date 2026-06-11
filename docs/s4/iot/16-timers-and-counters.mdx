@@ -1,0 +1,117 @@
+---
+title: Timers and Counters
+sidebar:
+  order: 16
+dateCreated: 2026-06-11T05:49:22.856Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+slug: s4/iot/timers-and-counters
+prev: true
+next: true
+---
+
+A timer/counter is a hardware register that increments on each clock edge — either the system clock (timer mode) or an external signal (counter mode). It runs independently of the CPU and can trigger interrupts or drive output pins on specific count values.
+
+## Counter Mode
+
+In counter mode the register increments on each rising (or falling) edge of an external signal rather than the system clock. This counts external events directly in hardware with no CPU involvement.
+
+Applications:
+
+- Frequency measurement  
+  Count pulses over a fixed gate period $T_{gate}$. Frequency $f = N / T_{gate}$.
+- Event counting  
+  Tally encoder pulses, flow-meter ticks, or product counts on a conveyor.
+- Rotational speed  
+  Count encoder edges per timer overflow to derive RPM.
+
+## Capture/Compare Module
+
+A Capture/Compare (CC) module shares a timer with one or more channels. Each channel can be independently configured in capture or compare mode. On PIC MCUs the module is called CCP (Capture/Compare/PWM) and adds hardware PWM as a third mode.
+
+### Capture Mode
+
+When a selected edge arrives on the capture input pin, the hardware instantly copies the current timer count into the capture register and sets a flag (optionally firing an interrupt). The CPU reads the latched timestamp at any point after.
+
+Edge selection options:
+
+- Rising edge only
+- Falling edge only
+- Every edge (alternating) — captures both transitions of a pulse
+
+Measurements derived from two successive captures $t_1$ and $t_2$:
+
+$$
+T_{pulse} = (t_2 - t_1) \times \frac{P}{f_{clk}}
+$$
+
+Where $P$ is the prescaler. If the timer overflows between captures, the overflow count must be added:
+
+$$
+T_{pulse} = \bigl((t_2 - t_1) + N_{ov} \times (TOP + 1)\bigr) \times \frac{P}{f_{clk}}
+$$
+
+Common measurements:
+
+- Pulse width — capture rising then falling edge on the same channel
+- Period — capture two consecutive rising edges
+- Frequency — $f = 1 / T_{period}$
+- Duty cycle — $D = T_{pulse} / T_{period}$, requires two channels or both edges on one channel
+
+Because the timestamp is latched in hardware, no polling latency is introduced. The CPU can read the value any time before the next capture overwrites it.
+
+### Compare Mode
+
+The timer continuously runs. When the counter value matches the compare register, the hardware performs a configurable output action immediately — with no software latency:
+
+| Action    | Effect                        |
+| --------- | ----------------------------- |
+| Set       | Output pin driven HIGH        |
+| Clear     | Output pin driven LOW         |
+| Toggle    | Output pin inverted           |
+| No output | Interrupt or DMA trigger only |
+
+After a compare match, software loads the next target value into the compare register to schedule the following event. This chains compare matches to produce arbitrary waveforms or precise periodic interrupts without blocking the CPU.
+
+PWM is a special case: the timer resets at a period compare match while a second compare match controls the duty cycle transition. See [Pulse Width Modulation](#pulse-width-modulation).
+
+### CCP Mode (PIC)
+
+PIC CCP modules combine capture, compare, and PWM in a single peripheral sharing Timer1 (16-bit) for capture/compare and Timer2 (8-bit) for PWM. Only one mode is active at a time, selected by the CCPxCON register.
+
+In PWM mode the 10-bit duty cycle is split: the upper 8 bits go into the CCPRxL register and the lower 2 bits into CCPxCON. Period is set by the Timer2 PR2 register:
+
+$$
+f_{PWM} = \frac{f_{clk}}{4 \times P \times (PR2 + 1)}
+$$
+
+$$
+\text{Duty Cycle} = \frac{(CCPRxL : CCPxCON\langle5:4\rangle)}{4 \times (PR2 + 1)}
+$$
+
+## Prescaler
+
+Sits between the clock source and the counter input. Divides the clock by a fixed ratio $P$ before the counter sees it:
+
+$$
+f_{tick} = \frac{f_{clk}}{P}
+$$
+
+Effect: slower count rate → longer maximum measurable period, lower time resolution per tick.
+
+A 16-bit counter at 16 MHz with no prescaler overflows every 4 ms and has a 62.5 ns tick resolution. With $P = 64$ it overflows every 256 ms at the cost of a 4 µs tick.
+
+Prescaler values are usually powers of 2 (1, 2, 4, 8, …, 256) or specific ratios depending on the MCU family.
+
+## Postscaler
+
+Sits after the timer's period/compare event, before the interrupt or output signal is asserted. Divides the event output by a ratio $Q$: the interrupt fires only every $Q$-th overflow or compare match.
+
+$$
+f_{event} = \frac{f_{overflow}}{Q} = \frac{f_{clk}}{P \times (TOP + 1) \times Q}
+$$
+
+Effect: reduces interrupt rate without changing the counter's tick resolution or period register value.
+
+Useful when the required interrupt period is longer than the timer can reach with the prescaler alone, or when the timer period must remain fixed for PWM frequency while the interrupt rate is adjusted independently.
+
+Not all MCU families include a postscaler. PIC microcontrollers expose a 4-bit postscaler on Timer0/Timer2 (1:1 to 1:16). AVR and most ARM Cortex-M timers omit it — the same effect is achieved in software by counting overflows in the ISR.

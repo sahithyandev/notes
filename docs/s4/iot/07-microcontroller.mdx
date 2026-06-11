@@ -1,0 +1,1480 @@
+---
+title: Microcontroller
+sidebar:
+  order: 7
+slug: s4/iot/microcontroller
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.624Z
+lastUpdatedOn: 2026-06-11T06:00:31.086Z
+prereqs:
+  - s2/computer-organization-and-digital-design/basics/digital-logic-signals
+---
+
+Aka. MCU. A compact integrated circuit designed to control embedded systems.
+
+Includes:
+
+- CPU
+- Memory
+- I/O interfaces
+- Timers and peripherals
+
+Often implemented as a System-on-Chip (SoC)
+
+Microcontrollers are widely used in IoT devices because they:
+
+- consume very little power
+- require few external components
+- provide built-in I/O capabilities.
+
+## Microcontroller Architecture
+
+### Hardware Model
+
+Describes the physical structure and electrical characteristics of the microcontroller. Relevant to circuit designers and PCB engineers.
+
+Covers:
+
+- Power supply requirements  
+  Operating voltage range, current draw, decoupling capacitor placement.
+- Clock system  
+  External crystal or internal RC oscillator frequency; clock distribution to peripherals.
+- Bus architecture  
+  Width and timing of address, data, and control buses between CPU, memory, and peripherals.
+- Memory types  
+  Physical flash, SRAM, and EEPROM cells and their access characteristics.
+- Bus timing  
+  Setup/hold times, read/write cycle lengths; critical for interfacing external memory or peripherals.
+- Pin configuration  
+  Physical pinout, alternate pin functions, drive strength, and logic voltage levels (e.g. 3.3 V vs 5 V).
+
+### Programmer’s Model
+
+Represents the microcontroller from the software developer’s perspective. Abstracts away physical implementation details.
+
+Covers:
+
+- Instruction set architecture  
+  The set of opcodes the CPU can execute; determines what the compiler targets.
+- Memory organization  
+  How the address space is laid out: program memory, data memory, and memory-mapped peripheral registers.
+- Register model  
+  General-purpose registers and special function registers (SFRs) accessible by software.
+- ALU capabilities  
+  Supported arithmetic and logical operations; whether hardware multiply/divide is available.
+- Interrupt handling  
+  Interrupt vector table, priority levels, and enable/flag registers.
+- Peripheral device access  
+  Reading and writing peripheral registers (GPIO, timers, UART, SPI, I²C) via memory-mapped I/O addresses.
+- Resource management  
+  Stack pointer, program counter, status flags, and watchdog control.
+
+## I/O Access Methods
+
+Two approaches exist for how software addresses peripheral registers.
+
+### Memory-Mapped I/O
+
+Peripheral registers occupy addresses in the same address space as RAM and ROM. The CPU uses ordinary load and store instructions to read and write them. No special I/O instructions are needed.
+
+A memory map partitions the address space into regions:
+
+- Program flash (read-only)
+- SRAM (read/write)
+- Peripheral registers (read/write, with hardware side effects)
+- Boot ROM / configuration fuses
+
+Writing to a peripheral register address does not store a value in RAM — it sends a command to the hardware. Reading from a status register address reads the current hardware state, not a cached value.
+
+Used by: ARM Cortex-M, AVR, PIC, ESP8266/ESP32, and most modern MCUs.
+
+Advantages:
+
+- No separate instruction set needed for I/O
+- Peripheral registers accessible with pointer arithmetic in C
+- Standard debugging tools (memory inspectors, JTAG) can read peripheral state directly
+
+#### Volatile Keyword
+
+Compilers may cache memory reads in registers and eliminate repeated loads as an optimisation. Peripheral registers change without CPU involvement, so caching their value produces stale reads.
+
+Declaring a peripheral register pointer as `volatile` tells the compiler every access must go to the actual address:
+
+```c
+volatile uint32_t *GPIOA_ODR = (uint32_t *)0x40020014;
+```
+
+### Port-Mapped I/O
+
+Aka. isolated I/O or I/O-mapped I/O. Peripheral registers occupy a separate address space, distinct from memory. Dedicated CPU instructions access them: `IN` (read from port) and `OUT` (write to port) on x86.
+
+The address bus carries a separate signal (M/IO̅) to distinguish memory cycles from I/O cycles, so the same numeric address can refer to both a RAM location and a peripheral register without conflict.
+
+Used by: x86 architecture (PC-class processors). Rare in embedded MCUs.
+
+Advantages:
+
+- Peripheral space cannot be accidentally accessed by a stray pointer
+- Full memory address space remains available for RAM and ROM
+
+Disadvantages:
+
+- Requires dedicated I/O instructions; C compilers need intrinsics or inline assembly
+- Peripherals not visible to standard memory debugging tools
+
+### Special Function Registers
+
+On many MCUs (8051, PIC, AVR) peripheral control registers are called Special Function Registers (SFRs). They appear at fixed addresses in the memory map and are named in the device header file so firmware can reference them by name rather than raw address.
+
+```c
+DDRB = 0xFF;   // AVR: set all Port B pins as output
+PORTB = 0xAA;  // AVR: write pattern to Port B
+```
+
+## Components
+
+### Microprocessor Unit
+
+Aka. MPU. The central processing unit inside the microcontroller that executes instructions and controls system operations. Uses a specialized or scaled-down processor design. Often based on architectures like 8051, 8048, or 68HC11. Executes instructions and coordinates peripherals.
+
+### Memory Subsystems
+
+IoT systems use Howard architecture to improve instruction execution efficiency.
+
+#### Program Memory
+
+Stores the executable instructions of the microcontroller program. Implemented as flash memory. Read-only during normal program execution.
+
+Flash is non-volatile: contents survive power loss. This makes it suitable for permanent code storage, unlike RAM which loses its contents on power-off.
+
+##### Why Read-Only During Execution
+
+Flash cells can only be erased in large blocks (pages or sectors), not byte by byte. Erasing forces all bits in the block to 1; writing then selectively drives bits to 0. This erase-before-write cycle takes milliseconds — orders of magnitude slower than instruction execution.
+
+Writing to flash while executing from the same flash block causes a bus conflict: the CPU fetch and the write controller both need the flash bus simultaneously. Most MCUs prevent this in hardware.
+
+For these reasons, flash is only written during:
+
+- Initial programming via ICSP or JTAG
+- Firmware update via a bootloader (which copies new code into RAM and executes the write from there)
+
+##### IP Protection
+
+See [Intellectual Property Protection](/s4/iot/ip-protection).
+
+#### Data Memory
+
+Stores variables and temporary program data. Often implemented as RAM. Sometimes structured as a register file for faster access.
+
+#### Hardware Stack
+
+A dedicated, fixed-depth set of internal registers that stores return addresses for subroutine calls and interrupts. Managed entirely by the CPU in hardware — no software stack pointer maintenance required.
+
+On a software stack (used by ARM, AVR, x86), the stack pointer (SP) register points into a region of RAM. The stack grows into RAM on each call and shrinks on return. On a hardware stack, the return addresses are stored in a separate on-chip register file with no RAM involvement.
+
+##### Reasons for Use in IoT
+
+- Speed  
+  Internal register access completes in a single clock cycle. No memory bus cycle is needed, so call and return latency is fixed and minimal.
+- Deterministic interrupt response  
+  Interrupt entry saves the program counter to the hardware stack instantly. No variability from RAM bus arbitration or cache misses.
+- RAM conservation  
+  Constrained 8-bit MCUs (8051: 128 B RAM, PIC: 96–368 B RAM) cannot afford to dedicate a block of their tiny RAM to a call stack. The hardware stack removes this cost entirely.
+- No initialisation overhead  
+  A software stack requires startup code to set the stack pointer before any function call. A hardware stack is ready at reset with no setup.
+
+##### Limitations
+
+- Fixed depth — PIC has 8 or 31 levels depending on the device; exceeding it silently overwrites the oldest return address
+- Deep recursion is impossible
+- The programmer must track call depth and ensure nesting never exceeds the limit
+
+### Peripheral Modules
+
+Peripheral modules extend the functionality of the microcontroller by enabling interaction with external devices. Each peripheral is controlled by a set of memory-mapped registers: a control register (mode and enable bits), a status register (flags), and one or more data registers.
+
+Categories:
+
+- Timers and counters
+- Analog-to-digital converters
+- Communication interfaces (UART, SPI, I²C)
+- Digital I/O ports
+
+Peripherals act as interfaces between the processor bus and the external environment.
+
+### Timer Modules
+
+A timer module is a hardware counter driven by the system clock (or an external signal). It increments independently of the CPU and can trigger interrupts or drive output pins on specific count values.
+
+Key registers:
+
+- Count register  
+  Holds the current counter value. Increments each clock (or prescaled clock) cycle.
+- Period / TOP register  
+  The value at which the counter resets to zero. Sets the timer's overflow frequency.
+- Compare register  
+  When the count matches this value, the timer fires a compare-match event or toggles an output pin.
+- Control register  
+  Selects operating mode, clock source, prescaler value, and output behaviour.
+
+#### Prescaler
+
+Divides the system clock before it reaches the counter. A prescaler of $P$ makes the counter increment at $f_{clk}/P$, extending the timer's range without widening the counter register.
+
+$$
+f_{overflow} = \frac{f_{clk}}{P \times (TOP + 1)}
+$$
+
+#### Operating Modes
+
+- Normal mode  
+  Counter increments from 0 to MAX, overflows to 0, and fires an overflow interrupt. Used for simple periodic tasks.
+- CTC mode (Clear Timer on Compare)  
+  Counter resets to 0 when it matches the compare register. Fires a compare-match interrupt at a precise, configurable frequency. Used for task scheduling and waveform generation.
+- Fast PWM  
+  Counter counts from 0 to TOP. Output pin goes HIGH at 0 and LOW at compare match. Generates a PWM signal whose frequency is $f_{clk} / (P \times (TOP+1))$.
+- Phase-Correct PWM  
+  Counter counts up to TOP then back down to 0. Output toggles on compare match in both directions. Produces a symmetric PWM waveform with lower harmonic distortion; preferred for motor control.
+
+#### Input Capture
+
+Some timers can record the counter value at the moment an external signal edge arrives on a dedicated pin. Used to measure pulse width, signal period, or frequency without polling.
+
+#### Common Uses
+
+- Periodic interrupt generation (task scheduling, timeouts)
+- PWM output for motor speed, LED brightness, servo control
+- Pulse width and frequency measurement via input capture
+- Event counting in external clock mode
+
+### Bit-Addressable Ports
+
+I/O port registers are normally byte-addressable: a read-modify-write sequence is needed to change one pin without disturbing others.
+
+Bit-addressable ports expose individual bits as independently addressable locations. A single instruction can set, clear, or test one pin without reading and rewriting the full byte.
+
+On the 8051, dedicated bit-address instructions operate directly on individual port bits:
+
+- `SETB P1.0` — set bit 0 of Port 1 HIGH
+- `CLR P1.3` — clear bit 3 of Port 1 LOW
+- `MOV C, P2.5` — copy bit 5 of Port 2 into the carry flag
+
+Only SFRs whose address is divisible by 8 (e.g. P0 at 80H, P1 at 90H) are bit-addressable on the 8051.
+
+<Note>
+
+On AVR and ARM MCUs, atomic bit manipulation is achieved differently — AVR uses separate PORT/DDR/PIN registers; ARM Cortex-M provides bit-banding, which maps each bit to a unique word address in an alias region.
+
+</Note>
+
+### I/O Port Hardware
+
+Each GPIO port is built from two types of digital circuit: flip-flops and tri-state buffers.
+
+#### Flip-Flops
+
+A flip-flop is a bistable latch that holds one bit indefinitely until overwritten.
+
+Output path: when the CPU writes a value to a port register, it is clocked into a flip-flop. The flip-flop drives the output pin continuously, independent of what the CPU does next. Without the latch, the output pin would float the moment the CPU bus moved to the next operation.
+
+Input path: a separate flip-flop (the input register) samples the voltage on the pin on a clock edge and presents a stable value to the CPU data bus. Sampling synchronously prevents metastability: an external signal can change at any time, but the CPU always reads a settled, single-clock-domain value.
+
+Two flip-flops per pin therefore decouple three independent concerns:
+
+- What the CPU last wrote (output latch)
+- What the pin is currently driven to (output driver)
+- What the external world is presenting (input register)
+
+<Note>
+
+On AVR, reading PINx returns the input register (sampled pin state). Reading PORTx returns the output latch (last written value). These differ when the pin is driven externally.
+
+</Note>
+
+#### Tri-State Buffers
+
+A tri-state buffer has three output states: HIGH, LOW, and high-impedance (Hi-Z). In Hi-Z the output is effectively disconnected — it neither sources nor sinks current and does not influence the line it is connected to.
+
+Why they are required:
+
+- Shared bus isolation  
+  The internal data bus connects many registers and peripherals. If two drivers were simultaneously active on the same wire, one driving HIGH and one LOW, the result is a near-short circuit and an undefined voltage. Each peripheral's connection to the bus is gated by a tri-state buffer enabled only when that peripheral is selected.
+- Input pin configuration  
+  When a GPIO pin is configured as input, its output driver is placed in Hi-Z. The pin is then purely receptive — the external circuit drives the line without the MCU's output stage fighting it.
+- Bidirectional lines  
+  SPI MISO, I²C SDA, and PSP data lines are bidirectional. Tri-state buffers allow the direction to be switched under software control: one side enables its driver while the other side is in Hi-Z.
+
+#### Bidirectional Ports
+
+A bidirectional port is a GPIO port where each pin can be independently configured as either input or output at runtime.
+
+The direction of each pin is controlled by a direction register (DDR). Each bit in the DDR corresponds to one pin: writing 1 configures the pin as output; writing 0 configures it as input. The data register and direction register are separate, so direction can be changed without disturbing the output latch value.
+
+Internal structure per pin:
+
+- Output latch (flip-flop) stores the value to drive when configured as output
+- Direction bit gates the tri-state output buffer: DDR=1 enables the driver; DDR=0 forces it to Hi-Z
+- Input register samples the pin regardless of direction, so software can read back the actual pin state even when configured as output
+
+This lets a single physical pin serve different roles at different points in program execution. Examples:
+
+- A pin configured as output to drive an LED, then reconfigured as input to read a button on the same line
+- I²C SDA: the MCU drives the line to send data, then releases to Hi-Z to receive an acknowledgement, all on the same pin within one transaction
+- 1-Wire bus: master drives the line LOW to initiate, then releases to Hi-Z to sample the device response
+
+<Note>
+
+On AVR, DDRx controls direction for port x. On ARM Cortex-M, the GPIO MODER register sets each pin to input, output, or alternate function. The principle is identical: a direction control field gates the output driver.
+
+</Note>
+
+#### Writing to an Input Pin
+
+The output latch and the direction register are independent. Writing a value to a pin configured as input stores the value in the output latch but does not drive the pin — the tri-state output buffer remains in Hi-Z.
+
+Two consequences:
+
+- On most ARM Cortex-M MCUs: the written value sits dormant in the output latch. The moment the pin is switched to output mode, that latched value immediately appears on the pin. This allows pre-loading the output value before enabling the driver, preventing a glitch on direction change.
+- On AVR MCUs: writing HIGH to an input-mode pin activates the internal pull-up resistor. Writing LOW deactivates it. The PORTx register doubles as the pull-up enable register when DDRx is 0. This is an AVR-specific behaviour; ARM MCUs use a separate pull-up enable register instead.
+
+In Arduino's `digitalWrite()`, calling it on an `INPUT`-mode pin explicitly enables or disables the internal pull-up. This is documented behaviour, not undefined.
+
+#### Reading an Output Pin
+
+The input register samples the actual voltage present on the physical pin, independent of the direction setting. Reading an output pin returns the real pin state, not the output latch value.
+
+These two differ when an external circuit overrides the pin:
+
+- A shorted output: if an output driving HIGH is shorted to GND externally, the input register reads LOW while the output latch holds HIGH. Comparing the two detects the fault.
+- Open-drain/open-collector: the pin is Hi-Z when released; an external device may hold the line LOW. Reading the pin reflects the actual bus state.
+- Slow external load: a heavily capacitive line takes time to reach the driven voltage. Reading immediately after writing may return the old level until the line settles.
+
+This property is used deliberately in AVR firmware: reading PINx on an output pin confirms the actual driven level, providing hardware-level output verification with no extra pins.
+
+#### Pull-Up and Pull-Down Resistors
+
+A floating input pin — one with no external driver — reads an undefined voltage. The MCU input register samples whatever noise or leakage current is present, producing unpredictable HIGH or LOW readings.
+
+A pull resistor fixes this by tying the pin to a known voltage through a high-value resistor (typically $1\ \text{k}\Omega$–$100\ \text{k}\Omega$).
+
+Pull-up resistor: connects the pin to $V_{CC}$. The pin reads HIGH when nothing drives it. A device that pulls the line LOW (e.g. a button to GND) can override the resistor.
+
+Pull-down resistor: connects the pin to GND. The pin reads LOW when nothing drives it. A device that pulls the line HIGH overrides the resistor.
+
+### Resistor Value Trade-off
+
+The pull resistor value must satisfy two conflicting constraints.
+
+#### Lower bound: current limit
+
+When an external device drives the line to the opposite rail, current flows through the pull resistor from $V_{CC}$ to GND. For a pull-up with the line driven LOW:
+
+$$
+I = \frac{V_{CC}}{R}
+$$
+
+This current flows continuously for as long as the line is asserted. A low resistance means high continuous current, which:
+
+- Wastes power — critical in battery-powered IoT devices
+- Stresses the driving transistor, which must sink the full resistor current in addition to any load current
+- Heats the resistor
+
+The resistor must be high enough to keep this current within the drive capability of the weakest device on the line and within the power budget of the system.
+
+#### Upper bound: voltage integrity
+
+A pull resistor and the parasitic capacitance of the wire, pin, and any connected devices form an RC circuit. When the line is released (driver goes Hi-Z), the resistor must charge the parasitic capacitance $C_{line}$ back to the rail:
+
+$$
+\tau = R \times C_{line}
+$$
+
+A high resistance means a large $\tau$, which means:
+
+- Slow rising edge — the line takes many time constants to reach $V_{IH}$
+- During the slow rise, the signal passes through the forbidden band for an extended period, causing metastability or spurious transitions at the receiver
+- At high signal frequencies, the line never fully reaches the rail before the next transition, reducing noise margins
+
+Additionally, any leakage current or injected noise produces a voltage error across a high resistance:
+
+$$
+V_{error} = I_{leakage} \times R
+$$
+
+A $100\ \text{nA}$ leakage across a $100\ \text{k}\Omega$ resistor produces a $10\ \text{mV}$ offset — usually acceptable. The same leakage across $1\ \text{M}\Omega$ produces $100\ \text{mV}$, which can push the line into the forbidden band on a 3.3 V system.
+
+#### Typical values
+
+The practical range for most applications is $1\ \text{k}\Omega$ to $10\ \text{k}\Omega$:
+
+- $1\ \text{k}\Omega$ to $4.7\ \text{k}\Omega$: I²C buses and higher-speed signals (fast edges required)
+- $4.7\ \text{k}\Omega$ to $10\ \text{k}\Omega$: general-purpose GPIO, buttons, slow signals
+
+Values above $10\ \text{k}\Omega$ are only suitable for ultra-low-power designs where signal speed is not a concern. Values below $1\ \text{k}\Omega$ draw excessive current.
+
+Most MCUs include configurable internal pull-up (and sometimes pull-down) resistors that can be enabled in software, eliminating the need for external components on simple inputs such as buttons. Internal pull-ups are typically $20\ \text{k}\Omega$–$50\ \text{k}\Omega$ — suitable for buttons but too high for I²C or high-speed lines.
+
+### Why Pull-Up Resistors Are Required for MCU Inputs
+
+- Undefined floating state  
+  An undriven MCU input has no connection to either rail. It picks up environmental noise and reads unpredictably. A pull-up clamps the idle voltage to $V_{CC}$, giving a defined HIGH when nothing actively drives the line.
+- No internal drive on digital inputs  
+  MCU input buffers are high-impedance. They do not self-bias to a valid level. Any voltage — including the forbidden band — is a legal input to the pin hardware; only the pull resistor enforces a valid default.
+- RC low-pass filter interaction  
+  Any capacitance on the input line (decoupling capacitor, cable shielding, connector parasitic) forms an RC low-pass filter with the pull-up resistor. This filter attenuates high-frequency signal components and slows rising edges. A large pull-up value combined with significant capacitance can round edges so severely that the signal lingers in the forbidden band, causing metastability. This is a reason to keep pull-up values within the $1\ \text{k}\Omega$–$10\ \text{k}\Omega$ range and to avoid adding unnecessary capacitance to input lines.
+- Safe default on device disconnect  
+  If the connected sensor or peripheral loses power or is physically removed, the pull-up ensures the input stays at a known HIGH rather than floating indeterminate.
+
+#### Floating Pin Behavior
+
+A floating input pin has input impedance in the megaohm range. The high impedance makes the pin voltage extremely sensitive to stray charge.
+
+The pin, its internal traces, and the ESD protection circuitry form a small parasitic capacitance. Charge accumulates on this capacitance from:
+
+- Electromagnetic fields from nearby switching circuits (power supplies, motors, other ICs)
+- Capacitive coupling from adjacent PCB traces
+- RF signals in the environment
+
+With input impedance this high, even a tiny induced current builds enough voltage across the parasitic capacitance to exceed $V_{IH}$. No low-impedance path exists to drain the accumulated charge, so the pin voltage stays in the HIGH region.
+
+##### Why HIGH is More Common Than LOW
+
+Most MCUs have weak internal pull-up resistors, or parasitic leakage paths from $V_{CC}$ through ESD protection diodes and input buffer transistors. These structures bias the floating pin toward $V_{CC}$ rather than GND.
+
+CMOS thresholds are asymmetric: $V_{IH} \approx 0.7 \times V_{CC}$. The HIGH region spans a wide voltage range, so any upward drift easily lands in it.
+
+The input flip-flop samples the pin on each clock cycle. With the voltage in the HIGH region, it latches a stable 1 — not a transient glitch — for as long as nothing actively pulls the pin LOW.
+
+A pull-down resistor to GND provides a low-resistance path that drains induced charge and holds the pin at LOW by default. Its steady-state current ($I = V/R$) dominates the tiny induced currents that cause drift. A pull-up to $V_{CC}$ does the opposite: it defines the default as HIGH and only transitions LOW when a device actively drives the line there.
+
+#### Logic Level Thresholds and the Forbidden Band
+
+Every logic family defines four voltage thresholds:
+
+- $V_{OL}$: maximum voltage an output guarantees when driving LOW
+- $V_{OH}$: minimum voltage an output guarantees when driving HIGH
+- $V_{IL}$: maximum voltage an input will reliably interpret as LOW
+- $V_{IH}$: minimum voltage an input will reliably interpret as HIGH
+
+The region between $V_{IL}$ and $V_{IH}$ is the forbidden band. A signal in this range is neither a valid LOW nor a valid HIGH. The input's output state is undefined: it may oscillate, latch at an intermediate voltage, or resolve differently on each device.
+
+No signal should ever sit in the forbidden band in steady state. The noise margins ($V_{IL} - V_{OL}$ for LOW, $V_{OH} - V_{IH}$ for HIGH) quantify how much voltage deviation the interface tolerates before entering the forbidden band.
+
+The threshold voltage $V_{th}$ is the nominal switching point of a gate: the input voltage at which the output is exactly midway through its transition ($V_{out} = V_{in}$ on the DC transfer characteristic). It lies inside the forbidden band.
+
+$V_{th}$ depends on the logic family:
+
+- CMOS: $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
+- TTL: $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
+
+$V_{th}$ is not a safe operating point — it is the instability point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread: no two gates switch at exactly the same voltage, and temperature shifts it further.
+
+Signals pass through the forbidden band during transitions. A fast edge spends negligible time there. A slow edge — from a long cable, RC load, or weak driver — lingers in the band, causing the receiver to toggle unpredictably. This is the problem Schmitt trigger inputs solve.
+
+#### Schmitt Trigger Inputs
+
+A standard digital input has a single switching threshold. A signal that crosses that threshold slowly (due to long cables, RC loading, or a slow-changing sensor) causes the output to toggle multiple times as noise kicks it back and forth across the threshold. This is called bouncing or chatter on the digital side.
+
+A Schmitt trigger input replaces the single $V_{th}$ with two thresholds, forming the dual threshold band:
+
+- $V_{T+}$: upper threshold. Output switches HIGH when input rises above this.
+- $V_{T-}$: lower threshold. Output switches LOW when input falls below this.
+
+The dual threshold band (hysteresis band) is the voltage interval $[V_{T-},\ V_{T+}]$. Its width is:
+
+$$
+V_H = V_{T+} - V_{T-}
+$$
+
+Switching behaviour is history-dependent:
+
+- If the output is currently LOW, it switches HIGH only when input exceeds $V_{T+}$.
+- If the output is currently HIGH, it switches LOW only when input drops below $V_{T-}$.
+- While the input is inside $[V_{T-},\ V_{T+}]$, the output holds its last state regardless of input movement.
+
+This means the transfer characteristic forms a loop rather than a single crossing point. The same input voltage can correspond to two different output states depending on which direction the signal arrived from. Noise smaller than $V_H$ cannot cause any transition regardless of where it occurs on the input.
+
+Contrast with a standard gate: a standard gate has one $V_{th}$; any noise that crosses it toggles the output. A Schmitt trigger requires the signal to travel the full width of the hysteresis band before the output changes.
+
+This makes Schmitt trigger inputs tolerant of:
+
+- Slow-rising signals (e.g. RC-charged lines, long cables)
+- Noisy environments (motors, switching regulators near signal lines)
+- Mechanical switch bounce
+
+Many MCU GPIO pins have a Schmitt trigger option that can be enabled per pin. UART RX, external interrupt pins, and I²C lines typically use Schmitt trigger inputs by default.
+
+#### Open-Collector Outputs
+
+A standard push-pull output drives the pin actively HIGH (connecting it to $V_{CC}$ through a transistor) or actively LOW (connecting it to GND through a transistor). Both rails are driven.
+
+An open-collector output has only the LOW-side transistor. It can pull the line to GND (asserted) or release it entirely (Hi-Z). It cannot actively drive the line HIGH.
+
+To produce a usable HIGH level, an external pull-up resistor connects the line to $V_{CC}$. When no device asserts the line, the resistor pulls it HIGH passively.
+
+Why open-collector is used:
+
+- Wired-AND bus  
+  Multiple open-collector devices share one wire. Any device can pull the line LOW independently. The line is HIGH only when all devices release it. I²C uses this: any device can hold SDA or SCL LOW to stall the bus, enabling clock stretching and multi-master arbitration.
+- Voltage level shifting  
+  The pull-up resistor connects to any supply voltage regardless of the MCU's own logic level. A 3.3 V MCU can drive a 5 V bus by using a 5 V pull-up; the open-collector transistor only needs to pull to GND.
+- Short-circuit safety  
+  If two devices simultaneously assert conflicting levels on a push-pull bus, a near-short circuit results. On an open-collector bus, two simultaneous LOW assertions are harmless — both transistors pull to GND together.
+
+<Note>
+
+Open-drain is the MOSFET equivalent of open-collector and is the term used in modern datasheets. The behaviour is identical.
+
+</Note>
+
+#### Switch Configurations
+
+Switches are described by two parameters:
+
+- Poles  
+  The number of independent circuits the switch controls simultaneously.
+- Throws  
+  The number of output positions each pole can connect to.
+
+##### SPST
+
+Single Pole Single Throw. One pole, one throw. The simplest switch: one input, one output. Either connected (closed) or disconnected (open). No alternate path.
+
+Used for: on/off control, simple button inputs, power switches.
+
+##### SPDT
+
+Single Pole Double Throw. One pole, two throws. The common terminal connects to either of two outputs — never both, never neither (in a make-before-break variant, briefly both during transition).
+
+Used for: selecting between two signal sources, changeover switches, routing one signal to one of two destinations.
+
+In MCU circuits: one throw to $V_{CC}$, one to GND, common to the GPIO pin. The pin is always driven to a valid level regardless of switch position — no pull resistor required.
+
+##### DPST
+
+Double Pole Single Throw. Two independent poles, each with one throw. Both poles open and close together (ganged). Equivalent to two SPST switches mechanically linked on the same actuator.
+
+Used for: simultaneously switching two separate circuits (e.g. both live and neutral in a mains circuit, or two independent signal lines that must switch in sync).
+
+##### DPDT
+
+Double Pole Double Throw. Two independent poles, each with two throws. Equivalent to two SPDT switches ganged on one actuator.
+
+Used for: reversing DC motor direction (H-bridge manual control), switching two signal lines simultaneously between two destinations.
+
+<Note>
+
+Higher configurations (3PDT, 4PDT) follow the same pattern. The pole count and throw count are independent; any combination is mechanically possible.
+
+</Note>
+
+#### Switch Types
+
+Switches are the most common digital input device. They produce a binary voltage level read by a GPIO input pin.
+
+##### Push Button Switch
+
+A momentary contact switch. The circuit is closed only while the button is physically held. Releasing it opens the circuit and the pin returns to its pull-up or pull-down voltage.
+
+Monostable behaviour: output is active for exactly as long as the button is pressed, then returns to idle.
+
+Requires a pull-up or pull-down resistor to define the idle voltage. Without one, the pin floats in the forbidden band when the button is released.
+
+Switch bounce: mechanical contacts bounce on make and break, producing multiple rapid transitions before settling. Debouncing is required in software (delay after first edge) or hardware (RC filter + Schmitt trigger).
+
+###### Contact Bounce
+
+When two metal contacts meet or separate, the elastic mechanical structure causes them to physically rebound multiple times before coming to rest. Each rebound opens and closes the circuit, producing a burst of rapid transitions on the signal line. Duration: typically $1\ \text{ms}$–$10\ \text{ms}$ depending on the switch mechanism.
+
+Clean bounce: contact transitions are sharp — the signal goes fully HIGH or fully LOW on each rebound. The voltage crosses $V_{IH}$ or $V_{IL}$ cleanly. The MCU sees several valid logic transitions in quick succession, all within the same logic family's thresholds.
+
+Dirty bounce: the contact surface is oxidised, contaminated, or worn. During partial contact, the resistance is high and unstable. The voltage sits in or near the forbidden band rather than switching cleanly. The signal oscillates with irregular amplitude and timing, and may never fully reach $V_{IH}$ or $V_{OL}$ on some bounces. Dirty bounce is harder to filter because its duration and waveform are unpredictable.
+
+Why dirty bounce occurs:
+
+- Contact oxidation: insulating oxide layer requires higher force to break through, causing erratic make resistance during early contact
+- Contamination: dust, flux residue, or moisture on the contact surfaces increase resistance during partial contact
+- Worn contacts: repeated actuation smooths contacts and reduces contact pressure, worsening both bounce count and edge quality
+
+###### Debouncing
+
+Three software debounce approaches exist, trading off simplicity, CPU blocking, and robustness.
+
+Delay-and-confirm: after detecting the first edge, the firmware blocks for a fixed blanking period ($20\ \text{ms}$–$50\ \text{ms}$), then re-samples to confirm the stable state.
+
+```c
+if (button_pressed()) {
+    delay_ms(20);
+    if (button_still_pressed())
+        handle_press();
+}
+```
+
+Simple but blocks the CPU for the blanking period. Unsuitable in event-driven or RTOS firmware where tasks cannot block.
+
+Counter method: sampled periodically by a timer ISR. A counter increments each sample period while the pin is in its new state. The state is accepted only when the counter reaches a threshold — meaning the pin has been stable for $N$ consecutive samples.
+
+```c
+// called from a 1 ms timer ISR
+void debounce_tick(void) {
+    if (read_pin() == NEW_STATE) {
+        if (++stable_count >= THRESHOLD) {
+            accepted_state = NEW_STATE;
+            stable_count = 0;
+        }
+    } else {
+        stable_count = 0;   // reset on any contrary sample
+    }
+}
+```
+
+Any bounce that returns the pin to its prior state resets the counter to zero. Only a run of $N$ identical samples triggers a state change. Threshold of 10–20 at a 1 ms sample rate gives $10\ \text{ms}$–$20\ \text{ms}$ settle time. Non-blocking: the ISR runs independently and the main loop reads `accepted_state` at any time.
+
+Shift register method (vertical counter / integrator): a fixed-width integer (typically 8 or 16 bits) acts as a shift register of recent pin samples. Each timer tick, the register is shifted left and the current pin state is shifted in at the LSB.
+
+```c
+// called from a timer ISR
+void debounce_tick(void) {
+    shift_reg = (shift_reg << 1) | read_pin();
+    if (shift_reg == 0xFF)        // 8 consecutive HIGHs
+        accepted_state = HIGH;
+    else if (shift_reg == 0x00)   // 8 consecutive LOWs
+        accepted_state = LOW;
+    // any other pattern: still bouncing, hold previous state
+}
+```
+
+The register holds the last $N$ samples as a history window. A state change is accepted only when all $N$ bits are identical — the pin has been stable for the entire window. Any bounce injects a contrary bit and prevents acceptance until the window is clean again.
+
+Advantages over the counter method:
+
+- No counter to reset; history is implicit in the shift register contents
+- Detects instability over the full window, not just consecutive samples from the last edge
+- Works correctly even if the pin drifts in and out of the new state during a dirty bounce
+
+Hardware RC debounce: a resistor-capacitor low-pass filter on the input line smooths the bounce transitions. The capacitor charges and discharges through the resistor, rounding sharp edges. A Schmitt trigger after the filter converts the slow rounded edge back to a clean transition. The RC time constant must be longer than the worst-case bounce duration.
+
+Hardware RC + diode debounce: adding a diode in parallel with the series resistor creates two different time constants for the rising and falling edges.
+
+Circuit: the series resistor $R$ sits between the switch node and the input pin. The capacitor $C$ connects from the input pin to GND. The diode is placed in parallel with $R$, forward-biased in the direction of the falling edge (anode toward the input pin, cathode toward the switch node).
+
+On press (signal falls):
+
+- The diode is forward-biased. The capacitor discharges rapidly through the diode's low forward resistance rather than through $R$.
+- Time constant $\approx R_{diode} \times C$ — very short. The input responds almost immediately to the button press.
+
+On bounce or release (signal tries to rise):
+
+- The diode is reverse-biased. The capacitor can only charge through $R$.
+- Time constant $= R \times C$ — long, chosen to exceed the worst-case bounce duration.
+- Any bounce that briefly opens the switch causes only a small, slow rise on the capacitor. It cannot reach $V_{IH}$ before the contact closes again, so no spurious transition reaches the MCU.
+
+This asymmetry solves the fundamental debounce problem: the MCU sees a fast, clean falling edge (responsive to the actual press) and a slow, filtered rising edge (immune to bounce). Choosing $R \times C \approx 10\ \text{ms}$–$20\ \text{ms}$ covers most mechanical switches.
+
+SR latch debounce: used with an SPDT switch wired to an SR latch ($\overline{S}$/$\overline{R}$ inputs). When the common terminal moves to one throw, it sets the latch; moving to the other throw resets it. Subsequent bounces on the same throw cannot change the latch output. Produces a perfectly clean edge with zero software overhead.
+
+Dedicated debounce IC: a chip that integrates the filtering and threshold logic for multiple switch inputs in a single package, replacing discrete RC networks, Schmitt triggers, and firmware debounce routines entirely.
+
+Internal structure per channel: an RC low-pass filter followed by a Schmitt trigger. Some ICs add a latch to hold the output until the MCU reads it, preventing the MCU from missing a short press.
+
+Advantages over discrete or software solutions:
+
+- No timer ISR or CPU cycles consumed
+- Consistent timing across all channels — no per-channel firmware tuning
+- Fewer discrete components on the PCB
+- Output edges are clean and guaranteed within the IC's specified settle time
+
+Common ICs:
+
+- MAX6816 / MAX6817 / MAX6818 (Maxim)  
+  Single, dual, and octal channel variants. Built-in $40\ \text{ms}$ debounce time. Each input has an internal pull-up. Output goes LOW when input is pressed (active-low). Available in small SOT-23 and SOIC packages.
+- MC14490 (ON Semiconductor)  
+  6-channel hex debouncer. Uses an internal RC oscillator to clock a shift-register integrator on each channel. Debounce period set by an external capacitor ($C_{ext}$), allowing adjustment from ~$1\ \text{ms}$ to ~$100\ \text{ms}$.
+- SN74LV1T34 + external RC (not a true debounce IC)  
+  A Schmitt trigger buffer used with an external RC. Requires discrete components but costs less than a dedicated debounce IC.
+
+<Note>
+
+Debounce ICs are practical when a board has many switch inputs (keypads, panel buttons). For one or two buttons on a cost-sensitive IoT device, software debounce is usually preferred to avoid the added IC cost and supply chain dependency.
+
+</Note>
+
+###### Edge Detection
+
+Level detection reads the current pin state on each loop iteration and acts continuously while the button is held. Edge detection acts once per state transition, regardless of how long the button stays in its new state.
+
+2 transitions occur per press-release cycle:
+
+- Falling edge  
+  Pin transitions from HIGH to LOW. On a pull-up circuit, this is the moment of press.
+- Rising edge  
+  Pin transitions from LOW to HIGH. On a pull-up circuit, this is the moment of release.
+
+Implementation compares the current sample to the previous sample:
+
+```c
+uint8_t prev = HIGH;
+
+void loop(void) {
+    uint8_t curr = read_pin();
+    if (prev == HIGH && curr == LOW) {
+        handle_press();   // fires once on falling edge
+    }
+    prev = curr;
+}
+```
+
+Edge detection requires debouncing. Without it, contact bounce produces multiple spurious transitions per physical press, firing the action several times from a single press.
+
+##### Bistable Switch
+
+A latching switch. Each actuation toggles the output between two stable states. The output remains in its new state after the actuating force is removed.
+
+- Toggle switches and rocker switches are bistable.
+- The MCU reads the current state at any time; no interrupt is needed to capture the event.
+- No debounce timer required for state reading, but transition edges still bounce.
+
+##### Monostable Switch
+
+Produces a single fixed-duration pulse on each actuation, regardless of how long the button is held.
+
+Implemented with a monostable multivibrator (one-shot) circuit: the trigger edge starts a timer; the output goes HIGH for a fixed period $T = R \times C$ determined by an RC network, then returns LOW.
+
+The MCU receives a clean, bounce-free pulse of guaranteed width — no software debouncing needed and no dependence on how quickly the user releases the button.
+
+<Note>
+
+A standard push button is physically monostable (returns to rest) but electrically produces a level, not a pulse. A monostable switch circuit adds the one-shot timer to convert that level into a fixed-width pulse.
+
+</Note>
+
+#### Input Protection and Clamping
+
+MCU GPIO input pins have absolute maximum voltage ratings, typically $V_{CC} + 0.3\ \text{V}$ to $V_{CC} + 0.5\ \text{V}$ above the supply and $-0.3\ \text{V}$ to $-0.5\ \text{V}$ below GND. Exceeding these limits permanently damages the ESD protection structures or input transistors. Signals from external sources — sensors, cables, other boards — can carry voltages outside this safe window due to inductive spikes, ground offsets, or wiring errors.
+
+A clamp circuit limits the voltage reaching the pin to within the safe range regardless of what the external signal does.
+
+##### Series Resistor
+
+A resistor in series with the input pin is the first line of protection. It does not clamp by itself, but limits the current flowing into the pin's internal ESD diodes when the voltage exceeds the safe range. Without a series resistor, an overvoltage event drives unlimited current through the ESD diodes, destroying them even if they clamp the voltage.
+
+Typical value: $1\ \text{k}\Omega$–$10\ \text{k}\Omega$. Higher values give more current limiting but slow the input edge (RC with pin capacitance).
+
+##### Diode Clamp to Supply Rails
+
+Two diodes — one to $V_{CC}$, one to GND — clamp the input to within one diode drop of each rail.
+
+- $D_1$: anode at signal, cathode at $V_{CC}$. Conducts when $V_{signal} > V_{CC} + V_f$, pulling the pin back toward $V_{CC}$.
+- $D_2$: anode at GND, cathode at signal. Conducts when $V_{signal} < -V_f$, clamping reverse-polarity signals.
+
+Schottky diodes are preferred: forward voltage $V_f \approx 0.3\ \text{V}$ vs $0.7\ \text{V}$ for silicon. The clamped voltage stays closer to the rail, reducing stress on the pin. Schottky diodes also respond faster to transients.
+
+The series resistor must be present to limit clamping current. Without it, a sustained overvoltage forces the $V_{CC}$ rail upward through $D_1$, potentially damaging other devices on the same supply.
+
+##### Zener Diode Clamp
+
+A zener diode from signal to GND (cathode at signal, anode at GND) clamps at its zener breakdown voltage $V_Z$.
+
+Choose $V_Z$ just below the pin's absolute maximum: for a $3.3\ \text{V}$ MCU, a $3.6\ \text{V}$ zener clamps at $3.6\ \text{V}$ while passing $3.3\ \text{V}$ signals undisturbed.
+
+Clamps overvoltage but does not protect against reverse polarity on its own. A second zener (or a standard diode to GND anode-toward-GND) handles the negative direction.
+
+##### TVS Diode
+
+A Transient Voltage Suppressor is optimised for high-energy transients (ESD, inductive kickback). It behaves like a very fast zener with a higher peak power rating.
+
+- Unidirectional TVS: clamps one polarity, like a zener.
+- Bidirectional TVS: clamps both overvoltage and reverse polarity in a single component.
+
+TVS diodes are the preferred solution when the signal line may carry ESD events or inductive spikes from motors, solenoids, or long cables. A series resistor is still required to limit sustained current.
+
+<Note>
+
+Internal ESD diodes exist on most MCU inputs but are rated only for ESD events (a few hundred nanoseconds). They are not designed to sink sustained overcurrent. External protection is required any time the signal source can maintain an out-of-range voltage for more than a microsecond.
+
+</Note>
+
+#### Fuses
+
+A fuse is a sacrificial overcurrent protection device placed in series with a power supply line. When current exceeds the fuse's rated value, it opens the circuit — either permanently or temporarily — disconnecting the load before sustained overcurrent can damage components.
+
+Without a fuse, a short circuit or component failure can drive unlimited current through the PCB traces, MCU, and other components. Traces act as resistors; sufficient current generates enough heat to delaminate the PCB, destroy the MCU, or start a fire.
+
+##### How They Work
+
+A fuse contains a conductor sized to melt (or increase dramatically in resistance) at its trip current. The energy deposited in the conductor is $I^2 \times R \times t$. When this energy exceeds the thermal capacity of the conductor, it opens.
+
+Key ratings:
+
+- Current rating $I_F$  
+  Continuous current the fuse carries without tripping. Fuse should be rated slightly above the maximum normal operating current of the circuit.
+- Voltage rating  
+  Maximum voltage the open fuse can safely block. A fuse that opens under a voltage exceeding its rating may arc across the gap.
+- Breaking capacity  
+  Maximum fault current the fuse can safely interrupt. At very high fault currents, the arc during opening may sustain conduction.
+
+##### Fast-Blow vs Slow-Blow
+
+Fast-blow (FF): opens very quickly at the rated current. Protects sensitive components that cannot tolerate even brief overcurrent. Used for MCUs, logic ICs, and signal circuitry.
+
+Slow-blow (T, time-delay): tolerates brief inrush currents above the rated value before tripping. Opens only on sustained overcurrent. Used for motors, transformers, and capacitive loads where normal startup draws a spike above steady-state current.
+
+Using a fast-blow fuse on a motor input causes nuisance tripping on every startup. Using a slow-blow fuse on an MCU power rail allows sustained overcurrent to damage the MCU before the fuse opens.
+
+##### One-Time vs Resettable Fuses
+
+One-time fuse: the conductor melts permanently. Must be physically replaced after a fault. Used in production devices where fuse replacement signals a genuine fault requiring inspection.
+
+Resettable fuse (PTC, polyfuse): a polymer positive temperature coefficient device. Under overcurrent, it heats up and its resistance increases by orders of magnitude, reducing current to a safe trickle. When power is removed and the device cools, it resets to low resistance automatically.
+
+- No replacement needed after a trip
+- Trip current is less precise than a one-time fuse
+- Small residual resistance even in normal operation ($0.1\ \Omega$–$1\ \Omega$)
+- Common in USB ports, battery packs, and IoT development boards
+
+<Note>
+
+In IoT devices, a polyfuse on the USB 5 V input and a fast-blow fuse on the battery output are typical. The polyfuse handles accidental shorts during development; the battery fuse prevents thermal runaway in case of cell damage.
+
+</Note>
+
+### Driving LEDs
+
+An LED is a current-driven device. Applying voltage without limiting current destroys the LED and can damage the GPIO pin.
+
+Every LED has a forward voltage $V_f$ — the minimum voltage across it required for conduction. Below $V_f$ the LED is off; above it, current rises steeply with any small voltage increase.
+
+Typical forward voltages by color:
+
+- Red / yellow: $\approx 1.8\ \text{V}$–$2.2\ \text{V}$
+- Green / blue / white: $\approx 3.0\ \text{V}$–$3.5\ \text{V}$
+
+#### Current-Limiting Resistor
+
+A series resistor between the GPIO pin and the LED limits current to a safe level.
+
+$$
+R = \frac{V_{CC} - V_f}{I_f}
+$$
+
+Here:
+
+- $V_{CC}$: supply voltage
+- $V_f$: LED forward voltage
+- $I_f$: desired forward current
+
+Typical $I_f$ for indicator LEDs is $5\ \text{mA}$–$20\ \text{mA}$. MCU GPIO pins are rated for $8\ \text{mA}$–$25\ \text{mA}$ depending on the device; $I_f$ must stay within this limit.
+
+<Note>
+
+Low-current LEDs ($2\ \text{mA}$) are preferred in battery-powered IoT devices. They remain clearly visible while consuming a fraction of the power of a standard $20\ \text{mA}$ LED.
+
+</Note>
+
+#### Transistor Driver
+
+When $I_f$ exceeds the GPIO current rating, or when driving multiple LEDs, a transistor is placed between the GPIO pin and the LED. The pin drives the transistor base; the transistor supplies current from $V_{CC}$ directly, bypassing the pin's drive limit.
+
+The GPIO pin only sources the small base current $I_B = I_f / h_{FE}$, which is well within pin limits even for high-current LEDs.
+
+### Driving 7-Segment Displays
+
+A 7-segment display is 7 individual LEDs (segments a–g) arranged to form digits. Each segment is an independent LED requiring its own current path.
+
+2 variants exist:
+
+- Common cathode  
+  All segment cathodes tied to GND. MCU drives a segment HIGH to light it.
+- Common anode  
+  All segment anodes tied to $V_{CC}$. MCU drives a segment LOW to light it (active-low logic).
+
+#### Why One Resistor Per Segment is Required
+
+Placing a single resistor in the common line (shared by all segments) causes the current through it to change with the number of active segments.
+
+When $n$ segments are on, total current through the shared resistor is:
+
+$$
+I_{total} = n \times I_f
+$$
+
+The voltage drop across the resistor:
+
+$$
+V_R = n \times I_f \times R
+$$
+
+Voltage remaining for each segment:
+
+$$
+V_{segment} = V_{CC} - V_R = V_{CC} - n \times I_f \times R
+$$
+
+As $n$ increases, $V_{segment}$ falls. With enough segments active, $V_{segment}$ may drop below $V_f$, turning segments off entirely. Segments that remain on are dimmer than when fewer segments share the resistor.
+
+The digit "8" lights all 7 segments; the digit "1" lights 2. With a shared resistor, "1" is far brighter than "8" — brightness varies with the digit being displayed.
+
+Each segment gets its own series resistor to fix $I_f$ independently of how many other segments are active.
+
+#### Multiplexing Multiple Digits
+
+Driving each segment of each digit directly requires $7 \times N$ GPIO pins for $N$ digits. Multiplexing reduces this to $7 + N$ pins.
+
+Each digit's corresponding segment pins are wired together across all digits. A separate digit-select line controls a transistor that connects one digit's common line to GND (common cathode) or $V_{CC}$ (common anode). Only the selected digit's transistor is active at any time.
+
+```
+Segment pins (a–g) ──────────────────────────────┐
+                                                  │
+         Digit 1 common ── transistor ── GND      │
+         Digit 2 common ── transistor ── GND      ├── shared segments
+         Digit 3 common ── transistor ── GND      │
+         Digit 4 common ── transistor ── GND      │
+                               ↑                  │
+                    digit-select GPIO              │
+```
+
+Scan sequence per cycle:
+
+1. Disable all digit-select lines (all digits off).
+2. Write segment pattern for digit $k$ to the 7 segment GPIO pins.
+3. Enable digit $k$'s select line.
+4. Hold for the slot duration $t_{slot}$.
+5. Advance $k$ to the next digit and repeat.
+
+For $N$ digits, each digit is on for $1/N$ of the total cycle. Refresh rate per digit must exceed $50\ \text{Hz}$ to avoid visible flicker:
+
+$$
+f_{refresh} = \frac{1}{N \times t_{slot}} \geq 50\ \text{Hz}
+$$
+
+The scan loop is typically driven from a timer ISR so the main program does not need to manage timing.
+
+##### Ghosting
+
+Ghosting occurs when residual segment current lights the wrong digit during a select transition. The cause: segment pins still hold the previous digit's pattern at the moment the next digit's select line activates.
+
+Fix: always blank all segment pins (drive all LOW) before enabling the next digit-select line. The blank period adds dead time per slot but eliminates ghost images.
+
+<Note>
+
+During multiplexing, only 1 digit is physically on at any instant. Peak segment current equals static drive current. Average current and brightness are $1/N$ of static drive. Segment resistors are sized for peak current, not average.
+
+</Note>
+
+### Driving Inductive Loads
+
+Inductive loads — motors, relays, solenoids — store energy in a magnetic field while current flows. When the driving transistor switches off, the magnetic field collapses and induces a voltage spike (back-EMF) in the opposite polarity to the supply.
+
+$$
+V_{spike} = -L \frac{\text{d}I}{\text{d}t}
+$$
+
+The spike amplitude depends on inductance $L$ and how fast current is interrupted. A fast transistor switch-off produces a very high $\text{d}I/\text{d}t$, generating a spike that can reach tens or hundreds of volts — far above the MCU's rated supply.
+
+This spike appears on the power rail and on the GPIO pin driving the transistor. Without protection it destroys the driving transistor and can latch up or permanently damage the MCU.
+
+#### Flyback Diode
+
+A diode placed in parallel with the inductive load, reverse-biased under normal operation. When the switch opens and back-EMF reverses polarity, the diode becomes forward-biased and provides a recirculating current path. The stored energy dissipates through the coil resistance rather than spiking onto the supply rail.
+
+```
+V_CC ──┬──────────────┐
+       │              │ ← flyback diode (cathode to V_CC)
+   [inductor]        ─┼─
+       │              │
+     [transistor]     │
+       │              │
+GND ───┴──────────────┘
+```
+
+The diode must be placed physically close to the load. A long lead between the load and the diode allows the spike to propagate before the diode clamps it.
+
+Schottky diodes are preferred over silicon for fast loads (PWM motor control): lower forward voltage and faster recovery reduce power dissipation during high-frequency switching.
+
+#### Transistor Driver Requirement
+
+MCU GPIO pins cannot drive inductive loads directly. 2 reasons:
+
+- Current  
+  Relay coils and motor windings draw $50\ \text{mA}$–$500\ \text{mA}$, far above GPIO limits.
+- Voltage  
+  Many inductive loads operate at $12\ \text{V}$ or $24\ \text{V}$. GPIO pins are rated to $3.3\ \text{V}$ or $5\ \text{V}$.
+
+An NPN transistor or N-channel MOSFET is used as the switch. The GPIO pin drives the base or gate; the transistor switches the full load current from the external supply.
+
+#### DC Motors
+
+A DC motor converts electrical energy to rotational motion. Current through the armature winding produces a magnetic field that reacts against the stator field, generating torque.
+
+Speed is proportional to the average voltage applied. PWM controls speed by varying duty cycle — the motor's inertia smooths the switching, so it responds to the average voltage rather than the individual pulses.
+
+Direction is controlled by reversing current polarity. An H-bridge achieves this with 4 switches arranged so the motor can be connected to the supply in either polarity. The circuit shape resembles the letter H — the motor forms the crossbar.
+
+```
+V_CC ──┬─────────────┬──
+       Q1(high-left) Q3(high-right)
+       │             │
+       ├────[motor]──┤
+       │             │
+       Q2(low-left)  Q4(low-right)
+GND ───┴─────────────┴──
+```
+
+##### Operating Modes
+
+- Forward  
+  Q1 + Q4 on, Q2 + Q3 off. Current flows left to right through the motor.
+- Reverse  
+  Q2 + Q3 on, Q1 + Q4 off. Current flows right to left through the motor.
+- Brake  
+  Q2 + Q4 on, Q1 + Q3 off. Both motor terminals shorted to GND. The motor's back-EMF drives current through the winding, producing a braking torque that resists rotation.
+- Coast  
+  All switches off. Motor terminals float. Motor spins freely with no braking force.
+
+##### Shoot-Through
+
+Turning on Q1 and Q2 simultaneously (or Q3 and Q4) connects $V_{CC}$ directly to GND through 2 conducting transistors. This is a short circuit that instantly destroys the switches.
+
+Shoot-through occurs during switching transitions: if Q1 turns on before Q2 fully turns off, both conduct briefly. A dead time — a brief period where both switches are off — is inserted between turning one switch off and the other on. Dead time is typically $100\ \text{ns}$–$1\ \mu\text{s}$ depending on transistor turn-off speed.
+
+##### PWM Speed Control
+
+PWM is applied to one or both switches on the active side while the opposite low-side switch stays on. The motor sees the average voltage, which scales with duty cycle.
+
+A flyback diode across each transistor is required. Every PWM transition collapses the motor's inductive field, generating back-EMF. H-bridge ICs include these diodes internally.
+
+Dedicated H-bridge ICs (L298N, DRV8833, TB6612) integrate the 4 transistors, flyback diodes, dead-time control, and logic-level inputs in a single package, accepting direct GPIO drive.
+
+##### Tachometer
+
+A tachometer measures rotational speed and converts it to an electrical signal the MCU can read. Common implementations:
+
+- Optical encoder  
+  A slotted disc attached to the motor shaft interrupts a light beam. Each slot produces 1 pulse per revolution. A disc with $N$ slots produces $N$ pulses per revolution.
+- Hall effect sensor  
+  A magnet on the shaft triggers a Hall sensor on each pass. Contactless; tolerates dust and oil.
+- Back-EMF sensing  
+  A spinning DC motor generates a voltage proportional to speed. Measured during PWM off-time when the driver is not switching.
+
+The MCU measures tachometer pulse frequency using a timer in counter or input-capture mode. Speed in RPM:
+
+$$
+\text{RPM} = \frac{f_{pulse}}{N} \times 60
+$$
+
+Here:
+
+- $f_{pulse}$: pulse frequency in Hz
+- $N$: pulses per revolution
+
+##### Closed-Loop Speed Control
+
+Open-loop control sets PWM duty cycle without measuring actual speed. Load changes, supply voltage variation, and motor temperature alter speed with no correction.
+
+Closed-loop control feeds the tachometer reading back to the MCU. The MCU compares measured speed to the setpoint and adjusts the PWM duty cycle to reduce the error.
+
+```
+setpoint ──► [+] ──► controller ──► PWM ──► H-bridge ──► motor
+              │                                              │
+              └──────────────── tachometer ◄────────────────┘
+```
+
+A PID controller computes the correction from 3 terms:
+
+$$
+u(t) = K_p\, e(t) + K_i \int e(t)\, \text{d}t + K_d \frac{\text{d}e}{\text{d}t}
+$$
+
+Here:
+
+- $e(t)$: error — setpoint minus measured speed
+- $K_p$: proportional gain — correction proportional to current error
+- $K_i$: integral gain — correction for accumulated error; eliminates steady-state offset
+- $K_d$: derivative gain — correction proportional to rate of error change; damps overshoot
+
+The controller output $u(t)$ maps to PWM duty cycle. On each control loop iteration (driven by a timer ISR), the MCU reads the tachometer, computes the error, updates the PID terms, and writes the new duty cycle to the PWM register.
+
+<Note>
+
+A P-only controller reaches a steady-state error proportional to load. Adding the I term drives steady-state error to zero. The D term is optional — it reduces overshoot but amplifies noise in the speed measurement.
+
+</Note>
+
+#### Stepper Motors
+
+A stepper motor moves in discrete angular steps. Each pulse from the driver advances the shaft by a fixed step angle. Position is controlled open-loop — no tachometer or encoder is needed because each step command produces a known, repeatable angular displacement.
+
+$$
+\text{Steps per revolution} = \frac{360°}{\theta_{step}}
+$$
+
+A common step angle is $1.8°$, giving 200 steps per revolution.
+
+##### Types
+
+Stepper motors are classified by 2 independent axes: rotor construction and winding configuration.
+
+###### By Rotor Construction
+
+- Permanent Magnet (PM)  
+  Rotor is a permanent magnet. Stator coils attract and repel the rotor poles. Large step angle: typically $7.5°$ or $15°$ (48–24 steps per revolution). Low cost; used in low-precision applications such as paper feed in printers.
+- Variable Reluctance (VR)  
+  Rotor is a toothed soft-iron cylinder with no permanent magnet. Torque is produced by the rotor teeth aligning with the energised stator poles to minimise magnetic reluctance. Step angle as small as $1.8°$. No detent torque when unpowered — rotor spins freely.
+- Hybrid  
+  Combines a permanent magnet rotor with toothed stator and rotor poles. The magnet provides detent torque and enhances holding torque; the teeth provide fine angular resolution. Step angle: $0.9°$–$1.8°$. Highest torque and precision of the 3 types. Most common in industrial and 3D printing applications.
+
+###### By Winding Configuration
+
+- Unipolar  
+  Each coil has a center tap, splitting it into 2 half-windings. Current flows through one half-winding at a time, always in the same direction. The center tap connects to the supply; a single transistor switches each half-winding to GND. 5 wires (4 half-winding ends + 1 common center tap) or 6 wires (separate center taps per coil). Driver circuit is simple — a transistor array such as the ULN2003 suffices. Torque is lower than bipolar because only half the winding is active per step.
+- Bipolar  
+  2 coils with no center tap. Current direction is reversed through the full winding to produce each magnetic pole. 4 wires (2 per coil). Full winding is active at every step, giving higher torque per frame size than unipolar. Requires an H-bridge per coil to reverse current direction.
+
+<Note>
+
+A unipolar motor can be driven as bipolar by leaving the center taps disconnected and driving the full winding through an H-bridge. Torque increases because the full winding is used, at the cost of a more complex driver.
+
+</Note>
+
+##### Excitation Sequences
+
+The coils must be energised in a specific sequence to advance the rotor. For a 2-coil bipolar motor with coils A and B:
+
+| Step | Coil A | Coil B |
+| ---- | ------ | ------ |
+| 1    | +      | +      |
+| 2    | −      | +      |
+| 3    | −      | −      |
+| 4    | +      | −      |
+
+- Full-step (2-phase on)  
+  Both coils energised at each step as above. Maximum torque.
+- Full-step (wave drive)  
+  1 coil energised at a time. Lower torque; used to reduce power consumption.
+- Half-step  
+  Alternates between 1-coil and 2-coil states. Doubles angular resolution to $0.9°$ on a $1.8°$ motor at the cost of varying torque per step.
+- Microstepping  
+  Driver varies current amplitude in both coils sinusoidally. Rotor positions between full steps are held by the ratio of currents. Greatly reduces vibration and increases smoothness; common ratios are 1/8, 1/16, 1/32 step.
+
+##### Driver Circuits
+
+- Unipolar driver  
+  A transistor array (e.g. ULN2003) switches each half-winding to GND. The center tap connects to the supply. 4 GPIO pins control 4 half-windings directly.
+- Bipolar driver  
+  Requires 1 H-bridge per coil — 2 H-bridges total for a standard 2-coil motor. A dedicated stepper driver IC (A4988, DRV8825) integrates both H-bridges, microstepping current control, and overcurrent protection. The MCU sends only a STEP pulse and a DIR level; the IC handles the excitation sequence internally.
+
+##### Step Rate and Stall
+
+Speed is proportional to step pulse frequency:
+
+$$
+\omega = \theta_{step} \times f_{step}
+$$
+
+Stepping too fast from standstill causes the rotor to miss steps (stall) because inertia prevents it from following the rotating magnetic field. The motor must be accelerated gradually — step frequency ramps up from a low starting rate.
+
+<Note>
+
+Unlike DC motors, stepper motors consume full coil current even when stationary and holding position. Holding current generates continuous heat. Many stepper driver ICs reduce coil current automatically after a configurable idle timeout.
+
+</Note>
+
+#### Electromagnetic Relays
+
+An EM relay uses a current-driven coil to mechanically actuate a switch. The coil and the switched contacts are electrically isolated — the MCU circuit and the switched load share no common ground.
+
+Structure:
+
+- Coil  
+  Energised by the MCU via a transistor driver. Draws $10\ \text{mA}$–$100\ \text{mA}$ at $5\ \text{V}$ or $12\ \text{V}$. Coil current must be high enough to generate sufficient magnetic force to pull the armature, and low enough to prevent resistive heating in the coil winding. Both bounds are specified in the relay datasheet as the pull-in current and the maximum continuous coil current.
+- Armature  
+  Ferromagnetic plate pulled toward the coil core when energised.
+- Contacts  
+  Mechanically linked to the armature. Rated independently of the coil — typically $5\ \text{A}$–$30\ \text{A}$ at $250\ \text{V}$ AC or $30\ \text{V}$ DC. The voltage rating is the maximum voltage the open contacts can block without arcing across the gap. Exceeding it causes the contacts to arc on open, eroding the contact surface and eventually welding them shut.
+
+The coil is an inductive load. When the transistor switches off, the magnetic field collapses and produces a back-EMF spike that can reach tens of volts above $V_{CC}$.
+
+A shunt diode (also called flyback or freewheeling diode) is placed directly across the coil — cathode to the coil's positive terminal, anode to GND. Under normal operation the diode is reverse-biased and carries no current. When the transistor switches off and back-EMF reverses the coil voltage, the diode becomes forward-biased and provides a recirculating path for the decaying coil current. The stored magnetic energy dissipates as heat through the coil's own resistance rather than spiking onto the supply rail or the transistor's collector.
+
+```
+V_CC ──┬──────────┐
+       │          │ (cathode)
+    [coil]       ─┼─  shunt diode
+       │          │ (anode)
+    [transistor]  │
+       │          │
+GND ───┴──────────┘
+```
+
+The diode must be placed physically close to the coil. A long PCB trace between the coil and the diode has parasitic inductance that allows part of the spike to propagate before the diode clamps it. A fast-recovery or Schottky diode is preferred to clamp the spike quickly.
+
+##### Single Transistor Driver
+
+An NPN transistor switches the relay coil. The GPIO pin sources a small base current; the transistor sinks the full coil current through its collector.
+
+```
+V_CC ── [coil] ──── collector
+                    NPN
+GPIO ── [R_B] ───── base
+                    emitter ── GND
+```
+
+Base resistor $R_B$ limits base current to a safe level while keeping the transistor in saturation:
+
+$$
+R_B = \frac{V_{GPIO} - V_{BE}}{I_B} \approx \frac{V_{GPIO} - 0.7}{I_{coil} / h_{FE}}
+$$
+
+Choosing $I_B$ to overdrive the transistor ($h_{FE}$ derated by a factor of 5–10) ensures it stays in saturation across temperature and device variation.
+
+Simple and low-cost. Suitable when the GPIO can source sufficient base current and the coil voltage equals the MCU supply.
+
+##### Dual Transistor Driver
+
+2 NPN transistors in a Darlington configuration. The emitter of the first (driver) transistor feeds the base of the second (output) transistor. The combined current gain is the product of the 2 stages:
+
+$$
+h_{FE(total)} = h_{FE1} \times h_{FE2}
+$$
+
+```
+GPIO ── [R_B] ── base(Q1)
+                 NPN Q1
+                 emitter(Q1) ── base(Q2)
+                                NPN Q2
+                 collector(Q2) ── [coil] ── V_CC
+                 emitter(Q2) ── GND
+```
+
+A very small GPIO current drives a relay coil that a single transistor could not switch reliably. Used when:
+
+- The coil current is high relative to the GPIO drive capability
+- The MCU operates at a lower voltage than the coil supply, reducing available base drive
+
+Trade-off: the 2 $V_{BE}$ drops in series raise the saturation voltage to $\approx 1.4\ \text{V}$, slightly reducing the voltage across the coil.
+
+Darlington arrays such as the ULN2003 integrate 7 Darlington pairs with built-in base resistors and shunt diodes in a single IC, replacing discrete transistor circuits for multi-relay designs.
+
+Contact types:
+
+- NO (Normally Open)  
+  Open when coil is off; closes when energised.
+- NC (Normally Closed)  
+  Closed when coil is off; opens when energised.
+- SPDT relays provide both NO and NC on 1 common terminal.
+
+<Note>
+
+Relay contacts have a rated mechanical and electrical lifetime (number of switching cycles). Switching inductive or capacitive loads with a relay degrades contacts faster than resistive loads due to arcing on make and break.
+
+</Note>
+
+### Local Communication Interfaces
+
+Short-range, board-level or chip-to-chip protocols for connecting an MCU to sensors, actuators, and peripherals.
+
+#### UART
+
+Universal Asynchronous Receiver/Transmitter. Asynchronous: no shared clock. Both ends must be configured to the same baud rate.
+
+Pins: TX (transmit) and RX (receive).
+
+Properties:
+
+- Full duplex
+- Point-to-point only (no bus topology)
+- Common baud rates: 9600, 115200 bps
+
+Used for: serial debug monitor, GPS modules, Bluetooth adapter modules, GSM modems.
+
+#### SPI
+
+Serial Peripheral Interface. Synchronous: master generates the clock.
+
+Pins: MOSI (master out, slave in), MISO (master in, slave out), SCK (clock), CS (chip select, one per slave).
+
+Properties:
+
+- Full duplex
+- Single master, multiple slaves (each slave requires a dedicated CS line)
+- Fast: up to tens of MHz depending on hardware
+- No addressing — CS line selects the active slave
+
+Used for: displays, SD cards, external ADC/DAC chips, flash memory.
+
+#### I²C
+
+Inter-Integrated Circuit. Synchronous. Two-wire open-drain bus requiring pull-up resistors on both lines.
+
+Pins: SDA (bidirectional data), SCL (clock).
+
+Properties:
+
+- Half duplex
+- Multi-master, multi-slave on the same two wires
+- Each device has a unique 7-bit (or 10-bit) address sent at the start of each transaction
+- Standard mode: 100 kHz. Fast mode: 400 kHz. Fast-plus: 1 MHz
+
+Used for: IMUs, temperature and pressure sensors, EEPROMs, real-time clocks.
+
+#### 1-Wire
+
+Single data line (plus ground). Semi-duplex. Supports multiple devices on the same wire, each identified by a unique 64-bit ROM code.
+
+Very low speed. Used where minimal pin count matters: temperature sensors (DS18B20), iButton authentication devices.
+
+#### Parallel Slave Port
+
+Aka. PSP. A parallel interface that allows an external master processor to read and write the MCU's internal registers directly over a multi-bit data bus.
+
+Unlike serial interfaces (UART, SPI, I²C), a PSP transfers a full byte (or word) simultaneously across multiple data lines.
+
+Pin groups:
+
+- Data bus  
+  8 (or 16) bidirectional data lines carrying one byte per transfer.
+- Address lines  
+  Select which internal register or memory location the master is targeting.
+- Control lines  
+  CS (chip select), RD (read strobe), WR (write strobe). The master asserts these to initiate a transfer.
+
+Operation: the external master places an address on the address lines, asserts CS and RD or WR, and the MCU responds by placing data on the bus or latching the incoming byte.
+
+Use cases:
+
+- MCU acting as a peripheral co-processor alongside a more powerful host CPU
+- Display controllers and memory-mapped peripherals on embedded boards
+- High-speed sensor data transfer where serial overhead is too slow
+
+<Note>
+
+PSP requires many pins (8 data + address + control). It is only practical when pin count is not constrained and transfer speed justifies it. Most modern IoT designs prefer SPI or I²C.
+
+</Note>
+
+### Network Communication Interfaces
+
+Protocols for connecting IoT devices to local networks or wide-area infrastructure.
+
+#### Wi-Fi
+
+IEEE 802.11. Operates at 2.4 GHz or 5 GHz. High bandwidth and low latency. High power consumption relative to other wireless IoT protocols.
+
+Used for cloud connectivity, over-the-air updates, and applications requiring high data rates.
+
+#### Bluetooth and BLE
+
+Operates at 2.4 GHz.
+
+- Bluetooth Classic  
+  Higher throughput. Used for audio streaming and file transfer.
+- Bluetooth Low Energy (BLE)  
+  Very low power. Short bursts of small data. Used for sensor beacons, wearables, and proximity detection.
+
+Range: approximately 10–100 m depending on environment.
+
+#### Zigbee
+
+IEEE 802.15.4. Operates at 2.4 GHz. Very low power. Supports mesh networking: devices relay packets for each other, extending range without infrastructure.
+
+Low bandwidth (~250 kbps). Used for home automation, lighting control, and dense sensor networks.
+
+#### LoRa / LoRaWAN
+
+Operates in sub-GHz ISM bands (868 MHz in Europe, 915 MHz in the Americas). Spread-spectrum modulation enables kilometre-range links at very low transmit power.
+
+Very low bandwidth (< 50 kbps). Used for wide-area sensor deployments: agriculture, smart metering, asset tracking.
+
+#### Ethernet
+
+IEEE 802.3. Wired. High reliability and deterministic latency. Not affected by wireless interference.
+
+Used in industrial IoT, building automation, and SBC-based devices (Raspberry Pi).
+
+#### Cellular
+
+NB-IoT and LTE-M are cellular standards designed for IoT:
+
+- Low bandwidth, low power, wide area coverage
+- Devices connect directly to cellular infrastructure without a local gateway
+- Used for mobile asset tracking, remote metering, and deployments in areas without Wi-Fi
+
+### Supervisory Modules
+
+Supervisory modules monitor system health and ensure correct processor operation.
+
+#### Watchdog Timer
+
+A hardware timer that runs independently of the CPU. Resets the MCU if software fails to service it before the timeout expires.
+
+Operation:
+
+- Software must periodically write a specific value to the watchdog register ("kicking" or "petting" the watchdog)
+- If the software hangs, crashes, or enters an infinite loop, the kick never arrives
+- On timeout, the watchdog asserts a reset signal and restarts the MCU
+
+Timeout period is configurable, typically ranging from a few milliseconds to several seconds.
+
+<Note>
+
+Some MCUs implement a window watchdog: the kick must arrive within a defined time window. Kicking too early is treated the same as kicking too late, detecting timing faults as well as hangs.
+
+</Note>
+
+#### Burnout Detection
+
+Aka. Brown-out Detection (BOD). Continuously monitors the supply voltage. Holds the MCU in reset if voltage drops below a configured threshold.
+
+Prevents corrupt execution caused by insufficient supply voltage (e.g. during battery discharge or power instability). When voltage recovers above the threshold, the MCU is released from reset and restarts cleanly.
+
+Threshold voltage is configurable on most MCUs via fuse bits or configuration registers.
+
+#### Startup Delay
+
+Delays processor execution after power-up until supply voltage and peripheral power rails have stabilised. The MCU holds the CPU in reset for a fixed number of clock cycles (or a time period) before releasing it to execute the first instruction.
+
+Without this delay, the CPU may begin fetching instructions while voltage is still ramping up. Instructions executed during an unstable supply can produce unpredictable results: incorrect register values, corrupted peripheral state, or a partially-executed first instruction that puts the system into an unknown condition.
+
+#### Oscillator Delay
+
+Holds the CPU in reset after the oscillator is enabled until the clock signal is stable and at its correct frequency. Crystal oscillators and RC oscillators take time to reach their steady-state frequency after power is applied or after waking from sleep.
+
+If execution begins before the clock is stable, instruction timing is wrong: peripherals clocked from the same source may miss setup/hold windows, UART baud rates are incorrect, and timer periods are inaccurate. The oscillator delay ensures the first instruction executes at the correct clock frequency.
+
+#### Cold Start vs Hot Start
+
+Describes the state of the MCU at the moment execution begins.
+
+Cold start: the MCU powers on from a fully unpowered state.
+
+- All RAM contents are undefined (or zero on some architectures)
+- All registers are at hardware reset values
+- Oscillators start from rest; both startup delay and oscillator delay apply
+- All peripherals must be initialised by software before use
+- Longest time-to-operational state
+
+Hot start: the MCU resumes from a low-power sleep mode with RAM and register state retained.
+
+- RAM contents preserved; no re-initialisation required
+- Oscillator may still be running or settles faster from a partially-warm state
+- Only oscillator delay (if any) applies; startup delay is skipped
+- Peripherals that remained powered are already configured
+- Fastest time-to-operational state
+
+<Note>
+
+The terms also apply to GPS receivers. A GPS cold start requires downloading the full satellite almanac and ephemeris from scratch (minutes to first fix). A GPS hot start uses cached almanac, ephemeris, and last-known position (seconds to first fix). The underlying principle is the same: how much prior state is available.
+
+</Note>
+
+## Examples
+
+| Microcontroller | Clock Speed  | ROM         | RAM   | I/O Pins |
+| --------------- | ------------ | ----------- | ----- | -------- |
+| PIC             | up to 20 MHz | up to 16 KB |       | 33       |
+| Intel 8051      |              | 4 KB        | 128 B | 32       |
+| AVR             | 8 MHz        | 32 KB       | 32 KB |          |
+| ATmega328P      | 20 MHz       | 32 KB       | 2 KB  | 23       |
+
+PIC and AVR support many peripherals. AVR supports analog input/output. Intel 8051 is an older architecture with limited resources which uses 8-bit instruction set. ARM is a newer architecture with more powerful features and better performance, but it is more complex and consumes more power than PIC and AVR.

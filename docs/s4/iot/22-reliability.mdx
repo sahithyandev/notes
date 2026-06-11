@@ -1,0 +1,200 @@
+---
+title: Reliability and Fault Tolerance
+sidebar:
+  order: 22
+slug: s4/iot/reliability
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-06-11T06:00:31.089Z
+---
+
+## Reliable vs Fail-Safe
+
+**Reliable**: a system that rarely fails. No system can be made completely failure-free.
+
+**Fail-safe**: a system that enters a safe state when it fails. Failure must not create danger.
+
+These are independent properties. A system can be reliable without being fail-safe, and vice versa.
+
+### Railway Crossing Example
+
+Option A: warning light normally OFF. On failure, the light goes dark, which looks like no train is coming. Dangerous.
+
+Option B: green light normally ON. On failure, the light goes dark, interpreted as unsafe. Safe.
+
+Option B is fail-safe.
+
+### Headlight Flash Convention
+
+International standard: flash means "I am stopping, you go." If both drivers flash, both stop.
+
+Opposite convention: flash means "I am coming." If both flash, both proceed, risking collision.
+
+The first convention is fail-safe; the second is not.
+
+## Fail-Stop
+
+A fail-stop system halts completely when a fault is detected rather than continuing in a degraded or undefined state.
+
+Stopping is preferable to degraded operation because:
+
+- Wrong output is worse than no output  
+  Downstream systems and human operators can handle absence of data. They cannot safely handle incorrect data presented as correct.
+- Corrupt state propagates  
+  An MCU executing with corrupted memory or wrong sensor readings spreads errors through every system that depends on it.
+- Degraded behaviour is often undetectable  
+  A system that appears to be running hides the fault. A stopped system makes the fault immediately visible and diagnosable.
+- Undefined states cause unpredictable physical effects  
+  An actuator commanded by corrupted logic may drive a motor, open a valve, or apply a brake in an unintended way. The physical consequence of wrong action exceeds the consequence of no action in most safety-critical contexts.
+
+<Note>
+
+Fail-stop is distinct from fail-safe. Fail-safe means the halted state itself is safe (e.g. a barrier that defaults to closed). A system can fail-stop without being fail-safe if the stopped state is still dangerous.
+
+</Note>
+
+## Fault Tolerance
+
+A fault-tolerant system continues operating after a component failure. Achieved through redundancy.
+
+### Active-Active Redundancy
+
+Both systems operate simultaneously.
+
+- Both are continuously verified
+- No switchover delay
+
+### Active-Passive Redundancy
+
+One system active, one on standby.
+
+- Lower operating cost
+- Standby unit may fail unnoticed
+
+### Aircraft Autopilot Example
+
+Typical setup:
+
+- 1 active autopilot
+- 1 supervisory autopilot
+- 3 standby autopilots
+
+Different manufacturers may be used to avoid common software bugs.
+
+## Reliability Metrics
+
+### MTTF
+
+Mean Time To Failure. The statistical average time from first use until the first failure of a non-repairable component or system.
+
+$$
+\text{MTTF} = \int_0^{\infty} R(t)\, \text{d}t
+$$
+
+where $R(t)$ is the reliability function (probability of surviving to time $t$). For a constant failure rate $\lambda$:
+
+$$
+\text{MTTF} = \frac{1}{\lambda}
+$$
+
+Used for components that are discarded on failure: sensors, MCUs, batteries, LEDs.
+
+### MTBF
+
+Mean Time Between Failures. The statistical average time between successive failures of a repairable system.
+
+$$
+\text{MTBF} = \text{MTTF} + \text{MTTR}
+$$
+
+where MTTR is Mean Time To Repair. For systems where repair time is negligible compared to operating time, MTBF $\approx$ MTTF.
+
+Used for systems that are repaired and returned to service: servers, industrial machines, repairable IoT gateways.
+
+<Note>
+
+For non-repairable components, MTTF and MTBF are often used interchangeably in datasheets, but strictly MTTF is the correct term.
+
+</Note>
+
+### How Metrics Change with Number of Components
+
+When $n$ independent components are connected in series (the system fails if any one fails), their failure rates add:
+
+$$
+\lambda_{system} = \lambda_1 + \lambda_2 + \cdots + \lambda_n
+$$
+
+Since $\text{MTTF} = 1/\lambda$, the system MTTF is:
+
+$$
+\frac{1}{\text{MTTF}_{system}} = \frac{1}{\text{MTTF}_1} + \frac{1}{\text{MTTF}_2} + \cdots + \frac{1}{\text{MTTF}_n}
+$$
+
+$\text{MTTF}_{system}$ is always shorter than the shortest individual MTTF. Adding more components strictly decreases system reliability.
+
+For $n$ identical components each with MTTF $= M$:
+
+$$
+\text{MTTF}_{system} = \frac{M}{n}
+$$
+
+Doubling the component count halves the system MTTF.
+
+For components in parallel (redundant: system survives until all fail), reliability improves. With $n$ identical components each with failure rate $\lambda$, the system survives until the last one fails:
+
+$$
+\text{MTTF}_{parallel} = \frac{1}{\lambda} \left(1 + \frac{1}{2} + \cdots + \frac{1}{n}\right) = \frac{1}{\lambda} \sum_{k=1}^{n} \frac{1}{k}
+$$
+
+For two identical components in parallel: $\text{MTTF}_{parallel} = \frac{3}{2\lambda} = 1.5 \times \text{MTTF}_{single}$.
+
+<Note>
+
+Parallel redundancy improves MTTF but with diminishing returns. Each added unit contributes less than the previous. The cost and complexity of $n$ redundant components must be weighed against the MTTF gain.
+
+</Note>
+
+## Component Count Rule
+
+Every additional component added to an IoT design has a cost on multiple axes simultaneously. Minimising component count is therefore a primary design objective, not merely a cost-cutting measure.
+
+### Cost
+
+- Bill of materials  
+  Each component has a unit price. At volume, even a $0.05 passive adds thousands of dollars across a production run.
+- PCB area  
+  More components require a larger board or finer pitch routing. Both increase fabrication cost and constrain enclosure options.
+- Assembly  
+  Each component is a placement operation on the pick-and-place machine. More placements mean longer cycle time and higher assembly cost per unit.
+- Testing  
+  Every component is a potential failure point during manufacturing test. More components increase test fixture complexity and time.
+- Supply chain  
+  Each distinct part number is a procurement dependency. Shortages, end-of-life notices, or single-source suppliers create supply risk.
+
+### Points of Failure
+
+Components in series multiply failure risk. If each component has reliability $R_i$ (probability of surviving a given period), the system reliability is:
+
+$$
+R_{system} = R_1 \times R_2 \times \cdots \times R_n
+$$
+
+Each $R_i < 1$, so $R_{system}$ strictly decreases with every added component. Equivalently, system MTTF for series components satisfies:
+
+$$
+\frac{1}{\text{MTTF}_{system}} = \frac{1}{\text{MTTF}_1} + \frac{1}{\text{MTTF}_2} + \cdots
+$$
+
+$\text{MTTF}_{system}$ is always shorter than the shortest individual MTTF.
+
+IoT devices are often deployed in locations with no on-site maintenance. A field failure requires a technician visit or a full device recall. The cost of a single field failure — labour, logistics, customer impact — vastly exceeds the cost saved by adding the component in the first place.
+
+### Power Consumption
+
+Every component draws quiescent current. In battery-powered IoT devices, the sum of all quiescent currents determines battery life. Removing one component that draws $10\ \mu\text{A}$ continuously can extend battery life by weeks in a low-duty-cycle device.
+
+### Design Complexity
+
+More components introduce more potential interaction effects: coupling, noise, voltage drop, thermal interference. Each interaction is a debugging surface. Fewer components means fewer failure modes to analyse and certify.

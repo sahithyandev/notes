@@ -1,0 +1,94 @@
+---
+title: IP Protection
+slug: s4/iot/ip-protection
+sidebar:
+  order: 23
+prev: true
+next: false
+dateCreated: 2026-06-07T11:00:00.000Z
+lastUpdatedOn: 2026-06-11T06:00:31.090Z
+---
+
+Firmware and hardware designs in IoT devices represent significant investment. Several mechanisms protect them from extraction, cloning, and tampering.
+
+## Flash Read Protection
+
+Fuse bits or configuration registers disable the debug interface's ability to read flash contents. Even with physical access to the board, JTAG or SWD cannot dump the firmware.
+
+### Why It Is Required
+
+During development, read protection must be disabled. The debug interface needs full flash access to:
+
+- Flash new firmware builds onto the device
+- Set breakpoints and single-step through code
+- Inspect memory contents and peripheral register values during in-circuit debugging sessions
+
+Once a device moves to production and is deployed in the field, the same open debug access becomes a liability. Any person with physical access and a cheap JTAG probe can extract the complete firmware binary. Read protection is enabled at the production programming stage to close this window.
+
+### Protection Levels
+
+Most MCUs offer graduated levels rather than a binary on/off:
+
+- STM32 RDP
+  - Level 0: default. flash fully readable via debug.
+  - Level 1: debug read disabled. transitioning back to Level 0 triggers a mass erase, destroying the firmware.
+  - Level 2: permanent. debug interface fully and irreversibly disabled.
+- AVR lock bits  
+  BLB and LB fuse bits independently restrict reading of the application section, boot section, and EEPROM via ISP or JTAG. Clearing lock bits requires a chip erase.
+
+### Trade-off
+
+Enabling read protection makes firmware recovery harder if a device in the field needs re-programming without a bootloader. Production workflows must account for this: typically a bootloader with secure update capability is flashed before protection is enabled, so future updates can still be delivered over UART, USB, or OTA without needing debug access.
+
+## Debug Interface Disabling
+
+JTAG and SWD pins can be repurposed as GPIO after programming is complete. Once reconfigured, the debug interface is inaccessible without erasing the device.
+
+Some MCUs allow permanent disabling via OTP fuses.
+
+### OTP Fuse
+
+A fusible link. A high current pulse melts and breaks it permanently. Once blown, the debug interface is disabled at the hardware level regardless of any software or configuration register.
+
+## Secure Boot
+
+The bootloader verifies a cryptographic signature on the firmware image before executing it. Firmware without a valid signature from the manufacturer's private key is rejected.
+
+A public key hash burned at manufacturing time that cannot be changed (stored in OTP memory).
+
+Prevents loading of modified or replacement firmware onto deployed devices.
+
+### OTP Memory
+
+Aka. One Time Programming memory. Stores device-specific secrets at manufacturing time. Bits can be written once and never changed or erased.
+
+Programming a bit passes a high current pulse through a microscopic fusible link. The link physically melts, ruptures, and breaks. The open circuit permanently represents the programmed state.
+
+Used to store:
+
+- Cryptographic keys for secure boot or firmware encryption
+- Device identity and licensing tokens
+- Hardware configuration that must not be alterable in the field
+
+## Firmware Encryption
+
+Firmware is stored encrypted in flash. A hardware decryption engine, keyed by a secret stored in OTP memory, decrypts instructions on-the-fly during execution.
+
+Even if flash contents are extracted, the binary is unusable without the device-specific key. The key never appears on any external bus.
+
+## Physical Protection
+
+- Epoxy potting  
+  PCB encased in solid resin. Physical probing requires destructive removal that typically destroys the board.
+- Active tamper mesh  
+  Fine conductive traces routed around sensitive components. Cutting or drilling any trace signals intrusion and triggers key erasure.
+- Package grinding defence  
+  Security chips use scrambled internal layouts and shield layers to defeat attempts to read memory cells under a microscope after decapping.
+- Component marking removal  
+  Part numbers and manufacturer markings are scratched or sanded off ICs and passives after soldering. A copycat cannot identify components from visual inspection alone and must reverse-engineer each part electrically.
+- Dummy components  
+  Non-functional components (such as a deliberately burned transistor which works as a shortcircuit) are soldered onto the board. The circuit operates correctly because these components do nothing electrically. A reverse-engineer tracing the schematic will include them, producing a design that fails to work, wasting time and misleading cloning attempts.
+
+## Code Obfuscation
+
+Compiler transformations that make disassembled firmware harder to understand. Uses a lot of techniques such as control-flow flattening, opaque predicates, symbol stripping. Increases the time it takes for a threat actor to reverse-engineer it (not impossible still).

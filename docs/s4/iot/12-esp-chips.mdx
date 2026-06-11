@@ -1,0 +1,75 @@
+---
+title: ESP32
+sidebar:
+  order: 12
+slug: s4/iot/esp-chips
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+---
+
+## ESP8266
+
+A breakthrough IoT chip. Major advantage: built-in Wi-Fi.
+
+Wi-Fi modes:
+
+- Station mode: connects to an existing Wi-Fi network
+- Access point mode: creates its own Wi-Fi network
+
+Features:
+
+- 32-bit processor
+- ~50 KB RAM
+- ~32 KB ROM
+- USB programming
+- Low power operation
+
+### Soft Microcontroller
+
+Unused modules can be disabled, reducing power consumption and interference.
+
+## ESP32
+
+Improved version of the ESP8266.
+
+Added features over ESP8266:
+
+- Better Wi-Fi
+- Bluetooth Low Energy (BLE)
+- More memory
+- ADC and DAC channels
+- Infrared support
+- CAN Bus support
+
+Programming options: Arduino, Lua, MicroPython.
+
+## NodeMCU
+
+Open-source IoT platform built on the ESP8266 (or ESP32) microcontroller.
+
+Consists of two parts:
+
+- Firmware  
+  Open-source Lua runtime flashed onto the ESP chip. Exposes hardware peripherals as Lua modules.
+- Development board  
+  PCB carrying the ESP module, a USB-to-Serial converter (CH340 or CP2102), voltage regulator, and reset/flash buttons.
+
+The USB-to-Serial converter allows direct programming from a PC without an external programmer.
+
+Primary language: Lua. Also supports MicroPython and Arduino C++ via alternative firmware.
+
+### ESPlorer
+
+IDE designed for NodeMCU Lua development. Connects to the board over the serial port and provides:
+
+- Script upload to the device filesystem
+- Interactive Lua REPL (command-line evaluation)
+- Serial monitor for output
+
+<Note>
+
+Arduino IDE can also target NodeMCU boards by installing the ESP8266/ESP32 board support package, enabling C++ development on the same hardware.
+
+</Note>

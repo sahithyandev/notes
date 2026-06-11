@@ -1,0 +1,50 @@
+---
+title: Modbus Protocol
+sidebar:
+  order: 19
+  label: Modbus
+slug: s4/iot/modbus
+prev: true
+next: true
+dateCreated: 2026-06-06T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T06:00:31.089Z
+---
+
+A serial communication protocol for industrial devices. Developed by Modicon in 1979. Master-slave architecture: one master initiates all transactions. Up to 247 slaves may respond.
+
+Widely used in SCADA systems, PLCs, and industrial sensors.
+
+## Data Model
+
+- Coils  
+  1-bit, read/write. Represents discrete outputs such as relays and valves.
+- Discrete inputs  
+  1-bit, read-only. Represents discrete inputs such as switches and sensors.
+- Input registers  
+  16-bit, read-only. Analogue input values.
+- Holding registers  
+  16-bit, read/write. General-purpose configuration and data storage.
+
+## Variants
+
+- Modbus RTU  
+  Binary encoding over serial lines (RS-232, RS-485). CRC error checking.
+- Modbus ASCII  
+  ASCII encoding over serial lines. LRC error checking. Slower but human-readable.
+- Modbus TCP  
+  Modbus framing over TCP/IP on port 502. Relies on TCP for error handling.
+
+## Common Function Codes
+
+- 01: Read coils
+- 02: Read discrete inputs
+- 03: Read holding registers
+- 04: Read input registers
+- 05: Write single coil
+- 06: Write single register
+- 15: Write multiple coils
+- 16: Write multiple registers
+
+## Limitations
+
+No built-in authentication or encryption. Sensitive deployments must apply security at the network layer.

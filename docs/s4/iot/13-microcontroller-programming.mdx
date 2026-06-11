@@ -1,0 +1,348 @@
+---
+title: Microcontroller Programming
+sidebar:
+  order: 13
+slug: s4/iot/microcontroller-programming
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+---
+
+To program a microcontroller, a basic development setup is required, which includes:
+
+- Microcontroller development board
+- Computer with an IDE
+- Programming cable or adapter
+- Power supply
+- Input/output devices
+
+Programs are typically written in high-level languages such as C or C++, compiled into machine code, and uploaded to the microcontroller.
+
+## Cross Compilation
+
+Native compilation produces machine code for the same architecture as the host machine. Cross compilation produces machine code for a different target architecture.
+
+MCU firmware is almost always cross-compiled. The host is a general-purpose PC (x86-64); the target is an 8-bit or 32-bit MCU (AVR, ARM Cortex-M, RISC-V). The host has no ability to run the resulting binary.
+
+### Toolchain
+
+A cross-compilation toolchain contains three components:
+
+- Compiler  
+  Translates source code to object files for the target ISA. Examples: `avr-gcc` for AVR, `arm-none-eabi-gcc` for ARM Cortex-M.
+- Linker  
+  Combines object files and resolves symbols. Uses a linker script that maps code and data sections to the exact flash and RAM addresses of the target device.
+- Binutils  
+  Assembler, object dump, and format conversion tools. The `objcopy` tool converts the linked ELF binary to Intel HEX or raw binary for upload.
+
+### Why Cross Compilation is Required
+
+- MCUs lack the RAM, storage, and OS to run a compiler.
+- Target ISA differs from the host; host-compiled binaries cannot execute on the MCU.
+- The linker script encodes the exact memory map of a specific chip variant, which is only known at build time.
+
+### Build Flow
+
+```
+Source (.c / .cpp)
+    ↓  cross-compiler (avr-gcc / arm-none-eabi-gcc)
+Object files (.o)
+    ↓  cross-linker + linker script
+ELF binary (.elf)
+    ↓  objcopy
+Intel HEX / binary (.hex / .bin)
+    ↓  programmer (avrdude / openocd / ST-Link)
+MCU flash
+```
+
+## In-Circuit Serial Programming
+
+Aka. ICSP. Writes compiled firmware directly into the microcontroller's flash while the chip remains soldered in the circuit. Uses a serial connection between the host programmer tool and the target MCU.
+
+No chip removal required. The same physical device used in production can be programmed and reprogrammed without a socket or extraction tool.
+
+### How It Works
+
+A hardware programmer (e.g. AVRISP, USBasp, ST-Link) connects to dedicated programming pins on the MCU. The programmer asserts a reset or special entry condition, then streams the firmware image over the serial link. The MCU's internal bootrom or dedicated programming hardware writes the data to flash.
+
+Programming pins used:
+
+- AVR (SPI-based ICSP): MOSI, MISO, SCK, RESET
+- PIC (2-wire ICSP): ICSPDAT, ICSPCLK plus MCLR for entry
+- ARM Cortex-M: SWD (SWDIO, SWDCLK) or JTAG — also used for ICD
+
+### ICSP vs Bootloader
+
+ICSP is hardware-level: the programmer directly writes flash cells. A bootloader is firmware-level: resident code in the MCU accepts the image over USB/UART and writes it itself. ICSP works on a blank chip; a bootloader must already be installed.
+
+<Note>
+
+Read protection must be disabled during ICSP programming. It is enabled after production programming to prevent firmware extraction. See [IP protection](s4/iot/microcontroller#intellectual-property-protection).
+
+</Note>
+
+## In-Circuit Debugging
+
+Aka. ICD. Allows developers to observe and control program execution inside the microcontroller while it remains in the circuit.
+
+Capabilities:
+
+- Set and trigger breakpoints at specific instructions
+- Step through code instruction by instruction
+- Inspect and modify CPU registers
+- Read and write memory contents in real time
+
+Requires a hardware debugger probe connected between the host computer and the target MCU.
+
+<Note>
+
+IoT devices typically have no screen, keyboard, or OS-level error catching. ICD is often the only practical way to diagnose firmware bugs.
+
+</Note>
+
+### Debugger Interfaces
+
+Two standard interfaces connect a debugger probe to the MCU.
+
+#### JTAG
+
+IEEE 1149.1 standard. Originally designed for PCB boundary-scan testing; now the primary in-circuit debug and programming interface for MCUs, SoCs, and FPGAs.
+
+Pins:
+
+- TCK  
+  Test clock — clocks the TAP state machine.
+- TMS  
+  Test mode select — controls state transitions in the TAP.
+- TDI  
+  Test data in — shifts data into the chip serially.
+- TDO  
+  Test data out — shifts data out of the chip serially.
+- TRST  
+  Test reset (optional) — resets the TAP asynchronously.
+
+The **Test Access Port (TAP)** is a state machine inside the chip. It controls access to internal **scan chains** — shift registers connected to CPU registers, memory, and peripherals. Clocking data through TDI/TDO reads or writes anything inside the chip.
+
+Capabilities:
+
+- Halt the CPU, set breakpoints and watchpoints
+- Read and write all CPU registers and memory
+- Single-step execution
+- Flash programming
+
+Multiple JTAG devices on a board are **daisy-chained**: TDO of one device feeds TDI of the next. A single JTAG connector reaches all devices on the chain.
+
+#### SWD
+
+Serial Wire Debug. ARM proprietary protocol, part of the CoreSight debug architecture. ARM Cortex-M specific.
+
+Pins:
+
+- SWDIO  
+  Bidirectional data — carries both host-to-target and target-to-host data on a single wire, direction switching within each transaction.
+- SWDCLK  
+  Clock.
+- SWO  
+  Serial Wire Output (optional) — a third unidirectional pin for non-intrusive real-time trace from the target with no CPU involvement.
+
+SWD accesses the **Debug Port (DP)** and **Access Ports (APs)** of the CoreSight system. The DP handles the physical connection; APs expose the CPU halt/resume, register access, and memory-mapped access to peripherals.
+
+Functionally identical to JTAG for single-device debugging. Daisy-chaining is not supported.
+
+#### JTAG vs SWD
+
+| Property       | JTAG              | SWD              |
+| -------------- | ----------------- | ---------------- |
+| Pin count      | 4–5               | 2 + optional SWO |
+| Architecture   | Universal         | ARM Cortex only  |
+| Daisy-chaining | Yes               | No               |
+| Trace output   | Separate ETM pins | SWO (1 pin)      |
+
+<Note>
+
+Most IoT MCUs (STM32, nRF52, RP2040) are ARM Cortex-based. SWD is the default choice on small PCBs where 2 debug pins are far cheaper than 4–5.
+
+</Note>
+
+### Debugger Probes
+
+Hardware circuit bridging the host computer to the target MCU over JTAG or SWD. The host runs a debug server (e.g. OpenOCD, J-Link GDB Server) that exposes a GDB-compatible interface.
+
+Common probes:
+
+- J-Link (SEGGER)
+- ST-Link (STMicroelectronics)
+- CMSIS-DAP compatible probes
+
+<Note>
+
+Some development boards include an onboard debug probe. STM32 Nucleo boards embed an ST-Link, so no external probe is needed.
+
+</Note>
+
+## Over-the-Air Programming
+
+Aka. OTA. Enables firmware updates delivered through a wireless link rather than a physical programming cable. The device downloads the new firmware image and writes it to flash without any physical access.
+
+Used in deployed IoT devices where physical access is impractical or impossible.
+
+### Bootloader Role
+
+OTA requires a resident bootloader that persists across firmware updates. On startup, the bootloader:
+
+- Checks for a pending update image in a designated flash region
+- Validates the image (CRC or cryptographic signature)
+- Writes the image to the application partition if valid
+- Boots the new application
+
+The bootloader itself is never overwritten by an OTA update.
+
+### Delivery Methods
+
+- Pull  
+  Device polls a remote server at intervals and downloads a new image when one is available.
+- Push  
+  Server initiates the transfer; device listens for a notification and fetches or receives the image.
+
+### Dual-Partition Scheme
+
+The most common approach. Flash is divided into two application partitions: active and update.
+
+1. New image downloads into the update partition while the current firmware keeps running.
+2. On success, the bootloader swaps the active and update labels.
+3. Device reboots into the new firmware.
+
+If the new firmware fails to boot, the bootloader rolls back to the previously active partition.
+
+<Note>
+
+Dual partitioning requires at least twice the application flash footprint. Devices with small flash budgets may use a single-partition scheme with no rollback capability.
+
+</Note>
+
+### Security Requirements
+
+OTA is a remote code execution path. Without protection, it is an attack surface.
+
+- Image signing  
+  Firmware image is signed with a private key. Bootloader verifies the signature against a public key stored in protected flash before installing.
+- Transport encryption  
+  Image transferred over TLS or equivalent to prevent interception.
+- Version check  
+  Bootloader rejects images with a version number lower than the current firmware to prevent downgrade attacks.
+- Secure element storage  
+  Signing keys stored in a hardware secure element or OTP region, not in general flash.
+
+### ESP32 OTA
+
+The ESP-IDF framework provides a built-in OTA API. Flash is partitioned into `ota_0` and `ota_1` application slots plus an `otadata` partition that records which slot is active.
+
+The `esp_ota_ops` library handles:
+
+- Writing the incoming image chunk by chunk to the inactive slot
+- Marking the new slot as pending-verify
+- Triggering a reboot; on successful first boot the slot is confirmed active
+
+## Libraries
+
+A library is a pre-compiled collection of functions and definitions that extends the capabilities of a microcontroller program without requiring the developer to write low-level code from scratch.
+
+### Why Libraries Are Used
+
+- Hardware abstraction  
+  Peripheral registers differ across MCU families. A library exposes a uniform API so the same function call works on different hardware.
+- Reduced development time  
+  Sensor drivers, protocol implementations, and signal processing routines are reused rather than rewritten per project.
+- Reduced bug surface  
+  Well-tested library code eliminates classes of bugs (bit-field errors, timing violations) that recur when developers write drivers manually.
+- Protocol complexity  
+  Protocols like I²C, SPI, and Wi-Fi involve multi-step handshakes, error recovery, and timing constraints. A library encapsulates this so application code only calls high-level functions.
+
+### Types of Libraries
+
+- Hardware abstraction libraries  
+  Wrap GPIO, ADC, timers, and communication peripherals. Example: Arduino's `Wire.h` for I²C, `SPI.h` for SPI.
+- Sensor driver libraries  
+  Translate raw register reads into calibrated physical values. Example: `DHT.h` for DHT11/DHT22 temperature and humidity sensors, `Adafruit_BMP280` for barometric pressure.
+- Communication protocol libraries  
+  Implement higher-level protocols on top of a serial interface. Example: `PubSubClient` for MQTT over TCP, `ESP8266HTTPClient` for HTTP.
+- Display libraries  
+  Drive character LCD or OLED displays. Example: `LiquidCrystal.h` for 16×2 HD44780 LCDs, `Adafruit_SSD1306` for I²C OLED displays.
+- Signal processing libraries  
+  FFT, filtering, and DSP routines. Example: `ArduinoFFT` for frequency analysis on ADC samples.
+- Real-time OS libraries  
+  Task scheduling, semaphores, and queues. Example: FreeRTOS (used on ESP32, STM32, and others).
+
+### HAL and Vendor Libraries
+
+MCU vendors supply Hardware Abstraction Layer libraries for their own silicon:
+
+- STM32 HAL (STMicroelectronics): `HAL_GPIO_WritePin()`, `HAL_UART_Transmit()`, etc.
+- AVR-libc (Atmel/Microchip): low-level C library for AVR; includes `<avr/io.h>`, `<avr/interrupt.h>`.
+- ESP-IDF (Espressif): full framework for ESP32 covering Wi-Fi, Bluetooth, flash, and peripherals.
+
+HAL libraries allow application code to be migrated to a different chip in the same family by changing the target in the build system without rewriting peripheral calls.
+
+<Note>
+
+Using a vendor HAL adds a code-size and performance overhead compared to direct register access. For space-constrained MCUs, direct register manipulation is sometimes preferred.
+
+</Note>
+
+## System Modelling Approaches
+
+Modelling describes a system at a level of abstraction above source code. Three primary modelling approaches are used in embedded and IoT design.
+
+### Behavioral Modelling
+
+Describes what the system does: its inputs, outputs, and how it responds to events or conditions. Does not specify the physical structure or internal implementation.
+
+Techniques:
+
+- Finite State Machine (FSM)  
+  Models the system as a set of discrete states and transitions triggered by events or conditions. Each state defines an output or action. Suitable for devices with well-defined operating modes (idle, sensing, transmitting, error).
+- UML State Diagram  
+  Graphical FSM notation with entry/exit actions and guard conditions on transitions.
+- Event-driven model  
+  System reacts to external events (interrupts, timer expiry, network message) rather than executing a fixed sequence. Lua/NodeMCU and RTOS callback architectures follow this model.
+- Pseudocode / algorithmic description  
+  Informal step-by-step logic with no syntax tied to a specific language.
+
+Behavioral modelling is the most common approach in IoT firmware design. The system's response to every event can be specified and verified before any code is written.
+
+### Structural Modelling
+
+Describes how the system is physically composed: which components exist and how they are connected.
+
+Techniques:
+
+- Block diagrams  
+  High-level boxes (MCU, sensor, radio, power supply) with arrows showing data or signal flow between them.
+- Schematics  
+  Precise electrical diagrams showing every component, pin, net, and value.
+- PCB layout  
+  Physical placement and routing of components on the board.
+
+Structural modelling does not say what the system does — only what it is made of and how parts connect. It is necessary for hardware design but does not capture timing or logic behaviour.
+
+### Dataflow Modelling
+
+Describes how data is transformed as it moves through the system. Focuses on data paths rather than control flow or physical structure.
+
+Techniques:
+
+- Data Flow Diagrams (DFD)  
+  Nodes represent processing operations; arrows represent data streams. Used to trace how sensor readings are filtered, aggregated, and forwarded through the IoT pipeline.
+- Signal Flow Graphs  
+  Mathematical representation of linear signal transformations. Used in control systems and signal processing design.
+- Pipeline models  
+  Stages of a processing chain (sample → filter → encode → transmit) with data passing between stages.
+
+Dataflow modelling is useful for the cloud and edge processing layers of an IoT system, where raw sensor data undergoes multiple transformation steps before storage or actuation.
+
+<Note>
+
+A complete IoT system design uses all three: behavioral modelling to specify device logic, structural modelling to design the hardware, and dataflow modelling to design the data pipeline.
+
+</Note>

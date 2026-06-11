@@ -1,0 +1,96 @@
+---
+title: Single Board Computer
+sidebar:
+  order: 10
+slug: s4/iot/single-board-computer
+prev: true
+next: true
+dateCreated: 2026-04-23T17:39:39.625Z
+lastUpdatedOn: 2026-06-11T06:00:31.087Z
+prereqs:
+  - s1/programming-fundamentals/c-book/operating-system
+---
+
+A complete computer built on a single circuit board. Includes processor, memory, storage, and I/O interfaces. Runs a full operating system (typically Linux). Used for complex IoT applications requiring high processing power.
+
+## Headed vs Headless
+
+- Headed  
+  Board operates with a display, keyboard, and mouse attached. Provides a full graphical user interface. Used during development or in applications that require a local UI.
+- Headless  
+  Board operates without a display or input peripherals. Accessed remotely via SSH or serial console. Preferred in deployed IoT systems where a local UI is unnecessary.
+
+## Examples
+
+### Raspberry Pi
+
+SBC developed by the Raspberry Pi Foundation. ARM-based processor. Runs Raspberry Pi OS (Debian-based Linux) or other Linux distributions.
+
+Used for IoT applications requiring significant processing power, networking, or a full OS environment.
+
+Capabilities:
+
+- Camera and display support via dedicated connectors
+- High-speed networking via Ethernet and Wi-Fi
+- GPIO header for sensor and actuator integration
+- Runs any software available for Linux (Python, Node.js, databases, ML frameworks)
+
+#### Hardware
+
+The main board (Pi 4 as reference):
+
+- SoC: Broadcom BCM2711, quad-core ARM Cortex-A72 @ 1.8 GHz
+- RAM: 1–8 GB LPDDR4
+- Storage: microSD card (no onboard flash)
+- Connectivity: Gigabit Ethernet, dual-band Wi-Fi, Bluetooth 5.0
+- USB: 2× USB 3.0, 2× USB 2.0
+- Video: 2× micro-HDMI (up to 4K)
+- GPIO: 40-pin header
+
+#### GPIO
+
+40-pin header exposing digital I/O and peripheral bus signals.
+
+Pin types:
+
+- Digital I/O (3.3 V logic, not 5 V tolerant)
+- SPI, I²C, UART buses
+- PWM outputs
+- 3.3 V and 5 V power pins
+
+<Note>
+
+Raspberry Pi has no built-in ADC. An external ADC chip (e.g. MCP3008 over SPI) is required to read analog sensors.
+
+</Note>
+
+#### Programming
+
+Any language that runs on Linux is usable. Common choices:
+
+- Python (most common; `RPi.GPIO` or `gpiozero` libraries for GPIO)
+- C/C++ (via `wiringPi` or direct `/dev/mem` access)
+- Node.js, Java, Go
+
+GPIO response time is slower than a bare-metal MCU due to OS scheduling overhead. Not suitable for hard real-time tasks.
+
+### Raspberry Pi Pico
+
+Microcontroller board (not an SBC) from the Raspberry Pi Foundation. Does not run Linux.
+
+Based on the RP2040 chip:
+
+- Dual-core ARM Cortex-M0+ @ 133 MHz
+- 264 KB SRAM
+- 2 MB onboard flash
+- 26 GPIO pins
+- 3 ADC channels
+- USB, SPI, I²C, UART, PWM, PIO
+
+Primary languages: MicroPython and C/C++. Behaves like an Arduino-class device rather than a full SBC.
+
+<Note>
+
+Use the Pico for low-power, real-time, or sensor-interfacing tasks. Use the full Raspberry Pi when networking, a filesystem, or Linux software is required.
+
+</Note>

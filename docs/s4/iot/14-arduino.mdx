@@ -1,0 +1,100 @@
+---
+title: Arduino
+sidebar:
+  order: 14
+slug: s4/iot/arduino
+prev: true
+next: true
+dateCreated: 2026-06-07T00:00:00.000Z
+lastUpdatedOn: 2026-06-11T06:00:31.088Z
+---
+
+A popular microcontroller development board used for prototyping and by beginners. Contains an ATmega328 microcontroller and supports various I/O interfaces.
+
+Has:
+
+- Digital I/O pins
+- Analog input pins
+- PWM outputs
+- I²C communication pins (SCL/SDA)
+- USB interface for programming
+- Power supply pins (5V, 3.3V, GND)
+
+Has a large ecosystem of compatible sensors, shields, and libraries that simplify development.
+
+## Shields
+
+A shield is an add-on board that stacks directly onto an Arduino via pin headers, extending its hardware capabilities without external wiring.
+
+The shield's pin headers align exactly with Arduino's standard pinout. Stacking is mechanical and electrical simultaneously: no breadboard or jumper wires required.
+
+Why shields are used:
+
+- Plug-and-play hardware expansion with no soldering
+- Pin mapping is fixed and documented; no wiring errors possible
+- Multiple shields can be stacked if pin assignments do not conflict
+
+Common shields:
+
+- Ethernet Shield  
+  Adds wired network connectivity via a W5100 or W5500 chip. Communicates with the MCU over SPI.
+- Wi-Fi Shield  
+  Adds wireless connectivity. Superseded by ESP-based boards for most new designs.
+- Motor Driver Shield  
+  H-bridge circuits for controlling DC motors and stepper motors. Accepts higher voltages than the Arduino's GPIO can drive.
+- Relay Shield  
+  Contains relay switches for controlling mains-voltage appliances from 3.3/5 V logic.
+- GSM/GPRS Shield  
+  Adds cellular communication via a SIM card for remote IoT deployments without Wi-Fi.
+- SD Card Shield  
+  Provides microSD storage over SPI for data logging applications.
+- Proto Shield  
+  Blank perfboard area for soldering custom circuitry while still connecting to Arduino headers.
+
+<Note>
+
+Shields designed for 5 V Arduino boards may not be directly compatible with 3.3 V boards without level shifting.
+
+</Note>
+
+## Wiring
+
+C++ hardware abstraction framework for microcontrollers. Provides a simplified API for pin control, serial communication, and peripheral access. Arduino is built on Wiring — Arduino sketches are Wiring programs compiled with `avr-gcc` or an equivalent toolchain.
+
+Core API functions: `pinMode()`, `digitalWrite()`, `analogRead()`, `delay()`.
+
+## Processing
+
+Java-based language and IDE for interactive visual programming. Developed at MIT Media Lab. Provides a `setup()`/`draw()` program model.
+
+Arduino's `setup()`/`loop()` structure and its IDE were directly modelled on Processing.
+
+## Arduino IDE
+
+The software environment used to write, compile, and upload programs to Arduino boards. The programs are written in a simplified version of C++ and can be easily uploaded to the board via USB.
+
+Works cross-platform (Windows, Linux, macOS). Includes serial monitor for debugging.
+
+The IDE converts Arduino code into machine instructions and uploads it to the board via USB.
+
+### Arduino Program Structure
+
+#### Setup Function
+
+The `setup()` function runs once when the program starts.
+
+Used to:
+
+- Configure pin modes
+- Initialize peripherals
+- Set initial conditions
+
+#### Loop Function
+
+The `loop()` function runs continuously after `setup()`.
+
+Used to:
+
+- Read sensor inputs
+- Control logic
+- Operate actuators
