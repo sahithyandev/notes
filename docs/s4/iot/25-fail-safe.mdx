@@ -3,11 +3,32 @@ title: Fail Safe
 sidebar:
   order: 25
 dateCreated: 2026-06-11T10:51:14.259Z
-lastUpdatedOn: 2026-06-11T10:58:24.923Z
+lastUpdatedOn: 2026-06-11T11:13:06.920Z
 slug: s4/iot/fail-safe
 prev: true
 next: true
 ---
+
+A **fail-safe** system defaults to a state that causes no harm when a fault occurs.
+
+The safe state is defined by the application. A barrier that defaults to closed is fail-safe. A barrier that defaults to open is not.
+
+## Design Principle
+
+Fail-safe design requires identifying the least-dangerous state for every possible failure mode, then engineering the system so every fault drives toward that state.
+
+2 approaches:
+
+- Normally energised  
+  The safe state requires power. Failure cuts power and the system moves to the unsafe state. Avoid.
+- Normally de-energised  
+  The safe state is the unpowered state. Failure cuts power and the system defaults to safe. Preferred.
+
+<Note>
+
+Normally de-energised design aligns with fail-safe because the most common fault, power loss, produces the desired outcome automatically.
+
+</Note>
 
 ## Fail-Stop
 
@@ -23,12 +44,6 @@ Stopping is preferable to degraded operation because:
   A system that appears to be running hides the fault. A stopped system makes the fault immediately visible and diagnosable.
 - Undefined states cause unpredictable physical effects  
   An actuator commanded by corrupted logic may drive a motor, open a valve, or apply a brake in an unintended way. The physical consequence of wrong action exceeds the consequence of no action in most safety-critical contexts.
-
-<Note>
-
-Fail-stop is distinct from fail-safe. Fail-safe means the halted state itself is safe (e.g. a barrier that defaults to closed). A system can fail-stop without being fail-safe if the stopped state is still dangerous.
-
-</Note>
 
 ## Examples
 

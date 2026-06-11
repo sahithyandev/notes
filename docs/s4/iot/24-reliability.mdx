@@ -6,7 +6,7 @@ slug: s4/iot/reliability
 prev: true
 next: true
 dateCreated: 2026-05-31T07:08:08.399Z
-lastUpdatedOn: 2026-06-11T10:58:24.920Z
+lastUpdatedOn: 2026-06-11T11:13:06.918Z
 ---
 
 A system is reliable when it rarely fails. No system can be made completely failure-free.
@@ -29,6 +29,10 @@ $$
 
 Used for components that are discarded on failure: sensors, MCUs, batteries, LEDs.
 
+### MTTR
+
+Mean Time To Repair. Considered for repairable systems such as servers and industrial machines.
+
 ### MTBF
 
 Mean Time Between Failures. The statistical average time between successive failures of a repairable system.
@@ -37,7 +41,7 @@ $$
 \text{MTBF} = \text{MTTF} + \text{MTTR}
 $$
 
-where MTTR is Mean Time To Repair. For systems where repair time is negligible compared to operating time, MTBF $\approx$ MTTF.
+For systems where repair time is negligible compared to operating time, MTBF $\approx$ MTTF.
 
 Used for systems that are repaired and returned to service: servers, industrial machines, repairable IoT gateways.
 
@@ -47,7 +51,7 @@ For non-repairable components, MTTF and MTBF are often used interchangeably in d
 
 </Note>
 
-### How Metrics Change with Number of Components
+### Number of Components vs. Metrics
 
 When $n$ independent components are connected in series (the system fails if any one fails), their failure rates add:
 
@@ -61,12 +65,12 @@ $$
 \frac{1}{\text{MTTF}_{system}} = \frac{1}{\text{MTTF}_1} + \frac{1}{\text{MTTF}_2} + \cdots + \frac{1}{\text{MTTF}_n}
 $$
 
-$\text{MTTF}_{system}$ is always shorter than the shortest individual MTTF. Adding more components strictly decreases system reliability.
+$\text{MTTF}_\text{system}$ is always shorter than the shortest individual MTTF. Adding more components strictly decreases system reliability.
 
 For $n$ identical components each with MTTF $= M$:
 
 $$
-\text{MTTF}_{system} = \frac{M}{n}
+\text{MTTF}_\text{system} = \frac{M}{n}
 $$
 
 Doubling the component count halves the system MTTF.
@@ -74,10 +78,10 @@ Doubling the component count halves the system MTTF.
 For components in parallel (redundant: system survives until all fail), reliability improves. With $n$ identical components each with failure rate $\lambda$, the system survives until the last one fails:
 
 $$
-\text{MTTF}_{parallel} = \frac{1}{\lambda} \left(1 + \frac{1}{2} + \cdots + \frac{1}{n}\right) = \frac{1}{\lambda} \sum_{k=1}^{n} \frac{1}{k}
+\text{MTTF}_\text{parallel} = \frac{1}{\lambda} \left(1 + \frac{1}{2} + \cdots + \frac{1}{n}\right) = \frac{1}{\lambda} \sum_{k=1}^{n} \frac{1}{k}
 $$
 
-For two identical components in parallel: $\text{MTTF}_{parallel} = \frac{3}{2\lambda} = 1.5 \times \text{MTTF}_{single}$.
+For two identical components in parallel: $\text{MTTF}_\text{parallel} = \frac{3}{2\lambda} = 1.5 \times \text{MTTF}_\text{single}$.
 
 <Note>
 
@@ -113,16 +117,16 @@ $$
 Each $R_i < 1$, so $R_{system}$ strictly decreases with every added component. Equivalently, system MTTF for series components satisfies:
 
 $$
-\frac{1}{\text{MTTF}_{system}} = \frac{1}{\text{MTTF}_1} + \frac{1}{\text{MTTF}_2} + \cdots
+\frac{1}{\text{MTTF}_\text{system}} = \frac{1}{\text{MTTF}_1} + \frac{1}{\text{MTTF}_2} + \cdots
 $$
 
-$\text{MTTF}_{system}$ is always shorter than the shortest individual MTTF.
+$\text{MTTF}_\text{system}$ is always shorter than the shortest individual MTTF.
 
-IoT devices are often deployed in locations with no on-site maintenance. A field failure requires a technician visit or a full device recall. The cost of a single field failure — labour, logistics, customer impact — vastly exceeds the cost saved by adding the component in the first place.
+IoT devices are often deployed in locations with no on-site maintenance. A field failure requires a technician visit or a full device recall. The cost of a single field failure (labour, logistics, customer impact) vastly exceeds the cost saved by adding the component in the first place.
 
 ### Power Consumption
 
-Every component draws quiescent current. In battery-powered IoT devices, the sum of all quiescent currents determines battery life. Removing one component that draws $10\ \mu\text{A}$ continuously can extend battery life by weeks in a low-duty-cycle device.
+Every component draws idle current. In battery-powered IoT devices, the sum of all idle currents determines battery life. Removing one component that draws $10\ \mu\text{A}$ continuously can extend battery life by weeks in a low-duty-cycle device.
 
 ### Design Complexity
 
