@@ -7,14 +7,23 @@ slug: s4/iot/modbus
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-11T17:47:33.163Z
+lastUpdatedOn: 2026-06-11T21:05:42.631Z
 ---
 
-A serial communication protocol for industrial devices. Developed by Modicon in 1979. Master-slave architecture: one master initiates all transactions. Up to 247 slaves may respond.
+A serial communication protocol for industrial devices. Developed by Modicon in 1979. Widely used in SCADA systems, PLCs, and IoT edge layers.
 
-Widely used in SCADA systems, PLCs, and industrial sensors.
+Follows master-slave architecture:
+
+- Master  
+  Initiates all communication. Only 1 master exists on a bus at a time. Sends requests and waits for responses.
+- Slave  
+  Responds only when addressed. Each slave has a unique 8-bit device address (1–247). Address 0 is reserved for broadcast; slaves do not respond to it. 248 Up to 247 slaves may respond. Never communicate spontaneously.
+
+Modbus appears primarily at the edge layer, connecting sensors, PLCs, meters, and actuators to a local controller. The gateway aggregates this data and forwards it via [MQTT](/s4/iot/mqtt) or similar protocols to the cloud. Modbus TCP enables direct integration of industrial devices into Ethernet-based IoT architectures.
 
 ## Data Model
+
+4 register/coil tables, each with 65,536 addressable locations (16-bit address):
 
 - Coils  
   1-bit, read/write. Represents discrete outputs such as relays and valves.
@@ -25,26 +34,105 @@ Widely used in SCADA systems, PLCs, and industrial sensors.
 - Holding registers  
   16-bit, read/write. General-purpose configuration and data storage.
 
+<Note>
+
+Modbus registers are 16-bit. 32-bit values (floats, integers) require 2 consecutive holding registers. Byte order (big-endian vs little-endian) is determined by convention between devices, not the protocol.
+
+</Note>
+
+## Packet Structure
+
+All variants share the same Protocol Data Unit (PDU):
+
+```
+┌───────────────┬──────────┐
+│ Function Code │   Data   │
+│   (1 byte)    │ (N bytes)│
+└───────────────┴──────────┘
+```
+
+The PDU is wrapped in a variant-specific Application Data Unit (ADU) that adds addressing and error checking.
+
+### Function Codes
+
+Every request contains a 1-byte function code specifying the operation:
+
+| Code | Operation                |
+| ---- | ------------------------ |
+| 01   | Read coils               |
+| 02   | Read discrete inputs     |
+| 03   | Read holding registers   |
+| 04   | Read input registers     |
+| 05   | Write single coil        |
+| 06   | Write single register    |
+| 15   | Write multiple coils     |
+| 16   | Write multiple registers |
+
+If a slave cannot execute a request, it responds with an exception: the function code OR-ed with `0x80`, followed by a 1-byte error code.
+
 ## Variants
 
-- Modbus RTU  
-  Binary encoding over serial lines (RS-232, RS-485). CRC error checking.
-- Modbus ASCII  
-  ASCII encoding over serial lines. LRC error checking. Slower but human-readable.
-- Modbus TCP  
-  Modbus framing over TCP/IP on port 502. Relies on TCP for error handling.
+### Modbus RTU
 
-## Common Function Codes
+Binary encoding over RS-232 or RS-485. Most compact variant. CRC-16 error checking.
 
-- 01: Read coils
-- 02: Read discrete inputs
-- 03: Read holding registers
-- 04: Read input registers
-- 05: Write single coil
-- 06: Write single register
-- 15: Write multiple coils
-- 16: Write multiple registers
+```
+┌─────────────────┬───────────────┬──────────┬───────────┐
+│  Slave Address  │ Function Code │   Data   │    CRC    │
+│    (1 byte)     │   (1 byte)    │ (N bytes)│ (2 bytes) │
+└─────────────────┴───────────────┴──────────┴───────────┘
+```
+
+- CRC  
+  CRC-16, low byte transmitted first.
+- Frame boundaries  
+  No start/end delimiters. A silent interval of at least 3.5 character times marks frame start and end.
+
+Typically runs over RS-485: differential signalling, up to 247 devices, bus length up to ~1200 m.
+
+### Modbus ASCII
+
+Each binary byte encoded as 2 ASCII hex characters. Longer frames than RTU but human-readable. LRC error checking.
+
+```
+┌───────┬─────────┬───────────────┬──────────┬───────┬─────────┐
+│ Start │ Address │ Function Code │   Data   │  LRC  │   End   │
+│ 1 ch  │ 2 chars │    2 chars    │ 2N chars │ 2 ch  │ 2 chars │
+└───────┴─────────┴───────────────┴──────────┴───────┴─────────┘
+```
+
+- Start  
+  `:` (ASCII `0x3A`).
+- End  
+  CR LF (`0x0D 0x0A`).
+- LRC  
+  Two's complement of the sum of all byte values from Address through Data. Encoded as 2 ASCII hex chars.
+
+### Modbus TCP
+
+Modbus PDU over TCP/IP on port 502. No CRC; TCP handles error checking. IP addressing removes the 247-device limit.
+
+The PDU is prefixed with a 7-byte MBAP header:
+
+```
+┌────────────────┬─────────────┬──────────┬─────────┬───────────────┬──────────┐
+│ Transaction ID │ Protocol ID │  Length  │ Unit ID │ Function Code │   Data   │
+│   (2 bytes)    │  (2 bytes)  │ (2 bytes)│ (1 byte)│   (1 byte)    │ (N bytes)│
+└────────────────┴─────────────┴──────────┴─────────┴───────────────┴──────────┘
+│←─────────────────── MBAP Header (7 bytes) ──────────────────────►│
+```
+
+- Transaction ID  
+  Echoed in the response. Matches request/response pairs when requests are pipelined.
+- Protocol ID  
+  Always `0x0000`.
+- Length  
+  Byte count of everything that follows (Unit ID + PDU).
+- Unit ID  
+  Slave address. Used when a TCP gateway fronts a serial Modbus network.
 
 ## Limitations
 
-No built-in authentication or encryption. Sensitive deployments must apply security at the network layer.
+- No built-in authentication or encryption. Sensitive deployments must apply security at the network layer.
+- Request-response only. Slaves cannot push data; the master must poll.
+- 16-bit register width requires device-level conventions for wider data types.
