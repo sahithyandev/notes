@@ -6,25 +6,14 @@ slug: s4/iot/system-architecture
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-06-11T16:39:28.347Z
+lastUpdatedOn: 2026-06-11T16:44:15.303Z
 ---
 
 An IoT solution consists of interconnected hardware and software components that collect, transmit, and process data for decision making.
 
-The architecture is structured in 3 layers:
-
-- Edge Layer  
-  The physical layer. Contains sensors, actuators, and hardware interfaces. Low computing power, low energy consumption, lower reliability per unit. Deployed in large volumes. Handles raw data collection and direct physical-world interaction.
-- Fog Layer  
-  The intermediate processing layer between edge and cloud. Handles local computation, local decision-making, and data pre-processing. Reduces latency by processing locally. Reduces bandwidth load on the network.
-- Cloud Layer  
-  Back-end infrastructure (Google Cloud, AWS, Azure, Huawei Cloud). High-power compute, large-scale storage, big data analytics, AI/ML workloads, computer vision, voice recognition, NLP. Not suitable for latency-sensitive decisions.
-
-Component chain: Sensors → Actuators → H/W Interfaces → Microcontrollers → Software → Communication → Cloud/Central Servers → Big Data Analytics → AI/ML.
-
 ## Device Layer
 
-Aka. edge layer. Hardware components embedded in physical devices.
+Physical layer. Hardware components embedded in physical devices. Low computing power, low energy consumption, lower reliability per unit. Deployed in large volumes. Handles raw data collection and direct physical-world interaction.
 
 - Sensors  
   Take inputs from the environment and convert them into data.
@@ -34,9 +23,19 @@ Aka. edge layer. Hardware components embedded in physical devices.
 - Microcontrollers
 - Embedded software
 
+### Edge Processing
+
+Data processed at IoT devices, close to the source of data generation. Computing power is very limited. Reduces latency and bandwidth usage by processing locally.
+
 ## Communication Layer
 
-Aka. fog layer. Transmits data between devices and servers.
+Intermediate processing layer between edge and cloud. Transmits data between devices and servers. Reduces latency by processing locally. Reduces bandwidth load on the network.
+
+Handles:
+
+- Local computation
+- Local decision-making
+- Data pre-processing
 
 Examples:
 
@@ -44,19 +43,18 @@ Examples:
 - Internet connectivity
 - Networking infrastructure
 
-## Processing and Cloud Layer
-
-Processes and analyzes IoT data. Technologies:
-
-- Cloud servers
-- Big data analytics
-- Artificial Intelligence / Machine Learning
-- Data analytics platforms (Google Cloud, AWS, Azure)
-
-### Edge Processing
-
-Data processed at IoT devices, close to the source of data generation. Computing power is very limited. Reduces latency and bandwidth usage by processing locally.
-
 ### Fog Processing
 
 Data processed at intermediate nodes between edge and cloud. Nodes can be local servers, gateways, or routers. Slightly more computing power than edge devices. Reduces latency and bandwidth usage compared to cloud processing.
+
+## Cloud Layer
+
+Back-end infrastructure (Google Cloud, AWS, Azure). Not suitable for latency-sensitive decisions. Does compute-intensive processing.
+
+- High-power compute
+- Large-scale storage
+- Big data analytics
+- AI/ML workloads
+- Computer vision
+- Voice recognition
+- NLP
