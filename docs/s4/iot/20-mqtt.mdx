@@ -7,43 +7,163 @@ slug: s4/iot/mqtt
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-11T17:47:33.163Z
+lastUpdatedOn: 2026-06-11T19:54:26.972Z
 ---
 
-A lightweight publish-subscribe messaging protocol for constrained devices and low-bandwidth, high-latency networks. Developed by IBM in 1999. Runs over TCP/IP on port 1883 (port 8883 for TLS).
+A lightweight publish-subscribe messaging protocol for constrained devices and low-bandwidth, high-latency networks. Developed by IBM in 1999. Runs over TCP/IP on port 1883 (port 8883 for TLS). Runs at application layer.
 
-## Concepts
+### Broker
 
-- Broker  
-  Central server that receives, routes, and delivers messages.
-- Topic  
-  Hierarchical string identifying a message channel (e.g. `home/bedroom/temperature`). Publishers and subscribers address topics independently.
-- Publisher  
-  Client that sends messages to a topic.
-- Subscriber  
-  Client that receives messages from subscribed topics.
+Central server that receives, routes, and delivers messages.
+
+### Topic
+
+Hierarchical string identifying a message channel (e.g. `home/bedroom/temperature`). Publishers and subscribers address topics independently.
+
+### Publisher
+
+Client that sends messages to a topic.
+
+### Subscriber
+
+Client that receives messages from subscribed topics.
 
 ## Quality of Service
 
-- QoS 0  
-  At most once. Message sent once with no acknowledgement.
-- QoS 1  
-  At least once. Message retransmitted until acknowledged. Duplicates possible.
-- QoS 2  
-  Exactly once. Four-step handshake eliminates duplicates.
+### QoS 0
+
+At most once. Message sent once with no acknowledgement.
+
+### QoS 1
+
+At least once. Message retransmitted until acknowledged. Duplicates possible.
+
+### QoS 2
+
+Exactly once. 4-step handshake eliminates duplicates.
+
+4-step handshake steps:
+
+1. PUBLISH  
+   Sender transmits message and stores it locally.
+2. PUBREC  
+   Receiver stores the message ID and acknowledges receipt. Sender stops retransmitting PUBLISH.
+3. PUBREL  
+   Sender acknowledges PUBREC and signals the receiver to deliver. Receiver may now forward the message to the application.
+4. PUBCOMP  
+   Receiver confirms delivery. Sender discards the stored message.
+
+3 steps are insufficient because after the receiver delivers the message, the sender has no confirmation that PUBREL arrived. Without PUBCOMP, the sender must retransmit PUBLISH on timeout, causing a duplicate. PUBCOMP gives the sender a safe discard signal without re-triggering delivery.
+
+## Packet Structure
+
+Every MQTT packet has 3 parts:
+
+```
+┌─────────────┬─────────────────┬─────────┐
+│ Fixed Header│ Variable Header │ Payload │
+│  (2–5 B)    │  (0–N bytes)    │ (0–N B) │
+└─────────────┴─────────────────┴─────────┘
+```
+
+### Fixed Header
+
+Always present. Minimum 2 bytes.
+
+```
+Byte 1: [ Packet Type (4 bits) | Flags (4 bits) ]
+Byte 2+: Remaining Length (1–4 bytes)
+```
+
+#### Packet Type
+
+4 bits. Identifies the control packet.
+
+| Value | Packet     |
+| ----- | ---------- |
+| 1     | CONNECT    |
+| 2     | CONNACK    |
+| 3     | PUBLISH    |
+| 4     | PUBACK     |
+| 5     | PUBREC     |
+| 6     | PUBREL     |
+| 7     | PUBCOMP    |
+| 8     | SUBSCRIBE  |
+| 9     | SUBACK     |
+| 12    | PINGREQ    |
+| 14    | DISCONNECT |
+
+#### Flags Field
+
+4 bits. Meaning depends on packet type.
+
+For PUBLISH:
+
+```
+Bit 3: DUP    — 1 if this is a retransmission
+Bit 2–1: QoS  — 00, 01, or 10
+Bit 0: RETAIN — 1 if broker should retain the message
+```
+
+Remaining Length encodes the byte count of everything after the fixed header. Uses variable-length encoding: each byte contributes 7 bits of value; the MSB is a continuation flag (1 = more bytes follow).
+
+| Bytes | Range                   |
+| ----- | ----------------------- |
+| 1     | 0 – 127                 |
+| 2     | 128 – 16,383            |
+| 3     | 16,384 – 2,097,151      |
+| 4     | 2,097,152 – 268,435,455 |
+
+### Variable Header
+
+Present only in certain packet types. Contains packet-specific metadata.
+
+- PUBLISH  
+  Topic name (2-byte length prefix + UTF-8 string), then packet identifier (2 bytes, only for QoS 1 and 2).
+- CONNECT  
+  Protocol name, protocol level, connect flags, keep-alive timer.
+- CONNACK, PUBACK, SUBACK, etc.: packet identifier and return/reason codes.
+
+### Payload
+
+Present only in certain packet types. Content is packet-specific.
+
+- CONNECT payload: client ID, will topic/message, username, password.
+- PUBLISH payload: application message bytes. No type encoding — format is opaque to the broker.
+- SUBSCRIBE payload: list of topic filters with requested QoS.
+
+No independent size field. Size derived from the remaining-length value minus the variable-header size.
+
+<Note>
+
+The 256 MB theoretical maximum is rarely the binding constraint. Mosquitto defaults to 10 MB; AWS IoT enforces 128 KB. Device RAM is typically the real limit, often only a few KB. MQTT v5.0 introduces a `Maximum Packet Size` property negotiated during CONNECT/CONNACK, making the effective limit explicit.
+
+</Note>
 
 ## Features
 
 - Retained messages  
   Broker stores the last message on a topic. New subscribers receive it immediately on subscribing.
-- Last Will and Testament (LWT)  
+- Last Will and Testament  
   Broker publishes a predefined message if a client disconnects unexpectedly.
 - Persistent sessions  
   Broker stores subscriptions and queued messages for a reconnecting client.
 
 ## Applications
 
-- IoT sensor telemetry
-- Home automation
-- Mobile push notifications
-- Fleet and asset tracking
+- IoT sensor telemetry  
+  Temperature, humidity, and pressure readings from field sensors published at regular intervals.
+- Home automation  
+  Smart lights, locks, and thermostats controlled via low-power microcontrollers.
+- Mobile push notifications  
+  Facebook Messenger originally used MQTT for push delivery over unreliable mobile networks.
+- Fleet and asset tracking  
+  GPS coordinates published from vehicles or shipping containers to a central broker.
+- Industrial equipment monitoring  
+  Machine health metrics (vibration, temperature) streamed from factory-floor sensors.
+- Smart metering  
+  Electricity, gas, and water meters transmitting readings to utility back-ends.
+- Healthcare  
+  Wearable sensors relaying patient vitals to hospital systems over constrained networks.
+- Connected vehicles  
+  In-vehicle telemetry and over-the-air status updates routed through cloud brokers.
