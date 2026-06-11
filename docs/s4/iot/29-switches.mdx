@@ -3,90 +3,130 @@ title: Switches
 sidebar:
   order: 29
 dateCreated: 2026-06-12T00:00:00.000Z
-lastUpdatedOn: 2026-06-11T21:00:25.906Z
+lastUpdatedOn: 2026-06-11T23:56:43.388Z
 slug: s4/iot/switches
 prev: true
 next: true
 ---
 
-## Switch Configurations
+## Configurations
 
 Switches are described by 2 parameters:
 
 - Poles  
-  The number of independent circuits the switch controls simultaneously.
+  Number of independent circuits controlled simultaneously.
 - Throws  
-  The number of output positions each pole can connect to.
+  Number of output positions each pole can connect to.
 
 ### SPST
 
-Single Pole Single Throw. 1 pole, 1 throw. 1 input, 1 output. Either connected (closed) or disconnected (open). No alternate path.
+Single Pole Single Throw. 1 input, 1 output. Either connected or disconnected.
 
-Used for on/off control, simple button inputs, power switches.
+Used for on/off control, power switches, simple button inputs.
 
 ### SPDT
 
-Single Pole Double Throw. 1 pole, 2 throws. The common terminal connects to either of 2 outputs.
+Single Pole Double Throw. Common terminal connects to either of 2 outputs.
 
-Used for selecting between 2 signal sources, changeover switches, routing 1 signal to 1 of 2 destinations.
-
-In MCU circuits: 1 throw to $V_{CC}$, 1 to GND, common to the GPIO pin. The pin is always driven to a valid level regardless of switch position. No pull resistor required.
+In MCU circuits: 1 throw to $V_{CC}$, 1 to GND, common to GPIO. Pin is always at a valid level. No pull resistor required.
 
 ### DPST
 
-Double Pole Single Throw. 2 independent poles, each with 1 throw. Both poles open and close together (ganged). Equivalent to 2 SPST switches mechanically linked on the same actuator.
+Double Pole Single Throw. 2 independent poles, each with 1 throw, ganged on 1 actuator.
 
-Used for simultaneously switching 2 separate circuits (e.g. both live and neutral in a mains circuit, or 2 independent signal lines that must switch in sync).
+Used when 2 circuits must switch simultaneously (e.g. live and neutral in a mains circuit).
 
 ### DPDT
 
-Double Pole Double Throw. 2 independent poles, each with 2 throws. Equivalent to 2 SPDT switches ganged on 1 actuator.
+Double Pole Double Throw. 2 independent poles, each with 2 throws, ganged on 1 actuator.
 
-Used for reversing DC motor direction (H-bridge manual control), switching 2 signal lines simultaneously between 2 destinations.
+Used for DC motor direction reversal and switching 2 signal lines between 2 destinations.
 
 <Note>
 
-Higher configurations (3PDT, 4PDT) follow the same pattern. The pole count and throw count are independent; any combination is mechanically possible.
+Higher configurations (3PDT, 4PDT) follow the same pattern. Pole count and throw count are independent.
 
 </Note>
 
-## Switch Types
+## Types
 
-Switches are the most common digital input device. They produce a binary voltage level read by a GPIO input pin.
+### Push Button
 
-### Push Button Switch
+A momentary contact switch. Circuit closes only while physically held.
 
-A momentary contact switch. The circuit is closed only while the button is physically held. Releasing it opens the circuit and the pin returns to its pull-up or pull-down voltage.
+Requires a pull-up or pull-down resistor. Without one, the pin floats when released.
 
-Monostable behaviour: output is active for exactly as long as the button is pressed, then returns to idle.
+### Bistable
 
-Requires a pull-up or pull-down resistor to define the idle voltage. Without one, the pin floats in the forbidden band when the button is released.
+A latching switch. Each actuation toggles between 2 stable states.
 
-Switch bounce: mechanical contacts bounce on make and break, producing multiple rapid transitions before settling. Debouncing is required in software or hardware (RC filter + Schmitt trigger).
+- MCU reads current state at any time. No interrupt needed.
+- Transition edges still bounce.
 
-### Contact Bounce
+Examples: toggle switches, rocker switches.
 
-When 2 metal contacts meet or separate, the elastic mechanical structure causes them to physically rebound multiple times before coming to rest. Each rebound opens and closes the circuit, producing a burst of rapid transitions. Duration: typically $1\ \text{ms}$–$10\ \text{ms}$ depending on the switch mechanism.
+### Monostable
 
-- Clean bounce  
-  Contact transitions are sharp. The signal goes fully HIGH or fully LOW on each rebound. The MCU sees several valid logic transitions in quick succession, all within the same logic family's thresholds.
-- Dirty bounce  
-  The contact surface is oxidised, contaminated, or worn. During partial contact, the resistance is high and unstable. The voltage sits in or near the forbidden band. The signal oscillates with irregular amplitude and timing, and may never fully reach $V_{IH}$ or $V_{OL}$ on some bounces. Dirty bounce is harder to filter because its duration and waveform are unpredictable.
+Produces a fixed-duration pulse per actuation regardless of hold duration.
 
-Dirty bounce occurs because of:
+A monostable multivibrator starts a timer on the trigger edge. Output goes HIGH for $T = R \times C$, then returns LOW. Produces a clean, bounce-free pulse. No software debouncing needed.
+
+<Note>
+
+A standard push button is physically monostable but electrically produces a level, not a pulse. The one-shot circuit converts it to a fixed-width pulse.
+
+</Note>
+
+## Edge Detection
+
+Level detection acts continuously while the pin is held. Edge detection acts once per transition.
+
+2 transitions per press-release cycle:
+
+- Falling edge  
+  HIGH to LOW. On a pull-up circuit, moment of press.
+- Rising edge  
+  LOW to HIGH. On a pull-up circuit, moment of release.
+
+```c
+uint8_t prev = HIGH;
+
+void loop(void) {
+    uint8_t curr = read_pin();
+    if (prev == HIGH && curr == LOW)
+        handle_press();
+    prev = curr;
+}
+```
+
+Requires debouncing. Without it, bounce produces multiple spurious transitions per physical press.
+
+## Bouncing
+
+When 2 metal contacts meet or separate, elastic rebound causes multiple rapid transitions before settling. Duration: typically $1\ \text{ms}$–$10\ \text{ms}$.
+
+### Clean Bounce
+
+Transitions are sharp. MCU sees valid logic transitions in quick succession.
+
+### Dirty bounce
+
+Voltage sits near the forbidden band. Irregular amplitude and timing. Harder to filter.
+
+Causes:
 
 - Contact oxidation  
-  An insulating oxide layer requires higher force to break through, causing erratic make resistance during early contact.
+  Oxide layer causes erratic make resistance during early contact.
 - Contamination  
-  Dust, flux residue, or moisture on the contact surfaces increase resistance during partial contact.
+  Dust, flux residue, or moisture increase resistance during partial contact.
 - Worn contacts  
-  Repeated actuation reduces contact pressure, worsening both bounce count and edge quality.
+  Reduced contact pressure worsens bounce count and edge quality.
 
-### Debouncing
+## Debouncing
 
-3 software debounce approaches exist, trading off simplicity, CPU blocking, and robustness.
+### Delay and Confirm
 
-Delay-and-confirm: after detecting the first edge, the firmware blocks for a fixed blanking period ($20\ \text{ms}$–$50\ \text{ms}$), then re-samples to confirm the stable state.
+After the first edge, block for $20\ \text{ms}$–$50\ \text{ms}$, then re-sample.
 
 ```c
 if (button_pressed()) {
@@ -96,13 +136,14 @@ if (button_pressed()) {
 }
 ```
 
-Simple but blocks the CPU for the blanking period. Unsuitable in event-driven or RTOS firmware where tasks cannot block.
+Blocks the CPU for the blanking period. Unsuitable in event-driven or RTOS firmware.
 
-Counter method: sampled periodically by a timer ISR. A counter increments each sample period while the pin is in its new state. The state is accepted only when the counter reaches a threshold, meaning the pin has been stable for $N$ consecutive samples.
+### Counter Method
+
+Timer ISR samples the pin periodically. Counter increments while pin holds its new state. State accepted when counter reaches threshold $N$.
 
 ```c
-// called from a 1 ms timer ISR
-void debounce_tick(void) {
+void debounce_tick(void) {  // 1 ms ISR
     if (read_pin() == NEW_STATE) {
         if (++stable_count >= THRESHOLD) {
             accepted_state = NEW_STATE;
@@ -114,121 +155,66 @@ void debounce_tick(void) {
 }
 ```
 
-Any bounce that returns the pin to its prior state resets the counter to zero. Only a run of $N$ identical samples triggers a state change. A threshold of 10–20 at a 1 ms sample rate gives $10\ \text{ms}$–$20\ \text{ms}$ settle time. Non-blocking: the ISR runs independently and the main loop reads `accepted_state` at any time.
+Any bounce resets the counter. Threshold of 10–20 at 1 ms rate gives $10\ \text{ms}$–$20\ \text{ms}$ settle time. Non-blocking.
 
-Shift register method: a fixed-width integer (typically 8 or 16 bits) acts as a shift register of recent pin samples. Each timer tick, the register is shifted left and the current pin state is shifted in at the LSB.
+### Shift Register Method
+
+A fixed-width integer (8 or 16 bits) holds recent samples. Each tick, shift left and OR in the current pin state at LSB. State accepted only when all $N$ bits are identical.
 
 ```c
-// called from a timer ISR
-void debounce_tick(void) {
+void debounce_tick(void) {  // timer ISR
     shift_reg = (shift_reg << 1) | read_pin();
-    if (shift_reg == 0xFF)
-        accepted_state = HIGH;
-    else if (shift_reg == 0x00)
-        accepted_state = LOW;
+    if (shift_reg == 0xFF) accepted_state = HIGH;
+    else if (shift_reg == 0x00) accepted_state = LOW;
 }
 ```
 
-The register holds the last $N$ samples as a history window. A state change is accepted only when all $N$ bits are identical. Any bounce injects a contrary bit and prevents acceptance until the window is clean.
+Advantages over counter method:
 
-Advantages over the counter method:
+- No counter to reset. History is implicit in the register.
+- Detects instability over the full window, not just from the last edge.
+- Works correctly during dirty bounce.
 
-- No counter to reset. History is implicit in the shift register contents.
-- Detects instability over the full window, not just consecutive samples from the last edge.
-- Works correctly even if the pin drifts in and out of the new state during a dirty bounce.
+### Hardware RC
 
-Hardware RC debounce: a resistor-capacitor low-pass filter on the input line smooths the bounce transitions. The capacitor charges and discharges through the resistor, rounding sharp edges. A Schmitt trigger after the filter converts the slow rounded edge back to a clean transition. The RC time constant must be longer than the worst-case bounce duration.
+RC low-pass filter on the input line smooths bounce transitions. Schmitt trigger converts the rounded edge back to a clean transition. Time constant must exceed worst-case bounce duration.
 
-Hardware RC + diode debounce: adding a diode in parallel with the series resistor creates 2 different time constants for the rising and falling edges.
+### Hardware RC + Diode
 
-Circuit: the series resistor $R$ sits between the switch node and the input pin. The capacitor $C$ connects from the input pin to GND. The diode is placed in parallel with $R$, forward-biased in the direction of the falling edge (anode toward the input pin, cathode toward the switch node).
+Diode in parallel with the series resistor creates asymmetric time constants.
 
-On press (signal falls):
+- On press  
+  Diode forward-biased. Capacitor discharges through diode. Time constant $\approx R_{diode} \times C$, very short.
+- On bounce or release  
+  Diode reverse-biased. Capacitor charges through $R$. Time constant $= R \times C$, long. Bounce cannot reach $V_{IH}$ before contact re-closes.
 
-- The diode is forward-biased. The capacitor discharges rapidly through the diode's low forward resistance rather than through $R$.
-- Time constant $\approx R_{diode} \times C$, very short. The input responds almost immediately to the button press.
+Choose $R \times C \approx 10\ \text{ms}$–$20\ \text{ms}$.
 
-On bounce or release (signal tries to rise):
+### SR Latch
 
-- The diode is reverse-biased. The capacitor can only charge through $R$.
-- Time constant $= R \times C$, long, chosen to exceed the worst-case bounce duration.
-- Any bounce that briefly opens the switch causes only a small, slow rise on the capacitor. The rise cannot reach $V_{IH}$ before the contact closes again, so no spurious transition reaches the MCU.
+SPDT switch wired to SR latch ($\overline{S}$/$\overline{R}$ inputs). Moving to 1 throw sets the latch. Moving to the other resets it. Subsequent bounces cannot change the output. Zero software overhead.
 
-Choosing $R \times C \approx 10\ \text{ms}$–$20\ \text{ms}$ covers most mechanical switches.
+### Dedicated Debounce IC
 
-SR latch debounce: used with an SPDT switch wired to an SR latch ($\overline{S}$/$\overline{R}$ inputs). When the common terminal moves to 1 throw, it sets the latch. Moving to the other throw resets it. Subsequent bounces on the same throw cannot change the latch output. Produces a perfectly clean edge with zero software overhead.
-
-Dedicated debounce IC: integrates the filtering and threshold logic for multiple switch inputs in a single package, replacing discrete RC networks, Schmitt triggers, and firmware debounce routines entirely.
-
-Internal structure per channel: an RC low-pass filter followed by a Schmitt trigger. Some ICs add a latch to hold the output until the MCU reads it, preventing the MCU from missing a short press.
+RC filter + Schmitt trigger per channel in a single package. Some ICs latch the output until MCU reads it.
 
 Advantages over discrete or software solutions:
 
-- No timer ISR or CPU cycles consumed.
-- Consistent timing across all channels. No per-channel firmware tuning.
-- Fewer discrete components on the PCB.
-- Output edges are clean and guaranteed within the IC's specified settle time.
+- No CPU cycles consumed.
+- Consistent timing across all channels.
+- Fewer discrete components.
 
 Common ICs:
 
 - MAX6816 / MAX6817 / MAX6818 (Maxim)  
-  Single, dual, and octal channel variants. Built-in $40\ \text{ms}$ debounce time. Each input has an internal pull-up. Output goes LOW when input is pressed (active-low). Available in small SOT-23 and SOIC packages.
+  Single, dual, octal variants. $40\ \text{ms}$ debounce time. Internal pull-ups. Active-low output.
 - MC14490 (ON Semiconductor)  
-  6-channel hex debouncer. Uses an internal RC oscillator to clock a shift-register integrator on each channel. Debounce period set by an external capacitor ($C_{ext}$), allowing adjustment from ~$1\ \text{ms}$ to ~$100\ \text{ms}$.
+  6-channel. Debounce period set by $C_{ext}$: ~$1\ \text{ms}$ to ~$100\ \text{ms}$.
 - SN74LV1T34 + external RC  
-  A Schmitt trigger buffer used with an external RC. Requires discrete components but costs less than a dedicated debounce IC.
+  Schmitt trigger buffer with discrete RC. Lower cost, more components.
 
 <Note>
 
-Debounce ICs are practical when a board has many switch inputs (keypads, panel buttons). For 1 or 2 buttons on a cost-sensitive IoT device, software debounce is usually preferred to avoid the added IC cost and supply chain dependency.
-
-</Note>
-
-### Edge Detection
-
-Level detection reads the current pin state on each loop iteration and acts continuously while the button is held. Edge detection acts once per state transition, regardless of how long the button stays in its new state.
-
-2 transitions occur per press-release cycle:
-
-- Falling edge  
-  Pin transitions from HIGH to LOW. On a pull-up circuit, this is the moment of press.
-- Rising edge  
-  Pin transitions from LOW to HIGH. On a pull-up circuit, this is the moment of release.
-
-Implementation compares the current sample to the previous sample:
-
-```c
-uint8_t prev = HIGH;
-
-void loop(void) {
-    uint8_t curr = read_pin();
-    if (prev == HIGH && curr == LOW) {
-        handle_press();
-    }
-    prev = curr;
-}
-```
-
-Edge detection requires debouncing. Without it, contact bounce produces multiple spurious transitions per physical press, firing the action several times from a single press.
-
-### Bistable Switch
-
-A latching switch. Each actuation toggles the output between 2 stable states. The output remains in its new state after the actuating force is removed.
-
-- Toggle switches and rocker switches are bistable.
-- The MCU reads the current state at any time. No interrupt is needed to capture the event.
-- No debounce timer required for state reading, but transition edges still bounce.
-
-### Monostable Switch
-
-Produces a single fixed-duration pulse on each actuation, regardless of how long the button is held.
-
-Implemented with a monostable multivibrator (one-shot) circuit. The trigger edge starts a timer. The output goes HIGH for a fixed period $T = R \times C$ determined by an RC network, then returns LOW.
-
-The MCU receives a clean, bounce-free pulse of guaranteed width. No software debouncing needed and no dependence on how quickly the user releases the button.
-
-<Note>
-
-A standard push button is physically monostable (returns to rest) but electrically produces a level, not a pulse. A monostable switch circuit adds the one-shot timer to convert that level into a fixed-width pulse.
+Debounce ICs suit boards with many switch inputs. For 1 or 2 buttons on a cost-sensitive IoT device, software debounce is usually preferred.
 
 </Note>

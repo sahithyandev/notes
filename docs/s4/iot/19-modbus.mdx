@@ -7,7 +7,7 @@ slug: s4/iot/modbus
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-11T21:05:42.631Z
+lastUpdatedOn: 2026-06-11T23:56:43.381Z
 ---
 
 A serial communication protocol for industrial devices. Developed by Modicon in 1979. Widely used in SCADA systems, PLCs, and IoT edge layers.
@@ -87,6 +87,8 @@ Binary encoding over RS-232 or RS-485. Most compact variant. CRC-16 error checki
   CRC-16, low byte transmitted first.
 - Frame boundaries  
   No start/end delimiters. A silent interval of at least 3.5 character times marks frame start and end.
+- Size  
+  Minimum 4 bytes (address + function code + CRC, no data). Maximum 256 bytes (1 + 1 + 252 data + 2 CRC).
 
 Typically runs over RS-485: differential signalling, up to 247 devices, bus length up to ~1200 m.
 
@@ -107,6 +109,8 @@ Each binary byte encoded as 2 ASCII hex characters. Longer frames than RTU but h
   CR LF (`0x0D 0x0A`).
 - LRC  
   Two's complement of the sum of all byte values from Address through Data. Encoded as 2 ASCII hex chars.
+- Size  
+  Minimum 9 characters. Maximum 513 characters (1 start + 2 address + 2 function + 504 data + 2 LRC + 2 CRLF). Each RTU data byte becomes 2 chars, so ASCII frames are approximately twice the size of an equivalent RTU frame.
 
 ### Modbus TCP
 
@@ -130,6 +134,8 @@ The PDU is prefixed with a 7-byte MBAP header:
   Byte count of everything that follows (Unit ID + PDU).
 - Unit ID  
   Slave address. Used when a TCP gateway fronts a serial Modbus network.
+- Size  
+  Minimum 8 bytes (7 MBAP + 1 function code, no data). Maximum 260 bytes (7 MBAP + 1 function code + 252 data).
 
 ## Limitations
 
