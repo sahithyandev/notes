@@ -70,7 +70,7 @@ async function renumberFiles(
 }
 
 export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
-  // mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
+  mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
     if (filePath.includes("/summary/") || filePath.includes("/images/"))
