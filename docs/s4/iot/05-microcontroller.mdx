@@ -6,7 +6,7 @@ slug: s4/iot/microcontroller
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-06-11T17:55:00.871Z
+lastUpdatedOn: 2026-06-11T18:25:18.253Z
 prereqs:
   - s2/computer-organization-and-digital-design/basics/digital-logic-signals
 ---
@@ -202,51 +202,6 @@ Categories:
 - Digital I/O ports
 
 Peripherals act as interfaces between the processor bus and the external environment.
-
-### Timer Modules
-
-A timer module is a hardware counter driven by the system clock (or an external signal). It increments independently of the CPU and can trigger interrupts or drive output pins on specific count values.
-
-Key registers:
-
-- Count register  
-  Holds the current counter value. Increments each clock (or prescaled clock) cycle.
-- Period / TOP register  
-  The value at which the counter resets to zero. Sets the timer's overflow frequency.
-- Compare register  
-  When the count matches this value, the timer fires a compare-match event or toggles an output pin.
-- Control register  
-  Selects operating mode, clock source, prescaler value, and output behaviour.
-
-#### Prescaler
-
-Divides the system clock before it reaches the counter. A prescaler of $P$ makes the counter increment at $f_{clk}/P$, extending the timer's range without widening the counter register.
-
-$$
-f_{overflow} = \frac{f_{clk}}{P \times (TOP + 1)}
-$$
-
-#### Operating Modes
-
-- Normal mode  
-  Counter increments from 0 to MAX, overflows to 0, and fires an overflow interrupt. Used for simple periodic tasks.
-- CTC mode (Clear Timer on Compare)  
-  Counter resets to 0 when it matches the compare register. Fires a compare-match interrupt at a precise, configurable frequency. Used for task scheduling and waveform generation.
-- Fast PWM  
-  Counter counts from 0 to TOP. Output pin goes HIGH at 0 and LOW at compare match. Generates a PWM signal whose frequency is $f_{clk} / (P \times (TOP+1))$.
-- Phase-Correct PWM  
-  Counter counts up to TOP then back down to 0. Output toggles on compare match in both directions. Produces a symmetric PWM waveform with lower harmonic distortion; preferred for motor control.
-
-#### Input Capture
-
-Some timers can record the counter value at the moment an external signal edge arrives on a dedicated pin. Used to measure pulse width, signal period, or frequency without polling.
-
-#### Common Uses
-
-- Periodic interrupt generation (task scheduling, timeouts)
-- PWM output for motor speed, LED brightness, servo control
-- Pulse width and frequency measurement via input capture
-- Event counting in external clock mode
 
 ### Bit-Addressable Ports
 

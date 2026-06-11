@@ -3,13 +3,35 @@ title: Timers and Counters
 sidebar:
   order: 16
 dateCreated: 2026-06-11T05:49:22.856Z
-lastUpdatedOn: 2026-06-11T17:47:33.162Z
+lastUpdatedOn: 2026-06-11T18:25:18.254Z
 slug: s4/iot/timers-and-counters
 prev: true
 next: true
 ---
 
 A timer/counter is a hardware register that increments on each clock edge: the system clock in timer mode, or an external signal in counter mode. It runs independently of the CPU and can trigger interrupts or drive output pins on specific count values.
+
+## Key Registers
+
+- Count register  
+  Holds the current counter value. Increments each clock (or prescaled clock) cycle.
+- Period / TOP register  
+  The value at which the counter resets to zero. Sets the timer's overflow frequency.
+- Compare register  
+  When the count matches this value, the timer fires a compare-match event or toggles an output pin.
+- Control register  
+  Selects operating mode, clock source, prescaler value, and output behaviour.
+
+## Operating Modes
+
+- Normal mode  
+  Counter increments from 0 to MAX, overflows to 0, and fires an overflow interrupt. Used for simple periodic tasks.
+- CTC mode (Clear Timer on Compare)  
+  Counter resets to 0 when it matches the compare register. Fires a compare-match interrupt at a precise, configurable frequency. Used for task scheduling and waveform generation.
+- Fast PWM  
+  Counter counts from 0 to TOP. Output pin goes HIGH at 0 and LOW at compare match. Generates a PWM signal whose frequency is $f_{clk} / (P \times (TOP+1))$.
+- Phase-Correct PWM  
+  Counter counts up to TOP then back down to 0. Output toggles on compare match in both directions. Produces a symmetric PWM waveform with lower harmonic distortion; preferred for motor control.
 
 ## Counter Mode
 
@@ -122,3 +144,10 @@ Effect: reduces interrupt rate without changing the counter's tick resolution or
 Useful when the required interrupt period is longer than the timer can reach with the prescaler alone, or when the timer period must remain fixed for PWM frequency while the interrupt rate is adjusted independently.
 
 Not all MCU families include a postscaler. PIC microcontrollers expose a 4-bit postscaler on Timer0/Timer2 (1:1 to 1:16). AVR and most ARM Cortex-M timers omit it. The same effect is achieved in software by counting overflows in the ISR.
+
+## Common Uses
+
+- Periodic interrupt generation (task scheduling, timeouts)
+- PWM output for motor speed, LED brightness, servo control
+- Pulse width and frequency measurement via input capture
+- Event counting in external clock mode
