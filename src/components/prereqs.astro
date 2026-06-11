@@ -22,7 +22,7 @@ const { entries } = Astro.props;
           const semNum = p.data.slug.match(/^s(\d)/)?.[1] ?? null;
           return (
             <li>
-              <a href={`/${p.data.slug}`}>
+              <a href={`/${p.data.slug}`} target="_blank">
                 <span class="prereqs-title">{p.data.title}</span>
                 {semNum && (
                   <span class="prereqs-sem"> — Semester {semNum}</span>
