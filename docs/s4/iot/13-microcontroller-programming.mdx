@@ -6,7 +6,7 @@ slug: s4/iot/microcontroller-programming
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.625Z
-lastUpdatedOn: 2026-06-11T06:03:43.421Z
+lastUpdatedOn: 2026-06-11T06:18:39.630Z
 ---
 
 To program a microcontroller, a basic development setup is required, which includes:
@@ -18,6 +18,36 @@ To program a microcontroller, a basic development setup is required, which inclu
 - Input/output devices
 
 Programs are typically written in high-level languages such as C or C++, compiled into machine code, and uploaded to the microcontroller.
+
+## Programming Languages
+
+### C and C++
+
+C dominated early MCU firmware and is still used for low-level driver code. For application-layer work, C++ with the Wiring/Arduino framework provides equivalent performance with cleaner abstractions. Scripting languages like Lua and MicroPython enable faster prototyping on capable MCUs.
+
+C++ is the primary language for Arduino development via the Wiring framework.
+
+### Java
+
+Java ME targeted embedded devices but is not used on typical MCUs. The JVM requires RAM and flash well beyond typical MCU budgets. The garbage collector introduces non-deterministic pauses, violating real-time constraints, and JIT compilation adds latency on low-clock processors.
+
+### Lua
+
+Designed for embedded systems. Used on ESP chips via the NodeMCU firmware. The interpreter has a ~256 KB flash footprint, uses dynamic typing, and collects garbage via mark-and-sweep with an event-driven callback model.
+
+Compared to C/C++ for ESP, Lua produces shorter code, requires less memory, and provides an interactive REPL for rapid testing. No compile-flash cycle: scripts run directly from the interpreter.
+
+<Note>
+
+The garbage collector can introduce brief pauses. Hard real-time tasks should use C/C++ firmware instead.
+
+</Note>
+
+### MicroPython
+
+Python subset designed for microcontrollers. Runs on ESP32, RP2040 (Raspberry Pi Pico), STM32, and others. Provides an interactive REPL over serial, dynamic typing, garbage collection, and standard Python syntax with a reduced standard library. Includes modules for GPIO, I²C, SPI, UART, Wi-Fi, and timers.
+
+Execution is slower than C/C++ since code is interpreted rather than compiled to native code. Memory footprint is higher than Lua. Not suitable for hard real-time tasks, but prototyping and iteration are significantly faster.
 
 ## Cross Compilation
 
