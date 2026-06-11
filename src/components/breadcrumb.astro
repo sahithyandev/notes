@@ -1,4 +1,6 @@
 ---
+import { titleize } from "../utils/index";
+
 interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -30,28 +32,17 @@ function generateBreadcrumb(
     }
     // Handle module names (convert kebab-case to title case)
     else if (index === 1) {
-      label = part
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+      label = titleize(part);
       href = `/${parts.slice(0, index + 1).join("/")}`;
     }
     // Handle subdirectories
     else if (index > 1 && index < parts.length - 1) {
-      label = part
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+      label = titleize(part);
       href = `/${parts.slice(0, index + 1).join("/")}`;
     }
     // Handle the final note (current page)
     else if (index === parts.length - 1) {
-      label =
-        pageTitle ??
-        part
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+      label = pageTitle ?? titleize(part);
       // No href for current page
     }
 
