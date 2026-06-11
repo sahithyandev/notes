@@ -17,10 +17,15 @@ function formatRelativeTime(isoDate: string): string {
 
 document.addEventListener("DOMContentLoaded", () => {
   const metaElement = document.querySelector(".note-meta-item[data-date]");
-  if (metaElement) {
-    const isoDate = metaElement.getAttribute("data-date");
-    if (isoDate) {
-      metaElement.textContent = "Updated " + formatRelativeTime(isoDate);
-    }
+  if (!metaElement) return;
+
+  const isoDate = metaElement.getAttribute("data-date");
+  if (!isoDate) return;
+
+  const valueElement = metaElement.querySelector(".value");
+  if (valueElement) {
+    valueElement.textContent = formatRelativeTime(isoDate);
+  } else {
+    metaElement.textContent = "Updated " + formatRelativeTime(isoDate);
   }
 });
