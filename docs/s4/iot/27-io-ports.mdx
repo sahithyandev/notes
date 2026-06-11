@@ -3,7 +3,7 @@ title: I/O Ports
 sidebar:
   order: 27
 dateCreated: 2026-06-11T18:35:15.000Z
-lastUpdatedOn: 2026-06-11T19:08:57.009Z
+lastUpdatedOn: 2026-06-11T19:20:02.040Z
 slug: s4/iot/io-ports
 prev: true
 next: true
@@ -11,37 +11,41 @@ next: true
 
 ## Bit-Addressable Ports
 
-I/O port registers are normally byte-addressable: a read-modify-write sequence is needed to change one pin without disturbing others.
+I/O port registers are normally byte-addressable. Changing 1 pin without disturbing others requires a read-modify-write sequence.
 
-Bit-addressable ports expose individual bits as independently addressable locations. A single instruction can set, clear, or test one pin without reading and rewriting the full byte.
+Bit-addressable ports expose individual bits as independently addressable locations. A single instruction can set, clear, or test 1 pin without reading and rewriting the full byte.
 
 On the 8051, dedicated bit-address instructions operate directly on individual port bits:
 
-- `SETB P1.0` — set bit 0 of Port 1 HIGH
-- `CLR P1.3` — clear bit 3 of Port 1 LOW
-- `MOV C, P2.5` — copy bit 5 of Port 2 into the carry flag
+- `SETB P1.0`  
+  Set bit 0 of Port 1 HIGH.
+- `CLR P1.3`  
+  Clear bit 3 of Port 1 LOW.
+- `MOV C, P2.5`  
+  Copy bit 5 of Port 2 into the carry flag.
 
-Only SFRs whose address is divisible by 8 (e.g. P0 at 80H, P1 at 90H) are bit-addressable on the 8051.
+Only SFRs whose address is divisible by 8 are bit-addressable on the 8051. Examples: P0 at 80H, P1 at 90H.
 
 <Note>
 
-On AVR and ARM MCUs, atomic bit manipulation is achieved differently — AVR uses separate PORT/DDR/PIN registers; ARM Cortex-M provides bit-banding, which maps each bit to a unique word address in an alias region.
+On AVR and ARM MCUs, atomic bit manipulation is achieved differently. AVR uses separate PORT/DDR/PIN registers. ARM Cortex-M provides bit-banding, which maps each bit to a unique word address in an alias region.
 
 </Note>
 
 ## I/O Port Hardware
 
-Each GPIO port is built from two types of digital circuit: flip-flops and tri-state buffers.
+Each GPIO port is built from flip-flops and tri-state buffers.
 
 ### Flip-Flops
 
-A flip-flop is a bistable latch that holds one bit indefinitely until overwritten.
+A flip-flop is a bistable latch that holds 1 bit indefinitely until overwritten.
 
-Output path: when the CPU writes a value to a port register, it is clocked into a flip-flop. The flip-flop drives the output pin continuously, independent of what the CPU does next. Without the latch, the output pin would float the moment the CPU bus moved to the next operation.
+- Output path  
+  When the CPU writes a value to a port register, it is clocked into a flip-flop. The flip-flop drives the output pin continuously. Without the latch, the output pin would float the moment the CPU bus moved to the next operation.
+- Input path  
+  A separate flip-flop (the input register) samples the voltage on the pin on a clock edge and presents a stable value to the CPU data bus. Sampling synchronously prevents metastability. An external signal can change at any time, but the CPU always reads a settled, single-clock-domain value.
 
-Input path: a separate flip-flop (the input register) samples the voltage on the pin on a clock edge and presents a stable value to the CPU data bus. Sampling synchronously prevents metastability: an external signal can change at any time, but the CPU always reads a settled, single-clock-domain value.
-
-Two flip-flops per pin therefore decouple three independent concerns:
+2 flip-flops per pin decouple 3 independent concerns:
 
 - What the CPU last wrote (output latch)
 - What the pin is currently driven to (output driver)
@@ -55,34 +59,36 @@ On AVR, reading PINx returns the input register (sampled pin state). Reading POR
 
 ### Tri-State Buffers
 
-A tri-state buffer has three output states: HIGH, LOW, and high-impedance (Hi-Z). In Hi-Z the output is effectively disconnected — it neither sources nor sinks current and does not influence the line it is connected to.
+A tri-state buffer has 3 output states: HIGH, LOW, and high-impedance (Hi-Z). In Hi-Z the output is effectively disconnected. It neither sources nor sinks current and does not influence the line it is connected to.
 
-Why they are required:
+Required for:
 
 - Shared bus isolation  
-  The internal data bus connects many registers and peripherals. If two drivers were simultaneously active on the same wire, one driving HIGH and one LOW, the result is a near-short circuit and an undefined voltage. Each peripheral's connection to the bus is gated by a tri-state buffer enabled only when that peripheral is selected.
+  The internal data bus connects many registers and peripherals. If 2 drivers are simultaneously active on the same wire, 1 driving HIGH and 1 LOW, the result is a near-short circuit and an undefined voltage. Each peripheral's connection to the bus is gated by a tri-state buffer enabled only when that peripheral is selected.
 - Input pin configuration  
-  When a GPIO pin is configured as input, its output driver is placed in Hi-Z. The pin is then purely receptive — the external circuit drives the line without the MCU's output stage fighting it.
+  When a GPIO pin is configured as input, its output driver is placed in Hi-Z. The pin is purely receptive. The external circuit drives the line without the MCU's output stage fighting it.
 - Bidirectional lines  
-  SPI MISO, I²C SDA, and PSP data lines are bidirectional. Tri-state buffers allow the direction to be switched under software control: one side enables its driver while the other side is in Hi-Z.
+  SPI MISO, I²C SDA, and PSP data lines are bidirectional. Tri-state buffers allow the direction to be switched under software control. 1 side enables its driver while the other is in Hi-Z.
 
 ### Bidirectional Ports
 
 A bidirectional port is a GPIO port where each pin can be independently configured as either input or output at runtime.
 
-The direction of each pin is controlled by a direction register (DDR). Each bit in the DDR corresponds to one pin: writing 1 configures the pin as output; writing 0 configures it as input. The data register and direction register are separate, so direction can be changed without disturbing the output latch value.
+Pin direction is controlled by a direction register (DDR). Each bit in the DDR corresponds to 1 pin. Writing 1 configures the pin as output. Writing 0 configures it as input. The data register and direction register are separate, so direction can be changed without disturbing the output latch value.
 
 Internal structure per pin:
 
-- Output latch (flip-flop) stores the value to drive when configured as output
-- Direction bit gates the tri-state output buffer: DDR=1 enables the driver; DDR=0 forces it to Hi-Z
-- Input register samples the pin regardless of direction, so software can read back the actual pin state even when configured as output
+- Output latch (flip-flop) stores the value to drive when configured as output.
+- Direction bit gates the tri-state output buffer. DDR=1 enables the driver. DDR=0 forces it to Hi-Z.
+- Input register samples the pin regardless of direction, so software can read back the actual pin state even when configured as output.
 
-This lets a single physical pin serve different roles at different points in program execution. Examples:
+A single physical pin can serve different roles at different points in program execution.
 
-- A pin configured as output to drive an LED, then reconfigured as input to read a button on the same line
-- I²C SDA: the MCU drives the line to send data, then releases to Hi-Z to receive an acknowledgement, all on the same pin within one transaction
-- 1-Wire bus: master drives the line LOW to initiate, then releases to Hi-Z to sample the device response
+Examples:
+
+- A pin configured as output to drive an LED, then reconfigured as input to read a button on the same line.
+- I²C SDA: the MCU drives the line to send data, then releases to Hi-Z to receive an acknowledgement, all on the same pin within 1 transaction.
+- 1-Wire bus: master drives the line LOW to initiate, then releases to Hi-Z to sample the device response.
 
 <Note>
 
@@ -92,106 +98,104 @@ On AVR, DDRx controls direction for port x. On ARM Cortex-M, the GPIO MODER regi
 
 ### Writing to an Input Pin
 
-The output latch and the direction register are independent. Writing a value to a pin configured as input stores the value in the output latch but does not drive the pin — the tri-state output buffer remains in Hi-Z.
+The output latch and the direction register are independent. Writing a value to a pin configured as input stores the value in the output latch but does not drive the pin. The tri-state output buffer remains in Hi-Z.
 
-Two consequences:
+2 consequences:
 
-- On most ARM Cortex-M MCUs: the written value sits dormant in the output latch. The moment the pin is switched to output mode, that latched value immediately appears on the pin. This allows pre-loading the output value before enabling the driver, preventing a glitch on direction change.
-- On AVR MCUs: writing HIGH to an input-mode pin activates the internal pull-up resistor. Writing LOW deactivates it. The PORTx register doubles as the pull-up enable register when DDRx is 0. This is an AVR-specific behaviour; ARM MCUs use a separate pull-up enable register instead.
+- On most ARM Cortex-M MCUs  
+  The written value sits dormant in the output latch. When the pin is switched to output mode, that latched value immediately appears on the pin. Pre-loading the output value before enabling the driver prevents a glitch on direction change.
+- On AVR MCUs  
+  Writing HIGH to an input-mode pin activates the internal pull-up resistor. Writing LOW deactivates it. The PORTx register doubles as the pull-up enable register when DDRx is 0. ARM MCUs use a separate pull-up enable register instead.
 
-In Arduino's `digitalWrite()`, calling it on an `INPUT`-mode pin explicitly enables or disables the internal pull-up. This is documented behaviour, not undefined.
+In Arduino, `digitalWrite()` called on an `INPUT`-mode pin enables or disables the internal pull-up. The behaviour is documented.
 
 ### Reading an Output Pin
 
-The input register samples the actual voltage present on the physical pin, independent of the direction setting. Reading an output pin returns the real pin state, not the output latch value.
+The input register samples the actual voltage on the physical pin, independent of direction setting. Reading an output pin returns the real pin state, not the output latch value.
 
-These two differ when an external circuit overrides the pin:
+The 2 differ when an external circuit overrides the pin:
 
-- A shorted output: if an output driving HIGH is shorted to GND externally, the input register reads LOW while the output latch holds HIGH. Comparing the two detects the fault.
-- Open-drain/open-collector: the pin is Hi-Z when released; an external device may hold the line LOW. Reading the pin reflects the actual bus state.
-- Slow external load: a heavily capacitive line takes time to reach the driven voltage. Reading immediately after writing may return the old level until the line settles.
+- Shorted output  
+  If an output driving HIGH is shorted to GND externally, the input register reads LOW while the output latch holds HIGH. Comparing the 2 detects the fault.
+- Open-drain/open-collector  
+  The pin is Hi-Z when released. An external device may hold the line LOW. Reading the pin reflects the actual bus state.
+- Slow external load  
+  A heavily capacitive line takes time to reach the driven voltage. Reading immediately after writing may return the old level until the line settles.
 
-This property is used deliberately in AVR firmware: reading PINx on an output pin confirms the actual driven level, providing hardware-level output verification with no extra pins.
+On AVR, reading PINx on an output pin confirms the actual driven level, providing hardware-level output verification with no extra pins.
 
 ### Pull-Up and Pull-Down Resistors
 
-A floating input pin — one with no external driver — reads an undefined voltage. The MCU input register samples whatever noise or leakage current is present, producing unpredictable HIGH or LOW readings.
+A floating input pin has no external driver and reads an undefined voltage. The MCU input register samples whatever noise or leakage current is present, producing unpredictable HIGH or LOW readings.
 
 A pull resistor fixes this by tying the pin to a known voltage through a high-value resistor (typically $1\ \text{k}\Omega$–$100\ \text{k}\Omega$).
 
-Pull-up resistor: connects the pin to $V_{CC}$. The pin reads HIGH when nothing drives it. A device that pulls the line LOW (e.g. a button to GND) can override the resistor.
-
-Pull-down resistor: connects the pin to GND. The pin reads LOW when nothing drives it. A device that pulls the line HIGH overrides the resistor.
+- Pull-up resistor  
+  Connects the pin to $V_{CC}$. The pin reads HIGH when nothing drives it. A device that pulls the line LOW can override the resistor.
+- Pull-down resistor  
+  Connects the pin to GND. The pin reads LOW when nothing drives it. A device that pulls the line HIGH overrides the resistor.
 
 ### Resistor Value Trade-off
 
-The pull resistor value must satisfy two conflicting constraints.
+The pull resistor value must satisfy 2 conflicting constraints.
 
-#### Lower bound: current limit
-
-When an external device drives the line to the opposite rail, current flows through the pull resistor from $V_{CC}$ to GND. For a pull-up with the line driven LOW:
+The lower bound is set by current. When an external device drives the line to the opposite rail, current flows through the pull resistor from $V_{CC}$ to GND. For a pull-up with the line driven LOW:
 
 $$
 I = \frac{V_{CC}}{R}
 $$
 
-This current flows continuously for as long as the line is asserted. A low resistance means high continuous current, which:
+The current flows continuously while the line is asserted. A low resistance:
 
-- Wastes power — critical in battery-powered IoT devices
-- Stresses the driving transistor, which must sink the full resistor current in addition to any load current
-- Heats the resistor
+- Wastes power. Critical in battery-powered IoT devices.
+- Stresses the driving transistor, which must sink the full resistor current in addition to any load current.
+- Heats the resistor.
 
-The resistor must be high enough to keep this current within the drive capability of the weakest device on the line and within the power budget of the system.
+The resistor must be high enough to keep current within the drive capability of the weakest device on the line.
 
-#### Upper bound: voltage integrity
-
-A pull resistor and the parasitic capacitance of the wire, pin, and any connected devices form an RC circuit. When the line is released (driver goes Hi-Z), the resistor must charge the parasitic capacitance $C_{line}$ back to the rail:
+The upper bound is set by voltage integrity. A pull resistor and the parasitic capacitance of the wire, pin, and connected devices form an RC circuit. When the line is released, the resistor must charge the parasitic capacitance $C_{line}$ back to the rail:
 
 $$
 \tau = R \times C_{line}
 $$
 
-A high resistance means a large $\tau$, which means:
+A high resistance:
 
-- Slow rising edge — the line takes many time constants to reach $V_{IH}$
-- During the slow rise, the signal passes through the forbidden band for an extended period, causing metastability or spurious transitions at the receiver
-- At high signal frequencies, the line never fully reaches the rail before the next transition, reducing noise margins
+- Slows the rising edge. The line takes many time constants to reach $V_{IH}$.
+- Extends the forbidden band crossing duration, causing metastability or spurious transitions at the receiver.
+- Prevents the line from fully reaching the rail before the next transition at high signal frequencies, reducing noise margins.
 
-Additionally, any leakage current or injected noise produces a voltage error across a high resistance:
+Any leakage current produces a voltage error across a high resistance:
 
 $$
 V_{error} = I_{leakage} \times R
 $$
 
-A $100\ \text{nA}$ leakage across a $100\ \text{k}\Omega$ resistor produces a $10\ \text{mV}$ offset — usually acceptable. The same leakage across $1\ \text{M}\Omega$ produces $100\ \text{mV}$, which can push the line into the forbidden band on a 3.3 V system.
+A $100\ \text{nA}$ leakage across a $100\ \text{k}\Omega$ resistor produces a $10\ \text{mV}$ offset. The same leakage across $1\ \text{M}\Omega$ produces $100\ \text{mV}$, which can push the line into the forbidden band on a 3.3 V system.
 
-#### Typical values
+Typical values for most applications are $1\ \text{k}\Omega$ to $10\ \text{k}\Omega$:
 
-The practical range for most applications is $1\ \text{k}\Omega$ to $10\ \text{k}\Omega$:
-
-- $1\ \text{k}\Omega$ to $4.7\ \text{k}\Omega$: I²C buses and higher-speed signals (fast edges required)
-- $4.7\ \text{k}\Omega$ to $10\ \text{k}\Omega$: general-purpose GPIO, buttons, slow signals
+- $1\ \text{k}\Omega$ to $4.7\ \text{k}\Omega$: I²C buses and higher-speed signals (fast edges required).
+- $4.7\ \text{k}\Omega$ to $10\ \text{k}\Omega$: general-purpose GPIO, buttons, slow signals.
 
 Values above $10\ \text{k}\Omega$ are only suitable for ultra-low-power designs where signal speed is not a concern. Values below $1\ \text{k}\Omega$ draw excessive current.
 
-Most MCUs include configurable internal pull-up (and sometimes pull-down) resistors that can be enabled in software, eliminating the need for external components on simple inputs such as buttons. Internal pull-ups are typically $20\ \text{k}\Omega$–$50\ \text{k}\Omega$ — suitable for buttons but too high for I²C or high-speed lines.
+Most MCUs include configurable internal pull-up resistors (and sometimes pull-down) that can be enabled in software, eliminating the need for external components on simple inputs. Internal pull-ups are typically $20\ \text{k}\Omega$–$50\ \text{k}\Omega$, suitable for buttons but too high for I²C or high-speed lines.
 
 ### Why Pull-Up Resistors Are Required for MCU Inputs
 
 - Undefined floating state  
   An undriven MCU input has no connection to either rail. It picks up environmental noise and reads unpredictably. A pull-up clamps the idle voltage to $V_{CC}$, giving a defined HIGH when nothing actively drives the line.
 - No internal drive on digital inputs  
-  MCU input buffers are high-impedance. They do not self-bias to a valid level. Any voltage — including the forbidden band — is a legal input to the pin hardware; only the pull resistor enforces a valid default.
+  MCU input buffers are high-impedance. Any voltage, including the forbidden band, is a legal input to the pin hardware. Only the pull resistor enforces a valid default.
 - RC low-pass filter interaction  
-  Any capacitance on the input line (decoupling capacitor, cable shielding, connector parasitic) forms an RC low-pass filter with the pull-up resistor. This filter attenuates high-frequency signal components and slows rising edges. A large pull-up value combined with significant capacitance can round edges so severely that the signal lingers in the forbidden band, causing metastability. This is a reason to keep pull-up values within the $1\ \text{k}\Omega$–$10\ \text{k}\Omega$ range and to avoid adding unnecessary capacitance to input lines.
+  Any capacitance on the input line forms an RC low-pass filter with the pull-up resistor. A large pull-up value combined with significant capacitance can round edges so severely that the signal lingers in the forbidden band, causing metastability. Pull-up values should stay within $1\ \text{k}\Omega$–$10\ \text{k}\Omega$. Unnecessary capacitance on input lines should be avoided.
 - Safe default on device disconnect  
-  If the connected sensor or peripheral loses power or is physically removed, the pull-up ensures the input stays at a known HIGH rather than floating indeterminate.
-
-#### Floating Pin Behavior
+  If the connected sensor or peripheral loses power or is physically removed, the pull-up ensures the input stays at a known HIGH.
 
 A floating input pin has input impedance in the megaohm range. The high impedance makes the pin voltage extremely sensitive to stray charge.
 
-The pin, its internal traces, and the ESD protection circuitry form a small parasitic capacitance. Charge accumulates on this capacitance from:
+The pin, its internal traces, and the ESD protection circuitry form a small parasitic capacitance. Charge accumulates from:
 
 - Electromagnetic fields from nearby switching circuits (power supplies, motors, other ICs)
 - Capacitive coupling from adjacent PCB traces
@@ -199,50 +203,46 @@ The pin, its internal traces, and the ESD protection circuitry form a small para
 
 With input impedance this high, even a tiny induced current builds enough voltage across the parasitic capacitance to exceed $V_{IH}$. No low-impedance path exists to drain the accumulated charge, so the pin voltage stays in the HIGH region.
 
-##### Why HIGH is More Common Than LOW
-
 Most MCUs have weak internal pull-up resistors, or parasitic leakage paths from $V_{CC}$ through ESD protection diodes and input buffer transistors. These structures bias the floating pin toward $V_{CC}$ rather than GND.
 
-CMOS thresholds are asymmetric: $V_{IH} \approx 0.7 \times V_{CC}$. The HIGH region spans a wide voltage range, so any upward drift easily lands in it.
+CMOS thresholds are asymmetric. $V_{IH} \approx 0.7 \times V_{CC}$. The HIGH region spans a wide voltage range, so any upward drift easily lands in it. The input flip-flop samples the pin on each clock cycle. With the voltage in the HIGH region, it latches a stable 1 for as long as nothing actively pulls the pin LOW.
 
-The input flip-flop samples the pin on each clock cycle. With the voltage in the HIGH region, it latches a stable 1 — not a transient glitch — for as long as nothing actively pulls the pin LOW.
-
-A pull-down resistor to GND provides a low-resistance path that drains induced charge and holds the pin at LOW by default. Its steady-state current ($I = V/R$) dominates the tiny induced currents that cause drift. A pull-up to $V_{CC}$ does the opposite: it defines the default as HIGH and only transitions LOW when a device actively drives the line there.
+A pull-down resistor to GND provides a low-resistance path that drains induced charge and holds the pin at LOW by default. A pull-up to $V_{CC}$ defines the default as HIGH and only transitions LOW when a device actively drives the line there.
 
 ### Logic Level Thresholds and the Forbidden Band
 
-Every logic family defines four voltage thresholds:
+Every logic family defines 4 voltage thresholds:
 
 - $V_{OL}$: maximum voltage an output guarantees when driving LOW
 - $V_{OH}$: minimum voltage an output guarantees when driving HIGH
 - $V_{IL}$: maximum voltage an input will reliably interpret as LOW
 - $V_{IH}$: minimum voltage an input will reliably interpret as HIGH
 
-The region between $V_{IL}$ and $V_{IH}$ is the forbidden band. A signal in this range is neither a valid LOW nor a valid HIGH. The input's output state is undefined: it may oscillate, latch at an intermediate voltage, or resolve differently on each device.
+The region between $V_{IL}$ and $V_{IH}$ is the forbidden band. A signal in this range is neither a valid LOW nor a valid HIGH. The input's output state is undefined. It may oscillate, latch at an intermediate voltage, or resolve differently on each device.
 
 No signal should ever sit in the forbidden band in steady state. The noise margins ($V_{IL} - V_{OL}$ for LOW, $V_{OH} - V_{IH}$ for HIGH) quantify how much voltage deviation the interface tolerates before entering the forbidden band.
 
-The threshold voltage $V_{th}$ is the nominal switching point of a gate: the input voltage at which the output is exactly midway through its transition ($V_{out} = V_{in}$ on the DC transfer characteristic). It lies inside the forbidden band.
+The threshold voltage $V_{th}$ is the nominal switching point of a gate. It lies inside the forbidden band.
 
 $V_{th}$ depends on the logic family:
 
 - CMOS: $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
 - TTL: $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
 
-$V_{th}$ is not a safe operating point — it is the instability point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread: no two gates switch at exactly the same voltage, and temperature shifts it further.
+$V_{th}$ is not a safe operating point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread. No 2 gates switch at exactly the same voltage, and temperature shifts it further.
 
-Signals pass through the forbidden band during transitions. A fast edge spends negligible time there. A slow edge — from a long cable, RC load, or weak driver — lingers in the band, causing the receiver to toggle unpredictably. This is the problem Schmitt trigger inputs solve.
+Signals pass through the forbidden band during transitions. A fast edge spends negligible time there. A slow edge, from a long cable, RC load, or weak driver, lingers in the band, causing the receiver to toggle unpredictably. Schmitt trigger inputs solve this.
 
 ### Schmitt Trigger Inputs
 
-A standard digital input has a single switching threshold. A signal that crosses that threshold slowly (due to long cables, RC loading, or a slow-changing sensor) causes the output to toggle multiple times as noise kicks it back and forth across the threshold. This is called bouncing or chatter on the digital side.
+A standard digital input has a single switching threshold. A signal that crosses it slowly causes the output to toggle multiple times as noise kicks it back and forth across the threshold.
 
-A Schmitt trigger input replaces the single $V_{th}$ with two thresholds, forming the dual threshold band:
+A Schmitt trigger input replaces the single $V_{th}$ with 2 thresholds:
 
 - $V_{T+}$: upper threshold. Output switches HIGH when input rises above this.
 - $V_{T-}$: lower threshold. Output switches LOW when input falls below this.
 
-The dual threshold band (hysteresis band) is the voltage interval $[V_{T-},\ V_{T+}]$. Its width is:
+The hysteresis band is the voltage interval $[V_{T-},\ V_{T+}]$. Its width is:
 
 $$
 V_H = V_{T+} - V_{T-}
@@ -254,13 +254,13 @@ Switching behaviour is history-dependent:
 - If the output is currently HIGH, it switches LOW only when input drops below $V_{T-}$.
 - While the input is inside $[V_{T-},\ V_{T+}]$, the output holds its last state regardless of input movement.
 
-This means the transfer characteristic forms a loop rather than a single crossing point. The same input voltage can correspond to two different output states depending on which direction the signal arrived from. Noise smaller than $V_H$ cannot cause any transition regardless of where it occurs on the input.
+The transfer characteristic forms a loop rather than a single crossing point. The same input voltage can correspond to 2 different output states depending on which direction the signal arrived from. Noise smaller than $V_H$ cannot cause any transition regardless of where it occurs on the input.
 
-Contrast with a standard gate: a standard gate has one $V_{th}$; any noise that crosses it toggles the output. A Schmitt trigger requires the signal to travel the full width of the hysteresis band before the output changes.
+A standard gate has 1 $V_{th}$. Any noise that crosses it toggles the output. A Schmitt trigger requires the signal to travel the full width of the hysteresis band before the output changes.
 
-This makes Schmitt trigger inputs tolerant of:
+Schmitt trigger inputs are tolerant of:
 
-- Slow-rising signals (e.g. RC-charged lines, long cables)
+- Slow-rising signals (RC-charged lines, long cables)
 - Noisy environments (motors, switching regulators near signal lines)
 - Mechanical switch bounce
 
@@ -274,14 +274,14 @@ An open-collector output has only the LOW-side transistor. It can pull the line 
 
 To produce a usable HIGH level, an external pull-up resistor connects the line to $V_{CC}$. When no device asserts the line, the resistor pulls it HIGH passively.
 
-Why open-collector is used:
+Open-collector is used for:
 
 - Wired-AND bus  
-  Multiple open-collector devices share one wire. Any device can pull the line LOW independently. The line is HIGH only when all devices release it. I²C uses this: any device can hold SDA or SCL LOW to stall the bus, enabling clock stretching and multi-master arbitration.
+  Multiple open-collector devices share 1 wire. Any device can pull the line LOW independently. The line is HIGH only when all devices release it. I²C uses this: any device can hold SDA or SCL LOW to stall the bus, enabling clock stretching and multi-master arbitration.
 - Voltage level shifting  
-  The pull-up resistor connects to any supply voltage regardless of the MCU's own logic level. A 3.3 V MCU can drive a 5 V bus by using a 5 V pull-up; the open-collector transistor only needs to pull to GND.
+  The pull-up resistor connects to any supply voltage regardless of the MCU's own logic level. A 3.3 V MCU can drive a 5 V bus by using a 5 V pull-up. The open-collector transistor only needs to pull to GND.
 - Short-circuit safety  
-  If two devices simultaneously assert conflicting levels on a push-pull bus, a near-short circuit results. On an open-collector bus, two simultaneous LOW assertions are harmless — both transistors pull to GND together.
+  If 2 devices simultaneously assert conflicting levels on a push-pull bus, a near-short circuit results. On an open-collector bus, 2 simultaneous LOW assertions are harmless. Both transistors pull to GND together.
 
 <Note>
 
@@ -291,38 +291,38 @@ Open-drain is the MOSFET equivalent of open-collector and is the term used in mo
 
 ### Switch Configurations
 
-Switches are described by two parameters:
+Switches are described by 2 parameters:
 
 - Poles  
   The number of independent circuits the switch controls simultaneously.
 - Throws  
   The number of output positions each pole can connect to.
 
-#### SPST
+### SPST
 
-Single Pole Single Throw. One pole, one throw. The simplest switch: one input, one output. Either connected (closed) or disconnected (open). No alternate path.
+Single Pole Single Throw. 1 pole, 1 throw. 1 input, 1 output. Either connected (closed) or disconnected (open). No alternate path.
 
-Used for: on/off control, simple button inputs, power switches.
+Used for on/off control, simple button inputs, power switches.
 
-#### SPDT
+### SPDT
 
-Single Pole Double Throw. One pole, two throws. The common terminal connects to either of two outputs — never both, never neither (in a make-before-break variant, briefly both during transition).
+Single Pole Double Throw. 1 pole, 2 throws. The common terminal connects to either of 2 outputs.
 
-Used for: selecting between two signal sources, changeover switches, routing one signal to one of two destinations.
+Used for selecting between 2 signal sources, changeover switches, routing 1 signal to 1 of 2 destinations.
 
-In MCU circuits: one throw to $V_{CC}$, one to GND, common to the GPIO pin. The pin is always driven to a valid level regardless of switch position — no pull resistor required.
+In MCU circuits: 1 throw to $V_{CC}$, 1 to GND, common to the GPIO pin. The pin is always driven to a valid level regardless of switch position. No pull resistor required.
 
-#### DPST
+### DPST
 
-Double Pole Single Throw. Two independent poles, each with one throw. Both poles open and close together (ganged). Equivalent to two SPST switches mechanically linked on the same actuator.
+Double Pole Single Throw. 2 independent poles, each with 1 throw. Both poles open and close together (ganged). Equivalent to 2 SPST switches mechanically linked on the same actuator.
 
-Used for: simultaneously switching two separate circuits (e.g. both live and neutral in a mains circuit, or two independent signal lines that must switch in sync).
+Used for simultaneously switching 2 separate circuits (e.g. both live and neutral in a mains circuit, or 2 independent signal lines that must switch in sync).
 
-#### DPDT
+### DPDT
 
-Double Pole Double Throw. Two independent poles, each with two throws. Equivalent to two SPDT switches ganged on one actuator.
+Double Pole Double Throw. 2 independent poles, each with 2 throws. Equivalent to 2 SPDT switches ganged on 1 actuator.
 
-Used for: reversing DC motor direction (H-bridge manual control), switching two signal lines simultaneously between two destinations.
+Used for reversing DC motor direction (H-bridge manual control), switching 2 signal lines simultaneously between 2 destinations.
 
 <Note>
 
@@ -334,7 +334,7 @@ Higher configurations (3PDT, 4PDT) follow the same pattern. The pole count and t
 
 Switches are the most common digital input device. They produce a binary voltage level read by a GPIO input pin.
 
-#### Push Button Switch
+### Push Button Switch
 
 A momentary contact switch. The circuit is closed only while the button is physically held. Releasing it opens the circuit and the pin returns to its pull-up or pull-down voltage.
 
@@ -342,25 +342,29 @@ Monostable behaviour: output is active for exactly as long as the button is pres
 
 Requires a pull-up or pull-down resistor to define the idle voltage. Without one, the pin floats in the forbidden band when the button is released.
 
-Switch bounce: mechanical contacts bounce on make and break, producing multiple rapid transitions before settling. Debouncing is required in software (delay after first edge) or hardware (RC filter + Schmitt trigger).
+Switch bounce: mechanical contacts bounce on make and break, producing multiple rapid transitions before settling. Debouncing is required in software or hardware (RC filter + Schmitt trigger).
 
-##### Contact Bounce
+### Contact Bounce
 
-When two metal contacts meet or separate, the elastic mechanical structure causes them to physically rebound multiple times before coming to rest. Each rebound opens and closes the circuit, producing a burst of rapid transitions on the signal line. Duration: typically $1\ \text{ms}$–$10\ \text{ms}$ depending on the switch mechanism.
+When 2 metal contacts meet or separate, the elastic mechanical structure causes them to physically rebound multiple times before coming to rest. Each rebound opens and closes the circuit, producing a burst of rapid transitions. Duration: typically $1\ \text{ms}$–$10\ \text{ms}$ depending on the switch mechanism.
 
-Clean bounce: contact transitions are sharp — the signal goes fully HIGH or fully LOW on each rebound. The voltage crosses $V_{IH}$ or $V_{IL}$ cleanly. The MCU sees several valid logic transitions in quick succession, all within the same logic family's thresholds.
+- Clean bounce  
+  Contact transitions are sharp. The signal goes fully HIGH or fully LOW on each rebound. The MCU sees several valid logic transitions in quick succession, all within the same logic family's thresholds.
+- Dirty bounce  
+  The contact surface is oxidised, contaminated, or worn. During partial contact, the resistance is high and unstable. The voltage sits in or near the forbidden band. The signal oscillates with irregular amplitude and timing, and may never fully reach $V_{IH}$ or $V_{OL}$ on some bounces. Dirty bounce is harder to filter because its duration and waveform are unpredictable.
 
-Dirty bounce: the contact surface is oxidised, contaminated, or worn. During partial contact, the resistance is high and unstable. The voltage sits in or near the forbidden band rather than switching cleanly. The signal oscillates with irregular amplitude and timing, and may never fully reach $V_{IH}$ or $V_{OL}$ on some bounces. Dirty bounce is harder to filter because its duration and waveform are unpredictable.
+Dirty bounce occurs because of:
 
-Why dirty bounce occurs:
+- Contact oxidation  
+  An insulating oxide layer requires higher force to break through, causing erratic make resistance during early contact.
+- Contamination  
+  Dust, flux residue, or moisture on the contact surfaces increase resistance during partial contact.
+- Worn contacts  
+  Repeated actuation reduces contact pressure, worsening both bounce count and edge quality.
 
-- Contact oxidation: insulating oxide layer requires higher force to break through, causing erratic make resistance during early contact
-- Contamination: dust, flux residue, or moisture on the contact surfaces increase resistance during partial contact
-- Worn contacts: repeated actuation smooths contacts and reduces contact pressure, worsening both bounce count and edge quality
+### Debouncing
 
-##### Debouncing
-
-Three software debounce approaches exist, trading off simplicity, CPU blocking, and robustness.
+3 software debounce approaches exist, trading off simplicity, CPU blocking, and robustness.
 
 Delay-and-confirm: after detecting the first edge, the firmware blocks for a fixed blanking period ($20\ \text{ms}$–$50\ \text{ms}$), then re-samples to confirm the stable state.
 
@@ -374,7 +378,7 @@ if (button_pressed()) {
 
 Simple but blocks the CPU for the blanking period. Unsuitable in event-driven or RTOS firmware where tasks cannot block.
 
-Counter method: sampled periodically by a timer ISR. A counter increments each sample period while the pin is in its new state. The state is accepted only when the counter reaches a threshold — meaning the pin has been stable for $N$ consecutive samples.
+Counter method: sampled periodically by a timer ISR. A counter increments each sample period while the pin is in its new state. The state is accepted only when the counter reaches a threshold, meaning the pin has been stable for $N$ consecutive samples.
 
 ```c
 // called from a 1 ms timer ISR
@@ -385,66 +389,65 @@ void debounce_tick(void) {
             stable_count = 0;
         }
     } else {
-        stable_count = 0;   // reset on any contrary sample
+        stable_count = 0;
     }
 }
 ```
 
-Any bounce that returns the pin to its prior state resets the counter to zero. Only a run of $N$ identical samples triggers a state change. Threshold of 10–20 at a 1 ms sample rate gives $10\ \text{ms}$–$20\ \text{ms}$ settle time. Non-blocking: the ISR runs independently and the main loop reads `accepted_state` at any time.
+Any bounce that returns the pin to its prior state resets the counter to zero. Only a run of $N$ identical samples triggers a state change. A threshold of 10–20 at a 1 ms sample rate gives $10\ \text{ms}$–$20\ \text{ms}$ settle time. Non-blocking: the ISR runs independently and the main loop reads `accepted_state` at any time.
 
-Shift register method (vertical counter / integrator): a fixed-width integer (typically 8 or 16 bits) acts as a shift register of recent pin samples. Each timer tick, the register is shifted left and the current pin state is shifted in at the LSB.
+Shift register method: a fixed-width integer (typically 8 or 16 bits) acts as a shift register of recent pin samples. Each timer tick, the register is shifted left and the current pin state is shifted in at the LSB.
 
 ```c
 // called from a timer ISR
 void debounce_tick(void) {
     shift_reg = (shift_reg << 1) | read_pin();
-    if (shift_reg == 0xFF)        // 8 consecutive HIGHs
+    if (shift_reg == 0xFF)
         accepted_state = HIGH;
-    else if (shift_reg == 0x00)   // 8 consecutive LOWs
+    else if (shift_reg == 0x00)
         accepted_state = LOW;
-    // any other pattern: still bouncing, hold previous state
 }
 ```
 
-The register holds the last $N$ samples as a history window. A state change is accepted only when all $N$ bits are identical — the pin has been stable for the entire window. Any bounce injects a contrary bit and prevents acceptance until the window is clean again.
+The register holds the last $N$ samples as a history window. A state change is accepted only when all $N$ bits are identical. Any bounce injects a contrary bit and prevents acceptance until the window is clean.
 
 Advantages over the counter method:
 
-- No counter to reset; history is implicit in the shift register contents
-- Detects instability over the full window, not just consecutive samples from the last edge
-- Works correctly even if the pin drifts in and out of the new state during a dirty bounce
+- No counter to reset. History is implicit in the shift register contents.
+- Detects instability over the full window, not just consecutive samples from the last edge.
+- Works correctly even if the pin drifts in and out of the new state during a dirty bounce.
 
 Hardware RC debounce: a resistor-capacitor low-pass filter on the input line smooths the bounce transitions. The capacitor charges and discharges through the resistor, rounding sharp edges. A Schmitt trigger after the filter converts the slow rounded edge back to a clean transition. The RC time constant must be longer than the worst-case bounce duration.
 
-Hardware RC + diode debounce: adding a diode in parallel with the series resistor creates two different time constants for the rising and falling edges.
+Hardware RC + diode debounce: adding a diode in parallel with the series resistor creates 2 different time constants for the rising and falling edges.
 
 Circuit: the series resistor $R$ sits between the switch node and the input pin. The capacitor $C$ connects from the input pin to GND. The diode is placed in parallel with $R$, forward-biased in the direction of the falling edge (anode toward the input pin, cathode toward the switch node).
 
 On press (signal falls):
 
 - The diode is forward-biased. The capacitor discharges rapidly through the diode's low forward resistance rather than through $R$.
-- Time constant $\approx R_{diode} \times C$ — very short. The input responds almost immediately to the button press.
+- Time constant $\approx R_{diode} \times C$, very short. The input responds almost immediately to the button press.
 
 On bounce or release (signal tries to rise):
 
 - The diode is reverse-biased. The capacitor can only charge through $R$.
-- Time constant $= R \times C$ — long, chosen to exceed the worst-case bounce duration.
-- Any bounce that briefly opens the switch causes only a small, slow rise on the capacitor. It cannot reach $V_{IH}$ before the contact closes again, so no spurious transition reaches the MCU.
+- Time constant $= R \times C$, long, chosen to exceed the worst-case bounce duration.
+- Any bounce that briefly opens the switch causes only a small, slow rise on the capacitor. The rise cannot reach $V_{IH}$ before the contact closes again, so no spurious transition reaches the MCU.
 
-This asymmetry solves the fundamental debounce problem: the MCU sees a fast, clean falling edge (responsive to the actual press) and a slow, filtered rising edge (immune to bounce). Choosing $R \times C \approx 10\ \text{ms}$–$20\ \text{ms}$ covers most mechanical switches.
+Choosing $R \times C \approx 10\ \text{ms}$–$20\ \text{ms}$ covers most mechanical switches.
 
-SR latch debounce: used with an SPDT switch wired to an SR latch ($\overline{S}$/$\overline{R}$ inputs). When the common terminal moves to one throw, it sets the latch; moving to the other throw resets it. Subsequent bounces on the same throw cannot change the latch output. Produces a perfectly clean edge with zero software overhead.
+SR latch debounce: used with an SPDT switch wired to an SR latch ($\overline{S}$/$\overline{R}$ inputs). When the common terminal moves to 1 throw, it sets the latch. Moving to the other throw resets it. Subsequent bounces on the same throw cannot change the latch output. Produces a perfectly clean edge with zero software overhead.
 
-Dedicated debounce IC: a chip that integrates the filtering and threshold logic for multiple switch inputs in a single package, replacing discrete RC networks, Schmitt triggers, and firmware debounce routines entirely.
+Dedicated debounce IC: integrates the filtering and threshold logic for multiple switch inputs in a single package, replacing discrete RC networks, Schmitt triggers, and firmware debounce routines entirely.
 
 Internal structure per channel: an RC low-pass filter followed by a Schmitt trigger. Some ICs add a latch to hold the output until the MCU reads it, preventing the MCU from missing a short press.
 
 Advantages over discrete or software solutions:
 
-- No timer ISR or CPU cycles consumed
-- Consistent timing across all channels — no per-channel firmware tuning
-- Fewer discrete components on the PCB
-- Output edges are clean and guaranteed within the IC's specified settle time
+- No timer ISR or CPU cycles consumed.
+- Consistent timing across all channels. No per-channel firmware tuning.
+- Fewer discrete components on the PCB.
+- Output edges are clean and guaranteed within the IC's specified settle time.
 
 Common ICs:
 
@@ -452,16 +455,16 @@ Common ICs:
   Single, dual, and octal channel variants. Built-in $40\ \text{ms}$ debounce time. Each input has an internal pull-up. Output goes LOW when input is pressed (active-low). Available in small SOT-23 and SOIC packages.
 - MC14490 (ON Semiconductor)  
   6-channel hex debouncer. Uses an internal RC oscillator to clock a shift-register integrator on each channel. Debounce period set by an external capacitor ($C_{ext}$), allowing adjustment from ~$1\ \text{ms}$ to ~$100\ \text{ms}$.
-- SN74LV1T34 + external RC (not a true debounce IC)  
+- SN74LV1T34 + external RC  
   A Schmitt trigger buffer used with an external RC. Requires discrete components but costs less than a dedicated debounce IC.
 
 <Note>
 
-Debounce ICs are practical when a board has many switch inputs (keypads, panel buttons). For one or two buttons on a cost-sensitive IoT device, software debounce is usually preferred to avoid the added IC cost and supply chain dependency.
+Debounce ICs are practical when a board has many switch inputs (keypads, panel buttons). For 1 or 2 buttons on a cost-sensitive IoT device, software debounce is usually preferred to avoid the added IC cost and supply chain dependency.
 
 </Note>
 
-##### Edge Detection
+### Edge Detection
 
 Level detection reads the current pin state on each loop iteration and acts continuously while the button is held. Edge detection acts once per state transition, regardless of how long the button stays in its new state.
 
@@ -480,7 +483,7 @@ uint8_t prev = HIGH;
 void loop(void) {
     uint8_t curr = read_pin();
     if (prev == HIGH && curr == LOW) {
-        handle_press();   // fires once on falling edge
+        handle_press();
     }
     prev = curr;
 }
@@ -488,21 +491,21 @@ void loop(void) {
 
 Edge detection requires debouncing. Without it, contact bounce produces multiple spurious transitions per physical press, firing the action several times from a single press.
 
-#### Bistable Switch
+### Bistable Switch
 
-A latching switch. Each actuation toggles the output between two stable states. The output remains in its new state after the actuating force is removed.
+A latching switch. Each actuation toggles the output between 2 stable states. The output remains in its new state after the actuating force is removed.
 
 - Toggle switches and rocker switches are bistable.
-- The MCU reads the current state at any time; no interrupt is needed to capture the event.
+- The MCU reads the current state at any time. No interrupt is needed to capture the event.
 - No debounce timer required for state reading, but transition edges still bounce.
 
-#### Monostable Switch
+### Monostable Switch
 
 Produces a single fixed-duration pulse on each actuation, regardless of how long the button is held.
 
-Implemented with a monostable multivibrator (one-shot) circuit: the trigger edge starts a timer; the output goes HIGH for a fixed period $T = R \times C$ determined by an RC network, then returns LOW.
+Implemented with a monostable multivibrator (one-shot) circuit. The trigger edge starts a timer. The output goes HIGH for a fixed period $T = R \times C$ determined by an RC network, then returns LOW.
 
-The MCU receives a clean, bounce-free pulse of guaranteed width — no software debouncing needed and no dependence on how quickly the user releases the button.
+The MCU receives a clean, bounce-free pulse of guaranteed width. No software debouncing needed and no dependence on how quickly the user releases the button.
 
 <Note>
 
@@ -512,40 +515,40 @@ A standard push button is physically monostable (returns to rest) but electrical
 
 ### Input Protection and Clamping
 
-MCU GPIO input pins have absolute maximum voltage ratings, typically $V_{CC} + 0.3\ \text{V}$ to $V_{CC} + 0.5\ \text{V}$ above the supply and $-0.3\ \text{V}$ to $-0.5\ \text{V}$ below GND. Exceeding these limits permanently damages the ESD protection structures or input transistors. Signals from external sources — sensors, cables, other boards — can carry voltages outside this safe window due to inductive spikes, ground offsets, or wiring errors.
+MCU GPIO input pins have absolute maximum voltage ratings, typically $V_{CC} + 0.3\ \text{V}$ to $V_{CC} + 0.5\ \text{V}$ above the supply and $-0.3\ \text{V}$ to $-0.5\ \text{V}$ below GND. Exceeding these limits permanently damages the ESD protection structures or input transistors. Signals from external sources can carry voltages outside this safe window due to inductive spikes, ground offsets, or wiring errors.
 
 A clamp circuit limits the voltage reaching the pin to within the safe range regardless of what the external signal does.
 
-#### Series Resistor
+### Series Resistor
 
-A resistor in series with the input pin is the first line of protection. It does not clamp by itself, but limits the current flowing into the pin's internal ESD diodes when the voltage exceeds the safe range. Without a series resistor, an overvoltage event drives unlimited current through the ESD diodes, destroying them even if they clamp the voltage.
+A resistor in series with the input pin limits the current flowing into the pin's internal ESD diodes when the voltage exceeds the safe range. Without a series resistor, an overvoltage event drives unlimited current through the ESD diodes, destroying them even if they clamp the voltage.
 
 Typical value: $1\ \text{k}\Omega$–$10\ \text{k}\Omega$. Higher values give more current limiting but slow the input edge (RC with pin capacitance).
 
-#### Diode Clamp to Supply Rails
+### Diode Clamp to Supply Rails
 
-Two diodes — one to $V_{CC}$, one to GND — clamp the input to within one diode drop of each rail.
+2 diodes, 1 to $V_{CC}$ and 1 to GND, clamp the input to within 1 diode drop of each rail.
 
 - $D_1$: anode at signal, cathode at $V_{CC}$. Conducts when $V_{signal} > V_{CC} + V_f$, pulling the pin back toward $V_{CC}$.
 - $D_2$: anode at GND, cathode at signal. Conducts when $V_{signal} < -V_f$, clamping reverse-polarity signals.
 
-Schottky diodes are preferred: forward voltage $V_f \approx 0.3\ \text{V}$ vs $0.7\ \text{V}$ for silicon. The clamped voltage stays closer to the rail, reducing stress on the pin. Schottky diodes also respond faster to transients.
+Schottky diodes are preferred. Forward voltage $V_f \approx 0.3\ \text{V}$ vs $0.7\ \text{V}$ for silicon. The clamped voltage stays closer to the rail, reducing stress on the pin. Schottky diodes also respond faster to transients.
 
 The series resistor must be present to limit clamping current. Without it, a sustained overvoltage forces the $V_{CC}$ rail upward through $D_1$, potentially damaging other devices on the same supply.
 
-#### Zener Diode Clamp
+### Zener Diode Clamp
 
 A zener diode from signal to GND (cathode at signal, anode at GND) clamps at its zener breakdown voltage $V_Z$.
 
-Choose $V_Z$ just below the pin's absolute maximum: for a $3.3\ \text{V}$ MCU, a $3.6\ \text{V}$ zener clamps at $3.6\ \text{V}$ while passing $3.3\ \text{V}$ signals undisturbed.
+Choose $V_Z$ just below the pin's absolute maximum. For a $3.3\ \text{V}$ MCU, a $3.6\ \text{V}$ zener clamps at $3.6\ \text{V}$ while passing $3.3\ \text{V}$ signals undisturbed.
 
-Clamps overvoltage but does not protect against reverse polarity on its own. A second zener (or a standard diode to GND anode-toward-GND) handles the negative direction.
+Clamps overvoltage but does not protect against reverse polarity on its own. A second zener or a standard diode to GND handles the negative direction.
 
-#### TVS Diode
+### TVS Diode
 
 A Transient Voltage Suppressor is optimised for high-energy transients (ESD, inductive kickback). It behaves like a very fast zener with a higher peak power rating.
 
-- Unidirectional TVS: clamps one polarity, like a zener.
+- Unidirectional TVS: clamps 1 polarity, like a zener.
 - Bidirectional TVS: clamps both overvoltage and reverse polarity in a single component.
 
 TVS diodes are the preferred solution when the signal line may carry ESD events or inductive spikes from motors, solenoids, or long cables. A series resistor is still required to limit sustained current.
@@ -558,44 +561,48 @@ Internal ESD diodes exist on most MCU inputs but are rated only for ESD events (
 
 ### Fuses
 
-A fuse is a sacrificial overcurrent protection device placed in series with a power supply line. When current exceeds the fuse's rated value, it opens the circuit — either permanently or temporarily — disconnecting the load before sustained overcurrent can damage components.
+A fuse is a sacrificial overcurrent protection device placed in series with a power supply line. When current exceeds the fuse's rated value, it opens the circuit, disconnecting the load before sustained overcurrent can damage components.
 
-Without a fuse, a short circuit or component failure can drive unlimited current through the PCB traces, MCU, and other components. Traces act as resistors; sufficient current generates enough heat to delaminate the PCB, destroy the MCU, or start a fire.
+Without a fuse, a short circuit or component failure can drive unlimited current through the PCB traces, MCU, and other components. Traces act as resistors. Sufficient current generates enough heat to delaminate the PCB, destroy the MCU, or start a fire.
 
-#### How They Work
+### Fuse Operation
 
 A fuse contains a conductor sized to melt (or increase dramatically in resistance) at its trip current. The energy deposited in the conductor is $I^2 \times R \times t$. When this energy exceeds the thermal capacity of the conductor, it opens.
 
 Key ratings:
 
 - Current rating $I_F$  
-  Continuous current the fuse carries without tripping. Fuse should be rated slightly above the maximum normal operating current of the circuit.
+  Continuous current the fuse carries without tripping. Rated slightly above the maximum normal operating current of the circuit.
 - Voltage rating  
   Maximum voltage the open fuse can safely block. A fuse that opens under a voltage exceeding its rating may arc across the gap.
 - Breaking capacity  
   Maximum fault current the fuse can safely interrupt. At very high fault currents, the arc during opening may sustain conduction.
 
-#### Fast-Blow vs Slow-Blow
+### Fast-Blow vs Slow-Blow
 
-Fast-blow (FF): opens very quickly at the rated current. Protects sensitive components that cannot tolerate even brief overcurrent. Used for MCUs, logic ICs, and signal circuitry.
-
-Slow-blow (T, time-delay): tolerates brief inrush currents above the rated value before tripping. Opens only on sustained overcurrent. Used for motors, transformers, and capacitive loads where normal startup draws a spike above steady-state current.
+- Fast-blow (FF)  
+  Opens very quickly at the rated current. Protects sensitive components that cannot tolerate even brief overcurrent. Used for MCUs, logic ICs, and signal circuitry.
+- Slow-blow (T, time-delay)  
+  Tolerates brief inrush currents above the rated value before tripping. Opens only on sustained overcurrent. Used for motors, transformers, and capacitive loads where normal startup draws a spike above steady-state current.
 
 Using a fast-blow fuse on a motor input causes nuisance tripping on every startup. Using a slow-blow fuse on an MCU power rail allows sustained overcurrent to damage the MCU before the fuse opens.
 
-#### One-Time vs Resettable Fuses
+### One-Time vs Resettable Fuses
 
-One-time fuse: the conductor melts permanently. Must be physically replaced after a fault. Used in production devices where fuse replacement signals a genuine fault requiring inspection.
+- One-time fuse  
+  The conductor melts permanently. Must be physically replaced after a fault. Used in production devices where fuse replacement signals a genuine fault requiring inspection.
+- Resettable fuse (PTC, polyfuse)  
+  A polymer positive temperature coefficient device. Under overcurrent, it heats up and its resistance increases by orders of magnitude, reducing current to a safe trickle. When power is removed and the device cools, it resets to low resistance automatically.
 
-Resettable fuse (PTC, polyfuse): a polymer positive temperature coefficient device. Under overcurrent, it heats up and its resistance increases by orders of magnitude, reducing current to a safe trickle. When power is removed and the device cools, it resets to low resistance automatically.
+Resettable fuse properties:
 
-- No replacement needed after a trip
-- Trip current is less precise than a one-time fuse
-- Small residual resistance even in normal operation ($0.1\ \Omega$–$1\ \Omega$)
-- Common in USB ports, battery packs, and IoT development boards
+- No replacement needed after a trip.
+- Trip current is less precise than a one-time fuse.
+- Small residual resistance even in normal operation ($0.1\ \Omega$–$1\ \Omega$).
+- Common in USB ports, battery packs, and IoT development boards.
 
 <Note>
 
-In IoT devices, a polyfuse on the USB 5 V input and a fast-blow fuse on the battery output are typical. The polyfuse handles accidental shorts during development; the battery fuse prevents thermal runaway in case of cell damage.
+In IoT devices, a polyfuse on the USB 5 V input and a fast-blow fuse on the battery output are typical. The polyfuse handles accidental shorts during development. The battery fuse prevents thermal runaway in case of cell damage.
 
 </Note>
