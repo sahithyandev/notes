@@ -1,0 +1,441 @@
+---
+title: Driving Loads
+sidebar:
+  order: 28
+dateCreated: 2026-06-11T19:05:16.258Z
+lastUpdatedOn: 2026-06-11T19:08:57.010Z
+slug: s4/iot/driving-loads
+prev: true
+next: false
+---
+
+## Driving LEDs
+
+An LED is a current-driven device. Applying voltage without limiting current destroys the LED and can damage the GPIO pin.
+
+Every LED has a forward voltage $V_f$ — the minimum voltage across it required for conduction. Below $V_f$ the LED is off; above it, current rises steeply with any small voltage increase.
+
+Typical forward voltages by color:
+
+- Red / yellow: $\approx 1.8\ \text{V}$–$2.2\ \text{V}$
+- Green / blue / white: $\approx 3.0\ \text{V}$–$3.5\ \text{V}$
+
+### Current-Limiting Resistor
+
+A series resistor between the GPIO pin and the LED limits current to a safe level.
+
+$$
+R = \frac{V_{CC} - V_f}{I_f}
+$$
+
+Here:
+
+- $V_{CC}$: supply voltage
+- $V_f$: LED forward voltage
+- $I_f$: desired forward current
+
+Typical $I_f$ for indicator LEDs is $5\ \text{mA}$–$20\ \text{mA}$. MCU GPIO pins are rated for $8\ \text{mA}$–$25\ \text{mA}$ depending on the device; $I_f$ must stay within this limit.
+
+<Note>
+
+Low-current LEDs ($2\ \text{mA}$) are preferred in battery-powered IoT devices. They remain clearly visible while consuming a fraction of the power of a standard $20\ \text{mA}$ LED.
+
+</Note>
+
+### Transistor Driver
+
+When $I_f$ exceeds the GPIO current rating, or when driving multiple LEDs, a transistor is placed between the GPIO pin and the LED. The pin drives the transistor base; the transistor supplies current from $V_{CC}$ directly, bypassing the pin's drive limit.
+
+The GPIO pin only sources the small base current $I_B = I_f / h_{FE}$, which is well within pin limits even for high-current LEDs.
+
+## Driving 7-Segment Displays
+
+A 7-segment display is 7 individual LEDs (segments a–g) arranged to form digits. Each segment is an independent LED requiring its own current path.
+
+2 variants exist:
+
+- Common cathode  
+  All segment cathodes tied to GND. MCU drives a segment HIGH to light it.
+- Common anode  
+  All segment anodes tied to $V_{CC}$. MCU drives a segment LOW to light it (active-low logic).
+
+### Why One Resistor Per Segment is Required
+
+Placing a single resistor in the common line (shared by all segments) causes the current through it to change with the number of active segments.
+
+When $n$ segments are on, total current through the shared resistor is:
+
+$$
+I_{total} = n \times I_f
+$$
+
+The voltage drop across the resistor:
+
+$$
+V_R = n \times I_f \times R
+$$
+
+Voltage remaining for each segment:
+
+$$
+V_{segment} = V_{CC} - V_R = V_{CC} - n \times I_f \times R
+$$
+
+As $n$ increases, $V_{segment}$ falls. With enough segments active, $V_{segment}$ may drop below $V_f$, turning segments off entirely. Segments that remain on are dimmer than when fewer segments share the resistor.
+
+The digit "8" lights all 7 segments; the digit "1" lights 2. With a shared resistor, "1" is far brighter than "8" — brightness varies with the digit being displayed.
+
+Each segment gets its own series resistor to fix $I_f$ independently of how many other segments are active.
+
+### Multiplexing Multiple Digits
+
+Driving each segment of each digit directly requires $7 \times N$ GPIO pins for $N$ digits. Multiplexing reduces this to $7 + N$ pins.
+
+Each digit's corresponding segment pins are wired together across all digits. A separate digit-select line controls a transistor that connects one digit's common line to GND (common cathode) or $V_{CC}$ (common anode). Only the selected digit's transistor is active at any time.
+
+```
+Segment pins (a–g) ──────────────────────────────┐
+                                                  │
+         Digit 1 common ── transistor ── GND      │
+         Digit 2 common ── transistor ── GND      ├── shared segments
+         Digit 3 common ── transistor ── GND      │
+         Digit 4 common ── transistor ── GND      │
+                               ↑                  │
+                    digit-select GPIO              │
+```
+
+Scan sequence per cycle:
+
+1. Disable all digit-select lines (all digits off).
+2. Write segment pattern for digit $k$ to the 7 segment GPIO pins.
+3. Enable digit $k$'s select line.
+4. Hold for the slot duration $t_{slot}$.
+5. Advance $k$ to the next digit and repeat.
+
+For $N$ digits, each digit is on for $1/N$ of the total cycle. Refresh rate per digit must exceed $50\ \text{Hz}$ to avoid visible flicker:
+
+$$
+f_{refresh} = \frac{1}{N \times t_{slot}} \geq 50\ \text{Hz}
+$$
+
+The scan loop is typically driven from a timer ISR so the main program does not need to manage timing.
+
+#### Ghosting
+
+Ghosting occurs when residual segment current lights the wrong digit during a select transition. The cause: segment pins still hold the previous digit's pattern at the moment the next digit's select line activates.
+
+Fix: always blank all segment pins (drive all LOW) before enabling the next digit-select line. The blank period adds dead time per slot but eliminates ghost images.
+
+<Note>
+
+During multiplexing, only 1 digit is physically on at any instant. Peak segment current equals static drive current. Average current and brightness are $1/N$ of static drive. Segment resistors are sized for peak current, not average.
+
+</Note>
+
+## Driving Inductive Loads
+
+Inductive loads — motors, relays, solenoids — store energy in a magnetic field while current flows. When the driving transistor switches off, the magnetic field collapses and induces a voltage spike (back-EMF) in the opposite polarity to the supply.
+
+$$
+V_{spike} = -L \frac{\text{d}I}{\text{d}t}
+$$
+
+The spike amplitude depends on inductance $L$ and how fast current is interrupted. A fast transistor switch-off produces a very high $\text{d}I/\text{d}t$, generating a spike that can reach tens or hundreds of volts — far above the MCU's rated supply.
+
+This spike appears on the power rail and on the GPIO pin driving the transistor. Without protection it destroys the driving transistor and can latch up or permanently damage the MCU.
+
+### Flyback Diode
+
+A diode placed in parallel with the inductive load, reverse-biased under normal operation. When the switch opens and back-EMF reverses polarity, the diode becomes forward-biased and provides a recirculating current path. The stored energy dissipates through the coil resistance rather than spiking onto the supply rail.
+
+```
+V_CC ──┬──────────────┐
+       │              │ ← flyback diode (cathode to V_CC)
+   [inductor]        ─┼─
+       │              │
+     [transistor]     │
+       │              │
+GND ───┴──────────────┘
+```
+
+The diode must be placed physically close to the load. A long lead between the load and the diode allows the spike to propagate before the diode clamps it.
+
+Schottky diodes are preferred over silicon for fast loads (PWM motor control): lower forward voltage and faster recovery reduce power dissipation during high-frequency switching.
+
+### Transistor Driver Requirement
+
+MCU GPIO pins cannot drive inductive loads directly. 2 reasons:
+
+- Current  
+  Relay coils and motor windings draw $50\ \text{mA}$–$500\ \text{mA}$, far above GPIO limits.
+- Voltage  
+  Many inductive loads operate at $12\ \text{V}$ or $24\ \text{V}$. GPIO pins are rated to $3.3\ \text{V}$ or $5\ \text{V}$.
+
+An NPN transistor or N-channel MOSFET is used as the switch. The GPIO pin drives the base or gate; the transistor switches the full load current from the external supply.
+
+### DC Motors
+
+A DC motor converts electrical energy to rotational motion. Current through the armature winding produces a magnetic field that reacts against the stator field, generating torque.
+
+Speed is proportional to the average voltage applied. PWM controls speed by varying duty cycle — the motor's inertia smooths the switching, so it responds to the average voltage rather than the individual pulses.
+
+Direction is controlled by reversing current polarity. An H-bridge achieves this with 4 switches arranged so the motor can be connected to the supply in either polarity. The circuit shape resembles the letter H — the motor forms the crossbar.
+
+```
+V_CC ──┬─────────────┬──
+       Q1(high-left) Q3(high-right)
+       │             │
+       ├────[motor]──┤
+       │             │
+       Q2(low-left)  Q4(low-right)
+GND ───┴─────────────┴──
+```
+
+#### Operating Modes
+
+- Forward  
+  Q1 + Q4 on, Q2 + Q3 off. Current flows left to right through the motor.
+- Reverse  
+  Q2 + Q3 on, Q1 + Q4 off. Current flows right to left through the motor.
+- Brake  
+  Q2 + Q4 on, Q1 + Q3 off. Both motor terminals shorted to GND. The motor's back-EMF drives current through the winding, producing a braking torque that resists rotation.
+- Coast  
+  All switches off. Motor terminals float. Motor spins freely with no braking force.
+
+#### Shoot-Through
+
+Turning on Q1 and Q2 simultaneously (or Q3 and Q4) connects $V_{CC}$ directly to GND through 2 conducting transistors. This is a short circuit that instantly destroys the switches.
+
+Shoot-through occurs during switching transitions: if Q1 turns on before Q2 fully turns off, both conduct briefly. A dead time — a brief period where both switches are off — is inserted between turning one switch off and the other on. Dead time is typically $100\ \text{ns}$–$1\ \mu\text{s}$ depending on transistor turn-off speed.
+
+#### PWM Speed Control
+
+PWM is applied to one or both switches on the active side while the opposite low-side switch stays on. The motor sees the average voltage, which scales with duty cycle.
+
+A flyback diode across each transistor is required. Every PWM transition collapses the motor's inductive field, generating back-EMF. H-bridge ICs include these diodes internally.
+
+Dedicated H-bridge ICs (L298N, DRV8833, TB6612) integrate the 4 transistors, flyback diodes, dead-time control, and logic-level inputs in a single package, accepting direct GPIO drive.
+
+#### Tachometer
+
+A tachometer measures rotational speed and converts it to an electrical signal the MCU can read. Common implementations:
+
+- Optical encoder  
+  A slotted disc attached to the motor shaft interrupts a light beam. Each slot produces 1 pulse per revolution. A disc with $N$ slots produces $N$ pulses per revolution.
+- Hall effect sensor  
+  A magnet on the shaft triggers a Hall sensor on each pass. Contactless; tolerates dust and oil.
+- Back-EMF sensing  
+  A spinning DC motor generates a voltage proportional to speed. Measured during PWM off-time when the driver is not switching.
+
+The MCU measures tachometer pulse frequency using a timer in counter or input-capture mode. Speed in RPM:
+
+$$
+\text{RPM} = \frac{f_{pulse}}{N} \times 60
+$$
+
+Here:
+
+- $f_{pulse}$: pulse frequency in Hz
+- $N$: pulses per revolution
+
+#### Closed-Loop Speed Control
+
+Open-loop control sets PWM duty cycle without measuring actual speed. Load changes, supply voltage variation, and motor temperature alter speed with no correction.
+
+Closed-loop control feeds the tachometer reading back to the MCU. The MCU compares measured speed to the setpoint and adjusts the PWM duty cycle to reduce the error.
+
+```
+setpoint ──► [+] ──► controller ──► PWM ──► H-bridge ──► motor
+              │                                              │
+              └──────────────── tachometer ◄────────────────┘
+```
+
+A PID controller computes the correction from 3 terms:
+
+$$
+u(t) = K_p\, e(t) + K_i \int e(t)\, \text{d}t + K_d \frac{\text{d}e}{\text{d}t}
+$$
+
+Here:
+
+- $e(t)$: error — setpoint minus measured speed
+- $K_p$: proportional gain — correction proportional to current error
+- $K_i$: integral gain — correction for accumulated error; eliminates steady-state offset
+- $K_d$: derivative gain — correction proportional to rate of error change; damps overshoot
+
+The controller output $u(t)$ maps to PWM duty cycle. On each control loop iteration (driven by a timer ISR), the MCU reads the tachometer, computes the error, updates the PID terms, and writes the new duty cycle to the PWM register.
+
+<Note>
+
+A P-only controller reaches a steady-state error proportional to load. Adding the I term drives steady-state error to zero. The D term is optional — it reduces overshoot but amplifies noise in the speed measurement.
+
+</Note>
+
+### Stepper Motors
+
+A stepper motor moves in discrete angular steps. Each pulse from the driver advances the shaft by a fixed step angle. Position is controlled open-loop — no tachometer or encoder is needed because each step command produces a known, repeatable angular displacement.
+
+$$
+\text{Steps per revolution} = \frac{360°}{\theta_{step}}
+$$
+
+A common step angle is $1.8°$, giving 200 steps per revolution.
+
+#### Types
+
+Stepper motors are classified by 2 independent axes: rotor construction and winding configuration.
+
+##### By Rotor Construction
+
+- Permanent Magnet (PM)  
+  Rotor is a permanent magnet. Stator coils attract and repel the rotor poles. Large step angle: typically $7.5°$ or $15°$ (48–24 steps per revolution). Low cost; used in low-precision applications such as paper feed in printers.
+- Variable Reluctance (VR)  
+  Rotor is a toothed soft-iron cylinder with no permanent magnet. Torque is produced by the rotor teeth aligning with the energised stator poles to minimise magnetic reluctance. Step angle as small as $1.8°$. No detent torque when unpowered — rotor spins freely.
+- Hybrid  
+  Combines a permanent magnet rotor with toothed stator and rotor poles. The magnet provides detent torque and enhances holding torque; the teeth provide fine angular resolution. Step angle: $0.9°$–$1.8°$. Highest torque and precision of the 3 types. Most common in industrial and 3D printing applications.
+
+##### By Winding Configuration
+
+- Unipolar  
+  Each coil has a center tap, splitting it into 2 half-windings. Current flows through one half-winding at a time, always in the same direction. The center tap connects to the supply; a single transistor switches each half-winding to GND. 5 wires (4 half-winding ends + 1 common center tap) or 6 wires (separate center taps per coil). Driver circuit is simple — a transistor array such as the ULN2003 suffices. Torque is lower than bipolar because only half the winding is active per step.
+- Bipolar  
+  2 coils with no center tap. Current direction is reversed through the full winding to produce each magnetic pole. 4 wires (2 per coil). Full winding is active at every step, giving higher torque per frame size than unipolar. Requires an H-bridge per coil to reverse current direction.
+
+<Note>
+
+A unipolar motor can be driven as bipolar by leaving the center taps disconnected and driving the full winding through an H-bridge. Torque increases because the full winding is used, at the cost of a more complex driver.
+
+</Note>
+
+#### Excitation Sequences
+
+The coils must be energised in a specific sequence to advance the rotor. For a 2-coil bipolar motor with coils A and B:
+
+| Step | Coil A | Coil B |
+| ---- | ------ | ------ |
+| 1    | +      | +      |
+| 2    | −      | +      |
+| 3    | −      | −      |
+| 4    | +      | −      |
+
+- Full-step (2-phase on)  
+  Both coils energised at each step as above. Maximum torque.
+- Full-step (wave drive)  
+  1 coil energised at a time. Lower torque; used to reduce power consumption.
+- Half-step  
+  Alternates between 1-coil and 2-coil states. Doubles angular resolution to $0.9°$ on a $1.8°$ motor at the cost of varying torque per step.
+- Microstepping  
+  Driver varies current amplitude in both coils sinusoidally. Rotor positions between full steps are held by the ratio of currents. Greatly reduces vibration and increases smoothness; common ratios are 1/8, 1/16, 1/32 step.
+
+#### Driver Circuits
+
+- Unipolar driver  
+  A transistor array (e.g. ULN2003) switches each half-winding to GND. The center tap connects to the supply. 4 GPIO pins control 4 half-windings directly.
+- Bipolar driver  
+  Requires 1 H-bridge per coil — 2 H-bridges total for a standard 2-coil motor. A dedicated stepper driver IC (A4988, DRV8825) integrates both H-bridges, microstepping current control, and overcurrent protection. The MCU sends only a STEP pulse and a DIR level; the IC handles the excitation sequence internally.
+
+#### Step Rate and Stall
+
+Speed is proportional to step pulse frequency:
+
+$$
+\omega = \theta_{step} \times f_{step}
+$$
+
+Stepping too fast from standstill causes the rotor to miss steps (stall) because inertia prevents it from following the rotating magnetic field. The motor must be accelerated gradually — step frequency ramps up from a low starting rate.
+
+<Note>
+
+Unlike DC motors, stepper motors consume full coil current even when stationary and holding position. Holding current generates continuous heat. Many stepper driver ICs reduce coil current automatically after a configurable idle timeout.
+
+</Note>
+
+### Electromagnetic Relays
+
+An EM relay uses a current-driven coil to mechanically actuate a switch. The coil and the switched contacts are electrically isolated — the MCU circuit and the switched load share no common ground.
+
+Structure:
+
+- Coil  
+  Energised by the MCU via a transistor driver. Draws $10\ \text{mA}$–$100\ \text{mA}$ at $5\ \text{V}$ or $12\ \text{V}$. Coil current must be high enough to generate sufficient magnetic force to pull the armature, and low enough to prevent resistive heating in the coil winding. Both bounds are specified in the relay datasheet as the pull-in current and the maximum continuous coil current.
+- Armature  
+  Ferromagnetic plate pulled toward the coil core when energised.
+- Contacts  
+  Mechanically linked to the armature. Rated independently of the coil — typically $5\ \text{A}$–$30\ \text{A}$ at $250\ \text{V}$ AC or $30\ \text{V}$ DC. The voltage rating is the maximum voltage the open contacts can block without arcing across the gap. Exceeding it causes the contacts to arc on open, eroding the contact surface and eventually welding them shut.
+
+The coil is an inductive load. When the transistor switches off, the magnetic field collapses and produces a back-EMF spike that can reach tens of volts above $V_{CC}$.
+
+A shunt diode (also called flyback or freewheeling diode) is placed directly across the coil — cathode to the coil's positive terminal, anode to GND. Under normal operation the diode is reverse-biased and carries no current. When the transistor switches off and back-EMF reverses the coil voltage, the diode becomes forward-biased and provides a recirculating path for the decaying coil current. The stored magnetic energy dissipates as heat through the coil's own resistance rather than spiking onto the supply rail or the transistor's collector.
+
+```
+V_CC ──┬──────────┐
+       │          │ (cathode)
+    [coil]       ─┼─  shunt diode
+       │          │ (anode)
+    [transistor]  │
+       │          │
+GND ───┴──────────┘
+```
+
+The diode must be placed physically close to the coil. A long PCB trace between the coil and the diode has parasitic inductance that allows part of the spike to propagate before the diode clamps it. A fast-recovery or Schottky diode is preferred to clamp the spike quickly.
+
+#### Single Transistor Driver
+
+An NPN transistor switches the relay coil. The GPIO pin sources a small base current; the transistor sinks the full coil current through its collector.
+
+```
+V_CC ── [coil] ──── collector
+                    NPN
+GPIO ── [R_B] ───── base
+                    emitter ── GND
+```
+
+Base resistor $R_B$ limits base current to a safe level while keeping the transistor in saturation:
+
+$$
+R_B = \frac{V_{GPIO} - V_{BE}}{I_B} \approx \frac{V_{GPIO} - 0.7}{I_{coil} / h_{FE}}
+$$
+
+Choosing $I_B$ to overdrive the transistor ($h_{FE}$ derated by a factor of 5–10) ensures it stays in saturation across temperature and device variation.
+
+Simple and low-cost. Suitable when the GPIO can source sufficient base current and the coil voltage equals the MCU supply.
+
+#### Dual Transistor Driver
+
+2 NPN transistors in a Darlington configuration. The emitter of the first (driver) transistor feeds the base of the second (output) transistor. The combined current gain is the product of the 2 stages:
+
+$$
+h_{FE(total)} = h_{FE1} \times h_{FE2}
+$$
+
+```
+GPIO ── [R_B] ── base(Q1)
+                 NPN Q1
+                 emitter(Q1) ── base(Q2)
+                                NPN Q2
+                 collector(Q2) ── [coil] ── V_CC
+                 emitter(Q2) ── GND
+```
+
+A very small GPIO current drives a relay coil that a single transistor could not switch reliably. Used when:
+
+- The coil current is high relative to the GPIO drive capability
+- The MCU operates at a lower voltage than the coil supply, reducing available base drive
+
+Trade-off: the 2 $V_{BE}$ drops in series raise the saturation voltage to $\approx 1.4\ \text{V}$, slightly reducing the voltage across the coil.
+
+Darlington arrays such as the ULN2003 integrate 7 Darlington pairs with built-in base resistors and shunt diodes in a single IC, replacing discrete transistor circuits for multi-relay designs.
+
+Contact types:
+
+- NO (Normally Open)  
+  Open when coil is off; closes when energised.
+- NC (Normally Closed)  
+  Closed when coil is off; opens when energised.
+- SPDT relays provide both NO and NC on 1 common terminal.
+
+<Note>
+
+Relay contacts have a rated mechanical and electrical lifetime (number of switching cycles). Switching inductive or capacitive loads with a relay degrades contacts faster than resistive loads due to arcing on make and break.
+
+</Note>
