@@ -46,7 +46,13 @@ if (!notesEntry) {
 }
 
 const { Content, headings } = await render(notesEntry);
-const voteCounts = await getVoteCounts(slug);
+let voteCounts = undefined;
+
+try {
+  voteCounts = await getVoteCounts(slug);
+} catch (error) {
+  console.log(error);
+}
 
 const prereqEntries = notesEntry.data.prereqs
   ? (
@@ -141,8 +147,8 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
       <NoteFeedback
         slug={slug}
-        initialUp={voteCounts.up}
-        initialDown={voteCounts.down}
+        initialUp={voteCounts?.up}
+        initialDown={voteCounts?.down}
       />
 
       <NoteNav
