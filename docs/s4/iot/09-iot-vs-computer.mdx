@@ -1,0 +1,120 @@
+---
+title: IoT vs Computer
+sidebar:
+  order: 9
+slug: s4/iot/iot-vs-computer
+prev: true
+next: true
+dateCreated: 2026-05-31T07:08:08.399Z
+lastUpdatedOn: 2026-06-11T17:47:33.161Z
+prereqs:
+  - >-
+    s2/computer-organization-and-digital-design/computer-organization/introduction
+  - s2/computer-organization-and-digital-design/computer-organization/memory
+  - s3/computer-architecture/instruction-set-architecture
+  - s3/computer-architecture/cache
+---
+
+An IoT device is not a smaller computer. Designed for a specific purpose and optimized entirely around it.
+
+## Design Philosophy
+
+| Computer                         | IoT Device                 |
+| -------------------------------- | -------------------------- |
+| General purpose                  | Task-specific              |
+| High performance                 | Sufficient performance     |
+| Expandable                       | Minimal hardware           |
+| Power consumption less important | Power consumption critical |
+| User present                     | Often unattended           |
+| Optimized for flexibility        | Optimized for efficiency   |
+
+Specialization yields:
+
+- Lower cost
+- Lower power consumption
+- Simpler maintenance
+- Higher reliability
+- Fewer failure points
+
+## Bus Architecture
+
+General-purpose computers connect devices at vastly different speeds.
+
+| Device               | Typical Speed |
+| -------------------- | ------------- |
+| Keyboard             | ~200 ms       |
+| Screen               | 40–100 ms     |
+| USB / Ethernet / HDD | 16–132 MHz    |
+| PCI Devices          | 250–266 MHz   |
+| RAM                  | 266–512 MHz   |
+| CPU Front Side Bus   | 400–466 MHz   |
+
+The speed range drives a 2-bridge design:
+
+- North Bridge  
+  Handles fast components (RAM, GPU). Runs at CPU-like speeds, located close to the CPU.
+- South Bridge  
+  Handles slower devices (USB, Ethernet, HDD, keyboard). Connected to the North Bridge via an internal bus.
+
+IoT devices use a single unified bus. Complexity is unnecessary for a single-task device.
+
+## Memory
+
+General-purpose computers layer memory to balance speed and cost: cache → RAM → ROM/storage.
+
+**BIOS shadowing** copies the BIOS from slow ROM into fast RAM at startup. Execution continues from RAM for higher speed.
+
+IoT firmware executes directly from flash. No hierarchy to manage, no shadowing.
+
+## Buffered I/O
+
+Buffers are temporary storage areas where data waits before processing. They bridge the speed gap between the CPU and slower I/O devices.
+
+General-purpose computers are not real-time. Screen updates may be delayed slightly. Acceptable for computers. Unacceptable for IoT systems.
+
+IoT requires a **guaranteed response time**: even if processing fails, the device must output an error within a fixed time window (e.g., 10 µs). Hard constraint, not a performance target.
+
+## I/O Ports
+
+Computer I/O targets flexibility. A single USB port handles keyboards, cameras, charging, and accessories.
+
+IoT I/O ports are dedicated to specific functions:
+
+- Analog signal input
+- Digital signal input/output
+- Timing and capture signals
+- Sensor interfaces
+
+A motion detector may only need the timestamp of when motion occurred. A dedicated timing input records this directly.
+
+## Power
+
+Power efficiency is the primary design objective in IoT. Energy consumption influences every design decision.
+
+Examples:
+
+- Smart refrigerators reduce electricity consumption
+- Inverter air conditioners adjust compressor speed to save power
+
+## Hardware-Software Boundary
+
+The hardware-software boundary in IoT is especially tight. Almost anything implementable in hardware can be done in software, and vice versa (e.g., LED blinking via hardware timer vs. software delay loop). In production at scale, hardware solutions are more reliable and energy-efficient.
+
+Every software-emulated function that could run in dedicated hardware is a trade-off. The IoT developer must understand the full stack, from physical interfaces to cloud. IoT does not permit the specialization that web development does.
+
+The real challenge is software, not hardware. Writing for a microcontroller means controlling the physical world in real-time, with no screen for debugging, no OS to catch errors, and no human in the loop.
+
+## ISA
+
+See [Instruction Set Architecture](/s3/computer-architecture/instruction-set-architecture) for a full comparison of RISC and CISC.
+
+|                   | CISC                                   | RISC                                          |
+| ----------------- | -------------------------------------- | --------------------------------------------- |
+| Full name         | Complex Instruction Set Computer       | Reduced Instruction Set Computer              |
+| Instruction count | 1000+                                  | ~35                                           |
+| Optimisation      | Breadth over depth                     | Depth over breadth                            |
+| Used in           | General-purpose computers (Intel, AMD) | IoT microcontrollers (AVR, PIC, ARM Cortex-M) |
+| Execution         | Variable-length, multi-cycle           | Fixed-length, single-cycle                    |
+| IoT suitability   | Poor: excess complexity, higher power  | High: predictable timing, energy efficient    |
+
+RISC's predictable, single-cycle execution enables the guaranteed response times IoT requires. CISC's variable-cycle instructions make timing guarantees harder to achieve.
