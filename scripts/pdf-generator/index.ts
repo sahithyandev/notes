@@ -1,22 +1,8 @@
-import { generateModulePdf } from "./core";
+import { generateModulePdf } from "./generate";
+import { c, fmt } from "./log";
 import { readdirSync } from "fs";
 import { resolve } from "path";
 import { spawn } from "node:child_process";
-
-const c = {
-  reset: "\x1b[0m",
-  bold: "\x1b[1m",
-  dim: "\x1b[2m",
-  green: "\x1b[32m",
-  red: "\x1b[31m",
-  yellow: "\x1b[33m",
-  cyan: "\x1b[36m",
-  gray: "\x1b[90m",
-};
-
-function fmt(ms: number): string {
-  return ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${Math.round(ms)}ms`;
-}
 
 function getAllModuleIds(semFilter?: string): string[] {
   const docsPath = resolve("./docs");
