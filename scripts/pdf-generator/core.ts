@@ -421,7 +421,7 @@ export async function generateModulePdf(moduleId: string) {
 
   const docLines = [
     "\\documentclass{book}",
-    "\\usepackage[paperwidth=6in,paperheight=9in,top=0.75in,bottom=0.75in,left=0.75in,right=0.75in]{geometry}",
+    "\\usepackage[paperwidth=6in,paperheight=9in,top=0.5in,bottom=0.5in,left=0.55in,right=0.55in]{geometry}",
     "\\usepackage{amsmath, amssymb}",
     "\\usepackage[colorlinks=true]{hyperref}",
     "\\usepackage{graphicx}",
@@ -488,12 +488,12 @@ export async function generateModulePdf(moduleId: string) {
   );
   const titleFontSize =
     maxGroupLen <= 12
-      ? 38
+      ? 32
       : maxGroupLen <= 18
-        ? 32
+        ? 26
         : maxGroupLen <= 24
-          ? 26
-          : 22;
+          ? 22
+          : 18;
   const titleLineHeight = Math.round(titleFontSize * 1.15);
 
   docLines.push(`\\definecolor{semaccent}{HTML}{${semColor}}`);
