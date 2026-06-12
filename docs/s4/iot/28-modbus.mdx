@@ -7,7 +7,7 @@ slug: s4/iot/modbus
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:59:21.295Z
+lastUpdatedOn: 2026-06-12T08:40:30.611Z
 ---
 
 A serial communication protocol for industrial devices. Developed by Modicon in 1979. Widely used in SCADA systems, PLCs, and IoT edge layers.
@@ -44,12 +44,13 @@ Modbus registers are 16-bit. 32-bit values (floats, integers) require 2 consecut
 
 All variants share the same Protocol Data Unit (PDU):
 
-```
-┌───────────────┬──────────┐
-│ Function Code │   Data   │
-│   (1 byte)    │ (N bytes)│
-└───────────────┴──────────┘
-```
+<Packet
+  unit="chars"
+  fields={[
+    { name: "Function Code", size: 1, label: "1 byte" },
+    { name: "Data", size: 3, label: "N bytes" },
+  ]}
+/>
 
 The PDU is wrapped in a variant-specific Application Data Unit (ADU) that adds addressing and error checking.
 
@@ -76,12 +77,14 @@ If a slave cannot execute a request, it responds with an exception: the function
 
 Binary encoding over RS-232 or RS-485. Most compact variant. CRC-16 error checking.
 
-```
-┌─────────────────┬───────────────┬──────────┬───────────┐
-│  Slave Address  │ Function Code │   Data   │    CRC    │
-│    (1 byte)     │   (1 byte)    │ (N bytes)│ (2 bytes) │
-└─────────────────┴───────────────┴──────────┴───────────┘
-```
+<Packet
+  unit="chars"
+  fields={[
+    { name: "Slave Address", size: 1, label: "1 byte" },
+    { name: "PDU", size: 3, label: "1+N bytes" },
+    { name: "CRC", size: 2, label: "2 bytes" },
+  ]}
+/>
 
 - CRC  
   CRC-16, low byte transmitted first.
@@ -96,12 +99,16 @@ Typically runs over RS-485: differential signalling, up to 247 devices, bus leng
 
 Each binary byte encoded as 2 ASCII hex characters. Longer frames than RTU but human-readable. LRC error checking.
 
-```
-┌───────┬─────────┬───────────────┬──────────┬───────┬─────────┐
-│ Start │ Address │ Function Code │   Data   │  LRC  │   End   │
-│ 1 ch  │ 2 chars │    2 chars    │ 2N chars │ 2 ch  │ 2 chars │
-└───────┴─────────┴───────────────┴──────────┴───────┴─────────┘
-```
+<Packet
+  unit="chars"
+  fields={[
+    { name: "Start", size: 1, label: "1 ch" },
+    { name: "Address", size: 2, label: "2 chars" },
+    { name: "PDU", size: 6, label: "2+2N chars" },
+    { name: "LRC", size: 2, label: "2 ch" },
+    { name: "End", size: 2, label: "2 chars" },
+  ]}
+/>
 
 - Start  
   `:` (ASCII `0x3A`).
@@ -118,13 +125,16 @@ Modbus PDU over TCP/IP on port 502. No CRC; TCP handles error checking. IP addre
 
 The PDU is prefixed with a 7-byte MBAP header:
 
-```
-┌────────────────┬─────────────┬──────────┬─────────┬───────────────┬──────────┐
-│ Transaction ID │ Protocol ID │  Length  │ Unit ID │ Function Code │   Data   │
-│   (2 bytes)    │  (2 bytes)  │ (2 bytes)│ (1 byte)│   (1 byte)    │ (N bytes)│
-└────────────────┴─────────────┴──────────┴─────────┴───────────────┴──────────┘
-│←─────────────────── MBAP Header (7 bytes) ──────────────────────►│
-```
+<Packet
+  unit="chars"
+  fields={[
+    { name: "Transaction ID", size: 2, label: "2 bytes" },
+    { name: "Protocol ID", size: 2, label: "2 bytes" },
+    { name: "Length", size: 2, label: "2 bytes" },
+    { name: "Unit ID", size: 1, label: "1 byte" },
+    { name: "PDU", size: 4, label: "1+N bytes" },
+  ]}
+/>
 
 - Transaction ID  
   Echoed in the response. Matches request/response pairs when requests are pipelined.

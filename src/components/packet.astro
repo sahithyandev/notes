@@ -1,0 +1,271 @@
+---
+interface Field {
+  name: string;
+  size: number;
+  label?: string;
+}
+
+interface RowField {
+  name: string;
+  size: number;
+  label: string;
+  widthInRow: number;
+  xInRow: number;
+  continued: boolean;
+}
+
+interface Props {
+  fields: Field[];
+  width?: number;
+  unit?: string;
+}
+
+const { fields, width, unit = "bits" } = Astro.props;
+
+function computeRows(fields: Field[], rowWidth?: number): RowField[][] {
+  if (!rowWidth) {
+    let x = 0;
+    return [
+      fields.map((f) => {
+        const row = {
+          ...f,
+          label: f.label ?? `${f.size} ${unit}`,
+          widthInRow: f.size,
+          xInRow: x,
+          continued: false,
+        };
+        x += f.size;
+        return row;
+      }),
+    ];
+  }
+
+  const rows: RowField[][] = [];
+  let currentRow: RowField[] = [];
+  let posInRow = 0;
+
+  for (const field of fields) {
+    let remaining = field.size;
+    let isFirst = true;
+
+    while (remaining > 0) {
+      const spaceInRow = rowWidth - posInRow;
+      const usedInRow = Math.min(remaining, spaceInRow);
+
+      currentRow.push({
+        name: field.name,
+        size: field.size,
+        label: field.label ?? `${field.size} ${unit}`,
+        widthInRow: usedInRow,
+        xInRow: posInRow,
+        continued: !isFirst,
+      });
+
+      posInRow += usedInRow;
+      remaining -= usedInRow;
+      isFirst = false;
+
+      if (posInRow >= rowWidth) {
+        rows.push(currentRow);
+        currentRow = [];
+        posInRow = 0;
+      }
+    }
+  }
+
+  if (currentRow.length > 0) {
+    rows.push(currentRow);
+  }
+
+  return rows;
+}
+
+function getOffsets(row: RowField[], startOffset: number): number[] {
+  const offsets: number[] = [];
+  let pos = startOffset;
+  for (const f of row) {
+    offsets.push(pos);
+    pos += f.widthInRow;
+  }
+  return offsets;
+}
+
+const W = 600;
+const ROW_H = 64;
+const RULER_H = 16;
+const rowH = width ? ROW_H + RULER_H : ROW_H;
+
+const rows = computeRows(fields, width);
+const effectiveRowWidth = width ?? fields.reduce((s, f) => s + f.size, 0);
+
+const uid = Math.random().toString(36).slice(2, 7);
+
+let rowStartOffset = 0;
+const svgRows = rows.map((row, rowIdx) => {
+  const offsets = width ? getOffsets(row, rowStartOffset) : [];
+  rowStartOffset += effectiveRowWidth;
+  const svgY = rowIdx * rowH;
+  const cellY = width ? svgY + RULER_H : svgY;
+  const svgFields = row.map((field, i) => {
+    const svgX = (field.xInRow / effectiveRowWidth) * W;
+    const svgW = (field.widthInRow / effectiveRowWidth) * W;
+    return { ...field, svgX, svgW, cx: svgX + svgW / 2, offset: offsets[i] };
+  });
+  return { svgFields, svgY, cellY, rowIdx };
+});
+
+const totalH = rows.length * rowH;
+---
+
+<svg
+  viewBox={`0 0 ${W} ${totalH}`}
+  width="100%"
+  xmlns="http://www.w3.org/2000/svg"
+  class="packet"
+  role="img"
+  aria-label="Packet structure diagram"
+  style={`max-height: ${totalH}px; aspect-ratio: ${W} / ${totalH}`}
+>
+  <defs>
+    {
+      svgRows.map(({ svgFields, cellY, rowIdx }) =>
+        svgFields.map((f, fi) => (
+          <clipPath id={`${uid}-${rowIdx}-${fi}`}>
+            <rect
+              x={f.svgX + 4}
+              y={cellY}
+              width={Math.max(0, f.svgW - 8)}
+              height={ROW_H}
+            />
+          </clipPath>
+        )),
+      )
+    }
+  </defs>
+
+  {/* Outer border */}
+  <rect
+    x="0.5"
+    y="0.5"
+    width={W - 1}
+    height={totalH - 1}
+    rx="5"
+    ry="5"
+    class="frame"></rect>
+
+  {
+    svgRows.map(({ svgFields, svgY, cellY, rowIdx }) => (
+      <g>
+        {/* Horizontal row divider */}
+        {rowIdx > 0 && (
+          <line
+            x1="0.5"
+            y1={svgY + 0.5}
+            x2={W - 0.5}
+            y2={svgY + 0.5}
+            class="div-h"
+          />
+        )}
+
+        {/* Ruler offsets */}
+        {width &&
+          svgFields.map((f) => (
+            <text x={f.svgX + 3} y={svgY + RULER_H - 3} class="ruler">
+              {f.offset}
+            </text>
+          ))}
+
+        {/* Vertical field dividers */}
+        {svgFields.slice(0, -1).map((f, i) => {
+          const nextContinued = svgFields[i + 1].continued;
+          return (
+            <line
+              x1={f.svgX + f.svgW}
+              y1={cellY + 0.5}
+              x2={f.svgX + f.svgW}
+              y2={cellY + ROW_H - 0.5}
+              class={nextContinued ? "div-v div-dashed" : "div-v"}
+            />
+          );
+        })}
+
+        {/* Field labels */}
+        {svgFields.map((f, fi) => (
+          <g clip-path={`url(#${uid}-${rowIdx}-${fi})`}>
+            <text
+              x={f.cx}
+              y={cellY + ROW_H / 2 - 9}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              class="fname"
+            >
+              {f.name}
+            </text>
+            <text
+              x={f.cx}
+              y={cellY + ROW_H / 2 + 10}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              class="fsize"
+            >
+              {f.label}
+            </text>
+          </g>
+        ))}
+      </g>
+    ))
+  }
+</svg>
+
+<style>
+  .packet {
+    display: block;
+    margin: 20px auto;
+    background: var(--surface);
+    border-radius: 6px;
+    width: auto;
+
+    text {
+      fill: currentColor;
+    }
+  }
+
+  .frame {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+
+  .div-h {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+
+  .div-v {
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+
+  .div-dashed {
+    stroke: var(--border-strong);
+    stroke-dasharray: 4 3;
+  }
+
+  .fname {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+
+  .fsize {
+    font-size: 0.65rem;
+    fill: var(--text-muted);
+  }
+
+  .ruler {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    fill: var(--text-muted);
+  }
+</style>
