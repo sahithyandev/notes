@@ -6,48 +6,43 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:59:21.294Z
+lastUpdatedOn: 2026-06-12T02:12:51.445Z
 ---
 
-A technique for encoding information in a digital square wave by varying the fraction of time the signal is HIGH. The frequency stays fixed. The duty cycle changes.
+PWM encodes a value in a digital square wave by varying the fraction of time the signal is HIGH. Frequency stays fixed. Duty cycle varies.
 
 - Cycle time ($T$)  
-  The total duration of 1 complete period.
-- Duty time ($t_{on}$)  
-  The portion of each cycle during which the signal is HIGH.
+  Total duration of 1 period.
+- On-time ($t_{on}$)  
+  Portion of each cycle the signal is HIGH.
 
 $$
 \text{Duty Cycle} = \frac{t_{on}}{T}
 $$
 
-Here:
-
-- $t_{on}$: duty time — time the signal is HIGH per period
-- $T$: cycle time — total period length
-
-The time-averaged voltage of the signal is:
+The time-averaged voltage:
 
 $$
 \bar{V} = V_{supply} \times \text{Duty Cycle}
 $$
 
-Hardware implementation: an MCU timer increments a counter at a fixed clock rate. A compare register holds the duty cycle value. The output pin goes HIGH when the counter resets and LOW when the counter matches the compare register.
+An MCU timer increments a counter at a fixed clock rate. A compare register holds the duty value. The output goes HIGH at counter reset and LOW at compare match.
 
-Resolution is determined by the counter width: an $n$-bit timer provides $2^n$ duty cycle steps.
+An $n$-bit timer provides $2^n$ duty cycle steps.
 
 Applications:
 
 - Motor speed control  
   Average voltage controls rotational speed.
 - LED brightness  
-  Human eye integrates the flicker; perceived brightness tracks duty cycle.
+  Perceived brightness tracks duty cycle.
 - Servo position  
-  Pulse width (typically 1–2 ms within a 20 ms period) encodes angle.
+  Pulse width (1–2 ms within a 20 ms period) encodes angle.
 - Buzzer tone  
-  PWM frequency sets the audible pitch.
+  PWM frequency sets audible pitch.
 
 ## Simulated Analog Output
 
-PWM can approximate a true analog voltage without a DAC. Passing the PWM signal through a low-pass RC filter removes the switching component, leaving a DC level equal to $\bar{V}$.
+A low-pass RC filter on a PWM signal removes the switching component, leaving a DC level equal to $\bar{V}$.
 
-Filter cutoff must be much lower than the PWM frequency to reduce ripple. A higher PWM frequency reduces ripple for the same filter. Output accuracy is limited by PWM resolution and filter component tolerances.
+Filter cutoff must be far below the PWM frequency. Higher PWM frequency reduces ripple for the same filter. Output accuracy is limited by PWM resolution and filter tolerances.

@@ -166,6 +166,8 @@ A 16-bit counter at 16 MHz with no prescaler overflows every 4 ms and has a 62.5
 
 Prescaler values are usually powers of 2 (1, 2, 4, 8, …, 256) or specific ratios depending on the MCU family.
 
+On PIC Timer0, the PSA (Prescaler Assignment) bit bypasses the prescaler entirely, routing the clock directly to the counter.
+
 ## Postscaler
 
 Sits after the timer's period/compare event, before the interrupt or output signal is asserted. Divides the event output by a ratio $Q$. The interrupt fires only every $Q$-th overflow or compare match.
@@ -179,6 +181,15 @@ Effect: reduces interrupt rate without changing the counter's tick resolution or
 Useful when the required interrupt period is longer than the timer can reach with the prescaler alone, or when the timer period must remain fixed for PWM frequency while the interrupt rate is adjusted independently.
 
 Not all MCU families include a postscaler. PIC microcontrollers expose a 4-bit postscaler on Timer0/Timer2 (1:1 to 1:16). AVR and most ARM Cortex-M timers omit it. The same effect is achieved in software by counting overflows in the ISR.
+
+## Prescaler vs Postscaler
+
+|            | Acts on                 | Effect                                     |
+| ---------- | ----------------------- | ------------------------------------------ |
+| Prescaler  | Input clock signal      | Slows how fast the counter increments      |
+| Postscaler | Counter overflow output | Reduces how often the overflow event fires |
+
+Both are frequency dividers. Combined, they configure the timer's effective period across a wide range without changing the counter's bit width.
 
 ## Common Uses
 
