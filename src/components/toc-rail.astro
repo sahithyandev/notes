@@ -233,30 +233,7 @@ const { headings } = Astro.props;
     background: var(--sem);
   }
 
-  @media (max-width: 47.99rem) {
-    .toc-rail {
-      position: fixed;
-      top: var(--nav-h);
-      right: 0;
-      height: calc(100dvh - var(--nav-h));
-      width: min(280px, 85vw);
-      z-index: 50;
-      transform: translateX(100%);
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
-      padding: 20px 16px 20px 0;
-      overflow-y: auto;
-    }
-
-    html.drawers-ready .toc-rail {
-      transition: transform 0.22s ease;
-    }
-
-    html.toc-open .toc-rail {
-      transform: translateX(0);
-    }
-
+  @media (max-width: 48rem) {
     .toc-trail {
       top: 52px;
       bottom: 20px;

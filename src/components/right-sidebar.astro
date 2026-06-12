@@ -15,4 +15,29 @@
     border-left: 1px solid var(--border);
     position: relative;
   }
+
+  @media (max-width: 48rem) {
+    .right-sidebar {
+      position: fixed;
+      top: var(--nav-h);
+      right: 0;
+      height: calc(100dvh - var(--nav-h));
+      width: min(280px, 85vw);
+      z-index: 50;
+      transform: translateX(100%);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
+      padding: 20px 16px 20px 0;
+      overflow-y: auto;
+    }
+
+    :global(html.drawers-ready) .right-sidebar {
+      transition: transform 0.22s ease;
+    }
+
+    :global(html.toc-open) .right-sidebar {
+      transform: translateX(0);
+    }
+  }
 </style>
