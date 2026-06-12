@@ -88,6 +88,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\titlespacing*{\\subsection}{0pt}{1.8ex plus .2ex}{0.8ex plus .1ex}",
     "\\titlespacing*{\\subsubsection}{0pt}{1.4ex plus .2ex}{0.6ex plus .1ex}",
     "",
+    "\\raggedbottom",
     "\\setlength{\\parindent}{0pt}",
     "\\setlength{\\parskip}{0.6em}",
     "",

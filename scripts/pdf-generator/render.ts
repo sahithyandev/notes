@@ -179,7 +179,9 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
   const { baseDir } = ctx;
   switch (node.type) {
     case "root":
-      return children(node, ctx).join("\n\n");
+      return children(node, ctx)
+        .filter((s) => s.length > 0)
+        .join("\n\n");
 
     case "heading": {
       const cmds = ["", "\\subsection", "\\subsubsection"];
