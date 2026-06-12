@@ -1,0 +1,56 @@
+---
+title: Digital-to-Analog Conversion
+slug: s4/iot/digital-to-analog-conversion
+sidebar:
+  order: 21
+prev: true
+next: true
+dateCreated: 2026-06-07T11:00:00.000Z
+lastUpdatedOn: 2026-06-12T01:59:21.294Z
+---
+
+A DAC converts a digital value back to a proportional output voltage.
+
+$$
+V_{out} = \frac{D}{2^n - 1} \times V_{ref}
+$$
+
+Here:
+
+- $V_{out}$: output voltage
+- $D$: digital input value
+- $n$: resolution in bits
+- $V_{ref}$: reference voltage
+
+Applications: motor speed control, audio signals, variable voltage references.
+
+<Note>
+
+Not all MCUs include a DAC. PWM is commonly used as a substitute — a low-pass filter on a PWM signal approximates an analog voltage.
+
+</Note>
+
+## DAC Types
+
+### Binary-Weighted Resistor DAC
+
+Uses a resistor network where each bit $k$ drives a resistor of value $\frac{R}{2^k}$. Currents from all bits sum at a virtual ground; the output voltage is proportional to the total current.
+
+- Simple circuit
+- Requires resistors spanning a wide range (e.g. $R$ to $R/256$ for 8 bits), making precision difficult for high resolutions
+
+### R-2R Ladder DAC
+
+Uses only two resistor values ($R$ and $2R$) in a ladder network. Each rung adds the contribution of one bit. The ladder is terminated with $2R$ at both ends so every node sees the same impedance.
+
+- Only two resistor values needed regardless of bit depth
+- Easy to fabricate accurately; scales to high resolutions
+- Most common DAC implementation in MCUs and audio hardware
+
+### PWM DAC
+
+A digital PWM signal is passed through a low-pass RC filter. The filter averages the square wave. The output DC voltage equals $V_{supply} \times \text{duty cycle}$.
+
+- No dedicated DAC hardware required
+- Output ripple depends on filter cutoff vs PWM frequency
+- Suitable for motor control, LED dimming; not suitable for audio or precision output

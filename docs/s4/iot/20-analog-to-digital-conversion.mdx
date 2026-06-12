@@ -1,21 +1,19 @@
 ---
-title: Signal Conversion
-slug: s4/iot/signal-conversion
+title: Analog-to-Digital Conversion
+slug: s4/iot/analog-to-digital-conversion
 sidebar:
   order: 20
 prev: true
 next: true
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:43:02.294Z
+lastUpdatedOn: 2026-06-12T01:59:21.292Z
 prereqs:
   - s3/data-communication-and-networking/signals
 ---
 
 MCUs operate on discrete binary values. The physical world produces continuously varying voltages. Signal conversion hardware bridges this gap.
 
-## Analog-to-Digital Conversion
-
-Samples an analog voltage and maps it to a binary integer.
+An ADC samples an analog voltage and maps it to a binary integer.
 
 $$
 D = \left\lfloor \frac{V_\text{in}}{V_\text{ref}} \times (2^n - 1) \right\rfloor
@@ -39,7 +37,7 @@ Key parameters:
 
 Needed because sensors (temperature, pressure, light, sound) produce analog voltages that a digital MCU cannot read directly.
 
-### ADC Types
+## Types
 
 Classified by how conversion is performed:
 
@@ -48,7 +46,7 @@ Classified by how conversion is performed:
 - Serial conversion  
   Bits are resolved 1 at a time (or approximated iteratively) over multiple clock cycles. Lower hardware cost. Slower.
 
-#### Flash ADC
+### Flash ADC
 
 Uses $2^n - 1$ comparators in parallel, each with a different reference voltage from a resistor ladder. All comparators fire simultaneously. A priority encoder converts the thermometer code to binary.
 
@@ -56,7 +54,7 @@ Uses $2^n - 1$ comparators in parallel, each with a different reference voltage 
 - Hardware cost grows exponentially with bit depth
 - Used in oscilloscopes and high-speed RF sampling where speed is critical
 
-#### Counter-Ramp ADC
+### Counter-Ramp ADC
 
 A counter starts at 0 and increments each clock cycle. Its value feeds an internal DAC (typically an R-2R ladder), generating a staircase voltage that rises 1 step per clock. A comparator checks the staircase against $V_{in}$ on every cycle. When the staircase exceeds $V_{in}$, the comparator trips and the counter value is latched as the digital output.
 
@@ -74,7 +72,7 @@ Conversion time varies with $V_{in}$. A near-zero input converts in 1 cycle. Ful
 - Simplest serial ADC design: 1 comparator, 1 counter, 1 DAC
 - Slower than SAR for most inputs. Used in low-cost, low-speed applications.
 
-#### Tracking ADC
+### Tracking ADC
 
 A variant of the counter-ramp ADC. Replaces the reset counter with an up/down counter that continuously follows $V_{in}$.
 
@@ -90,7 +88,7 @@ The counter never resets. The output is always the current counter value, which 
 - Slow for large step changes: must slew ±1 per cycle from the current value to the new level, taking up to $2^n$ cycles in the worst case
 - Unsuitable for multiplexed inputs that switch between unrelated voltages
 
-#### Successive Approximation Register ADC
+### Successive Approximation Register ADC
 
 Uses 1 comparator, 1 internal DAC, and an $n$-bit SAR register. Resolves the output 1 bit per clock cycle via binary search, from MSB to LSB.
 
@@ -108,7 +106,7 @@ After $n$ cycles the SAR register holds the final digital output.
 - Low hardware cost: 1 comparator, 1 DAC, 1 shift register
 - Most common ADC type in MCUs (ATmega, STM32, ESP32 all use SAR ADCs)
 
-#### Dual-Slope ADC
+### Dual-Slope ADC
 
 2-phase operation:
 
@@ -125,15 +123,24 @@ The result depends only on the ratio of times, not on component tolerances. Nois
 - Slow (conversion takes milliseconds)
 - Used in digital multimeters and precision instrumentation
 
-#### Sigma-Delta ADC
+### Sigma-Delta ADC
 
-Oversamples the input at a rate far above the [Nyquist rate](/s3/data-communication-and-networking/signals#nyquist-theorem) (required here), then applies noise shaping and a digital decimation filter to produce a high-resolution output.
+Oversamples the input at a rate far above the [Nyquist rate](/s3/data-communication-and-networking/signals#nyquist-theorem), then applies noise shaping and a digital decimation filter to produce a high-resolution output. Resolution up to 24 bits.
 
-- Resolution up to 24 bits
-- Slow conversion rate (latency proportional to oversampling ratio)
-- Used in audio codecs and precision sensors (load cells, pressure)
+Slow conversion rate (latency proportional to oversampling ratio).
 
-### ADC Implementation in MCUs
+Used in audio codecs and precision sensors (load cells, pressure). Not covered in this module.
+
+### Comparison
+
+| ADC Type                 | Resolution (bits) | Speed       | Cost   |
+| ------------------------ | ----------------- | ----------- | ------ |
+| Flash                    | 4–12              | Very fast   | High   |
+| Successive Approximation | 8–16              | Medium–fast | Low    |
+| Dual-Slope               | 12–18             | Slow        | Medium |
+| Sigma-Delta              | 12–24             | Slow        | Low    |
+
+## Implementation in MCUs
 
 MCUs expose multiple analog input pins but contain only 1 ADC circuit internally. An analog multiplexer (MUX) sits between the input pins and the ADC, connecting exactly 1 pin to the ADC at a time.
 
@@ -157,105 +164,3 @@ The reason for sharing 1 ADC across all channels is silicon area. An ADC contain
 Because channels are sampled sequentially, 2 analog readings taken in different conversion cycles are not simultaneous. Applications requiring phase-accurate multi-channel sampling need an external simultaneous-sampling ADC.
 
 </Note>
-
-### ADC Type Comparison
-
-| ADC Type                 | Resolution (bits) | Speed       | Cost   |
-| ------------------------ | ----------------- | ----------- | ------ |
-| Flash                    | 4–12              | Very fast   | High   |
-| Successive Approximation | 8–16              | Medium–fast | Low    |
-| Dual-Slope               | 12–18             | Slow        | Medium |
-| Sigma-Delta              | 12–24             | Slow        | Low    |
-
-## Digital-to-Analog Conversion
-
-A DAC converts a digital value back to a proportional output voltage.
-
-$$
-V_{out} = \frac{D}{2^n - 1} \times V_{ref}
-$$
-
-Here:
-
-- $V_{out}$: output voltage
-- $D$: digital input value
-- $n$: resolution in bits
-- $V_{ref}$: reference voltage
-
-Applications: motor speed control, audio signals, variable voltage references.
-
-<Note>
-
-Not all MCUs include a DAC. PWM is commonly used as a substitute — a low-pass filter on a PWM signal approximates an analog voltage.
-
-</Note>
-
-### DAC Types
-
-#### Binary-Weighted Resistor DAC
-
-Uses a resistor network where each bit $k$ drives a resistor of value $\frac{R}{2^k}$. Currents from all bits sum at a virtual ground; the output voltage is proportional to the total current.
-
-- Simple circuit
-- Requires resistors spanning a wide range (e.g. $R$ to $R/256$ for 8 bits), making precision difficult for high resolutions
-
-#### R-2R Ladder DAC
-
-Uses only two resistor values ($R$ and $2R$) in a ladder network. Each rung adds the contribution of one bit. The ladder is terminated with $2R$ at both ends so every node sees the same impedance.
-
-- Only two resistor values needed regardless of bit depth
-- Easy to fabricate accurately; scales to high resolutions
-- Most common DAC implementation in MCUs and audio hardware
-
-#### PWM DAC
-
-A digital PWM signal is passed through a low-pass RC filter. The filter averages the square wave. The output DC voltage equals $V_{supply} \times \text{duty cycle}$.
-
-- No dedicated DAC hardware required
-- Output ripple depends on filter cutoff vs PWM frequency
-- Suitable for motor control, LED dimming; not suitable for audio or precision output
-
-## Pulse Width Modulation
-
-A technique for encoding information in a digital square wave by varying the fraction of time the signal is HIGH. The frequency stays fixed. The duty cycle changes.
-
-- Cycle time ($T$)  
-  The total duration of 1 complete period.
-- Duty time ($t_{on}$)  
-  The portion of each cycle during which the signal is HIGH.
-
-$$
-\text{Duty Cycle} = \frac{t_{on}}{T}
-$$
-
-Here:
-
-- $t_{on}$: duty time — time the signal is HIGH per period
-- $T$: cycle time — total period length
-
-The time-averaged voltage of the signal is:
-
-$$
-\bar{V} = V_{supply} \times \text{Duty Cycle}
-$$
-
-Hardware implementation: an MCU timer increments a counter at a fixed clock rate. A compare register holds the duty cycle value. The output pin goes HIGH when the counter resets and LOW when the counter matches the compare register.
-
-Resolution is determined by the counter width: an $n$-bit timer provides $2^n$ duty cycle steps.
-
-Applications:
-
-- Motor speed control  
-  Average voltage controls rotational speed.
-- LED brightness  
-  Human eye integrates the flicker; perceived brightness tracks duty cycle.
-- Servo position  
-  Pulse width (typically 1–2 ms within a 20 ms period) encodes angle.
-- Buzzer tone  
-  PWM frequency sets the audible pitch.
-
-### Simulated Analog Output
-
-PWM can approximate a true analog voltage without a DAC. Passing the PWM signal through a low-pass RC filter removes the switching component, leaving a DC level equal to $\bar{V}$.
-
-Filter cutoff must be much lower than the PWM frequency to reduce ripple. A higher PWM frequency reduces ripple for the same filter. Output accuracy is limited by PWM resolution and filter component tolerances.
