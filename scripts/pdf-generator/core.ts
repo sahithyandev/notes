@@ -7,7 +7,7 @@ import remarkMath from "remark-math";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import { exec } from "node:child_process";
-import type { MdNode } from "./types";
+import { isMdCodeNode, type MdNode } from "./types";
 import { titleize } from "../../src/utils";
 
 const SEMESTER_COLORS: Record<string, string> = {
@@ -182,6 +182,10 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
       return `\\lstinline|${node.value ?? ""}|`;
 
     case "code": {
+      if (!isMdCodeNode(node)) {
+        console.error(node);
+        throw new Error(`'code' block but not MdCodeNode`);
+      }
       const LANG_MAP: Record<string, string> = {
         python: "Python",
         py: "Python",
@@ -306,6 +310,9 @@ const step = (label: string, ms?: number) =>
     `  ${c.dim}›${c.reset}  ${label.padEnd(30)}` +
       (ms !== undefined ? `  ${c.gray}${fmt(ms)}${c.reset}` : ""),
   );
+
+const TEX_OUT_DIR = ".tmp";
+const PDF_OUT_DIR = "pdf-exports";
 
 export async function generateModulePdf(moduleId: string) {
   const parts = moduleId.split("/");
@@ -520,7 +527,7 @@ export async function generateModulePdf(moduleId: string) {
   docLines.push("", "\\end{document}");
 
   const texOutputPath = resolve(
-    ".tmp/tex",
+    TEX_OUT_DIR,
     moduleId.replace("/", "-").concat(".tex"),
   );
   const latexOutputFile = Bun.file(texOutputPath);
@@ -528,12 +535,12 @@ export async function generateModulePdf(moduleId: string) {
   await latexOutputFile.write(docLines.join("\n"));
   step(`write ${texOutputPath}`, performance.now() - tTex);
 
-  await mkdir(".tmp/pdf", { recursive: true });
+  await mkdir(PDF_OUT_DIR, { recursive: true });
 
   const tTectonic = performance.now();
   await new Promise<void>((res, rej) => {
     exec(
-      `tectonic --chatter minimal --outdir .tmp/pdf ${texOutputPath}`,
+      `tectonic --chatter minimal --outdir ${PDF_OUT_DIR} ${texOutputPath}`,
       (error, stdout, stderr) => {
         if (error) {
           console.error(
