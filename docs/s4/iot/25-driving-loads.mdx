@@ -3,7 +3,7 @@ title: Driving Loads
 sidebar:
   order: 25
 dateCreated: 2026-06-11T19:05:16.258Z
-lastUpdatedOn: 2026-06-12T01:59:21.295Z
+lastUpdatedOn: 2026-06-12T06:46:09.150Z
 slug: s4/iot/driving-loads
 prev: true
 next: true
@@ -46,7 +46,7 @@ Low-current LEDs ($2\ \text{mA}$) are preferred in battery-powered IoT devices. 
 
 When $I_f$ exceeds the GPIO current rating, or when driving multiple LEDs, a transistor is placed between the GPIO pin and the LED. The pin drives the transistor base. The transistor supplies current from $V_{CC}$ directly, bypassing the pin's drive limit.
 
-The GPIO pin only sources the small base current $I_B = I_f / h_{FE}$, which is well within pin limits even for high-current LEDs.
+The GPIO pin sources only $I_B = I_f / h_{FE}$, well within pin limits.
 
 ## Driving 7-Segment Displays
 
@@ -59,7 +59,7 @@ A 7-segment display is 7 individual LEDs (segments a–g) arranged to form digit
 - Common anode  
   All segment anodes tied to $V_{CC}$. MCU drives a segment LOW to light it (active-low logic).
 
-### Why One Resistor Per Segment is Required
+### Per-Segment Resistor
 
 Placing a single resistor in the common line (shared by all segments) causes the current through it to change with the number of active segments.
 
@@ -81,9 +81,7 @@ $$
 V_{segment} = V_{CC} - V_R = V_{CC} - n \times I_f \times R
 $$
 
-As $n$ increases, $V_{segment}$ falls. With enough segments active, $V_{segment}$ may drop below $V_f$, turning segments off entirely. Segments that remain on are dimmer than when fewer segments share the resistor.
-
-The digit "8" lights all 7 segments. The digit "1" lights 2. With a shared resistor, "1" is far brighter than "8". Brightness varies with the digit being displayed.
+As $n$ increases, $V_{segment}$ falls. With enough segments active, $V_{segment}$ drops below $V_f$, extinguishing segments entirely.
 
 Each segment gets its own series resistor to fix $I_f$ independently of how many other segments are active.
 
@@ -118,7 +116,7 @@ $$
 f_{refresh} = \frac{1}{N \times t_{slot}} \geq 50\ \text{Hz}
 $$
 
-The scan loop is typically driven from a timer ISR so the main program does not need to manage timing.
+The scan loop runs from a timer ISR.
 
 #### Ghosting
 
@@ -140,9 +138,7 @@ $$
 V_{spike} = -L \frac{\text{d}I}{\text{d}t}
 $$
 
-The spike amplitude depends on inductance $L$ and how fast current is interrupted. A fast transistor switch-off produces a very high $\text{d}I/\text{d}t$, generating a spike that can reach tens or hundreds of volts, well above the MCU's rated supply.
-
-The spike appears on the power rail and on the GPIO pin driving the transistor. Without protection it destroys the driving transistor and can latch up or permanently damage the MCU.
+Spike amplitude depends on $L$ and $\text{d}I/\text{d}t$. A fast switch-off generates spikes of tens to hundreds of volts, above the MCU's rated supply. Without protection, the spike destroys the transistor and can permanently damage the MCU.
 
 ### Flyback Diode
 
@@ -177,9 +173,9 @@ An NPN transistor or N-channel MOSFET is used as the switch. The GPIO pin drives
 
 A DC motor converts electrical energy to rotational motion. Current through the armature winding produces a magnetic field that reacts against the stator field, generating torque.
 
-Speed is proportional to the average voltage applied. PWM controls speed by varying duty cycle. The motor's inertia smooths the switching, so it responds to average voltage rather than the individual pulses.
+Speed is proportional to average voltage. PWM controls speed by varying duty cycle. Motor inertia smooths the switching pulses.
 
-Direction is controlled by reversing current polarity. An H-bridge achieves this with 4 switches arranged so the motor can be connected to the supply in either polarity. The circuit shape resembles the letter H, with the motor forming the crossbar.
+Direction is controlled by reversing current polarity. An H-bridge arranges 4 switches to connect the motor in either supply polarity.
 
 ```
 V_CC ──┬─────────────┬──
@@ -204,7 +200,7 @@ GND ───┴─────────────┴──
 
 #### Shoot-Through
 
-Turning on Q1 and Q2 simultaneously (or Q3 and Q4) connects $V_{CC}$ directly to GND through 2 conducting transistors. This is a short circuit that instantly destroys the switches.
+Turning on Q1 and Q2 simultaneously (or Q3 and Q4) shorts $V_{CC}$ to GND and instantly destroys the switches.
 
 Shoot-through occurs during switching transitions. If Q1 turns on before Q2 fully turns off, both conduct briefly. A dead time (both switches off) is inserted between turning one switch off and the other on. Dead time is typically $100\ \text{ns}$–$1\ \mu\text{s}$ depending on transistor turn-off speed.
 
@@ -273,7 +269,7 @@ A P-only controller reaches a steady-state error proportional to load. Adding th
 
 ### Stepper Motors
 
-A stepper motor moves in discrete angular steps. Each pulse from the driver advances the shaft by a fixed step angle. Position is controlled open-loop. No tachometer or encoder is needed because each step command produces a known, repeatable angular displacement.
+A stepper motor moves in discrete angular steps. Each pulse advances the shaft by a fixed step angle. Position is controlled open-loop with no encoder required.
 
 $$
 \text{Steps per revolution} = \frac{360°}{\theta_{step}}
@@ -342,7 +338,7 @@ $$
 \omega = \theta_{step} \times f_{step}
 $$
 
-Stepping too fast from standstill causes the rotor to miss steps (stall) because inertia prevents it from following the rotating magnetic field. The motor must be accelerated gradually. Step frequency must ramp up from a low starting rate.
+Stepping too fast from standstill stalls the rotor. Step frequency must ramp up from a low starting rate.
 
 <Note>
 
@@ -363,9 +359,7 @@ Structure:
 - Contacts  
   Mechanically linked to the armature. Rated independently of the coil, typically $5\ \text{A}$–$30\ \text{A}$ at $250\ \text{V}$ AC or $30\ \text{V}$ DC. The voltage rating is the maximum voltage the open contacts can block without arcing across the gap. Exceeding it causes the contacts to arc on open, eroding the contact surface and eventually welding them shut.
 
-The coil is an inductive load. When the transistor switches off, the magnetic field collapses and produces a back-EMF spike that can reach tens of volts above $V_{CC}$.
-
-A shunt diode (also called flyback or freewheeling diode) is placed directly across the coil, with its cathode at the coil's positive terminal and anode at GND. Under normal operation the diode is reverse-biased and carries no current. When the transistor switches off and back-EMF reverses the coil voltage, the diode becomes forward-biased and provides a recirculating path for the decaying coil current. The stored magnetic energy dissipates as heat through the coil's own resistance rather than spiking onto the supply rail or the transistor's collector.
+The coil is an inductive load requiring a flyback diode across its terminals. The diode clamps back-EMF on switch-off and dissipates stored energy through the coil's own resistance.
 
 ```
 V_CC ──┬──────────┐
@@ -377,7 +371,7 @@ V_CC ──┬──────────┐
 GND ───┴──────────┘
 ```
 
-The diode must be placed physically close to the coil. A long PCB trace between the coil and the diode has parasitic inductance that allows part of the spike to propagate before the diode clamps it. A fast-recovery or Schottky diode is preferred to clamp the spike quickly.
+Place the diode physically close to the coil. Parasitic inductance in long PCB traces allows the spike to propagate before clamping. A Schottky or fast-recovery diode is preferred.
 
 #### Single Transistor Driver
 
