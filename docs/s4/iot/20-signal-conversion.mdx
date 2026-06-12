@@ -2,11 +2,11 @@
 title: Signal Conversion
 slug: s4/iot/signal-conversion
 sidebar:
-  order: 17
+  order: 20
 prev: true
 next: true
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-06-11T17:47:33.162Z
+lastUpdatedOn: 2026-06-12T01:43:02.294Z
 prereqs:
   - s3/data-communication-and-networking/signals
 ---
@@ -46,19 +46,19 @@ Classified by how conversion is performed:
 - Parallel conversion  
   All bits are determined simultaneously in a single step. Fast. Hardware cost scales exponentially with resolution.
 - Serial conversion  
-  Bits are resolved one at a time (or approximated iteratively) over multiple clock cycles. Lower hardware cost. Slower.
+  Bits are resolved 1 at a time (or approximated iteratively) over multiple clock cycles. Lower hardware cost. Slower.
 
 #### Flash ADC
 
-Uses $2^n - 1$ comparators in parallel, each with a different reference voltage from a resistor ladder. All comparators fire simultaneously; a priority encoder converts the thermometer code to binary.
+Uses $2^n - 1$ comparators in parallel, each with a different reference voltage from a resistor ladder. All comparators fire simultaneously. A priority encoder converts the thermometer code to binary.
 
-- Fastest possible conversion: one clock cycle
+- Fastest possible conversion: 1 clock cycle
 - Hardware cost grows exponentially with bit depth
 - Used in oscilloscopes and high-speed RF sampling where speed is critical
 
 #### Counter-Ramp ADC
 
-A counter starts at 0 and increments each clock cycle. Its value feeds an internal DAC (typically an R-2R ladder), generating a staircase voltage that rises one step per clock. A comparator checks the staircase against $V_{in}$ on every cycle. When the staircase exceeds $V_{in}$, the comparator trips and the counter value is latched as the digital output.
+A counter starts at 0 and increments each clock cycle. Its value feeds an internal DAC (typically an R-2R ladder), generating a staircase voltage that rises 1 step per clock. A comparator checks the staircase against $V_{in}$ on every cycle. When the staircase exceeds $V_{in}$, the comparator trips and the counter value is latched as the digital output.
 
 $$
 T_{conv} = D \times T_{clk}
@@ -68,9 +68,11 @@ Here:
 
 - $D$: digital output value (number of steps to reach $V_{in}$)
 - $T_{clk}$: clock period
-- Conversion time varies with $V_{in}$: a near-zero input converts in 1 cycle; full-scale requires up to $2^n - 1$ cycles
+
+Conversion time varies with $V_{in}$. A near-zero input converts in 1 cycle. Full-scale requires up to $2^n - 1$ cycles.
+
 - Simplest serial ADC design: 1 comparator, 1 counter, 1 DAC
-- Slower than SAR for most inputs; used in low-cost, low-speed applications
+- Slower than SAR for most inputs. Used in low-cost, low-speed applications.
 
 #### Tracking ADC
 
@@ -90,7 +92,7 @@ The counter never resets. The output is always the current counter value, which 
 
 #### Successive Approximation Register ADC
 
-Uses 1 comparator, 1 internal DAC, and an $n$-bit SAR register. Resolves the output one bit per clock cycle via binary search, from MSB to LSB.
+Uses 1 comparator, 1 internal DAC, and an $n$-bit SAR register. Resolves the output 1 bit per clock cycle via binary search, from MSB to LSB.
 
 Conversion sequence for each bit $k$ (starting at $k = n-1$):
 
@@ -108,7 +110,7 @@ After $n$ cycles the SAR register holds the final digital output.
 
 #### Dual-Slope ADC
 
-Two-phase operation:
+2-phase operation:
 
 1. Integrate $V_{in}$ for a fixed time period $T_1$, charging a capacitor.
 2. Discharge the capacitor with a fixed reference voltage $-V_{ref}$; measure the time $T_2$ to reach zero.
@@ -173,7 +175,14 @@ $$
 V_{out} = \frac{D}{2^n - 1} \times V_{ref}
 $$
 
-Needed to drive analog outputs: motor speed control, audio signals, variable voltage references.
+Here:
+
+- $V_{out}$: output voltage
+- $D$: digital input value
+- $n$: resolution in bits
+- $V_{ref}$: reference voltage
+
+Applications: motor speed control, audio signals, variable voltage references.
 
 <Note>
 
@@ -200,7 +209,7 @@ Uses only two resistor values ($R$ and $2R$) in a ladder network. Each rung adds
 
 #### PWM DAC
 
-A digital PWM signal is passed through a low-pass RC filter. The filter averages the square wave; the output DC voltage equals $V_{supply} \times \text{duty cycle}$.
+A digital PWM signal is passed through a low-pass RC filter. The filter averages the square wave. The output DC voltage equals $V_{supply} \times \text{duty cycle}$.
 
 - No dedicated DAC hardware required
 - Output ripple depends on filter cutoff vs PWM frequency
@@ -208,10 +217,12 @@ A digital PWM signal is passed through a low-pass RC filter. The filter averages
 
 ## Pulse Width Modulation
 
-A technique for encoding information in a digital square wave by varying the fraction of time the signal is HIGH. The frequency stays fixed; the duty cycle changes.
+A technique for encoding information in a digital square wave by varying the fraction of time the signal is HIGH. The frequency stays fixed. The duty cycle changes.
 
-- **Cycle time** ($T$): the total duration of one complete period — from the start of one HIGH pulse to the start of the next.
-- **Duty time** ($t_{on}$): the portion of each cycle during which the signal is HIGH.
+- Cycle time ($T$)  
+  The total duration of 1 complete period.
+- Duty time ($t_{on}$)  
+  The portion of each cycle during which the signal is HIGH.
 
 $$
 \text{Duty Cycle} = \frac{t_{on}}{T}
