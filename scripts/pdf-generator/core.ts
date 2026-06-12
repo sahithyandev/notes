@@ -7,7 +7,7 @@ import remarkMath from "remark-math";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import { exec } from "node:child_process";
-import { isMdCodeNode, type MdNode } from "./types";
+import { isMdCodeNode, type MdNode, type MdJsxAttribute } from "./types";
 import { titleize } from "../../src/utils";
 
 const SEMESTER_COLORS: Record<string, string> = {
@@ -90,6 +90,79 @@ function escapeTextForLatex(text: string): string {
       if (c === "^") return "\\textasciicircum{}";
       return `\\${c}`;
     });
+}
+
+function evalJsxAttr(attrs: MdJsxAttribute[], name: string): unknown {
+  const attr = attrs.find((a) => a.name === name);
+  if (!attr) return undefined;
+  const val = attr.value;
+  if (typeof val === "string") return val;
+  if (val?.type === "mdxJsxAttributeValueExpression") {
+    try {
+      return new Function(`return (${val.value})`)();
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+interface PacketField {
+  name: string;
+  size: number;
+  label?: string;
+}
+
+function packetToLatex(node: MdNode): string {
+  const attrs = node.attributes ?? [];
+  const fields = evalJsxAttr(attrs, "fields") as PacketField[] | undefined;
+  const rowWidth = evalJsxAttr(attrs, "width") as number | undefined;
+  const unit = (evalJsxAttr(attrs, "unit") as string | undefined) ?? "bits";
+
+  if (!fields || !Array.isArray(fields)) {
+    return `% <Packet /> [could not parse fields]`;
+  }
+
+  const totalPerRow = rowWidth ?? fields.reduce((s, f) => s + f.size, 0);
+
+  const rows: Array<Array<PacketField & { displaySize: number }>> = [];
+  let currentRow: Array<PacketField & { displaySize: number }> = [];
+  let posInRow = 0;
+  for (const field of fields) {
+    let remaining = field.size;
+    while (remaining > 0) {
+      const used = Math.min(remaining, totalPerRow - posInRow);
+      currentRow.push({ ...field, displaySize: used });
+      posInRow += used;
+      remaining -= used;
+      if (posInRow >= totalPerRow) {
+        rows.push(currentRow);
+        currentRow = [];
+        posInRow = 0;
+      }
+    }
+  }
+  if (currentRow.length > 0) rows.push(currentRow);
+
+  const lines = [
+    `\\begin{center}`,
+    `\\begin{bytefield}[`,
+    `    bitwidth=\\dimexpr\\linewidth/${totalPerRow}\\relax,`,
+    `    bitheight=4\\baselineskip,`,
+    `    boxformatting={\\centering}`,
+    `]{${totalPerRow}}`,
+  ];
+  for (const row of rows) {
+    const rowStr = row
+      .map((f) => {
+        const label = f.label ?? `${f.size} ${unit}`;
+        return `  \\bitbox{${f.displaySize}}{\\textbf{${escapeTextForLatex(f.name)}}\\\\[4pt]{\\small ${escapeTextForLatex(label)}}}`;
+      })
+      .join("\n");
+    lines.push(rowStr + " \\\\");
+  }
+  lines.push(`\\end{bytefield}`, `\\end{center}`);
+  return lines.join("\n");
 }
 
 function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
@@ -270,16 +343,14 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
     // return empty string to avoid breaking table-cell alignment (% comments
     // out the rest of the line, swallowing subsequent & separators).
     case "mdxJsxFlowElement": {
-      const n = node as MdNode & { name?: string };
+      if (node.name === "Packet") return packetToLatex(node);
       const inner = children(node, ctx).join("\n\n");
       return inner
-        ? `% <${n.name}>\n${inner}\n% </${n.name}>`
-        : `% <${n.name} />`;
+        ? `% <${node.name}>\n${inner}\n% </${node.name}>`
+        : `% <${node.name} />`;
     }
-    case "mdxJsxTextElement": {
-      const n = node as MdNode & { name?: string };
+    case "mdxJsxTextElement":
       return children(node, ctx).join("");
-    }
 
     default:
       console.error("default", node);
@@ -364,6 +435,7 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{needspace}",
     "\\usepackage{etoolbox}",
     "\\usepackage[version=4]{mhchem}",
+    "\\usepackage{bytefield}",
     "\\usepackage{float}",
     "\\usepackage{enumitem}",
     "\\usepackage{listings}",
