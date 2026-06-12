@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import { exec } from "node:child_process";
 import { isMdCodeNode, type MdNode, type MdJsxAttribute } from "./types";
 import { titleize } from "../../src/utils";
+import type { PacketField } from "../../src/utils/types";
 
 const SEMESTER_COLORS: Record<string, string> = {
   "1": "3348c8",
@@ -105,12 +106,6 @@ function evalJsxAttr(attrs: MdJsxAttribute[], name: string): unknown {
     }
   }
   return undefined;
-}
-
-interface PacketField {
-  name: string;
-  size: number;
-  label?: string;
 }
 
 function packetToLatex(node: MdNode): string {

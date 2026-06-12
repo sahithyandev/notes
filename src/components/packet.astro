@@ -1,9 +1,5 @@
 ---
-interface Field {
-  name: string;
-  size: number;
-  label?: string;
-}
+import type { PacketField } from "../utils/types";
 
 interface RowField {
   name: string;
@@ -15,14 +11,14 @@ interface RowField {
 }
 
 interface Props {
-  fields: Field[];
+  fields: PacketField[];
   width?: number;
   unit?: string;
 }
 
 const { fields, width, unit = "bits" } = Astro.props;
 
-function computeRows(fields: Field[], rowWidth?: number): RowField[][] {
+function computeRows(fields: PacketField[], rowWidth?: number): RowField[][] {
   if (!rowWidth) {
     let x = 0;
     return [

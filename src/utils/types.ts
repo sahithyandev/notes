@@ -4,3 +4,9 @@ export interface ModuleItem {
   count: number;
   active?: boolean;
 }
+
+export interface PacketField {
+  name: string;
+  size: number;
+  label?: string;
+}
