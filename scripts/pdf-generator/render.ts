@@ -371,9 +371,22 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
     // out the rest of the line, swallowing subsequent & separators).
     case "mdxJsxFlowElement": {
       if (node.name === "Packet") return packetToLatex(node);
+
       const imgPath = ctx.importedImages.get(node.name ?? "");
       if (imgPath) {
-        return `\\begin{center}\n\\includegraphics[max width=\\linewidth]{${imgPath}}\n\\end{center}`;
+        const widthVal = evalJsxAttr(node.attributes ?? [], "width") as
+          | number
+          | undefined;
+        let graphicsOpts: string;
+        if (!widthVal) {
+          graphicsOpts = "max width=\\linewidth";
+        } else if (widthVal < 1) {
+          graphicsOpts = `max width=${widthVal}\\linewidth`;
+        } else {
+          // converting pixel value to bp
+          graphicsOpts = `width=${widthVal * 0.6}bp`;
+        }
+        return `\\begin{center}\n\\includegraphics[${graphicsOpts}]{${imgPath}}\n\\end{center}`;
       }
       const inner = children(node, ctx).join("\n\n");
       return inner
