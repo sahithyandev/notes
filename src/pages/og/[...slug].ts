@@ -1,11 +1,17 @@
 export const prerender = true;
 
 import { getCollection } from "astro:content";
-import { OGImageRoute } from "astro-og-canvas";
+import { OGImageRoute, type OGImageOptions } from "astro-og-canvas";
 import { titleize } from "../../utils/index";
 import { SITE_NAME, SITE_DESCRIPTION } from "../../utils/values";
 
 type RGBColor = [r: number, g: number, b: number];
+
+interface ParsedSlug {
+  semester: string;
+  module: string;
+  submodule?: string;
+}
 
 const LOGO_PATH = "./public/android-chrome-192x192.png";
 const LOGO_SIZE = 192;
@@ -37,7 +43,7 @@ const semesterColors: Record<string, { primary: RGBColor; bg: RGBColor }> = {
 };
 
 // Parse slug to extract semester, module, and submodule
-function parseSlug(slug: string) {
+function parseSlug(slug: string): ParsedSlug {
   const parts = slug.split("/");
   const semester = parts[0]; // e.g., "s2"
   const module = parts[1]; // e.g., "theory-of-electricity"
@@ -49,6 +55,22 @@ function parseSlug(slug: string) {
 function formatModuleInfo(semester: string, module: string) {
   return `Semester ${semester.slice(1)}: ${titleize(module)}`;
 }
+
+const BASE_OG_CONFIG = {
+  format: "JPEG" as const,
+  logo: LOGO_CONFIG,
+  padding: 60,
+  font: {
+    title: {
+      weight: "Bold" as const,
+      size: 90,
+      lineHeight: 1.2,
+    },
+    description: {
+      size: 32,
+    },
+  },
+} as const;
 
 const entries = await getCollection("notes");
 
@@ -96,23 +118,20 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     // Handle default homepage OG image
     if (page.data.slug === "default") {
       return {
+        ...BASE_OG_CONFIG,
         title: SITE_NAME,
         description: SITE_DESCRIPTION,
         bgGradient: [[235, 237, 250]] as RGBColor[],
-        logo: LOGO_CONFIG,
         font: {
           title: {
-            color: [51, 72, 200],
-            weight: "Bold",
-            size: 90,
-            lineHeight: 1.2,
+            ...BASE_OG_CONFIG?.font.title,
+            color: [51, 72, 200] as RGBColor,
           },
           description: {
-            color: [51, 72, 200],
-            size: 32,
+            ...BASE_OG_CONFIG?.font.description,
+            color: [51, 72, 200] as RGBColor,
           },
         },
-        padding: 60,
       };
     }
 
@@ -121,49 +140,37 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       const colors = semesterColors[page.data.slug] || semesterColors.s1;
       const semesterNum = page.data.slug.replace("s", "");
       return {
+        ...BASE_OG_CONFIG,
         title: `Semester ${semesterNum}`,
         description: SITE_DESCRIPTION,
         bgGradient: [colors.bg],
-        logo: LOGO_CONFIG,
         font: {
-          title: {
-            color: colors.primary,
-            weight: "Bold",
-            size: 90,
-            lineHeight: 1.2,
-          },
+          title: { ...BASE_OG_CONFIG.font.title, color: colors.primary },
           description: {
+            ...BASE_OG_CONFIG.font.description,
             color: colors.primary,
-            size: 32,
           },
         },
-        padding: 60,
       };
     }
 
     // Handle note pages
     const { semester, module } = parseSlug(page.data.slug);
-    const colors = semesterColors[semester] || semesterColors.s1; // Default to s1 if not found
+    const colors = semesterColors[semester] || semesterColors.s1;
     const description = formatModuleInfo(semester, module);
 
     return {
+      ...BASE_OG_CONFIG,
       title: page.data.title,
-      description: description,
+      description,
       bgGradient: [colors.bg],
-      logo: LOGO_CONFIG,
       font: {
-        title: {
-          color: colors.primary,
-          weight: "Bold",
-          size: 90,
-          lineHeight: 1.2,
-        },
+        title: { ...BASE_OG_CONFIG.font.title, color: colors.primary },
         description: {
+          ...BASE_OG_CONFIG.font.description,
           color: colors.primary,
-          size: 32,
         },
       },
-      padding: 60,
     };
   },
 });
