@@ -167,16 +167,14 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
       return children(node, ctx).join("\n\n");
 
     case "heading": {
-      if (node.depth === 1) {
-        console.warn(
-          `${c.yellow}warning:${c.reset} h1 found in ${ctx.baseDir}`,
-        );
-      }
       const cmds = ["", "\\subsection", "\\subsubsection"];
       const cmd = cmds[Math.min((node.depth ?? 1) - 1, cmds.length - 1)];
       const headingCtx: RenderCtx = { ...ctx, inHeading: true };
       const headingText = children(node, headingCtx).join("");
       const label = slugifyLabel(headingText);
+      if (node.depth === 1) {
+        throw new Error(`h1 heading found in ${ctx.baseDir}: "${headingText}"`);
+      }
       return `${cmd}{${headingText}}\\label{${label}}`;
     }
 
