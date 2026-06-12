@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { mkdirSync, existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { dirname, resolve, relative, basename } from "node:path";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkMdx from "remark-mdx";
@@ -50,8 +52,34 @@ const mdxParser = unified()
   .use(remarkGfm)
   .use(remarkMdx);
 
+const IMAGE_EXTS = /\.(svg|png|jpe?g|gif|webp|pdf)$/i;
+
+function convertSvgToPdf(svgPath: string, cacheDir: string): string {
+  const pdfName = relative(process.cwd(), svgPath)
+    .replace(/[/\\]/g, "-")
+    .replace(/\.svg$/i, ".pdf");
+  const outDir = resolve(cacheDir, "svg");
+  mkdirSync(outDir, { recursive: true });
+  const outPath = resolve(outDir, pdfName);
+  if (!existsSync(outPath)) {
+    const raw = readFileSync(svgPath, "utf8");
+    const cleaned = raw.replace(/&nbsp;/g, " ");
+    const result = spawnSync("rsvg-convert", ["-f", "pdf", "-o", outPath], {
+      input: cleaned,
+    });
+    if (result.status !== 0) {
+      throw new Error(
+        `rsvg-convert failed for ${svgPath}: ${result.stderr?.toString()}`,
+      );
+    }
+  }
+  return outPath;
+}
+
 interface RenderCtx {
   baseDir: string;
+  importedImages: Map<string, string>;
+  svgCacheDir?: string;
   inTableCell?: boolean;
   inHeading?: boolean;
 }
@@ -271,9 +299,28 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
     }
 
     case "yaml":
-    case "mdxjsEsm":
+      return "";
+
+    case "mdxjsEsm": {
+      const raw = node.value ?? "";
+      const match = raw.match(/^import\s+(\w+)\s+from\s+["']([^"']+)["']/m);
+      if (match && IMAGE_EXTS.test(match[2])) {
+        const absPath = resolve(baseDir, match[2]);
+        const isSvg = /\.svg$/i.test(match[2]);
+        const finalPath =
+          isSvg && ctx.svgCacheDir
+            ? convertSvgToPdf(absPath, ctx.svgCacheDir)
+            : absPath;
+        ctx.importedImages.set(match[1], finalPath);
+      } else {
+        console.warn(`[render] skipping mdxjsEsm: ${raw}`);
+      }
+      return "";
+    }
+
     case "mdxTextExpression":
     case "mdxFlowExpression":
+      console.warn(`[render] skipping ${node.type}: ${node.value}`);
       return "";
 
     case "break":
@@ -289,7 +336,7 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
       const colCount = (headerRow?.children ?? []).length;
       const colWidth = `\\dimexpr(\\linewidth - ${colCount + 1}\\tabcolsep * 2 - ${colCount - 1}\\arrayrulewidth) / ${colCount}\\relax`;
       const colSpec = Array(colCount).fill(`p{${colWidth}}`).join(" | ");
-      const cellCtx: RenderCtx = { baseDir, inTableCell: true };
+      const cellCtx: RenderCtx = { ...ctx, inTableCell: true };
 
       const renderRow = (row: MdNode) =>
         (row.children ?? [])
@@ -324,13 +371,22 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
     // out the rest of the line, swallowing subsequent & separators).
     case "mdxJsxFlowElement": {
       if (node.name === "Packet") return packetToLatex(node);
+      const imgPath = ctx.importedImages.get(node.name ?? "");
+      if (imgPath) {
+        return `\\begin{center}\n\\includegraphics[max width=\\linewidth]{${imgPath}}\n\\end{center}`;
+      }
       const inner = children(node, ctx).join("\n\n");
       return inner
         ? `% <${node.name}>\n${inner}\n% </${node.name}>`
         : `% <${node.name} />`;
     }
-    case "mdxJsxTextElement":
+    case "mdxJsxTextElement": {
+      const imgPath = ctx.importedImages.get(node.name ?? "");
+      if (imgPath) {
+        return `\\includegraphics[max width=\\linewidth]{${imgPath}}`;
+      }
       return children(node, ctx).join("");
+    }
 
     default:
       console.error("default", node);
@@ -338,10 +394,17 @@ function mdNodetoLatex(node: MdNode, ctx: RenderCtx): string {
   }
 }
 
-export async function compileMdxFile(filePath: string) {
+export async function compileMdxFile(filePath: string, svgCacheDir?: string) {
   const content = await readFile(filePath);
   const tree = mdxParser.parse(content) as MdNode;
   const yamlNode = (tree.children ?? []).find((n) => n.type === "yaml");
   const title = yamlNode?.value?.match(/^title:\s*(.+)$/m)?.[1]?.trim();
-  return { latex: mdNodetoLatex(tree, { baseDir: dirname(filePath) }), title };
+  return {
+    latex: mdNodetoLatex(tree, {
+      baseDir: dirname(filePath),
+      importedImages: new Map(),
+      svgCacheDir,
+    }),
+    title,
+  };
 }

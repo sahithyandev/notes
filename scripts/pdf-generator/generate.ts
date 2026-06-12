@@ -211,7 +211,10 @@ export async function generateModulePdf(moduleId: string) {
       .slice(1)
       .join(" ");
 
-    const { latex, title } = await compileMdxFile(resolve(modulePath, file));
+    const { latex, title } = await compileMdxFile(
+      resolve(modulePath, file),
+      TEX_OUT_DIR,
+    );
 
     if (lastNote !== noteName) {
       const rawName = title ?? titleize(noteName);
