@@ -19,6 +19,12 @@ const SEMESTER_COLORS: Record<string, string> = {
 const TEX_OUT_DIR = ".tmp";
 const PDF_OUT_DIR = "pdf-exports";
 
+const AUTHOR_BIO =
+  "Sahithyan Kandathasan is a Computer Science \\& Engineering student at the University of Moratuwa. More at \\href{https://sahithyan.dev}{sahithyan.dev}.";
+
+const NOTES_DESCRIPTION =
+  "These notes started as a personal study tool and are now publicly available at \\texttt{notes.sahithyan.dev}. Each module is compiled from lectures, textbooks, and problem sets with the goal of being concise and exam-ready.";
+
 export async function generateModulePdf(moduleId: string) {
   const parts = moduleId.split("/");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
@@ -172,10 +178,10 @@ export async function generateModulePdf(moduleId: string) {
     "",
     "\\thispagestyle{empty}",
     "\\vspace*{2cm}",
-    "{\\Large\\bfseries About the Author}\\\\[0.5cm]",
-    "\\noindent I am Sahithyan Kandathasan, a Computer Science \\& Engineering student at the University of Moratuwa, Sri Lanka. Alongside my studies, I build software and write, driven by a belief that understanding something well enough to explain it clearly is the deepest form of learning. More of my work can be found at \\href{https://sahithyan.dev}{sahithyan.dev}.",
+    "{\\Large\\bfseries About Me}\\\\[0.5cm]",
+    `\\noindent ${AUTHOR_BIO}`,
     "\\\\[0.5cm]",
-    "\\noindent These notes began as a personal study tool and grew into a structured resource I share publicly at \\texttt{notes.sahithyan.dev}. Each module is distilled from lectures, textbooks, and problem sets into a form that is direct and exam-ready, written to be the companion I wished I had when sitting down to revise.",
+    `\\noindent ${NOTES_DESCRIPTION}`,
     "\\newpage",
     "",
     "\\tableofcontents",
