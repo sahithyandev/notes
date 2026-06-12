@@ -43,6 +43,9 @@ function generateBreadcrumb(
     // Handle the final note (current page)
     else if (index === parts.length - 1) {
       label = pageTitle ?? titleize(part);
+      if (label.startsWith("Introduction to ")) {
+        label = label.slice("Introduction to ".length);
+      }
       // No href for current page
     }
 
