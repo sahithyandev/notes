@@ -1,7 +1,7 @@
 export const prerender = true;
 
 import { getCollection } from "astro:content";
-import { OGImageRoute, type OGImageOptions } from "astro-og-canvas";
+import { OGImageRoute } from "astro-og-canvas";
 import { titleize } from "../../utils/index";
 import { SITE_NAME, SITE_DESCRIPTION } from "../../utils/values";
 
@@ -82,7 +82,7 @@ const pages: Record<
 > = {};
 
 // Add default entry for homepage
-pages["default"] = {
+pages["default.jpg"] = {
   data: {
     title: SITE_NAME,
     slug: "default",
@@ -97,12 +97,12 @@ for (const entry of entries) {
   if (!slug || slug.endsWith("summary")) {
     continue;
   }
-  pages[slug] = { data };
+  pages[`${slug}.jpg`] = { data };
   semesters.add(slug.split("/")[0]);
 }
 
 for (const semester of semesters) {
-  pages[`sem-${semester.slice(1)}`] = {
+  pages[`sem-${semester.slice(1)}.jpg`] = {
     data: {
       title: `Semester ${semester.slice(1)}`,
       slug: semester,
@@ -113,7 +113,7 @@ for (const semester of semesters) {
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
   param: "slug",
-  getSlug: (path) => path,
+  getSlug: (path) => path.replace(/\.jpe?g$/i, "").concat(".jpg"),
   getImageOptions: (_path, page: (typeof pages)[number]) => {
     // Handle default homepage OG image
     if (page.data.slug === "default") {
