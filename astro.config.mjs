@@ -135,6 +135,8 @@ function buildModuleRedirects() {
 // https://astro.build/config
 export default defineConfig({
   output: "server",
+  // ponytail: v7 changed default to 'jsx'; preserve v6 whitespace behavior
+  compressHTML: true,
   redirects: buildModuleRedirects(),
   integrations: [
     mdx({
@@ -157,6 +159,8 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     build: {
+      // ponytail: lightningcss fails with Tailwind v4 CSS under Vite 8/rolldown; esbuild works fine
+      cssMinify: "esbuild",
       rollupOptions: {
         external: ["/pagefind/pagefind.js"],
       },
