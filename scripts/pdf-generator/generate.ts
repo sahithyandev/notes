@@ -62,16 +62,14 @@ export async function generateModulePdf(moduleId: string) {
   const docLines = [
     "\\documentclass{book}",
     "\\usepackage[a4paper,top=0.5in,bottom=0.5in,left=0.55in,right=0.55in]{geometry}",
+    "\\usepackage{fontspec}",
     "\\usepackage{amsmath, amssymb}",
     "\\usepackage[colorlinks=true]{hyperref}",
     "\\usepackage{graphicx}",
     "\\usepackage[export]{adjustbox}",
     "\\usepackage{centernot}",
-    "\\usepackage{amsmath}",
     "\\usepackage{xcolor}",
     "\\usepackage{tikz}",
-    "\\usepackage{lmodern}",
-    "\\usepackage[T1]{fontenc}",
     "\\usepackage{needspace}",
     "\\usepackage{etoolbox}",
     "\\usepackage[version=4]{mhchem}",
@@ -79,7 +77,6 @@ export async function generateModulePdf(moduleId: string) {
     "\\usepackage{float}",
     "\\usepackage{enumitem}",
     "\\usepackage{listings}",
-    "\\usepackage{inconsolata}",
     "\\usepackage{titlesec}",
     "\\usepackage{tocloft}",
     "\\setlength{\\cftbeforechapskip}{4pt}",
@@ -142,7 +139,7 @@ export async function generateModulePdf(moduleId: string) {
 
   docLines.push(`\\definecolor{semaccent}{HTML}{${semColor}}`);
   docLines.push(
-    "\\hypersetup{linkcolor=semaccent,urlcolor=semaccent,citecolor=semaccent}",
+    `\\hypersetup{linkcolor=semaccent,urlcolor=semaccent,citecolor=semaccent,pdftitle={${moduleName} Notes},pdfauthor={Sahithyan Kandathasan},pdfsubject={Semester ${semesterNumber} Notes},pdflang={en-US}}`,
   );
   docLines.push("\\begin{document}");
   docLines.push(
