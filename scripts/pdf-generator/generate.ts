@@ -61,7 +61,7 @@ export async function generateModulePdf(moduleId: string) {
 
   const docLines = [
     "\\documentclass{book}",
-    "\\usepackage[paperwidth=6in,paperheight=9in,top=0.5in,bottom=0.5in,left=0.55in,right=0.55in]{geometry}",
+    "\\usepackage[a4paper,top=0.5in,bottom=0.5in,left=0.55in,right=0.55in]{geometry}",
     "\\usepackage{amsmath, amssymb}",
     "\\usepackage[colorlinks=true]{hyperref}",
     "\\usepackage{graphicx}",
