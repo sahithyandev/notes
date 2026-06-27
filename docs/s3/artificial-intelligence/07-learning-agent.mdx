@@ -6,23 +6,48 @@ slug: s3/artificial-intelligence/learning-agent
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.684Z
-lastUpdatedOn: 2026-04-24T03:19:45.158Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
-An improvement over "agent"s. Learns from its experiences.
+An improvement over basic agents. Learns from its experiences to improve future behavior.
+
+## Components
 
 ### Performance element
 
-Takes in percepts and decides on actions. What is meant by "agent" until now.
+Takes in percepts and decides on actions. Corresponds to what was called "the agent" in prior models.
 
 ### Critic
 
-Evaluates how the agent is performing and gives feedback.
+Evaluates how the agent is performing against the performance standard and produces feedback signals.
 
 ### Learning element
 
-Takes feedback from the critic and modifies the performance element to do better in the future.
+Takes feedback from the critic and modifies the performance element to improve future decisions.
 
 ### Problem generator
 
-Suggests exploratory actions leading to new and informative experiences. These actions may be suboptimal, but will lead to the discovery of better actions. Learn through mistakes.
+Suggests exploratory actions that lead to new and informative experiences. These actions may be suboptimal in the short term but yield better overall knowledge.
+
+## Component Interaction
+
+```
+Percepts → Performance Element → Actions
+               ↑                    ↓
+         Learning Element      Environment
+               ↑                    ↓
+            Critic ← ← ← ← ← ← Feedback
+               ↑
+        Problem Generator
+```
+
+The critic judges action quality against the performance measure. The learning element updates the performance element accordingly. The problem generator injects exploration to avoid local optima.
+
+## Exploration vs. Exploitation
+
+- Exploitation  
+  Use current knowledge to take the best-known action. Maximizes short-term performance.
+- Exploration  
+  Try new actions to gather information. May reduce short-term performance but improves long-term knowledge.
+
+The problem generator drives exploration. Balancing the 2 is a central challenge in reinforcement learning.

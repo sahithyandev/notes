@@ -6,13 +6,41 @@ slug: s3/differential-equations/inverse-fourier-transform
 prev: true
 next: false
 dateCreated: 2026-04-22T07:09:10.702Z
-lastUpdatedOn: 2026-05-10T07:10:02.685Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
 Used to recover original function from its Fourier transform.
 
 $$
-f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(\omega)e^{i\omega t}d\omega
+f(t) = \frac{1}{2\pi} \int_{-\infty}^{\infty} F(\omega) e^{i\omega t} \, \text{d}\omega
 $$
 
 Provided that the integral converges.
+
+## Convergence Conditions
+
+The inverse Fourier transform exists when $F(\omega)$ is absolutely integrable:
+
+$$
+\int_{-\infty}^{\infty} |F(\omega)| \, \text{d}\omega < \infty
+$$
+
+## Properties
+
+- Linearity  
+  $\mathcal{F}^{-1}\{aF(\omega) + bG(\omega)\} = af(t) + bg(t)$
+- Time shift  
+  $\mathcal{F}^{-1}\{F(\omega) e^{-i\omega t_0}\} = f(t - t_0)$
+- Frequency shift  
+  $\mathcal{F}^{-1}\{F(\omega - \omega_0)\} = e^{i\omega_0 t} f(t)$
+- Duality  
+  $\mathcal{F}^{-1}\{F(t)\} = \frac{1}{2\pi} f(-\omega)$
+
+## Comparison with Inverse Laplace Transform
+
+| Property    | Inverse Fourier                 | Inverse Laplace                               |
+| ----------- | ------------------------------- | --------------------------------------------- | --- | ----------- |
+| Integration | Along the real $\omega$-axis    | Along a vertical line $\text{Re}(s) = c$      |
+| Domain      | Bilateral (all $t$)             | Unilateral ($t \geq 0$)                       |
+| Convergence | Requires absolute integrability | Requires $F(s)$ to decay as $                 | s   | \to \infty$ |
+| Typical use | Signal analysis, filters        | System response, ODEs with initial conditions |

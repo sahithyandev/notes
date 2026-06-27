@@ -6,13 +6,70 @@ slug: s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.592Z
-lastUpdatedOn: 2026-06-01T03:58:53.187Z
+lastUpdatedOn: 2026-06-27T08:46:52.685Z
 ---
 
-Suppose $f$ is defined on $R = [a,b] \times [c,d]$ such that $\forall x \in [a,b]$, $\int_c^d f(x,y)\,\text{d}y$ exists.
+An iterated integral evaluates a double integral one variable at a time.
+
+For $f$ defined on $R = [a,b] \times [c,d]$:
 
 $$
 \int_a^b \int_c^d f(x,y)\;\text{d}y\,\text{d}x
 $$
 
-The inner integral is first solved, assuming $x$ as a constant, which results in a function of $x$.
+The inner integral is computed first, treating $x$ as a constant. The result is a function of $x$ alone.
+
+## Fubini's Theorem
+
+If $f$ is continuous on $R = [a,b] \times [c,d]$, then:
+
+$$
+\iint_R f(x,y)\,\text{d}A
+= \int_a^b \int_c^d f(x,y)\;\text{d}y\,\text{d}x
+= \int_c^d \int_a^b f(x,y)\;\text{d}x\,\text{d}y
+$$
+
+The order of integration can be swapped freely.
+
+<Note>
+
+Continuity is sufficient but not necessary. The theorem holds for any bounded $f$ that is integrable on $R$ (i.e., continuous except on a set of measure zero).
+
+</Note>
+
+## Order Reversal
+
+For non-rectangular regions, limits depend on variables. Swapping integration order requires re-expressing the region's bounds.
+
+For the region $\{(x, y) : a \leq x \leq b,\; g_1(x) \leq y \leq g_2(x)\}$:
+
+1. Find the full range of $y$: $c \leq y \leq d$.
+2. For fixed $y$, find the range of $x$: $h_1(y) \leq x \leq h_2(y)$.
+3. Rewrite: $\displaystyle\int_c^d \int_{h_1(y)}^{h_2(y)} f(x,y)\;\text{d}x\,\text{d}y$.
+
+For the triangular region $\{0 \leq y \leq 1,\; y \leq x \leq 1\}$:
+
+$$
+\int_0^1 \int_y^1 f(x,y)\;\text{d}x\,\text{d}y
+= \int_0^1 \int_0^x f(x,y)\;\text{d}y\,\text{d}x
+$$
+
+Both integrals cover the triangle $\{0 \leq x \leq 1,\; 0 \leq y \leq x\}$.
+
+## Example
+
+$$
+\int_0^1 \int_0^x y\;\text{d}y\,\text{d}x
+$$
+
+Inner integral:
+
+$$
+\int_0^x y\;\text{d}y = \left[\frac{y^2}{2}\right]_0^x = \frac{x^2}{2}
+$$
+
+Outer integral:
+
+$$
+\int_0^1 \frac{x^2}{2}\;\text{d}x = \left[\frac{x^3}{6}\right]_0^1 = \frac{1}{6}
+$$

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/transaction
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.697Z
-lastUpdatedOn: 2026-06-01T03:58:53.202Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
 A logical unit of work that performs one or more database operations (reads/writes). Ensures [ACID properties](/s3/database-systems/basics/introduction/#acid-properties). Consistency might be temporarily lost while a transaction is running. Multiple transactions can run in parallel.
@@ -22,3 +22,36 @@ A logical unit of work that performs one or more database operations (reads/writ
 | Committed           | Completed successfully.                           | -                           |
 
 If the failure is temporary, can retry.
+
+## SQL Commands
+
+```sql
+BEGIN;                    -- start a transaction
+-- ... operations ...
+COMMIT;                   -- persist all changes
+ROLLBACK;                 -- undo all changes since BEGIN
+SAVEPOINT sp1;            -- set a named savepoint
+ROLLBACK TO SAVEPOINT sp1;-- rollback to savepoint only
+```
+
+## Concurrency Anomalies
+
+Problems that arise when multiple transactions run concurrently without proper isolation.
+
+- Dirty Read  
+  Transaction reads uncommitted data written by another transaction. Data may later be rolled back.
+- Non-Repeatable Read  
+  Transaction reads the same row twice and gets different values because another transaction modified and committed that row in between.
+- Phantom Read  
+  Transaction re-executes a query and gets a different set of rows because another transaction inserted or deleted rows in between.
+
+## Isolation Levels
+
+Higher isolation prevents more anomalies at the cost of reduced concurrency.
+
+| Isolation Level  | Dirty Read | Non-Repeatable Read | Phantom Read |
+| ---------------- | ---------- | ------------------- | ------------ |
+| Read Uncommitted | possible   | possible            | possible     |
+| Read Committed   | prevented  | possible            | possible     |
+| Repeatable Read  | prevented  | prevented           | possible     |
+| Serializable     | prevented  | prevented           | prevented    |

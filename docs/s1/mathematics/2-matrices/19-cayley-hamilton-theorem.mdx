@@ -6,13 +6,36 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.560Z
-lastUpdatedOn: 2026-06-01T03:58:53.142Z
+lastUpdatedOn: 2026-06-27T08:46:52.682Z
 ---
 
-If $p(\lambda)$ is the characteristic polynomial of the matrix $A_{n\times n}$,
-then $p(A)=O$
+If $p(\lambda)$ is the characteristic polynomial of $A_{n\times n}$, then $p(A)=O$.
+
+Every matrix satisfies its own characteristic equation.
 
 ## Uses
 
-- Easily compute the inverse of a matrix
-- Easily express higher powers of a matrix in terms of its lower powers
+- Compute the inverse of a matrix without row reduction.
+- Express higher powers of a matrix in terms of lower powers.
+
+## Example
+
+Let $A = \begin{pmatrix}1 & 1 \\ 0 & 2\end{pmatrix}$.
+
+Characteristic polynomial: $p(\lambda) = \lambda^2 - 3\lambda + 2$.
+
+By Cayley-Hamilton: $A^2 - 3A + 2I = O$.
+
+Computing $A^{-1}$: multiply through by $A^{-1}$:
+
+$$
+A - 3I + 2A^{-1} = O \implies A^{-1} = \frac{3I - A}{2}
+$$
+
+Computing $A^3$: from $A^2 = 3A - 2I$, multiply by $A$:
+
+$$
+A^3 = 3A^2 - 2A = 3(3A-2I) - 2A = 7A - 6I
+$$
+
+Each higher power reduces to a linear combination of $A$ and $I$.

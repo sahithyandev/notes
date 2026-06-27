@@ -6,7 +6,7 @@ slug: s3/applied-statistics/continuous-distributions
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.679Z
-lastUpdatedOn: 2026-05-10T07:10:02.677Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
 ## Normal Distribution
@@ -14,21 +14,35 @@ lastUpdatedOn: 2026-05-10T07:10:02.677Z
 Denoted by $N(\mu, \sigma^2)$.
 
 $$
-P(x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
 $$
 
-Kurtosis is 3.
+Properties:
 
-### Cumulative Distribution Function
+- Symmetric about $\mu$
+- Kurtosis is 3
+- CDF has a sigmoid (S-shaped) curve; no closed form; use tables or software
 
-Shows a dragged S shape.
+### When to Use
+
+Applies when the Central Limit Theorem (CLT) holds: sample means from any distribution with finite variance approach normality as $n \to \infty$. Rule of thumb: $n \geq 30$.
 
 ## Standard Normal Distribution
 
-Denoted by $N(0, 1)$. $z$ is used to denote that it is a standard normal distribution.
+Denoted by $N(0, 1)$. Variable is written as $z$.
 
 $$
-P(z) = \frac{1}{\sqrt{2\pi}} \exp\left(-\frac{z^2}{2}\right)
+\phi(z) = \frac{1}{\sqrt{2\pi}} \exp\left(-\frac{z^2}{2}\right)
 $$
+
+### Standardization
+
+Any $X \sim N(\mu, \sigma^2)$ can be converted to $z$:
+
+$$
+z = \frac{x - \mu}{\sigma}
+$$
+
+Standardization enables use of a single $z$-table for all normal distributions.
 
 Other continuous distributions are explained in separate pages, in detail.

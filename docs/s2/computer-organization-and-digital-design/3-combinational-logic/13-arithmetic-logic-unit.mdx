@@ -5,20 +5,50 @@ sidebar:
 slug: >-
   s2/computer-organization-and-digital-design/combinational-logic/arithmetic-logic-unit
 prev: true
-next: true
+next: false
 dateCreated: 2026-04-22T07:07:02.583Z
-lastUpdatedOn: 2026-06-01T03:58:53.170Z
+lastUpdatedOn: 2026-06-27T08:46:52.685Z
 ---
 
-A component inside a CPU. Does arithmetic and logical operations. Combines
-various arithmetic and logical operations into a single unit. Performs only one
-operation at a time. Takes in 3 inputs: 2 operators and a flag. The flag input
-determines the operation. Multiplexers are used to select between different
-circuits to perform different operations.
+A combinational circuit inside a CPU that performs arithmetic and logical operations. Takes 2 operands and a function-select input; outputs 1 result. Multiplexers select between operation circuits based on the function-select input.
 
-### Overflow
+## Supported Operations
 
-- Happens when result > range of bits
-- Detected when:
-  - Two positives → negative result
-  - Two negatives → positive result
+Arithmetic:
+
+- ADD, SUB (via adder-subtractor)
+- INC, DEC
+- NEG (two's complement negation)
+
+Logical:
+
+- AND, OR, NOT, XOR
+- NAND, NOR
+
+Shift:
+
+- SHL, SHR (logical shift left/right)
+- SAR (arithmetic shift right, sign-extends)
+- ROL, ROR (rotate)
+
+## Flags Register
+
+The ALU sets status flags alongside each result:
+
+- Zero (Z)  
+  Set when result = 0.
+- Carry (C)  
+  Set on unsigned overflow (carry out of MSB).
+- Overflow (V)  
+  Set on signed overflow.
+- Sign (N)  
+  Set when result is negative (MSB = 1).
+
+## Overflow Detection
+
+Overflow occurs when the result falls outside the representable range.
+
+Detected when:
+
+- 2 positive operands produce a negative result
+- 2 negative operands produce a positive result

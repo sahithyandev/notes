@@ -6,7 +6,7 @@ slug: s3/applied-statistics/f-distribution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.681Z
-lastUpdatedOn: 2026-05-10T07:10:02.678Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
 Suppose 2 independent populations (of sizes $N_1$ and $N_2$) are given. And samples of sizes $n_1$ and $n_2$ are taken from each population.
@@ -17,18 +17,34 @@ $$
 F = \cfrac{ \chi_1^2 / \nu_1 }{ \chi_2^2 / \nu_2 }  = \frac{ s_1^2 }{ s_2^2 }\cdot \frac{\sigma_1 ^2}{\sigma_2 ^2}
 $$
 
-### Uses
-
-- To compare variance of 2 different independent samples
-
 ## Properties
 
 ### Degrees of Freedom
 
-If sample size is $n$, then the degrees of freedom for the F distribution are $n_1 - 1$ and $n_2 - 1$.
+Degrees of freedom are $\nu_1 = n_1 - 1$ and $\nu_2 = n_2 - 1$.
 
-### F
+### F Reciprocal
 
 $$
 F_{\nu_1, \nu_2, \alpha} = \frac{1}{F_{\nu_2, \nu_1, 1 - \alpha}}
 $$
+
+## Uses
+
+- Variance comparison: test whether 2 populations have equal variance
+- ANOVA: test whether means of 3 or more groups are equal (ratio of between-group to within-group variance)
+- Regression F-test: test whether the regression model as a whole explains a significant portion of variance in the response
+
+## Hypothesis Test for Equal Variance
+
+$H_0$: $\sigma_1^2 = \sigma_2^2$
+
+Test statistic:
+
+$$
+F = \frac{s_1^2}{s_2^2}
+$$
+
+Under $H_0$, $F \sim F(\nu_1, \nu_2)$.
+
+Reject $H_0$ if $F > F_{\nu_1, \nu_2, \alpha}$ (right-tail) or compare against both tails for a 2-tailed test. Critical values are read from the F-table for the given $\nu_1$, $\nu_2$, and significance level $\alpha$.

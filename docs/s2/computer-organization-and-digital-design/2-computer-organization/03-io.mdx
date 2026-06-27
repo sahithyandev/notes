@@ -4,36 +4,58 @@ sidebar:
   order: 3
 slug: s2/computer-organization-and-digital-design/computer-organization/io
 prev: true
-next: true
+next: false
 dateCreated: 2026-04-22T07:07:02.585Z
-lastUpdatedOn: 2026-06-01T03:58:53.167Z
+lastUpdatedOn: 2026-06-27T08:46:52.685Z
 ---
 
-Consists of input devices and output devices.
+Consists of input devices and output devices connected to the CPU and memory via an I/O bus.
 
-## Techniques
+## I/O Addressing
+
+### Memory-Mapped I/O
+
+I/O device registers occupy addresses in the same address space as main memory. The CPU accesses them with ordinary load/store instructions.
+
+- No special I/O instructions needed.
+- Part of the memory address space is reserved for devices.
+- Used in most RISC architectures (ARM, MIPS).
+
+### Port-Mapped I/O
+
+I/O devices have a separate address space from memory. The CPU uses dedicated I/O instructions (`IN`, `OUT` on x86).
+
+- Full memory address space remains available for RAM.
+- Requires hardware support to distinguish I/O cycles from memory cycles.
+
+## Transfer Techniques
 
 ### Programmed I/O
 
-- CPU has direct control over I/O
-  - Continuously sense status – Poll
-  - Read/write commands
-  - Transferring data
-- CPU waits for I/O module to complete operation
-- Wastes CPU time
+CPU has direct control over I/O. Continuously polls the device status register until the device is ready (busy-waiting). Wastes CPU cycles.
 
-### Interrupt Driven I/O
+### Interrupt-Driven I/O
 
-CPU does its own work without waiting. When I/O device is ready, interrupts CPU.
+CPU issues an I/O command and continues other work. The device interrupts the CPU when ready.
 
 Steps:
 
-- CPU issues read command
-- I/O module gets data from peripheral whilst CPU does other work
-- I/O module interrupts CPU
-- CPU requests data
-- I/O module transfers data
+1. CPU issues read command.
+2. I/O module fetches data from peripheral while CPU executes other instructions.
+3. I/O module raises an interrupt.
+4. CPU suspends current task, reads data from I/O module.
+5. CPU resumes.
 
 ### Direct Memory Access (DMA)
 
-DMA transfers data directly to/from memory without CPU intervention.
+A DMA controller transfers data directly between an I/O device and main memory, bypassing the CPU for each byte.
+
+The CPU only initiates and finalises the transfer; the DMA controller handles the data movement.
+
+#### Cycle Stealing
+
+The DMA controller takes 1 bus cycle at a time from the CPU to transfer 1 word. The CPU is stalled for that cycle but resumes immediately after. CPU and DMA interleave memory accesses without a full processor handoff.
+
+#### Burst Mode
+
+The DMA controller holds the bus for the entire block transfer. CPU is halted for the duration. Faster throughput but longer CPU stall.

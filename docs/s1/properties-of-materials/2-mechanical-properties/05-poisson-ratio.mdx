@@ -6,20 +6,41 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.579Z
-lastUpdatedOn: 2026-06-01T03:58:53.162Z
+lastUpdatedOn: 2026-06-27T08:46:52.683Z
 ---
 
-A tensile stress in a particular direction causes extension (say $\epsilon_z$)
-in that direction and contraction in other two directions ($\epsilon_x$ and
-$\epsilon_y$). For isotropic materials:
+A tensile stress in a particular direction causes extension ($\epsilon_z$) in that direction and contraction in the other 2 directions ($\epsilon_x$, $\epsilon_y$). For isotropic materials:
 
 $$
-v=-\frac{\epsilon_x}{\epsilon_z}=-\frac{\epsilon_y}{\epsilon_z}
+\nu = -\frac{\epsilon_x}{\epsilon_z} = -\frac{\epsilon_y}{\epsilon_z}
 $$
 
-For metals (if not given) can be taken as $v=0.34$. Rubber's poisson's ratio is
-$0.5$ which is the maximum possible value, mathematically.
+For metals, $\nu = 0.34$ if not given. Maximum possible value is $\nu = 0.5$.
 
-## Isotropic materials
+## Isotropic Materials
 
-Homogenous materials. $\epsilon_x=\epsilon_y$.
+Homogeneous materials where properties are direction-independent. $\epsilon_x = \epsilon_y$ under uniaxial stress.
+
+## Relation to Elastic Moduli
+
+$$
+G = \frac{E}{2(1+\nu)} \qquad K = \frac{E}{3(1-2\nu)}
+$$
+
+Here:
+
+- $G$: shear modulus
+- $K$: bulk modulus
+- $E$: Young's modulus
+
+## Biaxial Stress State
+
+When stresses $\sigma_x$ and $\sigma_y$ both act in the $xy$-plane, the strain in $z$ is:
+
+$$
+\epsilon_z = -\frac{\nu}{E}(\sigma_x + \sigma_y)
+$$
+
+## Why Rubber has $\nu = 0.5$
+
+Rubber is nearly incompressible: volume does not change under stress. Volume conservation requires $\nu = 0.5$ exactly. From the bulk modulus relation, $K \to \infty$ as $\nu \to 0.5$, which corresponds to a perfectly incompressible material.

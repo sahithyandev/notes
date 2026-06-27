@@ -6,27 +6,42 @@ slug: s4/computer-networks/internetworking
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.621Z
-lastUpdatedOn: 2026-06-05T16:39:48.485Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
-Internetworking connects different networks that may use different technologies.
+Internetworking connects heterogeneous networks that may use different technologies, protocols, and addressing schemes.
 
-Challenging because:
+Challenges:
 
-- Different protocols
-- Different addressing schemes
-- Different packet sizes
-- Security differences
+- Different protocols and frame formats
+- Different addressing schemes (IP vs MAC vs others)
+- Different MTUs (Maximum Transmission Units)
+- Security policy mismatches
 - QoS differences
 
 ## Interconnection Methods
 
-Networks can be interconnected at different OSI layers.
+Networks are interconnected at different OSI layers. Higher-layer devices understand more of the packet and can translate between more dissimilar networks.
 
-| Layer       | Device               |
-| ----------- | -------------------- |
-| Physical    | Repeaters, hubs      |
-| Data Link   | Bridges, switches    |
-| Network     | Routers              |
-| Transport   | Transport gateways   |
-| Application | Application gateways |
+| Layer       | Device               | Function                                      |
+| ----------- | -------------------- | --------------------------------------------- |
+| Physical    | Repeaters, hubs      | Amplify signal; no protocol awareness         |
+| Data Link   | Bridges, switches    | Forward by MAC address; same protocol only    |
+| Network     | Routers              | Forward by IP address; connects IP networks   |
+| Transport   | Transport gateways   | Translate between transport protocols         |
+| Application | Application gateways | Full protocol translation (e.g., email relay) |
+
+## Fragmentation
+
+When a packet crosses a network with a smaller MTU, it must be fragmented. The IP header carries offset and more-fragments flag to allow reassembly at the destination.
+
+- IPv4: fragmentation by any router along the path.
+- IPv6: fragmentation only at the source (routers drop oversized packets and send ICMPv6 Packet Too Big).
+
+Path MTU Discovery (PMTUD) avoids fragmentation by detecting the minimum MTU along the path before sending.
+
+## Tunneling
+
+A packet from one protocol is encapsulated inside another protocol's packet to cross a network that does not support the original protocol.
+
+Example: IPv6 packets tunneled inside IPv4 (6in4) to traverse IPv4-only segments. The IPv6 packet becomes the payload of an IPv4 packet; the receiving tunnel endpoint strips the IPv4 header and delivers the IPv6 packet.

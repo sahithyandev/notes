@@ -6,17 +6,40 @@ slug: s4/graph-theory/pigeonhole-principle
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-05-25T17:06:29.131Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
-If there are $n$ boxes and $m$ pigeons (where $m > n$), then at least one box must contain $\lceil \frac{m}{n} \rceil$ pigeons.
+If $m$ objects are placed into $n$ containers where $m > n$, at least 1 container holds $\ge \lceil \frac{m}{n} \rceil$ objects.
 
-For a graph with $n \ge 2$ vertices, there exist 2 vertices with the same degree.
+## Graph Degree Corollary
+
+For any simple graph with $n \ge 2$ vertices, at least 2 vertices share the same degree.
 
 <Note title="Proof Hint">
 
-- There are $n$ vertices
-- Possible values for degree from $0$ to $n-1$
-- $0$ and $n-1$ cannot occur at the same time.
+- Possible degree values: $0$ to $n-1$ ($n$ values total)
+- Degrees $0$ and $n-1$ cannot both occur (a vertex connected to all others cannot coexist with an isolated vertex)
+- So at most $n-1$ distinct degree values exist for $n$ vertices
+- By pigeonhole, 2 vertices share a degree
+
+</Note>
+
+## Applications in Graph Theory
+
+### Paths in Dense Graphs
+
+In any graph where every vertex has degree $\ge \lceil \frac{n}{2} \rceil$, a Hamiltonian path exists. The pigeonhole argument shows that any 2 non-adjacent vertices share enough neighbors to force connectivity.
+
+### Ramsey Numbers
+
+Ramsey theory uses pigeonhole to prove monochromatic substructures must exist in large enough graphs. The classic result: in any 2-coloring of the edges of $K_6$, there is a monochromatic triangle.
+
+<Note title="Proof Hint">
+
+- Pick any vertex $v$ in $K_6$. It has $5$ edges.
+- By pigeonhole, at least $3$ edges from $v$ share the same color (say red).
+- Call the 3 endpoints $a, b, c$.
+- If any edge among $a, b, c$ is red, that edge plus 2 red edges from $v$ form a red triangle.
+- If no edge among $a, b, c$ is red, all 3 are blue, forming a blue triangle.
 
 </Note>

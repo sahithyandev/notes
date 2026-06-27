@@ -6,15 +6,14 @@ slug: s2/methods-of-mathematics/numerical-methods/interpolation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.593Z
-lastUpdatedOn: 2026-06-01T03:58:53.188Z
+lastUpdatedOn: 2026-06-27T08:46:52.686Z
 ---
 
-A type of estimation. A method of constructing new data points
-based on the range of a discrete set of known data points. It is the process of deriving a simple function from a set of discrete data points so that the function passes through all the given data points and can be used to estimate data points in-between the given ones.
+A method of constructing new data points within the range of a discrete set of known data points. The constructed function passes through all given points.
 
 ## Weierstrass Approximation Theorem
 
-Suppose $f$ is continuous on $[a,b]$. Then $\forall \epsilon \gt 0,\;\exists P(x)$ such that $\forall x \in [a,b]$:
+Suppose $f$ is continuous on $[a,b]$. Then $\forall \epsilon > 0$, $\exists$ a polynomial $P(x)$ such that $\forall x \in [a,b]$:
 
 $$
 \left\lvert f(x) - P(x) \right\rvert < \epsilon
@@ -22,7 +21,30 @@ $$
 
 <Note>
 
-For $n + 1$ data points, there is one and only one polynomial of order $n$ that passes through
-all the points.
+For $n + 1$ data points, exactly one polynomial of degree $\leq n$ passes through all points.
 
 </Note>
+
+## Types
+
+### Linear Interpolation
+
+Fits a straight line between 2 adjacent data points $(x_0, y_0)$ and $(x_1, y_1)$:
+
+$$
+P(x) = y_0 + \frac{y_1 - y_0}{x_1 - x_0}(x - x_0)
+$$
+
+Simple but only accurate when the underlying function is nearly linear between nodes.
+
+### Polynomial Interpolation
+
+Fits a single polynomial of degree $n$ through $n + 1$ data points. Methods include [Lagrange](/s2/methods-of-mathematics/numerical-methods/lagrange-interpolating-polynomials/) and [Newton's divided differences](/s2/methods-of-mathematics/numerical-methods/newton-interpolating-polynomials/).
+
+High-degree polynomials can oscillate wildly near the endpoints (Runge's phenomenon).
+
+### Spline Interpolation
+
+Fits piecewise polynomials between consecutive data points, joined smoothly at **knots**. Cubic splines are most common: each piece is degree 3 and the join points satisfy $C^2$ continuity (matching function value, first derivative, and second derivative).
+
+Avoids Runge's phenomenon while remaining smooth.

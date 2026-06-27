@@ -6,7 +6,7 @@ slug: s3/operating-systems/liveness
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.708Z
-lastUpdatedOn: 2026-04-28T07:56:31.654Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
 A set of properties that a system must satisfy to ensure processes make progress.
@@ -15,12 +15,33 @@ A set of properties that a system must satisfy to ensure processes make progress
 
 ### Deadlock
 
-Two processes waiting indefinitely for each other. Explained in [Deadlock](/s3/operating-systems/deadlock) extensively.
+2 or more processes waiting indefinitely for each other to release resources. Explained in [Deadlock](/s3/operating-systems/deadlock) extensively.
+
+### Livelock
+
+Processes are actively running but making no progress. Each process keeps responding to the other's state changes without doing useful work.
+
+Differs from deadlock: processes are not blocked, but still stuck.
+
+Example: 2 processes each step aside for the other simultaneously and keep repeating the gesture indefinitely.
 
 ### Starvation
 
-A process never gets the resource it needs. Occurs due to unfair scheduling.
+A process never gets the resource it needs. Occurs due to unfair scheduling where higher-priority processes always preempt.
 
 ### Priority Inversion
 
-When a low-priority process holds a lock needed by high-priority process.
+A low-priority process holds a lock needed by a high-priority process. The high-priority process is blocked while the low-priority one runs.
+
+#### Solutions
+
+- Priority Inheritance  
+  The low-priority process temporarily inherits the priority of the highest-priority process waiting for its lock. Released when the lock is released.
+- Priority Ceiling  
+  Each resource is assigned a ceiling priority equal to the highest priority of any process that may lock it. A process can only acquire the resource if its priority exceeds the ceiling of all currently held resources.
+
+<Note>
+
+Mars Pathfinder (1997) experienced repeated system resets due to priority inversion. Fixed in-flight via priority inheritance.
+
+</Note>

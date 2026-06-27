@@ -6,7 +6,7 @@ slug: s3/computer-architecture/performance
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-06-11T16:40:17.528Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
 ## Performance Equation
@@ -30,6 +30,33 @@ Performance can be improved by:
 
 ## Performance Measurement and Benchmarking
 
-- Compare processors using different kinds of benchmarks.
-- Performance is domain-specific.
-- Requirements evolve over time and depend on target devices.
+Performance is domain-specific. Requirements evolve over time and depend on target devices.
+
+### SPEC
+
+Standard Performance Evaluation Corporation. Provides standardized, reproducible benchmark suites.
+
+- SPEC CPU: measures CPU-intensive workloads (integer and floating-point subsets)
+- Results reported as a ratio relative to a reference machine
+- Geometric mean used to combine scores across workloads
+
+### MIPS
+
+Millions of Instructions Per Second.
+
+$$
+\text{MIPS} = \frac{\text{Instruction count}}{\text{Execution time} \times 10^6}
+$$
+
+<Note>
+
+MIPS is misleading across different ISAs. A processor with fewer, more powerful instructions completes the same work with lower MIPS, making cross-ISA comparisons invalid.
+
+</Note>
+
+### Peak vs Sustained Performance
+
+- Peak  
+  Maximum theoretical throughput under ideal conditions. Rarely achieved in practice.
+- Sustained  
+  Actual throughput under real workloads. Reduced by memory bottlenecks, branch mispredictions, and pipeline stalls.

@@ -1,0 +1,56 @@
+---
+title: Indices
+sidebar:
+  order: 6
+slug: s3/database-systems/sql/indices
+prev: true
+next: true
+dateCreated: 2026-04-22T07:09:10.698Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
+---
+
+Refer to [Indexing](/s3/database-systems/basics/indexing) before continuing. Primary key is indexed by default.
+
+## Creating an Index
+
+```sql
+CREATE INDEX idx_employee_name ON Employees (LastName, FirstName);
+```
+
+Here:
+
+- `idx_employee_name`: name of the index
+- `Employees`: table on which the index is created
+- `LastName`, `FirstName`: columns included in the index
+
+Speeds up queries filtering or sorting by `LastName` and `FirstName`.
+
+## Unique Index
+
+Enforces uniqueness on the indexed columns in addition to speeding up lookups.
+
+```sql
+CREATE UNIQUE INDEX idx_email ON Users (Email);
+```
+
+## Dropping an Index
+
+```sql
+DROP INDEX idx_employee_name ON Employees;
+```
+
+## Index Types
+
+- B-tree  
+  Default type. Supports equality and range queries. Works with `=`, `<`, `>`, `BETWEEN`, `LIKE 'prefix%'`.
+- Hash  
+  Optimized for exact equality lookups only. Does not support range queries.
+- Full-text  
+  For text search. Supports `MATCH ... AGAINST` queries on text columns.
+
+## When Not to Index
+
+- Small tables: full scan is faster than an index lookup
+- Columns with low cardinality (e.g. boolean flags): index provides little selectivity
+- Columns that are frequently updated: index maintenance adds write overhead
+- Tables with heavy write workloads: each write must update all applicable indices

@@ -6,21 +6,41 @@ slug: s4/graph-theory/graph-coloring
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-05-26T18:26:32.664Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 ---
 
-The assignment of colors to elements of a graph where adjacent elements must not share the same color.
+The assignment of colors to vertices (or edges) of a graph such that no 2 adjacent vertices share the same color.
+
+## Chromatic Number
+
+The chromatic number $\chi(G)$ is the minimum number of colors needed to properly color the vertices of $G$.
+
+Bounds:
+
+- $\chi(G) \ge 1$ for any non-empty graph
+- $\chi(G) \ge \omega(G)$, where $\omega(G)$ is the clique number (size of the largest complete subgraph)
+- $\chi(G) \le \Delta(G) + 1$, where $\Delta(G)$ is the maximum vertex degree (Brooks' theorem tightens this for non-complete non-odd-cycle graphs to $\chi(G) \le \Delta(G)$)
+
+Special cases:
+
+- $\chi(G) = 1$ **iff** $G$ has no edges
+- $\chi(G) = 2$ **iff** $G$ is bipartite
+- $\chi(K_n) = n$ for the complete graph on $n$ vertices
 
 ## Four-Color Theorem
 
-Any planar graph can be colored with at most 4 colors. Other direction is not true.
-
-$$
-\chi(G) \le 4
-$$
+Any planar graph satisfies $\chi(G) \le 4$. The converse does not hold: a graph with $\chi(G) \le 4$ need not be planar.
 
 ## Algorithms
 
-Greedy algorithm give a valid coloring by making local-optimal choices at each step. But not globally optimal.
+Determining $\chi(G)$ exactly is NP-hard.
 
-Heuristic based algorithms improve quality of the solution (low number of colors). Optimal solutions become harder for large graphs. Exact solutions are computationally expensive.
+- Greedy coloring assigns colors in vertex order, using the smallest color not taken by any neighbor. Produces at most $\Delta(G) + 1$ colors. Not globally optimal.
+- Backtracking search finds the exact chromatic number but is exponential in the worst case.
+- Heuristic methods (DSATUR, RLF) give near-optimal colorings for large graphs.
+
+## Applications
+
+- Register allocation in compilers: variables are vertices, edges connect variables live simultaneously, colors are registers.
+- Scheduling: tasks are vertices, conflicts are edges, colors are time slots.
+- Map coloring: regions are vertices, shared borders are edges.

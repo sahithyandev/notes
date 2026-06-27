@@ -6,19 +6,56 @@ slug: s2/methods-of-mathematics/numerical-methods/lagrange-interpolating-polynom
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.594Z
-lastUpdatedOn: 2026-06-01T03:58:53.188Z
+lastUpdatedOn: 2026-06-27T08:46:52.686Z
 ---
 
-A rearranged version of Newton's Divided Difference Interpolating Polynomial.
+A rearranged form of [Newton's divided difference polynomial](/s2/methods-of-mathematics/numerical-methods/newton-interpolating-polynomials/).
+
+The $k$-th Lagrange basis polynomial for $n+1$ nodes is:
 
 $$
-L_{n,k}(x) = \prod_{i=0,i\neq k}^{n} \frac{x - x_i}{x_k - x_i}
+L_{n,k}(x) = \prod_{\substack{i=0 \\ i \neq k}}^{n} \frac{x - x_i}{x_k - x_i}
 $$
 
-$n$-th Lagrange interpolating polynomial is:
+Here:
+
+- $x_0, x_1, \ldots, x_n$: the $n+1$ distinct data points (nodes)
+- $L_{n,k}(x_k) = 1$ and $L_{n,k}(x_i) = 0$ for $i \neq k$
+
+The $n$-th Lagrange interpolating polynomial through the data $(x_k, f(x_k))$ is:
 
 $$
-P_n(x)=
-\sum_{k=0}^n
-L_{n,k}(x)f(x_k)
+P_n(x) = \sum_{k=0}^{n} L_{n,k}(x)\, f(x_k)
 $$
+
+<Note>
+
+For $n+1$ data points, exactly one polynomial of degree $\leq n$ passes through all points.
+
+</Note>
+
+## Example
+
+Interpolate through $(1, 1)$, $(2, 4)$, $(3, 9)$ (i.e., $f(x) = x^2$).
+
+Basis polynomials for $n = 2$:
+
+$$
+L_{2,0}(x) = \frac{(x-2)(x-3)}{(1-2)(1-3)} = \frac{(x-2)(x-3)}{2}
+$$
+
+$$
+L_{2,1}(x) = \frac{(x-1)(x-3)}{(2-1)(2-3)} = -(x-1)(x-3)
+$$
+
+$$
+L_{2,2}(x) = \frac{(x-1)(x-2)}{(3-1)(3-2)} = \frac{(x-1)(x-2)}{2}
+$$
+
+$$
+P_2(x) = 1 \cdot \frac{(x-2)(x-3)}{2} - 4(x-1)(x-3) + 9 \cdot \frac{(x-1)(x-2)}{2}
+$$
+
+At $x = 4$: $L_{2,0}(4) = 1$, $L_{2,1}(4) = -3$, $L_{2,2}(4) = 3$, so:
+
+$$P_2(4) = 1(1) + 4(-3) + 9(3) = 1 - 12 + 27 = 16 = 4^2 \checkmark$$

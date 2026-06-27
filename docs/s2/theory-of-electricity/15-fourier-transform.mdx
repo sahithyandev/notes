@@ -6,19 +6,42 @@ slug: s2/theory-of-electricity/fourier-transform
 prev: true
 next: false
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-06-12T11:50:26.879Z
+lastUpdatedOn: 2026-06-27T08:46:52.686Z
 ---
 
 $$
-F(\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} f(t) e^{-j\omega t}\,\text{d}t
+F(\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} f(t)\, e^{-j\omega t}\,\text{d}t
 $$
 
-$F$ is a continuous function of $\omega$, and is called the spectrum of $f(t)$.
+$F(\omega)$ is a continuous function of $\omega$ called the **spectrum** of $f(t)$.
 
-Always done using numerical methods. Used for non-repetitive signals. Used in telecommunications, and in transient analysis, especially where the circuit parameters are frequency dependent.
+Used for aperiodic signals. Applied in telecommunications and transient circuit analysis where circuit parameters are frequency-dependent.
 
-## Fourier inverse transform
+## Inverse Transform
 
 $$
-F(t) = \int_{-\infty}^{\infty} F(\omega) e^{j\omega t}\,\text{d}\omega
+f(t) = \int_{-\infty}^{\infty} F(\omega)\, e^{j\omega t}\,\text{d}\omega
 $$
+
+## Properties
+
+- Linearity  
+  $\mathcal{F}\{af(t) + bg(t)\} = aF(\omega) + bG(\omega)$
+
+- Time shift  
+  $\mathcal{F}\{f(t - t_0)\} = e^{-j\omega t_0} F(\omega)$
+
+- Differentiation  
+  $\mathcal{F}\{f'(t)\} = j\omega\, F(\omega)$
+
+- Time scaling  
+  $\mathcal{F}\{f(at)\} = \dfrac{1}{|a|} F\!\left(\dfrac{\omega}{a}\right)$
+
+- Convolution  
+  $\mathcal{F}\{(f * g)(t)\} = 2\pi\, F(\omega)\, G(\omega)$
+
+<Note>
+
+The factor of $2\pi$ in the convolution property follows from the $\frac{1}{2\pi}$ in the forward transform definition. With the symmetric convention $F(\omega) = \int f(t)e^{-j\omega t}\,\text{d}t$, convolution becomes $F(\omega)G(\omega)$ without the factor.
+
+</Note>

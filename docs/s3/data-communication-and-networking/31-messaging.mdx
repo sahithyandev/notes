@@ -6,14 +6,56 @@ slug: s3/data-communication-and-networking/messaging
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.693Z
-lastUpdatedOn: 2026-05-03T07:56:35.317Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
-A crucial aspect of communication. Enables communication in real-time. Most protocols are proprietary.
+A crucial aspect of communication. Most protocols are proprietary. Open standards exist for interoperability.
+
+## Types
+
+- Real-time messaging  
+  Messages delivered immediately. Both parties must be online simultaneously. Examples: XMPP, Matrix.
+- Store-and-forward  
+  Messages stored at intermediate servers and delivered when the recipient is available. Examples: email (SMTP), MQTT with persistent sessions.
 
 ## XMPP
 
-Aka. eXtensive Messaging and Presence Protocol. A standard protocol for messaging. Anyone can run a server, and servers can
-interconnect. Messages are XML-based. Supports presence, attachments, groups, etc.
+Aka. eXtensible Messaging and Presence Protocol. Open standard for messaging. Anyone can run a server; servers can interconnect. Messages are XML-based. Supports presence, attachments, and group chats.
 
-Versions of XMPP are used in WhatsApp, Google etc. Popular for IoT messaging.
+Versions of XMPP are used in WhatsApp and Google. Also used for IoT messaging.
+
+## MQTT
+
+Aka. Message Queuing Telemetry Transport. Lightweight publish-subscribe protocol. Designed for constrained devices on low-bandwidth, high-latency networks.
+
+Key concepts:
+
+- Broker  
+  Central server that receives all messages and routes them to subscribers.
+- Topics  
+  Hierarchical string identifiers used to route messages (e.g. `home/sensor/temperature`).
+- QoS levels  
+  0 = at most once, 1 = at least once, 2 = exactly once.
+
+Standard for sensor-to-cloud communication in IoT.
+
+## AMQP
+
+Aka. Advanced Message Queuing Protocol. Open standard for message-oriented middleware. Supports queuing, routing (point-to-point and publish-subscribe), reliability, and security.
+
+Used in enterprise messaging systems. RabbitMQ is a popular AMQP broker.
+
+## Matrix
+
+Open standard for decentralized, real-time communication. Servers federate: users on different homeservers can communicate. Supports end-to-end encryption, rooms, and bridging to other protocols.
+
+Used by Element. Designed as an open alternative to proprietary chat platforms.
+
+## Protocol Comparison
+
+| Protocol | Model             | Payload | Primary Use          |
+| -------- | ----------------- | ------- | -------------------- |
+| XMPP     | Federated         | XML     | Instant messaging    |
+| MQTT     | Publish-subscribe | Binary  | IoT, telemetry       |
+| AMQP     | Queue/exchange    | Binary  | Enterprise messaging |
+| Matrix   | Federated         | JSON    | Decentralized chat   |

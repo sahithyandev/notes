@@ -6,34 +6,53 @@ slug: s3/engineering-thermodynamics/brayton-cycle
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.705Z
-lastUpdatedOn: 2026-05-10T07:10:02.687Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
 Ideal cycle for gas turbines. Open cycle. Named after George Brayton.
 
-The cycle is converted to a close cycle using a heat exchanger (aka. heat recovery steam generator).
+The cycle is converted to a closed cycle using a heat exchanger (aka. heat recovery steam generator) in combined cycle plants.
 
-### Processes
+## Processes
 
 1 → 2: isentropic compression (compressor)
 2 → 3: constant-pressure heat addition (combustor)
 3 → 4: isentropic expansion (turbine)
 4 → 1: constant-pressure heat rejection
 
-### Pressure Ratio
+## Pressure Ratio
 
 $$
 r_p = \frac{P_2}{P_1}
 $$
 
-### Efficiency
+## Efficiency
 
 $$
-\eta = 1 - \frac{1}{r_p^{1 - \frac{1}{k}}}
+\eta = 1 - \frac{1}{r_p^{(k-1)/k}}
 $$
 
-### Back-Work Ratio
+Here:
+
+- $r_p$: pressure ratio
+- $k$: specific heat ratio ($c_p / c_v$), approximately 1.4 for air
+
+Efficiency increases with higher $r_p$. Practical limits exist due to material temperature constraints at the turbine inlet.
+
+## Back-Work Ratio
 
 $$
 BWR = \frac{W_\text{comp}}{W_\text{turb}} = \frac{W_\text{in}}{W_\text{out}}
 $$
+
+Gas turbine BWR is high (40–80%), meaning the compressor consumes a large fraction of turbine output. Much higher than steam turbine pump work ratio.
+
+## Regeneration
+
+Exhaust gases (state 4) are hot. A regenerator preheats the compressed air (state 2) using exhaust heat before the combustor. Reduces fuel input and increases efficiency.
+
+$$
+\eta_\text{regen} > \eta_\text{basic}
+$$
+
+Only effective when turbine exhaust temperature exceeds compressor exit temperature.

@@ -6,18 +6,39 @@ slug: s4/theory-of-computing/mealy-machine
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.633Z
-lastUpdatedOn: 2026-06-09T19:59:41.776Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 ---
 
-A finite automaton where the output depends on both the current state and the input symbol. Output is produced during transitions. A 6-tuple.
+A finite state transducer where output depends on the current state and the input symbol. Output is produced on transitions, not on states. A 6-tuple.
 
-Suppose $M = (Q, \Sigma, \Delta, q_0, \delta, \lambda)$ is a Mealy machine, where:
+$M = (Q, \Sigma, \Delta, q_0, \delta, \lambda)$ where:
 
 - $Q$ is a finite set of states
-- $\Sigma$ is a finite input alphabet
-- $\Delta$ is a finite output alphabet
+- $\Sigma$ is the input alphabet
+- $\Delta$ is the output alphabet
 - $q_0 \in Q$ is the initial state
 - $\delta : Q \times \Sigma \rightarrow Q$ is the transition function
 - $\lambda : Q \times \Sigma \rightarrow \Delta$ is the output function
 
-Output is attached to state + input or transitions.
+## Example
+
+A Mealy machine that outputs $1$ when the number of $a$s seen so far is even, and $0$ otherwise:
+
+- States: $\{q_0, q_1\}$, where $q_0$ = even count, $q_1$ = odd count
+- On input $a$ in $q_0$: move to $q_1$, output $0$
+- On input $a$ in $q_1$: move to $q_0$, output $1$
+
+Input `aaa` produces output `010`.
+
+## Mealy vs Moore Machine
+
+Both are finite state transducers. The difference is where output is generated.
+
+| Property           | Mealy              | Moore              |
+| ------------------ | ------------------ | ------------------ |
+| Output depends on  | State + input      | State only         |
+| Output produced on | Transition         | Entry to state     |
+| States needed      | Fewer              | More               |
+| Output latency     | Immediate on input | After state change |
+
+Every Moore machine has an equivalent Mealy machine and vice versa. The Mealy-to-Moore conversion typically increases state count.

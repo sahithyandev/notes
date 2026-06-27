@@ -6,29 +6,58 @@ slug: s4/computer-networks/congestion
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.621Z
-lastUpdatedOn: 2026-06-05T16:39:48.484Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
-A network is said to be _congested_ when the offered traffic approaches or exceeds the network capacity.
+A network is _congested_ when offered traffic approaches or exceeds network capacity.
 
 Congestion causes:
 
-- Increased delay
-- Packet loss
-- Reduced throughput
+- Increased queuing delay
+- Packet loss (buffer overflow)
+- Reduced throughput (can drop to near zero under severe congestion)
 
 ## Congestion Control
 
 ### Open Loop Control
 
-Prevents congestion before it occurs. Network state is not monitored. Typically implemented at transport or network layer.
+Prevents congestion before it occurs. No runtime monitoring. Policies set at design time.
+
+Mechanisms:
+
+- Admission control: reject new flows if capacity is insufficient
+- Traffic shaping: enforce rate limits at the source (leaky bucket, token bucket)
+- Scheduling: prioritize traffic classes to avoid starvation
 
 ### Closed Loop Control
 
-Detects and reacts to congestion.
+Detects congestion and reacts to it.
 
 Steps:
 
-1. Monitor network conditions
-2. Inform relevant nodes
-3. Take corrective action
+1. Monitor network conditions (queue length, packet loss rate, delay)
+2. Inform relevant nodes (explicit feedback or implicit signal)
+3. Take corrective action (reduce sending rate)
+
+Feedback types:
+
+- Explicit  
+  Network sends a signal to the source. Examples: choke packets (router sends ICMP source quench), ECN (Explicit Congestion Notification bits in IP header).
+- Implicit  
+  Source infers congestion from observable signals. Example: TCP infers congestion from packet loss or RTT increase.
+
+## TCP Congestion Control
+
+TCP implements closed-loop congestion control using a congestion window ($cwnd$).
+
+### Slow Start
+
+$cwnd$ begins at $1$ MSS and doubles each RTT until a threshold ($ssthresh$) is reached or loss occurs. Exponential growth.
+
+### Congestion Avoidance
+
+After $ssthresh$, $cwnd$ grows by $1$ MSS per RTT (additive increase). On loss, $ssthresh = cwnd / 2$ and $cwnd$ resets to $1$ (TCP Tahoe) or $cwnd = ssthresh$ (TCP Reno fast recovery).
+
+## Random Early Detection
+
+RED is a router-side active queue management algorithm. Drops packets probabilistically before the queue is full, signaling congestion to TCP sources before buffers overflow. Avoids the global synchronization problem (many TCP flows cutting rate simultaneously when a full buffer drops many packets at once).

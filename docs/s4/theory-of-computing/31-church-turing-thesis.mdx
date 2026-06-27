@@ -3,19 +3,42 @@ title: Church Turing Thesis
 sidebar:
   order: 31
 dateCreated: 2026-06-09T23:16:59.876Z
-lastUpdatedOn: 2026-06-10T04:52:55.371Z
+lastUpdatedOn: 2026-06-27T08:46:52.691Z
 slug: s4/theory-of-computing/church-turing-thesis
 prev: true
 next: true
 ---
 
-Any real-world computation can be translated into an equivalent Turing machine computation. A TM is a general model of computation.
+Any real-world computation can be translated into an equivalent Turing machine computation. A TM is the general model of computation.
 
-Formerly known as Church's thesis. First formulated by Alonzo Church. Treated as a conjecture.
+Formerly known as Church's thesis. First formulated by Alonzo Church. Treated as a conjecture, not a mathematical theorem, because "real-world computation" has no formal definition.
 
 Accepted because:
 
 - No counterexample proposed in 90+ years.
 - All other theoretical computation models proven equivalent to TMs.
-- Enhanced TMs provide no additional computing power.
+- Enhanced TMs (multi-tape, nondeterministic, probabilistic) provide no additional computing power.
 - TM operations capture all steps essential to human computation.
+
+## Implications
+
+### Limits of Computation
+
+If no TM can solve a problem, no algorithm can. The thesis converts questions about "what is computable" into questions about Turing machines.
+
+Problems beyond TM capability:
+
+- The [Halting Problem](/s4/theory-of-computing/halting-problem): given a TM and input, decide if the TM halts. Proven undecidable by diagonalization.
+- Rice's Theorem: any non-trivial semantic property of a TM's language is undecidable.
+
+### Undecidability Transfer
+
+To show a new problem $P$ is undecidable, reduce a known undecidable problem (typically the Halting Problem) to $P$. If a TM for $P$ existed, it would solve the Halting Problem — contradiction.
+
+### Hierarchy of Problems
+
+The thesis anchors the [Chomsky hierarchy](/s4/theory-of-computing/chomsky-hierarchy) at the top:
+
+- Decidable problems correspond to [recursive languages](/s4/theory-of-computing/recursive-and-recursively-enumerable).
+- Semi-decidable problems correspond to recursively-enumerable languages.
+- Everything above Type 0 is beyond any computation.

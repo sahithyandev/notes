@@ -6,17 +6,44 @@ slug: s4/theory-of-computing/pumping-lemma-for-cfl
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-06-09T08:25:32.554Z
+lastUpdatedOn: 2026-06-27T08:46:52.691Z
 ---
 
-Let $L$ be a CFL. Then $\exists n \in \mathbb{N}$ such that $\forall u \in L$ satisfying $|u| \ge n$, there are strings $v, w, x, y$ and $z$ satisfying:
+Let $L$ be a CFL. Then $\exists n \in \mathbb{N}$ such that $\forall u \in L$ satisfying $|u| \ge n$, there exist strings $v, w, x, y, z$ satisfying:
 
 - $u = vwxyz$
-- $|wy| \gt 0$
+- $|wy| > 0$
 - $|wxy| \le n$
-- For any $m \ge 0$, $vw^mxy^mz$ is in $L$
+- $\forall m \ge 0$, $vw^mxy^mz \in L$
+
+## Using the Lemma to Prove Non-CFL
+
+To show $L$ is not a CFL, assume $L$ is a CFL and derive a contradiction.
+
+Standard proof structure:
+
+1. Assume $L$ is a CFL with pumping length $n$.
+2. Choose a string $u \in L$ with $|u| \ge n$.
+3. Consider all possible decompositions $u = vwxyz$ satisfying $|wy| > 0$ and $|wxy| \le n$.
+4. Show that for every such decomposition, some $vw^mxy^mz \notin L$ for some $m \ge 0$.
+5. Contradiction. $L$ is not a CFL.
+
+## Example
+
+Prove $L = \{a^n b^n c^n \mid n \ge 1\}$ is not a CFL.
+
+Assume $L$ is a CFL with pumping length $p$. Choose $u = a^p b^p c^p$, so $|u| = 3p \ge p$.
+
+Any decomposition $u = vwxyz$ with $|wxy| \le p$ means $wxy$ spans at most 2 of the 3 symbol types (cannot reach from the $a$-block to the $c$-block in $p$ characters).
+
+Case 1: $wxy$ lies entirely in $a^p b^p$. Pumping increases the count of $a$s or $b$s (or both) but not $c$s. The pumped string has unequal counts.
+
+Case 2: $wxy$ lies entirely in $b^p c^p$. Pumping increases $b$s or $c$s but not $a$s. Unequal counts.
+
+In all cases, $vw^2xy^2z \notin L$. Contradiction. $L$ is not a CFL.
 
 ## Ogden’s Lemma
 
-A generalization of the pumping lemma for CFL. Can designate “distinguished” positions of $u$. Can guarantee pumped up portions include at least some of
-these distinguished positions. Sometimes more convenient to use; can also use when the pumping lemma fails.
+A generalization of the pumping lemma for CFL. Allows marking “distinguished” positions in $u$. Guarantees $w$ or $y$ contains at least 1 distinguished position.
+
+Useful when the standard lemma is insufficient to force a contradiction. Every CFL satisfies Ogden’s lemma; it strictly subsumes the pumping lemma.

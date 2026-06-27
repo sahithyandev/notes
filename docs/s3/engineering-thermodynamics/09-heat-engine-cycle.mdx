@@ -6,22 +6,63 @@ slug: s3/engineering-thermodynamics/heat-engine-cycle
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.703Z
-lastUpdatedOn: 2026-05-10T07:10:02.686Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
 ### Efficiency
 
 $$
-\text{Thermal efficiency} = \frac{W_\text{net}}{Q_\text{in}} = 1 - \frac{Q_\text{out}}{Q_\text{in}}
+\eta_\text{thermal} = \frac{W_\text{net}}{Q_\text{in}} = 1 - \frac{Q_\text{out}}{Q_\text{in}}
 $$
 
 ## Carnot Cycle
 
-Ideal reversible cycle for a heat engine. Has maximum thermal efficiency.
+Ideal reversible cycle for a heat engine. Has maximum thermal efficiency for given temperature limits.
 
-Has 4 elements. All processes are reversible.
+Has 4 processes. All processes are reversible.
 
 - through the boiler: isothermal heat addition
 - through the turbine: adiabatic expansion
 - through the condenser: isothermal heat rejection
 - through the pump: adiabatic compression
+
+### Carnot Efficiency
+
+$$
+\eta_\text{Carnot} = 1 - \frac{T_L}{T_H}
+$$
+
+Here:
+
+- $T_L$: temperature of the cold reservoir (K)
+- $T_H$: temperature of the hot reservoir (K)
+
+No real engine can exceed Carnot efficiency operating between the same temperature limits.
+
+## Coefficient of Performance
+
+For reverse heat engines (refrigerators and heat pumps), performance is expressed as Coefficient of Performance (COP) rather than efficiency, since COP can exceed 1.
+
+### Refrigerator
+
+$$
+\text{COP}_R = \frac{Q_L}{W_\text{net,in}} = \frac{Q_L}{Q_H - Q_L}
+$$
+
+Carnot COP for refrigerator:
+
+$$
+\text{COP}_{R,\text{Carnot}} = \frac{T_L}{T_H - T_L}
+$$
+
+### Heat Pump
+
+$$
+\text{COP}_{HP} = \frac{Q_H}{W_\text{net,in}} = \frac{Q_H}{Q_H - Q_L}
+$$
+
+Relation between the 2 COP values:
+
+$$
+\text{COP}_{HP} = \text{COP}_R + 1
+$$

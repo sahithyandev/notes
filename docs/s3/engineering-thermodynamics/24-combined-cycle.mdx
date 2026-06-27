@@ -4,15 +4,38 @@ sidebar:
   order: 24
 slug: s3/engineering-thermodynamics/combined-cycle
 prev: true
-next: true
+next: false
 dateCreated: 2026-04-22T07:09:10.705Z
-lastUpdatedOn: 2026-04-24T03:19:45.177Z
+lastUpdatedOn: 2026-06-27T08:46:52.689Z
 ---
 
-Exhaust heat from gas turbine is used to run a Rankine cycle.
+Exhaust heat from a gas turbine ([Brayton cycle](/s3/engineering-thermodynamics/brayton-cycle)) is recovered to drive a steam turbine ([Rankine cycle](/s3/engineering-thermodynamics/rankine-cycle)). Higher total efficiency than either cycle alone, often exceeding 55%.
 
-Higher total efficiency (often >55%). Better use of high exhaust temperature.
+## Energy Relation
 
-### Energy Relation
+Heat rejected from the Brayton cycle becomes the heat input for the Rankine cycle.
 
-Heat rejected from Brayton = heat supplied to Rankine.
+$$
+Q_\text{Rankine,in} = Q_\text{Brayton,out}
+$$
+
+No additional fuel is burned in the heat recovery stage.
+
+## Efficiency
+
+Let $\eta_B$ and $\eta_R$ be the Brayton and Rankine thermal efficiencies.
+
+$$
+\eta_\text{combined} = 1 - (1 - \eta_B)(1 - \eta_R)
+$$
+
+Combined efficiency exceeds either individual cycle because waste heat from the topping cycle does useful work in the bottoming cycle.
+
+## Heat Recovery Steam Generator
+
+The Heat Recovery Steam Generator (HRSG) transfers exhaust heat from the gas turbine to produce steam for the Rankine cycle.
+
+Examples:
+
+- Natural gas combined cycle (NGCC) power plants
+- Co-generation plants producing heat and electricity simultaneously

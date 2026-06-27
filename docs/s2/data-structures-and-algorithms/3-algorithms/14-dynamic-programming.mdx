@@ -6,20 +6,54 @@ slug: s2/data-structures-and-algorithms/algorithms/dynamic-programming
 prev: true
 next: false
 dateCreated: 2026-04-22T07:07:02.589Z
-lastUpdatedOn: 2026-06-01T03:58:53.182Z
+lastUpdatedOn: 2026-06-27T08:46:52.685Z
 ---
 
-Dynamic programming is a method for solving complex problems by breaking them down into simpler subproblems. It is particularly useful for optimization problems where the solution can be constructed from solutions to overlapping subproblems.
-
-## Main components
-
-- Being able to model the problem as a recursive algorithm
-- Different instances of your recurrence should be bounded by polynomial
-- Order of evaluation of recurrence is important. Should be able to create a directed acyclic graph from the sub-problems.
+Dynamic programming solves problems by breaking them into overlapping subproblems, solving each once, and caching the result.
 
 ## Elements
 
-- Optimal structure  
-  An optimal solution to the problem can be formed from optimal solution to the subproblems
+A problem suits DP **iff**:
+
+- Optimal substructure  
+  An optimal solution to the problem contains optimal solutions to its subproblems.
 - Overlapping subproblems  
-  The space of subproblems must be small. The same subproblems are encountered more than once.
+  The same subproblems recur across different recursive branches.
+
+## DP vs Divide-and-Conquer
+
+Both decompose a problem recursively.
+
+- Divide-and-conquer  
+  Subproblems are independent. Results are not reused.
+- Dynamic programming  
+  Subproblems overlap. Results are cached and reused.
+
+## Approaches
+
+- Memoization (top-down)  
+  Solve recursively. Cache each result on first computation and return it directly on repeat calls.
+- Tabulation (bottom-up)  
+  Fill a table from base cases upward in dependency order. No recursion stack.
+
+## Requirements
+
+- Problem must be expressible as a recurrence.
+- Number of distinct subproblem instances must be polynomially bounded.
+- Subproblem dependency graph must be a DAG (no cycles).
+
+## Fibonacci Example
+
+$$
+F(n) = F(n-1) + F(n-2), \quad F(0) = 0,\; F(1) = 1
+$$
+
+Naive recursion recomputes $F(k)$ at every branch: time $O(2^n)$.
+
+Tabulation:
+
+1. Set $dp[0] = 0$, $dp[1] = 1$.
+2. For $i = 2$ to $n$: $dp[i] = dp[i-1] + dp[i-2]$.
+3. Return $dp[n]$.
+
+Time: $O(n)$. Space: $O(n)$, reducible to $O(1)$ by keeping only the last 2 values.

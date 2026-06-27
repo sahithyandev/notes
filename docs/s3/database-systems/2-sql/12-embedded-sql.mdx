@@ -6,12 +6,27 @@ slug: s3/database-systems/sql/embedded-sql
 prev: true
 next: false
 dateCreated: 2026-04-22T07:09:10.700Z
-lastUpdatedOn: 2026-06-01T03:58:53.205Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
 Refers to the practice of incorporating SQL statements directly within the code of a host programming language. Allows applications to interact with a relational database by executing SQL commands as part of the program's logic.
 
 Special syntax or preprocessor directives are used to distinguish SQL statements from the host language code. Typically, the embedded SQL statements are parsed and converted into function calls by a precompiler before the main compilation step of the host language.
+
+### Example (C with EXEC SQL)
+
+```c
+EXEC SQL BEGIN DECLARE SECTION;
+    int emp_id;
+    char emp_name[50];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL SELECT name INTO :emp_name
+         FROM employees
+         WHERE id = :emp_id;
+```
+
+Host language variables are prefixed with `:` when used inside SQL statements.
 
 Some advantages of embedded SQL include:
 

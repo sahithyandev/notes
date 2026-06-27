@@ -6,14 +6,111 @@ slug: s2/theory-of-electricity/dc-circuit-analysis
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-05-31T13:38:52.599Z
+lastUpdatedOn: 2026-06-27T08:46:52.686Z
 ---
 
-### DC Time Constant
+## Node Voltage Method
 
-Time required to charge the capacitor through the resistor from an initial
-charge voltage of 0 to approximately $63.2%$ of the value of an applied DC
-voltage.
+Applies KCL at each non-reference node to find all node voltages.
 
-An alternate definition: Time required to discharge the capacitor through the
-same resistor to approximately $36.8%$ of its initial charge voltage.
+Procedure:
+
+1. Select 1 node as reference (ground, $V = 0$).
+2. Assign voltages $V_1, V_2, \ldots$ to the remaining nodes.
+3. Write KCL at each non-reference node: sum of currents leaving = 0.
+4. Express each current as $(V_i - V_j)/R$.
+5. Solve the linear system.
+
+<Note>
+
+When a voltage source connects 2 nodes directly, treat them as a supernode: write KVL across the source and one combined KCL equation.
+
+</Note>
+
+## Mesh Current Method
+
+Applies KVL around each independent loop.
+
+Procedure:
+
+1. Identify all meshes (innermost loops of a planar circuit).
+2. Assign a clockwise mesh current $I_1, I_2, \ldots$ to each.
+3. Write KVL for each mesh: $\sum V_{\text{drops}} = 0$.
+4. Solve for mesh currents; branch currents are algebraic sums of contributing mesh currents.
+
+<Note>
+
+When a current source lies on the boundary between 2 meshes, form a supermesh: write 1 KVL equation around both combined, plus 1 KCL constraint relating the 2 mesh currents to the source.
+
+</Note>
+
+## Superposition Theorem
+
+The response (voltage or current) at any element equals the sum of responses due to each independent source acting alone.
+
+To isolate a source:
+
+- Replace all other voltage sources with short circuits.
+- Replace all other current sources with open circuits.
+
+<Note>
+
+Superposition does not apply to power. $P = I^2R$ is non-linear, so individual power contributions cannot be summed.
+
+</Note>
+
+## Thevenin's Theorem
+
+Any linear 2-terminal network can be replaced by a voltage source $V_{th}$ in series with a resistance $R_{th}$.
+
+$$
+V_{th} = V_{oc}
+$$
+
+$V_{oc}$: open-circuit voltage at the terminals.
+
+$$
+R_{th} = \frac{V_{oc}}{I_{sc}}
+$$
+
+$I_{sc}$: short-circuit current at the terminals.
+
+Alternatively: deactivate all independent sources and compute the equivalent resistance seen at the terminals.
+
+## Norton's Theorem
+
+Dual of Thevenin's theorem. Any linear 2-terminal network can be replaced by a current source $I_N$ in parallel with $R_N$.
+
+$$
+I_N = I_{sc}
+$$
+
+$$
+R_N = R_{th}
+$$
+
+The 2 forms are interconvertible:
+
+$$
+V_{th} = I_N R_N
+$$
+
+## DC Time Constant
+
+Time for a capacitor to charge through a resistor from $0\,\text{V}$ to $63.2\%$ of the applied DC voltage.
+
+Alternatively: time to discharge to $36.8\%$ of the initial charge voltage.
+
+$$
+\tau_{RC} = RC
+$$
+
+$$
+\tau_{RL} = \frac{L}{R}
+$$
+
+Here:
+
+- $R$: resistance (ohms)
+- $C$: capacitance (farads)
+- $L$: inductance (henries)

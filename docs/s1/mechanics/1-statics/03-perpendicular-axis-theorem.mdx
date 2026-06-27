@@ -6,14 +6,41 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.570Z
-lastUpdatedOn: 2026-06-01T03:58:53.152Z
+lastUpdatedOn: 2026-06-27T08:46:52.683Z
 ---
 
+Applies only to flat (planar) objects lying in the $xy$-plane. For any 2 perpendicular axes $x$, $y$ in the plane of the object and a third axis $z$ perpendicular to the plane:
+
 $$
-I_{zz} = I_{xx} + I_{yy} = I_{mm} + I_{nn}
+I_{zz} = I_{xx} + I_{yy}
 $$
 
-$ x $, $ y $, $ z $ are a set of axes. $ m $, $ n $, $ z $ are another set of
-axes.
+The same holds for any other pair of in-plane perpendicular axes $m$, $n$ sharing the same $z$:
 
-If $I_{xx}$ is at maximum, $I_{yy}$ will be at minimum.
+$$
+I_{zz} = I_{mm} + I_{nn}
+$$
+
+If $I_{xx}$ is at maximum, $I_{yy}$ is at minimum (their sum is fixed).
+
+## Derivation
+
+For a mass element $dm$ at position $(x, y)$:
+
+$$
+I_{zz} = \int r^2 \,\text{d}m = \int (x^2 + y^2)\,\text{d}m = \int y^2\,\text{d}m + \int x^2\,\text{d}m = I_{xx} + I_{yy}
+$$
+
+## Example
+
+Thin disk of radius $R$ and mass $M$: $I_{xx} = I_{yy} = \dfrac{MR^2}{4}$ by symmetry.
+
+$$
+I_{zz} = \frac{MR^2}{4} + \frac{MR^2}{4} = \frac{MR^2}{2}
+$$
+
+<Note>
+
+Perpendicular axis theorem does not apply to 3D solids. Use the [parallel axis theorem](/s1/mechanics/statics/parallel-axis-theorem) for shifting axes, not for combining them.
+
+</Note>

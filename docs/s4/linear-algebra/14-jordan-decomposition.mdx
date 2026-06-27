@@ -3,7 +3,7 @@ title: Jordan Decomposition
 sidebar:
   order: 14
 dateCreated: 2026-05-05T19:13:22.425Z
-lastUpdatedOn: 2026-05-31T19:40:41.097Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 slug: s4/linear-algebra/jordan-decomposition
 prev: true
 next: true
@@ -58,7 +58,44 @@ Unique for a given matrix, up to the reordering of the Jordan blocks.
 
 2 matrices $A$ and $B$ are similar **iff** they have the same Jordan form (up to the reordering of the Jordan blocks).
 
-TODO: explain how jordan decomposition is done easily.
+## Finding Jordan Form
+
+**Step 1:** Find the characteristic polynomial $f(\lambda) = \det(\lambda I - A)$.
+
+**Step 2:** Solve $f(\lambda) = 0$. Each distinct root is an eigenvalue. The power of $(\lambda - \lambda_i)$ in $f$ is $a_{\lambda_i}$.
+
+**Step 3:** For each eigenvalue $\lambda_i$, compute:
+
+- $g_{\lambda_i} = n - \text{rank}(A - \lambda_i I)$  
+  Number of Jordan blocks for $\lambda_i$.
+- $a_{\lambda_i}$  
+  Sum of sizes of all blocks for $\lambda_i$.
+
+**Step 4:** Determine the sizes of the $g_\lambda$ blocks, which must sum to $a_\lambda$.
+
+If $a_\lambda = g_\lambda$: all blocks are $1 \times 1$.
+
+Otherwise, compute $r_k = \text{rank}(A - \lambda I)^k$ for $k = 0, 1, 2, \dots$
+
+Number of blocks of size $\ge k$ is:
+
+$$
+n_{\ge k} = r_{k-1} - r_k
+$$
+
+Number of blocks of size exactly $k$ is:
+
+$$
+n_k = r_{k-1} - 2r_k + r_{k+1}
+$$
+
+<Note>
+
+For $n \le 3$, $m_\lambda = a_\lambda - g_\lambda + 1$ (from the relationship $a_\lambda - g_\lambda = m_\lambda - 1$). This gives the largest block size directly.
+
+</Note>
+
+**Step 5:** Assemble $J$ by placing each Jordan block $B(\lambda_i, k)$ along the diagonal.
 
 ## Relationship between multiplicities
 

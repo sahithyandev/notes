@@ -3,14 +3,51 @@ title: Linear-Bounded Automata
 sidebar:
   order: 35
 dateCreated: 2026-05-06T17:29:38.238Z
-lastUpdatedOn: 2026-06-10T04:52:55.372Z
+lastUpdatedOn: 2026-06-27T08:46:52.691Z
 slug: s4/theory-of-computing/linear-bounded-automata
 prev: true
 next: true
 ---
 
-Aka. LBA. A nondeterministic Turing machine with limited-length tape. Length bounded linearly by input length. Head cannot move beyond defined bounds. Lies between PDA and TM in computational power.
+Aka. LBA. A nondeterministic [Turing machine](/s4/theory-of-computing/turing-machine) whose read/write head is restricted to the portion of the tape occupied by the input. Tape length is bounded linearly by input length.
 
-If $L$ is a context-sensitive language then there exists an LBA accepting $L$.
+## Formal Definition
 
-If there exists a LBA accepting $L \subseteq \Sigma^*$ then there exists a CSG generating $L - \{\Lambda\}$.
+An LBA is a nondeterministic TM $M = (Q, \Sigma, \Gamma, \delta, q_0, B, F)$ with 2 additional constraints:
+
+- The input alphabet $\Sigma$ includes 2 special symbols: left endmarker $\lfloor$ and right endmarker $\rfloor$.
+- The head never moves left of $\lfloor$ or right of $\rfloor$.
+
+If the input has length $n$, the usable tape is exactly $n$ cells. The machine accepts by entering a final state $q_f \in F$.
+
+## Relation to Chomsky Hierarchy
+
+LBAs accept exactly the class of [context-sensitive languages](/s4/theory-of-computing/chomsky-hierarchy) (Type 1).
+
+- If $L$ is a context-sensitive language, there exists an LBA accepting $L$.
+- If an LBA accepts $L \subseteq \Sigma^*$, there exists a CSG generating $L - \{\Lambda\}$.
+
+<Note>
+
+The empty string $\Lambda$ is excluded because a CSG production $\alpha \to \beta$ requires $|\beta| \geq |\alpha|$, preventing erasure to empty.
+
+</Note>
+
+## Comparison to TM
+
+| Property       | LBA                                      | Turing Machine                |
+| -------------- | ---------------------------------------- | ----------------------------- |
+| Tape           | Bounded to input length                  | Unbounded                     |
+| Language class | Context-sensitive                        | Recursively enumerable        |
+| Decidability   | Open problem (is LBA complement closed?) | Undecidable (Halting Problem) |
+| Power          | Strictly weaker                          | Strictly stronger             |
+
+## Example
+
+The language $L = \{a^n b^n c^n \mid n \geq 1\}$ is context-sensitive but not context-free. An LBA accepts it:
+
+1. Scan and mark one $a$, one $b$, one $c$ in each pass.
+2. Repeat until all symbols are marked.
+3. Accept if marking completes cleanly; reject if counts mismatch.
+
+The LBA needs only the original input tape. No extra space beyond the $3n$ input cells is required.

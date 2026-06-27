@@ -3,7 +3,7 @@ title: Inspection
 sidebar:
   order: 16
 dateCreated: 2026-06-08T20:55:33.457Z
-lastUpdatedOn: 2026-06-09T03:05:56.967Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 slug: s4/software-engineering/inspection
 prev: true
 next: true
@@ -29,3 +29,47 @@ Can only be used for verification, not validation. Cannot check non-functional c
   Unfreed memory, corrupt pointers.
 - Exception management faults  
   Missing or wrong exception handlers.
+
+## Inspection Roles
+
+- Author  
+  Created the artifact under review. Present to clarify intent, not to defend.
+- Inspector  
+  Examines the artifact and raises issues. Multiple inspectors may participate.
+- Reader  
+  Narrates the artifact aloud, paraphrasing rather than reading verbatim.
+- Moderator (Chair)  
+  Runs the meeting, enforces the agenda, ensures issues are logged, not resolved during inspection.
+- Recorder  
+  Documents every issue raised, its type, and its location.
+
+## Fagan Inspection Process
+
+Fagan inspection is the formal, structured variant developed by Michael Fagan at IBM.
+
+6 phases in order:
+
+- Planning  
+  Moderator selects team, distributes materials, schedules meeting.
+- Overview  
+  Author presents the artifact to all participants to establish context.
+- Preparation  
+  Each inspector studies the artifact individually, noting potential defects using checklists.
+- Inspection meeting  
+  Reader narrates; inspectors raise issues; moderator logs them. No fixing occurs during this phase.
+- Rework  
+  Author corrects all logged defects.
+- Follow-up  
+  Moderator verifies that rework is complete and satisfactory. May trigger re-inspection.
+
+## Checklists
+
+Checklists guide inspectors toward known defect-prone areas. Specific to language and artifact type.
+
+Examples for code inspection:
+
+- Are all variables initialized before use?
+- Are array indices within bounds on every access?
+- Are all allocated resources freed on every exit path?
+- Are all exception cases handled?
+- Does every method validate its input preconditions?

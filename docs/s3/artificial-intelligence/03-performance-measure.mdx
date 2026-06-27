@@ -6,11 +6,40 @@ slug: s3/artificial-intelligence/performance-measure
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.683Z
-lastUpdatedOn: 2026-04-24T03:19:45.158Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
 A measure of the effectiveness of the agent function. Evaluates how successful the agent’s behavior is.
 
 ## Consequentialism
 
-Evaluation based only on the consequences of an agent's behaviors. Only outcomes are evaluated and not the actions.
+Evaluation based only on the consequences of an agent’s behaviors. Only outcomes are evaluated and not the actions.
+
+## Design Criteria
+
+Performance measure design depends on the task environment. A good measure:
+
+- Reflects what the agent is actually supposed to achieve
+- Is defined over environment states, not the agent’s internal actions
+- Avoids rewarding proxy behaviors that score high without achieving the goal
+
+<Note>
+
+A vacuum cleaner rewarded for the number of cleaning actions might clean, dirty, and re-clean the same patch to maximize its score.
+
+</Note>
+
+## Task-specific Examples
+
+- Vacuum cleaner: amount of dirt removed per unit time, not number of actions taken
+- Chess agent: win/loss/draw outcome, not number of pieces captured
+- Medical diagnosis agent: patient health outcomes, not number of diagnoses made
+
+## Relation to Reward and Utility
+
+- Reward  
+  Immediate signal given after each action. Used in reinforcement learning.
+- Utility  
+  Long-term cumulative measure of satisfaction across a sequence of states.
+- Performance measure  
+  External objective criterion used to evaluate agent behavior, typically defined by the designer.

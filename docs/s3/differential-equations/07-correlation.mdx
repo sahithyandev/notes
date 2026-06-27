@@ -6,17 +6,43 @@ slug: s3/differential-equations/correlation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.701Z
-lastUpdatedOn: 2026-05-10T07:10:02.685Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
 Correlation between $f$ and $g$, 2 piecewise continuous functions absolutely integrable over $(-\infty, \infty)$:
 
 $$
-(f⋆g)(t)=\int_{-\infty}^{\infty}f(\lambda)g(\lambda-t)\,\text{d}\lambda
+(f \star g)(t) = \int_{-\infty}^{\infty} f(\lambda) g(\lambda - t) \, \text{d}\lambda
 $$
 
 ## Relation with Convolution
 
 $$
-(f⋆g)(t)=(-f*g)(t) = (f * -g)(t)
+(f \star g)(t) = (-f * g)(t) = (f * {-g})(t)
 $$
+
+## Types
+
+### Cross-Correlation
+
+Correlation of 2 different signals $f$ and $g$. Measures the similarity between them as a function of time lag $t$. Not commutative in general:
+
+$$
+(f \star g)(t) \neq (g \star f)(t)
+$$
+
+### Autocorrelation
+
+Correlation of a signal with itself:
+
+$$
+R_{ff}(t) = (f \star f)(t) = \int_{-\infty}^{\infty} f(\lambda) f(\lambda - t) \, \text{d}\lambda
+$$
+
+Always symmetric: $R_{ff}(t) = R_{ff}(-t)$.
+
+## Applications
+
+- Signal detection: finding a known pattern within a noisy signal by sliding it over the signal
+- Time-delay estimation: determining the lag between 2 related signals from different sensors
+- Power spectral density: autocorrelation and PSD are a Fourier transform pair (Wiener-Khinchin theorem)

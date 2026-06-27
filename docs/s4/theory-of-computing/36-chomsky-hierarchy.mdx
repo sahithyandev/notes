@@ -6,7 +6,7 @@ slug: s4/theory-of-computing/chomsky-hierarchy
 prev: true
 next: true
 dateCreated: 2026-04-30T05:32:24.846Z
-lastUpdatedOn: 2026-06-10T04:52:55.372Z
+lastUpdatedOn: 2026-06-27T08:46:52.691Z
 ---
 
 Four language classes, nested by expressive power.
@@ -18,10 +18,29 @@ Four language classes, nested by expressive power.
 | 1    | Context-sensitive      | $\alpha \to \beta$, $\lvert \beta \rvert \geq \lvert\alpha\rvert$, $\alpha$ has non-terminal | Linear-bounded automaton |
 | 0    | Recursively enumerable | $\alpha \to \beta$, $\alpha$ has non-terminal                                                | Turing machine           |
 
-Each type is a subset of the below type.
+Each type is a strict subset of the type below it.
 
 $$
-\text{Type 3 }\subset\text{ Type 2 }\subset\text{ Type 1 }\subset\text{ Type 0}
+\text{Type 3 }\subsetneq\text{ Type 2 }\subsetneq\text{ Type 1 }\subsetneq\text{ Type 0}
 $$
 
-Not all languages are RE. Proven using counting argument: $|\text{languages}| > |\text{TMs}|$.
+Not all languages are RE. Proven by counting: $|\text{languages}| > |\text{TMs}|$ (languages are uncountable, TMs are countable).
+
+## Closure Properties
+
+| Operation     | Regular | CFL | CSL | RE  |
+| ------------- | ------- | --- | --- | --- |
+| Union         | Yes     | Yes | Yes | Yes |
+| Concatenation | Yes     | Yes | Yes | Yes |
+| Kleene star   | Yes     | Yes | Yes | Yes |
+| Intersection  | Yes     | No  | Yes | Yes |
+| Complement    | Yes     | No  | Yes | No  |
+| Difference    | Yes     | No  | Yes | No  |
+
+<Note>
+
+CFL is not closed under intersection or complement. $\{a^nb^nc^n\}$ is not CFL but can be expressed as an intersection of 2 CFLs: $\{a^nb^nc^m\} \cap \{a^mb^nc^n\}$.
+
+RE is closed under union and intersection but not complement. The complement of the Halting Problem is not RE.
+
+</Note>

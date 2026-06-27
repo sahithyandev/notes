@@ -6,16 +6,59 @@ slug: s2/computer-organization-and-digital-design/combinational-logic/multiplexe
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.583Z
-lastUpdatedOn: 2026-06-01T03:58:53.169Z
+lastUpdatedOn: 2026-06-27T08:46:52.685Z
 ---
 
-A combinational circuit that selects binary information from one of $2^n$ inputs
-and outputs it. Aka. MUX. Available as ICs in market. The selected input line is
-configured using $n$ number select lines (or selector variables).
+A multiplexer (MUX) is a combinational circuit that routes 1 of $2^n$ input lines to a single output. $n$ select lines determine which input is forwarded. Available as ICs.
+
+## Select-Line Logic
+
+For a $2^n$-to-$1$ MUX with inputs $I_0, \ldots, I_{2^n-1}$ and select lines $S_{n-1}, \ldots, S_0$:
+
+$$
+Y = \sum_{k=0}^{2^n-1} m_k \cdot I_k
+$$
+
+$m_k$: minterm corresponding to binary value $k$ of the select lines.
+
+For a 4-to-1 MUX:
+
+$$
+Y = \overline{S_1}\,\overline{S_0}\,I_0 + \overline{S_1}\,S_0\,I_1 + S_1\,\overline{S_0}\,I_2 + S_1\,S_0\,I_3
+$$
+
+| $S_1$ | $S_0$ | $Y$   |
+| ----- | ----- | ----- |
+| 0     | 0     | $I_0$ |
+| 0     | 1     | $I_1$ |
+| 1     | 0     | $I_2$ |
+| 1     | 1     | $I_3$ |
+
+## Implementing Boolean Functions
+
+Any $n$-variable boolean function can be implemented with a $2^n$-to-$1$ MUX:
+
+1. Use the $n$ input variables as select lines.
+2. Connect each data input $I_k$ to $1$ if the function is $1$ for minterm $k$, else to $0$.
+
+With a $2^{n-1}$-to-$1$ MUX, 1 variable becomes a data input. Each $I_k$ is connected to $0$, $1$, the variable, or its complement based on the last truth table column.
 
 ## Advantages
 
 - Reduction of wires
 - Reduction of circuit complexity
 - Reduction of cost
-- Many circuits can be implemented using MUX
+- Any combinational function can be implemented using MUX
+
+## Demultiplexer
+
+A demultiplexer (DEMUX) routes 1 input to 1 of $2^n$ outputs based on $n$ select lines. The inverse operation of MUX.
+
+For a 1-to-4 DEMUX with input $D$:
+
+| $S_1$ | $S_0$ | $Y_0$ | $Y_1$ | $Y_2$ | $Y_3$ |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| 0     | 0     | $D$   | $0$   | $0$   | $0$   |
+| 0     | 1     | $0$   | $D$   | $0$   | $0$   |
+| 1     | 0     | $0$   | $0$   | $D$   | $0$   |
+| 1     | 1     | $0$   | $0$   | $0$   | $D$   |

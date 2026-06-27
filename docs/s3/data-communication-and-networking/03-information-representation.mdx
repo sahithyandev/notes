@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/information-representation
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.690Z
-lastUpdatedOn: 2026-04-24T03:19:45.162Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
 ### Bit
@@ -15,16 +15,45 @@ Smallest unit of information a computer can store. 1 or 0.
 
 ### Code
 
-Association of sequence of bits with information.
+Association of a sequence of bits with information. Standards such as ISO and IEEE ensure consistent interpretation across systems.
 
-To make sure everyone interprets the code in the same way, standards such as ISO, IEEE are created. Different standards are defined for different data types.
+## Binary Encoding
 
-## Common standards
+All data is ultimately stored as sequences of bits.
+
+- Unsigned integer: binary (base-2). 8-bit unsigned: 0 to 255.
+- Signed integer: two's complement. 8-bit signed: -128 to 127.
+- Floating-point: IEEE 754. 32-bit single precision, 64-bit double precision.
+
+## Endianness
+
+Byte order in which multi-byte values are stored in memory.
+
+- Big-endian  
+  Most significant byte at the lowest address. Used in network protocols (network byte order).
+- Little-endian  
+  Least significant byte at the lowest address. Used by x86 processors.
+
+<Note>
+
+When transferring multi-byte values across systems, byte order must be converted. `htons()` and `ntohs()` convert between host and network byte order.
+
+</Note>
+
+## Character Encoding Standards
 
 ### ASCII
 
-Uses 7 bits for a code. Unique combination for per English character. Includes both printable and unprintable characters.
+Uses 7 bits per code. 1 unique combination per English character. Includes both printable and unprintable characters.
 
 ### Unicode
 
-Uses 32 bits for a code. Designed as the superset of ASCII.
+Covers scripts for all major writing systems. Designed as the superset of ASCII.
+
+#### UTF-8
+
+Variable-length encoding of Unicode. ASCII characters use 1 byte; others use 2 to 4 bytes. Most common encoding for web content.
+
+#### UTF-16
+
+Variable-length encoding. Uses 2 or 4 bytes per character. Common in Windows and Java internals.

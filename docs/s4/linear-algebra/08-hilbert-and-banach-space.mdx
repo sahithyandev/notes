@@ -6,22 +6,50 @@ slug: s4/linear-algebra/hilbert-and-banach-space
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.626Z
-lastUpdatedOn: 2026-05-25T17:16:27.925Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 prereqs:
   - s1/mathematics/real-analysis/cauchy-sequence
   - s1/mathematics/real-analysis/completeness-axiom
 ---
 
-Cauchy sequences can be defined on metric spaces.
-
-### Complete
-
-A set is said to be complete **iff** all [Cauchy sequences](/s1/mathematics/real-analysis/cauchy-sequence) approach a limit in the set.
-
-## Hilbert Space
-
-A complete inner product space.
+A metric space is complete **iff** every [Cauchy sequence](/s1/mathematics/real-analysis/cauchy-sequence) in the space converges to a limit within the space.
 
 ## Banach Space
 
-A complete normed space.
+A complete normed vector space.
+
+Formally, a normed space $(X, \|\cdot\|)$ is a Banach space **iff** every Cauchy sequence in $X$ converges in $X$.
+
+Examples:
+
+- $\mathbb{R}^n$ with the Euclidean norm
+- $\ell^p$ spaces for $1 \le p \le \infty$: sequences $(x_1, x_2, \ldots)$ with $\sum |x_i|^p < \infty$
+- $L^p([a,b])$: functions on $[a,b]$ with finite $p$-norm
+
+## Hilbert Space
+
+A complete inner product space. Every Hilbert space is a Banach space (the inner product induces a norm), but not every Banach space is a Hilbert space.
+
+A norm $\|\cdot\|$ comes from an inner product **iff** it satisfies the parallelogram law:
+
+$$
+\|x + y\|^2 + \|x - y\|^2 = 2(\|x\|^2 + \|y\|^2)
+$$
+
+Examples:
+
+- $\mathbb{R}^n$ with the dot product
+- $L^2([a,b])$: square-integrable functions with inner product $\langle f, g \rangle = \int_a^b f(x)\overline{g(x)}\,\text{d}x$
+- $\ell^2$: square-summable sequences with inner product $\langle x, y \rangle = \sum x_i \overline{y_i}$
+
+<Note>
+
+$L^p$ for $p \ne 2$ is a Banach space but not a Hilbert space. It fails the parallelogram law.
+
+</Note>
+
+## Relation
+
+$$
+\text{Hilbert Space} \subset \text{Banach Space} \subset \text{Normed Space} \subset \text{Metric Space}
+$$

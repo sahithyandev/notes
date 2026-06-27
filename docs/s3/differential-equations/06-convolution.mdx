@@ -6,33 +6,46 @@ slug: s3/differential-equations/convolution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.701Z
-lastUpdatedOn: 2026-05-31T13:38:52.601Z
+lastUpdatedOn: 2026-06-27T08:46:52.688Z
 ---
 
-A mathematical operation that combines two functions to produce a third function expressing how the shape of one is modified by the other. Denoted by a star symbol $ \* $.
+A mathematical operation that combines 2 functions to produce a third expressing how the shape of one is modified by the other. Denoted by $*$.
 
 $$
-(f * g)(t) = \int_{-\infty}^{\infty} f(\tau) \, g(t - \tau) \, d\tau
+(f * g)(t) = \int_{-\infty}^{\infty} f(\tau) \, g(t - \tau) \, \text{d}\tau
 $$
 
-The convolution essentially "slides" one function over another, multiplying and integrating to produce a new function that reflects the combined effect of both.
-
-Widely used in signal processing, probability, and many areas of mathematics and engineering.
+Slides one function over another, multiplying and integrating at each shift.
 
 ## Properties
 
-### Commutative
-
-$$
-f * g = g * f
-$$
+- Commutative  
+  $f * g = g * f$
+- Associative  
+  $f * (g * h) = (f * g) * h$
+- Distributive  
+  $f * (g + h) = (f * g) + (f * h)$
+- Identity  
+  $f * \delta = f$, where $\delta$ is the Dirac delta function
 
 ## Convolution Theorem
 
-Product of Laplace transforms of two functions is the Laplace transform of their convolution.
+### Laplace
 
-Suppose $L\{f\}=F$ and $L\{g\}=G$:
+The Laplace transform of a convolution is the product of the individual Laplace transforms.
+
+Suppose $\mathcal{L}\{f\} = F$ and $\mathcal{L}\{g\} = G$:
 
 $$
-L\{f*g\}=F(s)G(s)
+\mathcal{L}\{f * g\} = F(s) \, G(s)
 $$
+
+Useful for solving ODEs: multiply in the $s$-domain, then apply the inverse Laplace transform.
+
+### Fourier
+
+$$
+\mathcal{F}\{f * g\} = F(\omega) \cdot G(\omega)
+$$
+
+Convolution in the time domain equals pointwise multiplication in the frequency domain. Used extensively in signal processing and filter design.

@@ -6,10 +6,12 @@ slug: s3/applied-statistics/paired-t-test
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.682Z
-lastUpdatedOn: 2026-05-31T13:49:07.992Z
+lastUpdatedOn: 2026-06-27T08:46:52.687Z
 ---
 
-Used when two related measurements are taken on the same sample population. Evaluates whether the mean difference between the paired observations is significantly different.
+Used when 2 related measurements are taken on the same subjects. Evaluates whether the mean difference between paired observations is significantly different from zero.
+
+Use when: observations are naturally paired (before/after, matched subjects, repeated measures). Use an independent 2-sample $t$-test instead when samples are unrelated.
 
 Let each pair have values $(X_1, X_2)$. Suppose $d_i = X_{1i} - X_{2i}$.
 
@@ -19,12 +21,10 @@ $$
 s_d = \sqrt{\frac{\sum (d_i - \bar{d})^2}{n - 1}}
 $$
 
-### Hypotheses Setup
+## Hypotheses
 
 $$
-H_0 : \mu_d = d_0
-\,\,
-\text{(no mean difference)}
+H_0 : \mu_d = d_0 \quad \text{(no mean difference, typically } d_0 = 0\text{)}
 $$
 
 $$
@@ -38,3 +38,16 @@ Under $H_0$ with $\nu = n - 1$:
 $$
 t = \frac{\bar{d} - d_0}{s_d / \sqrt{n}} \sim t_\nu
 $$
+
+## Decision Rule
+
+Reject $H_0$ **if**:
+
+- Left-tail: $t < -t_{\nu, \alpha}$
+- Right-tail: $t > t_{\nu, \alpha}$
+- Two-tail: $|t| > t_{\nu, \alpha/2}$
+
+Examples:
+
+- Blood pressure measured before and after a drug treatment on the same patients
+- Exam scores for the same students before and after a tutoring program

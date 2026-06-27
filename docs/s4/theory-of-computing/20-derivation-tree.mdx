@@ -6,25 +6,47 @@ slug: s4/theory-of-computing/derivation-tree
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.634Z
-lastUpdatedOn: 2026-06-10T00:03:01.625Z
+lastUpdatedOn: 2026-06-27T08:46:52.690Z
 ---
 
-Aka. parse tree. Represents the hierarchical structure of a derivation.
+Aka. parse tree. Represents the hierarchical structure of a derivation from a [CFG](/s4/theory-of-computing/context-free-grammar).
 
-- Root: start symbol
+Structure:
+
+- Root: start symbol $S$
 - Internal nodes: non-terminals
-- Leaves: terminals
+- Leaves: terminals or $\Lambda$
 
-Reading the leaf nodes left-to-right gives the derived string.
+Reading leaf nodes left-to-right gives the derived string (the yield of the tree).
 
 ## Types of Derivations
 
 ### Leftmost Derivation
 
-Always replace the leftmost non-terminal.
+Always replace the leftmost non-terminal first.
 
 ### Rightmost Derivation
 
-Always replace the rightmost non-terminal.
+Always replace the rightmost non-terminal first.
 
-Each derivation tree corresponds to one unique leftmost derivation and one unique rightmost derivation.
+Each derivation tree corresponds to exactly 1 leftmost derivation and exactly 1 rightmost derivation.
+
+## Example
+
+Grammar:
+
+- $S \to S + S \mid S * S \mid a$
+
+Deriving $a + a * a$ leftmost:
+
+$$
+S \Rightarrow S + S \Rightarrow a + S \Rightarrow a + S * S \Rightarrow a + a * S \Rightarrow a + a * a
+$$
+
+The corresponding derivation tree has $S$ at the root, with children $S$, $+$, $S$. The right $S$ has children $S$, $*$, $S$.
+
+## Ambiguity
+
+A grammar is **ambiguous** **iff** some string has 2 or more distinct derivation trees (equivalently, 2 distinct leftmost derivations).
+
+For $a + a * a$ under the grammar above, a 2nd tree exists where the root $S$ splits as $S * S$ instead. Both trees are valid, so the grammar is ambiguous.
