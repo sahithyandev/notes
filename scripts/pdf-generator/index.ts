@@ -1,5 +1,6 @@
 import { generateModulePdf } from "./generate";
 import { c, fmt } from "./log";
+import { uploadPdf } from "./upload";
 import { readdirSync } from "fs";
 import { resolve } from "path";
 import { spawn } from "node:child_process";
@@ -27,10 +28,12 @@ function getAllModuleIds(semFilter?: string): string[] {
 
 (async () => {
   const args = process.argv.slice(2);
+  const upload = args.includes("--upload");
+  const filteredArgs = args.filter((a) => a !== "--upload");
 
-  const semGlob = args[0]?.match(/^(s\d+)\/\*$/)?.[1];
+  const semGlob = filteredArgs[0]?.match(/^(s\d+)\/\*$/)?.[1];
 
-  if (args.includes("--all") || semGlob) {
+  if (filteredArgs.includes("--all") || semGlob) {
     const moduleIds = getAllModuleIds(semGlob);
     console.log(
       `${c.bold}${c.cyan}pdf-generator${c.reset}  generating ${c.bold}${moduleIds.length}${c.reset} modules in parallel\n`,
@@ -45,7 +48,10 @@ function getAllModuleIds(semFilter?: string): string[] {
         const start = performance.now();
         return new Promise<void>((res) => {
           let output = "";
-          const child = spawn("bun", [scriptPath, id], { stdio: "pipe" });
+          const spawnArgs = upload
+            ? [scriptPath, id, "--upload"]
+            : [scriptPath, id];
+          const child = spawn("bun", spawnArgs, { stdio: "pipe" });
           child.stdout.on("data", (d: Buffer) => (output += d.toString()));
           child.stderr.on("data", (d: Buffer) => (output += d.toString()));
           child.on("close", (code) => {
@@ -79,15 +85,16 @@ function getAllModuleIds(semFilter?: string): string[] {
 
     if (failed.length) process.exit(1);
   } else {
-    const moduleId = args[0];
+    const moduleId = filteredArgs[0];
     if (!moduleId) {
       console.error(
-        `Usage: index.ts ${c.cyan}<moduleId>${c.reset} | ${c.cyan}--all${c.reset}`,
+        `Usage: index.ts ${c.cyan}<moduleId>${c.reset} | ${c.cyan}--all${c.reset} [${c.cyan}--upload${c.reset}]`,
       );
       process.exit(1);
     }
     const start = performance.now();
     await generateModulePdf(moduleId);
+    if (upload) await uploadPdf(moduleId);
     console.log(
       `${c.green}✓${c.reset}  ${moduleId}  ${c.gray}${fmt(performance.now() - start)}${c.reset}`,
     );
