@@ -114,6 +114,9 @@ export async function generateModulePdf(moduleId: string) {
     "  belowskip=4pt,",
     "}",
     "",
+    "\\renewcommand{\\chaptermark}[1]{\\markboth{#1}{#1}}",
+    "\\renewcommand{\\sectionmark}[1]{\\markboth{#1}{#1}}",
+    "",
     "\\pretocmd{\\section}{\\Needspace*{0.40\\textheight}}{}{}",
     "\\pretocmd{\\subsection}{\\Needspace*{0.25\\textheight}}{}{}",
     "\\pretocmd{\\subsubsection}{\\Needspace*{0.15\\textheight}}{}{}",
@@ -191,6 +194,8 @@ export async function generateModulePdf(moduleId: string) {
     "\\newpage",
     "",
     "\\tableofcontents",
+    "\\clearpage",
+    "\\markboth{}{}",
     "",
   );
 
