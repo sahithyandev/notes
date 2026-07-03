@@ -1,0 +1,70 @@
+---
+title: Linear Programming
+dateCreated: 2026-07-03T00:00:00.000Z
+lastUpdatedOn: 2026-07-03T04:21:51.316Z
+slug: s5/operational-research/linear-programming
+sidebar:
+  order: 2
+prev: true
+next: true
+---
+
+A linear program is an optimization problem with a linear objective function subject to linear constraints.
+
+$$
+\text{maximize (or minimize) } z = c_1x_1 + c_2x_2 + \dots + c_nx_n
+$$
+
+Subject to:
+
+$$
+a_{i1}x_1 + a_{i2}x_2 + \dots + a_{in}x_n \le b_i \quad \forall i
+$$
+
+Here:
+
+- $x_1, \dots, x_n$: decision variables
+- $c_1, \dots, c_n$: objective coefficients
+- $a_{ij}$: constraint coefficients
+- $b_i$: constraint bounds
+
+## Modelling
+
+Identify decision variables, express the objective and constraints as linear functions of those variables.
+
+## Geometrical Solution
+
+For 2 decision variables, plot the constraints as half-planes on the $x_1$-$x_2$ plane.
+
+- Feasible region  
+  The intersection of all constraint half-planes.
+- Optimal solution  
+  Occurs at a vertex of the feasible region.
+
+## Sensitivity Analysis
+
+Studies how the optimal solution changes as objective coefficients or constraint bounds vary.
+
+## Simplex Algorithm
+
+Iterative method that moves between vertices of the feasible region, improving the objective at each step.
+
+- All slack starting method  
+  Used when the origin is a feasible starting vertex.
+- Big M method  
+  Adds artificial variables with a large penalty $M$ to handle mixed constraints.
+- Two-phase method  
+  Solves a phase 1 problem to find a feasible starting vertex, then optimizes in phase 2.
+
+## Dual Simplex Algorithm
+
+Starts from a dual-feasible but primal-infeasible solution and iterates toward primal feasibility.
+
+## Duality
+
+Every linear program (the primal) has an associated dual linear program.
+
+- Weak duality  
+  The dual objective bounds the primal objective.
+- Strong duality  
+  At optimality, primal and dual objective values coincide.

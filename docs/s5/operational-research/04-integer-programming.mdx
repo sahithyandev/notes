@@ -1,0 +1,28 @@
+---
+title: Integer Programming
+dateCreated: 2026-07-03T00:00:00.000Z
+lastUpdatedOn: 2026-07-03T04:21:51.316Z
+slug: s5/operational-research/integer-programming
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+An integer program is a linear program where some or all decision variables are restricted to integer values.
+
+- Pure integer program  
+  All decision variables are integers.
+- Mixed integer program  
+  Some decision variables are integers, others continuous.
+- Binary integer program  
+  Decision variables restricted to $0$ or $1$.
+
+## Solving Algorithms
+
+The linear programming relaxation drops the integer restriction and solves as an ordinary linear program.
+
+- Cutting plane algorithm  
+  Adds constraints that cut off fractional solutions without removing integer feasible points.
+- Branch and bound algorithm  
+  Splits the feasible region on a fractional variable, solving relaxations of each subproblem to find the integer optimum.
