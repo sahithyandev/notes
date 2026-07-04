@@ -1,0 +1,68 @@
+---
+title: Integer Programming
+dateCreated: 2026-07-03T00:00:00.000Z
+lastUpdatedOn: 2026-07-04T05:52:29.782Z
+slug: s5/operational-research/integer-programming
+sidebar:
+  order: 5
+prev: true
+next: true
+prereqs:
+  - s5/operational-research/linear-programming
+---
+
+An integer program is a linear program where some or all decision variables are restricted to integer values.
+
+- Pure integer program  
+  All decision variables are integers.
+- Mixed integer program  
+  Some decision variables are integers, others continuous.
+- Binary integer program  
+  Decision variables restricted to $0$ or $1$.
+
+## Linear Programming Relaxation
+
+The linear programming relaxation drops the integer restriction and solves as an ordinary [linear program](/s5/operational-research/linear-programming).
+
+- The relaxation optimum bounds the integer optimum. Upper bound for maximization, lower bound for minimization.
+- An integer-valued relaxation optimum solves the integer program directly.
+
+<Note>
+
+Rounding a fractional relaxation optimum is not a valid solution method. The rounded point may violate constraints, and even when feasible it may be far from the integer optimum.
+
+</Note>
+
+## Cutting Plane Algorithm
+
+Adds constraints that cut off fractional solutions without removing integer feasible points.
+
+<Note title="Proof Hint">
+
+- Solve the LP relaxation
+- If the solution is integer, stop
+- Derive a cut violated by the current fractional solution, from a tableau row with a fractional right-hand side
+- Add the cut and re-solve with the [dual simplex algorithm](/s5/operational-research/simplex-algorithm#dual-simplex-algorithm)
+- Repeat
+
+</Note>
+
+## Branch and Bound Algorithm
+
+Splits the feasible region on a fractional variable, solving relaxations of each subproblem to find the integer optimum.
+
+<Note title="Proof Hint">
+
+- Solve the LP relaxation
+- Pick a variable $x_j$ with fractional value $f$
+- Branch into 2 subproblems, adding $x_j \le \lfloor f \rfloor$ to one and $x_j \ge \lceil f \rceil$ to the other
+- Solve each subproblem's relaxation
+- Prune a subproblem if its relaxation is infeasible, if its bound is no better than the best integer solution found so far, or if its relaxation is integer valued
+- Repeat until every subproblem is pruned
+
+</Note>
+
+- Incumbent  
+  The best integer feasible solution found so far. Updated whenever a subproblem's relaxation is integer valued and better.
+- Optimality  
+  The incumbent is optimal once no unpruned subproblem remains.
