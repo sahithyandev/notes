@@ -1,0 +1,85 @@
+---
+title: Linux Security Hardening
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:24:28.770Z
+slug: s5/secure-app-dev/linux-security-hardening
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+Hardening [Linux's DAC model](/s5/secure-app-dev/linux-discretionary-access-control) requires mitigating risk at both the OS level and the application level.
+
+## OS Installation and Patch Management
+
+- Minimize installed software  
+  Unused applications are liable to be left in a default, un-hardened, unpatched state. Avoid running X Window, RPC services, R-services, inetd, SMTP daemons, telnet, unless required.
+- Initial configuration  
+  Set the root password, create a non-root user account, set a system security level, enable a host-based firewall, enable SELinux.
+- Patch management  
+  Installed applications must be configured securely and kept current with security patches. Automated update tools exist, e.g. `up2date`, `YaST`, `apt-get`, but automatic updates should not run on change-controlled systems without testing first.
+
+## Network Access Controls
+
+- TCP wrappers  
+  Checks a connecting host against `hosts.allow` and `hosts.deny` before permitting a connection, based on service, source IP, and username.
+- netfilter and iptables  
+  The Linux kernel's native firewall mechanism, with `iptables` as the user-space configuration front end. Typical personal firewall policy: allow specified inbound services, block all other inbound requests, allow all outbound requests.
+
+## Logging
+
+Linux logs via `syslogd` or `syslog-ng`, sorting messages by facility and severity and writing them to local or remote log files. `syslog-ng` is preferable for its flexible rules engine and support for encrypted TCP transport.
+
+Log files must be rotated and old copies deleted, typically with `logrotate` run by `cron`, balancing the number of log files against ease of locating information.
+
+## Application Security
+
+- Running as unprivileged user or group  
+  Every process runs as some user, and it is critical that user is not root, since a bug could otherwise compromise the entire system. If root privileges are briefly required, e.g. to bind a privileged port, a root parent should perform that step and hand off to an unprivileged child.
+- Running in a chroot jail  
+  Confines a process to a subset of the file system by remapping the virtual root. Directories outside the jail are not visible or reachable. Contains the effects of a compromised daemon, but is complex to configure.
+- Modularity  
+  A single large multipurpose process is harder to run unprivileged, harder to audit, and harder to disable selectively. Modular applications present a smaller attack surface.
+- Encryption  
+  Sending credentials or data over a network in clear text exposes them to eavesdropping, so network applications should support encryption, often via OpenSSL.
+- Logging  
+  Applications should log to an appropriate level of detail, either to a dedicated file or a central facility such as `syslog`, with rotation ensured.
+
+## Mandatory Access Control
+
+Linux's native model is DAC. Mandatory Access Control (MAC) additionally imposes a global security policy on all users, where users cannot set controls weaker than the policy, and normal administration does not carry authority to change the policy itself.
+
+### SELinux
+
+SELinux is NSA's implementation of MAC for Linux. Linux DAC still applies first, and if it permits an action, SELinux then evaluates the action against its own policy, following the principle that anything not expressly permitted is denied.
+
+Each subject (process) and object (not just files and directories) is governed by a security context:
+
+- User  
+  SELinux maintains its own user list, distinct from Linux users, labeling a subject's privileges or an object's owner.
+- Role  
+  Similar to a group, assumed by users. A user holds 1 role at a time and may only switch roles when authorized.
+- Domain (type)  
+  A sandbox combining subjects and objects permitted to interact with each other.
+
+This model is Type Enforcement (TE).
+
+Decisions in SELinux are of 2 kinds:
+
+- Access decisions  
+  A subject acts on an existing object, or creates a new object, within its expected domain.
+- Transition decisions  
+  A process is invoked in a different domain than its caller, or an object is created in a different type than its parent directory. Transitions must be explicitly authorized by policy.
+
+SELinux also implements Role Based Access Control (RBAC), rules governing which roles a user may assume and when a role transition is allowed, and Multi Level Security (MLS) for classified data, enforced via file system labeling under a "no read up, no write down" rule.
+
+<Note>
+
+SELinux policies are complex, often hundreds of lines. RHEL ships a default "targeted" policy that only constrains selected network applications, leaving everything else to DAC.
+
+</Note>
+
+### AppArmor
+
+Novell's MAC implementation for SuSE Linux, enforced at the kernel level via Linux Security Modules. Restricts the behavior of selected applications in a granular, targeted way, so a compromised root application's access is contained. It has no data classification controls, making it a partial MAC implementation. Unprotected applications fall back to plain Linux DAC.

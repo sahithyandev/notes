@@ -1,0 +1,63 @@
+---
+title: Buffer Overflow Basics
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:24:28.771Z
+slug: s5/secure-app-dev/buffer-overflow-basics
+sidebar:
+  order: 6
+prev: true
+next: true
+---
+
+A buffer overflow, also called a buffer overrun, is a condition at an interface under which more input is placed into a buffer than its allocated capacity, overwriting other information. First widely exploited by the Morris Worm in 1988, it remains a major concern despite well-known prevention techniques.
+
+The overflow is a programming error: a process attempts to store data beyond a fixed-size buffer's limits, overwriting adjacent memory locations. Those locations may hold other program variables, parameters, or control flow data. The buffer itself may sit on the stack, in the heap, or in the process's data section.
+
+## Consequences
+
+- Corruption of program data.
+- Unexpected transfer of control.
+- Memory access violations.
+- Execution of code chosen by the attacker.
+
+To exploit a buffer overflow, an attacker needs:
+
+- A buffer overflow vulnerability triggerable using externally sourced, attacker-controlled data.
+- An understanding of how that buffer is stored in memory, to determine the potential for corruption.
+
+Vulnerable programs are identified by source inspection, tracing execution under oversized input, or automated fuzzing.
+
+<Note>
+
+Modern high-level languages with strong typing are not vulnerable to buffer overflow, at the cost of runtime overhead and reduced direct memory access. C and related languages allow direct memory access without bounds checks, hence their vulnerability and large legacy of unsafe code.
+
+</Note>
+
+## Stack Frame
+
+When one function calls another, it needs somewhere to save the return address, the parameters passed to the called function, and possibly saved register values. This region is the stack frame.
+
+## Stack Buffer Overflow
+
+Also called stack smashing, this overflow occurs when the overflowed buffer sits on the stack, used by the Morris Worm and still widely exploited today.
+
+An unchecked call, e.g. `gets()`, copying attacker-controlled input into a fixed-size stack buffer can overwrite adjacent stack contents, including the saved frame pointer and the return address. Overwriting the return address redirects control flow to an address chosen by the attacker on function return.
+
+<Note>
+
+Table of some common unsafe C standard library routines: `gets`, `sprintf`, `strcat`, `strcpy`, `vsprintf`. Each performs no bounds checking against the destination buffer's size.
+
+</Note>
+
+## Shellcode
+
+Code supplied by the attacker, often saved in the buffer being overflowed. Traditionally transfers control to a command-line interpreter (a shell). Shellcode is machine code specific to the target processor and operating system, traditionally requiring assembly language skill to write, though tools such as the Metasploit Project now automate its generation.
+
+Stack overflow attacks can target:
+
+- Shellcode functions  
+  Launch a local or reverse remote shell, or use local exploits to establish one.
+- A trusted system utility  
+  Flush firewall rules currently blocking other attacks.
+- Commonly used library code  
+  Break out of a chroot environment, giving full system access.

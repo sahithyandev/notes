@@ -1,0 +1,86 @@
+---
+title: Linux Discretionary Access Control
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:24:28.770Z
+slug: s5/secure-app-dev/linux-discretionary-access-control
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+Linux's traditional security model grants a process running with root privileges unrestricted access, while other accounts can do much less. This is Discretionary Access Control (DAC), and attackers therefore target root privileges.
+
+In Linux, most system resources, including memory, device drivers, and named pipes, are represented as files, so file system security is central to the model.
+
+## Users and Groups
+
+- User account  
+  Represents an entity, human or process, capable of using files. Details are kept in `/etc/passwd`.
+- Group account  
+  A list of user accounts. A user has 1 main group and may belong to other groups. Details are kept in `/etc/group`.
+
+Users and groups are managed with `useradd`, `usermod`, `userdel`, and the equivalent `group*` commands.
+
+<Note>
+
+Users and groups are not files themselves, they are entries in these configuration files.
+
+</Note>
+
+## File Permissions
+
+Every file has 2 owners, a user and a group, plus a third permission set for all other users. Each of the 3 sets carries read, write, and execute permissions, in the order user, group, other:
+
+```
+-rw-rw-r--  1  maestro  user  35414  Mar 25 01:38  baton.txt
+```
+
+Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read contributes 4, write 2, execute 1, summed per set (user, group, other).
+
+### Directory Permissions
+
+- Read  
+  List the directory's contents.
+- Write  
+  Create or delete files in the directory.
+- Execute  
+  Use anything in the directory, or change the working directory into it.
+
+### Sticky Bit
+
+Originally used to lock a file in memory, now applied to directories to restrict deletion: if set, a user must own a file to delete it, even with write permission on the directory. Set with `chmod +t`, shown as a `t` or `T` flag in the listing. Applies only to that directory, not to child directories.
+
+### SetUID and SetGID
+
+- SetUID  
+  The program runs with the privileges of its owner, regardless of who executes it.
+- SetGID  
+  The program runs as a member of the group that owns it, regardless of who executes it.
+
+<Note>
+
+SetUID and SetGID are dangerous when set on a file owned by root or another privileged account, and should only be used on executable binaries, not shell scripts.
+
+</Note>
+
+SetUID has no effect on directories. SetGID on a directory causes any file created inside to inherit the directory's group, useful when users share files across a common group without manually changing ownership.
+
+## Kernel vs User Space
+
+- Kernel space  
+  Memory used by the Linux kernel and its loadable modules, e.g. device drivers.
+- User space  
+  Memory used by all other processes.
+
+Since the kernel enforces Linux's DAC, isolating kernel space from user space is security-critical: kernel space is never swapped to disk, and only root may load or unload kernel modules.
+
+## setuid root Vulnerabilities
+
+A setuid root program runs as root no matter who executes it, used to give unprivileged users controlled access to privileged resources. Such programs must be very carefully written.
+
+<Note>
+
+A software bug in a setuid root program may allow an otherwise-unprivileged user to wield unauthorized root privileges. Modern distributions minimize the number of setuid-root programs, but attackers still scan systems for them.
+
+</Note>

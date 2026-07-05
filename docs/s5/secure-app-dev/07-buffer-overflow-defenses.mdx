@@ -1,0 +1,53 @@
+---
+title: Buffer Overflow Defenses
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:24:28.771Z
+slug: s5/secure-app-dev/buffer-overflow-defenses
+sidebar:
+  order: 7
+prev: true
+next: false
+---
+
+Defenses against [buffer overflow](/s5/secure-app-dev/buffer-overflow-basics) fall into 2 broad categories.
+
+- Compile-time defenses  
+  Harden new programs to resist attacks.
+- Run-time defenses  
+  Detect and abort attacks against existing programs.
+
+## Compile-Time Defenses
+
+- Modern high-level language  
+  Not vulnerable to buffer overflow, the compiler enforces range checks and permissible operations. Costs runtime overhead and loses access to some hardware-level instructions, limiting use for code such as device drivers.
+- Safe coding techniques  
+  C prioritizes space and performance over type safety, assuming programmer discipline. The OpenBSD project audited its entire code base, OS, standard libraries, and utilities, producing one of the safest operating systems in widespread use.
+- Language extensions and safe libraries  
+  Replace unsafe standard library routines with safer variants, e.g. Libsafe, a dynamic library loaded before the standard libraries. Requires recompilation and can conflict with third-party applications.
+- Stack protection  
+  Add function entry and exit code to detect stack corruption using a random canary value, unpredictable and varying across systems. Stackshield and Return Address Defender (RAD) are GCC extensions: entry code saves a copy of the return address to a safe region, exit code compares it against the stack copy, and aborts on mismatch.
+
+## Run-Time Defenses
+
+- Executable address space protection  
+  Use virtual memory support to mark regions of memory, e.g. the stack, non-executable. Requires memory management unit (MMU) support and special provisions where executable stack code is legitimately needed.
+- Address space randomization  
+  Randomly shift the location of the stack, heap, and global data per process. The large address range on modern systems makes the resulting waste negligible.
+- Guard pages  
+  Place pages flagged as illegal in the MMU between critical memory regions, e.g. between stack frames or around heap buffers, so any access attempt aborts the process. Costs execution time due to the number of page mappings required.
+
+## Attack Variants Against These Defenses
+
+- Replacement stack frame  
+  Overwrites the buffer and the saved frame pointer to point at a dummy stack frame, so the current function returns into the replacement frame and control transfers to shellcode in the overwritten buffer.
+- Off-by-one attack  
+  A coding error allows 1 more byte to be copied than the buffer has space for, still defended against by stack protection, non-executable stacks, and randomization.
+- Return-to-system-call (return-to-libc)  
+  Overwrites the return address with the address of a standard library function instead of shellcode, a response to non-executable stack defenses. The attacker constructs parameters on the stack above the return address so the "returned-to" function executes with attacker-chosen arguments, and calls can even be chained. Defended against by the same stack protection, non-executable stack, and randomization mechanisms.
+
+## Heap and Global Data Overflows
+
+- Heap overflow  
+  The overflowed buffer sits in the heap, typically above the program code, allocated for dynamic data structures. There is no return address to hijack, so control transfer instead exploits function pointers stored nearby, or manipulates heap management data structures. Defended against by a non-executable heap and randomizing heap allocation.
+- Global data overflow  
+  The overflowed buffer sits in the global data region, which may be located above program code. If a vulnerable buffer and a function pointer share a struct, or the buffer neighbors process management tables, the attack aims to overwrite the function pointer later invoked. Defended against by a non-executable or randomized global data region, moving function pointers, and guard pages.
