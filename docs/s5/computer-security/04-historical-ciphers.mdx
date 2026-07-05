@@ -1,0 +1,187 @@
+---
+title: Historical Ciphers
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:11:45.001Z
+slug: s5/computer-security/historical-ciphers
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+An encryption algorithm ($e$), also called a cipher, transforms a plaintext ($m$) into a ciphertext ($c$) under the control of a secret key ($k$).
+
+$$
+c = e_k(m)
+$$
+
+The reverse process, decryption ($d$) or decipherment, recovers the plaintext:
+
+$$
+m = d_k(c)
+$$
+
+<Note>
+
+Encryption and decryption algorithms ($e$ and $d$) are public. Only the key is secret, and the ciphertext ($c$) is assumed to be easily, that is publicly, accessible.
+
+</Note>
+
+## Secret Key
+
+The secrecy of plaintext $m$ is totally dependent on the secrecy of the key $k$.
+
+Algorithms with this property are called symmetric cryptosystems or secret key cryptosystems. Both parties to a secret communication must know $k$ and keep it secret.
+
+## Ciphers for Human Readable Languages
+
+The ciphers used in the pre-computer era are called historical ciphers or classical ciphers.
+
+Historical ciphers used plaintext linked to:
+
+- A particular language.
+- The alphabet of symbols or characters used.
+- The peculiar statistical characteristics of the language.
+
+For English:
+
+- A 26 character alphabet (A to Z).
+- Higher usage of characters e, t, a, o, i.
+- Higher appearance of bigrams (th, he, an, in) and trigrams (the, ing, and, her, ere).
+
+## Shift Cipher
+
+Encryption replaces each letter in the alphabet by a letter located at a specific fixed distance from that letter.
+
+$$
+c = m + k \mod 26
+$$
+
+Here:
+
+- $m$: plaintext letter, encoded as an integer 0 (a) to 25 (z)
+- $k$: the shift value, the secret key
+
+<Note>
+
+A shift value of 3 is commonly called the Caesar cipher.
+
+</Note>
+
+Viewed as a stream cipher, a stream of plaintext characters $m_i$ and a stream of keys $k_i$ are input to $c_i = m_i + k_i \mod 26$, producing a stream of ciphertext characters $c_i$. The shift cipher's keystream is a repeating sequence of just one key value $k$.
+
+### Breaking the Shift Cipher
+
+The shift cipher has only 26 possible keys, so an attacker can try each in turn until the correct plaintext is recognized. This is called an exhaustive key search attack.
+
+Character frequency analysis computes the frequency of characters in the ciphertext and matches it against the standard character frequency table of the language.
+
+- Replace the highest frequency ciphertext characters with the corresponding plaintext characters by frequency rank.
+- The 6 most frequent English characters account for approximately 44.4% of characters in a block of text, so the correct key is usually found quickly.
+- Trial and error over different orderings of characters may be needed to find the correct key.
+
+A more rigorous technique computes the statistical distance between the standard character frequency distribution and the ciphertext's frequency distribution, for each candidate shift $k$.
+
+$$
+\Delta[X, Y_k] = \frac{1}{2}\sum_{u \in V} \left| \Pr_{X \leftarrow D_{\text{standard}}}[X = u] - \Pr_{Y_k \leftarrow D_k}[Y_k = u] \right|
+$$
+
+Here:
+
+- $X$: random variable distributed according to the standard character frequency
+- $Y_k$: random variable distributed according to the shift $k$
+- $V$: the set of values which can occur for $X$ or $Y_k$ with non-zero probability
+
+Computing $\Delta[X, Y_k]$ for each of the 26 values of $k$ and taking the smallest value gives the secret key.
+
+## Substitution Cipher
+
+The key is a proper permutation of the plaintext alphabet, rather than a simple shift.
+
+The key space equals the number of permutations of the alphabet, $26! \approx 4.03 \times 10^{26} \approx 2^{88}$.
+
+<Note>
+
+A massive key space does not make the substitution cipher unbreakable. Statistical techniques based on language characteristics still apply.
+
+</Note>
+
+## Poly-alphabetic Ciphers
+
+Both the shift and substitution ciphers always replace a plaintext character with the same ciphertext character, preserving the language's statistical characteristics in the ciphertext.
+
+A poly-alphabetic substitution cipher uses multiple substitution alphabets, e.g. one alphabet for odd-numbered positions and a different one for even-numbered positions, flattening the character frequency graph.
+
+Using $n$ alphabets in a poly-alphabetic cipher gives a key space of $(26!)^n$ at the cost of remembering a key of length $26n$ characters.
+
+### Vigenère Cipher
+
+Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
+
+A variant restricts the ciphertext alphabets used to cyclic shifts of the standard alphabet, so an $n$-alphabet Vigenère cipher has key space $26^n$ at the cost of just $n$ numeric values as the key.
+
+Viewed as a stream cipher, the keystream is a repetition of the short secret key, each character replaced by its position value, and the ciphertext stream is the modulo addition of the plaintext stream with the keystream.
+
+<Note>
+
+The cipher created by Vigenère himself is called the autokey cipher, and provides higher security than the Bellaso variant.
+
+</Note>
+
+### Attacking the Vigenère Cipher
+
+Security depends significantly on keeping the key length secret. Once the key length is found, the cipher can be attacked in the same manner as a shift cipher, using statistical properties of the plaintext language for each block of ciphertext extracted from separate keyword positions.
+
+The Kasiski test determines the keyword length.
+
+<Note title="Proof Hint">
+
+- Locate a repeating character sequence in the ciphertext.
+- Count the distances between multiple occurrences of that sequence.
+- Take the greatest common divisor of these distances as the keyword length, or a multiple of it.
+
+</Note>
+
+Repeated short strings, often common bigrams or trigrams of the language, that align to the same keyword position produce the same ciphertext string.
+
+## Playfair Cipher
+
+Invented by Sir Charles Wheatstone in 1854, named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
+
+Construction:
+
+- Fill a 5x5 grid with letters of the English alphabet, treating I and J as one letter.
+- Fill the grid starting from the top left with a short secret word containing no repeating letters.
+- Fill the remaining cells with the alphabet in natural order, skipping letters already placed.
+
+Encryption of a bigram:
+
+- Rectangle rule: if the two letters form a rectangle, replace each with the letter on the same row at the opposite corner.
+- Same column rule: if both letters are in the same column, replace each with the letter below it, wrapping to the top.
+- Same row rule: if both letters are in the same row, replace each with the letter to its right, wrapping to the left.
+
+### Attacking the Playfair Cipher
+
+Since there are more than 600 possible bigrams versus only 26 monograms, frequency analysis of bigrams requires a much larger amount of ciphertext to be captured.
+
+## Permutation Cipher
+
+Requires a block length $n$, typically small, and a permutation $\sigma \in S_n$ as the secret key.
+
+$$
+\sigma = \begin{pmatrix} 1 & 2 & 3 & 4 & 5 \\ 2 & 4 & 1 & 3 & 5 \end{pmatrix}
+$$
+
+Encrypts the plaintext HELLO as ciphertext LHLEO.
+
+### Attacking Permutation Ciphers
+
+A character frequency analysis matching the standard distribution exactly reveals that a substitution cipher, not a permutation cipher, was used, since permutation ciphers preserve single-character frequencies.
+
+<Note title="Proof Hint">
+
+- Find repeating character sequences aligned to the same block position, since these produce similar repeating sequences in the ciphertext.
+- Compute the distance between 2 such repeating blocks, or the gcd across several distances, to reveal the block length.
+- Once the block length is known, deduce the permutation by exhaustive search over $n!$ possibilities.
+
+</Note>

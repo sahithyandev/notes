@@ -1,0 +1,112 @@
+---
+title: Block Cipher Modes of Operation
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:11:45.002Z
+slug: s5/computer-security/block-cipher-modes
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+AES, the successor to DES, is based on the substitution-permutation network (SP-network) design of Rijndael, rather than the Feistel structure.
+
+## SP-Network
+
+Proposed by Claude Shannon in 1945: a series of linked permutation and substitution operations.
+
+- Diffusion  
+  Permutations disperse the statistical characteristics of each input bit among all output bits.
+- Confusion  
+  Substitutions create a complex relationship between the input and key with the output, providing the cipher's non-linearity.
+
+## Modes of Operation
+
+A mode of operation combines a block cipher into a usable block encryption scheme. DES was standardized with 4 modes:
+
+- ECB, useful for encrypting short secrets such as session keys.
+- CBC, useful for bulk data encryption.
+- OFB, useful for real-time streamed content.
+- CFB, useful for streamed content.
+
+CTR mode, enabling parallel block encryption, was developed later.
+
+### ECB
+
+Electronic Code Book: each plaintext block is encrypted independently.
+
+$$
+c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
+$$
+
+<Note>
+
+Vulnerabilities: identical plaintext blocks leak as identical ciphertext blocks, an attacker can delete or splice blocks undetected since blocks carry no context, and a ciphertext bit error corrupts only its own block on decryption, with no propagation.
+
+</Note>
+
+### CBC
+
+Cipher Block Chaining: chains each ciphertext block into the encryption of the next, giving every block context.
+
+$$
+c_1 \leftarrow e_k(m_1 \oplus IV), \quad c_i \leftarrow e_k(m_i \oplus c_{i-1}) \text{ for } i > 1
+$$
+
+$$
+m_1 \leftarrow d_k(c_1) \oplus IV, \quad m_i \leftarrow d_k(c_i) \oplus c_{i-1} \text{ for } i > 1
+$$
+
+- A single ciphertext bit error corrupts its own plaintext block fully, plus a single bit in the next block, giving 1-block error propagation.
+- A fixed public IV (e.g. all-0) need not be transmitted. A random nonce IV must be sent alongside the ciphertext.
+
+### OFB
+
+Output Feedback: runs the block cipher as a keystream generator, turning it into a stream cipher.
+
+$$
+Y_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Y_i, \quad m_i \leftarrow c_i \oplus Y_i
+$$
+
+with $Y_0 \leftarrow IV$. Both encryption and decryption use $e_k$, never $d_k$.
+
+<Note>
+
+A ciphertext bit error corrupts only the corresponding plaintext bit, no propagation. The keystream can be precomputed before ciphertext arrives, making OFB suitable for real-time streaming.
+
+</Note>
+
+### CFB
+
+Cipher Feedback: also produces a keystream, but feeds the ciphertext itself back into the cipher input.
+
+$$
+Z_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Z_i^*, \quad Y_i \leftarrow Y_{i-1} \ll c_i
+$$
+
+with $Y_0 \leftarrow IV$ and $Z_i^*$ the leading $b$ bits of $Z_i$. Decryption mirrors this using $c_i$ in place of $m_i$.
+
+<Note>
+
+A ciphertext bit error corrupts the corresponding plaintext bit, then keeps corrupting the shift register $Y_i$ until it is fully flushed after $n/b$ rounds, causing severe error propagation. Since $Y_i$ depends on the received ciphertext, the keystream cannot be precomputed, making CFB less suited to real-time use than OFB.
+
+</Note>
+
+### CTR
+
+Counter mode: like ECB, but XORs plaintext with the encryption of a counter rather than encrypting the plaintext directly.
+
+$$
+c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_b), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_b)
+$$
+
+where $\langle i \rangle_b$ is the $b$-bit binary representation of $i$.
+
+- Blocks can be encrypted in parallel, like ECB, since each block is independent.
+- The counter provides context, preventing the cut-and-paste and rearrangement attacks possible against ECB.
+
+<Note>
+
+The counter value $IV + i$ must never be reused under the same key.
+
+</Note>

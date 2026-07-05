@@ -1,0 +1,91 @@
+---
+title: "Confidentiality, Integrity, and Availability"
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-07-05T05:11:45.001Z
+slug: s5/computer-security/confidentiality-integrity-availability
+sidebar:
+  order: 2
+prev: true
+next: true
+prereqs:
+  - s4/operating-systems-security/cia-triad
+---
+
+## Confidentiality
+
+Ensuring confidentiality raises several open questions:
+
+- Who determines which people or systems are authorized to access a system.
+- Whether authorized access covers part or all of a data collection.
+- Whether an authorized party can access pieces of data out of context.
+- Whether an authorized party can disclose data they access to other parties.
+- Who owns data generated indirectly, e.g. the fact that a user clicked a link on a web page.
+
+### Modeling Confidentiality
+
+A general statement on confidentiality: a person, process, or program is (or is not) authorized to access a data item in a particular way.
+
+The security model consists of:
+
+- Subject  
+  The person, process, or program.
+- Object  
+  The data item.
+- Access mode  
+  The kind of access, such as read, write, or execute.
+- Policy  
+  The authorization.
+
+<Note>
+
+The policy-based access control scheme forms a critical part of every general purpose operating system.
+
+</Note>
+
+### Confidentiality Violations
+
+Examples:
+
+- An unauthorized person accesses a data item.
+- An unauthorized process or program accesses a data item.
+- An authorized person accesses data they are not authorized to access, a privilege violation.
+- A person accesses data in a manner allowing inference of data whose access is unauthorized, e.g. a medical condition inferred through pharmaceutical purchases.
+- An unauthorized person learns of the existence of a piece of data, e.g. a company takeover inferred through updates to financial reports.
+
+<Note>
+
+A series of individually unremarkable actions can together violate confidentiality.
+
+</Note>
+
+## Integrity
+
+Interpretations of an item's integrity:
+
+- Precise.
+- Accurate.
+- Unmodified.
+- Modified only in acceptable ways.
+- Modified only by authorized people.
+- Modified only by authorized processes.
+- Consistent, internally consistent.
+- Meaningful and usable.
+
+## Availability
+
+Availability applies to both data (information) and services (information processing).
+
+An item of data or a specific service is available **iff**:
+
+- It is present in a usable form.
+- It has enough capacity to meet the service's needs.
+- It is making clear progress, and if in wait mode, has a bounded waiting time.
+- The service completes in an acceptable period of time.
+
+<Note>
+
+Availability is a complex notion perceived differently across varied circumstances.
+
+</Note>
+
+Availability overlaps with related non-functional requirements: capacity, performance, fault tolerance, usability.
