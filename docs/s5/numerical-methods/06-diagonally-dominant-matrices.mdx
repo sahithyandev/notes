@@ -1,0 +1,38 @@
+---
+title: Diagonally Dominant Matrices
+dateCreated: 2026-07-07T05:18:51.154Z
+lastUpdatedOn: 2026-07-11T10:48:03.834Z
+slug: s5/numerical-methods/diagonally-dominant-matrices
+sidebar:
+  order: 6
+prev: true
+next: true
+---
+
+An $n \times n$ matrix $A$ is diagonally dominant **iff**
+
+$$
+|a_{ii}| \ge \sum_{j=1, j \neq i}^{n} |a_{ij}|, \quad \text{for each } i = 1, 2, \ldots, n
+$$
+
+$A$ is strictly diagonally dominant **iff**
+
+$$
+|a_{ii}| > \sum_{j=1, j \neq i}^{n} |a_{ij}|, \quad \text{for each } i = 1, 2, \ldots, n
+$$
+
+A strictly diagonally dominant matrix $A$ is nonsingular. Gauss elimination on $A\vec{x} = \vec{b}$ then gives a unique solution without row or column interchanges, with computations stable against round-off error growth.
+
+Examples:
+
+$$
+A = \begin{pmatrix} 7 & 2 & 0 \\ 3 & 5 & -1 \\ 0 & 5 & -6 \end{pmatrix}
+$$
+
+$A$ is strictly diagonally dominant since $|7| > |2| + |0|$, $|5| > |3| + |1|$, and $|6| > |0| + |5|$.
+
+$$
+B = \begin{pmatrix} 6 & 4 & -3 \\ 4 & -2 & 0 \\ -3 & 0 & 1 \end{pmatrix}
+$$
+
+$B$ is not strictly diagonally dominant since $|6| < |4| + |3| = 7$ in the first row.

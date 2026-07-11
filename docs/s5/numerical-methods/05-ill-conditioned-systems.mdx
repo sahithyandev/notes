@@ -1,0 +1,30 @@
+---
+title: Ill-Conditioned Systems
+dateCreated: 2026-07-07T05:18:49.719Z
+lastUpdatedOn: 2026-07-11T10:48:03.834Z
+slug: s5/numerical-methods/ill-conditioned-systems
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+A problem is ill-conditioned **iff** a small change in any of its elements causes a large change in its solution. Otherwise it's well-conditioned.
+
+For a matrix, the degree of ill-conditioning is measured by a condition number, defined using the norms of the matrix and its inverse.
+
+<Note>
+
+Round-off error effectively perturbs the entries of $A$ and $\vec{b}$. If the system is ill-conditioned, this produces large errors in the solution. Ill-conditioned systems are inherently difficult to handle in the presence of rounding errors, and the usual row reduction algorithm must be modified when they arise.
+
+</Note>
+
+Examples:
+
+$$
+\begin{cases} x + y = 2 \\ x + 1.001y = 2 \end{cases}
+\qquad
+\begin{cases} x + y = 2 \\ x + 1.001y = 2.001 \end{cases}
+$$
+
+The left system has solution $x = 2$, $y = 0$. The right system, obtained by a $0.001$ change in one constant, has solution $x = 1$, $y = 1$. The coefficient matrix is ill-conditioned, with condition number $4004$.

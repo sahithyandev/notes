@@ -1,0 +1,55 @@
+---
+title: LUP Decomposition
+dateCreated: 2026-07-07T05:19:23.724Z
+lastUpdatedOn: 2026-07-11T10:48:03.834Z
+slug: s5/numerical-methods/lup-decomposition
+sidebar:
+  order: 10
+prev: true
+next: true
+---
+
+The LU decomposition with partial pivoting of an $n \times n$ matrix $A$ is a triple $L, U, P$ such that
+
+$$
+PA = LU
+$$
+
+where:
+
+- $L$: $n \times n$ lower triangular, with all diagonal entries $1$
+- $U$: $n \times n$ upper triangular
+- $P$: $n \times n$ permutation matrix
+
+Properties:
+
+- $P$ permutes the rows of $A$ to put large entries in the top-left position of $A$ and each sub-matrix encountered during the recursion, avoiding division by a small or zero element.
+- LUP decomposition always exists for $A$.
+- LUP decomposition of $A$ is not unique.
+- LUP decomposition solves linear systems more robustly than plain LU decomposition, at approximately the same cost.
+
+To solve $A\vec{x} = \vec{b}$ using an LUP decomposition:
+
+$$
+A\vec{x} = \vec{b} \implies PA\vec{x} = P\vec{b} \implies LU\vec{x} = P\vec{b}
+$$
+
+then solve $LU\vec{x} = P\vec{b}$ as in [LU decomposition](/s5/numerical-methods/lu-decomposition).
+
+## Recursive leading-row-column algorithm
+
+Finds $L, U, P$ so that $PA = LU$:
+
+- Choose $i$ so row $i$ of $A$ has the largest absolute first entry, $|A_{i1}| \ge |A_{j1}|$ for all $j$. Let $P_1$ pivot row $i$ to the first row, leaving all other rows in order.
+- Let $\bar{A} = P_1 A$.
+- Let $P_2$ leave the first row fixed and permute the remaining rows, so $P_2 = \begin{pmatrix} 1 & 0 \\ 0 & P_{22} \end{pmatrix}$.
+- Factor the full permutation as $P = P_2 P_1$.
+- Solve $P_{22}(\bar{A}_{22} - \bar{a}_{21}\bar{a}_{11}^{-1}\bar{a}_{12}) = L_{22}U_{22}$ recursively for the remaining rows and columns of $L$ and $U$.
+
+Examples:
+
+Find the LU factorization with partial pivoting of
+
+$$
+A = \begin{pmatrix} -3 & 2 & -1 \\ 6 & -6 & 7 \\ 3 & -4 & 4 \end{pmatrix}
+$$

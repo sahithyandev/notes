@@ -1,0 +1,32 @@
+---
+title: Positive Definite Matrices
+dateCreated: 2026-07-07T05:18:54.628Z
+lastUpdatedOn: 2026-07-11T10:48:03.834Z
+slug: s5/numerical-methods/positive-definite-matrices
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+A matrix $A$ is positive definite **iff** $A$ is symmetric and $\vec{x}^T A \vec{x} > 0$ for every non-zero $n$-dimensional vector $\vec{x}$.
+
+If $A$ is positive definite, all eigenvalues of $A$ are positive.
+
+A leading principal submatrix of $A$ is
+
+$$
+A_k = \begin{pmatrix} a_{11} & a_{12} & \cdots & a_{1k} \\ a_{21} & a_{22} & \cdots & a_{2k} \\ \vdots & \vdots & & \vdots \\ a_{k1} & a_{k2} & \cdots & a_{kk} \end{pmatrix}, \quad \text{for some } 1 \le k \le n
+$$
+
+A symmetric matrix $A$ is positive definite **iff** each of its leading principal submatrices has a positive determinant.
+
+A symmetric matrix $A$ is positive definite **iff** Gauss elimination without row interchanges can be performed on $A\vec{x} = \vec{b}$ with all pivot elements positive. In this case the computations are stable against round-off error growth.
+
+Examples:
+
+$$
+A = \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix}
+$$
+
+is positive definite: its leading principal submatrices have determinants $2$, $3$, and $4$, all positive.

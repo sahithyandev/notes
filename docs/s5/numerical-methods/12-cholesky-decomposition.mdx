@@ -1,0 +1,32 @@
+---
+title: Cholesky Decomposition
+dateCreated: 2026-07-07T05:19:32.034Z
+lastUpdatedOn: 2026-07-11T10:48:03.835Z
+slug: s5/numerical-methods/cholesky-decomposition
+sidebar:
+  order: 12
+prev: true
+next: false
+---
+
+$A$ is [positive definite](/s5/numerical-methods/positive-definite-matrices) **iff** $A$ factors as $A = LL^T$, where $L$ is lower triangular with non-zero diagonal entries. This factorization is the Cholesky decomposition.
+
+The triangular factors are transposes of each other.
+
+For row $k$:
+
+$$
+l_{ki} = \frac{a_{ki} - \sum\limits_{j=1}^{i-1} l_{ij}l_{kj}}{l_{ii}}, \quad \text{for } i = 1, 2, \ldots, k-1
+$$
+
+$$
+l_{kk} = \sqrt{a_{kk} - \sum_{j=1}^{k-1} l_{kj}^2}
+$$
+
+Examples:
+
+Apply Cholesky decomposition to
+
+$$
+A = \begin{pmatrix} 6 & 15 & 55 \\ 15 & 55 & 225 \\ 55 & 225 & 979 \end{pmatrix}
+$$

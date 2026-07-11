@@ -1,0 +1,102 @@
+---
+title: Vector and Matrix Norms
+dateCreated: 2026-07-07T05:19:09.542Z
+lastUpdatedOn: 2026-07-11T10:48:03.834Z
+slug: s5/numerical-methods/vector-and-matrix-norms
+sidebar:
+  order: 8
+prev: true
+next: true
+---
+
+A norm is a real-valued function that measures the size of a vector or matrix.
+
+## Vector norms
+
+A vector norm on $\mathbb{R}^n$ is a function $\lVert \cdot \rVert$ from $\mathbb{R}^n$ into $\mathbb{R}$ satisfying, for all $\vec{x}, \vec{y} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$:
+
+- $\lVert \vec{x} \rVert \ge 0$
+- $\lVert \vec{x} \rVert = 0$ **iff** $\vec{x} = \vec{0}$
+- $\lVert \alpha \vec{x} \rVert = |\alpha| \lVert \vec{x} \rVert$
+- $\lVert \vec{x} + \vec{y} \rVert \le \lVert \vec{x} \rVert + \lVert \vec{y} \rVert$
+
+For $\vec{x} = (x_1, x_2, \ldots, x_n)^T$, 3 standard norms are:
+
+$$
+\lVert \vec{x} \rVert_1 = \sum_{i=1}^{n} |x_i|, \qquad
+\lVert \vec{x} \rVert_2 = \left( \sum_{i=1}^{n} x_i^2 \right)^{1/2}, \qquad
+\lVert \vec{x} \rVert_\infty = \max_{1 \le i \le n} |x_i|
+$$
+
+$\lVert \cdot \rVert_2$ is the Euclidean norm.
+
+The Cauchy-Schwarz inequality holds for $\vec{x}, \vec{y} \in \mathbb{R}^n$:
+
+$$
+\left( \sum_{i=1}^{n} x_i^2 \right) \left( \sum_{i=1}^{n} y_i^2 \right) \ge \left( \sum_{i=1}^{n} x_i y_i \right)^2
+$$
+
+2 norms $\lVert \cdot \rVert_{v_1}$ and $\lVert \cdot \rVert_{v_2}$ are equivalent **iff** positive constants $c_1, c_2$ exist such that for all $\vec{x} \in \mathbb{R}^n$,
+
+$$
+c_1 \lVert \vec{x} \rVert_{v_1} \le \lVert \vec{x} \rVert_{v_2} \le c_2 \lVert \vec{x} \rVert_{v_1}
+$$
+
+$\lVert \cdot \rVert_\infty$, $\lVert \cdot \rVert_2$, and $\lVert \cdot \rVert_1$ are equivalent on $\mathbb{R}^n$:
+
+- $\lVert \vec{x} \rVert_\infty \le \lVert \vec{x} \rVert_2 \le \sqrt{n} \lVert \vec{x} \rVert_\infty$
+- $\lVert \vec{x} \rVert_\infty \le \lVert \vec{x} \rVert_1 \le n \lVert \vec{x} \rVert_\infty$
+
+## Matrix norms
+
+A matrix norm on $n \times n$ matrices is a real-valued function $\lVert \cdot \rVert$ satisfying, for all $n \times n$ matrices $A, B$ and $\alpha \in \mathbb{R}$:
+
+- $\lVert A \rVert \ge 0$
+- $\lVert A \rVert = 0$ **iff** $A$ is the zero matrix
+- $\lVert \alpha A \rVert = |\alpha| \lVert A \rVert$
+- $\lVert A + B \rVert \le \lVert A \rVert + \lVert B \rVert$
+- $\lVert AB \rVert \le \lVert A \rVert \lVert B \rVert$
+
+Given a vector norm $\lVert \cdot \rVert_v$ on $\mathbb{R}^n$, the induced matrix norm is
+
+$$
+\lVert A \rVert_M = \sup_{\vec{x} \neq \vec{0}} \frac{\lVert A\vec{x} \rVert_v}{\lVert \vec{x} \rVert_v} = \sup_{\lVert \vec{x} \rVert_v = 1} \lVert A\vec{x} \rVert_v
+$$
+
+For $A = (a_{ij}) \in \mathbb{R}^{n \times n}$, the induced $\infty$-norm and $1$-norm are
+
+$$
+\lVert A \rVert_\infty = \max_{1 \le i \le n} \sum_{j=1}^{n} |a_{ij}| \quad \text{(maximum row sum)}
+$$
+
+$$
+\lVert A \rVert_1 = \max_{1 \le j \le n} \sum_{i=1}^{n} |a_{ij}| \quad \text{(maximum column sum)}
+$$
+
+## Spectral radius
+
+The set of eigenvalues of $A$ is the spectrum, $\sigma(A) = \{\lambda_i \mid A\vec{v} = \lambda_i \vec{v}, \vec{v} \in \mathbb{R}^n\}$.
+
+The spectral radius of $A$ is $\rho(A) = \max_{\lambda \in \sigma(A)} |\lambda|$.
+
+The induced $2$-norm is
+
+$$
+\lVert A \rVert_2 = \sqrt{\rho(A^T A)}
+$$
+
+For any matrix norm $\lVert \cdot \rVert_m$ induced by a vector norm, $\rho(A) \le \lVert A \rVert_m$ for all $A \in \mathbb{R}^{n \times n}$.
+
+## Convergent matrices
+
+$A_{n \times n}$ converges to $B$ **iff** $\lim\limits_{k \to \infty} A^k = B$.
+
+For any square matrix $A$, the following are equivalent:
+
+- $A$ converges to $\vec{0}$, i.e. $\lim\limits_{k \to \infty} A^k = 0$
+- $\lim\limits_{k \to \infty} \lVert A \rVert_m^k = 0$ for some matrix norm $\lVert \cdot \rVert_m$
+- $\rho(A) < 1$
+
+Examples:
+
+For $A = \begin{pmatrix} 1 & 2 & 0 \\ 0 & 3 & -2 \\ 2 & -1 & 1 \end{pmatrix}$, $\lVert A \rVert_\infty = 5$ (row 2: $|0| + |3| + |-2|$), $\lVert A \rVert_1 = 6$ (column 2: $|2| + |3| + |-1|$).
