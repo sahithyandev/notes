@@ -1,0 +1,43 @@
+---
+title: TNB Frame
+dateCreated: 2026-07-03T04:23:09.633Z
+lastUpdatedOn: 2026-07-12T17:39:20.140Z
+slug: s5/calculus/tnb-frame
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+Let $C$ be the curve traced by a differentiable $\vec{r}(t)$ in three-dimensional space, with $T(t)$ and $N(t)$ defined. The binormal vector is
+
+$$
+B(t) = T(t) \times N(t)
+$$
+
+$B(t)$ is orthogonal to both $T(t)$ and $N(t)$, oriented by the right-hand rule, and is a unit vector since $\lVert T(t) \times N(t) \rVert = \lVert T(t) \rVert \lVert N(t) \rVert \sin\frac{\pi}{2} = 1$.
+
+For each $t$, $\{T(t), N(t), B(t)\}$ is a set of 3 mutually orthogonal unit vectors.
+
+If $\vec{r}'(t)$ and $\vec{r}''(t)$ exist and $\vec{r}'(t) \times \vec{r}''(t) \ne \vec{0}$,
+
+$$
+B(t) = \frac{\vec{r}'(t) \times \vec{r}''(t)}{\lVert \vec{r}'(t) \times \vec{r}''(t) \rVert}
+$$
+
+If $\vec{r}$ is parametrized by arc length $s$ and $\vec{r}''(s) \ne \vec{0}$,
+
+$$
+B(s) = \frac{\vec{r}'(s) \times \vec{r}''(s)}{\lVert \vec{r}''(s) \rVert}
+$$
+
+At each point on $C$, $T(t)$, $N(t)$, $B(t)$ determine 3 mutually perpendicular planes:
+
+- $TB$-plane
+  Rectifying plane.
+- $TN$-plane
+  Osculating plane.
+- $NB$-plane
+  Normal plane.
+
+The moving orthonormal frame determined by $T(t)$, $N(t)$, $B(t)$ is the TNB frame, or Frenet frame. It changes as its origin moves along $C$. The fixed $xyz$-coordinate system determined by $\hat{i}$, $\hat{j}$, $\hat{k}$ remains unchanged along the curve.

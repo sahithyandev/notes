@@ -1,0 +1,48 @@
+---
+title: Arc-Length Parametrization
+dateCreated: 2026-07-03T04:23:09.633Z
+lastUpdatedOn: 2026-07-12T17:39:20.139Z
+slug: s5/calculus/arc-length-parametrization
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+## Change of parameter
+
+A change of parameter in $\vec{r}(t)$ is a substitution $t = g(\tau)$ producing $\vec{r}(g(\tau))$, tracing the same curve as $\vec{r}(t)$, possibly in a different direction as $\tau$ increases.
+
+If $\vec{r}(t)$ is differentiable with respect to $t$, and $t = g(\tau)$ is a change of parameter with $g$ differentiable with respect to $\tau$, then $\vec{r}(g(\tau))$ is differentiable with respect to $\tau$, and
+
+$$
+\frac{\text{d}}{\text{d}\tau}[\vec{r}(g(\tau))] = \vec{r}'(g(\tau))g'(\tau)
+$$
+
+Equivalently,
+
+$$
+\frac{\text{d}\vec{r}}{\text{d}\tau} = \frac{\text{d}\vec{r}}{\text{d}t} \cdot \frac{\text{d}t}{\text{d}\tau}
+$$
+
+## Arc-length parametrization
+
+Let $C$ be the curve traced by a continuously differentiable $\vec{r}(t)$ with $\vec{r}'(t) \ne \vec{0}$, and let $\vec{r}(t_0)$ be a reference point on $C$. The signed arc-length parameter $s$ measured from $\vec{r}(t_0)$ is
+
+$$
+s = s(t) = \int_{t_0}^{t} \left\lVert \frac{\text{d}\vec{r}}{\text{d}u} \right\rVert \text{d}u
+$$
+
+Since
+
+$$
+\frac{\text{d}s}{\text{d}t} = \lVert \vec{r}'(t) \rVert > 0
+$$
+
+$s = s(t)$ is increasing and can be used as a new parameter. A parametrization expressed in terms of $s$ is an arc-length parametrization.
+
+Let $C$ be the curve traced by a continuously differentiable $\vec{r}(t)$ with $\vec{r}'(t) \ne \vec{0}$:
+
+- $s = s(t)$ is the arc-length parameter for $C$ **iff** $\dfrac{\text{d}s}{\text{d}t} = \left\lVert \dfrac{\text{d}\vec{r}}{\text{d}t} \right\rVert$.
+- If $\vec{r}$ is expressed as a function of $s$, $\left\lVert \dfrac{\text{d}\vec{r}}{\text{d}s} \right\rVert = 1$.
+- If $\left\lVert \dfrac{\text{d}\vec{r}}{\text{d}t} \right\rVert = 1$ for all $t$, then for any $t_0$ in the domain of $\vec{r}$, $s = t - t_0$ is an arc-length parameter with reference point $\vec{r}(t_0)$.
