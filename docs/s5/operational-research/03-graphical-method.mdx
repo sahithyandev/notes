@@ -1,0 +1,29 @@
+---
+title: Graphical Method
+dateCreated: 2026-07-14T00:00:00.000Z
+lastUpdatedOn: 2026-07-14T15:42:45.276Z
+slug: s5/operational-research/graphical-method
+sidebar:
+  order: 3
+prev: true
+next: true
+---
+
+Suppose a linear program has $n$ decision variables. Then it can be solved graphically using a $\mathbb{R}^n$ space. Hence not suitable for $n > 2$ (or $n > 3$ with computer visualization).
+
+All constraints are plotted on the same $\mathbb{R}^n$ space. Feasible region is the intersection of all constraint half-spaces. Optimal solution occurs at a vertex (and not the interior) of the feasible region.
+
+The vertex is found by moving the objective hyperplane $z = c_1x_1 + \dots + c_nx_n$ across the feasible region. Increase $z$ for maximization, decrease it for minimization. The optimal vertex is the last one the hyperplane touches before leaving the region.
+
+### Vertex Property
+
+The vertex property holds because the feasible region is a convex polygon. A linear function attains its extremum over a convex polygon at an extreme point.
+
+## Special Cases
+
+- Multiple optima  
+  The objective line is parallel to a binding constraint edge. Every point on that edge is optimal.
+- Unbounded problem  
+  The feasible region extends without limit in the improving direction. No finite optimum exists.
+- Infeasible problem  
+  The constraint half-planes have empty intersection. No solution exists.

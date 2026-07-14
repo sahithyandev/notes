@@ -1,13 +1,47 @@
 ---
 title: Linear Programming
 dateCreated: 2026-07-03T00:00:00.000Z
-lastUpdatedOn: 2026-07-04T05:52:29.781Z
+lastUpdatedOn: 2026-07-14T15:42:45.274Z
 slug: s5/operational-research/linear-programming
 sidebar:
   order: 2
 prev: true
 next: true
 ---
+
+Linear programming focuses on solving optimization problems with a linear objective function subject to linear constraints.
+
+## Decision Variable
+
+A quantity $x_j$ whose value is chosen by the solver to optimize the objective.
+
+Values of these variables are determined by solving the LP.
+
+## Linear Objective Function
+
+Expression that must be maximized or minimized. Linear in terms of the decision variables; no products or powers of $x_j$ terms.
+
+## Linear Constraint
+
+A linear inequality or equality that restricts the values decision variables can take.
+
+- Structural constraint  
+  Limits imposed by resources, demand, or policy.
+- Non-negativity constraint  
+  $x_j \ge 0$ for every decision variable. Negative quantities are not physically meaningful.
+- Bound constraint  
+  Fixes an upper or lower limit on a single variable.
+
+Types by direction:
+
+- Less than or equal to ($\le$)  
+  Caps usage, common for limited resources.
+- Greater than or equal to ($\ge$)  
+  Enforces a minimum, common for demand or quality requirements.
+- Equal to ($=$)  
+  Forces exact equality, common for balance conditions.
+
+## Linear Program
 
 A linear program is an optimization problem with a linear objective function subject to linear constraints.
 
@@ -17,142 +51,45 @@ $$
 
 Subject to:
 
-$$
-a_{i1}x_1 + a_{i2}x_2 + \dots + a_{in}x_n \le b_i \quad \forall i
-$$
-
-Here:
-
 - $x_1, \dots, x_n$: decision variables
 - $c_1, \dots, c_n$: objective coefficients
 - $a_{ij}$: constraint coefficients
 - $b_i$: constraint bounds
 
-## Modelling
+To solve a linear program:
 
-Identify decision variables, express the objective and constraints as linear functions of those variables.
+- Identify decision variables
+- Express the objective and constraints as linear functions
+- Use a linear programming solver to find the optimal solution
 
-### Decision Variables
+## Standard Model Types
 
-A decision variable is a quantity $x_j$ whose value is chosen by the solver to optimize the objective.
-
-- Represent the choices actually available (units produced, quantity shipped, hours allocated).
-- Values are determined by solving the LP, never fixed in advance.
-
-### Constraints
-
-A constraint is a linear inequality or equality that restricts the values decision variables can take.
-
-- Structural constraint  
-  Limits imposed by resources, demand, or policy, expressed as $\sum_j a_{ij}x_j \le b_i$, $\ge b_i$, or $= b_i$.
-- Non-negativity constraint  
-  $x_j \ge 0$ for every decision variable, since negative quantities are not physically meaningful.
-- Bound constraint  
-  Fixes an upper or lower limit on a single variable, $x_j \le u_j$ or $x_j \ge l_j$.
-
-Types by direction:
-
-- $\le$  
-  Caps usage, common for limited resources (labour hours, budget).
-- $\ge$  
-  Enforces a minimum, common for demand or quality requirements (nutrient content, minimum output).
-- $=$  
-  Forces exact equality, common for balance conditions (supply equals demand, mass balance).
-
-### Standard Model Types
+A standard model type is a recurring pattern of variables, objective, and constraints for building a linear program.
 
 - Product mix  
-  Maximize profit from producing $n$ products subject to limited resources (labour, machine hours, raw material). Used when a firm decides how much of each product to make.
+  Maximize profit from $n$ products under limited resources.
 - Blending  
-  Minimize cost of mixing $n$ ingredients into a final product meeting quality specs (nutrient content, octane rating). Used when inputs are combined in continuous proportions rather than discrete units.
-- Diet  
-  Minimize cost of a food combination subject to minimum nutrient requirements. A special case of blending where constraints are $\ge$ (lower bounds) rather than $\le$.
+  Minimize cost of mixing $n$ ingredients into a product meeting quality specs.
+  - Diet  
+    Special case of blending. Minimize food cost subject to minimum nutrient requirements.
 - Transportation  
-  Minimize shipping cost of a single commodity from $m$ supply points to $n$ demand points. Used when supply and demand are at fixed locations and only routing quantities are decided.
-- Assignment  
-  Minimize cost (or maximize efficiency) of assigning $n$ agents to $n$ tasks, one-to-one. A special case of transportation where every supply and demand equals 1.
+  Minimize shipping cost of one commodity from $m$ supply points to $n$ fixed demand points.
+  - Assignment  
+    Special case of transportation with unit supply and demand. Minimize cost of assigning $n$ agents to $n$ tasks, one-to-one.
 - Transshipment  
-  Minimize shipping cost when goods may pass through intermediate nodes before reaching demand points. Used when direct supply-to-demand routes are not the only option.
+  Minimize shipping cost when goods pass through intermediate nodes instead of direct supply-to-demand routes.
 
-<Note>
+## Choosing Between Models
 
-Transportation, assignment, and transshipment models share integer-valued optimal solutions at vertices whenever supplies and demands are integers, so they can be solved as LPs without rounding.
+LP requires linear relationships, a single objective, no time-staging, and no integrality restriction. Use instead:
 
-</Note>
-
-### Choosing Between Models
-
-Related model types solve different structures. Picking LP over these requires the corresponding condition below to hold.
-
-- Nonlinear Programming  
-  Needed when the objective or constraints contain nonlinear relationships (diminishing returns, interaction terms between variables). Unnecessary, and an overcomplication, if every relationship in the model is linear.
-- Pure Integer Programming  
-  Needed when every decision variable must take integer values. Excessive if the variables represent continuously divisible quantities (acreage, litres, hours), since forcing integrality only slows solving without adding accuracy.
-- Mixed Integer Linear Programming  
-  Needed when some, but not all, decision variables are restricted to integers (a subset of on/off or count decisions mixed with continuous ones), while the objective and constraints stay linear.
-- Goal Programming  
-  Needed when multiple competing objectives must be balanced against target trade-offs. Does not fit a model with a single, clear objective (maximize profit, minimize cost).
-- Dynamic Programming  
-  Needed when decisions are sequential and stage-based, with outcomes at one stage affecting later stages. Does not fit a one-shot allocation problem with no time-staged component.
-
-## Geometrical Solution
-
-For 2 decision variables, plot the constraints as half-planes on the $x_1$-$x_2$ plane.
-
-- Feasible region  
-  The intersection of all constraint half-planes.
-- Optimal solution  
-  Occurs at a vertex of the feasible region.
-
-The optimum is found by sliding the objective line $c_1x_1 + c_2x_2 = z$ across the feasible region in the improving direction. The last point of contact before the line leaves the region is optimal.
-
-<Note>
-
-The vertex property holds because the feasible region is a convex polygon and a linear function attains its extremum over a convex polygon at an extreme point.
-
-</Note>
-
-Special cases:
-
-- Multiple optima  
-  The objective line is parallel to a binding constraint edge. Every point on that edge is optimal.
-- Unbounded problem  
-  The feasible region extends without limit in the improving direction. No finite optimum exists.
-- Infeasible problem  
-  The constraint half-planes have empty intersection. No solution exists.
-
-For more than 2 variables, the [simplex algorithm](/s5/operational-research/simplex-algorithm) solves the LP algebraically.
-
-## Sensitivity Analysis
-
-Studies how the optimal solution changes as objective coefficients or constraint bounds vary.
-
-- Objective coefficient range  
-  The interval over which a coefficient $c_j$ can vary while the current optimal vertex remains optimal. The objective value changes within the range, the solution does not.
-- Right-hand side range  
-  The interval over which a bound $b_i$ can vary while the same set of constraints remains binding. The optimal vertex moves, but its identity as an intersection of the same constraints is preserved.
-- Shadow price  
-  The rate of change of the optimal objective value per unit increase in $b_i$. Valid only within the right-hand side range. A non-binding constraint has shadow price 0.
-- Reduced cost  
-  The amount the objective coefficient of a variable at value 0 must improve before that variable takes a positive value in the optimal solution.
-
-## Duality
-
-Every linear program (the primal) has an associated dual linear program.
-
-Construction for a maximization primal with $\le$ constraints:
-
-- 1 dual variable $y_i \ge 0$ per primal constraint.
-- 1 dual constraint $\sum_i a_{ij}y_i \ge c_j$ per primal variable.
-- The dual minimizes $\sum_i b_iy_i$.
-
-Properties:
-
-- Weak duality  
-  The dual objective bounds the primal objective. Any dual feasible solution gives an upper bound on any primal feasible solution (for a maximization primal).
-- Strong duality  
-  At optimality, primal and dual objective values coincide.
-- Complementary slackness  
-  At optimality, a primal constraint with slack has dual variable 0. A positive dual variable implies its primal constraint is binding.
-
-The optimal dual variable $y_i$ equals the shadow price of primal constraint $i$.
+- Nonlinear programming  
+  Relationships aren't linear.
+- Pure integer programming  
+  Every variable must be an integer.
+- Mixed integer linear programming  
+  Only some variables must be integers.
+- Goal programming  
+  Multiple competing objectives balanced against targets.
+- Dynamic programming  
+  Sequential, stage-based decisions where one stage affects later ones.
