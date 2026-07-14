@@ -16,7 +16,8 @@
     "script:update-frontmatter": "bun scripts/update-frontmatter.ts",
     "script:auto-slug": "bun scripts/auto-slug.ts",
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "generate-db-types": "supabase gen types typescript --project-id qrpfxrgemtvxmkuhmpcg > src/lib/database.types.ts"
   },
   "lint-staged": {
     "docs/**/*.{md,mdx}": [
