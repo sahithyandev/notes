@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { SITE_HOST_URL } from "../../utils/values";
+import { SITE_HOST_URL, isWip } from "../../utils/values";
 
 export const prerender = true;
 
@@ -24,15 +24,16 @@ export async function GET({ params }: { params: { sem: string } }) {
     <priority>0.8</priority>
   </url>
   ${semesterNotes
-    .map(
-      (note) => `
+    .map((note) => {
+      const wip = isWip(note.data.slug);
+      return `
   <url>
     <loc>${SITE_HOST_URL}/${note.data.slug}</loc>
     <lastmod>${note.data.lastUpdatedOn ? formatDate(note.data.lastUpdatedOn) : new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`,
-    )
+    <changefreq>${wip ? "daily" : "weekly"}</changefreq>
+    <priority>${wip ? "0.4" : "0.7"}</priority>
+  </url>`;
+    })
     .join("")}
 </urlset>`;
 
