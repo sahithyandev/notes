@@ -52,7 +52,17 @@ const { Content, headings } = await render(notesEntry);
 const prereqEntries = notesEntry.data.prereqs
   ? (
       await Promise.all(
-        notesEntry.data.prereqs.map((s) => getEntry("notes", s)),
+        notesEntry.data.prereqs.map(async (s) => {
+          const entry = await getEntry(
+            "notes",
+            s.includes("#") ? s.slice(0, s.indexOf("#")) : s,
+          );
+          if (!entry) return null;
+          return {
+            entry,
+            slug: s,
+          };
+        }),
       )
     ).filter((e): e is NonNullable<typeof e> => !!e)
   : [];
