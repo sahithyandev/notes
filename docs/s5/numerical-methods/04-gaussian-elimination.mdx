@@ -1,0 +1,144 @@
+---
+title: Gaussian Elimination
+sidebar:
+  order: 4
+dateCreated: 2026-07-19T16:40:09.889Z
+lastUpdatedOn: 2026-07-19T18:25:51.371Z
+slug: s5/numerical-methods/gaussian-elimination
+prev: true
+next: true
+prereqs:
+  - s1/mathematics/matrices/echelon-form
+---
+
+Gaussian elimination reduces $A\vec{x} = \vec{b}$ to [echelon form](/s1/mathematics/matrices/echelon-form) by [row operations](/s5/numerical-methods/equivalent-systems), then solves it by back substitution.
+
+## Forward elimination
+
+The pivot element of a column is the entry used to eliminate the other entries in that column.
+
+Provided $a_{11} \neq 0$, eliminate $x_1$ from equations $2$ through $n$ using
+
+$$
+R_j - \frac{a_{j1}}{a_{11}} R_1 \to R_j, \quad j = 2, 3, \ldots, n
+$$
+
+More generally, eliminate $x_i$ below row $i$, for $i = 1, 2, \ldots, n-1$, using
+
+$$
+R_j - \frac{a_{ji}^{(i)}}{a_{ii}^{(i)}} R_i \to R_j, \quad j = i+1, i+2, \ldots, n
+$$
+
+provided $a_{ii}^{(i)} \neq 0$. This reduces $[A \mid \vec{b}]$ to upper triangular form
+
+$$
+\begin{pmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} & b_1^{(1)} \\
+0 & a_{22}^{(1)} & \cdots & a_{2n} & b_2^{(2)} \\
+\vdots & & \ddots & \vdots & \vdots \\
+0 & 0 & \cdots & a_{nn}^{(n-1)} & b_n^{(n-1)}
+\end{pmatrix}
+$$
+
+## Back substitution
+
+Once $[A \mid \vec{b}]$ is upper triangular, each row has 1 fewer unknown than the row above it. The last row has only $x_n$
+
+$$
+x_n = \frac{b_n^{(n-1)}}{a_{nn}^{(n-1)}}
+$$
+
+Each remaining unknown is then found from the bottom up, substituting in the ones already solved
+
+$$
+x_i = \frac{b_i^{(i-1)} - \sum\limits_{j=i+1}^{n} a_{ij}^{(i-1)}x_j}{a_{ii}^{(i-1)}}, \quad i = n-1, n-2, \ldots, 1
+$$
+
+Here, $\sum_{j=i+1}^{n} a_{ij}^{(i-1)}x_j$ is the contribution of the already-solved unknowns $x_{i+1}, \ldots, x_n$ to row $i$.
+
+## Pivoting
+
+Pivoting is interchanging rows to place a useful entry in the pivot position. It only reorders rows, so the system produced is still equivalent to the original.
+
+### Partial pivoting
+
+At stage $i$, scan column $i$ from row $i$ to row $n$, and swap the row with the largest absolute entry into row $i$ before eliminating.
+
+Using the largest available entry as the pivot keeps the multipliers $\frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}$ at or below $1$ in size, which stops them from amplifying rounding error.
+
+### Scaled partial pivoting
+
+Partial pivoting alone can still pick a poor pivot if rows are scaled very differently, since an entry can be large only because its whole row has large entries.
+
+Scaled partial pivoting corrects for this. For candidate entry $a_{ji}^{(i)}$, compute the scale factor
+
+$$
+s_j = \max_k |a_{jk}|
+$$
+
+then choose the row maximizing $\frac{|a_{ji}^{(i)}|}{s_j}$ instead of the raw entry $|a_{ji}^{(i)}|$. This picks the pivot largest relative to its own row, not largest in absolute terms.
+
+## Pitfalls
+
+### Zero pivot
+
+If $a_{ii}^{(i)} = 0$ at any stage, the elimination formula divides by zero, even though the system may still have a unique solution.
+
+<Note>
+
+Pivoting fixes this by swapping in a row below with a non-zero entry in that column.
+
+</Note>
+
+### Small pivot
+
+A pivot that is small rather than zero doesn't stop the algorithm, but dividing by it inflates the multipliers $\frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}$. This amplifies rounding error already present in $a_{ji}^{(i)}$ and $b_j^{(i)}$, which then propagates through every later stage and into back substitution.
+
+### Ill conditioning
+
+A problem is ill-conditioned **iff** a small change in any of its elements causes a large change in its solution. Otherwise the problem is well-conditioned.
+
+Round-off errors effectively change the elements of $A$ and $\vec{b}$ slightly. If the system is ill-conditioned, these small changes produce large errors in the solution.
+
+<Note>
+
+Ill-conditioned systems are inherently difficult to handle in the presence of rounding errors. When rounding errors are unavoidable, ill-conditioned systems must be avoided wherever possible.
+
+</Note>
+
+If $A$ is close to singular, small errors in the input data or in rounding get magnified into large errors in $\vec{x}$, even with pivoting. Pivoting controls error growth from the algorithm itself, but cannot fix a system that is inherently sensitive to small changes in its input.
+
+Consider
+
+$$
+\begin{pmatrix} 1 & 1 \\ 1 & 1.0001 \end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}2\\2.0001\end{pmatrix}
+$$
+
+with solution $x = 1, y = 1$. Changing $b_2$ from $2.0001$ to $2.0002$, a change of $0.0001$, gives
+
+$$
+\begin{pmatrix} 1 & 1 \\ 1 & 1.0001 \end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}2\\2.0002\end{pmatrix}
+$$
+
+with solution $x = 0, y = 2$. A $0.0001$ change in $b_2$ moved $x$ by $1$ and $y$ by $1$. No amount of pivoting prevents this, since the coefficient matrix itself is nearly singular, $\det \begin{pmatrix} 1 & 1 \\ 1 & 1.0001 \end{pmatrix} = 0.0001$.
+
+#### Condition Number
+
+A measure of the degree of ill-conditioning. Denoted as $\kappa(A)$. Defined as:
+
+$$
+\kappa(A) = \|A\| \, \|A^{-1}\|
+$$
+
+A large $\kappa(A)$ means $A$ is close to singular, and small errors in $\vec{b}$ or in rounding get magnified into large errors in $\vec{x}$.
+
+### Cost
+
+| Method              | Time     | Space    |
+| ------------------- | -------- | -------- |
+| Forward elimination | $O(n^3)$ | $O(n^2)$ |
+| Back substitution   | $O(n^2)$ | $O(n^2)$ |
+
+Space is $O(n^2)$ for both, for storing the augmented matrix $[A \mid \vec{b}]$. Elimination is done in place, so no extra storage proportional to $n^2$ is needed beyond this.
+
+The $O(n^3)$ time cost of forward elimination makes Gaussian elimination unsuitable for repeatedly solving $A\vec{x} = \vec{b}$ for many different $\vec{b}$ with the same $A$.

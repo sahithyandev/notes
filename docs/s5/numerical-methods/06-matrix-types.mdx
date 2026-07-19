@@ -1,0 +1,58 @@
+---
+title: Matrix Types
+sidebar:
+  order: 6
+dateCreated: 2026-07-19T18:06:25.234Z
+lastUpdatedOn: 2026-07-19T18:25:51.371Z
+slug: s5/numerical-methods/matrix-types
+prev: true
+next: false
+prereqs:
+  - s4/linear-algebra/hermitian#positive-definite-matrix
+---
+
+## Diagonally Dominant Matrix
+
+An $n \times n$ matrix $A$ is diagonally dominant **iff**
+
+$$
+|a_{ii}| \geq \sum_{j=1, j \neq i}^{n} |a_{ij}|
+$$
+
+holds for each $i = 1, 2, \dots, n$.
+
+### Strictly Diagonally Dominant Matrix
+
+$A$ is strictly diagonally dominant **iff** the inequality above is strict for each $i$. Non-singular.
+
+Gaussian elimination on $Ax = b$ then proceeds without row or column interchanges, and the computation is stable with respect to round-off error growth.
+
+## Positive Definite Matrix
+
+See [Positive Definite Matrix](/s4/linear-algebra/hermitian#positive-definite-matrix) for the definition and eigenvalue characterization.
+
+A leading principal submatrix $A_k$ of $A$ is the $k \times k$ block
+
+$$
+A_k = \begin{bmatrix} a_{11} & \cdots & a_{1k} \\ \vdots & \ddots & \vdots \\ a_{k1} & \cdots & a_{kk} \end{bmatrix}
+$$
+
+for some $1 \leq k \leq n$.
+
+A symmetric matrix $A$ is positive definite **iff** every leading principal submatrix has a positive determinant.
+
+A symmetric matrix $A$ is positive definite **iff** Gaussian elimination on $Ax = b$ can be performed without row interchanges with all pivot elements positive. The computation is then stable with respect to round-off error growth.
+
+## Convergent Matrix
+
+An $n \times n$ matrix $A$ is convergent to $B$ **iff**
+
+$$
+\lim_{k \to \infty} A^k = B
+$$
+
+For a square matrix $A$, the following are equivalent:
+
+- $A$ is convergent to $0$, i.e. $\lim_{k \to \infty} A^k = 0$
+- $\lim_{k \to \infty} \lVert A^k \rVert_m = 0$ for some matrix norm $\lVert \cdot \rVert_m$
+- $\rho(A) < 1$
