@@ -3,7 +3,7 @@ title: Gaussian Elimination
 sidebar:
   order: 4
 dateCreated: 2026-07-19T16:40:09.889Z
-lastUpdatedOn: 2026-07-19T18:25:51.371Z
+lastUpdatedOn: 2026-07-20T07:30:04.389Z
 slug: s5/numerical-methods/gaussian-elimination
 prev: true
 next: true
@@ -66,6 +66,12 @@ At stage $i$, scan column $i$ from row $i$ to row $n$, and swap the row with the
 
 Using the largest available entry as the pivot keeps the multipliers $\frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}$ at or below $1$ in size, which stops them from amplifying rounding error.
 
+<Note>
+
+Searching both rows and columns for the largest element is called complete pivoting. It's rarely used since switching columns changes the order of the $x_i$'s and adds significant complexity.
+
+</Note>
+
 ### Scaled partial pivoting
 
 Partial pivoting alone can still pick a poor pivot if rows are scaled very differently, since an entry can be large only because its whole row has large entries.
@@ -77,6 +83,31 @@ s_j = \max_k |a_{jk}|
 $$
 
 then choose the row maximizing $\frac{|a_{ji}^{(i)}|}{s_j}$ instead of the raw entry $|a_{ji}^{(i)}|$. This picks the pivot largest relative to its own row, not largest in absolute terms.
+
+<Note>
+
+If $s_j = 0$ for some $j$, the system has no unique solution since the entire $j$-th row is $0$.
+
+</Note>
+
+Apply scaled partial pivoting to
+
+$$
+\begin{aligned}
+30.00x_1 + 591400x_2 &= 591700 \\
+5.291x_1 - 6.130x_2 &= 46.78
+\end{aligned}
+$$
+
+$$
+s_1 = \max\{|30.00|, |591400|\} = 591400, \quad s_2 = \max\{|5.291|, |6.130|\} = 6.130
+$$
+
+$$
+\frac{|a_{11}|}{s_1} = \frac{30}{591400} = 5.073 \times 10^{-5}, \quad \frac{|a_{21}|}{s_2} = \frac{5.291}{6.130} = 0.8631
+$$
+
+$\dfrac{|a_{21}|}{s_2}$ is larger, so exchange $R_1 \leftrightarrow R_2$. Gauss elimination on the reordered system gives $x_1 = 10.00$ and $x_2 = 1.000$.
 
 ## Pitfalls
 
@@ -131,6 +162,14 @@ $$
 $$
 
 A large $\kappa(A)$ means $A$ is close to singular, and small errors in $\vec{b}$ or in rounding get magnified into large errors in $\vec{x}$.
+
+$$
+\begin{cases} x + y = 2 \\ x + 1.001y = 2 \end{cases}
+\qquad
+\begin{cases} x + y = 2 \\ x + 1.001y = 2.001 \end{cases}
+$$
+
+The left system has solution $x = 2$, $y = 0$. The right system, obtained by a $0.001$ change in one constant, has solution $x = 1$, $y = 1$. The coefficient matrix is ill-conditioned, with condition number $4004$.
 
 ### Cost
 
