@@ -138,6 +138,9 @@ export default defineConfig({
   // ponytail: v7 changed default to 'jsx'; preserve v6 whitespace behavior
   compressHTML: true,
   redirects: buildModuleRedirects(),
+  server: {
+    allowedHosts: process.env.NODE_ENV == "development" ? true : undefined,
+  },
   integrations: [
     mdx({
       optimize: true,
