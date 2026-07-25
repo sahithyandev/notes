@@ -1,7 +1,7 @@
 ---
 title: Tangent and Normal Vectors
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-07-25T07:23:29.489Z
+lastUpdatedOn: 2026-07-25T14:25:16.419Z
 slug: s5/calculus/tangent-and-normal-vectors
 sidebar:
   order: 9
@@ -9,15 +9,23 @@ prev: true
 next: true
 ---
 
+Let $C$ be a curve traced by a differentiable vector-valued function $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, where $t$ is the parameter. $s$ denotes the arc-length parameter of $C$. $T(t)$, $N(t)$, $B(t)$ denote respectively the unit tangent, principal unit normal, and binormal vectors of $C$ at $t$, each defined below.
+
 ## Unit Tangent Vector
 
-Let $C$ be the curve traced by a differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$. The unit tangent vector at $t$ is
+The unit tangent vector at $t$ is
 
 $$
 T(t) = \frac{\boldsymbol{r}'(t)}{\lVert \boldsymbol{r}'(t) \rVert}
 $$
 
 $T(t)$ is tangent to $C$ and points in the direction of increasing $t$.
+
+If $\boldsymbol{r}$ is parametrized by arc length $s$, $\lVert \boldsymbol{r}'(s) \rVert = 1$, so
+
+$$
+T(s) = \boldsymbol{r}'(s)
+$$
 
 ## Unit Normal Vector
 
@@ -41,9 +49,15 @@ In two-dimensional space, 2 unit vectors are orthogonal to $T(t)$. In three-dime
 
 $T$ points in the direction of motion. $N$ points in the direction the moving object is turning. For a plane curve, $N$ points toward the concave side of the trajectory.
 
+If $\boldsymbol{r}$ is parametrized by arc length $s$ and $\boldsymbol{r}''(s) \ne \vec{0}$, then $T(s) = \boldsymbol{r}'(s)$ gives $T'(s) = \boldsymbol{r}''(s)$, so
+
+$$
+N(s) = \frac{\boldsymbol{r}''(s)}{\lVert \boldsymbol{r}''(s) \rVert}
+$$
+
 ## Binormal Vector
 
-Let $C$ be the curve traced by a differentiable $\boldsymbol{r}(t)$ in three-dimensional space, with $T(t)$ and $N(t)$ defined. The binormal vector is
+For $C$ in three-dimensional space, with $T(t)$ and $N(t)$ defined, the binormal vector is
 
 $$
 B(t) = T(t) \times N(t)

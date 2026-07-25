@@ -1,7 +1,7 @@
 ---
 title: Arc Length
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-07-25T07:23:29.489Z
+lastUpdatedOn: 2026-07-25T14:25:16.418Z
 slug: s5/calculus/arc-length
 sidebar:
   order: 8
@@ -63,11 +63,57 @@ $$
 
 $s = s(t)$ is increasing and can be used as a new parameter. A parametrization expressed in terms of $s$ is an arc-length parametrization.
 
-Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$:
+### Properties
 
-- $s = s(t)$ is the arc-length parameter for $C$ **iff** $\dfrac{\text{d}s}{\text{d}t} = \left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert$.
-- If $\boldsymbol{r}$ is expressed as a function of $s$, $\left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = 1$.
-- If $\left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = 1$ for all $t$, then for any $t_0$ in the domain of $\boldsymbol{r}$, $s = t - t_0$ is an arc-length parameter with reference point $\boldsymbol{r}(t_0)$.
+$C$ is the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and $s$ is the signed arc-length parameter defined above, measuring distance travelled along $C$ from a fixed reference point $\boldsymbol{r}(t_0)$.
+
+$s = s(t)$ is the arc-length parameter for $C$ **iff**
+
+$$
+\frac{\text{d}s}{\text{d}t} = \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert
+$$
+
+This is a direct restatement of the defining integral. Differentiating
+
+$$
+s(t) = \int_{t_0}^{t} \lVert \boldsymbol{r}'(u) \rVert \, \text{d}u
+$$
+
+with respect to $t$ gives back the integrand $\lVert \boldsymbol{r}'(t) \rVert$. So $s$ always increases at the same rate $C$ is being traced, rather than at some rate tied to an arbitrary choice of parameter $t$.
+
+If $\boldsymbol{r}$ is expressed as a function of $s$ instead of $t$, then
+
+$$
+\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = 1
+$$
+
+everywhere. This follows from the chain rule,
+
+$$
+\frac{\text{d}\boldsymbol{r}}{\text{d}t} = \frac{\text{d}\boldsymbol{r}}{\text{d}s} \cdot \frac{\text{d}s}{\text{d}t}
+$$
+
+Since
+
+$$
+\frac{\text{d}s}{\text{d}t} = \lVert \boldsymbol{r}'(t) \rVert
+$$
+
+dividing through leaves $\lVert \text{d}\boldsymbol{r}/\text{d}s \rVert = 1$. Concretely, advancing the parameter $s$ by one unit moves the point $\boldsymbol{r}(s)$ exactly one unit of distance along $C$, so $s$ is not just a parameter but a literal measure of distance travelled.
+
+Conversely, if
+
+$$
+\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = 1
+$$
+
+for all $t$, then for any $t_0$ in the domain of $\boldsymbol{r}$,
+
+$$
+s = t - t_0
+$$
+
+is an arc-length parameter with reference point $\boldsymbol{r}(t_0)$. So a parametrization that already has unit speed does not need to be re-parametrized through the integral formula; it already is an arc-length parametrization, only shifted so that $s = 0$ at the reference point.
 
 Examples:
 
