@@ -1,0 +1,39 @@
+---
+title: Limits and Continuity
+dateCreated: 2026-07-23T17:18:10.526Z
+lastUpdatedOn: 2026-07-25T07:23:29.488Z
+slug: s5/calculus/limits-and-continuity
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+Let $\boldsymbol{r}(t)$ be defined for each $t$ in some open interval containing $a$, except possibly at $a$, and let $L$ be a vector. Then
+
+$$
+\lim_{t \to a} \boldsymbol{r}(t) = L \quad \iff \quad \lim_{t \to a} \lVert \boldsymbol{r}(t) - L \rVert = 0
+$$
+
+## Properties
+
+### Limit on Component Functions
+
+If $\boldsymbol{r}(t) = \langle x(t), y(t), z(t) \rangle$ and the limits of the component functions exist as $t \to a$,
+
+$$
+\lim_{t \to a} \boldsymbol{r}(t) = \left\langle \lim_{t \to a} x(t), \lim_{t \to a} y(t), \lim_{t \to a} z(t) \right\rangle
+$$
+
+For vector-valued functions $F(t)$, $G(t)$ and real-valued function $h(t)$ with $\lim\limits_{t \to a} F(t)$, $\lim\limits_{t \to a} G(t)$, $\lim\limits_{t \to a} h(t)$ existing:
+
+- $\lim\limits_{t \to a} [F(t) \pm G(t)] = \lim\limits_{t \to a} F(t) \pm \lim\limits_{t \to a} G(t)$
+- $\lim\limits_{t \to a} [h(t)F(t)] = \left( \lim\limits_{t \to a} h(t) \right) \left( \lim\limits_{t \to a} F(t) \right)$
+- $\lim\limits_{t \to a} [F(t) \cdot G(t)] = \lim\limits_{t \to a} F(t) \cdot \lim\limits_{t \to a} G(t)$
+- $\lim\limits_{t \to a} [F(t) \times G(t)] = \lim\limits_{t \to a} F(t) \times \lim\limits_{t \to a} G(t)$
+
+## Continuity
+
+$\boldsymbol{r}(t)$ is continuous at $a$ **iff** $\lim\limits_{t \to a} \boldsymbol{r}(t) = \boldsymbol{r}(a)$. It is continuous on an interval $I$ if it is continuous at each point of $I$.
+
+$\boldsymbol{r}(t)$ is continuous at $a$ **iff** each component function is continuous at $a$.

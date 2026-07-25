@@ -1,0 +1,78 @@
+---
+title: Differentiation
+dateCreated: 2026-07-23T17:18:33.918Z
+lastUpdatedOn: 2026-07-25T07:23:29.488Z
+slug: s5/calculus/differentiation
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+The derivative of $\boldsymbol{r}$ is defined the same way as for a real-valued function:
+
+$$
+\boldsymbol{r}'(t) = \frac{\text{d}\boldsymbol{r}(t)}{\text{d}t} = \lim_{h \to 0} \frac{\boldsymbol{r}(t+h) - \boldsymbol{r}(t)}{h}
+$$
+
+provided the limit exists.
+
+For $\boldsymbol{r}(t) = \langle x(t), y(t), z(t) \rangle$, $\boldsymbol{r}$ is differentiable at $a$ **iff** each component function is differentiable at $a$, and
+
+$$
+\boldsymbol{r}'(a) = \langle x'(a), y'(a), z'(a) \rangle
+$$
+
+More generally, whenever the component derivatives exist,
+
+$$
+\boldsymbol{r}'(t) = \langle x'(t), y'(t), z'(t) \rangle
+$$
+
+For differentiable vector-valued functions $\boldsymbol{r}(t)$, $\boldsymbol{r}_1(t)$, $\boldsymbol{r}_2(t)$, differentiable real-valued function $f(t)$, scalar $k$, and constant vector $\vec{c}$:
+
+- $\dfrac{\text{d}}{\text{d}t}[\vec{c}] = \vec{0}$
+- $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{r}_1(t) \pm \boldsymbol{r}_2(t)] = \boldsymbol{r}_1'(t) \pm \boldsymbol{r}_2'(t)$
+- $\dfrac{\text{d}}{\text{d}t}[k\boldsymbol{r}(t)] = k\boldsymbol{r}'(t)$
+- $\dfrac{\text{d}}{\text{d}t}[f(t)\boldsymbol{r}(t)] = f(t)\boldsymbol{r}'(t) + f'(t)\boldsymbol{r}(t)$
+- $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{r}_1(t) \cdot \boldsymbol{r}_2(t)] = \boldsymbol{r}_1(t) \cdot [\boldsymbol{r}_2'(t) + \boldsymbol{r}_1'(t) \cdot \boldsymbol{r}_2(t)$
+- $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{r}_1(t) \times \boldsymbol{r}_2(t)] = \boldsymbol{r}_1(t) \times [\boldsymbol{r}_2'(t) + \boldsymbol{r}_1'(t) \times \boldsymbol{r}_2(t)$
+- $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{r}(f(t))] = f'(t)\boldsymbol{r}'(f(t))$
+
+## Tangent Line
+
+Let $P$ be a point on the graph of $\boldsymbol{r}(t)$, with $\boldsymbol{r}(t_0)$ the position vector of $P$. If $\boldsymbol{r}'(t_0)$ exists and is non-zero, $\boldsymbol{r}'(t_0)$ is a tangent vector to the graph at $P$. The tangent line through $P$ parallel to $\boldsymbol{r}'(t_0)$ has vector equation
+
+$$
+\vec{x}(s) = \boldsymbol{r}(t_0) + s\boldsymbol{r}'(t_0), \qquad s \in \mathbb{R}
+$$
+
+If $\lVert \boldsymbol{r}(t) \rVert$ is constant for all $t$ in an interval, then $\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0$. So $\boldsymbol{r}(t)$ and $\boldsymbol{r}'(t)$ are orthogonal for every $t$ in the interval.
+
+<Note title="Proof">
+
+Given $\lVert \boldsymbol{r}(t) \rVert$ is constant, square both sides:
+
+$$
+\lVert \boldsymbol{r}(t) \rVert^2 = \boldsymbol{r}(t) \cdot \boldsymbol{r}(t) = \text{constant}
+$$
+
+Differentiate with respect to $t$:
+
+$$
+\frac{\text{d}}{\text{d}t}[\boldsymbol{r}(t) \cdot \boldsymbol{r}(t)] = 0
+$$
+
+By the product rule and commutativity of the dot product:
+
+$$
+\boldsymbol{r}'(t) \cdot \boldsymbol{r}(t) + \boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 2\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0
+$$
+
+So $\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0$. It is the dot product, not the magnitude, that equals $0$.
+
+</Note>
+
+## Mean Value Theorem
+
+Vector-valued functions **do not** satisfy a direct Mean Value Theorem of the form $\boldsymbol{r}(b) - \boldsymbol{r}(a) = \boldsymbol{r}'(c)(b-a)$.

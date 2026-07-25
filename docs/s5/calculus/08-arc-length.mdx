@@ -1,0 +1,74 @@
+---
+title: Arc Length
+dateCreated: 2026-07-03T04:23:09.633Z
+lastUpdatedOn: 2026-07-25T07:23:29.489Z
+slug: s5/calculus/arc-length
+sidebar:
+  order: 8
+prev: true
+next: true
+---
+
+Let $\boldsymbol{r}(t)$ be defined on $[a, b]$, and let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a, b]$. The polygonal length corresponding to $P$ is
+
+$$
+s(\boldsymbol{r}, P) = \sum_{k=1}^{n} \lVert \boldsymbol{r}(t_k) - \boldsymbol{r}(t_{k-1}) \rVert
+$$
+
+The curve is rectifiable **iff** these polygonal lengths have a finite least upper bound. That bound is the arc length of the curve.
+
+If $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, have continuous derivatives on $[a, b]$, the arc length from $t = a$ to $t = b$ is
+
+$$
+L = \int_a^b \sqrt{\left( \frac{\text{d}x}{\text{d}t} \right)^2 + \left( \frac{\text{d}y}{\text{d}t} \right)^2 + \left( \frac{\text{d}z}{\text{d}t} \right)^2} \, \text{d}t
+$$
+
+Equivalently, for $\boldsymbol{r}(t)$ continuously differentiable on $[a, b]$ and $C$ the curve traced by $\boldsymbol{r}(t)$,
+
+$$
+L = \int_a^b \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert \text{d}t
+$$
+
+As vector-valued functions do not have a mean value theorem, arc length is defined via polygonal approximations and computed by the integral formula only once the curve is sufficiently smooth.
+
+## Change of parameter
+
+A change of parameter in $\boldsymbol{r}(t)$ is a substitution $t = g(\tau)$ producing $\boldsymbol{r}(g(\tau))$, tracing the same curve as $\boldsymbol{r}(t)$, possibly in a different direction as $\tau$ increases.
+
+If $\boldsymbol{r}(t)$ is differentiable with respect to $t$, and $t = g(\tau)$ is a change of parameter with $g$ differentiable with respect to $\tau$, then $\boldsymbol{r}(g(\tau))$ is differentiable with respect to $\tau$, and
+
+$$
+\frac{\text{d}}{\text{d}\tau}[\boldsymbol{r}(g(\tau))] = \boldsymbol{r}'(g(\tau))g'(\tau)
+$$
+
+Equivalently,
+
+$$
+\frac{\text{d}\boldsymbol{r}}{\text{d}\tau} = \frac{\text{d}\boldsymbol{r}}{\text{d}t} \cdot \frac{\text{d}t}{\text{d}\tau}
+$$
+
+## Parametrization
+
+Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and let $\boldsymbol{r}(t_0)$ be a reference point on $C$. The signed arc-length parameter $s$ measured from $\boldsymbol{r}(t_0)$ is
+
+$$
+s = s(t) = \int_{t_0}^{t} \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}u} \right\rVert \text{d}u
+$$
+
+Since
+
+$$
+\frac{\text{d}s}{\text{d}t} = \lVert \boldsymbol{r}'(t) \rVert > 0
+$$
+
+$s = s(t)$ is increasing and can be used as a new parameter. A parametrization expressed in terms of $s$ is an arc-length parametrization.
+
+Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$:
+
+- $s = s(t)$ is the arc-length parameter for $C$ **iff** $\dfrac{\text{d}s}{\text{d}t} = \left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert$.
+- If $\boldsymbol{r}$ is expressed as a function of $s$, $\left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = 1$.
+- If $\left\lVert \dfrac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = 1$ for all $t$, then for any $t_0$ in the domain of $\boldsymbol{r}$, $s = t - t_0$ is an arc-length parameter with reference point $\boldsymbol{r}(t_0)$.
+
+Examples:
+
+- For $x^2 + y^2 = a^2$, $a > 0$, with counterclockwise orientation and reference point $(a, 0)$: $\boldsymbol{r}(t) = a\cos t\,\boldsymbol{i} + a\sin t\,\boldsymbol{j}$, with $t_0 = 0$ giving $\boldsymbol{r}(t_0) = (a, 0)$. Since $\lVert \boldsymbol{r}'(t) \rVert = a$ is constant, $s = at$, so the arc-length parametrization is $\boldsymbol{r}(s) = a\cos(s/a)\,\boldsymbol{i} + a\sin(s/a)\,\boldsymbol{j}$.
