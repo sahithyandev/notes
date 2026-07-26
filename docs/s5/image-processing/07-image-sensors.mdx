@@ -1,0 +1,45 @@
+---
+title: Image Sensors
+dateCreated: 2026-07-26T04:59:10.531Z
+lastUpdatedOn: 2026-07-26T05:09:41.941Z
+slug: s5/image-processing/image-sensors
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+A photo-sensor produces a weak electrical signal proportional to incident light.
+
+- Signal is analog, a few microvolts, and usually noisy
+- Conditioned for DC bias and noise, then amplified through a gain-controlled amplifier
+- Converted to digital format by a fast analog to digital converter
+
+## CCD and CMOS
+
+- CCD  
+  Short for charge coupled device. Photons create charged particles, forming a potential field between 2 terminals. The field integrates over time, so a longer exposure increases the response. The charge is read by the amplifier as a voltage, and must be neutralized before the next frame. Sensitive to illumination, not colour.
+- CMOS  
+  Provides a non-integrating dynamic response. Each element gives an addressable single output. Requires relatively larger circuitry than CCD.
+
+<Note>
+
+Support circuitry takes up space on the sensor surface, blocking light in those areas. This is more significant on CMOS sensors, where the circuit is more complex. Modern sensors use micro-lenses to redirect light to each pixel's sensing element.
+
+</Note>
+
+## Frame capture
+
+Each photo-receptor must be read fast enough that the captured scene can be considered stationary, making shutter control important.
+
+- CMOS sensors require direct on-sensor reading through complex multiplexing
+- CCD sensors retain charge like memory, even after light is removed, and can transfer it to a holding memory to be read in the background
+- Delayed reading causes motion blur or the rolling shutter effect
+
+## Sensitivity and SNR
+
+An adjustable aperture regulates incident light by controlling the exposed lens surface area. CCD sensors, due to their integrating response, can also regulate output through exposure time.
+
+- Non-sensitive region: too little light for a usable signal
+- Optimum sensitivity: best signal to noise ratio
+- Saturated region: output stops responding to further light, requiring high-gain amplification and giving a low signal to noise ratio

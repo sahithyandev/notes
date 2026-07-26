@@ -1,0 +1,62 @@
+---
+title: Colour Representation
+sidebar:
+  order: 9
+dateCreated: 2026-07-26T04:59:18.528Z
+lastUpdatedOn: 2026-07-26T05:09:41.941Z
+slug: s5/image-processing/colour-representation
+prev: true
+next: true
+---
+
+A digital colour image is stored as a multi-channel structure, one image per attribute.
+
+## Channels
+
+- RGB  
+  Maintains the intensity of red, green and blue in separate channels.
+- Luminance and chrominance  
+  Separates brightness (luminance) from colour (chrominance) into separate channels.
+
+$$
+Y = f(R,G,B) \qquad C_r = f(R-Y) \qquad C_b = f(B-Y)
+$$
+
+- Discarding $C_r, C_b$ gives a monochrome image directly
+- The human visual system is more sensitive to luminance than colour, so YCrCb formats often allocate bits in a 4:2:2 ratio
+- Widely used for its inherent compression capability
+
+## Emission and absorption colours
+
+- Emission based  
+  Determined by what light should be emitted to produce a colour. Absence of light is black, presence of all components is white.
+- Absorption based  
+  Determined by what ink should be applied so that light reflected from the substrate produces a colour. Ink subtracts colours from white.
+
+RGB is emission based. CMYK is absorption based.
+
+$$
+K = \min(1-R,\; 1-G,\; 1-B)
+$$
+
+$$
+C = \frac{1-R-K}{1-K} \qquad M = \frac{1-G-K}{1-K} \qquad Y = \frac{1-B-K}{1-K}
+$$
+
+## True colour images
+
+RGB uses 24 bits per pixel, or 3 bytes. CMYK needs 4 bytes per pixel.
+
+<Note>
+
+A 1920x1024 image has under 2 million pixels, so it needs at most 2 million distinct colours, far fewer than the $2^{24}$ colours RGB can represent.
+
+</Note>
+
+## Palette based representation
+
+Storing a table of the colours actually used, then storing pointers into that table, is more storage-efficient than native RGB.
+
+- Palette length determines how many distinct colours can be used at once, out of the full $2^{24}$
+- Bits per pixel in image memory depend on the palette table length
+- The palette table is usually stored with the image, allowing a custom colour set per image

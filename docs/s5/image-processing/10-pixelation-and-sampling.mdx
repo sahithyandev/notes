@@ -1,0 +1,39 @@
+---
+title: Pixelation and Sampling
+sidebar:
+  order: 10
+dateCreated: 2026-07-26T04:59:21.791Z
+lastUpdatedOn: 2026-07-26T05:09:41.941Z
+slug: s5/image-processing/pixelation-and-sampling
+prev: true
+next: true
+---
+
+Converting an analog image to digital requires 2 independent choices.
+
+- Pixelation (spatial resolution)  
+  Determined by the size of the image sensor element.
+- Quantization (grey-level depth)  
+  Determined by the resolution of the analog to digital converter.
+
+Resolution is the number of samples per unit length. Grey-level depth is the number of discrete intensity levels. Both determine the memory required for image storage.
+
+<Note>
+
+Insufficient spatial resolution causes a checkerboard effect. Insufficient grey-level depth causes false contouring.
+
+</Note>
+
+## Sampling effects
+
+- Loss of information  
+  More apparent with large sampling regions and images with fine detail.
+- Aliasing  
+  Occurs when the sampling interval differs slightly from signal frequencies.
+
+## Dithering
+
+Used in 2-colour systems to create the impression of intermediate grey levels.
+
+- Each sampled pixel is divided into several sub-pixels
+- Pixel intensity is represented as a pattern within the sub-pixel region
