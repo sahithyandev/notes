@@ -1,0 +1,72 @@
+---
+title: Cholesky Decomposition
+prereqs:
+  - s5/numerical-methods/matrix-types#positive-definite-matrix
+dateCreated: 2026-07-28T05:09:34.810Z
+lastUpdatedOn: 2026-07-28T05:11:18.628Z
+slug: s5/numerical-methods/cholesky-decomposition
+sidebar:
+  order: 8
+prev: true
+next: false
+---
+
+A symmetric matrix $A$ is positive definite **iff** $A$ can be factored as
+
+$$
+A = LL^T
+$$
+
+where $L$ is lower triangular with non-zero diagonal entries. This factorization is Cholesky decomposition. The 2 triangular factors are transposes of each other, so $L$ alone determines the factorization.
+
+## Computing $L$
+
+Multiplying out $A = LL^T$ and equating entries row by row gives, for row $k = 1, 2, \ldots, n$ in order
+
+$$
+l_{ki} = \frac{a_{ki} - \sum\limits_{j=1}^{i-1} l_{ij}l_{kj}}{l_{ii}}, \quad i = 1, 2, \ldots, k-1
+$$
+
+$$
+l_{kk} = \sqrt{a_{kk} - \sum\limits_{j=1}^{k-1} l_{kj}^2}
+$$
+
+<Note>
+
+Compute row $k$'s off-diagonal entries $l_{ki}$ before $l_{kk}$, since $l_{kk}$ sums over the same row.
+
+</Note>
+
+## Example
+
+Apply Cholesky decomposition to
+
+$$
+A = \begin{pmatrix} 6 & 15 & 55 \\ 15 & 55 & 225 \\ 55 & 225 & 979 \end{pmatrix}
+$$
+
+Row $1$
+
+$$
+l_{11} = \sqrt{6} \approx 2.449
+$$
+
+Row $2$
+
+$$
+l_{21} = \frac{a_{21}}{l_{11}} = \frac{15}{2.449} \approx 6.124, \quad l_{22} = \sqrt{a_{22} - l_{21}^2} = \sqrt{55 - 6.124^2} \approx 4.183
+$$
+
+Row $3$
+
+$$
+l_{31} = \frac{a_{31}}{l_{11}} = \frac{55}{2.449} \approx 22.454, \quad l_{32} = \frac{a_{32} - l_{31}l_{21}}{l_{22}} = \frac{225 - 22.454 \times 6.124}{4.183} \approx 20.917
+$$
+
+$$
+l_{33} = \sqrt{a_{33} - l_{31}^2 - l_{32}^2} = \sqrt{979 - 22.454^2 - 20.917^2} \approx 6.110
+$$
+
+$$
+L \approx \begin{pmatrix} 2.449 & 0 & 0 \\ 6.124 & 4.183 & 0 \\ 22.454 & 20.917 & 6.110 \end{pmatrix}
+$$

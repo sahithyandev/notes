@@ -1,0 +1,83 @@
+---
+title: LUP Decomposition
+prereqs:
+  - s5/numerical-methods/gaussian-elimination
+dateCreated: 2026-07-28T05:06:00.161Z
+lastUpdatedOn: 2026-07-28T05:11:18.628Z
+slug: s5/numerical-methods/lup-decomposition
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+The LUP decomposition of an $n \times n$ matrix $A$ is the triple $(L, U, P)$ satisfying
+
+$$
+PA = LU
+$$
+
+Here:
+
+- $L$: unit lower triangular, $n \times n$ with all diagonal entries $1$
+- $U$: upper triangular, $n \times n$
+- $P$: permutation matrix, $n \times n$
+
+## Properties
+
+- $P$ permutes the rows of $A$, placing large entries in the pivot position to avoid dividing by a small or zero element. Same reordering as [partial pivoting](/s5/numerical-methods/gaussian-elimination#partial-pivoting).
+- LUP decomposition exists for any nonsingular matrix $A$.
+- LUP decomposition of $A$ is not unique.
+- LUP decomposition solves $A\vec{x} = \vec{b}$ more robustly than LU decomposition without pivoting, at approximately the same cost.
+
+## Solving $A\vec{x} = \vec{b}$
+
+Multiplying $A\vec{x} = \vec{b}$ by $P$ and substituting $PA = LU$ gives
+
+$$
+PA\vec{x} = P\vec{b} \implies LU\vec{x} = P\vec{b}
+$$
+
+- Solve $L\vec{y} = P\vec{b}$ for $\vec{y}$ by forward substitution.
+- Solve $U\vec{x} = \vec{y}$ for $\vec{x}$ by [back substitution](/s5/numerical-methods/gaussian-elimination#back-substitution).
+
+## Recursive Leading-Row-Column Algorithm
+
+Recursively constructs $L$, $U$, $P$ so that $PA = LU$.
+
+### Base Case
+
+$n = 1$: $A = (a)$, so $L = (1)$, $U = (a)$, $P = (1)$.
+
+### Recursive Step
+
+- Choose row $i$ so that $|a_{i1}| \geq |a_{j1}|$ for all $j = 1, 2, \ldots, n$.
+- Let $P_1$ be the permutation matrix that moves row $i$ to row $1$, leaving the other rows in order.
+- Let $\bar{A} = P_1 A$, partitioned in block form
+
+$$
+\bar{A} = \begin{pmatrix} \bar{a}_{11} & \bar{a}_{12}^T \\ \bar{a}_{21} & \bar{A}_{22} \end{pmatrix}
+$$
+
+- Eliminate the first column below $\bar{a}_{11}$
+
+$$
+\bar{A} = \begin{pmatrix} 1 & \vec{0}^T \\ \bar{a}_{21}/\bar{a}_{11} & I_{n-1} \end{pmatrix} \begin{pmatrix} \bar{a}_{11} & \bar{a}_{12}^T \\ \vec{0} & A' \end{pmatrix}, \quad A' = \bar{A}_{22} - \frac{\bar{a}_{21}\bar{a}_{12}^T}{\bar{a}_{11}}
+$$
+
+$A'$ is the Schur complement of $\bar{a}_{11}$ in $\bar{A}$.
+
+- Recurse on $A'$ to find $P_2, L_2, U_2$ with $P_2 A' = L_2 U_2$.
+- Combine
+
+$$
+P = \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P_2 \end{pmatrix} P_1, \quad
+L = \begin{pmatrix} 1 & \vec{0}^T \\ P_2\bar{a}_{21}/\bar{a}_{11} & L_2 \end{pmatrix}, \quad
+U = \begin{pmatrix} \bar{a}_{11} & \bar{a}_{12}^T \\ \vec{0} & U_2 \end{pmatrix}
+$$
+
+<Note>
+
+Choosing $i$ to maximize $|a_{i1}|$ is partial pivoting. It bounds the multiplier $\bar{a}_{21}/\bar{a}_{11}$, for the same reason as in [Gaussian elimination](/s5/numerical-methods/gaussian-elimination#partial-pivoting).
+
+</Note>
