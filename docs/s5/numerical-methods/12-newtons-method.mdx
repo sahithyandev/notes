@@ -1,0 +1,73 @@
+---
+title: Newton's Method
+prereqs:
+  - s5/numerical-methods/fixed-point
+dateCreated: 2026-07-28T05:17:13.897Z
+lastUpdatedOn: 2026-07-28T14:02:20.882Z
+slug: s5/numerical-methods/newtons-method
+sidebar:
+  order: 12
+prev: true
+next: false
+---
+
+Newton's method for nonlinear systems generalizes the single-variable iteration $g(x) = x - \phi(x)f(x)$, $\phi(x) = 1/f'(x)$, to $n$ dimensions by replacing $\phi(x)$ with the inverse of a matrix $A(\vec{x})$
+
+$$
+G(\vec{x}) = \vec{x} - A(\vec{x})^{-1}F(\vec{x})
+$$
+
+Quadratic convergence of this [fixed-point iteration](/s5/numerical-methods/fixed-point) to $\vec{p}$ requires $\dfrac{\partial g_i(\vec{p})}{\partial x_k} = 0$ for each $i, k$, which holds by choosing $A(\vec{x})$ to be the [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) $J(\vec{x})$ of $F$.
+
+## Iteration
+
+$$
+G(\vec{x}) = \vec{x} - J(\vec{x})^{-1}F(\vec{x})
+$$
+
+$$
+\vec{x}^{(k)} = \vec{x}^{(k-1)} - J(\vec{x}^{(k-1)})^{-1}F(\vec{x}^{(k-1)}), \quad k \geq 1
+$$
+
+<Note>
+
+Inverting $J(\vec{x}^{(k-1)})$ explicitly is avoided in practice. Instead, solve the linear system
+
+$$
+J(\vec{x}^{(k-1)})\vec{y}^{(k-1)} = -F(\vec{x}^{(k-1)})
+$$
+
+for $\vec{y}^{(k-1)}$, for example by [Gaussian elimination](/s5/numerical-methods/gaussian-elimination), then set $\vec{x}^{(k)} = \vec{x}^{(k-1)} + \vec{y}^{(k-1)}$.
+
+</Note>
+
+Convergence is quadratic, provided a sufficiently accurate starting value $\vec{x}^{(0)}$ is known and $J(\vec{p})^{-1}$ exists.
+
+## Example
+
+Apply Newton's method to the [nonlinear system](/s5/numerical-methods/nonlinear-system-of-equations#example) with its [Jacobian](/s5/numerical-methods/jacobian-matrix#example), starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T$.
+
+$$
+F(\vec{x}^{(0)}) \approx (-1.199950, -2.269833, 8.462025)^T
+$$
+
+$$
+J(\vec{x}^{(0)}) \approx
+\begin{pmatrix}
+3 & 0.001000 & -0.001000 \\
+0.200000 & -32.400000 & 0.995004 \\
+-0.099005 & -0.099005 & 20.000000
+\end{pmatrix}
+$$
+
+Solving $J(\vec{x}^{(0)})\vec{y}^{(0)} = -F(\vec{x}^{(0)})$ gives
+
+$$
+\vec{y}^{(0)} \approx (0.399870, -0.080533, -0.421520)^T
+$$
+
+$$
+\vec{x}^{(1)} = \vec{x}^{(0)} + \vec{y}^{(0)} \approx (0.499870, 0.019467, -0.521520)^T
+$$
+
+Repeating converges to $\vec{x}^{(5)} \approx (0.500000, 0.000000, -0.523599)^T$, matching the exact solution $\vec{p} = (0.5, 0, -\pi/6)$.

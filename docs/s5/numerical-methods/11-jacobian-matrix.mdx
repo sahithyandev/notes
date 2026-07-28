@@ -1,0 +1,49 @@
+---
+title: Jacobian Matrix
+prereqs:
+  - s5/numerical-methods/nonlinear-system-of-equations
+dateCreated: 2026-07-28T05:17:01.970Z
+lastUpdatedOn: 2026-07-28T14:02:20.882Z
+slug: s5/numerical-methods/jacobian-matrix
+sidebar:
+  order: 11
+prev: true
+next: true
+---
+
+For $F : \mathbb{R}^n \to \mathbb{R}^n$ with [coordinate functions](/s5/numerical-methods/nonlinear-system-of-equations) $f_1, f_2, \ldots, f_n$, the Jacobian matrix $J(\vec{x})$ is the $n \times n$ matrix of first partial derivatives
+
+$$
+J(\vec{x}) =
+\begin{pmatrix}
+\dfrac{\partial f_1}{\partial x_1} & \dfrac{\partial f_1}{\partial x_2} & \cdots & \dfrac{\partial f_1}{\partial x_n} \\[6pt]
+\dfrac{\partial f_2}{\partial x_1} & \dfrac{\partial f_2}{\partial x_2} & \cdots & \dfrac{\partial f_2}{\partial x_n} \\[6pt]
+\vdots & \vdots & \ddots & \vdots \\[6pt]
+\dfrac{\partial f_n}{\partial x_1} & \dfrac{\partial f_n}{\partial x_2} & \cdots & \dfrac{\partial f_n}{\partial x_n}
+\end{pmatrix}
+$$
+
+Row $i$ of $J(\vec{x})$ is the gradient of $f_i$.
+
+## Example
+
+For the [coordinate functions](/s5/numerical-methods/nonlinear-system-of-equations#example)
+
+$$
+\begin{aligned}
+f_1(\vec{x}) &= 3x_1 - \cos(x_2 x_3) - \tfrac{1}{2} \\
+f_2(\vec{x}) &= x_1^2 - 81(x_2 + 0.1)^2 + \sin x_3 + 1.06 \\
+f_3(\vec{x}) &= e^{-x_1 x_2} + 20x_3 + \tfrac{10\pi - 3}{3}
+\end{aligned}
+$$
+
+the partial derivatives give
+
+$$
+J(\vec{x}) =
+\begin{pmatrix}
+3 & x_3 \sin(x_2 x_3) & x_2 \sin(x_2 x_3) \\
+2x_1 & -162(x_2 + 0.1) & \cos x_3 \\
+-x_2 e^{-x_1 x_2} & -x_1 e^{-x_1 x_2} & 20
+\end{pmatrix}
+$$

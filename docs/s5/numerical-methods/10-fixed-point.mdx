@@ -1,0 +1,64 @@
+---
+title: Fixed Point
+dateCreated: 2026-07-28T05:16:51.643Z
+lastUpdatedOn: 2026-07-28T14:02:20.882Z
+slug: s5/numerical-methods/fixed-point
+sidebar:
+  order: 10
+prev: true
+next: true
+---
+
+A function $G$ from $D \subseteq \mathbb{R}^n$ into $\mathbb{R}^n$ has a fixed point at $\vec{p} \in D$ **iff**
+
+$$
+G(\vec{p}) = \vec{p}
+$$
+
+A [nonlinear system](/s5/numerical-methods/nonlinear-system-of-equations) $F(\vec{x}) = \vec{0}$ can be rewritten in fixed-point form $\vec{x} = G(\vec{x})$, so that a solution of $F(\vec{x}) = \vec{0}$ is a fixed point of $G$.
+
+## Fixed-Point Iteration
+
+Given $G$ and a starting vector $\vec{x}^{(0)}$, generate
+
+$$
+\vec{x}^{(k)} = G(\vec{x}^{(k-1)}), \quad k \geq 1
+$$
+
+## Fixed-Point Theorem in n-space
+
+Let $D = \{(x_1, x_2, \ldots, x_n)^T \mid a_i \leq x_i \leq b_i, \; i = 1, 2, \ldots, n\}$ for constants $a_i, b_i$, and let $G$ be continuous from $D$ into $\mathbb{R}^n$ with $G(\vec{x}) \in D$ whenever $\vec{x} \in D$. Then $G$ has a fixed point in $D$.
+
+If, in addition, every component function of $G$ has continuous partial derivatives and a constant $K < 1$ exists with
+
+$$
+\left|\frac{\partial g_i(\vec{x})}{\partial x_j}\right| \leq \frac{K}{n}, \quad \forall \vec{x} \in D, \; i, j = 1, 2, \ldots, n
+$$
+
+then:
+
+- $G$ has a unique fixed point $\vec{p} \in D$.
+- Fixed-point iteration converges to $\vec{p}$ for any $\vec{x}^{(0)} \in D$.
+- $\lVert \vec{x}^{(k)} - \vec{p} \rVert_\infty \leq \dfrac{K^k}{1-K} \lVert \vec{x}^{(1)} - \vec{x}^{(0)} \rVert_\infty$ for each $k \geq 1$.
+
+<Note>
+
+This is the $n$-dimensional generalization of the Contraction Mapping Theorem.
+
+</Note>
+
+## Accelerating Convergence
+
+Computing $\vec{x}^{(k)}$ with the already-updated components $x_1^{(k)}, \ldots, x_{i-1}^{(k)}$ in place of $x_1^{(k-1)}, \ldots, x_{i-1}^{(k-1)}$, rather than waiting for the full previous iterate, is the Gauss-Seidel method applied to fixed-point iteration. It often converges faster, but not always.
+
+## Example
+
+For the [coordinate functions](/s5/numerical-methods/nonlinear-system-of-equations#example) $f_1, f_2, f_3$, solving each $f_i = 0$ for $x_i$ gives the fixed-point form $\vec{x} = G(\vec{x})$
+
+$$
+\begin{aligned}
+x_1 &= g_1(\vec{x}) = \tfrac{1}{3}\cos(x_2 x_3) + \tfrac{1}{6} \\
+x_2 &= g_2(\vec{x}) = \tfrac{1}{9}\sqrt{x_1^2 + \sin x_3 + 1.06} - 0.1 \\
+x_3 &= g_3(\vec{x}) = -\tfrac{1}{20}e^{-x_1 x_2} - \tfrac{10\pi - 3}{60}
+\end{aligned}
+$$
