@@ -1,0 +1,30 @@
+---
+title: Permutation Cipher
+sidebar:
+  order: 6
+dateCreated: 2026-07-29T05:53:52.082Z
+lastUpdatedOn: 2026-07-29T05:56:57.697Z
+slug: s5/computer-security/ciphers/permutation-cipher
+prev: true
+next: true
+---
+
+Requires a block length $n$, typically small, and a permutation $\sigma \in S_n$ as the secret key.
+
+$$
+\sigma = \begin{pmatrix} 1 & 2 & 3 & 4 & 5 \\ 2 & 4 & 1 & 3 & 5 \end{pmatrix}
+$$
+
+Encrypts the plaintext HELLO as ciphertext LHLEO.
+
+### Attacking Permutation Ciphers
+
+A character frequency analysis matching the standard distribution exactly reveals that a substitution cipher, not a permutation cipher, was used, since permutation ciphers preserve single-character frequencies.
+
+<Note title="Proof Hint">
+
+- Find repeating character sequences aligned to the same block position, since these produce similar repeating sequences in the ciphertext.
+- Compute the distance between 2 such repeating blocks, or the gcd across several distances, to reveal the block length.
+- Once the block length is known, deduce the permutation by exhaustive search over $n!$ possibilities.
+
+</Note>

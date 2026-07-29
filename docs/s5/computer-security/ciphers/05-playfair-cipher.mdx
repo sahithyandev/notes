@@ -1,0 +1,28 @@
+---
+title: Playfair Cipher
+sidebar:
+  order: 5
+dateCreated: 2026-07-29T05:53:47.519Z
+lastUpdatedOn: 2026-07-29T05:56:57.697Z
+slug: s5/computer-security/ciphers/playfair-cipher
+prev: true
+next: true
+---
+
+Invented by Sir Charles Wheatstone in 1854, named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
+
+Construction:
+
+- Fill a 5x5 grid with letters of the English alphabet, treating I and J as one letter.
+- Fill the grid starting from the top left with a short secret word containing no repeating letters.
+- Fill the remaining cells with the alphabet in natural order, skipping letters already placed.
+
+Encryption of a bigram:
+
+- Rectangle rule: if the two letters form a rectangle, replace each with the letter on the same row at the opposite corner.
+- Same column rule: if both letters are in the same column, replace each with the letter below it, wrapping to the top.
+- Same row rule: if both letters are in the same row, replace each with the letter to its right, wrapping to the left.
+
+### Attacking the Playfair Cipher
+
+Since there are more than 600 possible bigrams versus only 26 monograms, frequency analysis of bigrams requires a much larger amount of ciphertext to be captured.

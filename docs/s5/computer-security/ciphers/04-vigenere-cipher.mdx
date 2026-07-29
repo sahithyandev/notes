@@ -1,0 +1,38 @@
+---
+title: Vigenere Cipher
+sidebar:
+  order: 4
+dateCreated: 2026-07-29T05:53:41.958Z
+lastUpdatedOn: 2026-07-29T05:56:57.697Z
+slug: s5/computer-security/ciphers/vigenere-cipher
+prev: true
+next: true
+---
+
+Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
+
+A variant restricts the ciphertext alphabets used to cyclic shifts of the standard alphabet, so an $n$-alphabet Vigenère cipher has key space $26^n$ at the cost of just $n$ numeric values as the key.
+
+Viewed as a stream cipher, the keystream is a repetition of the short secret key, each character replaced by its position value, and the ciphertext stream is the modulo addition of the plaintext stream with the keystream.
+
+<Note>
+
+The cipher created by Vigenère himself is called the autokey cipher, and provides higher security than the Bellaso variant.
+
+</Note>
+
+### Attacking the Vigenère Cipher
+
+Security depends significantly on keeping the key length secret. Once the key length is found, the cipher can be attacked in the same manner as a shift cipher, using statistical properties of the plaintext language for each block of ciphertext extracted from separate keyword positions.
+
+The Kasiski test determines the keyword length.
+
+<Note title="Proof Hint">
+
+- Locate a repeating character sequence in the ciphertext.
+- Count the distances between multiple occurrences of that sequence.
+- Take the greatest common divisor of these distances as the keyword length, or a multiple of it.
+
+</Note>
+
+Repeated short strings, often common bigrams or trigrams of the language, that align to the same keyword position produce the same ciphertext string.
