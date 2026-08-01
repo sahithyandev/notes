@@ -3,6 +3,7 @@ export interface ModuleItem {
   href: string;
   count: number;
   active?: boolean;
+  elective?: boolean;
 }
 
 export interface PacketField {

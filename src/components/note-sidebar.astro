@@ -1,6 +1,7 @@
 ---
 import type { SidebarData } from "../lib/sidebar";
 import { getSemesterInfo } from "../lib/sidebar";
+import { isElective } from "../utils/values";
 import ChevronDown from "./icons/ChevronDown.astro";
 import ModulesList from "./modules-list.astro";
 import ModuleTree from "./module-tree.astro";
@@ -54,6 +55,7 @@ const { sidebarData, slug, slugParts } = Astro.props;
       href: `/${sidebarData.currentSemester}/${module}`,
       count: notes.length,
       active: module === sidebarData.currentModule,
+      elective: isElective(`${sidebarData.currentSemester}/${module}`),
     }))}
   />
 

@@ -11,9 +11,10 @@ const { modules } = Astro.props;
 
 <div class="sb-group-title">Modules</div>
 {
-  modules.map(({ module, href, count, active }) => (
+  modules.map(({ module, href, count, active, elective }) => (
     <a href={href} class={`sb-item${active ? " active" : ""}`}>
       {titleize(module)}
+      {elective && <span class="sb-item-tag">Elective</span>}
       <span class="sb-item-count">{count}</span>
     </a>
   ))
@@ -62,5 +63,17 @@ const { modules } = Astro.props;
     font-family: var(--font-mono);
     font-size: 0.625rem;
     color: var(--text-muted);
+  }
+
+  .sb-item-tag {
+    margin-left: 6px;
+    padding: 1px 5px;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
   }
 </style>
