@@ -1,0 +1,54 @@
+---
+title: Independence of Path
+sidebar:
+  order: 16
+dateCreated: 2026-07-31T00:00:00.000Z
+lastUpdatedOn: 2026-08-01T13:04:33.491Z
+slug: s5/calculus/independence-of-path
+prev: true
+next: false
+---
+
+### Connected Region
+
+A region $D$ in $\mathbb{R}^n$ is _connected_ **iff** any 2 points in $D$ can be joined by a piecewise smooth curve contained entirely in $D$.
+
+### Simply Connected Region
+
+A connected open region $D$ in the plane is _simply connected_ **iff** every simple closed curve contained in $D$ encloses only points of $D$.
+
+In the plane, $D$ is simply connected **iff** it has no holes.
+
+## Fundamental Theorem of Line Integrals
+
+Suppose $C$ be a piecewise smooth curve parametrized by $\boldsymbol{r}(t)$, $a \le t \le b$.
+
+If $\phi$ is a [scalar potential](/s5/calculus/vector-field#conservative-field) of $\boldsymbol{F}$ on a region containing $C$,
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C \nabla \phi \cdot \text{d}\boldsymbol{r} = \phi(\boldsymbol{r}(b)) - \phi(\boldsymbol{r}(a))
+$$
+
+## Equivalence of Conservative Fields
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
+
+- $\boldsymbol{F}$ is [conservative](/s5/calculus/vector-field) on $D$
+- $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0$ for every piecewise smooth closed curve $C$ in $D$
+- For any 2 points $P$, $Q$ in $D$, $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ is independent of the piecewise smooth curve $C$ in $D$ from $P$ to $Q$
+
+## Conservative Field Test
+
+Let $P(x,y)$ and $Q(x,y)$ have continuous first-order partial derivatives on an open, simply connected region $D$ in the plane. The vector field
+
+$$
+\boldsymbol{F}(x,y) = P(x,y)\hat{i} + Q(x,y)\hat{j}
+$$
+
+is conservative on $D$ **iff**, for each point in $D$,
+
+$$
+\frac{\partial P}{\partial y} = \frac{\partial Q}{\partial x}
+$$
+
+The region must be simply connected. On a region with a hole, $\partial P/\partial y = \partial Q/\partial x$ can hold everywhere without $\boldsymbol{F}$ being conservative.

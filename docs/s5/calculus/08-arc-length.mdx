@@ -1,7 +1,7 @@
 ---
 title: Arc Length
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-07-25T14:25:16.418Z
+lastUpdatedOn: 2026-08-01T13:04:33.490Z
 slug: s5/calculus/arc-length
 sidebar:
   order: 8
@@ -15,23 +15,32 @@ $$
 s(\boldsymbol{r}, P) = \sum_{k=1}^{n} \lVert \boldsymbol{r}(t_k) - \boldsymbol{r}(t_{k-1}) \rVert
 $$
 
-The curve is rectifiable **iff** these polygonal lengths have a finite least upper bound. That bound is the arc length of the curve.
+The curve is rectifiable **iff** these polygonal lengths have a finite least upper bound, which is the arc length of the curve.
 
-If $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, have continuous derivatives on $[a, b]$, the arc length from $t = a$ to $t = b$ is
+Examples:
+
+- $\boldsymbol{r}(t) = a\cos t\,\boldsymbol{i} + a\sin t\,\boldsymbol{j}$, $0 \le t \le 2\pi$, is rectifiable: $\boldsymbol{r}'(t)$ is continuous, so the arc length integral applies directly, giving $L = 2\pi a$.
+- $f(x) = x\sin(1/x)$ for $0 < x \le 1$, $f(0) = 0$, is continuous but not rectifiable: near $x = 0$ the graph oscillates infinitely often, and the amplitude does not decay fast enough to keep the polygonal lengths bounded.
+
+If $x = x(t)$, $y = y(t)$, $z = z(t)$ have continuous derivatives on $[a, b]$, the arc length from $t = a$ to $t = b$ is
 
 $$
 L = \int_a^b \sqrt{\left( \frac{\text{d}x}{\text{d}t} \right)^2 + \left( \frac{\text{d}y}{\text{d}t} \right)^2 + \left( \frac{\text{d}z}{\text{d}t} \right)^2} \, \text{d}t
 $$
 
-Equivalently, for $\boldsymbol{r}(t)$ continuously differentiable on $[a, b]$ and $C$ the curve traced by $\boldsymbol{r}(t)$,
+Equivalently, for $C$ the curve traced by continuously differentiable $\boldsymbol{r}(t)$,
 
 $$
 L = \int_a^b \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert \text{d}t
 $$
 
-As vector-valued functions do not have a mean value theorem, arc length is defined via polygonal approximations and computed by the integral formula only once the curve is sufficiently smooth.
+<Note>
 
-## Change of parameter
+Vector-valued functions have no mean value theorem, so arc length is defined via polygonal approximations first, and only computed by the integral formula once the curve is sufficiently smooth.
+
+</Note>
+
+## Change of Parameter
 
 A change of parameter in $\boldsymbol{r}(t)$ is a substitution $t = g(\tau)$ producing $\boldsymbol{r}(g(\tau))$, tracing the same curve as $\boldsymbol{r}(t)$, possibly in a different direction as $\tau$ increases.
 
@@ -47,7 +56,7 @@ $$
 \frac{\text{d}\boldsymbol{r}}{\text{d}\tau} = \frac{\text{d}\boldsymbol{r}}{\text{d}t} \cdot \frac{\text{d}t}{\text{d}\tau}
 $$
 
-## Parametrization
+## Arc-Length Parametrization
 
 Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and let $\boldsymbol{r}(t_0)$ be a reference point on $C$. The signed arc-length parameter $s$ measured from $\boldsymbol{r}(t_0)$ is
 
@@ -55,17 +64,13 @@ $$
 s = s(t) = \int_{t_0}^{t} \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}u} \right\rVert \text{d}u
 $$
 
-Since
+This is an odometer reading, integrating speed over time gives distance travelled.
 
-$$
-\frac{\text{d}s}{\text{d}t} = \lVert \boldsymbol{r}'(t) \rVert > 0
-$$
+Since $\text{d}s/\text{d}t = \lVert \boldsymbol{r}'(t) \rVert > 0$, $s = s(t)$ is strictly increasing, hence invertible into $\boldsymbol{r}(s)$. A parametrization expressed in terms of $s$ is an arc-length parametrization.
 
-$s = s(t)$ is increasing and can be used as a new parameter. A parametrization expressed in terms of $s$ is an arc-length parametrization.
+## Properties
 
-### Properties
-
-$C$ is the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and $s$ is the signed arc-length parameter defined above, measuring distance travelled along $C$ from a fixed reference point $\boldsymbol{r}(t_0)$.
+$C$ is the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and $s$ is the signed arc-length parameter defined above.
 
 $s = s(t)$ is the arc-length parameter for $C$ **iff**
 
@@ -73,13 +78,7 @@ $$
 \frac{\text{d}s}{\text{d}t} = \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert
 $$
 
-This is a direct restatement of the defining integral. Differentiating
-
-$$
-s(t) = \int_{t_0}^{t} \lVert \boldsymbol{r}'(u) \rVert \, \text{d}u
-$$
-
-with respect to $t$ gives back the integrand $\lVert \boldsymbol{r}'(t) \rVert$. So $s$ always increases at the same rate $C$ is being traced, rather than at some rate tied to an arbitrary choice of parameter $t$.
+This is the defining integral restated as a derivative: $s$ advances at exactly the rate $C$ is traced, not some rate tied to an arbitrary parameter $t$.
 
 If $\boldsymbol{r}$ is expressed as a function of $s$ instead of $t$, then
 
@@ -87,33 +86,27 @@ $$
 \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = 1
 $$
 
-everywhere. This follows from the chain rule,
+everywhere, almost by definition: since $s$ counts distance travelled, advancing it by one unit moves $\boldsymbol{r}(s)$ exactly one unit along $C$. This is why an arc-length parametrization is also called a **unit-speed parametrization**.
+
+<Note title="Proof Hint">
+
+By the chain rule:
 
 $$
 \frac{\text{d}\boldsymbol{r}}{\text{d}t} = \frac{\text{d}\boldsymbol{r}}{\text{d}s} \cdot \frac{\text{d}s}{\text{d}t}
 $$
 
-Since
+Dividing through by $\text{d}s/\text{d}t = \lVert \boldsymbol{r}'(t) \rVert$ leaves $\lVert \text{d}\boldsymbol{r}/\text{d}s \rVert = 1$.
 
-$$
-\frac{\text{d}s}{\text{d}t} = \lVert \boldsymbol{r}'(t) \rVert
-$$
+</Note>
 
-dividing through leaves $\lVert \text{d}\boldsymbol{r}/\text{d}s \rVert = 1$. Concretely, advancing the parameter $s$ by one unit moves the point $\boldsymbol{r}(s)$ exactly one unit of distance along $C$, so $s$ is not just a parameter but a literal measure of distance travelled.
-
-Conversely, if
-
-$$
-\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = 1
-$$
-
-for all $t$, then for any $t_0$ in the domain of $\boldsymbol{r}$,
+Conversely, if $\lVert \text{d}\boldsymbol{r}/\text{d}t \rVert = 1$ for all $t$, then for any $t_0$ in the domain of $\boldsymbol{r}$,
 
 $$
 s = t - t_0
 $$
 
-is an arc-length parameter with reference point $\boldsymbol{r}(t_0)$. So a parametrization that already has unit speed does not need to be re-parametrized through the integral formula; it already is an arc-length parametrization, only shifted so that $s = 0$ at the reference point.
+is already an arc-length parameter with reference point $\boldsymbol{r}(t_0)$: a unit-speed parametrization needs no reparametrization through the integral formula, only a shift so that $s = 0$ at the reference point.
 
 Examples:
 

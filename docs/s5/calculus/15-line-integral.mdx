@@ -1,0 +1,66 @@
+---
+title: Line Integral
+sidebar:
+  order: 15
+dateCreated: 2026-07-31T00:00:00.000Z
+lastUpdatedOn: 2026-08-01T13:04:33.491Z
+slug: s5/calculus/line-integral
+prev: true
+next: true
+---
+
+Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
+
+$$
+\int_C f(x,y,z)\,\text{d}s = \lim_{\max\{\Delta s_k\} \to 0} \sum_{k=1}^{n} f(x_k^*, y_k^*, z_k^*)\,\Delta s_k
+$$
+
+provided the limit exists and does not depend on the choice of partition or sample points.
+
+<Note>
+
+The line integral exists if $f$ is continuous at each point of $C$.
+
+</Note>
+
+For $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$,
+
+$$
+\text{d}s
+= \lVert \boldsymbol{r}'(t) \rVert\,\text{d}t
+= \sqrt{\left(\frac{\text{d}x}{\text{d}t}\right)^2 + \left(\frac{\text{d}y}{\text{d}t}\right)^2 + \left(\frac{\text{d}z}{\text{d}t}\right)^2}\,\text{d}t
+$$
+
+so
+
+$$
+\int_C f(x,y,z)\,\text{d}s = \int_a^b f(x(t),y(t),z(t))\,\lVert \boldsymbol{r}'(t) \rVert\,\text{d}t
+$$
+
+<Note>
+
+If $C$ lies in the $xy$-plane and $z = f(x,y)$ is a non-negative continuous function on $C$, $\int_C f(x,y)\,\text{d}s$ is the area of the vertical sheet swept out by a line segment of height $f(x,y)$ as $(x,y)$ moves along $C$.
+
+</Note>
+
+## Line Integral of a Vector Field
+
+Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_a^b \boldsymbol{F}(\boldsymbol{r}(t)) \cdot \boldsymbol{r}'(t)\,\text{d}t
+$$
+
+For $\boldsymbol{F} = P\hat{i} + Q\hat{j} + R\hat{k}$,
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C P\,\text{d}x + Q\,\text{d}y + R\,\text{d}z
+$$
+
+### Work
+
+For a particle moving along a smooth curve $C$, oriented in the direction of motion, under a continuous force field $\boldsymbol{F}$, the work done by $\boldsymbol{F}$ on the particle is
+
+$$
+W = \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}
+$$

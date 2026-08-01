@@ -1,0 +1,66 @@
+---
+title: Vector Field
+sidebar:
+  order: 14
+dateCreated: 2026-07-31T02:57:02.410Z
+lastUpdatedOn: 2026-08-01T13:04:33.491Z
+slug: s5/calculus/vector-field
+prev: true
+next: true
+---
+
+A vector field in $\mathbb{R}^n$ is a function that assigns a vector to each point in its domain $D \subseteq \mathbb{R}^n$,
+
+$$
+\boldsymbol{F}(x,y,z) = f(x,y,z)\hat{i} + g(x,y,z)\hat{j} + h(x,y,z)\hat{k}
+$$
+
+Here $f$, $g$, $h$ are real-valued component functions of $\boldsymbol{F}$ on $D$.
+
+$\boldsymbol{F}$ is continuous **iff** each component function is continuous. $\boldsymbol{F}$ is differentiable **iff** each component function is differentiable.
+
+## Inverse-Square Field
+
+Let $\boldsymbol{r} \ne \boldsymbol{0}$ be the position vector of a point and $c$ a constant. A vector field of the below form is an inverse-square field.
+
+$$
+\boldsymbol{F}(\boldsymbol{r}) = \frac{c}{\lVert \boldsymbol{r} \rVert^3}\boldsymbol{r}
+$$
+
+For example, the electric field given by Coulomb's law is an inverse-square field
+
+## Conservative Field
+
+A vector field $\boldsymbol{F}$ in 2-space or 3-space is conservative on a region $D$ **iff** it is the [gradient](/s5/calculus/field) field of some scalar function $\phi$ defined on $D$,
+
+$$
+\boldsymbol{F} = \nabla \phi
+$$
+
+$\phi$ is a potential function, or scalar potential, of $\boldsymbol{F}$.
+
+## Divergence
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The divergence of $\boldsymbol{F}$ is
+
+$$
+\text{div}\,\boldsymbol{F} = \nabla \cdot \boldsymbol{F} = \frac{\partial f}{\partial x} + \frac{\partial g}{\partial y} + \frac{\partial h}{\partial z}
+$$
+
+$\text{div}\,\boldsymbol{F}$ is a scalar field.
+
+<Note>
+
+$\nabla^2 \phi$ can also be expressed as $\text{div}(\nabla \phi)$. The equation $\nabla^2 \phi = 0$ is Laplace's equation.
+
+</Note>
+
+## Curl
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The curl of $\boldsymbol{F}$ is
+
+$$
+\text{curl}\,\boldsymbol{F} = \nabla \times \boldsymbol{F} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] f & g & h \end{vmatrix}
+$$
+
+$\text{curl}\,\boldsymbol{F}$ is a vector field.

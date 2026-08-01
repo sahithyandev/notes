@@ -3,10 +3,10 @@ title: Triple Integrals
 sidebar:
   order: 11
 dateCreated: 2026-07-24T02:50:13.245Z
-lastUpdatedOn: 2026-07-25T14:25:16.420Z
+lastUpdatedOn: 2026-08-01T13:04:33.490Z
 slug: s5/calculus/triple-integrals
 prev: true
-next: false
+next: true
 ---
 
 Let $G$ be a bounded solid region and $f$ a real-valued function defined on $G$. Partition a rectangular box containing $G$ into sub-boxes by planes parallel to the coordinate planes, and choose a sample point $(x_k^*, y_k^*, z_k^*)$ in each resulting subregion of volume $\Delta V_k$. The triple integral of $f$ over $G$ is
@@ -17,20 +17,22 @@ $$
 
 provided the limit exists.
 
-- $\iiint_G 1\,\text{d}V$: volume of $G$
-- $\iiint_G f\,\text{d}V$: mass of $G$, if $f$ is a density function
-
 ## Properties
 
-For $f$ and $g$ integrable over $G$, and $c \in \mathbb{R}$:
+Suppose $f$ and $g$ integrable over $G$, and $c \in \mathbb{R}$:
 
+- $\displaystyle \iiint_G 1\,\text{d}V$: volume of $G$
+- $\displaystyle\iiint_G f\,\text{d}V$: mass of $G$ with $f$ density
 - $\displaystyle\iiint_G cf\,\text{d}V = c\iiint_G f\,\text{d}V$
 - $\displaystyle\iiint_G (f+g)\,\text{d}V = \iiint_G f\,\text{d}V + \iiint_G g\,\text{d}V$
-- If $G = G_1 \cup G_2$ with $G_1$, $G_2$ having disjoint interiors, $\displaystyle\iiint_G f\,\text{d}V = \iiint_{G_1} f\,\text{d}V + \iiint_{G_2} f\,\text{d}V$
+- If $G = G_1 \cup G_2$ with $G_1$, $G_2$ having disjoint interiors,  
+  $\displaystyle\iiint_G f\,\text{d}V = \iiint_{G_1} f\,\text{d}V + \iiint_{G_2} f\,\text{d}V$
 
 ## Fubini's Theorem
 
-Let $G$ be the rectangular box $a \le x \le b$, $c \le y \le d$, $k \le z \le l$. If $f$ is continuous on $G$,
+Let $G$ be the rectangular box $a \le x \le b$, $c \le y \le d$, $k \le z \le l$.
+
+If $f$ is continuous on $G$:
 
 $$
 \iiint_G f(x,y,z)\,\text{d}V = \int_a^b \int_c^d \int_k^l f(x,y,z)\,\text{d}z\,\text{d}y\,\text{d}x
@@ -38,13 +40,23 @@ $$
 
 <Note>
 
-The iterated integral can be written in any of the 5 other orders obtained by permuting $\text{d}x$, $\text{d}y$, $\text{d}z$.
+The iterated integral can be written in any of the 5 other orders obtained by permuting the order of integrations (limits and $\text{d}x$, $\text{d}y$, $\text{d}z$).
 
 </Note>
 
 ## Regions of Integration
 
-A solid region $G$ bounded above by $z = v(x,y)$ and below by $z = u(x,y)$, with $u$, $v$ continuous on the projection $R$ of $G$ onto the $xy$-plane and $u(x,y) \le v(x,y)$ for all $(x,y) \in R$, is a simple $xy$-solid region.
+A solid region $G$ is a simple $xy$-solid region **iff**:
+
+- Bounded above by $z = v(x,y)$ and below by $z = u(x,y)$
+- $u$, $v$ continuous on the projection $R$ of $G$ onto the $xy$-plane
+- $u(x,y) \le v(x,y)$ for all $(x,y) \in R$
+
+For $f$ continuous on $G$,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \iint_R \left( \int_{u(x,y)}^{v(x,y)} f(x,y,z)\,\text{d}z \right) \text{d}A
+$$
 
 The projection $R$ can be:
 
@@ -52,12 +64,6 @@ The projection $R$ can be:
   $R = \{(x,y) : a \le x \le b,\ g_1(x) \le y \le g_2(x)\}$
 - Type II, or horizontally simple
   $R = \{(x,y) : c \le y \le d,\ h_1(y) \le x \le h_2(y)\}$
-
-For $f$ continuous on $G$,
-
-$$
-\iiint_G f(x,y,z)\,\text{d}V = \iint_R \left( \int_{u(x,y)}^{v(x,y)} f(x,y,z)\,\text{d}z \right) \text{d}A
-$$
 
 If $R$ is Type I,
 
@@ -141,42 +147,3 @@ $$
   $0 \le \rho \le \rho_0$, $\phi_1 \le \phi \le \phi_2$, $0 \le \theta \le 2\pi$
 - Solid enclosed laterally by the cone $\phi = \phi_0$, $0 < \phi_0 < \frac{\pi}{2}$, and above by the plane $z = a$, $a > 0$
   $0 \le \rho \le a\sec\phi$, $0 \le \phi \le \phi_0$, $0 \le \theta \le 2\pi$
-
-## Jacobians
-
-For a transformation $T$ from the $uv$-plane to the $xy$-plane defined by $x = x(u,v)$, $y = y(u,v)$, the Jacobian of $T$ is
-
-$$
-J(u,v) = \frac{\partial(x,y)}{\partial(u,v)} = \begin{vmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} \\[6pt] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} \end{vmatrix} = \frac{\partial x}{\partial u}\frac{\partial y}{\partial v} - \frac{\partial x}{\partial v}\frac{\partial y}{\partial u}
-$$
-
-For a transformation $T$ from $uvw$-space to $xyz$-space defined by $x = x(u,v,w)$, $y = y(u,v,w)$, $z = z(u,v,w)$, the Jacobian of $T$ is
-
-$$
-J(u,v,w) = \frac{\partial(x,y,z)}{\partial(u,v,w)} = \begin{vmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} & \dfrac{\partial x}{\partial w} \\[6pt] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} & \dfrac{\partial y}{\partial w} \\[6pt] \dfrac{\partial z}{\partial u} & \dfrac{\partial z}{\partial v} & \dfrac{\partial z}{\partial w} \end{vmatrix}
-$$
-
-Examples:
-
-- $\dfrac{\partial(x,y)}{\partial(r,\theta)} = r$, for polar coordinates $x = r\cos\theta$, $y = r\sin\theta$
-- $\dfrac{\partial(x,y,z)}{\partial(\rho,\phi,\theta)} = \rho^2\sin\phi$, for spherical coordinates
-
-## Change of Variables in Multiple Integrals
-
-Let $T$ be a transformation from the $uv$-plane to the $xy$-plane, one-to-one on a region $S$, mapping $S$ onto a region $R$ in the $xy$-plane. If $T$ has continuous first partial derivatives and $\dfrac{\partial(x,y)}{\partial(u,v)}$ is non-zero and does not change sign on $S$,
-
-$$
-\iint_R f(x,y)\,\text{d}A = \iint_S f(x(u,v), y(u,v)) \left| \frac{\partial(x,y)}{\partial(u,v)} \right| \text{d}A
-$$
-
-Analogously, for a transformation from $uvw$-space to $xyz$-space, one-to-one on $S$, mapping $S$ onto $R$, with continuous first partial derivatives and $\dfrac{\partial(x,y,z)}{\partial(u,v,w)}$ non-zero and not changing sign on $S$,
-
-$$
-\iiint_R f(x,y,z)\,\text{d}V = \iiint_S f(x(u,v,w), y(u,v,w), z(u,v,w)) \left| \frac{\partial(x,y,z)}{\partial(u,v,w)} \right| \text{d}V
-$$
-
-<Note>
-
-Cylindrical and spherical coordinates are special cases of this change of variables, with Jacobians $r$ and $\rho^2\sin\phi$ respectively.
-
-</Note>
