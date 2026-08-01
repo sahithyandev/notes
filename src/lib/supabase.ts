@@ -28,13 +28,15 @@ export function getSupabase() {
 /** Aggregate up/down counts for a slug. Returns zeros if unconfigured. */
 export async function getVoteCounts(
   slug: string,
-): Promise<{ up: number; down: number }> {
+): Promise<{ up: number; down: number } | null> {
   const client = makeClient();
   if (!client) return { up: 0, down: 0 };
   const { data, error } = await client
     .rpc("get_vote_counts", { p_slug: slug })
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    return null;
+  }
   return { up: data?.up ?? 0, down: data?.down ?? 0 };
 }
