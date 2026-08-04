@@ -1,19 +1,84 @@
 ---
-title: Block Cipher Modes of Operation
+title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-07-29T05:56:57.695Z
-slug: s5/computer-security/block-cipher-modes
+lastUpdatedOn: 2026-08-04T03:56:01.936Z
+slug: s5/computer-security/block-ciphers
 sidebar:
-  order: 6
+  order: 7
 prev: true
 next: true
 ---
 
-AES, the successor to DES, is based on the substitution-permutation network (SP-network) design of Rijndael, rather than the Feistel structure.
+A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
 
-## SP-Network
+For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$.
 
-Proposed by Claude Shannon in 1945: a series of linked permutation and substitution operations.
+## Block Cipher as a PRP
+
+A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
+
+Large messages are divided into blocks and encrypted independently per block:
+
+$$
+c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
+$$
+
+Per [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), $e$ and $d$ are public. Only $k$ is secret.
+
+## Attacking a Block Cipher
+
+- Ciphertext only  
+  Attacker has only $c$ and searches the key space exhaustively for a $k$ giving a meaningful $d_k(c)$. Requires $|K| > 2^{64}$ to make this infeasible.
+- Chosen plaintext (IND-CPA)  
+  Attacker submits chosen plaintexts to an encryption oracle and must not be able to distinguish encryptions of chosen messages better than a coin toss.
+- Chosen ciphertext (IND-CCA)  
+  Attacker has access to an encryption oracle, a decryption oracle (except for the challenge ciphertext), and a left-right oracle producing $c^* = e_k(m_b)$ for $b \in \{0,1\}$. Wins by guessing $b$. A secure scheme limits this to probability 0.5.
+
+<Note>
+
+A large key space alone does not guarantee security against these attacks.
+
+</Note>
+
+A block cipher encrypts a set of bits or characters at a time, whereas a stream cipher encrypts a single bit or character at a time. A stream cipher is used directly as an encryption scheme, but a block cipher is only a building block. The specific design combining a block cipher into a usable encryption scheme is its mode of operation.
+
+## Iterated Block Cipher Design
+
+Security comes from repeated application of a round function to the block, over $r$ rounds. Increasing $r$ increases security up to a stable level.
+
+### Feistel Cipher
+
+Named after Horst Feistel. Splits the plaintext block into halves $(L_0, R_0)$ and iterates a round function $F$, keyed by $k_i$, over $r$ rounds, swapping the final halves to produce the ciphertext.
+
+Each encryption round:
+
+$$
+L_i \leftarrow R_{i-1}, \quad R_i \leftarrow L_{i-1} \oplus F(k_i, R_{i-1})
+$$
+
+Each decryption round, using the round keys in reverse order:
+
+$$
+R_{i-1} \leftarrow L_i, \quad L_{i-1} \leftarrow R_i \oplus F(k_i, L_i)
+$$
+
+<Note>
+
+The round operation is invertible independent of $F$, so the same hardware or software can perform both encryption and decryption by reversing the order of round keys.
+
+</Note>
+
+Design parameters of a Feistel cipher:
+
+- Block length $n$.
+- Number of rounds $r$.
+- Definition of the round function $F$.
+- Key schedule generating each round key $k_i$ from $k$.
+- Length of the secret key $k$.
+
+### SP-Network
+
+Proposed by Claude Shannon in 1945: a series of linked permutation and substitution operations. AES, the successor to DES, is based on this design, rather than the Feistel structure.
 
 - Diffusion  
   Permutations disperse the statistical characteristics of each input bit among all output bits.
