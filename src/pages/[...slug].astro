@@ -48,7 +48,17 @@ if (!notesEntry) {
   });
 }
 
-const { Content, headings } = await render(notesEntry);
+const { Content, headings, remarkPluginFrontmatter } = await render(notesEntry);
+// Astro derives heading.text from rendered HTML, which mangles KaTeX
+// headings (see remarkKatexMhchem in astro.config.mjs); use the real
+// rendered heading markup instead, so the TOC shows properly typeset math.
+const headingHtml = remarkPluginFrontmatter?.headingHtml as
+  | string[]
+  | undefined;
+const cleanHeadings = headings.map((heading, i) => ({
+  ...heading,
+  html: headingHtml?.[i] ?? heading.text,
+}));
 const prereqEntries = notesEntry.data.prereqs
   ? (
       await Promise.all(
@@ -71,7 +81,7 @@ const sidebarData = await getSidebarData(slug);
 const wip = isWip(slug);
 
 // Filter headings for TOC (h2 and h3 only)
-const tocHeadings = headings.filter(
+const tocHeadings = cleanHeadings.filter(
   (heading) => heading.depth === 2 || heading.depth === 3,
 );
 

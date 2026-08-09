@@ -1,6 +1,6 @@
 ---
 interface Props {
-  headings: { depth: 2 | 3; slug: string; text: string }[];
+  headings: { depth: 2 | 3; slug: string; html: string }[];
 }
 
 const { headings } = Astro.props;
@@ -25,9 +25,8 @@ const { headings } = Astro.props;
           class={`toc-item ${heading.depth === 3 ? "toc-sub" : ""} ${index === 0 ? "active" : ""}`}
           data-depth={heading.depth}
           data-index={index}
-        >
-          {heading.text}
-        </a>
+          set:html={heading.html}
+        />
       ))}
       {headings.length > 5 && <div class="toc-rule" />}
     </>

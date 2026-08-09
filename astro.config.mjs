@@ -10,6 +10,8 @@ import linkValidator from "./src/integrations/link-validator/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
+import { toHast } from "mdast-util-to-hast";
+import { toHtml } from "hast-util-to-html";
 import "katex/contrib/mhchem";
 import { unified } from "@astrojs/markdown-remark";
 
@@ -23,7 +25,7 @@ function render(value, displayMode) {
 }
 
 export function remarkKatexMhchem() {
-  return (tree) => {
+  return (tree, file) => {
     visit(tree, (node, index, parent) => {
       if (!parent || typeof index !== "number") return;
 
@@ -41,6 +43,25 @@ export function remarkKatexMhchem() {
         };
       }
     });
+
+    // Astro's TOC heading text is extracted from the rendered page HTML
+    // before math is parsed back out of its raw HTML node, so it ends up
+    // concatenating the KaTeX MathML annotation, the raw TeX source, and
+    // the visible glyphs all at once. Render each heading's own markup
+    // (post math substitution, above) here instead, so [...slug].astro can
+    // pass real KaTeX HTML to the TOC rather than Astro's mangled text.
+    const headingHtml = [];
+    visit(tree, "heading", (node) => {
+      const inline = { type: "root", children: node.children };
+      headingHtml.push(
+        toHtml(toHast(inline, { allowDangerousHtml: true }), {
+          allowDangerousHtml: true,
+        }),
+      );
+    });
+    file.data.astro ??= {};
+    file.data.astro.frontmatter ??= {};
+    file.data.astro.frontmatter.headingHtml = headingHtml;
   };
 }
 
