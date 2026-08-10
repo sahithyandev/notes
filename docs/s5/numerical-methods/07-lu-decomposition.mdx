@@ -1,0 +1,113 @@
+---
+title: LU Decomposition
+prereqs:
+  - s5/numerical-methods/gaussian-elimination
+dateCreated: 2026-07-28T05:06:00.161Z
+lastUpdatedOn: 2026-08-10T06:34:55.623Z
+slug: s5/numerical-methods/lu-decomposition
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+The process of factorizing a square matrix into 2 [triangular matrices](/s1/mathematics/matrices/introduction#triangular-matrix): a lower triangular matrix ($L$) and an upper triangular matrix ($U$).
+Introduced by Alan Turing in 1948.
+
+$$
+A = LU
+$$
+
+## Finding $L$ and $U$ Without Pivoting
+
+### Using Gaussian Elimination
+
+Can be used when [Gaussian elimination](/s5/numerical-methods/gaussian-elimination) can be performed on $A\vec{x} = \vec{b}$ without row interchanges, $A$ factors as $A = LU$, where
+
+$$
+m_{ji} = \frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}
+$$
+
+is the multiplier used to eliminate entry $(j, i)$ at step $i$, $U$ is the row-echelon form produced by elimination, and $L$ collects the multipliers:
+
+$$
+U = \begin{pmatrix}
+a_{11}^{(1)} & a_{12}^{(1)} & \cdots & a_{1n}^{(1)} \\
+0 & a_{22}^{(2)} & \cdots & a_{2n}^{(2)} \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & \cdots & \cdots & a_{nn}^{(n)} \end{pmatrix}
+
+\; \text{and} \;
+
+L = \begin{pmatrix}
+1 & 0 & \cdots & 0 \\
+m_{21} & 1 & \cdots & \vdots \\
+\vdots & \vdots & \ddots & 0 \\
+m_{n1} & \cdots & m_{n,n-1} & 1 \end{pmatrix}
+$$
+
+$L$ and $U$ are produced together in 1 pass of elimination.
+
+- For $i = 1, \ldots, n-1$, use row $i$ as the pivot row.
+- For each row $j > i$, compute $m_{ji} = a_{ji}^{(i)} / a_{ii}^{(i)}$.
+- Eliminate $a_{ji}$ with $\text{row}_j \leftarrow \text{row}_j - m_{ji} \cdot \text{row}_i$.
+- Place $m_{ji}$ at position $(j, i)$ of $L$.
+
+$U$ is the result of elimination. $L$ is the record of multipliers used to produce it.
+
+### Direct Computation Method
+
+$L$ and $U$ can also be computed directly by equating entries of $A$ with entries of the product $LU$.
+
+- For $i = 1, \ldots, n$, set $l_{ii} = 1$ or $u_{ii} = 1$.
+- Compute $l_{11} u_{11} = a_{11}$.
+- For $j = 2, \ldots, n$, compute
+
+$$
+u_{1j} = \frac{a_{1j}}{l_{11}}, \quad l_{j1} = \frac{a_{j1}}{u_{11}}
+$$
+
+- For $i = 2, \ldots, n-1$:
+  - Compute $l_{ii} u_{ii} = a_{ii} - \sum_{k=1}^{i-1} l_{ik} u_{ki}$.
+    - $a_{ii}$  
+      Diagonal entry of $A$ at row $i$.
+    - $\sum_{k=1}^{i-1} l_{ik} u_{ki}$  
+      Contribution already accounted for by the first $i-1$ rows and columns of $L$ and $U$.
+    - $l_{ii} u_{ii}$  
+      Remainder left for the diagonal entries of $L$ and $U$ at step $i$, split by the fixed value from step 1.
+  - For $j = i+1, \ldots, n$, compute
+
+$$
+u_{ij} = \frac{1}{l_{ii}} \left[ a_{ij} - \sum_{k=1}^{i-1} l_{ik} u_{kj} \right], \quad
+l_{ji} = \frac{1}{u_{ii}} \left[ a_{ji} - \sum_{k=1}^{i-1} l_{jk} u_{ki} \right]
+$$
+
+<Note>
+
+Setting $l_{ii} = 1$ for all $i$ gives Doolittle's method. Setting $u_{ii} = 1$ for all $i$ gives Crout's method.
+
+</Note>
+
+## Pivoting
+
+LU decomposition can fail when the top-left entry of $A$ is $0$ or small compared to other entries.
+
+Pivoting rearranges the rows and/or columns of $A$ to place a larger element in the top-left position, mitigating this. Multiple pivoting algorithms exist.
+
+## Applications
+
+- Solving $A\vec{x} = \vec{b}$, used for finding current in a circuit and solving discrete dynamical systems.
+- Finding the inverse of a matrix.
+- Finding the determinant of a matrix.
+
+Applicable whenever a problem can be modeled in matrix form, since triangular matrices are easy to compute with.
+
+### Solving $A\vec{x} = \vec{b}$
+
+Suppose $A = LU$ and $A\vec{x} = LU\vec{x} = \vec{b}$ must be solved.
+
+- Set $\vec{w} = U\vec{x}$.
+- Solve $L\vec{w} = \vec{b}$ for $\vec{w}$ by forward substitution, since $L$ is lower triangular.
+- Solve $U\vec{x} = \vec{w}$ for $\vec{x}$ by back substitution, since $U$ is upper triangular. This $\vec{x}$ solves the original system.
+
+This uses $L$ to perform row operations on $U$ to solve the system.

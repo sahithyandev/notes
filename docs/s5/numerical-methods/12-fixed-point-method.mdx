@@ -1,0 +1,154 @@
+---
+title: Fixed Point Method
+dateCreated: 2026-07-28T05:16:51.643Z
+lastUpdatedOn: 2026-08-10T06:34:55.626Z
+slug: s5/numerical-methods/fixed-point-method
+sidebar:
+  order: 12
+prev: true
+next: true
+---
+
+A function $G$ from $D \subseteq \mathbb{R}^n$ into $\mathbb{R}^n$ has a fixed point at $\vec{p} \in D$ **iff**
+
+$$
+G(\vec{p}) = \vec{p}
+$$
+
+A [nonlinear system](/s5/numerical-methods/nonlinear-system-of-equations) $F(\vec{x}) = \vec{0}$ can be rewritten in fixed-point form $\vec{x} = G(\vec{x})$, so that a solution of $F(\vec{x}) = \vec{0}$ is a fixed point of $G$.
+
+## Rearranging F to G
+
+For each coordinate function $f_i(\vec{x}) = 0$, solve for one variable in terms of the rest to isolate $x_i$, giving $x_i = g_i(\vec{x})$. Stacking the $g_i$'s gives $G = (g_1, \ldots, g_n)^T$. This choice is not unique: $f_i = 0$ can be solved for any variable, and different choices give different $G$'s with different convergence behavior under the fixed-point theorem.
+
+## Fixed-Point Iteration
+
+Given $G$ and a starting vector $\vec{x}^{(0)}$, generate
+
+$$
+\vec{x}^{(k)} = G(\vec{x}^{(k-1)}), \quad k \geq 1
+$$
+
+## Fixed-Point Theorem in n-space
+
+Let $D = \{(x_1, x_2, \ldots, x_n)^T \mid a_i \leq x_i \leq b_i, \; i = 1, 2, \ldots, n\}$ for constants $a_i, b_i$, and let $G: D \rightarrow \mathbb{R}^n$ be continuous with $G(\vec{x}) \in D$ whenever $\vec{x} \in D$. Then $G$ has a fixed point in $D$.
+
+If, in addition, every component function of $G$ has continuous partial derivatives and a constant $K < 1$ exists with
+
+$$
+\left|\frac{\partial g_i(\vec{x})}{\partial x_j}\right| \leq \frac{K}{n}, \quad \forall \vec{x} \in D, \; i, j = 1, 2, \ldots, n
+$$
+
+then:
+
+- $G$ has a unique fixed point $\vec{p} \in D$.
+- Fixed-point iteration converges to $\vec{p}$ for any $\vec{x}^{(0)} \in D$.
+- $\lVert \vec{x}^{(k)} - \vec{p} \rVert_\infty \leq \dfrac{K^k}{1-K} \lVert \vec{x}^{(1)} - \vec{x}^{(0)} \rVert_\infty$ for each $k \geq 1$.
+
+<Note>
+
+This is the $n$-dimensional generalization of the Contraction Mapping Theorem.
+
+</Note>
+
+## Accelerating Convergence
+
+Computing $\vec{x}^{(k)}$ with the already-updated components $x_1^{(k)}, \ldots, x_{i-1}^{(k)}$ in place of $x_1^{(k-1)}, \ldots, x_{i-1}^{(k-1)}$, rather than waiting for the full previous iterate, is the Gauss-Seidel method applied to fixed-point iteration. It often converges faster, but not always.
+
+## Example
+
+$$
+\begin{aligned}
+f_1(x_1, x_2, x_3) &= 3x_1 - \cos(x_2 x_3) - \tfrac{1}{2} \\
+f_2(x_1, x_2, x_3) &= x_1^2 - 81(x_2 + 0.1)^2 + \sin x_3 + 1.06 \\
+f_3(x_1, x_2, x_3) &= e^{-x_1 x_2} + 20x_3 + \tfrac{10\pi - 3}{3}
+\end{aligned}
+$$
+
+For the coordinate functions $f_1, f_2, f_3$, solving each $f_i = 0$ for $x_i$ gives the fixed-point form $\vec{x} = G(\vec{x})$.
+
+Solving $f_1 = 3x_1 - \cos(x_2x_3) - \tfrac{1}{2} = 0$ for $x_1$:
+
+$$
+3x_1 = \cos(x_2x_3) + \tfrac{1}{2} \implies x_1 = g_1(\vec{x}) = \tfrac{1}{3}\cos(x_2 x_3) + \tfrac{1}{6}
+$$
+
+Solving $f_2 = x_1^2 - 81(x_2+0.1)^2 + \sin x_3 + 1.06 = 0$ for $x_2$:
+
+$$
+(x_2+0.1)^2 = \tfrac{1}{81}\left(x_1^2 + \sin x_3 + 1.06\right) \implies x_2 = g_2(\vec{x}) = \tfrac{1}{9}\sqrt{x_1^2 + \sin x_3 + 1.06} - 0.1
+$$
+
+(taking the positive root, since the solution near the expected root has $x_2 + 0.1 > 0$)
+
+Solving $f_3 = e^{-x_1x_2} + 20x_3 + \tfrac{10\pi - 3}{3} = 0$ for $x_3$:
+
+$$
+20x_3 = -e^{-x_1x_2} - \tfrac{10\pi - 3}{3} \implies x_3 = g_3(\vec{x}) = -\tfrac{1}{20}e^{-x_1 x_2} - \tfrac{10\pi - 3}{60}
+$$
+
+### Verifying a Fixed Point Exists
+
+Take $D = \{(x_1, x_2, x_3)^T \mid -1 \leq x_i \leq 1\}$.
+
+**$G(D) \subseteq D$:** for $\vec{x} \in D$, $x_2 x_3 \in [-1, 1]$, so $\cos(x_2x_3) \in [\cos 1, 1] = [0.5403, 1]$, giving
+
+$$
+g_1(\vec{x}) \in \left[\tfrac{1}{3}(0.5403) + \tfrac{1}{6},\ \tfrac{1}{3}(1) + \tfrac{1}{6}\right] = [0.3468,\ 0.5]
+$$
+
+Similarly $x_1^2 + \sin x_3 + 1.06 \in [0.2185, 2.9015]$ (using $\sin x_3 \in [-0.8415, 0.8415]$, $x_1^2 \in [0, 1]$), so
+
+$$
+g_2(\vec{x}) \in [-0.0481,\ 0.0893]
+$$
+
+and $x_1 x_2 \in [-1, 1]$ gives $e^{-x_1x_2} \in [0.3679, 2.7183]$, so
+
+$$
+g_3(\vec{x}) \in [-0.6095,\ -0.4920]
+$$
+
+All three ranges lie in $[-1, 1]$, so $G(\vec{x}) \in D$ whenever $\vec{x} \in D$. Every $g_i$ is continuous on $D$, so by the [Fixed-Point Theorem](#fixed-point-theorem-in-n-space), $G$ has a fixed point in $D$.
+
+### Verifying Uniqueness
+
+The [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) of $G$ is
+
+$$
+J_G(\vec{x}) =
+\begin{pmatrix}
+0 & -\tfrac{1}{3}x_3\sin(x_2x_3) & -\tfrac{1}{3}x_2\sin(x_2x_3) \\[6pt]
+\dfrac{x_1}{9\sqrt{x_1^2+\sin x_3+1.06}} & 0 & \dfrac{\cos x_3}{18\sqrt{x_1^2+\sin x_3+1.06}} \\[6pt]
+\tfrac{1}{20}x_2 e^{-x_1x_2} & \tfrac{1}{20}x_1 e^{-x_1x_2} & 0
+\end{pmatrix}
+$$
+
+Bounding each entry of $J_G(\vec{x})$ on $D$ (using $|x_i| \leq 1$, $|\sin(x_2x_3)| \leq \sin 1 = 0.8415$, $\sqrt{x_1^2+\sin x_3+1.06} \geq \sqrt{0.2185} = 0.4675$, $e^{-x_1x_2} \leq e = 2.7183$):
+
+$$
+\left|\frac{\partial g_1}{\partial x_2}\right|, \left|\frac{\partial g_1}{\partial x_3}\right| \leq 0.2805,
+\quad
+\left|\frac{\partial g_2}{\partial x_1}\right| \leq 0.2377,
+\quad
+\left|\frac{\partial g_2}{\partial x_3}\right| \leq 0.1189,
+\quad
+\left|\frac{\partial g_3}{\partial x_1}\right|, \left|\frac{\partial g_3}{\partial x_2}\right| \leq 0.1359
+$$
+
+The largest of these is $0.2805$, so taking $K = 0.85$ (so $K/n = K/3 = 0.2833 \geq 0.2805$) satisfies $\left|\left(J_G(\vec{x})\right)_{ij}\right| \leq K/n$ for all $i,j$ on $D$, with $K < 1$. By the Fixed-Point Theorem, $G$ therefore has a **unique** fixed point in $D$, and fixed-point iteration converges to it for any $\vec{x}^{(0)} \in D$.
+
+### Iterating to the Fixed Point
+
+Starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T \in D$ and applying $\vec{x}^{(k)} = G(\vec{x}^{(k-1)})$:
+
+| $k$ | $x_1^{(k)}$ | $x_2^{(k)}$ | $x_3^{(k)}$ |
+| --- | ----------- | ----------- | ----------- |
+| 0   | 0.10000     | 0.10000     | -0.10000    |
+| 1   | 0.49998     | 0.00944     | -0.52310    |
+| 2   | 0.49999     | 0.00003     | -0.52336    |
+| 3   | 0.50000     | 0.00001     | -0.52360    |
+
+For $k=1$: $x_2^{(0)}x_3^{(0)} = -0.01$, so $g_1 = \tfrac{1}{3}\cos(-0.01) + \tfrac{1}{6} = 0.49998$; $\left(x_1^{(0)}\right)^2 + \sin x_3^{(0)} + 1.06 = 0.97017$, so $g_2 = \tfrac{1}{9}\sqrt{0.97017} - 0.1 = 0.00944$; $x_1^{(0)}x_2^{(0)} = 0.01$, so $g_3 = -\tfrac{1}{20}e^{-0.01} - \tfrac{10\pi-3}{60} = -0.52310$.
+
+The iterates converge to $\vec{p} = \left(0.5,\ 0,\ -\tfrac{\pi}{6}\right) \approx (0.5, 0, -0.52360)$, which checks out directly: $g_1(\vec{p}) = \tfrac{1}{3}\cos(0) + \tfrac{1}{6} = 0.5$, $g_2(\vec{p}) = \tfrac{1}{9}\sqrt{0.25 - 0.5 + 1.06} - 0.1 = \tfrac{1}{9}\sqrt{0.81} - 0.1 = 0$, $g_3(\vec{p}) = -\tfrac{1}{20}e^0 - \tfrac{10\pi-3}{60} = -0.05 - 0.4736 = -\tfrac{\pi}{6}$.
