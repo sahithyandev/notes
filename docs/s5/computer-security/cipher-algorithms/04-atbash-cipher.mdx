@@ -1,0 +1,30 @@
+---
+title: Atbash Cipher
+sidebar:
+  order: 4
+dateCreated: 2026-08-11T00:00:00.000Z
+lastUpdatedOn: 2026-08-11T04:59:37.964Z
+slug: s5/computer-security/cipher-algorithms/atbash-cipher
+prev: true
+next: true
+---
+
+Encryption replaces each letter in the alphabet with the letter at its mirrored position, counting from the opposite end.
+
+$$
+c = 25 - m \mod 26
+$$
+
+Here $m$ is the plaintext letter, encoded as an integer 0 (a) to 25 (z).
+
+<Note>
+
+Atbash has no key: a always maps to z, b to y, and so on. Encryption and decryption are the same operation.
+
+</Note>
+
+Originally devised for the Hebrew alphabet, then applied to Latin and other alphabets.
+
+### Breaking the Atbash Cipher
+
+There is no key to search: the mapping is fixed, so recovering the plaintext is a single substitution away once Atbash is suspected.

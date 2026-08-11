@@ -1,0 +1,101 @@
+---
+title: Block Cipher Modes
+dateCreated: 2026-08-11T00:00:00.000Z
+lastUpdatedOn: 2026-08-11T04:59:37.962Z
+slug: s5/computer-security/block-cipher-modes
+sidebar:
+  order: 8
+prev: true
+next: true
+---
+
+A mode of operation is a recommended standard for using a block cipher to build a block encryption scheme. Plaintext $m$ is divided into blocks $m_1,...,m_n$ of the length the underlying cipher specifies, padding the last block if needed.
+
+DES was standardized with 4 modes: ECB, CBC, OFB, CFB. CTR was added later to allow parallel encryption of data blocks.
+
+## ECB Mode
+
+Electronic Code Book, the simplest mode: each block is encrypted independently.
+
+$$
+c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
+$$
+
+### Security Vulnerabilities
+
+- Information leakage  
+  Identical plaintext blocks ($m_i = m_j$) produce identical ciphertext blocks ($c_i = c_j$), letting an attacker spot repetition.
+- Block deletion  
+  Blocks are independent, so an attacker can delete blocks in transit and the receiver cannot detect the modification.
+- Block splicing  
+  For the same reason, an attacker can copy blocks from one message into another undetected.
+
+### Error Propagation
+
+A single bit error in a received ciphertext block corrupts the entire corresponding plaintext block on decryption. There is no propagation into other blocks.
+
+## CBC Mode
+
+Cipher Block Chaining fixes ECB by chaining ciphertext into each block's encryption, giving every block context from its neighbors.
+
+$$
+c_1 \leftarrow e_k(m_1 \oplus IV), \quad c_i \leftarrow e_k(m_i \oplus c_{i-1}) \text{ for } i > 1
+$$
+
+$$
+m_1 \leftarrow d_k(c_1) \oplus IV, \quad m_i \leftarrow d_k(c_i) \oplus c_{i-1} \text{ for } i > 1
+$$
+
+The IV can be a fixed public value (e.g. all-zero), which need not be transmitted, or a random nonce, which must be transmitted with the ciphertext as $IV, c_1,...,c_n$.
+
+### Error Propagation
+
+A single bit error in a received ciphertext block corrupts the entire corresponding plaintext block, plus a single bit in the next block. This is one-block error propagation.
+
+## OFB Mode
+
+Output Feedback lets a block cipher operate as a stream cipher: it generates a keystream $Y_i$ of $b$ bits at a time, XORed with the plaintext or ciphertext stream.
+
+$$
+Y_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Y_i, \quad m_i \leftarrow c_i \oplus Y_i
+$$
+
+$Y_0 \leftarrow IV$. Both encryption and decryption use only the encryption operation $e_k$.
+
+The keystream can be precomputed before any ciphertext arrives, so OFB suits real-time streamed content.
+
+### Error Propagation
+
+A single bit error in a received ciphertext block corrupts only the corresponding single bit of plaintext. There is no propagation into other blocks.
+
+## CFB Mode
+
+Cipher Feedback also lets a block cipher operate as a stream cipher, similar to OFB, but feeds the ciphertext itself back into the keystream generator.
+
+$$
+Z_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Z_i^*, \quad Y_i \leftarrow Y_{i-1} \ll c_i
+$$
+
+$Y_0 \leftarrow IV$, and $Z_i^*$ is the $b$ most-significant bits of $Z_i$. Decryption mirrors this, also using only $e_k$.
+
+Unlike OFB, the keystream depends on the ciphertext and cannot be precomputed before ciphertext arrives, making CFB less useful than OFB for real-time streaming.
+
+### Error Propagation
+
+A single bit error in a received ciphertext block corrupts a single bit in the corresponding plaintext block, then keeps corrupting the input buffer $Y_i$ until it is flushed after $n/b$ rounds, completely corrupting $n/b - 1$ further blocks. This causes severe error propagation.
+
+## CTR Mode
+
+Counter mode is similar to ECB but removes its disadvantages while keeping its advantage of parallel processing.
+
+$$
+c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_b), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_b)
+$$
+
+$\langle i \rangle_b$ is the binary representation of $i$ as a $b$-bit number.
+
+Each plaintext block is encrypted independently, like ECB, so blocks can be processed in parallel. The counter also gives each block context, so unlike ECB, an attacker cannot cut-and-paste or rearrange ciphertext blocks undetected.
+
+### Security Vulnerabilities
+
+The counter input $IV + i$ must never be reused for a subsequent encryption under the same key $k$.
