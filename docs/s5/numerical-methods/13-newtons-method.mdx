@@ -3,12 +3,12 @@ title: Newton's Method
 prereqs:
   - s5/numerical-methods/fixed-point
 dateCreated: 2026-07-28T05:17:13.897Z
-lastUpdatedOn: 2026-08-10T06:34:55.626Z
+lastUpdatedOn: 2026-08-12T06:16:48.781Z
 slug: s5/numerical-methods/newtons-method
 sidebar:
   order: 13
 prev: true
-next: false
+next: true
 ---
 
 Newton's method for nonlinear systems generalizes the single-variable iteration $g(x) = x - \phi(x)f(x)$, $\phi(x) = 1/f'(x)$, to $n$ dimensions by replacing $\phi(x)$ with the inverse of a matrix $A(\vec{x})$
@@ -17,7 +17,7 @@ $$
 G(\vec{x}) = \vec{x} - A(\vec{x})^{-1}F(\vec{x})
 $$
 
-Quadratic convergence of this [fixed-point iteration](/s5/numerical-methods/fixed-point) to $\vec{p}$ requires $\dfrac{\partial g_i(\vec{p})}{\partial x_k} = 0$ for each $i, k$, which holds by choosing $A(\vec{x})$ to be the [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) $J(\vec{x})$ of $F$.
+Quadratic convergence of this [fixed-point iteration](/s5/numerical-methods/fixed-point-method) to $\vec{p}$ requires $\dfrac{\partial g_i(\vec{p})}{\partial x_k} = 0$ for each $i, k$, which holds by choosing $A(\vec{x})$ to be the [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) $J(\vec{x})$ of $F$.
 
 ## Iteration
 
@@ -45,7 +45,7 @@ Convergence is quadratic, provided a sufficiently accurate starting value $\vec{
 
 ## Example
 
-Apply Newton's method to the [nonlinear system](/s5/numerical-methods/nonlinear-system-of-equations#example) with its [Jacobian](/s5/numerical-methods/jacobian-matrix#example), starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T$.
+Apply Newton's method to the [nonlinear system](/s5/numerical-methods/non-linear-system-of-equations#example) with its [Jacobian](/s5/numerical-methods/jacobian-matrix#example), starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T$.
 
 $$
 F(\vec{x}^{(0)}) \approx (-1.199950, -2.269833, 8.462025)^T

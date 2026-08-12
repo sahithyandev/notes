@@ -1,0 +1,58 @@
+---
+title: Flux
+sidebar:
+  order: 20
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-08-12T06:16:48.780Z
+slug: s5/calculus/flux
+prev: true
+next: false
+---
+
+The flux of a [vector field](/s5/calculus/vector-field) through an [oriented surface](/s5/calculus/orientation) measures the net amount of flow passing through the surface in the chosen normal direction, assuming a fluid in steady state and incompressible. The volume of fluid flowing through a portion of a surface depends on:
+
+- Speed of the fluid.
+- Orientation of the surface relative to the flow.
+- Area of the portion of the surface.
+
+Let $\boldsymbol{F}$ be a continuous vector field on an oriented surface $\sigma$, and let $\hat{n}$ be the chosen unit normal field on $\sigma$. The flux of $\boldsymbol{F}$ across $\sigma$ is
+
+$$
+\Phi = \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S
+$$
+
+<Note>
+
+A positive flux means more flow passes through $\sigma$ in the positive normal direction than the negative. A negative flux means the reverse. A zero flux means the 2 amounts balance.
+
+</Note>
+
+## Flux through a Parametric Surface
+
+Let $\sigma$ be a smooth parametric surface $\boldsymbol{r} = \boldsymbol{r}(u,v)$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. Suppose the component functions of $\boldsymbol{F}$ are continuous on $\sigma$ and that
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v}
+$$
+
+determines the chosen orientation of $\sigma$. Then
+
+$$
+\Phi = \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iint_R \boldsymbol{F}(\boldsymbol{r}(u,v)) \cdot \left(\frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v}\right) \text{d}A_{uv}
+$$
+
+## Flux through a Graph
+
+Let $\sigma$ be a smooth surface of the form $z = g(x,y)$, $y = g(x,z)$, or $x = g(y,z)$, written as $G(x,y,z) = 0$ by moving all terms to the left side, with [orientation](/s5/calculus/orientation) determined by $\nabla G$. Let $R$ be the projection of $\sigma$ onto the coordinate plane determined by the independent variables of $g$. If $\boldsymbol{F}$ is continuous on $\sigma$,
+
+$$
+\Phi = \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iint_R \boldsymbol{F} \cdot \nabla G\,\text{d}A
+$$
+
+<Note>
+
+For the opposite orientation, $\Phi = -\displaystyle\iint_R \boldsymbol{F} \cdot \nabla G\,\text{d}A$.
+
+$\boldsymbol{F}$ and $\nabla G$ are evaluated on $\sigma$, and $\text{d}A$ is the area element in the corresponding projection plane.
+
+</Note>

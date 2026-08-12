@@ -1,0 +1,212 @@
+---
+title: Cubic Spline Interpolation
+dateCreated: 2026-08-11T05:00:40.584Z
+lastUpdatedOn: 2026-08-12T06:16:48.781Z
+slug: s5/numerical-methods/cubic-spline-interpolation
+sidebar:
+  order: 14
+prev: true
+next: false
+---
+
+Given nodes $a = x_0 < x_1 < \cdots < x_n = b$ and $f$ defined on $[a, b]$, a cubic spline interpolant for $f$ is a function $S$ satisfying:
+
+<Note>
+
+$f$ is the function being interpolated, known only through its values $f(x_0), \ldots, f(x_n)$ at the nodes (or, for a clamped spline, also through $f'(x_0)$ and $f'(x_n)$). $S$ is the piecewise-cubic approximation to $f$ built from those values.
+
+</Note>
+
+- $S(x)$ is a cubic polynomial $S_j(x)$ on $[x_j, x_{j+1}]$, for each $j = 0, 1, \ldots, n-1$ (piecewise cubic)
+- $S_j(x_j) = f(x_j)$ and $S_j(x_{j+1}) = f(x_{j+1})$, for each $j = 0, 1, \ldots, n-1$ (interpolation)
+- $S_{j+1}(x_{j+1}) = S_j(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (value continuity, implied by interpolation above)
+- $S_{j+1}'(x_{j+1}) = S_j'(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (slope continuity)
+- $S_{j+1}''(x_{j+1}) = S_j''(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (curvature continuity)
+- one of the following boundary conditions holds:
+  - $S''(x_0) = S''(x_n) = 0$ (natural, aka. free, boundary)
+  - $S'(x_0) = f'(x_0)$ and $S'(x_n) = f'(x_n)$ (clamped boundary)
+
+Each $S_j$ is written as
+
+$$
+S_j(x) = a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3
+$$
+
+giving $4n$ unknowns $a_j, b_j, c_j, d_j$, $j = 0, 1, \ldots, n-1$, for $4n$ equations from the conditions above.
+
+<Note>
+
+A natural spline approximates the shape a long flexible rod takes when forced through the data points, hence the name.
+
+</Note>
+
+## Constructing the Spline
+
+Let $h_j = x_{j+1} - x_j$. Solve order:
+
+1. $a_j = f(x_j)$, directly from interpolation.
+2. $c_j$, from the tridiagonal system plus the boundary conditions.
+3. $b_j$ and $d_j$, by back-substitution from the known $a_j, c_j$.
+
+The interpolation condition already gives $a_j$ for each $j = 0, 1, \ldots, n$ directly, leaving $b_j, c_j, d_j$ to determine. Applying the continuity conditions to $S_j$ gives, for each $j = 0, 1, \ldots, n-1$
+
+$$
+\begin{aligned}
+a_{j+1} &= a_j + b_j h_j + c_j h_j^2 + d_j h_j^3 & \text{(value continuity)} \\
+b_{j+1} &= b_j + 2c_j h_j + 3d_j h_j^2 & \text{(slope continuity)} \\
+c_{j+1} &= c_j + 3d_j h_j & \text{(curvature continuity)}
+\end{aligned}
+$$
+
+Solving the third equation for $d_j$ and substituting into the first two, then eliminating $b_j$, leaves a linear system in the $c_j$'s alone
+
+$$
+h_{j-1}c_{j-1} + 2(h_{j-1} + h_j)c_j + h_j c_{j+1} = \frac{3}{h_j}(a_{j+1} - a_j) - \frac{3}{h_{j-1}}(a_j - a_{j-1}), \quad j = 1, \ldots, n-1 \quad \text{(tridiagonal system)}
+$$
+
+Once $\{c_j\}_{j=0}^n$ is known, the remaining coefficients follow directly
+
+$$
+b_j = \frac{1}{h_j}(a_{j+1} - a_j) - \frac{h_j}{3}(2c_j + c_{j+1}), \qquad d_j = \frac{c_{j+1} - c_j}{3h_j} \quad \text{(back-substitution)}
+$$
+
+<Note>
+
+This system has $n-1$ equations in $n+1$ unknowns $c_0, \ldots, c_n$. The 2 missing equations come from the boundary conditions.
+
+</Note>
+
+### Natural Boundary Conditions
+
+$S''(x_0) = S''(x_n) = 0$ gives $c_0 = c_n = 0$ directly. The resulting $(n+1) \times (n+1)$ system for $c_0, \ldots, c_n$ is strictly diagonally dominant, so it has a unique solution, and thus $f$ has a unique natural spline interpolant on the given nodes.
+
+### Clamped Boundary Conditions
+
+$S'(x_0) = f'(x_0)$ and $S'(x_n) = f'(x_n)$ give 2 more equations
+
+$$
+2h_0 c_0 + h_0 c_1 = \frac{3}{h_0}(a_1 - a_0) - 3f'(x_0) \quad \text{(left clamp)}
+$$
+
+$$
+h_{n-1}c_{n-1} + 2h_{n-1}c_n = 3f'(x_n) - \frac{3}{h_{n-1}}(a_n - a_{n-1}) \quad \text{(right clamp)}
+$$
+
+This $(n+1) \times (n+1)$ system is also strictly diagonally dominant, so $f$ has a unique clamped spline interpolant on the given nodes.
+
+<Note>
+
+Unlike the natural spline, this requires knowing $f'(x_0)$ and $f'(x_n)$ directly, not just the node values $f(x_j)$, e.g. from a known formula for $f$.
+
+</Note>
+
+## Example
+
+Construct a natural cubic spline through $(1, 2), (2, 3), (3, 5)$.
+
+Nodes $x_0 = 1, x_1 = 2, x_2 = 3$, so $n = 2$, $h_0 = h_1 = 1$, and $a_0 = 2, a_1 = 3, a_2 = 5$ directly from interpolation. Natural boundary conditions give $c_0 = c_2 = 0$. The system for $c_1$ (the single interior equation, $j = 1$) is
+
+$$
+h_0 c_0 + 2(h_0 + h_1)c_1 + h_1 c_2 = \frac{3}{h_1}(a_2 - a_1) - \frac{3}{h_0}(a_1 - a_0) = 3(5-3) - 3(3-2) = 3
+$$
+
+$$
+4c_1 = 3 \implies c_1 = \tfrac{3}{4}
+$$
+
+$$
+b_0 = (a_1 - a_0) - \tfrac{1}{3}(2c_0 + c_1) = 1 - \tfrac{1}{4} = \tfrac{3}{4}, \qquad d_0 = \tfrac{c_1 - c_0}{3} = \tfrac{1}{4}
+$$
+
+$$
+b_1 = (a_2 - a_1) - \tfrac{1}{3}(2c_1 + c_2) = 2 - \tfrac{1}{2} = \tfrac{3}{2}, \qquad d_1 = \tfrac{c_2 - c_1}{3} = -\tfrac{1}{4}
+$$
+
+$$
+S(x) = \begin{cases} 2 + \tfrac{3}{4}(x-1) + \tfrac{1}{4}(x-1)^3, & x \in [1, 2] \\[4pt] 3 + \tfrac{3}{2}(x-2) + \tfrac{3}{4}(x-2)^2 - \tfrac{1}{4}(x-2)^3, & x \in [2, 3] \end{cases}
+$$
+
+### With Multiple Interior Nodes
+
+The 3-point example above has only 1 interior node, so its tridiagonal system is a single equation. With 4 nodes, there are 2 interior equations, and solving for $c_1, c_2$ requires actual elimination.
+
+Construct a natural cubic spline through $(0, 0), (1, 1), (2, 0), (3, 1)$.
+
+Nodes give $n = 3$, $h_0 = h_1 = h_2 = 1$, and $a_0 = 0, a_1 = 1, a_2 = 0, a_3 = 1$. Natural boundary conditions give $c_0 = c_3 = 0$. The tridiagonal system for $j = 1, 2$ is
+
+$$
+\begin{aligned}
+4c_1 + c_2 &= \tfrac{3}{h_1}(a_2-a_1) - \tfrac{3}{h_0}(a_1-a_0) = 3(0-1) - 3(1-0) = -6 \\
+c_1 + 4c_2 &= \tfrac{3}{h_2}(a_3-a_2) - \tfrac{3}{h_1}(a_2-a_1) = 3(1-0) - 3(0-1) = 6
+\end{aligned}
+$$
+
+Eliminating $c_2$ (multiply the second row by $4$ and subtract the first)
+
+$$
+4(c_1 + 4c_2) - (4c_1 + c_2) = 4(6) - (-6) \implies 15c_2 = 30 \implies c_2 = 2
+$$
+
+Back-substituting into the first row
+
+$$
+4c_1 + 2 = -6 \implies c_1 = -2
+$$
+
+$$
+b_0 = 1 - \tfrac{1}{3}(-2) = \tfrac{5}{3}, \quad d_0 = \tfrac{c_1 - c_0}{3} = -\tfrac{2}{3}
+$$
+
+$$
+b_1 = -1 - \tfrac{1}{3}(-4+2) = -\tfrac{1}{3}, \quad d_1 = \tfrac{c_2 - c_1}{3} = \tfrac{4}{3}
+$$
+
+$$
+b_2 = 1 - \tfrac{1}{3}(4) = -\tfrac{1}{3}, \quad d_2 = \tfrac{c_3 - c_2}{3} = -\tfrac{2}{3}
+$$
+
+$$
+S(x) = \begin{cases} \tfrac{5}{3}x - \tfrac{2}{3}x^3, & x \in [0, 1] \\[4pt] 1 - \tfrac{1}{3}(x-1) - 2(x-1)^2 + \tfrac{4}{3}(x-1)^3, & x \in [1, 2] \\[4pt] -\tfrac{1}{3}(x-2) + 2(x-2)^2 - \tfrac{2}{3}(x-2)^3, & x \in [2, 3] \end{cases}
+$$
+
+### Clamped Boundary Example
+
+Construct a clamped cubic spline through $(0, 0), (1, 1), (2, 0)$ with $f'(0) = 1$, $f'(2) = -1$.
+
+Nodes give $n = 2$, $h_0 = h_1 = 1$, and $a_0 = 0, a_1 = 1, a_2 = 0$. The interior equation ($j = 1$) plus the 2 clamp equations give 3 equations in $c_0, c_1, c_2$
+
+$$
+\begin{aligned}
+c_0 + 4c_1 + c_2 &= \tfrac{3}{h_1}(a_2-a_1) - \tfrac{3}{h_0}(a_1-a_0) = 3(-1) - 3(1) = -6 \quad \text{(interior)} \\
+2c_0 + c_1 &= \tfrac{3}{h_0}(a_1-a_0) - 3f'(x_0) = 3(1) - 3(1) = 0 \quad \text{(left clamp)} \\
+c_1 + 2c_2 &= 3f'(x_2) - \tfrac{3}{h_1}(a_2-a_1) = 3(-1) - 3(-1) = 0 \quad \text{(right clamp)}
+\end{aligned}
+$$
+
+From the clamp equations, $c_1 = -2c_0$ and $c_2 = -\tfrac{1}{2}c_1 = c_0$. Substituting into the interior equation
+
+$$
+c_0 + 4(-2c_0) + c_0 = -6 \implies -6c_0 = -6 \implies c_0 = 1, \quad c_1 = -2, \quad c_2 = 1
+$$
+
+$$
+b_0 = 1 - \tfrac{1}{3}(0) = 1, \quad d_0 = \tfrac{c_1-c_0}{3} = -1
+$$
+
+$$
+b_1 = -1 - \tfrac{1}{3}(-3) = 0, \quad d_1 = \tfrac{c_2-c_1}{3} = 1
+$$
+
+$$
+S(x) = \begin{cases} x + x^2 - x^3, & x \in [0, 1] \\[4pt] 1 - 2(x-1)^2 + (x-1)^3, & x \in [1, 2] \end{cases}
+$$
+
+Checking the endpoints confirms the clamp held: $S_0'(0) = b_0 = 1 = f'(0)$, and $S_1'(2) = b_1 + 2c_1h_1 + 3d_1h_1^2 = 0 - 4 + 3 = -1 = f'(2)$.
+
+## Error
+
+For $f \in C^4[a,b]$ with $\max_{a \leq x \leq b} |f^{(4)}(x)| = M$, the unique clamped cubic spline interpolant $S$ satisfies, for all $x \in [a, b]$
+
+$$
+|f(x) - S(x)| \leq \frac{5M}{384} \max_{0 \leq j \leq n-1} (x_{j+1} - x_j)^4 \quad \text{(error bound)}
+$$

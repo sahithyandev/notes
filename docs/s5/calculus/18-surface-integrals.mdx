@@ -1,0 +1,47 @@
+---
+title: Surface Integrals
+sidebar:
+  order: 18
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-08-12T06:16:48.779Z
+slug: s5/calculus/surface-integrals
+prev: true
+next: true
+---
+
+### Normal Vector to a Surface
+
+- Parametric form  
+  If $\sigma$ is parametrized by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$, a normal vector to $\sigma$ is $\boldsymbol{N} = \dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v}$.
+- Implicit form  
+  If $\sigma$ is expressed as $G(x,y,z) = 0$, a normal vector at $(x,y,z)$ on $\sigma$ is $\boldsymbol{N} = \nabla G(x,y,z)$.
+- Graph form  
+  If $\sigma$ is given by $z = g(x,y)$, an upward-pointing normal vector is $\boldsymbol{N} = \langle -g_x(x,y), -g_y(x,y), 1 \rangle$.
+
+A surface is smooth **iff** it has a non-zero normal vector at each point. A surface is piecewise smooth **iff** it is composed of finitely many smooth pieces.
+
+## Surface Integral of a Scalar Function
+
+Let $f$ be a continuous scalar function defined on a piecewise smooth surface $\sigma$. Partition $\sigma$ into $n$ subregions, where the $k$th subregion has area $\Delta S_k$. Choose a sample point $(x_k^*, y_k^*, z_k^*)$ in the $k$th subregion. The surface integral of $f$ over $\sigma$ is
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \lim_{n \to \infty} \sum_{k=1}^{n} f(x_k^*, y_k^*, z_k^*)\,\Delta S_k
+$$
+
+provided the limit exists and does not depend on the partition or the choice of sample points.
+
+## Surface Integral over a Parametric Surface
+
+Let $\sigma$ be a smooth parametric surface given by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. If $f$ is continuous on $\sigma$,
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \iint_R f(x(u,v),y(u,v),z(u,v)) \left\lVert \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \right\rVert \text{d}A_{uv}
+$$
+
+## Surface Integral over a Graph
+
+Let $\sigma$ be a surface given by $z = g(x,y)$, and let $R$ be its projection onto the $xy$-plane. If $g$, $g_x$, $g_y$ are continuous on $R$ and $f$ is continuous on $\sigma$,
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \iint_R f(x,y,g(x,y)) \sqrt{1 + (g_x(x,y))^2 + (g_y(x,y))^2}\,\text{d}A
+$$

@@ -1,0 +1,54 @@
+---
+title: Jordan Curve
+sidebar:
+  order: 17
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-08-12T06:16:48.779Z
+slug: s5/calculus/jordan-curve
+prev: true
+next: true
+---
+
+A Jordan curve in the plane is a simple closed curve, a closed curve that does not intersect itself except that the initial and terminal points coincide.
+
+## Green's Theorem
+
+Let $C$ be a positively oriented, piecewise smooth Jordan curve in the plane, and let $D$ be the region bounded by $C$. Suppose
+
+$$
+\boldsymbol{F}(x,y) = M(x,y)\hat{i} + N(x,y)\hat{j}
+$$
+
+is continuously differentiable on an open region containing $D$. Then
+
+$$
+\oint_C M\,\text{d}x + N\,\text{d}y = \iint_D \left(\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y}\right)\text{d}A
+$$
+
+<Note>
+
+For a simple closed curve, positive orientation means counterclockwise. Equivalently, as $C$ is traversed, $D$ remains on the left.
+
+</Note>
+
+### Area Formula
+
+Taking $M = -y/2$ and $N = x/2$ gives
+
+$$
+A(D) = \iint_D 1\,\text{d}A = \frac{1}{2}\oint_C x\,\text{d}y - y\,\text{d}x
+$$
+
+## Green's Theorem for Doubly Connected Regions
+
+Let $R$ be a doubly connected region in the plane, with outer boundary $C_1$ oriented counterclockwise and inner boundary $C_2$ oriented clockwise. If $C_1$, $C_2$, and $\boldsymbol{F}(x,y) = M(x,y)\hat{i} + N(x,y)\hat{j}$ satisfy the hypotheses of Green's theorem, then
+
+$$
+\iint_R \left(\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y}\right)\text{d}A = \oint_{C_1} M\,\text{d}x + N\,\text{d}y + \oint_{C_2} M\,\text{d}x + N\,\text{d}y
+$$
+
+<Note>
+
+For a multiply connected region with $n$ holes, the boundary integral is the sum of $n+1$ line integrals, taken counterclockwise around the outer boundary and clockwise around each hole.
+
+</Note>

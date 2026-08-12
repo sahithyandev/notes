@@ -1,0 +1,56 @@
+---
+title: Orientation
+sidebar:
+  order: 19
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-08-12T06:16:48.780Z
+slug: s5/calculus/orientation
+prev: true
+next: true
+---
+
+### Orientable Surface
+
+A surface is orientable **iff** a continuous choice of unit normal vector can be made over the entire surface.
+
+Two-sided surfaces are orientable. One-sided surfaces are non-orientable.
+
+<Note>
+
+The Mobius strip is a one-sided, non-orientable surface.
+
+</Note>
+
+If $\sigma$ is smooth and orientable with unit normal $\hat{n}$ at each point, the direction of $\hat{n}$ can be chosen so that $\hat{n} = \hat{n}(x,y,z)$ varies continuously over the surface. Such a choice of unit normal field is an orientation of $\sigma$.
+
+## Orientation of a Smooth Parametric Surface
+
+Let $\sigma$ be a smooth [parametric surface](/s5/calculus/surface-integrals) given by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$. If
+
+$$
+\boldsymbol{N}(u,v) = \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \ne \boldsymbol{0}
+$$
+
+then
+
+$$
+\hat{n} = \frac{\boldsymbol{N}(u,v)}{\lVert \boldsymbol{N}(u,v) \rVert} = \frac{\dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v}}{\left\lVert \dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v} \right\rVert}
+$$
+
+defines one orientation of $\sigma$. The opposite orientation is $-\hat{n}$.
+
+## Orientation of Non-Parametric Surfaces
+
+Surfaces of the form $z = g(x,y)$, $y = g(x,z)$, $x = g(y,z)$ can be parametrized using their independent variables as parameters:
+
+- $\boldsymbol{r}(x,y) = x\hat{i} + y\hat{j} + g(x,y)\hat{k}$, for $z = g(x,y)$
+- $\boldsymbol{r}(x,z) = x\hat{i} + g(x,z)\hat{j} + z\hat{k}$, for $y = g(x,z)$
+- $\boldsymbol{r}(y,z) = g(y,z)\hat{i} + y\hat{j} + z\hat{k}$, for $x = g(y,z)$
+
+Each can be written as a level surface $G(x,y,z) = 0$ by moving all terms to one side. The vector
+
+$$
+\hat{n} = \frac{\nabla G}{\lVert \nabla G \rVert}
+$$
+
+is a unit normal vector to the surface, whenever $\nabla G \ne \boldsymbol{0}$.
