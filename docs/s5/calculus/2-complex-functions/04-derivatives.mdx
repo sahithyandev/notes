@@ -1,0 +1,89 @@
+---
+title: Derivatives
+sidebar:
+  order: 4
+dateCreated: 2026-08-14T00:00:00.000Z
+lastUpdatedOn: 2026-08-14T03:05:03.681Z
+slug: s5/calculus/complex-functions/derivatives
+prev: true
+next: false
+---
+
+Let $f$ be a function whose domain contains a neighborhood $|z-z_0| < \epsilon$ of $z_0$. The derivative of $f$ at $z_0$ is
+
+$$
+f'(z_0) = \lim_{z \to z_0} \frac{f(z)-f(z_0)}{z-z_0}
+$$
+
+provided this limit exists. $f$ is differentiable at $z_0$ when $f'(z_0)$ exists.
+
+If $f$ is differentiable at $z_0$, then $f$ is [continuous](/s5/calculus/complex-functions/continuity) at $z_0$.
+
+## Differentiation Formulas
+
+Let $c \in \mathbb{C}$, and let $f$, $g$ be functions differentiable at $z \in \mathbb{C}$. Then:
+
+- $\dfrac{\text{d}}{\text{d}z}\,c = 0$
+- $\dfrac{\text{d}}{\text{d}z}\,(cf(z)) = cf'(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,z^n = nz^{n-1}$, for positive integer $n$
+- $\dfrac{\text{d}}{\text{d}z}\,(f(z)+g(z)) = f'(z)+g'(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,(f(z)g(z)) = f(z)g'(z)+f'(z)g(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,\dfrac{f(z)}{g(z)} = \dfrac{g(z)f'(z)-f(z)g'(z)}{(g(z))^2}$, provided $g(z) \ne 0$
+
+### Analytic Function
+
+A function $f$ is analytic at $z_0$ **iff** it is differentiable at each point in some neighborhood of $z_0$. $f$ is analytic in an open set **iff** it is differentiable at every point in that open set.
+
+<Note>
+
+If $f$ is analytic at $z_0$, it is analytic in some neighborhood of $z_0$. If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
+
+</Note>
+
+## Cauchy-Riemann Equations
+
+Let $f(z) = u(x,y)+iv(x,y)$, and suppose $f'(z_0)$ exists at $z_0 = x_0+iy_0$. Then the first-order partial derivatives of $u$ and $v$ exist at $(x_0,y_0)$ and satisfy
+
+$$
+u_x = v_y, \qquad u_y = -v_x
+$$
+
+at $(x_0,y_0)$, and
+
+$$
+f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
+$$
+
+## Sufficient Conditions for Differentiability
+
+Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$. $f'(z_0)$ exists **iff**:
+
+- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist everywhere in $U$.
+- Those partial derivatives are continuous at $(x_0,y_0)$ and satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) at $(x_0,y_0)$.
+
+When these hold,
+
+$$
+f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
+$$
+
+Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the Cauchy-Riemann equations throughout $U$.
+
+## Polar Form of the Cauchy-Riemann Equations
+
+Let $f(z) = u(r,\theta)+iv(r,\theta)$ be defined throughout a neighborhood of a non-zero point $z_0 = r_0e^{i\theta_0}$. $f'(z_0)$ exists **iff**:
+
+- The first-order partial derivatives of $u$ and $v$ with respect to $r$ and $\theta$ exist everywhere in the corresponding polar-coordinate neighborhood.
+- Those partial derivatives are continuous at $(r_0,\theta_0)$ and satisfy
+
+$$
+ru_r = v_\theta, \qquad u_\theta = -rv_r
+$$
+
+at $(r_0,\theta_0)$.
+
+When these hold,
+
+$$
+f'(z_0) = e^{-i\theta_0}(u_r(r_0,\theta_0)+iv_r(r_0,\theta_0))
+$$

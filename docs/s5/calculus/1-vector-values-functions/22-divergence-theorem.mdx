@@ -1,0 +1,46 @@
+---
+title: Divergence Theorem
+sidebar:
+  order: 22
+dateCreated: 2026-08-14T00:00:00.000Z
+lastUpdatedOn: 2026-08-14T03:05:03.681Z
+slug: s5/calculus/vector-values-functions/divergence-theorem
+prev: true
+next: false
+---
+
+### Closed Surface
+
+A surface $\sigma$ is a closed surface **iff** it is the boundary of a solid region in $\mathbb{R}^3$.
+
+For a closed surface, the positive orientation is the outward orientation.
+
+## Divergence Theorem
+
+Let $\sigma$ be a closed, piecewise smooth, orientable surface that encloses a solid region $R$ in $\mathbb{R}^3$. Suppose $\boldsymbol{F}$ is a [vector field](/s5/calculus/vector-field) whose component functions have continuous first-order partial derivatives on an open set containing $R$ and its boundary $\sigma$. If $\hat{n}$ is the outward unit normal field for $\sigma$,
+
+$$
+\iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iiint_R \text{div}\,\boldsymbol{F}\,\text{d}V
+$$
+
+<Note>
+
+If $\sigma$ is not closed, close it by adding the missing faces, then subtract their flux to recover the flux across the original surface.
+
+</Note>
+
+## Divergence as Flux Density
+
+Let $G$ be a small solid region centered at $P_0$ with boundary surface $\sigma(G)$ oriented outward, and let $\boldsymbol{F}$ be a vector field whose component functions have continuous first-order partial derivatives on an open set containing $G$. Denote the volume of $G$ by $\text{Vol}(G)$ and the flux of $\boldsymbol{F}$ across $\sigma(G)$ by $\Phi(G)$.
+
+$$
+\Phi(G) = \iint_{\sigma(G)} \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iiint_G \text{div}\,\boldsymbol{F}\,\text{d}V \approx \text{div}\,\boldsymbol{F}(P_0)\,\text{Vol}(G)
+$$
+
+As $G$ shrinks to $P_0$ in all directions,
+
+$$
+\text{div}\,\boldsymbol{F}(P_0) = \lim_{G \to P_0} \frac{1}{\text{Vol}(G)} \iint_{\sigma(G)} \boldsymbol{F} \cdot \hat{n}\,\text{d}S
+$$
+
+If $\boldsymbol{F}$ is the velocity field of a fluid in steady-state flow, $\text{div}\,\boldsymbol{F}$ is the limiting outward flux per unit volume at a point.

@@ -1,0 +1,78 @@
+---
+title: Limits
+sidebar:
+  order: 2
+dateCreated: 2026-08-14T00:00:00.000Z
+lastUpdatedOn: 2026-08-14T03:05:03.681Z
+slug: s5/calculus/complex-functions/limits
+prev: true
+next: true
+---
+
+Let $S \subseteq \mathbb{C}$, let $f: S \to \mathbb{C}$ be a [function](/s5/calculus/complex-functions/functions-of-a-complex-variable), and let $z_0$ be a limit point of $S$, so every deleted neighborhood of $z_0$ contains at least 1 point of $S$. For $\omega_0 \in \mathbb{C}$,
+
+$$
+\lim_{z \to z_0} f(z) = \omega_0
+$$
+
+**iff**, for each $\epsilon > 0$, there exists $\delta > 0$ such that, for each $z \in S$,
+
+$$
+0 < |z-z_0| < \delta \implies |f(z)-\omega_0| < \epsilon
+$$
+
+$f(z)$ can be made arbitrarily close to $\omega_0$ by choosing $z$ sufficiently close to, but distinct from, $z_0$.
+
+<Note>
+
+$z_0$ need not lie in the domain of $f$. It only needs to be a limit point of the domain.
+
+</Note>
+
+## Uniqueness of Limits
+
+If a limit of $f: S \to \mathbb{C}$ exists at a limit point of $S$, the limit is unique.
+
+## Limits via Real and Imaginary Parts
+
+Let $f(z) = u(x,y)+iv(x,y)$, $z_0 = x_0+iy_0$, $\omega_0 = u_0+iv_0$. Then
+
+$$
+\lim_{z \to z_0} f(z) = \omega_0
+$$
+
+**iff**
+
+$$
+\lim_{(x,y) \to (x_0,y_0)} u(x,y) = u_0 \quad \text{and} \quad \lim_{(x,y) \to (x_0,y_0)} v(x,y) = v_0
+$$
+
+## Limit Laws
+
+Suppose $\displaystyle\lim_{z \to z_0} f(z) = \omega_0$ and $\displaystyle\lim_{z \to z_0} g(z) = \Omega_0$. Then:
+
+- $\displaystyle\lim_{z \to z_0} (f(z)+g(z)) = \omega_0+\Omega_0$
+- $\displaystyle\lim_{z \to z_0} (f(z)g(z)) = \omega_0\Omega_0$
+- $\displaystyle\lim_{z \to z_0} \frac{f(z)}{g(z)} = \frac{\omega_0}{\Omega_0}$, provided $\Omega_0 \ne 0$
+
+## Limit of a Composition
+
+Let $f: B \to \mathbb{C}$ and $g: A \to B$ be functions. Suppose
+
+$$
+\lim_{\omega \to \omega_0} g(\omega) = z_0 \quad \text{and} \quad \lim_{z \to z_0} f(z) = L
+$$
+
+and $g(\omega) \ne z_0$ for all $\omega$ sufficiently close to $\omega_0$, $\omega \ne \omega_0$. Then
+
+$$
+\lim_{\omega \to \omega_0} f(g(\omega)) = L
+$$
+
+## Limits Involving Infinity
+
+Let $z_0, \omega_0 \in \mathbb{C}$.
+
+- $\displaystyle\lim_{z \to z_0} f(z) = \infty$ **iff** $\displaystyle\lim_{z \to z_0} \frac{1}{f(z)} = 0$, where $f(z) \ne 0$ for all $z$ sufficiently close to $z_0$ with $z \ne z_0$
+- $\displaystyle\lim_{z \to \infty} f(z) = \omega_0$ **iff** $\displaystyle\lim_{z \to 0} f\left(\frac{1}{z}\right) = \omega_0$
+- $\displaystyle\lim_{z \to \infty} f(z) = \infty$ **iff** $\displaystyle\lim_{z \to 0} \frac{1}{f(1/z)} = 0$
