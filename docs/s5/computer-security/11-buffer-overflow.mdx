@@ -1,0 +1,66 @@
+---
+title: Buffer Overflow
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-08-18T07:00:57.468Z
+slug: s5/computer-security/buffer-overflow
+sidebar:
+  order: 11
+prev: true
+next: true
+---
+
+A buffer is a data storage area inside memory, on the stack or heap, intended to hold a pre-defined amount of data. A buffer overflow occurs when data written to a buffer exceeds its allocated size, overwriting adjacent memory. If the overflowing data is executable code disguised as input, the victim machine can be fooled into executing it, giving the attacker control.
+
+<Note>
+
+Famous buffer overflow attacks: Morris worm (fingerd, 6000 machines), CodeRed (MS-IIS), SQL Slammer (MS-SQL, 75000 machines in 10 minutes), Sasser (Windows LSASS), Conficker (Windows Server, around 10 million machines).
+
+</Note>
+
+## Stack Frame Layout
+
+When a function is invoked, a new frame is pushed onto the stack, growing towards lower addresses:
+
+- Arguments
+- Return address
+- Saved frame pointer, `sfp`
+- Local variables, including buffers
+
+On return, local variables are popped, `sfp` is recovered, the return address is retrieved, the frame is popped, and execution continues at the return address.
+
+```c
+void func(char *str) {
+    char buf[126];
+    strcpy(buf, str);
+}
+```
+
+`strcpy` does not check whether `*str` contains fewer than 126 characters. A string longer than the buffer overwrites adjacent stack locations, including `sfp` and the return address.
+
+## Attack Types
+
+- Smashing the stack  
+  Attacker-supplied input contains assembly instructions, e.g. the binary code of `execve("/bin/sh")`, plus an overflowed return address pointing back into the buffer. When the function exits, control jumps into the buffer and the injected code executes, giving the attacker a shell, root if the victim process is setuid root.
+- Variable overflow  
+  An adjacent variable, e.g. a flag `authenticated`, sits after a buffer in memory. Overflowing the buffer overwrites the flag directly without needing to hijack control flow.
+- Pointer variables  
+  A function pointer `fnptr` declared after a buffer gets overwritten by the overflow to point at injected malicious code. When `fnptr` is later invoked, the malicious code executes.
+- Frame pointer overwrite  
+  The overflow changes the caller's saved frame pointer (`sfp`) to point into the malicious code. The caller's return address is read relative to `sfp`, so when `func` returns, the malicious code runs.
+- Integer overflow  
+  A bounds check compares a signed length against a maximum, e.g. `len = MIN(len, sa->sa_len)`. A negative `len` passes this check, then gets reinterpreted as a huge unsigned integer in a subsequent copy operation, e.g. `copyout`, copying up to 4G of memory.
+
+<Note>
+
+`strncpy(dest, src, n)` bounds the copy to `n` characters but still requires the programmer to supply the correct `n`. In the Apache `htpasswd.c` fix, `strncpy(record, user, MAX_STRING_LEN-1)` followed by `strncat(record, cpw, MAX_STRING_LEN-1)` can still overflow `record`, since the second call's bound is not reduced by the length already written.
+
+</Note>
+
+## Prevention
+
+- Canary  
+  A known value placed between a buffer and control data on the stack. An overflow corrupts the canary first, so a failed canary verification signals an overflow before control data is used.
+- Bounds checking  
+  A compiler-based technique that adds run-time bounds information to each allocated memory block and checks all pointers against those bounds at run time.
+- Tagging  
+  Each piece of data in memory is tagged with its type. Data buffers are tagged non-executable, preventing them from storing executable code.

@@ -1,0 +1,31 @@
+---
+title: Incomplete Mediation
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-08-18T07:00:57.469Z
+slug: s5/computer-security/incomplete-mediation
+sidebar:
+  order: 14
+prev: true
+next: true
+---
+
+Incomplete mediation occurs when a system fails to validate all input values against every constraint before acting on them.
+
+```
+http://www.abc.com/subpage/userinput.asp?par1=(808)555-1212&par2=2017Jan24
+```
+
+`par2` is left unvalidated against constraints it should satisfy, e.g.:
+
+- `1800Jan01`, outside the acceptable range.
+- `2000Feb30`, a non-existent date.
+- `2048Min32`, an undefined unit.
+- `1Aardvark2Many`, not a date at all.
+
+Client-side fixes, e.g. validating input before submission or restricting choices to a drop-down menu, remain vulnerable.
+
+<Note>
+
+The results of client-side verification are exposed in the URL. A malicious user can bypass the client entirely, edit the URL fields directly, and send the request straight to the server. The server cannot tell whether a URL came from its own client's browser or from a modified request.
+
+</Note>
