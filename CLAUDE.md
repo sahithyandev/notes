@@ -67,6 +67,16 @@ URLs come from the `slug` frontmatter field, **not** from the file path. The `au
 
 Always run the slug script after adding or renaming note files. `images/` and `summary/` subdirectories are excluded from slug processing.
 
+## Computer Security Notes Scope
+
+`docs/s5/computer-security/cipher-algorithms/` holds one note per specific cipher algorithm. Both classical (shift, substitution, playfair, vigenere, permutation, lorenz) and modern (DES, RSA) ciphers are covered. `cipher-algorithms/01-introduction.mdx` is a pure index page for the directory, grouping links to every cipher note by category. It holds no theory content of its own.
+
+Common cipher theory that isn't specific to one algorithm belongs in dedicated top-level notes, not `cipher-algorithms/01-introduction.mdx`: `ciphers.mdx` (encryption/decryption, secret-key definitions, and categorization) and `kerckhoffs-principle.mdx`.
+
+`docs/s5/computer-security/` (top level) holds every other note in the module: security models and threats, CIA triad, and cipher-family concepts not tied to one algorithm (general cipher theory, stream ciphers, block ciphers, block cipher modes, public key cryptography, Diffie-Hellman key exchange).
+
+New note on one specific cipher algorithm → `cipher-algorithms/`. New shared cipher theory → its own top-level note (split further if it covers more than one concept). Anything else in the module → top level.
+
 ## Styling
 
 - Light/dark mode toggled via `data-theme` on `<html>`, persisted to `localStorage` key `sn-theme`.
