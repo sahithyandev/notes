@@ -1,0 +1,45 @@
+---
+title: Heap Overflow
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-08-18T07:15:37.878Z
+slug: s5/secure-app-dev/heap-overflow
+sidebar:
+  order: 8
+prev: true
+next: true
+---
+
+A heap overflow is a [buffer overflow](/s5/secure-app-dev/buffer-overflow-basics) where the overflowed buffer is a dynamic buffer, e.g. one allocated with `malloc`, on the heap.
+
+Adjacent to a heap buffer:
+
+- Other variables
+- vtables of C++ objects
+- Internal data structures of the memory allocator
+
+As with a stack overflow, an attacker controlling the buffer input overwrites this adjacent data, changing control flow or manipulating program data.
+
+## Allocator Metadata Corruption
+
+Malloc implementations differ by platform, e.g. jemalloc on Android, FreeBSD, and Firefox, dlmalloc/ptmalloc on glibc, tcmalloc on former Chrome, PartitionAlloc on current Chrome. All handle lists of chunks, where each chunk consists of metadata and user data.
+
+Corrupting a chunk's metadata is a technique to achieve arbitrary memory reads and writes, e.g. by forcing overlapping chunks.
+
+## vtable Overwrite
+
+A C++ object with virtual methods holds a pointer to a vtable, itself containing function pointers. If a vulnerable buffer sits before such an object, overflowing it overwrites the vtable pointer to reference an attacker-crafted vtable. Controlling the vtable pointer allows calling arbitrary functions.
+
+## Heartbleed
+
+A 2014 security bug in OpenSSL's TLS heartbeat extension. The heartbeat handler read the attacker-supplied payload length field without validating it against the actual payload size, then copied that many bytes into the response.
+
+```c
+hbtype = *p++;                      // message type
+n2s(p, payload);                    // payload = received payload length
+pl = p;                             // pl = content of payload
+*bp++ = TLS1_HB_RESPONSE;           // message type
+s2n(payload, bp);                   // payload length to message (bp)
+memcpy(bp, pl, payload);            // copy payload bytes from original content to message
+```
+
+The missing bounds check is a buffer over-read, allowing an attacker to read up to 64KB of server memory per request.

@@ -1,0 +1,119 @@
+---
+title: Integer Overflow
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-08-18T07:15:37.878Z
+slug: s5/secure-app-dev/integer-overflow
+sidebar:
+  order: 9
+prev: true
+next: true
+---
+
+Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safety) violation. It leads to one when the overflowed value is used:
+
+- For pointer arithmetic
+- As a `malloc` argument
+- As an array index
+
+An overflowed value used this way often leads to a buffer overflow, or directly to an out-of-bounds read or write.
+
+## Unsigned Overflow
+
+An $n$-bit unsigned integer represents $x$ with $0 \leq x < 2^n$. On overflow, C++11 requires the value be reduced modulo $2^n$, so unsigned arithmetic never triggers undefined behaviour.
+
+An $n$-bit unsigned integer can overflow in multiple cases, for $0 \leq a,b < 2^n$:
+
+- Addition  
+  $a+b \geq 2^n$.
+- Subtraction  
+  $a-b < 0$ if $b > a$.
+- Multiplication  
+  $a \cdot b \geq 2^n$.
+
+<Note>
+
+Stagefright: `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended.
+
+</Note>
+
+## Signed Overflow
+
+By the C++11 standard, if evaluating an expression produces a result not mathematically defined or not representable by its type, the behaviour is undefined. This applies only to signed integers, since unsigned arithmetic is defined modulo $2^n$.
+
+An $n$-bit signed integer can overflow in multiple cases, for $-2^{n-1} \leq a,b < 2^{n-1}$:
+
+- Addition or subtraction  
+  $a+b \geq 2^{n-1}$ or $a+b < -2^{n-1}$.
+- Negation  
+  $a = -2^{n-1} \implies -a = 2^{n-1}$, an asymmetry of two's complement since $2^{n-1}$ is not representable.
+- Multiplication  
+  $a \cdot b \geq 2^{n-1}$ or $a \cdot b < -2^{n-1}$. Multiplication by $-1$ reduces to negation.
+- Division  
+  $\frac{-2^{n-1}}{-1} = 2^{n-1}$, reducing to negation. Division by $0$ is also undefined.
+
+<Note>
+
+Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index.
+
+</Note>
+
+## Type Conversion
+
+C automatically converts between types, known as coercion, performed by the compiler and capable of unintended consequences.
+
+- `float` to `int`  
+  Truncates the fractional part.
+- `double` to `float`  
+  Rounds to the nearest representable value.
+
+Converting a smaller type to a larger one uses:
+
+- Sign extension  
+  High bits set to the sign bit, used when the source is signed.
+- Zero extension  
+  High bits set to `0`, used when the source is unsigned.
+
+For an arithmetic operation between two operands, the compiler chooses a common type:
+
+- Same type, same rank  
+  No conversion.
+- Same type, different rank  
+  Convert the smaller type to the larger.
+- Unsigned operand with rank $\geq$ the signed operand's rank  
+  Convert both to unsigned.
+- Else if the signed type can represent every value of the unsigned type  
+  Convert both to signed.
+- Else  
+  Convert both to unsigned, using the signed operand's type as the unsigned width.
+
+<Note>
+
+Rank is similar to size. An integer type's rank is at least as high as every type ranked below it.
+
+</Note>
+
+## Fixing Integer Overflow
+
+Checking `width * height > UINT_MAX` after computing `width * height` is unsound, since the multiplication has already overflowed by the time the check runs.
+
+A correct check divides instead of multiplying, guarding against division by $0$:
+
+```c
+void* new_8bit_image(unsigned int width, unsigned int height)
+{
+  if (!width || (UINT_MAX / width < height)) return NULL;
+  unsigned int memory = width * height;
+  void* data = malloc(memory);
+  return data;
+}
+```
+
+GCC and clang also provide built-in overflow-checking arithmetic, e.g. `__builtin_umul_overflow`, `__builtin_add_overflow`, `__builtin_sub_overflow`, for various integer types.
+
+```c
+unsigned int memory;
+if (__builtin_umul_overflow(width, height, &memory)) {
+  return NULL;
+}
+void* data = malloc(memory);
+```

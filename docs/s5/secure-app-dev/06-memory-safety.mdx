@@ -1,0 +1,46 @@
+---
+title: Memory Safety
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-08-18T07:15:37.876Z
+slug: s5/secure-app-dev/memory-safety
+sidebar:
+  order: 6
+prev: true
+next: true
+---
+
+A program execution is memory safe **iff** none of the following occur:
+
+- Access errors
+- Buffer overflow or over-read
+- Invalid pointer
+- Race condition
+- Use after free
+- Uninitialized variable or pointer access
+- Null pointer access
+- Memory leak
+- Stack or heap overflow
+- Invalid free
+- Unwanted aliasing
+
+<Note>
+
+Memory safe languages exist, e.g. Rust, Java, but most code is still written in C/C++, since C/C++ is supported nearly everywhere, low-level code such as operating systems cannot easily be implemented in memory safe languages, and memory safe languages are still not fully mature.
+
+</Note>
+
+## Spatial and Temporal Violations
+
+A spatial violation is a memory access outside an object's bounds.
+
+- Buffer overflow
+- Out-of-bounds read
+- Null pointer dereference
+
+A temporal violation is a memory access referring to an invalid object.
+
+- Use after free
+- Double free
+- Use of uninitialized memory
+
+Overflows, covered in [buffer overflow basics](/s5/secure-app-dev/buffer-overflow-basics), [heap overflow](/s5/secure-app-dev/heap-overflow), and [integer overflow](/s5/secure-app-dev/integer-overflow), are the most common form of spatial violation.
