@@ -84,7 +84,7 @@ const minDepth =
     let totalLength = 0;
 
     function measure() {
-      if (!wrapper) return;
+      if (!wrapper || !pathTrack || !pathProgress) return;
       const wrapperRect = wrapper.getBoundingClientRect();
 
       // Rail line sits 6px inside each link's left edge, leaving a clean 12px gap to text
