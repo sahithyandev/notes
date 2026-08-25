@@ -1,0 +1,76 @@
+---
+export interface HeadingItem {
+  depth: number;
+  slug: string;
+  html: string;
+}
+
+export interface HeadingNode {
+  heading: HeadingItem;
+  children: HeadingNode[];
+}
+
+interface Props {
+  nodes: HeadingNode[];
+  minDepth?: number;
+}
+
+const { nodes, minDepth = 2 } = Astro.props;
+---
+
+<ul class="toc-list">
+  {
+    nodes.map((node) => (
+      <li class="toc-item-node">
+        <a
+          href={`#${node.heading.slug}`}
+          class={`toc-link ${node.heading.depth === 3 ? "toc-sub" : ""}`}
+          style={`margin-left: ${(node.heading.depth - minDepth) * 20}px;`}
+          set:html={node.heading.html}
+        />
+        {node.children.length > 0 && (
+          <Astro.self nodes={node.children} minDepth={minDepth} />
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-item-node {
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 4px 10px 4px 18px;
+    font-size: 0.78125rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    line-height: 1.45;
+    position: relative;
+    z-index: 1;
+  }
+
+  .toc-link.toc-sub {
+    font-size: 0.734375rem;
+  }
+
+  .toc-link:hover {
+    color: var(--text-secondary);
+  }
+
+  .toc-link.active {
+    color: var(--sem);
+    font-weight: 700;
+  }
+</style>
