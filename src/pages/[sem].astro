@@ -96,14 +96,14 @@ Object.keys(grouped)
     subjectTrees[subject] = tree;
   });
 
-const tocHeadings: { depth: 2 | 3; slug: string; text: string }[] = [];
+const tocHeadings: { depth: 2 | 3; slug: string; html: string }[] = [];
 Object.entries(subjectTrees).forEach(([subject, { modules }]) => {
-  tocHeadings.push({ depth: 2, slug: subject, text: titleize(subject) });
+  tocHeadings.push({ depth: 2, slug: subject, html: titleize(subject) });
   Object.keys(modules).forEach((mod) => {
     tocHeadings.push({
       depth: 3,
       slug: `${subject}-${mod}`,
-      text: titleize(mod),
+      html: titleize(mod),
     });
   });
 });
