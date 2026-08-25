@@ -1,109 +1,307 @@
 ---
+import TocList, { type HeadingItem, type HeadingNode } from "./toc-list.astro";
+
 interface Props {
-  headings: { depth: 2 | 3; slug: string; html: string }[];
+  headings: HeadingItem[];
 }
 
 const { headings } = Astro.props;
+
+function buildHeadingTree(headings: HeadingItem[]): HeadingNode[] {
+  const rootNodes: HeadingNode[] = [];
+  const stack: HeadingNode[] = [];
+
+  for (const heading of headings) {
+    const node: HeadingNode = { heading, children: [] };
+    while (
+      stack.length > 0 &&
+      stack[stack.length - 1].heading.depth >= heading.depth
+    ) {
+      stack.pop();
+    }
+    if (stack.length === 0) {
+      rootNodes.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+    stack.push(node);
+  }
+  return rootNodes;
+}
+
+const tree = buildHeadingTree(headings);
+const minDepth =
+  headings.length > 0 ? Math.min(...headings.map((h) => h.depth)) : 2;
 ---
 
 {
   headings.length > 0 && (
-    <>
+    <div class="toc-container">
       <div class="toc-title">On this page</div>
-      <div class="toc-trail">
-        {headings.map((heading, index) => (
-          <div
-            class={`toc-trail-segment ${heading.depth === 3 ? "toc-trail-sub" : ""}`}
-            data-depth={heading.depth}
-            data-index={index}
-          />
-        ))}
+      <div class="toc-wrapper">
+        <svg class="toc-svg" aria-hidden="true">
+          <path class="toc-path-track" />
+          <path class="toc-path-progress" />
+        </svg>
+        <TocList nodes={tree} minDepth={minDepth} />
       </div>
-      {headings.map((heading, index) => (
-        <a
-          href={`#${heading.slug}`}
-          class={`toc-item ${heading.depth === 3 ? "toc-sub" : ""} ${index === 0 ? "active" : ""}`}
-          data-depth={heading.depth}
-          data-index={index}
-          set:html={heading.html}
-        />
-      ))}
       {headings.length > 5 && <div class="toc-rule" />}
-    </>
+    </div>
   )
 }
 
 <script>
-  const headings = [...document.querySelectorAll("article h2, article h3")];
-  const tocLinks = [...document.querySelectorAll(".toc-item")];
-  const trailSegments = [...document.querySelectorAll(".toc-trail-segment")];
+  function initToc() {
+    const wrapper = document.querySelector<HTMLElement>(".toc-wrapper");
+    const pathTrack = document.querySelector<SVGPathElement>(".toc-path-track");
+    const pathProgress =
+      document.querySelector<SVGPathElement>(".toc-path-progress");
+    const tocLinks = [
+      ...document.querySelectorAll<HTMLAnchorElement>(".toc-link"),
+    ];
 
-  if (headings.length > 0 && tocLinks.length > 0) {
-    const positionTrailSegments = () => {
-      const tocTrail = document.querySelector(".toc-trail");
-      if (!tocTrail) return;
-      const trailRect = tocTrail.getBoundingClientRect();
-      const JOIN = 5;
-      trailSegments.forEach((segment, index) => {
-        const tocItem = tocLinks[index];
-        if (!tocItem) return;
-        const tocRect = tocItem.getBoundingClientRect();
-        const relativeTop = tocRect.top - trailRect.top;
-        const depth = segment.getAttribute("data-depth");
-        const prevDepth = trailSegments[index - 1]?.getAttribute("data-depth");
-        const nextDepth = trailSegments[index + 1]?.getAttribute("data-depth");
-        const shrinkTop = prevDepth && prevDepth !== depth ? JOIN : 0;
-        const shrinkBottom = nextDepth && nextDepth !== depth ? JOIN : 0;
-        (segment as HTMLElement).style.top = `${relativeTop + shrinkTop}px`;
-        (segment as HTMLElement).style.height =
-          `${tocRect.height - shrinkTop - shrinkBottom}px`;
+    if (!wrapper || !pathTrack || !pathProgress || tocLinks.length === 0)
+      return;
+
+    const headingElements = tocLinks.map((link) => {
+      const href = link.getAttribute("href");
+      if (!href) return null;
+      const rawId = href.substring(1);
+      const decodedId = decodeURIComponent(rawId);
+      return (
+        document.getElementById(rawId) ||
+        document.getElementById(decodedId) ||
+        document.querySelector<HTMLElement>(
+          `article [id="${CSS.escape(rawId)}"]`,
+        ) ||
+        document.querySelector<HTMLElement>(
+          `article [id="${CSS.escape(decodedId)}"]`,
+        )
+      );
+    });
+
+    let nodeLengths: number[] = [];
+    let totalLength = 0;
+
+    function measure() {
+      if (!wrapper) return;
+      const wrapperRect = wrapper.getBoundingClientRect();
+
+      // Rail line sits 6px inside each link's left edge, leaving a clean 12px gap to text
+      const points = tocLinks.map((link) => {
+        const linkRect = link.getBoundingClientRect();
+        return {
+          x: Math.max(6, linkRect.left - wrapperRect.left + 6),
+          y: linkRect.top - wrapperRect.top + linkRect.height / 2,
+        };
       });
-    };
 
-    const mqDesktop = window.matchMedia("(min-width: 48rem)");
+      if (points.length === 0) return;
 
-    const updateActiveToc = () => {
-      const section = document.querySelector("section");
-      if (!section) return;
+      let d = `M ${points[0].x} ${points[0].y}`;
+      nodeLengths = [0];
+      totalLength = 0;
 
-      const isDesktop = mqDesktop.matches;
-      const viewportTop = isDesktop ? section.getBoundingClientRect().top : 0;
-      const viewportHeight = isDesktop
-        ? section.clientHeight
-        : window.innerHeight;
+      for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
 
-      tocLinks.forEach((t) => t.classList.remove("active"));
-      trailSegments.forEach((t) => t.classList.remove("active"));
+        const dy = curr.y - prev.y;
+        const dx = curr.x - prev.x;
 
-      headings.forEach((heading, index) => {
-        const rect = heading.getBoundingClientRect();
-        const relativeTop = rect.top - viewportTop;
-        const relativeBottom = relativeTop + rect.height;
+        if (Math.abs(dx) < 1) {
+          // Same depth level -> straight vertical line
+          d += ` L ${curr.x} ${curr.y}`;
+          totalLength += Math.abs(dy);
+        } else {
+          // Depth change -> diagonal chamfered transition (45 degree slant)
+          const diagH = Math.min(Math.abs(dx), Math.abs(dy) / 2);
+          const yMid = (prev.y + curr.y) / 2;
+          const yStartDiag = yMid - diagH / 2;
+          const yEndDiag = yMid + diagH / 2;
 
-        if (relativeBottom > 0 && relativeTop < viewportHeight) {
-          if (tocLinks[index]) tocLinks[index].classList.add("active");
-          if (trailSegments[index])
-            trailSegments[index].classList.add("active");
+          const dy1 = yStartDiag - prev.y;
+          const diagLen = Math.hypot(dx, yEndDiag - yStartDiag);
+          const dy2 = curr.y - yEndDiag;
+
+          d += ` L ${prev.x} ${yStartDiag} L ${curr.x} ${yEndDiag} L ${curr.x} ${curr.y}`;
+          totalLength += dy1 + diagLen + dy2;
+        }
+
+        nodeLengths.push(totalLength);
+      }
+
+      pathTrack.setAttribute("d", d);
+      pathProgress.setAttribute("d", d);
+
+      updateScroll();
+    }
+
+    function updateScroll() {
+      if (nodeLengths.length === 0 || !pathProgress) return;
+
+      // Calculate true un-obscured visible viewport bounds (accounting for top sticky navbar)
+      const nav =
+        document.querySelector("nav") || document.querySelector("header");
+      const navBottom = nav ? nav.getBoundingClientRect().bottom : 56;
+
+      const visibleTop = navBottom + 20;
+      const visibleBottom = window.innerHeight - 24;
+
+      const validHeadings: {
+        index: number;
+        top: number;
+        bottom: number;
+      }[] = [];
+      headingElements.forEach((el, index) => {
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          validHeadings.push({
+            index,
+            top: rect.top,
+            bottom: rect.bottom,
+          });
         }
       });
-    };
 
-    positionTrailSegments();
+      if (validHeadings.length === 0) return;
 
+      // 1. Calculate L_start (top boundary of colored SVG segment)
+      let lStart = 0;
+      let startIndex = 0;
+
+      if (visibleTop <= validHeadings[0].top) {
+        lStart = 0;
+        startIndex = 0;
+      } else if (visibleTop >= validHeadings[validHeadings.length - 1].top) {
+        lStart = totalLength;
+        startIndex = validHeadings[validHeadings.length - 1].index;
+      } else {
+        for (let i = 0; i < validHeadings.length - 1; i++) {
+          const curr = validHeadings[i];
+          const next = validHeadings[i + 1];
+
+          if (visibleTop >= curr.top && visibleTop < next.top) {
+            const fraction =
+              next.top === curr.top
+                ? 0
+                : (visibleTop - curr.top) / (next.top - curr.top);
+
+            const lenA = nodeLengths[curr.index];
+            const lenB = nodeLengths[next.index];
+            lStart = lenA + Math.max(0, Math.min(1, fraction)) * (lenB - lenA);
+
+            // Exclude heading if its text has scrolled completely above the visible top threshold (hidden under navbar)
+            if (curr.bottom <= visibleTop) {
+              startIndex = next.index;
+            } else {
+              startIndex = curr.index;
+            }
+            break;
+          }
+        }
+      }
+
+      // 2. Calculate L_end (bottom boundary of colored SVG segment)
+      let lEnd = totalLength;
+      let endIndex = validHeadings[validHeadings.length - 1].index;
+
+      if (visibleBottom <= validHeadings[0].top) {
+        lEnd = 0;
+        endIndex = 0;
+      } else if (visibleBottom >= validHeadings[validHeadings.length - 1].top) {
+        lEnd = totalLength;
+        endIndex = validHeadings[validHeadings.length - 1].index;
+      } else {
+        for (let i = 0; i < validHeadings.length - 1; i++) {
+          const curr = validHeadings[i];
+          const next = validHeadings[i + 1];
+
+          if (visibleBottom >= curr.top && visibleBottom < next.top) {
+            endIndex = curr.index;
+            const fraction =
+              next.top === curr.top
+                ? 0
+                : (visibleBottom - curr.top) / (next.top - curr.top);
+
+            const lenA = nodeLengths[curr.index];
+            const lenB = nodeLengths[next.index];
+            lEnd = lenA + Math.max(0, Math.min(1, fraction)) * (lenB - lenA);
+            break;
+          }
+        }
+      }
+
+      // Ensure lStart <= lEnd
+      if (lStart > lEnd) {
+        lStart = lEnd;
+      }
+
+      const segLen = Math.max(0, lEnd - lStart);
+
+      // SVG path segment reveal using strokeDashoffset shift
+      pathProgress.style.strokeDasharray = `${segLen} ${totalLength}`;
+      pathProgress.style.strokeDashoffset = `${-lStart}px`;
+
+      // Highlight ONLY headings that are currently visible within the un-obscured viewport
+      tocLinks.forEach((link, i) => {
+        if (i >= startIndex && i <= endIndex) {
+          link.classList.add("active");
+        } else {
+          link.classList.remove("active");
+        }
+      });
+    }
+
+    // requestAnimationFrame syncs scroll updates with browser paint cycle
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    // Remeasure triggers
+    measure();
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", measure);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure);
+    }
+
+    window.addEventListener("resize", () => {
+      measure();
+    });
+
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(() => {
+        measure();
+      });
+      ro.observe(wrapper);
+    }
+
+    // Scroll driver
     const section = document.querySelector("section");
-    section?.addEventListener("scroll", updateActiveToc);
-    window.addEventListener("scroll", updateActiveToc, { passive: true });
+    section?.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
-    updateActiveToc();
-
-    window.addEventListener("resize", positionTrailSegments);
-
+    // Smooth scroll link click
     tocLinks.forEach((link) => {
       link.addEventListener("click", (e) => {
+        e.preventDefault();
         const href = link.getAttribute("href");
         if (!href) return;
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
+        const rawId = href.substring(1);
+        const targetElement =
+          document.getElementById(rawId) ||
+          document.getElementById(decodeURIComponent(rawId));
         if (targetElement) {
           targetElement.scrollIntoView({
             behavior: "smooth",
@@ -113,6 +311,8 @@ const { headings } = Astro.props;
       });
     });
   }
+
+  initToc();
 </script>
 
 <style>
@@ -122,120 +322,45 @@ const { headings } = Astro.props;
     color: var(--text-muted);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin-bottom: 10px;
-    padding-left: 14px;
+    margin-bottom: 12px;
+    padding-left: 18px;
   }
 
-  .toc-item {
-    display: block;
-    padding: 2px 14px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition:
-      color 0.12s,
-      border-color 0.12s;
-    line-height: 1.4;
+  .toc-wrapper {
+    position: relative;
+    padding-left: 10px;
   }
 
-  .toc-item:hover {
-    color: var(--text-secondary);
+  .toc-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
   }
 
-  .toc-item.active {
-    color: var(--sem);
-    font-weight: 700;
+  .toc-path-track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 1.75px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.7;
   }
 
-  .toc-sub {
-    padding-left: 24px;
-    font-size: 0.71875rem;
+  .toc-path-progress {
+    fill: none;
+    stroke: var(--sem);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .toc-rule {
     height: 1px;
     background: var(--border);
-    margin: 10px 14px;
-  }
-
-  .toc-trail {
-    position: absolute;
-    left: 0;
-    top: 32px;
-    bottom: 32px;
-    width: 14px;
-    pointer-events: none;
-  }
-
-  .toc-trail-segment {
-    position: absolute;
-    left: 5px;
-    width: 2px;
-    background: var(--border);
-    transition: background 0.2s ease;
-  }
-
-  .toc-trail-segment:first-of-type {
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
-  }
-
-  .toc-trail-segment:last-of-type {
-    border-bottom-left-radius: 1px;
-    border-bottom-right-radius: 1px;
-  }
-
-  .toc-trail-segment.active {
-    background: var(--sem);
-  }
-
-  .toc-trail-sub {
-    left: 15px;
-  }
-
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"]::before,
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"]::before {
-    border-radius: 1px;
-    content: "";
-    position: absolute;
-    width: 15.9px;
-    height: 2px;
-    background: var(--border);
-    transform-origin: left center;
-  }
-
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"]::before {
-    left: -9.6px;
-    top: -12px;
-    transform: rotate(45deg);
-  }
-
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"]::before {
-    left: 11.5px;
-    top: -12px;
-    transform: rotate(135deg);
-  }
-
-  .toc-trail-segment[data-depth="2"].active
-    + .toc-trail-segment[data-depth="3"]::before,
-  .toc-trail-segment[data-depth="2"]
-    + .toc-trail-segment[data-depth="3"].active::before,
-  .toc-trail-segment[data-depth="3"].active
-    + .toc-trail-segment[data-depth="2"]::before,
-  .toc-trail-segment[data-depth="3"]
-    + .toc-trail-segment[data-depth="2"].active::before {
-    background: var(--sem);
-  }
-
-  @media (max-width: 48rem) {
-    .toc-trail {
-      top: 52px;
-      bottom: 20px;
-    }
+    margin: 14px 18px;
   }
 </style>
