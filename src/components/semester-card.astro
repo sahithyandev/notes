@@ -1,7 +1,12 @@
 ---
+interface ModuleItem {
+  name: string;
+  slug: string;
+}
+
 interface Props {
   number: number;
-  subjects: string[];
+  subjects: ModuleItem[];
   notesCount: string;
   href?: string;
 }
@@ -24,12 +29,27 @@ const semesterColor = `var(${semesterVar})`;
       Semester {number}
     </div>
     <ul class="sem-card-subjects">
-      {subjects.map((subject) => <li>{subject}</li>)}
+      {
+        subjects.map((subject) => (
+          <li>
+            <span
+              data-href={`/s${number}#${subject.slug}`}
+              class="sem-card-subject-link"
+              role="link"
+              tabindex="0"
+              onclick="event.preventDefault(); event.stopPropagation(); window.location.href=this.dataset.href;"
+              onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault(); event.stopPropagation(); window.location.href=this.dataset.href;}"
+            >
+              {subject.name}
+            </span>
+          </li>
+        ))
+      }
     </ul>
   </div>
   <div class="sem-card-footer">
     <span class="sem-card-count">{notesCount} notes</span>
-    <span class="sem-open" style={`color:${semesterColor}`}>Open →</span>
+    <span class="sem-open" style={`color:${semesterColor}`}>Open &rarr;</span>
   </div>
 </a>
 
@@ -43,6 +63,7 @@ const semesterColor = `var(${semesterVar})`;
     text-decoration: none;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
     transition:
       border-color 0.16s,
       box-shadow 0.16s,
@@ -126,6 +147,19 @@ const semesterColor = `var(${semesterVar})`;
     background: currentColor;
     opacity: 0.4;
     flex-shrink: 0;
+  }
+
+  .sem-card-subject-link {
+    position: relative;
+    z-index: 2;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .sem-card-subject-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
   }
 
   .sem-card-footer {

@@ -12,9 +12,14 @@ import {
   CGPA,
 } from "../utils/values";
 
+interface ModuleItem {
+  name: string;
+  slug: string;
+}
+
 interface SemesterInfo {
   number: number;
-  modules: Array<string>;
+  modules: Array<ModuleItem>;
   notesCount: number;
 }
 
@@ -22,7 +27,7 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
   const notes = await getCollection("notes");
   const semestersMap = new Map<
     number,
-    { modules: Set<string>; notesCount: number }
+    { modules: Map<string, string>; notesCount: number }
   >();
 
   for (const note of notes) {
@@ -31,18 +36,18 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
     const slugParts = note.data.slug.split("/");
 
     let semesterNumber: number;
-    let moduleName: string;
+    let moduleSlug: string;
 
     if (slugParts[0].match(/s(\d)/g)) {
       semesterNumber = parseInt(slugParts[0][1]);
-      moduleName = slugParts[1];
+      moduleSlug = slugParts[1];
     } else {
       semesterNumber = 0;
-      moduleName = "General";
+      moduleSlug = "general";
     }
 
     // Format module name (capitalize each word, replace hyphens with spaces)
-    const formattedModuleName = moduleName
+    const formattedModuleName = moduleSlug
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
@@ -50,13 +55,15 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
     // Initialize semester entry if it doesn't exist
     if (!semestersMap.has(semesterNumber)) {
       semestersMap.set(semesterNumber, {
-        modules: new Set<string>(),
+        modules: new Map<string, string>(),
         notesCount: 0,
       });
     }
 
     const semesterData = semestersMap.get(semesterNumber)!;
-    semesterData.modules.add(formattedModuleName);
+    if (!semesterData.modules.has(moduleSlug)) {
+      semesterData.modules.set(moduleSlug, formattedModuleName);
+    }
     semesterData.notesCount++;
   }
 
@@ -64,7 +71,10 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
   const semestersData: SemesterInfo[] = Array.from(semestersMap.entries())
     .map(([number, data]) => ({
       number,
-      modules: Array.from(data.modules),
+      modules: Array.from(data.modules.entries()).map(([slug, name]) => ({
+        slug,
+        name,
+      })),
       notesCount: data.notesCount,
     }))
     .sort((a, b) => a.number - b.number);
