@@ -18,7 +18,15 @@ const semesterVar = `--s${number}`;
 const semesterColor = `var(${semesterVar})`;
 ---
 
-<a href={href} class="sem-card" data-s={number}>
+<div
+  class="sem-card"
+  data-s={number}
+  data-href={href}
+  role="link"
+  tabindex="0"
+  onclick="if(event.target.closest('a')) return; window.location.href=this.dataset.href;"
+  onkeydown="if((event.key==='Enter' || event.key===' ') && !event.target.closest('a')){event.preventDefault(); window.location.href=this.dataset.href;}"
+>
   <div class="sem-card-top" style={`background:${semesterColor}`}></div>
   <div class="sem-card-wm" style={`color:${semesterColor}`}>
     {number.toString().padStart(2, "0")}
@@ -32,16 +40,12 @@ const semesterColor = `var(${semesterVar})`;
       {
         subjects.map((subject) => (
           <li>
-            <span
-              data-href={`/s${number}#${subject.slug}`}
+            <a
+              href={`/s${number}#${subject.slug}`}
               class="sem-card-subject-link"
-              role="link"
-              tabindex="0"
-              onclick="event.preventDefault(); event.stopPropagation(); window.location.href=this.dataset.href;"
-              onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault(); event.stopPropagation(); window.location.href=this.dataset.href;}"
             >
               {subject.name}
-            </span>
+            </a>
           </li>
         ))
       }
@@ -51,7 +55,7 @@ const semesterColor = `var(${semesterVar})`;
     <span class="sem-card-count">{notesCount} notes</span>
     <span class="sem-open" style={`color:${semesterColor}`}>Open &rarr;</span>
   </div>
-</a>
+</div>
 
 <style>
   .sem-card {
