@@ -85,14 +85,19 @@ const minDepth =
     });
 
     // Rail line sits 6px inside each link's left edge, leaving a clean 12px gap to text
-    const RAIL_INSET = 6;
+    const RAIL_INSET = 4;
     const SAME_DEPTH_THRESHOLD_PX = 1;
     const DIAGONAL_HEIGHT_DIVISOR = 2;
     const NAV_FALLBACK_BOTTOM_PX = 56;
     const VISIBLE_TOP_PADDING_PX = 20;
     const VISIBLE_BOTTOM_PADDING_PX = 24;
+    // Rail overshoots each end, and the active segment shifts outward by the
+    // same amount, so both the track and the highlight reach link edges
+    // instead of stopping/starting at link centers.
+    const RAIL_END_EXTENSION_RATIO = 0.4;
 
     let nodeLengths: number[] = [];
+    let halfHeights: number[] = [];
     let totalLength = 0;
 
     function measure() {
@@ -107,14 +112,17 @@ const minDepth =
             linkRect.left - wrapperRect.left + RAIL_INSET,
           ),
           y: linkRect.top - wrapperRect.top + linkRect.height / 2,
+          halfHeight: linkRect.height * RAIL_END_EXTENSION_RATIO,
         };
       });
 
       if (points.length === 0) return;
 
-      let d = `M ${points[0].x} ${points[0].y}`;
-      nodeLengths = [0];
-      totalLength = 0;
+      halfHeights = points.map((p) => p.halfHeight);
+
+      let d = `M ${points[0].x} ${points[0].y - points[0].halfHeight} L ${points[0].x} ${points[0].y}`;
+      nodeLengths = [points[0].halfHeight];
+      totalLength = points[0].halfHeight;
 
       for (let i = 1; i < points.length; i++) {
         const prev = points[i - 1];
@@ -147,6 +155,10 @@ const minDepth =
 
         nodeLengths.push(totalLength);
       }
+
+      const last = points[points.length - 1];
+      d += ` L ${last.x} ${last.y + last.halfHeight}`;
+      totalLength += last.halfHeight;
 
       pathTrack.setAttribute("d", d);
       pathProgress.setAttribute("d", d);
@@ -250,6 +262,11 @@ const minDepth =
           }
         }
       }
+
+      // Shift outward by each boundary link's half-height so the segment
+      // starts/ends at link edges rather than link centers
+      lStart = Math.max(0, lStart - (halfHeights[startIndex] ?? 0));
+      lEnd = Math.min(totalLength, lEnd + (halfHeights[endIndex] ?? 0));
 
       // Ensure lStart <= lEnd
       if (lStart > lEnd) {
