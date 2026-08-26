@@ -3,7 +3,7 @@ title: Vigenere Cipher
 sidebar:
   order: 5
 dateCreated: 2026-07-29T05:53:41.958Z
-lastUpdatedOn: 2026-08-11T04:59:37.964Z
+lastUpdatedOn: 2026-08-26T08:39:38.146Z
 slug: s5/computer-security/cipher-algorithms/vigenere-cipher
 prev: true
 next: true
@@ -11,17 +11,27 @@ next: true
 
 Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
 
-A variant restricts the ciphertext alphabets used to cyclic shifts of the standard alphabet, so an $n$-alphabet Vigenère cipher has key space $26^n$ at the cost of just $n$ numeric values as the key.
+A polyalphabetic substitution cipher which means, each letter is shifted by an amount that depends on its position in the message. And a stream cipher.
 
-Viewed as a stream cipher, the keystream is a repetition of the short secret key, each character replaced by its position value, and the ciphertext stream is the modulo addition of the plaintext stream with the keystream.
+The key is repeated and aligned with the plaintext (as shown below for the key `LEMON`). Key stream is the repeated key aligned with the plaintext.
 
-<Note>
+```
+plaintext:  ATTACKATDAWN
+key:        LEMONLEMONLE
+```
 
-The cipher created by Vigenère himself is called the autokey cipher, and provides higher security than the Bellaso variant.
+Each plaintext letter is shifted forward in the alphabet by the position of the key letter above it (A = 0, B = 1, ..., Z = 25).
 
-</Note>
+- `A` shifted by `L` (11) gives `L`
+- `T` shifted by `E` (4) gives `X`
 
-### Attacking the Vigenère Cipher
+Decryption shifts each ciphertext letter backward by the same amount.
+
+For a key of length $n$, each key letter picks one of 26 possible shift amounts, independently of the other $n - 1$ key letters. So the number of possible keys is $26 \times 26 \times \dots$ ($n$ times) $= 26^n$.
+
+You can find an implementation of the Vigenère cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/vigenere-cipher.c).
+
+### Attacking
 
 Security depends significantly on keeping the key length secret. Once the key length is found, the cipher can be attacked in the same manner as a shift cipher, using statistical properties of the plaintext language for each block of ciphertext extracted from separate keyword positions.
 
