@@ -29,9 +29,13 @@ function buildHeadingTree(headings: HeadingItem[]): HeadingNode[] {
   return rootNodes;
 }
 
+const DEFAULT_MIN_DEPTH = 2;
+
 const tree = buildHeadingTree(headings);
 const minDepth =
-  headings.length > 0 ? Math.min(...headings.map((h) => h.depth)) : 2;
+  headings.length > 0
+    ? Math.min(...headings.map((h) => h.depth))
+    : DEFAULT_MIN_DEPTH;
 ---
 
 {
@@ -80,6 +84,14 @@ const minDepth =
       );
     });
 
+    // Rail line sits 6px inside each link's left edge, leaving a clean 12px gap to text
+    const RAIL_INSET = 6;
+    const SAME_DEPTH_THRESHOLD_PX = 1;
+    const DIAGONAL_HEIGHT_DIVISOR = 2;
+    const NAV_FALLBACK_BOTTOM_PX = 56;
+    const VISIBLE_TOP_PADDING_PX = 20;
+    const VISIBLE_BOTTOM_PADDING_PX = 24;
+
     let nodeLengths: number[] = [];
     let totalLength = 0;
 
@@ -87,11 +99,13 @@ const minDepth =
       if (!wrapper || !pathTrack || !pathProgress) return;
       const wrapperRect = wrapper.getBoundingClientRect();
 
-      // Rail line sits 6px inside each link's left edge, leaving a clean 12px gap to text
       const points = tocLinks.map((link) => {
         const linkRect = link.getBoundingClientRect();
         return {
-          x: Math.max(6, linkRect.left - wrapperRect.left + 6),
+          x: Math.max(
+            RAIL_INSET,
+            linkRect.left - wrapperRect.left + RAIL_INSET,
+          ),
           y: linkRect.top - wrapperRect.top + linkRect.height / 2,
         };
       });
@@ -109,16 +123,19 @@ const minDepth =
         const dy = curr.y - prev.y;
         const dx = curr.x - prev.x;
 
-        if (Math.abs(dx) < 1) {
+        if (Math.abs(dx) < SAME_DEPTH_THRESHOLD_PX) {
           // Same depth level -> straight vertical line
           d += ` L ${curr.x} ${curr.y}`;
           totalLength += Math.abs(dy);
         } else {
           // Depth change -> diagonal chamfered transition (45 degree slant)
-          const diagH = Math.min(Math.abs(dx), Math.abs(dy) / 2);
-          const yMid = (prev.y + curr.y) / 2;
-          const yStartDiag = yMid - diagH / 2;
-          const yEndDiag = yMid + diagH / 2;
+          const diagH = Math.min(
+            Math.abs(dx),
+            Math.abs(dy) / DIAGONAL_HEIGHT_DIVISOR,
+          );
+          const yMid = (prev.y + curr.y) / DIAGONAL_HEIGHT_DIVISOR;
+          const yStartDiag = yMid - diagH / DIAGONAL_HEIGHT_DIVISOR;
+          const yEndDiag = yMid + diagH / DIAGONAL_HEIGHT_DIVISOR;
 
           const dy1 = yStartDiag - prev.y;
           const diagLen = Math.hypot(dx, yEndDiag - yStartDiag);
@@ -143,10 +160,12 @@ const minDepth =
       // Calculate true un-obscured visible viewport bounds (accounting for top sticky navbar)
       const nav =
         document.querySelector("nav") || document.querySelector("header");
-      const navBottom = nav ? nav.getBoundingClientRect().bottom : 56;
+      const navBottom = nav
+        ? nav.getBoundingClientRect().bottom
+        : NAV_FALLBACK_BOTTOM_PX;
 
-      const visibleTop = navBottom + 20;
-      const visibleBottom = window.innerHeight - 24;
+      const visibleTop = navBottom + VISIBLE_TOP_PADDING_PX;
+      const visibleBottom = window.innerHeight - VISIBLE_BOTTOM_PADDING_PX;
 
       const validHeadings: {
         index: number;
