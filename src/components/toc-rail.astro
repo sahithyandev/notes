@@ -99,6 +99,16 @@ const minDepth =
     let nodeLengths: number[] = [];
     let halfHeights: number[] = [];
     let totalLength = 0;
+    let headingTops: (number | null)[] = [];
+    let headingBottoms: (number | null)[] = [];
+    let navBottom: number | undefined;
+
+    // Article scrolls inside <section>, not the window — cache/read
+    // positions relative to whichever element actually scrolls.
+    const scrollEl = document.querySelector("section");
+    function getScrollOffset() {
+      return scrollEl ? scrollEl.scrollTop : window.scrollY;
+    }
 
     function measure() {
       if (!wrapper || !pathTrack || !pathProgress) return;
@@ -119,6 +129,17 @@ const minDepth =
       if (points.length === 0) return;
 
       halfHeights = points.map((p) => p.halfHeight);
+
+      const scrollOffset = getScrollOffset();
+      headingTops = headingElements.map((el) =>
+        el ? el.getBoundingClientRect().top + scrollOffset : null,
+      );
+      headingBottoms = headingElements.map((el) =>
+        el ? el.getBoundingClientRect().bottom + scrollOffset : null,
+      );
+      navBottom = (
+        document.querySelector("nav") || document.querySelector("header")
+      )?.getBoundingClientRect().bottom;
 
       let d = `M ${points[0].x} ${points[0].y - points[0].halfHeight} L ${points[0].x} ${points[0].y}`;
       nodeLengths = [points[0].halfHeight];
@@ -170,27 +191,24 @@ const minDepth =
       if (nodeLengths.length === 0 || !pathProgress) return;
 
       // Calculate true un-obscured visible viewport bounds (accounting for top sticky navbar)
-      const nav =
-        document.querySelector("nav") || document.querySelector("header");
-      const navBottom = nav
-        ? nav.getBoundingClientRect().bottom
-        : NAV_FALLBACK_BOTTOM_PX;
-
-      const visibleTop = navBottom + VISIBLE_TOP_PADDING_PX;
+      const visibleTop =
+        (navBottom ?? NAV_FALLBACK_BOTTOM_PX) + VISIBLE_TOP_PADDING_PX;
       const visibleBottom = window.innerHeight - VISIBLE_BOTTOM_PADDING_PX;
 
+      // Positions are cached document-relative (measure()); convert to
+      // viewport-relative here instead of re-reading layout every frame.
       const validHeadings: {
         index: number;
         top: number;
         bottom: number;
       }[] = [];
-      headingElements.forEach((el, index) => {
-        if (el) {
-          const rect = el.getBoundingClientRect();
+      const scrollOffset = getScrollOffset();
+      headingTops.forEach((top, index) => {
+        if (top !== null) {
           validHeadings.push({
             index,
-            top: rect.top,
-            bottom: rect.bottom,
+            top: top - scrollOffset,
+            bottom: (headingBottoms[index] ?? top) - scrollOffset,
           });
         }
       });
@@ -324,8 +342,7 @@ const minDepth =
     }
 
     // Scroll driver
-    const section = document.querySelector("section");
-    section?.addEventListener("scroll", onScroll, { passive: true });
+    scrollEl?.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // Smooth scroll link click
