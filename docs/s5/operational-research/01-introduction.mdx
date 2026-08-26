@@ -1,7 +1,7 @@
 ---
 title: Introduction to Operational Research
 dateCreated: 2026-07-01T06:36:47.522Z
-lastUpdatedOn: 2026-07-04T05:52:29.780Z
+lastUpdatedOn: 2026-08-26T18:01:43.919Z
 slug: s5/operational-research/introduction
 sidebar:
   label: Introduction
@@ -22,3 +22,28 @@ The module covers 4 main areas:
   Optimization problems where decision variables are restricted to integers.
 - Network optimization  
   Optimization problems modelled as flows or paths on a graph.
+
+**Note:** This module was taught with a practical focus. Theoretical foundations were not covered in lectures; only applied problem-solving was. I am trying my best to cover the theoretical aspects on here.
+
+## Hyperplane
+
+Generalization of a line (from $\mathbb{R}^2$) to $\mathbb{R}^n$
+
+$$
+\{x \in \mathbb{R}^n : a^Tx = c\}
+$$
+
+Here $a \in \mathbb{R}^n$ and $c \in \mathbb{R}$.
+
+## Half-space
+
+A hyperplane $a^Tx = c$ divides $\mathbb{R}^n$ into two half-spaces, the sets of points on either side of it.
+
+- Open half-space  
+  $a^Tx < c$ or $a^Tx > c$. Excludes the boundary hyperplane.
+- Closed half-space  
+  $a^Tx \le c$ or $a^Tx \ge c$. Includes the boundary hyperplane.
+
+Every linear constraint in $n$ decision variables is a closed half-space. The feasible region is the intersection of all constraint half-spaces.
+
+In $\mathbb{R}^2$, a half-space is called a half-plane.

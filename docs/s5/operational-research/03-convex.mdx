@@ -1,0 +1,135 @@
+---
+title: Convex
+slug: s5/operational-research/convex
+sidebar:
+  order: 3
+prev: true
+next: true
+dateCreated: 2026-08-26T11:47:32.345Z
+lastUpdatedOn: 2026-08-26T18:01:43.921Z
+---
+
+For all definitions in this note, whenever a set is mentioned, it is assumed to be a set of points in $\mathbb{R}^n$.
+
+## Convex Combination
+
+A point $x = \sum_{i=1}^{k} \lambda_i x_i$ is a convex combination of $x_1, \dots, x_k$ if $\lambda_i \ge 0$ for every $i$ and $\sum_{i=1}^{k} \lambda_i = 1$.
+
+## Convex Set
+
+A set is convex **iff** it contains every convex combination of its points.
+
+A set $S$ is convex **iff** for every pair of points $x, y \in S$, the line segment joining them lies entirely in $S$.
+
+$$
+\lambda x + (1 - \lambda) y \in S \quad \text{for all } \lambda \in [0, 1]
+$$
+
+The intersection of convex sets is convex. The union of convex sets is not necessarily convex.
+
+For example: a [half-space](/s5/operational-research/introduction#half-space).
+
+### Set of Convex Combinations
+
+For a convex set $S$, the set of all convex combinations of points of $S$ (say $H$) is also convex.
+
+$$
+H = \left\{ \sum \lambda_i x_i \mid \lambda_i \ge 0, \sum \lambda_i = 1, x_i \in S\right\}
+$$
+
+<Note title="Proof Hint">
+
+- $x, y \in H$
+- $x = \sum_i \lambda_i p_i$ for some points $p_i \in P$ with coefficients $\lambda_i$ with $\sum_i \lambda_i = 1$
+- $y = \sum_i \mu_i p_i$ for some points $p_i \in P$ with coefficients $\mu_i$ with $\sum_i \mu_i = 1$
+- The segment point  
+  $z = \alpha x + (1-\alpha)y = \sum_i \left(a\lambda_i + (1-a)\mu_i\right) p_i$ where $\sum_i \left(a\lambda_i + (1-a)\mu_i\right) = 1$
+
+</Note>
+
+### Extreme point
+
+A point in a convex set that cannot be written as a convex combination of 2 other distinct points in the set. A bounded convex polyhedron has finitely many extreme points.
+
+For example: the corners of a polygon, or every point on the boundary of a disk.
+
+## Convex Polygon
+
+A polygon that is a convex set. All segments joining any 2 of its points stays inside it.
+
+Geometrically, a convex polygon is a polygon where every interior angle is $\le 180°$.
+
+For a finite point set, the convex hull is a convex polygon whose vertices are a subset of the given points.
+
+## Convex Polyhedron
+
+The intersection of finitely many [half-spaces](/s5/operational-research/introduction#half-space). Always a convex set, since the intersection of convex sets is convex.
+
+### Polytope
+
+A bounded convex polyhedron. Every point in it is a convex combination of its extreme points, so a polytope is exactly the convex hull of its extreme points.
+
+This relies on boundedness, not on being a polyhedron specifically. See [Minkowski's Theorem](#minkowskis-theorem).
+
+## Convex Hull
+
+The smallest convex set containing all the points of a set.
+
+Equivalently, the set of all convex combinations of the points.
+
+<Note title="Proof hint">
+
+Let $P$ be a set of points and $H$ be the set of all convex combinations of points in $P$.
+
+- $H$ is convex ([already proved](/s5/operational-research/convex#set-of-convex-combinations))
+- $P \subseteq H$  
+  Each $p \in P$ is the trivial combination $1 \cdot p$.
+- $H$ is contained in every convex set $S \supseteq P$
+  - Suppose $S$ is a convex set with $P \subseteq S$ and $p_i \in P\text{ and } p_i \in S$ for all $i$.
+  - Take any $h = \sum_{i=1}^{k} \lambda_i p_i \in H$
+  - $S$ contains every convex combination of its own points [by definition](#convex-set), and $p_i \in S$ hence $h \in S$. Hence $H \subseteq S$.
+
+Hence $H$ is the smallest convex set containing $P$, i.e. the convex hull.
+
+</Note>
+
+### Minkowski's Theorem
+
+Any compact (closed and bounded) convex set in $\mathbb{R}^n$ equals the convex hull of its extreme points.
+
+For example: polytopes.
+
+Every point in the set is a convex combination of its extreme points.
+
+### Simplex
+
+The convex hull of $n+1$ affinely independent points in $\mathbb{R}^n$.
+
+For example:
+
+| Dimension ($n$) | Simplex     |
+| --------------- | ----------- |
+| 0               | Point       |
+| 1               | Line        |
+| 2               | Triangle    |
+| 3               | Tetrahedron |
+
+A simplex is the simplest possible polytope with non-zero volume in its dimension. It has the fewest vertices needed to enclose an $n$-dimensional region.
+
+## Relationship with Linear Programs
+
+The feasible region of a linear program is a polytope.
+
+If the LP has an optimal solution, at least one extreme point attains it. This is why the optimal solution can always be found at a vertex, as used in the graphical method and the simplex algorithm.
+
+<Note title="Proof hint">
+
+Let $v_1, \dots, v_k$ be the vertices of the feasible region, and let $v^*$ be the one with the largest objective value: $z(v^*) = \max_i z(v_i)$.
+
+- Any feasible point $x$ is a convex combination of the vertices: $x = \sum_i \lambda_i v_i$, with $\lambda_i \ge 0$ and $\sum_i \lambda_i = 1$.
+- $z$ is linear, so it distributes over the combination: $z(x) = \sum_i \lambda_i z(v_i)$.
+- Replace every $z(v_i)$ with the upper bound $z(v^*)$: $z(x) \le \sum_i \lambda_i z(v^*) = z(v^*) \sum_i \lambda_i = z(v^*)$, using $\sum_i \lambda_i = 1$.
+
+So $z(x) \le z(v^*)$ for every feasible $x$: no point, interior or on an edge, can beat the best vertex. Hence $v^*$ is optimal.
+
+</Note>

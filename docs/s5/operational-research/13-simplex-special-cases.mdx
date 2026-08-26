@@ -1,0 +1,40 @@
+---
+title: Simplex Special Cases
+slug: s5/operational-research/simplex-special-cases
+sidebar:
+  order: 13
+prev: true
+next: true
+dateCreated: 2026-08-26T11:53:52.062Z
+lastUpdatedOn: 2026-08-26T18:01:43.922Z
+---
+
+## Solution Types
+
+- Unique optimal solution  
+  Every non-basic variable has a strictly positive objective row coefficient at optimality.
+- Alternate (infinite) optimal solutions  
+  A non-basic variable has a 0 objective row coefficient at optimality. Every convex combination of the corresponding basic feasible solutions is also optimal.
+- Unbounded solution  
+  No positive entry exists in the entering variable's column during the minimum ratio test.
+
+## Tie in Entering Variable
+
+More than one non-basic variable shares the most negative objective row coefficient. Break the tie arbitrarily; any choice leads to an optimal solution, though the number of iterations may differ.
+
+## Tie in Leaving Variable
+
+More than one row shares the minimum ratio. Breaking the tie arbitrarily leaves a basic variable at 0, producing a degenerate basic feasible solution. This risks cycling (revisiting the same basis without improving the objective), avoided in practice by a fixed tie-breaking rule (e.g. Bland's rule: prefer the lowest-indexed variable).
+
+## Solving LPP Without Artificial Variables
+
+If every constraint is already $\le$ with a non-negative RHS, the slack variables alone form a starting identity basis. No artificial variables, and no Big-M or two-phase method, are needed.
+
+## Other Uses of Simplex
+
+- Constructing a simplex tableau for a given set of basic variables  
+  Express the basic variables' columns as an identity matrix by row-reducing the original constraint matrix on those columns.
+- Solving a system of linear equations  
+  Add an artificial objective (e.g. minimize the sum of artificial variables) and run simplex; a 0 optimal value with all artificial variables out of the basis gives a solution.
+- Finding the inverse of a matrix  
+  Run simplex with each column of the identity matrix as a separate RHS; the columns under the original identity's position in the final tableau form the inverse.

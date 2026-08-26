@@ -1,47 +1,19 @@
 ---
 title: Simplex Algorithm
 dateCreated: 2026-07-04T00:00:00.000Z
-lastUpdatedOn: 2026-07-14T15:42:45.277Z
+lastUpdatedOn: 2026-08-26T18:01:43.922Z
 slug: s5/operational-research/simplex-algorithm
 sidebar:
-  order: 4
+  order: 9
 prev: true
-next: false
+next: true
 ---
 
-The simplex algorithm iterates between vertices of the feasible region, improving the objective each step. It stops when no adjacent vertex improves it further.
+The simplex algorithm iterates between basic feasible solutions of the feasible region, improving the objective each step. It stops when no adjacent vertex improves it further.
 
-## Definitions
+Requires the LP in standard form, per the fundamental theorem of linear programming.
 
-### Slack Variable
-
-A non-negative variable added to a $\le$ constraint. Absorbs unused capacity, converting it to an equality.
-
-### Surplus Variable
-
-A non-negative variable subtracted from a $\ge$ constraint. Absorbs excess over the minimum, converting it to an equality.
-
-### Artificial Variable
-
-A non-negative variable added to a $\ge$ or $=$ constraint. Provides a starting basic feasible solution when slack or surplus can't.
-
-### Basic Variable
-
-A variable solved for from the constraints rather than set to 0.
-
-### Non-basic Variable
-
-A variable fixed at 0 while solving the constraints for the basic variables.
-
-## Standard Form
-
-Convert the LP to standard form before applying simplex.
-
-- Objective should be maximization  
-  Negate if a minimization objective.
-- Constraints must be equalities  
-  All inequalities must be converted via slack, surplus, or artificial variables.
-- Variables must be non-negative
+Named after [simplices](/s5/operational-research/convex#simplex). It moves along the edges between adjacent extreme points (vertices) of the feasible polyhedron, which can be decomposed into simplices, improving the objective at each step.
 
 ## Simplex Tableau
 
@@ -92,3 +64,7 @@ The intersection of the entering column and leaving row is the pivot element.
 
 - Divide the pivot row by the pivot element, making it 1.
 - Eliminate the entering variable from every other row, including the objective row, by elementary row operations.
+
+## Minimization Problems
+
+Negate the objective ($z' = -z$) during standard form conversion and maximize $z'$. Negate the resulting optimal value back at the end. The iteration steps are otherwise unchanged.

@@ -1,0 +1,30 @@
+---
+title: Standard Form
+slug: s5/operational-research/standard-form
+sidebar:
+  order: 5
+prev: true
+next: true
+dateCreated: 2026-08-26T11:52:55.534Z
+lastUpdatedOn: 2026-08-26T18:01:43.921Z
+---
+
+Convert a linear program to standard form before applying the simplex algorithm.
+
+- Objective should be maximization  
+  Negate the objective if it's a minimization problem.
+- Constraints must be equalities  
+  All inequalities are converted using slack, surplus, or artificial variables.
+- Variables must be non-negative
+
+## Slack Variable
+
+A non-negative variable added to a $\le$ constraint. Absorbs unused capacity, converting it to an equality.
+
+## Surplus Variable
+
+A non-negative variable subtracted from a $\ge$ constraint. Absorbs excess over the minimum, converting it to an equality.
+
+## Artificial Variable
+
+A non-negative variable added to a $\ge$ or $=$ constraint. Provides a starting basic feasible solution when slack or surplus alone can't.

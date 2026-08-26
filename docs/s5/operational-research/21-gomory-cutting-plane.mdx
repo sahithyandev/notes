@@ -1,0 +1,34 @@
+---
+title: Gomory's Cutting Plane Method
+slug: s5/operational-research/gomory-cutting-plane
+sidebar:
+  order: 21
+prev: true
+next: true
+dateCreated: 2026-08-26T11:54:39.098Z
+lastUpdatedOn: 2026-08-26T18:01:43.924Z
+---
+
+Solves a pure IPP by adding constraints (cuts) to the LP relaxation's optimal tableau that exclude the fractional solution without excluding any feasible integer solution.
+
+## Fractional Cut
+
+For a basic variable $x_i$ with a fractional value in the optimal tableau's row:
+
+$$
+x_i + \sum_j a_{ij} x_j = b_i
+$$
+
+Split each coefficient into integer and fractional parts, $a_{ij} = \lfloor a_{ij} \rfloor + f_{ij}$ and $b_i = \lfloor b_i \rfloor + f_i$ (with $0 \le f_{ij}, f_i < 1$). The Gomory constraint is:
+
+$$
+\sum_j f_{ij} x_j \ge f_i
+$$
+
+## Steps
+
+- Solve the LP relaxation with simplex.
+- If every basic variable is integral, stop; the solution is optimal for the IPP.
+- Otherwise, pick a row with a fractional basic variable and derive its Gomory constraint.
+- Add the constraint (as a new row with a surplus variable) to the tableau and resolve with the dual simplex method, since the new RHS is negative.
+- Repeat until every basic variable is integral.

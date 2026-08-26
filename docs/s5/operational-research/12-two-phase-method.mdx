@@ -1,0 +1,27 @@
+---
+title: Two-Phase Method
+slug: s5/operational-research/two-phase-method
+sidebar:
+  order: 12
+prev: true
+next: true
+dateCreated: 2026-08-26T11:53:40.542Z
+lastUpdatedOn: 2026-08-26T18:01:43.922Z
+---
+
+Solves an LP with artificial variables using 2 separate simplex runs, avoiding the arbitrary constant $M$ of the Big-M method.
+
+## Phase 1
+
+- Replace the original objective with minimizing the sum of all artificial variables.
+- Run the simplex algorithm.
+- If the minimum is 0, a basic feasible solution to the original problem was found; proceed to phase 2.
+- If the minimum is positive, the original problem is infeasible. Stop.
+
+## Phase 2
+
+- Drop the artificial variables and restore the original objective.
+- Use the phase 1 optimal basis as the starting basic feasible solution.
+- Run the simplex algorithm to optimize the original objective.
+
+Unbounded and alternate/infinite optimal solutions are detected in phase 2 the same way as in the ordinary simplex algorithm.

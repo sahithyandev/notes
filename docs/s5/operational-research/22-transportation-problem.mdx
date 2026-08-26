@@ -1,0 +1,42 @@
+---
+title: Transportation Problem
+slug: s5/operational-research/transportation-problem
+sidebar:
+  order: 22
+prev: true
+next: true
+dateCreated: 2026-08-26T11:54:50.043Z
+lastUpdatedOn: 2026-08-26T18:01:43.924Z
+---
+
+Minimizes the cost of shipping a single commodity from $m$ supply points to $n$ demand points, given a per-unit shipping cost $c_{ij}$ for every supply-demand pair.
+
+$$
+\text{minimize } z = \sum_{i=1}^{m} \sum_{j=1}^{n} c_{ij} x_{ij}
+$$
+
+Subject to:
+
+- $\sum_{j=1}^{n} x_{ij} \le a_i$ for every supply point $i$ (supply capacity)
+- $\sum_{i=1}^{m} x_{ij} \ge b_j$ for every demand point $j$ (demand requirement)
+- $x_{ij} \ge 0$
+
+## Balanced Transportation Problem
+
+Total supply equals total demand: $\sum_i a_i = \sum_j b_j$. Every constraint becomes an equality.
+
+## Necessary and Sufficient Condition for Feasibility
+
+A feasible solution exists **iff** the problem is balanced.
+
+## Unbalanced Transportation Problem
+
+Total supply and demand differ. Add a dummy supply point (if demand exceeds supply) or a dummy demand point (if supply exceeds demand) with 0 shipping cost, absorbing the excess, to rebalance it.
+
+## Maximization Transportation Problem
+
+Convert to an equivalent minimization problem by negating every cost $c_{ij}$ (or subtracting each from the largest cost in the matrix), then solve as usual.
+
+## Restricted Transportation Problem
+
+A route is prohibited (e.g. no road between a supply and demand point). Assign it a very large cost $M$, which drives $x_{ij}$ to 0 in any optimal solution.

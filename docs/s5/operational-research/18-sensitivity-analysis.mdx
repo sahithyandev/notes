@@ -1,0 +1,36 @@
+---
+title: Sensitivity Analysis
+slug: s5/operational-research/sensitivity-analysis
+sidebar:
+  order: 18
+prev: true
+next: true
+dateCreated: 2026-08-26T11:54:20.131Z
+lastUpdatedOn: 2026-08-26T18:01:43.923Z
+---
+
+Post-optimality analysis: examines how the optimal solution changes as LP data changes, without re-solving from scratch.
+
+## Change in Cost Coefficient
+
+- Non-basic variable  
+  Stays optimal as long as its objective row coefficient stays within the range keeping the optimality criterion satisfied.
+- Basic variable  
+  The whole objective row is recomputed; find the coefficient range keeping every entry within the optimality criterion.
+
+## Change in RHS (Requirement/Resource)
+
+The RHS column is recomputed using the current basis inverse. Optimal as long as every basic variable's value stays $\ge 0$. Determines the range over which a resource can change without altering the optimal basis.
+
+## Change in Coefficient Matrix
+
+A change to a non-basic variable's column only affects its own objective row entry, recomputed from the new column and the current basis inverse. A change to a basic variable's column can alter the basis itself, requiring more extensive recomputation.
+
+## Addition of a Variable
+
+Treat the new variable as a new column. Compute its objective row coefficient using the current basis inverse; if it violates the optimality criterion, it can enter the basis and improve the objective further.
+
+## Addition of a Constraint
+
+- If the current optimal solution already satisfies the new constraint, it's still optimal.
+- Otherwise, add the constraint (with a slack/surplus/artificial variable) to the optimal tableau and continue with the dual simplex method, since the RHS may go negative while the tableau stays optimal.
