@@ -1,7 +1,7 @@
 ---
 title: Graphical Method
 dateCreated: 2026-07-14T00:00:00.000Z
-lastUpdatedOn: 2026-08-26T18:01:43.921Z
+lastUpdatedOn: 2026-08-27T16:29:21.212Z
 slug: s5/operational-research/graphical-method
 sidebar:
   order: 4
@@ -11,13 +11,34 @@ next: true
 
 Suppose a linear program has $n$ decision variables. Then it can be solved graphically using a $\mathbb{R}^n$ space. Hence not suitable for $n > 2$ (or $n > 3$ with computer visualization).
 
-All constraints are plotted on the same $\mathbb{R}^n$ space. Feasible region is the intersection of all constraint half-spaces. Optimal solution occurs at a vertex (and not the interior) of the feasible region.
+All constraints are plotted on the same $\mathbb{R}^n$ space. Feasible region is the intersection of all constraint half-spaces. Optimal solution occurs at a vertex (and not the interior) of the feasible region. Based on the [vertex property](/s5/operational-research/convex#vertex-property).
 
 The vertex is found by moving the objective hyperplane $z = c_1x_1 + \dots + c_nx_n$ across the feasible region. Increase $z$ for maximization, decrease it for minimization. The optimal vertex is the last one the hyperplane touches before leaving the region.
 
-### Vertex Property
+## Worked Example
 
-The vertex property holds because the feasible region is a convex polygon. A linear function attains its extremum over a convex polygon at an extreme point.
+Maximize $z = 3x_1 + 2x_2$ subject to
+
+$$
+\begin{aligned}
+x_1 + x_2 &\le 4 \\
+x_1 + 3x_2 &\le 6 \\
+x_1, x_2 &\ge 0
+\end{aligned}
+$$
+
+Plot both constraint lines. The feasible region is the polygon with vertices $(0,0)$, $(4,0)$, $(3,1)$, $(0,2)$. Vertex $(3,1)$ is the intersection of $x_1 + x_2 = 4$ and $x_1 + 3x_2 = 6$.
+
+Evaluate $z$ at each vertex:
+
+| Vertex  | $z$  |
+| ------- | ---- |
+| $(0,0)$ | $0$  |
+| $(4,0)$ | $12$ |
+| $(3,1)$ | $11$ |
+| $(0,2)$ | $4$  |
+
+Optimal: $x_1 = 4$, $x_2 = 0$, $z = 12$.
 
 ## Special Cases
 

@@ -1,0 +1,77 @@
+---
+title: Solutions of a Linear Program
+slug: s5/operational-research/solutions-of-lp
+sidebar:
+  order: 6
+prev: true
+next: true
+dateCreated: 2026-08-26T11:53:03.283Z
+lastUpdatedOn: 2026-08-27T16:29:21.213Z
+---
+
+Consider a linear program in standard form: maximize $c^T x$ subject to $Ax = b$, $x \ge 0$, where $A$ is $m \times n$ with $n \ge m$ and rank $m$. Here $m$ is the number of constraints and $n$ is the number of variables.
+
+A point $x$ is feasible **iff** it satisfies both $Ax = b$ and $x \ge 0$.
+
+A feasible $x$ is an [extreme point](/s5/operational-research/convex#extreme-point) **iff** the columns $\{a_i : x_i > 0\}$ of $A$ are linearly independent (proved below).
+
+## Basic Solution
+
+$Ax = b$ is $m$ equations in $n$ unknowns with $n > m$, so it is underdetermined. Kill the extra $n - m$ degrees of freedom by choosing $n - m$ variables (non-basic) and fixing them at exactly 0. The remaining $m$ variables (basic) have columns forming a square $m \times m$ matrix $B$; when $B$ is invertible, $B x_B = b$ has the unique solution $x_B = B^{-1} b$. Filling the non-basic entries back in with 0 gives the full vector, a basic solution. It has at most $m$ nonzero entries.
+
+A basic solution is determined by which $m$ variables are chosen as basic.
+
+Example: $x_1 + x_2 + x_3 = 4$, $x_1 + 2x_2 + x_4 = 6$ ($m = 2$, $n = 4$, so 2 variables are set to 0).
+
+- Non-basic $\{x_3, x_4\}$: solve $x_1 + x_2 = 4$, $x_1 + 2x_2 = 6$ to get $(2, 2, 0, 0)$.
+- Non-basic $\{x_2, x_3\}$: gives $(4, 0, 0, 2)$.
+- Non-basic $\{x_1, x_2\}$: gives $(0, 0, 4, 6)$.
+
+For a given LP, the maximum number of basic solutions is:
+
+$$
+\binom{n}{m} = \frac{n!}{m!(n - m)!}
+$$
+
+## Basic Feasible Solution
+
+A basic solution in which every variable is also $\ge 0$. Since the $n - m$ non-basic variables are already 0, this just requires $x_B = B^{-1} b \ge 0$.
+
+The basic feasible solutions of the LP are exactly the extreme points of its convex hull.
+
+<Note title="Proof Hint">
+
+By the [feasible-direction criterion](/s5/operational-research/convex#extreme-point), $x$ is extreme **iff** no nonzero $d$ keeps both $x + \epsilon d$ and $x - \epsilon d$ feasible for small $\epsilon > 0$. Such a $d$ must satisfy:
+
+- $Ad = 0$: from $A(x \pm \epsilon d) = b$ and $Ax = b$. The step stays on the constraint plane.
+- $d_i = 0$ wherever $x_i = 0$: otherwise one of $x_i \pm \epsilon d_i$ is negative. Zero coordinates are pinned; positive ones have slack.
+
+So a valid step is exactly a nonzero $d$ supported on $\{i : x_i > 0\}$ with $\sum_{x_i > 0} d_i a_i = 0$. One exists **iff** those columns are dependent, so $x$ is extreme **iff** they are independent.
+
+**BFS $\Rightarrow$ extreme (directly).** Let $x$ be a BFS with basis $B$ and non-basic set $N$. Suppose $x = \lambda y + (1 - \lambda) z$ with $y, z$ feasible, $\lambda \in (0, 1)$. For $j \in N$: $0 = x_j = \lambda y_j + (1 - \lambda) z_j$ with $y_j, z_j \ge 0$ forces $y_j = z_j = 0$. So $y$ and $z$ vanish on $N$, and $Ay = b$ becomes $B y_B = b$, giving $y_B = B^{-1} b = x_B$; likewise $z_B = x_B$. Hence $y = z = x$, so $x$ is extreme. (This uses only $B^{-1}$ existing, not the crux.)
+
+**Extreme $\Rightarrow$ BFS.** The positive-entry columns are independent, and there are at most $m$ of them. Since $A$ has rank $m$, extend them to $m$ independent columns; call these basic, the other $n - m$ non-basic. Every variable with $x_i > 0$ is already basic, so all non-basic variables are 0. Thus $x$ is the basic solution for this basis, and it is feasible, so it is a BFS.
+
+</Note>
+
+### Degeneracy
+
+Degeneracy classifies a basic feasible solution by how many of its $m$ basic variables are nonzero.
+
+- Non-degenerate: all $m$ basic variables are strictly positive, so the point has exactly $m$ nonzero entries.
+- Degenerate: at least one basic variable equals 0, so the point has fewer than $m$ nonzero entries.
+
+"Non-degenerate" and "degenerate" are two disjoint subclasses of the basic feasible solutions. A non-degenerate basic solution that had a negative basic variable would not be feasible and would not be called either.
+
+A degenerate basic feasible solution can come from more than one basic set: different choices of the $m$ basic variables can produce the same point when some basic variables are 0.
+
+## Fundamental Theorem of Linear Programming
+
+- If a feasible solution exists, a basic feasible solution exists.
+- If an optimal feasible solution exists, an optimal basic feasible solution exists.
+
+A basic feasible solution has at most $m$ nonzero variables and is an extreme point (corner) of the feasible region.
+
+Basic feasible solutions are finite in number, at most $\binom{n}{m}$, one per choice of which $m$ variables may be nonzero. An optimum can therefore be found by checking finitely many corners instead of the whole continuous feasible region, and the [simplex algorithm](/s5/operational-research/simplex-algorithm) does exactly this, walking from corner to corner.
+
+To see why it holds, start at any feasible $x$. If it is not basic, the columns of $A$ for its nonzero entries are linearly dependent, so there is a direction $d$ with $Ad = 0$. Moving to $x \pm t d$ keeps $Ax = b$ satisfied; increase $t$ until some variable hits $0$, leaving fewer nonzeros. Repeating drives the point to a basic one. For the second statement, pick the sign of $d$ so $c^T x$ does not decrease, so the basic point reached is at least as good as the original optimum.

@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:47:32.345Z
-lastUpdatedOn: 2026-08-26T18:01:43.921Z
+lastUpdatedOn: 2026-08-27T16:29:21.212Z
 ---
 
 For all definitions in this note, whenever a set is mentioned, it is assumed to be a set of points in $\mathbb{R}^n$.
@@ -52,6 +52,8 @@ $$
 A point in a convex set that cannot be written as a convex combination of 2 other distinct points in the set. A bounded convex polyhedron has finitely many extreme points.
 
 For example: the corners of a polygon, or every point on the boundary of a disk.
+
+Equivalently, $x$ is an extreme point **iff** no non-zero direction $d$ lets both $x + \epsilon d$ and $x - \epsilon d$ stay in the set for small $\epsilon > 0$. Otherwise $x$ is the midpoint of two distinct points of the set.
 
 ## Convex Polygon
 
@@ -119,6 +121,8 @@ A simplex is the simplest possible polytope with non-zero volume in its dimensio
 ## Relationship with Linear Programs
 
 The feasible region of a linear program is a polytope.
+
+### Vertex Property
 
 If the LP has an optimal solution, at least one extreme point attains it. This is why the optimal solution can always be found at a vertex, as used in the graphical method and the simplex algorithm.
 

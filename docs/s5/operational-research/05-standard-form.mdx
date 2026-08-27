@@ -6,10 +6,10 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:52:55.534Z
-lastUpdatedOn: 2026-08-26T18:01:43.921Z
+lastUpdatedOn: 2026-08-27T16:29:21.213Z
 ---
 
-Convert a linear program to standard form before applying the simplex algorithm.
+The graphical method only works for 2 (or 3) decision variables. An algebraic method is needed beyond that, and it starts by rewriting the linear program in a fixed form.
 
 - Objective should be maximization  
   Negate the objective if it's a minimization problem.
@@ -17,14 +17,81 @@ Convert a linear program to standard form before applying the simplex algorithm.
   All inequalities are converted using slack, surplus, or artificial variables.
 - Variables must be non-negative
 
-## Slack Variable
+## Variable
+
+### Basic Variable
+
+A variable solved for from the constraints rather than set to 0.
+
+### Non-basic Variable
+
+A variable fixed at 0 while solving the constraints for the basic variables.
+
+### Slack Variable
 
 A non-negative variable added to a $\le$ constraint. Absorbs unused capacity, converting it to an equality.
 
-## Surplus Variable
+### Surplus Variable
 
 A non-negative variable subtracted from a $\ge$ constraint. Absorbs excess over the minimum, converting it to an equality.
 
-## Artificial Variable
+### Artificial Variable
 
-A non-negative variable added to a $\ge$ or $=$ constraint. Provides a starting basic feasible solution when slack or surplus alone can't.
+A non-negative variable added to a constraint purely to supply a starting basic variable, with no meaning in the original problem.
+
+#### When It Is Required
+
+After the RHS of every constraint is made non-negative (multiply the row by $-1$ if needed), each constraint must contribute one variable that appears with coefficient $+1$ in that row and $0$ in all others (a unit column). That variable becomes basic in the starting solution.
+
+- $\le$ constraint  
+  The slack variable is already such a unit column. No artificial variable.
+- $\ge$ constraint  
+  The surplus variable has coefficient $-1$, not a unit column. Add an artificial variable.
+- $=$ constraint  
+  No slack or surplus at all. Add an artificial variable.
+
+So the number of artificial variables equals the number of $\ge$ constraints plus the number of $=$ constraints (after fixing signs).
+
+#### Handling Them
+
+A valid final solution must have every artificial variable equal to $0$ (non-basic, or basic at value $0$). If one stays positive, the original problem is infeasible. 2 methods drive them out:
+
+- Big-M method
+- Two-phase method
+
+## Worked Example
+
+Minimize $z = 2x_1 + 3x_2$ subject to
+
+$$
+\begin{aligned}
+x_1 + x_2 &\le 4 && \quad (1) \\
+x_1 + 3x_2 &\ge 6 && \quad (2) \\
+x_1 - x_2 &= 1 && \quad (3) \\
+x_1, x_2 &\ge 0
+\end{aligned}
+$$
+
+Convert each requirement:
+
+- Objective: minimizing $z$ becomes maximizing $z' = -2x_1 - 3x_2$.
+- $(1)$ is $\le$: add slack $s_1$.
+- $(2)$ is $\ge$: subtract surplus $s_2$, then add artificial $a_1$.
+- $(3)$ is $=$: add artificial $a_2$.
+
+Standard form:
+
+$$
+\text{maximize } z' = -2x_1 - 3x_2
+$$
+
+$$
+\begin{aligned}
+x_1 + x_2 + s_1 &= 4 && \quad (1') \\
+x_1 + 3x_2 - s_2 + a_1 &= 6 && \quad (2') \\
+x_1 - x_2 + a_2 &= 1 && \quad (3') \\
+x_1, x_2, s_1, s_2, a_1, a_2 &\ge 0
+\end{aligned}
+$$
+
+Starting basic feasible solution: $s_1 = 4$ from $(1')$, $a_1 = 6$ from $(2')$, $a_2 = 1$ from $(3')$ are basic (their columns are the unit columns), all other variables $0$.

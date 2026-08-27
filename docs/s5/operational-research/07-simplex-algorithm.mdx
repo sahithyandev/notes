@@ -1,0 +1,166 @@
+---
+title: Simplex Algorithm
+dateCreated: 2026-07-04T00:00:00.000Z
+lastUpdatedOn: 2026-08-27T16:29:21.213Z
+slug: s5/operational-research/simplex-algorithm
+sidebar:
+  order: 7
+prev: true
+next: true
+---
+
+The simplex algorithm iterates between basic feasible solutions of the feasible region, improving the objective each step. It stops when no adjacent vertex improves it further.
+
+Named after [simplices](/s5/operational-research/convex#simplex). It moves along the edges between adjacent extreme points (vertices) of the feasible polyhedron, which can be decomposed into simplices, improving the objective at each step.
+
+## Conditions for Use
+
+All of the following must hold:
+
+- LP in [standard form](/s5/operational-research/standard-form)  
+  Objective to maximize, constraints as equalities, all variables $\ge 0$, RHS $\ge 0$. Per the [fundamental theorem](/s5/operational-research/solutions-of-lp).
+- An initial basic feasible solution is available  
+  With all $\le$ constraints and non-negative RHS, the slack variables give one directly. Otherwise use [artificial variable methods](/s5/operational-research/artificial-variable-methods) (big-M or two-phase) to start.
+- Feasible region is non-empty  
+  Infeasible LPs have no basic feasible solution to iterate from.
+
+Cycling on degenerate solutions is possible but preventable with anti-cycling rules (Bland's rule). The algorithm handles unboundedness by detecting it during the ratio test.
+
+Represents the system of equations and objective row together for iteration.
+
+Suppose a linear program with $m$ constraints and $n$ variables is in standard form.
+
+- $m+1$ Rows  
+  1 objective row, plus $m$ rows (1 per constraint).
+- $n+1$ Columns  
+  1 per variable, plus 1 for right-hand-side (RHS).
+
+A basic feasible solution reads basic variables directly from the RHS. Non-basic variables are 0.
+
+## Iteration Steps
+
+Each iteration moves from one basic feasible solution to an adjacent one with a better or equal objective value.
+
+Repeat the following steps until an optimal solution is found.
+
+### Check optimality
+
+Inspect the objective row coefficients. If all are $\ge 0$ (maximization, standard form), the current solution is optimal. Stop.
+
+### Select Entering Variable
+
+Entering variable is the non-basic variable selected to become basic. Chosen as the variable with the most negative objective row coefficient.
+
+### Select Leaving Variable
+
+Leaving variable is the basic variable selected to become non-basic. Chosen by the minimum ratio test on the entering variable's column.
+
+#### Minimum Ratio Test
+
+In the entering variable's column, for each constraint row with $a_{i,\text{entering}} > 0$, compute:
+
+$$
+\frac{\text{RHS}_i}{a_{i,\text{entering}}}
+$$
+
+The row with the smallest non-negative ratio determines the leaving variable.
+
+If no $a_{i,\text{entering}} > 0$ exists in the entering column, the problem is unbounded. Stop.
+
+### Pivot
+
+The intersection of the entering column and leaving row.
+
+- Divide the pivot row by the pivot element, making its entering-column entry 1.
+- For every other row (constraint rows and the objective row), subtract $c_r$ times the new pivot row, where $c_r$ is that row's current entering-column entry. Applied across all columns including RHS.
+
+This zeroes the entering column everywhere except the pivot row, making the entering column a unit vector. On the objective row the same operation removes the negative reduced cost and updates $z$.
+
+## Worked Example
+
+$$
+\begin{aligned}
+\text{maximize} \quad & z = 3x_1 + 5x_2 \\
+\text{subject to} \quad & x_1 \le 4 \\
+& 2x_2 \le 12 \\
+& 3x_1 + 2x_2 \le 18 \\
+& x_1, x_2 \ge 0
+\end{aligned}
+\tag{1}
+$$
+
+Standard form adds slacks $s_1, s_2, s_3$, one per constraint:
+
+$$
+\begin{aligned}
+x_1 + s_1 &= 4 \\
+2x_2 + s_2 &= 12 \\
+3x_1 + 2x_2 + s_3 &= 18
+\end{aligned}
+\tag{2}
+$$
+
+The objective row is written as $z - 3x_1 - 5x_2 = 0$. Initial basis $(s_1, s_2, s_3) = (4, 12, 18)$.
+
+<SimplexWalkthrough>
+  <SimplexStep
+    label="Initial tableau"
+    columns={["x_1", "x_2", "s_1", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["-3", "-5", "0", "0", "0"], rhs: "0" },
+      { basic: "s_1", cells: ["1", "0", "1", "0", "0"], rhs: "4" },
+      { basic: "s_2", cells: ["0", "2", "0", "1", "0"], rhs: "12" },
+      { basic: "s_3", cells: ["3", "2", "0", "0", "1"], rhs: "18" },
+    ]}
+  >
+    Basic feasible solution $x_1 = x_2 = 0$, $z = 0$. Two negative objective
+    coefficients ($-3$, $-5$), so not optimal.
+  </SimplexStep>
+
+  <SimplexStep
+    label="Iteration 1"
+    entering={1}
+    leaving={2}
+    columns={["x_1", "x_2", "s_1", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["-3", "-5", "0", "0", "0"], rhs: "0", ratio: "" },
+      { basic: "s_1", cells: ["1", "0", "1", "0", "0"], rhs: "4", ratio: "skip (0)" },
+      { basic: "s_2", cells: ["0", "2", "0", "1", "0"], rhs: "12", ratio: "12/2 = 6" },
+      { basic: "s_3", cells: ["3", "2", "0", "0", "1"], rhs: "18", ratio: "18/2 = 9" },
+    ]}
+  >
+    Most negative objective coefficient is $-5$, so $x_2$ enters. Minimum ratio
+    is $6$ in row $s_2$, so $s_2$ leaves. Pivot element is $a_{s_2, x_2} = 2$.
+  </SimplexStep>
+
+  <SimplexStep
+    label="Iteration 2"
+    entering={0}
+    leaving={3}
+    columns={["x_1", "x_2", "s_1", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["-3", "0", "0", "5/2", "0"], rhs: "30", ratio: "" },
+      { basic: "s_1", cells: ["1", "0", "1", "0", "0"], rhs: "4", ratio: "4/1 = 4" },
+      { basic: "x_2", cells: ["0", "1", "0", "1/2", "0"], rhs: "6", ratio: "skip (0)" },
+      { basic: "s_3", cells: ["3", "0", "0", "-1", "1"], rhs: "6", ratio: "6/3 = 2" },
+    ]}
+  >
+    After the pivot $z = 30$. Now $-3$ is the most negative, so $x_1$ enters.
+    Minimum ratio is $2$ in row $s_3$, so $s_3$ leaves. Pivot element is
+    $a_{s_3, x_1} = 3$.
+  </SimplexStep>
+
+  <SimplexStep
+    label="Final tableau"
+    columns={["x_1", "x_2", "s_1", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "0", "3/2", "1"], rhs: "36" },
+      { basic: "s_1", cells: ["0", "0", "1", "1/3", "-1/3"], rhs: "2" },
+      { basic: "x_2", cells: ["0", "1", "0", "1/2", "0"], rhs: "6" },
+      { basic: "x_1", cells: ["1", "0", "0", "-1/3", "1/3"], rhs: "2" },
+    ]}
+  >
+    All objective coefficients are non-negative. Optimal at $x_1 = 2$,
+    $x_2 = 6$, $z = 36$.
+  </SimplexStep>
+</SimplexWalkthrough>
