@@ -8,6 +8,8 @@ import { SITE_NAME, SITE_HOST_URL, isWip } from "../utils/values";
 import Note from "../components/note.astro";
 import WalksVennDiagram from "../components/walks-venn-diagram.astro";
 import TreePropertiesProofs from "../components/illustrations/tree-properties-proofs.astro";
+import SimplexWalkthrough from "../components/illustrations/simplex-walkthrough.astro";
+import SimplexStep from "../components/illustrations/simplex-step.astro";
 import TocRail from "../components/toc-rail.astro";
 import NoteFeedback from "../components/note-feedback.astro";
 import RightSidebar from "../components/right-sidebar.astro";
@@ -166,7 +168,14 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
       <Article>
         <Content
-          components={{ Note, WalksVennDiagram, TreePropertiesProofs, Packet }}
+          components={{
+            Note,
+            WalksVennDiagram,
+            TreePropertiesProofs,
+            SimplexWalkthrough,
+            SimplexStep,
+            Packet,
+          }}
         />
       </Article>
 

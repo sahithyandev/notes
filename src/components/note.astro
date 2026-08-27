@@ -32,7 +32,7 @@ const { title, type = "note" } = Astro.props;
     line-height: 1.6;
   }
 
-  .callout-title {
+  .callout strong.callout-title {
     font-family: var(--font-ui);
     font-size: 0.75rem;
     font-weight: 700;
@@ -44,9 +44,12 @@ const { title, type = "note" } = Astro.props;
   }
 
   .callout p {
-    margin-bottom: 0 !important;
     font-family: var(--font-body);
     color: var(--cal-text);
+  }
+
+  .callout p:last-child {
+    margin-bottom: 0;
   }
 
   .callout ul li::before {
