@@ -1,0 +1,179 @@
+---
+import katex from "katex";
+
+interface Row {
+  basic: string;
+  cells: string[];
+  rhs: string;
+  ratio?: string;
+}
+
+interface Props {
+  label: string;
+  columns: string[];
+  rows: Row[];
+  entering?: number;
+  leaving?: number;
+}
+
+const { label, columns, rows, entering, leaving } = Astro.props;
+
+const tex = (v: string) =>
+  katex.renderToString(v, { throwOnError: false, strict: false });
+
+const colCount = columns.length;
+---
+
+<div class="step" data-label={label} style={`--col-count:${colCount}`}>
+  {
+    /* Hidden data source. The walkthrough clones one live table and copies
+      only the cells that actually change between steps. */
+  }
+  <table class="tableau" aria-hidden="true">
+    <colgroup>
+      <col class="c-basic" />
+      {columns.map(() => <col class="c-data" />)}
+      <col class="c-rhs" />
+      <col class="c-ratio" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="basic">Basic</th>
+        {
+          columns.map((c, ci) => (
+            <th
+              class:list={["num", { enter: ci === entering }]}
+              set:html={tex(c)}
+            />
+          ))
+        }
+        <th class="num rhs">RHS</th>
+        <th class="num">Ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r, ri) => (
+          <tr class:list={{ leave: ri === leaving }}>
+            <td class="basic" set:html={tex(r.basic)} />
+            {r.cells.map((cell, ci) => (
+              <td
+                class:list={[
+                  "num",
+                  {
+                    enter: ci === entering,
+                    pivot: ci === entering && ri === leaving,
+                  },
+                ]}
+                set:html={tex(cell)}
+              />
+            ))}
+            <td class="num rhs" set:html={tex(r.rhs)} />
+            <td class="num ratio">{r.ratio ?? ""}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <div class="step-note"><slot /></div>
+</div>
+
+<style>
+  table.tableau {
+    border-collapse: collapse;
+    /* Fixed layout: data columns share the leftover space equally, so widths
+       stay put as cells swap between steps. Below min-width the parent .scroll
+       scrolls horizontally. */
+    table-layout: fixed;
+    width: 100%;
+    min-width: 34rem;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+  }
+  .tableau col.c-basic {
+    width: 3rem;
+  }
+  .tableau col.c-rhs {
+    width: 5rem;
+  }
+  .tableau col.c-ratio {
+    width: 5rem;
+  }
+
+  .tableau th,
+  .tableau td {
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tableau thead tr {
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .tableau tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .tableau th.basic,
+  .tableau td.basic {
+    text-align: left;
+    color: var(--text-secondary);
+  }
+  .tableau td.num,
+  .tableau th.num {
+    font-variant-numeric: tabular-nums;
+  }
+  .tableau .rhs {
+    border-left: 2px solid var(--border-strong);
+  }
+  .tableau td.ratio {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+
+  /* Only background and text color change, with a plain fade. */
+  .tableau th,
+  .tableau td {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .tableau th.enter,
+  .tableau td.enter {
+    background: var(--accent-dim);
+  }
+  .tableau tr.leave td {
+    background: var(--accent-dim);
+  }
+  /* Cells whose value the current step changed: foreground only, so it
+     stays readable on top of any background. Persists for the step. */
+  .tableau td.changed {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .tableau td.pivot {
+    background: var(--accent-subtle);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tableau th,
+    .tableau td {
+      transition: none;
+    }
+  }
+
+  .step-note {
+    margin: 12px 0 0;
+    min-height: 2.8em;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+  .step-note :global(p) {
+    margin: 0;
+  }
+  .step-note :global(.katex) {
+    font-size: 1em;
+  }
+</style>
