@@ -1,7 +1,7 @@
 ---
 title: Simplex Algorithm
 dateCreated: 2026-07-04T00:00:00.000Z
-lastUpdatedOn: 2026-08-27T16:29:21.213Z
+lastUpdatedOn: 2026-08-28T11:38:57.350Z
 slug: s5/operational-research/simplex-algorithm
 sidebar:
   order: 7
@@ -164,3 +164,31 @@ The objective row is written as $z - 3x_1 - 5x_2 = 0$. Initial basis $(s_1, s_2,
     $x_2 = 6$, $z = 36$.
   </SimplexStep>
 </SimplexWalkthrough>
+
+## Special Cases
+
+Read off the final tableau:
+
+- Unique optimal solution  
+  Every non-basic variable has a strictly positive objective row coefficient.
+- Alternate (infinite) optimal solutions  
+  A non-basic variable has a 0 objective row coefficient. Every convex combination of the corresponding basic feasible solutions is also optimal.
+- Unbounded solution  
+  No positive entry in the entering variable's column during the minimum ratio test.
+
+### Tie in Entering Variable
+
+Several non-basic variables share the most negative objective row coefficient. Break the tie arbitrarily; any choice reaches an optimal solution, though the iteration count may differ.
+
+### Tie in Leaving Variable
+
+Several rows share the minimum ratio. Breaking the tie arbitrarily leaves a basic variable at 0, giving a degenerate basic feasible solution. This risks cycling (revisiting a basis without improving the objective), avoided by a fixed tie-breaking rule (Bland's rule: prefer the lowest-indexed variable).
+
+## Other Uses of Simplex
+
+- Constructing a tableau for a given set of basic variables  
+  Row-reduce the constraint matrix on those columns until they form an identity matrix.
+- Solving a system of linear equations  
+  Add an artificial objective (minimize the sum of artificial variables) and run simplex; a 0 optimal value with all artificial variables out of the basis gives a solution.
+- Finding the inverse of a matrix  
+  Run simplex with each column of the identity matrix as a separate RHS; the columns under the original identity's position in the final tableau form the inverse.

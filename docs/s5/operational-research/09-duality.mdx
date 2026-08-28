@@ -1,0 +1,106 @@
+---
+title: Duality
+slug: s5/operational-research/duality
+sidebar:
+  order: 9
+prev: true
+next: true
+dateCreated: 2026-08-26T11:53:59.790Z
+lastUpdatedOn: 2026-08-28T11:38:57.352Z
+---
+
+Every linear program (the primal) has an associated linear program (the dual) built from the same data.
+
+## Primal-Dual Correspondence
+
+- Objective flips  
+  Maximize primal $\leftrightarrow$ minimize dual (or vice versa).
+- Primal constraint $\leftrightarrow$ dual variable  
+  1 dual variable per primal constraint.
+- Primal variable $\leftrightarrow$ dual constraint  
+  1 dual constraint per primal variable.
+- RHS and objective coefficients swap  
+  Primal RHS becomes dual objective coefficients; primal objective coefficients become dual RHS.
+- Constraint matrix transposes  
+  Dual constraint coefficients are the transpose of the primal's.
+
+## Constraint Direction Rules
+
+For a maximization primal with non-negative variables:
+
+- Primal $\le$ constraint $\to$ dual variable $\ge 0$
+- Primal $\ge$ constraint $\to$ dual variable $\le 0$
+- Primal $=$ constraint $\to$ dual variable unrestricted in sign
+
+Rules invert for a minimization primal.
+
+## Theorems
+
+### Weak Duality Theorem
+
+For a maximization primal and its minimization dual, every primal feasible objective value is $\le$ every dual feasible objective value.
+
+$$
+z_{\text{primal}} \le z_{\text{dual}}
+$$
+
+Consequence: if the primal is unbounded, the dual is infeasible (and vice versa).
+
+### Strong Duality Theorem
+
+If the primal has an optimal solution, the dual also has an optimal solution, and their optimal objective values are equal.
+
+$$
+z_{\text{primal}}^* = z_{\text{dual}}^*
+$$
+
+## Complementary Slackness
+
+Relates the optimal primal and dual solutions: at optimality, either a constraint is binding (0 slack/surplus) or its corresponding variable in the other problem is 0, never both non-zero.
+
+$$
+x_j \cdot (\text{dual constraint } j \text{ slack}) = 0 \quad \text{for every primal variable } x_j
+$$
+
+$$
+y_i \cdot (\text{primal constraint } i \text{ slack}) = 0 \quad \text{for every dual variable } y_i
+$$
+
+Used to recover one problem's optimal solution directly from the other's, without re-solving.
+
+## Reading Dual Values from the Primal Optimal Table
+
+The optimal dual variable values appear in the primal's optimal simplex tableau, in the objective row under the columns of the corresponding primal slack/surplus variables (with sign adjusted for the constraint direction).
+
+## Worked Example
+
+Primal, the same LP as the [simplex worked example](/s5/operational-research/simplex-algorithm#worked-example):
+
+$$
+\begin{aligned}
+\text{maximize} \quad & z = 3x_1 + 5x_2 \\
+\text{subject to} \quad & x_1 \le 4 \\
+& 2x_2 \le 12 \\
+& 3x_1 + 2x_2 \le 18 \\
+& x_1, x_2 \ge 0
+\end{aligned}
+$$
+
+3 constraints give 3 dual variables $y_1, y_2, y_3$; 2 primal variables give 2 dual constraints. All primal constraints are $\le$, so all $y_i \ge 0$. Transposing the constraint matrix and swapping RHS with objective coefficients:
+
+$$
+\begin{aligned}
+\text{minimize} \quad & w = 4y_1 + 12y_2 + 18y_3 \\
+\text{subject to} \quad & y_1 + 3y_3 \ge 3 \\
+& 2y_2 + 2y_3 \ge 5 \\
+& y_1, y_2, y_3 \ge 0
+\end{aligned}
+$$
+
+The primal's final tableau has objective row entries $0, \tfrac{3}{2}, 1$ under $s_1, s_2, s_3$, so $y_1 = 0$, $y_2 = \tfrac{3}{2}$, $y_3 = 1$. Then $w = 4(0) + 12(\tfrac{3}{2}) + 18(1) = 36 = z^*$, confirming strong duality.
+
+Complementary slackness holds at $x^* = (2, 6)$, $y^* = (0, \tfrac{3}{2}, 1)$:
+
+- Primal constraint 1 has slack $4 - 2 = 2 > 0$, so $y_1 = 0$.
+- $y_2, y_3 > 0$, so primal constraints 2 and 3 are binding: $2(6) = 12$, $3(2) + 2(6) = 18$.
+- $x_1, x_2 > 0$, so both dual constraints are binding: $0 + 3(1) = 3$, $2(\tfrac{3}{2}) + 2(1) = 5$.
