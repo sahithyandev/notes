@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:47:32.345Z
-lastUpdatedOn: 2026-08-27T16:29:21.212Z
+lastUpdatedOn: 2026-08-29T07:00:13.793Z
 ---
 
 For all definitions in this note, whenever a set is mentioned, it is assumed to be a set of points in $\mathbb{R}^n$.
@@ -105,7 +105,7 @@ Every point in the set is a convex combination of its extreme points.
 
 ### Simplex
 
-The convex hull of $n+1$ affinely independent points in $\mathbb{R}^n$.
+The convex hull of $n+1$ affinely independent points in $\mathbb{R}^n$. Points $x_0, \dots, x_n$ are affinely independent if the vectors $x_1 - x_0, \dots, x_n - x_0$ are linearly independent, i.e. none of the points lies in the affine subspace spanned by the others.
 
 For example:
 
@@ -137,3 +137,11 @@ Let $v_1, \dots, v_k$ be the vertices of the feasible region, and let $v^*$ be t
 So $z(x) \le z(v^*)$ for every feasible $x$: no point, interior or on an edge, can beat the best vertex. Hence $v^*$ is optimal.
 
 </Note>
+
+### Simplex Algorithm
+
+Walks vertex to vertex along the edges of the feasible polytope, improving the objective at each step, until no adjacent vertex is better. It does not construct geometric [simplices](#simplex) during iteration.
+
+The name is historical. In Dantzig's original formulation the constraints $\sum_i x_i = 1$, $x_i \ge 0$ appear, whose feasible set is a standard simplex. A basic feasible solution is a vertex of it.
+
+Per iteration (a pivot): at a vertex, $n$ constraint hyperplanes meet, and the vertex together with its $n$ neighbouring vertices forms a local $n$-simplex. A pivot swaps one basic variable for one non-basic variable, which replaces one vertex of that local simplex with a better one.
