@@ -1,7 +1,7 @@
 ---
 title: DES
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-08-26T08:39:38.147Z
+lastUpdatedOn: 2026-08-29T06:57:47.735Z
 slug: s5/computer-security/cipher-algorithms/des
 sidebar:
   order: 10
@@ -54,6 +54,8 @@ Given an attacker with $2^{64}$ storage and chosen-plaintext access, both 3-key 
 3. 16 Feistel rounds.
 4. Rejoin the halves.
 5. Final inverse permutation ($IP^{-1}$).
+
+You can find an implementation of a generic Feistel cipher, the construction DES is built on, in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/feistel-cipher.c).
 
 $IP$ shifts all even-positioned input bits to the left half and all odd-positioned bits to the right half.
 
