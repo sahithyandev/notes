@@ -1,0 +1,101 @@
+---
+title: Euler's Method
+prereqs:
+  - s5/numerical-methods/initial-value-problems
+dateCreated: 2026-09-01T00:00:00.000Z
+lastUpdatedOn: 2026-09-01T12:39:12.164Z
+slug: s5/numerical-methods/eulers-method
+sidebar:
+  order: 16
+prev: true
+next: true
+---
+
+Euler's method approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-value-problems) at equally spaced mesh points, using the first-order Taylor expansion.
+
+## Mesh Points
+
+Choose a positive integer $N$. The step size is $h = \dfrac{b - a}{N}$. The mesh points are
+
+$$
+t_i = a + ih, \quad i = 0, 1, \ldots, N
+$$
+
+with $t_0 = a$, $t_N = b$, and $t_{i+1} - t_i = h$.
+
+Approximations are produced only at the mesh points. Values between them come from interpolation.
+
+## Difference Equation
+
+First-order Taylor expansion of $y$ about $t_i$, assuming $y$ is twice differentiable
+
+$$
+y(t_{i+1}) = y(t_i) + h f(t_i, y(t_i)) + \frac{h^2}{2} y''(\xi_i), \quad \xi_i \in (t_i, t_{i+1})
+$$
+
+Dropping the second-order term and writing $w_i \approx y(t_i)$
+
+$$
+\begin{aligned}
+w_0 &= \alpha \\
+w_{i+1} &= w_i + h f(t_i, w_i), \quad i = 0, 1, \ldots, N-1
+\end{aligned}
+$$
+
+## Theoretical Error Bound
+
+If $f$ satisfies a Lipschitz condition with constant $L > 0$ **and** $|y''(t)| \leq M$ for some $M > 0$, then for each $i = 0, 1, \ldots, N$
+
+$$
+|y(t_i) - w_i| \leq \frac{hM}{2L}\left( e^{L(t_i - a)} - 1 \right)
+$$
+
+- $M$: bound on $|y''|$ over $[a, b]$
+- $L$: Lipschitz constant of $f$
+
+The bound is proportional to $h$. Euler's method has order 1.
+
+<Note>
+
+The bound is often much larger than the actual error, and the gap widens as $i$ increases.
+
+</Note>
+
+## Computational Error Bound
+
+With round-off, each step carries an error bounded by $\delta$. The computed values $u_i$ satisfy
+
+$$
+\begin{aligned}
+u_0 &= \alpha + \delta_0 \\
+u_{i+1} &= u_i + h f(t_i, u_i) + \delta_{i+1}, \quad |\delta_i| < \delta
+\end{aligned}
+$$
+
+Then for each $i = 0, 1, \ldots, N$
+
+$$
+|y(t_i) - u_i| \leq \frac{1}{L}\left( \frac{hM}{2} + \frac{\delta}{h} \right)\left( e^{L(t_i - a)} - 1 \right) + |\delta_0|\, e^{L(t_i - a)}
+$$
+
+As $h \to 0$ the factor $\dfrac{hM}{2} + \dfrac{\delta}{h} \to \infty$. Error grows with decreasing $h$ once $h$ is small enough. The minimizing step size is
+
+$$
+h = \sqrt{\frac{2\delta}{M}}
+$$
+
+## Worked Example
+
+IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$.
+
+$$
+\begin{aligned}
+w_0 &= 0.5 \\
+w_1 &= w_0 + 0.5\,(w_0 - 0.0^2 + 1) = 1.25 \\
+w_2 &= w_1 + 0.5\,(w_1 - 0.5^2 + 1) = 2.25 \\
+w_3 &= w_2 + 0.5\,(w_2 - 1.0^2 + 1) = 3.375 \\
+w_4 &= w_3 + 0.5\,(w_3 - 1.5^2 + 1) = 4.4375
+\end{aligned}
+$$
+
+Hence $y(2) \approx w_4 = 4.4375$. The exact solution is $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.

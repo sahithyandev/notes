@@ -1,0 +1,72 @@
+---
+title: Runge-Kutta Methods
+dateCreated: 2026-09-01T00:00:00.000Z
+lastUpdatedOn: 2026-09-01T12:39:12.164Z
+slug: s5/numerical-methods/runge-kutta-methods
+sidebar:
+  order: 17
+prev: true
+next: true
+---
+
+Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problems) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
+
+The order-$n$ Taylor expansion of $y$ needs derivatives of $f$ up to order $n-1$. These are costly to compute and may not exist everywhere. Runge-Kutta methods replace each derivative term with values of $f$ at selected $(t, y)$ points.
+
+Mesh points are $t_i = a + ih$ with $h = \dfrac{b - a}{N}$, as in [Euler's method](/s5/numerical-methods/eulers-method).
+
+## Midpoint Method
+
+Second-order Taylor, with the derivative term replaced using
+
+$$
+f(t, y) + \frac{h}{2} f'(t, y) = f\left( t + \frac{h}{2},\ y + \frac{h}{2} f(t, y) \right) + O(h^2)
+$$
+
+$$
+\begin{aligned}
+w_0 &= \alpha \\
+w_{i+1} &= w_i + h\, f\left( t_i + \frac{h}{2},\ w_i + \frac{h}{2} f(t_i, w_i) \right)
+\end{aligned}
+$$
+
+Local error $O(h^2)$.
+
+## Modified Euler Method
+
+Third-order Taylor, with the derivative term replaced by an average of the endpoint slopes.
+
+$$
+\begin{aligned}
+w_0 &= \alpha \\
+w_{i+1} &= w_i + \frac{h}{2}\left[ f(t_i, w_i) + f\big(t_{i+1},\ w_i + h f(t_i, w_i)\big) \right]
+\end{aligned}
+$$
+
+Local error $O(h^3)$.
+
+## Order 4 Runge-Kutta
+
+$$
+\begin{aligned}
+w_0 &= \alpha \\
+k_1 &= h\, f(t_i, w_i) \\
+k_2 &= h\, f\left( t_i + \tfrac{h}{2},\ w_i + \tfrac{1}{2} k_1 \right) \\
+k_3 &= h\, f\left( t_i + \tfrac{h}{2},\ w_i + \tfrac{1}{2} k_2 \right) \\
+k_4 &= h\, f\left( t_{i+1},\ w_i + k_3 \right) \\
+w_{i+1} &= w_i + \tfrac{1}{6}\left( k_1 + 2k_2 + 2k_3 + k_4 \right)
+\end{aligned}
+$$
+
+for $i = 0, 1, \ldots, N-1$. Local error $O(h^4)$.
+
+## Error Orders
+
+| Method              | Asymptotic error bound |
+| ------------------- | ---------------------- |
+| Euler               | $O(h)$                 |
+| Midpoint            | $O(h^2)$               |
+| Modified Euler      | $O(h^3)$               |
+| Order 4 Runge-Kutta | $O(h^4)$               |
+
+Higher order gives a better approximation for the same $h$.

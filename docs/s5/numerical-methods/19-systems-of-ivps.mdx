@@ -1,0 +1,102 @@
+---
+title: Systems of IVPs
+prereqs:
+  - s5/numerical-methods/runge-kutta-methods
+dateCreated: 2026-09-01T00:00:00.000Z
+lastUpdatedOn: 2026-09-01T12:39:12.165Z
+slug: s5/numerical-methods/systems-of-ivps
+sidebar:
+  order: 19
+prev: true
+next: false
+---
+
+An $m$th-order system of first-order [IVPs](/s5/numerical-methods/initial-value-problems) is
+
+$$
+\begin{aligned}
+u_1'(t) &= f_1(t, u_1, u_2, \ldots, u_m) \\
+&\ \ \vdots \\
+u_m'(t) &= f_m(t, u_1, u_2, \ldots, u_m)
+\end{aligned}
+$$
+
+for $a \leq t \leq b$, with $u_1(a) = \alpha_1, \ldots, u_m(a) = \alpha_m$. The goal is to approximate $u_1(t), \ldots, u_m(t)$.
+
+## Lipschitz Condition for Systems
+
+$f(t, u_1, \ldots, u_m)$ on
+
+$$
+D = \{ (t, u_1, \ldots, u_m) : a \leq t \leq b,\ -\infty < u_i < \infty \}
+$$
+
+satisfies a Lipschitz condition in $u_1, \ldots, u_m$ **iff** a constant $L > 0$ exists with
+
+$$
+|f(t, u_1, \ldots, u_m) - f(t, z_1, \ldots, z_m)| \leq L \sum_{j=1}^{m} |u_j - z_j|
+$$
+
+for all $(t, u_1, \ldots, u_m), (t, z_1, \ldots, z_m) \in D$.
+
+Sufficient test: $f$ and each partial derivative $\dfrac{\partial f}{\partial u_i}$ are continuous on $D$ with $\left| \dfrac{\partial f}{\partial u_i} \right| \leq L$ for each $i = 1, \ldots, m$.
+
+### Existence and Uniqueness
+
+If each $f_i$ is continuous and satisfies a Lipschitz condition on $D$, the system has a unique solution $u_1(t), \ldots, u_m(t)$ on $[a, b]$.
+
+## Order 4 Runge-Kutta for Systems
+
+Superscript $(j)$ marks quantities for $u_j$. Mesh points are $t_i = a + ih$ with $h = \dfrac{b - a}{N}$.
+
+$$
+\begin{aligned}
+w_0^{(j)} &= \alpha_j \\
+k_1^{(j)} &= h\, f_j\big(t_i,\ w_i^{(1)}, \ldots, w_i^{(m)}\big) \\
+k_2^{(j)} &= h\, f_j\left( t_i + \tfrac{h}{2},\ w_i^{(1)} + \tfrac{1}{2} k_1^{(1)}, \ldots, w_i^{(m)} + \tfrac{1}{2} k_1^{(m)} \right) \\
+k_3^{(j)} &= h\, f_j\left( t_i + \tfrac{h}{2},\ w_i^{(1)} + \tfrac{1}{2} k_2^{(1)}, \ldots, w_i^{(m)} + \tfrac{1}{2} k_2^{(m)} \right) \\
+k_4^{(j)} &= h\, f_j\left( t_{i+1},\ w_i^{(1)} + k_3^{(1)}, \ldots, w_i^{(m)} + k_3^{(m)} \right) \\
+w_{i+1}^{(j)} &= w_i^{(j)} + \tfrac{1}{6}\left( k_1^{(j)} + 2 k_2^{(j)} + 2 k_3^{(j)} + k_4^{(j)} \right)
+\end{aligned}
+$$
+
+for $i = 0, \ldots, N-1$ and $j = 1, \ldots, m$. All $k_1^{(j)}$ are computed before any $k_2^{(j)}$, and so on. Then $u_j(t_i) \approx w_i^{(j)}$.
+
+## Reducing a Higher-Order IVP
+
+An $m$th-order IVP
+
+$$
+y^{(m)}(t) = f\big(t, y, y', \ldots, y^{(m-1)}\big), \quad a \leq t \leq b
+$$
+
+with $y(a) = \alpha_1, y'(a) = \alpha_2, \ldots, y^{(m-1)}(a) = \alpha_m$ becomes a first-order system by setting $u_1 = y, u_2 = y', \ldots, u_m = y^{(m-1)}$
+
+$$
+\begin{aligned}
+u_1' &= u_2 \\
+u_2' &= u_3 \\
+&\ \ \vdots \\
+u_{m-1}' &= u_m \\
+u_m' &= f(t, u_1, u_2, \ldots, u_m)
+\end{aligned}
+$$
+
+with $u_1(a) = \alpha_1, \ldots, u_m(a) = \alpha_m$. Solving the system by order 4 Runge-Kutta, $w_i^{(1)}$ approximates $y(t_i)$.
+
+## Worked Example
+
+$$
+y'' - 2y' + 2y = e^{2t}\sin t, \quad 0 \leq t \leq 1, \quad y(0) = -0.4,\ y'(0) = -0.6
+$$
+
+Set $u_1 = y$, $u_2 = y'$
+
+$$
+\begin{aligned}
+u_1' &= u_2 \\
+u_2' &= 2 u_2 - 2 u_1 + e^{2t}\sin t
+\end{aligned}
+$$
+
+with $u_1(0) = -0.4$, $u_2(0) = -0.6$. Apply order 4 Runge-Kutta with $f_1 = u_2$ and $f_2 = 2 u_2 - 2 u_1 + e^{2t}\sin t$. Then $w_i^{(1)}$ approximates $y(t_i)$.

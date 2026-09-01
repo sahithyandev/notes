@@ -1,0 +1,99 @@
+---
+title: Initial Value Problems
+dateCreated: 2026-09-01T00:00:00.000Z
+lastUpdatedOn: 2026-09-01T12:39:12.163Z
+slug: s5/numerical-methods/initial-value-problems
+sidebar:
+  order: 15
+prev: true
+next: true
+prereqs:
+  - s5/operational-research/convex
+---
+
+An initial value problem (IVP) is a first-order ODE together with the solution value at the left endpoint.
+
+$$
+y'(t) = f(t, y), \quad a \leq t \leq b, \quad y(a) = \alpha
+$$
+
+Most IVPs have no analytical solution. Numerical methods approximate $y$ at discrete points of $[a, b]$.
+
+## Lipschitz Condition
+
+$f(t, y)$ satisfies a Lipschitz condition in $y$ on $D \subseteq \mathbb{R}^2$ **iff** a constant $L > 0$ exists with
+
+$$
+|f(t, y_1) - f(t, y_2)| \leq L|y_1 - y_2|
+$$
+
+for all $(t, y_1), (t, y_2) \in D$. $L$ is a Lipschitz constant for $f$.
+
+### Partial Derivative Test
+
+If $D$ is convex and a constant $L > 0$ exists with $\left| \dfrac{\partial f}{\partial y}(t, y) \right| \leq L$ for all $(t, y) \in D$, then $f$ satisfies a Lipschitz condition in $y$ on $D$ with Lipschitz constant $L$.
+
+## Existence and Uniqueness
+
+Let $D = [a, b] \times \mathbb{R}$. If $f$ is continuous on $D$ **and** satisfies a Lipschitz condition in $y$ on $D$, then the IVP has a unique solution $y(t)$ for $a \leq t \leq b$.
+
+For example, consider: $y' = 1 + t\sin(ty)$, $0 \leq t \leq 2$, $y(0) = 0$.
+
+Here $\left| \dfrac{\partial f}{\partial y} \right| = |t^2 \cos(ty)| \leq 4$ on $[0, 2] \times \mathbb{R}$, so a unique solution exists.
+
+## Well-Posed Problem
+
+The IVP is well-posed **iff**:
+
+- a unique solution $y(t)$ exists
+- the solution is stable, in the sense defined below
+
+Let $\delta(t)$ be a continuous perturbation of the equation and $\delta_0$ a perturbation of the initial value. The perturbed problem is
+
+$$
+z'(t) = f(t, z) + \delta(t), \quad a \leq t \leq b, \quad z(a) = \alpha + \delta_0
+$$
+
+The solution is stable **iff** constants $\varepsilon_0 > 0$ and $k > 0$ exist such that for every $\varepsilon \in (0, \varepsilon_0)$:
+
+- whenever $|\delta(t)| < \varepsilon$ for all $t \in [a, b]$ **and** $|\delta_0| < \varepsilon$
+- the perturbed problem has a unique solution $z(t)$
+- $|z(t) - y(t)| < k\varepsilon$ for all $t \in [a, b]$
+
+Here:
+
+- $k$: stability constant, independent of $\varepsilon$
+
+The perturbed solution stays within $k\varepsilon$ of the original. The change in the solution is bounded proportionally to the size of the perturbations.
+
+Check well-posedness before applying any numerical method.
+
+### Well-Posedness from Lipschitz
+
+Let $D = [a, b] \times \mathbb{R}$. If $f$ is continuous and satisfies a Lipschitz condition in $y$ on $D$, then the IVP is well-posed.
+
+A well-posed IVP may fail the Lipschitz condition. If Lipschitz fails, check the well-posed definition directly.
+
+## Worked Example
+
+$y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$.
+
+$f(t, y) = y - t^2 + 1$ is continuous on $D = [0, 2] \times \mathbb{R}$, and $\left| \dfrac{\partial f}{\partial y} \right| = 1$. So $f$ is Lipschitz in $y$ with $L = 1$, and the IVP is well-posed.
+
+To see the stability bound directly, take a constant equation perturbation $\delta$ and an initial perturbation $\delta_0$
+
+$$
+z'(t) = z - t^2 + 1 + \delta, \quad z(0) = 0.5 + \delta_0
+$$
+
+Both problems have closed-form solutions
+
+$$
+y(t) = (t+1)^2 - 0.5 e^t, \qquad z(t) = (t+1)^2 - \delta + (\delta_0 + \delta - 0.5)\, e^t
+$$
+
+$$
+|z(t) - y(t)| = \left| (\delta_0 + \delta)\, e^t - \delta \right| \leq (2 e^2 + 1)\, \varepsilon
+$$
+
+for $|\delta| < \varepsilon$ and $|\delta_0| < \varepsilon$, using $e^t \leq e^2$ on $[0, 2]$. The bound holds with $k = 2 e^2 + 1$ for every $\varepsilon > 0$.
