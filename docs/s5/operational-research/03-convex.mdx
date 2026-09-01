@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:47:32.345Z
-lastUpdatedOn: 2026-08-29T07:00:13.793Z
+lastUpdatedOn: 2026-09-01T12:58:33.696Z
 ---
 
 For all definitions in this note, whenever a set is mentioned, it is assumed to be a set of points in $\mathbb{R}^n$.
@@ -28,6 +28,24 @@ $$
 The intersection of convex sets is convex. The union of convex sets is not necessarily convex.
 
 For example: a [half-space](/s5/operational-research/introduction#half-space).
+
+### Verifying Convexity
+
+To prove $S$ is convex:
+
+1. Take arbitrary $x, y \in S$ and arbitrary $\lambda \in [0, 1]$.
+2. Form $z = \lambda x + (1 - \lambda) y$.
+3. Check $z$ satisfies every defining condition of $S$, using only $x \in S$, $y \in S$, and $\lambda \in [0, 1]$.
+4. If it always holds, $S$ is convex.
+
+To prove $S$ is not convex: give one explicit counterexample, i.e. points $x, y \in S$ and a value $\lambda \in [0, 1]$ with $\lambda x + (1 - \lambda) y \notin S$.
+
+Shortcuts for the "is convex" case:
+
+- $S = \{x \mid a^T x \le b\}$ or $\{x \mid a^T x = b\}$ (half-space, hyperplane): convex.
+- Finite intersection of convex sets: convex.
+- Image or preimage of a convex set under an affine map: convex.
+- $S = \{x \mid f(x) \le c\}$ with $f$ convex: convex.
 
 ### Set of Convex Combinations
 
