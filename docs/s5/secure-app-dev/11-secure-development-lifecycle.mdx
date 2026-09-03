@@ -1,0 +1,37 @@
+---
+title: Secure Software Development Lifecycle
+slug: s5/secure-app-dev/secure-development-lifecycle
+sidebar:
+  order: 11
+dateCreated: 2026-09-03T05:24:45.100Z
+lastUpdatedOn: 2026-09-03T07:45:46.119Z
+prev: true
+next: true
+---
+
+Security must be built into every phase of the SDLC, not bolted on as a final checklist. Fixing vulnerabilities early cuts remediation cost and deployment delay.
+
+## Core Security Pillars
+
+Threat modeling finds attack vectors and design flaws during architecture, before code is written. Secure coding applies defensive standards against common flaws like SQL injection, XSS, and buffer overflows. Dependency management scans and updates third-party components against supply chain attacks. Automated testing runs SAST and DAST in the CI/CD pipeline. Identity management enforces strong authentication, MFA, and RBAC. Data protection encrypts sensitive data at rest and in transit.
+
+## Core Security Design Principles
+
+Foundational guidelines that hold across all languages and architectures. They should not be relaxed for a specific customer or environment.
+
+Least privilege grants only the minimum access rights needed for a task. Defense in depth stacks redundant layers of controls, so one failed layer does not expose the system. Fail securely means an error or crash lands in the most secure state. Complete mediation checks access rights on every request, never on cached permissions. Open design keeps security independent of secret implementation or source. Minimizing the attack surface disables unused features, ports, and protocols. Psychological acceptability keeps security intuitive so users do not bypass it.
+
+The [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework) formalizes these into 4 pillars.
+
+## Secure Software Development vs Secure Application Development
+
+Secure software development covers the whole ecosystem. It sets engineering rules, secure coding standards, threat modeling, and pipeline architecture for any component. It is proactive and shift-left.
+
+Secure application development is the narrower subset. It secures a finalized, running application through session management, input validation, authentication flows, and encryption. It is reactive and operational.
+
+| Metric           | Secure Software Development                                     | Secure Application Development                                     |
+| ---------------- | --------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Primary approach | Proactive, embed security before deployment                     | Reactive and operational, guard the running system                 |
+| Technical focus  | Source code logic, dependency supply chain, framework integrity | Vulnerabilities, APIs, server configuration, environment endpoints |
+| Testing tools    | SAST, SCA, manual architecture review                           | DAST, IAST, WAF configuration, penetration testing                 |
+| Core goal        | Building software right across all components                   | Protecting one application in production                           |

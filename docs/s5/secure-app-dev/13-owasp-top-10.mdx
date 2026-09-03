@@ -1,0 +1,54 @@
+---
+title: OWASP Top 10
+slug: s5/secure-app-dev/owasp-top-10
+sidebar:
+  order: 13
+dateCreated: 2026-09-03T07:42:03.136Z
+lastUpdatedOn: 2026-09-03T07:45:46.119Z
+prev: true
+next: true
+---
+
+The OWASP Top 10 is a list of the most critical web application security risks, maintained by the Open Web Application Security Project. The categories below follow the classic list taught with WebGoat.
+
+## Cross-Site Scripting (XSS)
+
+Injecting attacker-controlled script into a page served by a trusted application, so it runs in the victim's browser with that site's privileges. It can exfiltrate page data and cookies, hijack site behavior, and enable CSRF and session attacks. In stored XSS the payload is persisted server-side (for example, a comment) and served to every visitor.
+
+Prevented by escaping all user input on output so `<script>` renders as `&lt;script&gt;`. Use a white-list filter, not a blacklist. Do not reflect unsolicited input in confirmation or error pages.
+
+## Cross-Site Request Forgery (CSRF)
+
+Forcing a logged-in victim's browser to send a pre-authenticated request that performs an action the attacker chooses. The request carries the victim's cookies and IP, so the server treats it as intentional. A typical example is an `<img>` tag on a forum pointing at `bank.com/transfer?to=attacker&amount=all`, triggered when the authenticated victim views the page.
+
+Prevented by an unguessable anti-CSRF token per form, a confirmation page before dangerous actions, accepting only POST for sensitive actions, and eliminating XSS (which defeats token protection).
+
+## Insecure Direct Object Reference
+
+Exposing an internal object key (file, record id, path) as a URL or form parameter, so an attacker edits it to reach objects they are not authorized for. Also called parameter tampering.
+
+Prevented by validating all input server-side on every request and checking authorization on every request, for example `... WHERE account_number = ? AND user_id = ?`. Use an indirect reference map with hard-to-guess keys instead of exposing raw ids.
+
+## Injection Flaws
+
+Untrusted input concatenated into an interpreted command (SQL, XPath, LDAP, OS command, JSON). SQL injection is the most common. In `SELECT * FROM users WHERE login = '<input>' AND password = '<input>'`, the input `' OR '' = '';--` bypasses authentication. Stacked queries can run `xp_cmdshell` to add OS accounts.
+
+Prevented by prepared statements (parameterized queries), strong typing and business-logic validation of input, least privilege for the database account (read-only where possible), and escaping questionable characters.
+
+## Broken Authentication and Session Management
+
+Credentials and session tokens not properly protected, letting attackers assume other identities. In session fixation the attacker fixes or predicts a valid session key, often via phishing. In session hijacking the attacker steals the victim's session id, often via XSS.
+
+Prevented by never storing plaintext passwords (salt and hash), revalidating authentication on every request, issuing a new session token on privilege change, and using secure random session keys, reasonable timeouts, and the framework's built-in session management.
+
+## Failure to Restrict URL Access
+
+Protecting sensitive functionality only by hiding its links, while the URL still works when requested directly. Caused by missing authentication, incorrect authorization, or unprotected admin areas with guessable URLs.
+
+Prevented by enforcing authentication and authorization checks on the server for every request, not by omitting links.
+
+## Insecure Cryptographic Storage
+
+Data and credentials protected with weak or misused cryptography. MD5 is a prominent case. MD5 collisions have been used to forge a root CA certificate trusted by all browsers.
+
+Prevented by using current standard algorithms (SHA-256, AES, RSA) and dropping MD5, SHA-1, and DES.

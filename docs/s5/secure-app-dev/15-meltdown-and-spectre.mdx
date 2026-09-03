@@ -1,0 +1,63 @@
+---
+title: Meltdown and Spectre
+slug: s5/secure-app-dev/meltdown-and-spectre
+sidebar:
+  order: 15
+dateCreated: 2026-09-03T05:28:35.093Z
+lastUpdatedOn: 2026-09-03T07:45:46.119Z
+prev: true
+next: true
+---
+
+Three 2018 CPU vulnerabilities that leak memory through microarchitectural side channels.
+
+- Variant 1, bounds check bypass (CVE-2017-5753), Spectre.
+- Variant 2, branch target injection (CVE-2017-5715), Spectre.
+- Variant 3, rogue data cache load (CVE-2017-5754), Meltdown.
+
+Meltdown breaks isolation between a user program and the OS. A faulting load from a kernel address still forwards its value to dependent speculative instructions before the fault retires. The program reads kernel memory. It needs the CPU to forward data from a permission-violating load, so it hits mainly Intel and some ARM cores, not AMD.
+
+Spectre breaks isolation within one privilege level, between processes or between a sandbox and its host. It tricks a correct program into speculatively reading its own secrets past a security check. It relies only on speculation, so it affects nearly all speculating CPUs, including AMD.
+
+## Exploited CPU Features
+
+Out-of-order execution starts instructions as soon as their operands are ready. Instructions are issued in order, executed out of order, then retired in order. This avoids stalls waiting for data.
+
+Speculative execution goes further and executes ahead of a predicted branch. If the prediction was wrong, results are discarded. Microarchitectural state, the cache, is not fully reverted.
+
+Caching keeps recently or nearby accessed memory in a fast cache. Cached data reads measurably faster than data from main memory.
+
+## Cache Side Channel
+
+Measure how fast a memory location reads to infer whether it was cached.
+
+Flush + Reload flushes attacker-controlled memory from the cache with `clflush`, lets the victim run, then times reloads of each line to see which the victim touched. Evict + Reload does the same, but evicts specific cache lines by loading other data. It is for CPUs without a flush instruction.
+
+## Meltdown Attack
+
+1. Allocate a probe array of 256 pages (256 \* 4096 bytes), none yet cached.
+2. `xor rax, rax` to clear the register.
+3. `mov al, byte [rcx]` reads one byte from the kernel address in `rcx` into the low byte of `rax`. The load is illegal from user mode, but the fault is only raised when the instruction retires. Until then the loaded byte feeds the instructions below.
+4. `shl rax, 0xc` multiplies the secret byte by 4096, the page size. Each of the 256 possible values lands on a distinct page, and the hardware prefetcher cannot create false hits.
+5. `mov rbx, qword [rbx + rax]` accesses page number `secret` of the probe array, caching exactly that page before the privilege check faults.
+6. Catch the exception, then time a read of each of the 256 pages. The one that reads fast reveals the secret byte value.
+
+## Spectre Attack
+
+V1 abuses the victim's own bounds-checked code plus attacker-supplied input. V2 abuses a shared branch predictor to redirect the victim's indirect branch into an attacker-chosen gadget.
+
+Variant 1 is conditional branch misprediction. Take code like `if (x < array1_len) y = array2[array1[x] * 4096]`. Train the branch with valid `x`, then pass an out-of-bounds `x` chosen so `array1[x]` reads a secret. The CPU speculatively runs the body, loads the secret, and indexes `array2` with it. This leaves a cache trace read out via the side channel.
+
+Variant 2 is indirect branch poisoning. Train the Branch Target Buffer (BTB) so an indirect branch in the victim mispredicts to an attacker-chosen Spectre gadget in the victim's address space. Its speculative execution leaks a secret into the cache. Only the low 31 bits of the branch address index the BTB.
+
+## Mitigations
+
+The real fix is redesigning the CPU, which is slow and costly. Software patches exist in the meantime.
+
+Meltdown is mitigated by KPTI (Kernel Page-Table Isolation). Each process gets 2 page tables. In user mode a shadow table with the kernel mostly unmapped is active, so kernel memory is not present to leak. Switching to kernel mode swaps to the full table. This carries a performance cost. KASLR randomizes the kernel address space each boot.
+
+Spectre is harder to mitigate. The victim speculatively touches memory it is allowed to access, so KPTI does nothing.
+
+For V1, put an `lfence` after a bounds check to block speculation past it, or mask the index into a safe range instead of branching. For V2, retpoline replaces indirect branches with a construct that steers speculation to a harmless spin loop instead of the poisoned BTB target. Microcode features (IBRS, IBPB, STIBP) restrict or flush the BTB across contexts. Chrome site isolation puts one site per process, so a speculative leak only reaches same-site data.
+
+Check a Linux system with `speed47/spectre-meltdown-checker`.

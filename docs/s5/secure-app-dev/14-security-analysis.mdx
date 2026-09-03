@@ -1,0 +1,123 @@
+---
+title: Security Analysis
+slug: s5/secure-app-dev/security-analysis
+sidebar:
+  order: 14
+dateCreated: 2026-09-03T05:28:16.620Z
+lastUpdatedOn: 2026-09-03T07:45:46.119Z
+prev: true
+next: true
+---
+
+Verification compares a system against its requirements and design. Analysis tools support it. Analysis can be manual, automated, or both. Relying only on manual techniques is usually too expensive.
+
+## Types of Analysis
+
+Static analysis verifies software without running it. It covers source code scanning, code inspection, and type checking. Dynamic analysis runs the software on specific inputs and checks results against an oracle. It covers functional testing, web app scanners, and fuzz testing. Hybrid analysis combines the two.
+
+## Measurement Terminology
+
+Treat a defect-detection tool as a classifier. For each code location it either raises a report or stays silent. That call is either right or wrong. This gives 4 outcomes.
+
+A true positive is a report where a real defect exists. This is the intended result. A false positive is a report where no defect exists. It costs developer time and erodes trust in the tool. A false negative is silence about a location with a real defect. This is the dangerous outcome, since the vulnerability ships unnoticed. A true negative is silence about defect-free code. It is correct but not directly observable, since you do not know which locations the tool cleared.
+
+Developers care most about false positives, which waste effort. Auditors care most about false negatives, which are missed defects.
+
+### Precision
+
+The fraction of real defects out of all locations the tool reported. Probability a given report is worth acting on. Developers want this high.
+
+$$
+\text{Precision} = \frac{TP}{TP + FP}
+$$
+
+### Recall
+
+Aka. sensitivity or true positive rate. The fraction of real defects out of all real defects present. Probability a defect will not be missed. Auditors want this high.
+
+$$
+\text{Recall} = \frac{TP}{TP + FN}
+$$
+
+### F1 Score
+
+The harmonic mean of precision and recall. It is low unless both inputs are high, so a tool cannot score well by sacrificing one for the other.
+
+$$
+\frac{1}{F_1} = \frac{1}{2} \times \left(\frac{1}{\text{Precision}} + \frac{1}{\text{Recall}}\right)
+$$
+
+$$
+F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+$$
+
+### ROC Curve
+
+Plots true positive rate against false positive rate as the reporting threshold varies. Catching more real defects also means more false alarms.
+
+Formal methods aside, automated tools do not understand system architecture, mission, or environment. Most have significant false positive or false negative rates. They work best as part of a process, not the only mechanism.
+
+## Static Analysis
+
+Source code gives more context through variable names and comments. It also allows fixing found problems and is hard to decompile. Executables are needed when source is unavailable, or when the built artifact differs from source.
+
+Human analysis is strong on context and intent. It is expensive and prone to boredom. Inspections use defined roles per IEEE 1028.
+
+Type checkers and compiler warnings are not security-specific but useful. Enable `-Wall -Wextra`, `use strict`, and fix every warning so new ones stand out. `-Wimplicit-fallthrough` in Linux found real bugs in about 10% of the fall-through patches it prompted.
+
+Unreachable code detection matters because dead code, while not itself exploitable, can signal skipped input validation or authentication. Apple's `goto fail; goto fail;` is the classic case.
+
+Style checkers and quality scanners compare source to pre-canned rules. Examples are PMD for Java source and SpotBugs for JVM bytecode. Neither targets security. FindSecurityBugs is a SpotBugs security plugin.
+
+Security defect text scanners are grep-like lexers that look for dangerous function calls. Examples are Flawfinder, RATS, and ITS4. They are fast, cheap, and work on partial code, but have high false positive and false negative rates.
+
+Security defect finders build an internal model and look for vulnerability patterns. Examples are Coverity, Fortify, cppcheck, and the clang static analyzer. Taint propagation tracks untrusted input from sources to sinks and warns when it reaches a sink unsanitized. It is especially useful for injection and buffer overflow. Control flow analysis follows execution paths to find dangerous sequences like double-free. Property checkers prove a narrow temporal safety property, for example always freeing allocated memory. Many aim to be sound.
+
+Software Composition Analysis (SCA), also called origin analysis, identifies embedded libraries and flags those with known vulnerabilities. It cross-references the NIST National Vulnerability Database. Prefer package-manager data for low false positives.
+
+Secret scanners look for accidentally committed passwords and private keys. They are built into GitHub and GitLab.
+
+## Dynamic Analysis
+
+Dynamic analysis cannot test all inputs. Adding two 64-bit integers has 2^128 cases, so exhaustive testing is infeasible. Security requirements are often "X never happens", which testing cannot prove.
+
+Negative testing checks what should not happen, not just what should. "Can I read without authorization?" "Can I connect with an invalid certificate?" People routinely forget these.
+
+Web application scanners crawl forms and links like a browser, send attack-like and random data, and detect problems. Examples are OWASP ZAP, W3AF, and Burp Suite Pro.
+
+Fuzz testing feeds large numbers of random or mutated inputs. It monitors for crashes, assertion failures, and memory leaks, not for correct answers. It often finds real defects quickly, with diminishing returns after fixes. The concept comes from Barton Miller, 1988.
+
+Input strategies range from fully random, through mutation-based ("dumb", mutate sample inputs), to generation-based ("smart", model the input format). Coverage-guided evolution routes inputs that hit new paths for more mutation.
+
+American Fuzzy Lop (AFL, AFL++) is a coverage-guided mutation fuzzer. It instruments branch counts and prioritizes inputs hitting new edges. It once produced a valid JPEG starting from the text "hello".
+
+Address Sanitizer (ASan) compiles with `-fsanitize=address` to catch buffer overflow, use-after-free, and double-free. It uses shadow bytes and inaccessible red zones around allocations. Overhead is roughly 2x CPU and 2x to 4x memory. Sanitizers tolerate some false positives. Production exploit mitigations tolerate none.
+
+## Hybrid Analysis
+
+Coverage measures include statement coverage and branch coverage. Statement coverage is the percentage of statements executed by some test. Branch coverage is the percentage of branch outcomes taken. Both reveal untested paths but cannot warn about missing code.
+
+Concolic testing is concrete plus symbolic. It runs the program on a real input. Along the path taken it tracks the branch conditions symbolically, forming the path constraint. To reach a new path, it negates one condition and passes the set to an SMT solver. The solver returns a concrete input satisfying the new set. That input is run and the process repeats. This walks the program path by path instead of guessing inputs. It gets past checks random fuzzing almost never hits, such as magic values, checksums, and parser keywords. The costs are expensive solver queries and path explosion. Tools include SAGE, KLEE, and fuzzgrind.
+
+Penetration testing has testers act as adversaries and try to break in. Effectiveness depends on tester skill and realistic rules of engagement. Kali Linux bundles the common tools.
+
+## Adopting Tools
+
+A fool with a tool is still a fool. RealPlayer developers marked genuine Flawfinder findings as "ignore" instead of fixing them, and each became a CVE. Tools are useless without understanding vulnerability types and fixes.
+
+Rollout is culture change, not just a tool. Define objectives. Create a soft gate that later becomes mandatory. Train on secure development first. Start with a small pilot and easily understood checks. Appoint a champion. Build on success.
+
+## Securing Project Infrastructure
+
+Attackers target the build and distribution process. In the SolarWinds Orion attack, malicious code was signed and distributed.
+
+Controls include least privilege and MFA on all accounts, blocking direct pushes to main so review is enforced, `git config fsckObjects true`, and keeping CI/CD secrets out of test environments.
+
+SLSA (Supply chain Levels for Software Artifacts, "salsa") rates how hard a build's provenance is to fake. Provenance is a signed record of how an artifact was built: which source commit, which build system, which inputs. The build track has 3 levels.
+
+- L1
+  The build produces a provenance record, but nothing stops someone editing or fabricating it. Catches honest mistakes, not attackers.
+- L2
+  The build runs on a hosted build service that writes and signs the provenance itself. Faking it now needs a deliberate attack, and swapping the artifact after the build is detectable.
+- L3
+  The build service is hardened and each build runs isolated. One build cannot tamper with another, and signing keys are out of reach of the build steps. Forging provenance means breaking the build platform itself.
