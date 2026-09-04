@@ -1,7 +1,7 @@
 ---
 title: Linear Programming
 dateCreated: 2026-07-03T00:00:00.000Z
-lastUpdatedOn: 2026-08-26T18:01:43.920Z
+lastUpdatedOn: 2026-09-04T02:56:25.096Z
 slug: s5/operational-research/linear-programming
 sidebar:
   order: 2
@@ -15,17 +15,19 @@ _Programming_ here means planning or scheduling, not computer programming. The t
 
 ## Decision Variable
 
-A quantity $x_j$ whose value is chosen by the solver to optimize the objective.
-
-Values of these variables are determined by solving the LP.
+A quantity $x_j$ ($j = 1, \dots, n$) whose value is chosen by the solver to optimize the objective. The vector $x = (x_1, \dots, x_n)^T \in \mathbb{R}^n$ is determined by solving the LP.
 
 ## Linear Objective Function
 
-Expression that must be maximized or minimized. Linear in terms of the decision variables; no products or powers of $x_j$ terms.
+A function $z = \sum_{j=1}^n c_j x_j = c^T x$ with $c \in \mathbb{R}^n$, to be maximized or minimized. Linear in the $x_j$.
 
 ## Linear Constraint
 
-A linear inequality or equality that restricts the values decision variables can take.
+A linear inequality or equality restricting $x$, of the form
+
+$$
+\sum_{j=1}^n a_{ij} x_j \ \{\le,\ =,\ \ge\}\ b_i
+$$
 
 - Structural constraint  
   Limits imposed by resources, demand, or policy.
@@ -45,26 +47,30 @@ Types by direction:
 
 ## Linear Program
 
-A linear program is an optimization problem with a linear objective function subject to linear constraints.
+A linear program is an optimization problem with a linear objective function subject to linear constraints. With $n$ variables and $m$ constraints:
 
 $$
-\text{maximize (or minimize) } z = c_1x_1 + c_2x_2 + \dots + c_nx_n
+\begin{aligned}
+\text{maximize (or minimize)} \quad & z = \sum_{j=1}^n c_j x_j \\
+\text{subject to} \quad & \sum_{j=1}^n a_{ij} x_j \le b_i \quad (i = 1, \dots, m) \\
+& x_j \ge 0 \quad (j = 1, \dots, n)
+\end{aligned}
 $$
 
-Subject to:
+In matrix form, with $c \in \mathbb{R}^n$, $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^m$:
 
 $$
-a_{i1}x_1 + a_{i2}x_2 + \dots + a_{in}x_n \le b_i \quad \text{for } i = 1, \dots, m
+\begin{aligned}
+\max_{x \in \mathbb{R}^n} \quad & z = c^T x \\
+\text{s.t.} \quad & Ax \le b \\
+& x \ge 0
+\end{aligned}
 $$
 
-$$
-x_1, \dots, x_n \ge 0
-$$
-
-- $x_1, \dots, x_n$: decision variables
-- $c_1, \dots, c_n$: objective coefficients
-- $a_{ij}$: constraint coefficients
-- $b_i$: constraint bounds
+- $x$: decision variables
+- $c$: objective coefficients
+- $A = [a_{ij}]$: constraint coefficients
+- $b$: constraint bounds
 
 To solve a linear program:
 

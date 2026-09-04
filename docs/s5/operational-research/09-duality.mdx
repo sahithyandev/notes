@@ -6,12 +6,44 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:53:59.790Z
-lastUpdatedOn: 2026-08-28T11:38:57.352Z
+lastUpdatedOn: 2026-09-04T02:56:25.098Z
 ---
 
 Every linear program (the primal) has an associated linear program (the dual) built from the same data.
 
-## Primal-Dual Correspondence
+Consider a primal in standard form, with $x \in \mathbb{R}^n$, an $m \times n$ matrix $A$, $b \in \mathbb{R}^m$, $c \in \mathbb{R}^n$. It has $n$ variables and $m$ constraints.
+
+$$
+\begin{aligned}
+\text{(primal)} \quad \text{maximize} \quad & c^T x \\
+\text{s.t.} \quad & Ax \le b \\
+& x \ge 0
+\end{aligned}
+$$
+
+The dual has $m$ variables and $n$ constraints. One variable $y_i$ per primal constraint. $y \in \mathbb{R}^m$:
+
+$$
+\begin{aligned}
+\text{(dual)} \quad \text{minimize} \quad & b^T y \\
+\text{s.t.} \quad & A^T y \ge c \\
+& y \ge 0
+\end{aligned}
+$$
+
+By index:
+
+$$
+\text{primal:} \quad \max \sum_{j=1}^n c_j x_j \quad \text{s.t.} \quad \sum_{j=1}^n a_{ij} x_j \le b_i \ \ (i = 1, \dots, m), \quad x_j \ge 0
+$$
+
+$$
+\text{dual:} \quad \min \sum_{i=1}^m b_i y_i \quad \text{s.t.} \quad \sum_{i=1}^m a_{ij} y_i \ge c_j \ \ (j = 1, \dots, n), \quad y_i \ge 0
+$$
+
+Same data $(A, b, c)$, rearranged: $A$ transposed, $b$ and $c$ exchanged, objective sense flipped, and the constraint and variable counts swapped ($n$ constraints, $m$ variables). The [correspondence table](#primal-dual-correspondence) lists every swap; the [direction rules](#constraint-direction-rules) cover constraints that are not $\le$.
+
+### Primal-Dual Correspondence
 
 - Objective flips  
   Maximize primal $\leftrightarrow$ minimize dual (or vice versa).
@@ -24,7 +56,7 @@ Every linear program (the primal) has an associated linear program (the dual) bu
 - Constraint matrix transposes  
   Dual constraint coefficients are the transpose of the primal's.
 
-## Constraint Direction Rules
+### Constraint Direction Rules
 
 For a maximization primal with non-negative variables:
 
@@ -32,7 +64,28 @@ For a maximization primal with non-negative variables:
 - Primal $\ge$ constraint $\to$ dual variable $\le 0$
 - Primal $=$ constraint $\to$ dual variable unrestricted in sign
 
-Rules invert for a minimization primal.
+For a minimization primal with non-negative variables, the two inequality rules swap. The equality rule is unchanged.
+
+- Primal $\ge$ constraint $\to$ dual variable $\ge 0$
+- Primal $\le$ constraint $\to$ dual variable $\le 0$
+- Primal $=$ constraint $\to$ dual variable unrestricted in sign
+
+The canonical constraint direction, the one giving a non-negative dual variable, is $\le$ for a max primal and $\ge$ for a min primal. A deviation from it forces the opposite sign.
+
+The variable-to-constraint mapping mirrors this. A non-negative primal variable gives a $\ge$ dual constraint for a max primal, a $\le$ dual constraint for a min primal.
+
+### Mnemonics
+
+- MOTS  
+  Max flips to Min. Objective coefficients swap with RHS. Transpose $A$. Sizes swap ($m$ constraints give $m$ variables, $n$ variables give $n$ constraints).
+- Max is under, min is over  
+  The canonical constraint direction is $\le$ for a max primal, $\ge$ for a min primal.
+- Same, equal, opposite  
+  Compare a primal constraint to the canonical direction. Same gives dual variable $\ge 0$. Equality gives it unrestricted. Opposite gives it $\le 0$.
+- Same, equal, opposite (variable side)  
+  Take the max primal case, where a non-negative variable gives a $\ge$ dual constraint. A free variable gives an $=$ dual constraint. A non-positive variable gives a $\le$ dual constraint. For a min primal every direction flips.
+- Pay only for what you use up  
+  A non-binding primal constraint has dual value $0$. A positive dual value forces its primal constraint to bind. See [complementary slackness](#complementary-slackness).
 
 ## Theorems
 
@@ -44,7 +97,21 @@ $$
 z_{\text{primal}} \le z_{\text{dual}}
 $$
 
-Consequence: if the primal is unbounded, the dual is infeasible (and vice versa).
+<Note title="Proof Hint">
+
+For primal feasible $x$ ($Ax \le b$, $x \ge 0$) and dual feasible $y$ ($A^T y \ge c$, $y \ge 0$),
+
+$$
+c^T x \le (A^T y)^T x = y^T(Ax) \le y^T b
+$$
+
+</Note>
+
+Consequences:
+
+- If the primal is unbounded, the dual is infeasible, and vice versa.
+- If a primal feasible $x$ and a dual feasible $y$ satisfy $c^T x = b^T y$, both are optimal.
+- Dual infeasible does not imply primal unbounded; both problems can be infeasible.
 
 ### Strong Duality Theorem
 
@@ -54,9 +121,26 @@ $$
 z_{\text{primal}}^* = z_{\text{dual}}^*
 $$
 
+<Note title="Proof Hint">
+
+At a primal simplex optimum all reduced costs are $\ge 0$; the objective-row values under the slack columns form a dual feasible $y^*$ with $b^T y^* = c^T x^*$, so weak duality forces both to be optimal.
+
+</Note>
+
+Only four primal-dual outcome pairs are possible:
+
+| Primal     | Dual                  |
+| ---------- | --------------------- |
+| optimal    | optimal, equal values |
+| unbounded  | infeasible            |
+| infeasible | unbounded             |
+| infeasible | infeasible            |
+
 ## Complementary Slackness
 
-Relates the optimal primal and dual solutions: at optimality, either a constraint is binding (0 slack/surplus) or its corresponding variable in the other problem is 0, never both non-zero.
+Primal feasible $x$ and dual feasible $y$ are both optimal if and only if for every matched pair one side is 0: either a constraint is binding (0 slack/surplus) or its corresponding variable in the other problem is 0, never both non-zero.
+
+Proof sketch: strong duality makes both $\le$ in the weak duality chain equalities; each gap is a sum of non-negative terms equal to 0, so every term is 0.
 
 $$
 x_j \cdot (\text{dual constraint } j \text{ slack}) = 0 \quad \text{for every primal variable } x_j
@@ -71,6 +155,8 @@ Used to recover one problem's optimal solution directly from the other's, withou
 ## Reading Dual Values from the Primal Optimal Table
 
 The optimal dual variable values appear in the primal's optimal simplex tableau, in the objective row under the columns of the corresponding primal slack/surplus variables (with sign adjusted for the constraint direction).
+
+Each $y_i^*$ is the shadow price of primal constraint $i$: the rate $z^*$ changes per unit increase of $b_i$, valid over the range that keeps the current basis optimal.
 
 ## Worked Example
 
