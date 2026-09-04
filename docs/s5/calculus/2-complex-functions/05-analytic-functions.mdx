@@ -1,0 +1,70 @@
+---
+title: Analytic Functions
+sidebar:
+  order: 5
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-09-04T02:55:52.935Z
+slug: s5/calculus/complex-functions/analytic-functions
+prev: true
+next: true
+---
+
+A function $f$ is analytic at $z_0$ **iff** it is differentiable at each point in some neighborhood of $z_0$. $f$ is analytic in an open set **iff** it is differentiable at every point in that open set.
+
+If $f$ is analytic at $z_0$, it is analytic in some neighborhood of $z_0$. If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
+
+## Sufficient Conditions for Differentiability
+
+Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$. $f'(z_0)$ exists **iff**:
+
+- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist everywhere in $U$.
+- Those partial derivatives are continuous at $(x_0,y_0)$ and satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) at $(x_0,y_0)$.
+
+When these hold,
+
+$$
+f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
+$$
+
+Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the Cauchy-Riemann equations throughout $U$.
+
+## Algebra of Analytic Functions
+
+Let $f$ and $g$ be analytic in a domain $D$.
+
+- $f+g$, $f-g$, and $fg$ are analytic in $D$.
+- $f/g$ is analytic in $D$ provided $g$ does not vanish at any point of $D$.
+- If $f$ is analytic in $D$ and $g$ is analytic on a domain containing the image of $D$ under $f$, then $g \circ f$ is analytic in $D$, and
+
+$$
+\frac{\text{d}}{\text{d}z}\,g(f(z)) = g'(f(z))\,f'(z)
+$$
+
+## Entire Function
+
+$f$ is an entire function **iff** $f$ is analytic at every point of $\mathbb{C}$.
+
+Examples:
+
+- Every polynomial
+- $e^z$
+- $f(z) = \cosh z$
+
+## Singular Point
+
+$z_0$ is a singular point (singularity) of $f$ **iff** $f$ fails to be analytic at $z_0$ **and** $f$ is analytic at some point in every neighborhood of $z_0$.
+
+### Isolated Singularity
+
+$z_0$ is an isolated singularity of $f$ **iff** $f$ is analytic throughout some punctured disc $D_r(z_0) \setminus \{z_0\}$ but not analytic at $z_0$.
+
+$z_0$ is a non-isolated singularity of $f$ **iff** $z_0$ is a singular point that is not isolated.
+
+Examples:
+
+- $z = 0$ is an isolated singularity of $f(z) = 1/z$.
+- $f(z) = |z|^2$ has no singular points, since it is not analytic at any point in any neighborhood of any point.
+
+## Zero Derivative on a Domain
+
+If $f'(z) = 0$ everywhere in a domain $D$, then $f$ is constant throughout $D$.

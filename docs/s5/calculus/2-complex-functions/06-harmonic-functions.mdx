@@ -1,0 +1,76 @@
+---
+title: Harmonic Functions
+sidebar:
+  order: 6
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-09-04T02:55:52.935Z
+slug: s5/calculus/complex-functions/harmonic-functions
+prereqs:
+  - s5/calculus/complex-functions/derivatives
+prev: true
+next: true
+---
+
+Let $D$ be a domain in the $xy$-plane. A real-valued function $u(x,y)$ is harmonic in $D$ **iff**:
+
+- $u$ has continuous second-order partial derivatives in $D$.
+- $u$ satisfies Laplace's equation throughout $D$:
+
+$$
+\nabla^2 u = u_{xx} + u_{yy} = 0
+$$
+
+## Component Functions of an Analytic Function
+
+If $f(z) = u(x,y) + iv(x,y)$ is analytic in a domain $D$, then $u$ and $v$ are harmonic in $D$.
+
+<Note title="Proof Hint">
+
+- Start with the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) $u_x = v_y$, $u_y = -v_x$
+- Differentiate $u_x = v_y$ with respect to $x$
+- Differentiate $u_y = -v_x$ with respect to $y$
+- Add the results and use equality of mixed partials of $v$
+
+</Note>
+
+## Harmonic Conjugate
+
+Let $u$ and $v$ be real-valued functions on a region $D \subseteq \mathbb{R}^2$. $v$ is a harmonic conjugate of $u$ **iff** $f(z) = u(x,y) + iv(x,y)$ is analytic on $D$.
+
+<Note>
+
+Order matters. $u$ and $v$ can both be harmonic on $D$ without $v$ being a harmonic conjugate of $u$.
+
+</Note>
+
+## Worked Example
+
+Find a harmonic conjugate $v$ of $u(x,y) = y^3 - 3x^2y$, and the corresponding analytic function $f$.
+
+$$
+u_x = -6xy, \qquad u_y = 3y^2 - 3x^2
+$$
+
+Cauchy-Riemann $v_y = u_x$:
+
+$$
+v_y = -6xy \implies v = -3xy^2 + \phi(x)
+$$
+
+Cauchy-Riemann $v_x = -u_y$:
+
+$$
+-3y^2 + \phi'(x) = -3y^2 + 3x^2 \implies \phi'(x) = 3x^2
+$$
+
+$$
+\phi(x) = x^3 + C
+$$
+
+$$
+v(x,y) = x^3 - 3xy^2 + C
+$$
+
+$$
+f(z) = (y^3 - 3x^2y) + i(x^3 - 3xy^2 + C) = iz^3 + iC
+$$

@@ -1,0 +1,49 @@
+---
+title: Complex Logarithm
+sidebar:
+  order: 10
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-09-04T02:55:52.936Z
+slug: s5/calculus/complex-functions/complex-logarithm
+prereqs:
+  - s5/calculus/complex-functions/exponential-function
+prev: true
+next: true
+---
+
+For a non-zero complex number $z$, $\log z$ is the set of all $w \in \mathbb{C}$ with $e^w = z$.
+
+Writing $z = re^{i\theta}$ with $r = |z|$ and $w = u + iv$, the condition $e^w = z$ gives $e^u = r$ and $v \in \arg z$. So
+
+$$
+\log z = \ln|z| + i\arg z = \{\,\ln|z| + i(\operatorname{Arg} z + 2k\pi) : k \in \mathbb{Z}\,\}, \qquad z \ne 0
+$$
+
+Here:
+
+- $\operatorname{Arg} z$: principal argument of $z$, the unique argument with $-\pi < \operatorname{Arg} z \le \pi$
+- $\arg z = \{\operatorname{Arg} z + 2k\pi : k \in \mathbb{Z}\}$
+
+$\log z$ is multi-valued.
+
+## Principal Value
+
+$$
+\operatorname{Log} z = \ln|z| + i\operatorname{Arg} z, \qquad z \ne 0
+$$
+
+## Properties
+
+Let $z_1$ and $z_2$ be non-zero.
+
+- $\log(z_1 z_2) = \log z_1 + \log z_2$
+- $\log\dfrac{z_1}{z_2} = \log z_1 - \log z_2$
+- $\log\dfrac{1}{z} = -\log z$
+
+<Note>
+
+The identities hold for the multi-valued $\log$ as equalities of sets. They can fail for $\operatorname{Log}$.
+
+$\operatorname{Log}((-1)(-1)) = \operatorname{Log}(1) = 0$, but $\operatorname{Log}(-1) + \operatorname{Log}(-1) = i\pi + i\pi = 2\pi i$.
+
+</Note>

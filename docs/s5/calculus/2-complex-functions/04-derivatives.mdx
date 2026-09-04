@@ -3,10 +3,10 @@ title: Derivatives
 sidebar:
   order: 4
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-08-14T03:05:03.681Z
+lastUpdatedOn: 2026-09-04T02:55:52.935Z
 slug: s5/calculus/complex-functions/derivatives
 prev: true
-next: false
+next: true
 ---
 
 Let $f$ be a function whose domain contains a neighborhood $|z-z_0| < \epsilon$ of $z_0$. The derivative of $f$ at $z_0$ is
@@ -30,16 +30,6 @@ Let $c \in \mathbb{C}$, and let $f$, $g$ be functions differentiable at $z \in \
 - $\dfrac{\text{d}}{\text{d}z}\,(f(z)g(z)) = f(z)g'(z)+f'(z)g(z)$
 - $\dfrac{\text{d}}{\text{d}z}\,\dfrac{f(z)}{g(z)} = \dfrac{g(z)f'(z)-f(z)g'(z)}{(g(z))^2}$, provided $g(z) \ne 0$
 
-### Analytic Function
-
-A function $f$ is analytic at $z_0$ **iff** it is differentiable at each point in some neighborhood of $z_0$. $f$ is analytic in an open set **iff** it is differentiable at every point in that open set.
-
-<Note>
-
-If $f$ is analytic at $z_0$, it is analytic in some neighborhood of $z_0$. If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
-
-</Note>
-
 ## Cauchy-Riemann Equations
 
 Let $f(z) = u(x,y)+iv(x,y)$, and suppose $f'(z_0)$ exists at $z_0 = x_0+iy_0$. Then the first-order partial derivatives of $u$ and $v$ exist at $(x_0,y_0)$ and satisfy
@@ -54,22 +44,32 @@ $$
 f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
 $$
 
-## Sufficient Conditions for Differentiability
+The equations follow from forcing the derivative limit to agree along the real and imaginary directions of approach.
 
-Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$. $f'(z_0)$ exists **iff**:
+<Note title="Proof Hint">
 
-- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist everywhere in $U$.
-- Those partial derivatives are continuous at $(x_0,y_0)$ and satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) at $(x_0,y_0)$.
+- Take $\Delta z = \Delta x$ in the limit, get $f'(z_0) = u_x + iv_x$
+- Take $\Delta z = i\,\Delta y$ in the limit, get $f'(z_0) = v_y - iu_y$
+- Equate real parts and imaginary parts
 
-When these hold,
+</Note>
+
+The equations are necessary but not sufficient. They can hold at $z_0$ while $f'(z_0)$ does not exist. See [Sufficient Conditions for Differentiability](/s5/calculus/complex-functions/analytic-functions#sufficient-conditions-for-differentiability).
+
+The Jacobian of $(x,y) \mapsto (u,v)$ is then
 
 $$
-f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
+\begin{pmatrix} u_x & -v_x \\ v_x & u_x \end{pmatrix}
 $$
 
-Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the Cauchy-Riemann equations throughout $U$.
+which acts as multiplication by $u_x + iv_x$. A complex-differentiable map is locally a rotation plus a uniform scaling.
 
-## Polar Form of the Cauchy-Riemann Equations
+Examples:
+
+- $f(z) = z^2$: $u_x = v_y = 2x$, $u_y = -v_x = -2y$, and $f'(z) = 2x + i2y = 2z$.
+- $f(z) = \bar{z}$: $u_x = 1$, $v_y = -1$, so the equations fail everywhere and $\bar{z}$ is nowhere differentiable.
+
+### Polar Form of the Cauchy-Riemann Equations
 
 Let $f(z) = u(r,\theta)+iv(r,\theta)$ be defined throughout a neighborhood of a non-zero point $z_0 = r_0e^{i\theta_0}$. $f'(z_0)$ exists **iff**:
 
