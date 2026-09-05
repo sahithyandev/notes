@@ -1,0 +1,197 @@
+---
+title: "Integrated Services, RSVP, and Differentiated Services"
+dateCreated: 2026-09-01T19:24:36.012Z
+lastUpdatedOn: 2026-09-05T22:02:39.582Z
+slug: s5/advanced-networking/intserv-rsvp-diffserv
+sidebar:
+  order: 5
+  label: "IntServ, RSVP, DiffServ"
+prev: true
+next: true
+---
+
+The IETF defined two QoS architectures: Integrated Services (IntServ), using RSVP, and Differentiated Services (DiffServ).
+
+For packet scheduling, policing, and QoS bounds, see [QoS Principles, Scheduling, and Policing](/s5/advanced-networking/qos).
+
+---
+
+## Application Taxonomy and Elasticity
+
+Applications handle network delays and packet drops differently, placing distinct demands on network QoS:
+
+```
+Applications
+  ├── Elastic Applications (Data transfers, HTTP, FTP - tolerate delay/loss)
+  └── Inelastic / Real-Time Applications
+        ├── Tolerant Real-Time (Continuous media - adapt frame rates/bitrates)
+        └── Intolerant Real-Time (Hard real-time - strict delay/jitter limits)
+```
+
+1. Elastic applications:
+   - Traditional data applications (e.g., File transfer via FTP, Web browsing via HTTP, Email via SMTP).
+   - Can adjust output rates dynamically based on TCP congestion control. Faster throughput is preferred, but arbitrary delays do not break application correctness.
+2. Tolerant real-time applications:
+   - Applications that stream audio or video (e.g., video conferencing, adaptive streaming).
+   - Can adapt to minor network delay fluctuations and packet drops by lowering resolution or adjusting frame rates ("network-aware" applications).
+3. Intolerant real-time applications:
+   - High-precision control systems, remote surgery, or interactive gaming.
+   - Require absolute, non-negotiable upper bounds on delay and jitter. Arriving past the deadline renders data useless.
+
+---
+
+## Integrated Services (IntServ)
+
+Integrated Services (IntServ) provides fine-grained per-flow QoS guarantees. A flow reserves resources at every router along its path.
+
+### IntServ Service Models
+
+IntServ defines two primary service levels:
+
+#### 1. Guaranteed Service
+
+- Designed for intolerant real-time applications.
+- Mathematically guarantees minimum bandwidth, maximum queuing delay, and zero queue-overflow packet loss.
+- Uses a Token Bucket $(r, b)$ traffic specification combined with Weighted Fair Queueing (WFQ) in routers. The worst-case queuing delay $D_{\max}$ is bounded by Parekh's bound:
+  $$D_{\max} = \frac{b}{R}$$
+  where $R$ is the WFQ rate allocated to the flow.
+
+#### 2. Controlled Load Service
+
+- Designed for tolerant real-time applications.
+- Guarantees performance equivalent to an unloaded network during congestion.
+- Uses measurement-based admission control instead of strict mathematical bounds.
+
+### IntServ Service Interface
+
+Applications communicate QoS requirements to routers using two parameters:
+
+- $T\text{-spec}$ (Traffic Specification): Flow characteristics such as token-bucket $r$ and $b$.
+- $R\text{-spec}$ (Reservation Specification): Requested QoS, such as rate $R$.
+
+---
+
+## Resource ReSerVation Protocol (RSVP)
+
+RSVP is the IntServ signalling protocol. It operates directly over IP as protocol number 46.
+
+```
+Sender ----------------> Intermediate Routers ----------------> Receiver
+  |                             |                                  |
+  | --- PATH (T-spec) --------> | --- PATH (T-spec) -------------> |
+  |                             |                                  |
+  | <--- RESV (R-spec) -------- | <--- RESV (R-spec) ------------- |
+```
+
+### Key Design Principles of RSVP
+
+1. Receiver-initiated reservation:
+   - The receiver sends `RESV` messages upstream.
+   - Supports heterogeneous receivers in multicast groups (e.g., a high-bandwidth receiver requests a $2\text{ Mbps}$ video stream while a low-bandwidth mobile receiver requests only $128\text{ kbps}$).
+2. Soft-state paradigm:
+   - Router reservation state is not permanent. Senders and receivers periodically send `PATH` and `RESV` refresh messages.
+   - A reservation times out without refresh messages.
+   - Enables self-healing during network topology or routing changes.
+
+### RSVP Message Types and Flow
+
+1. `PATH` message (sender to receiver):
+   - Transmitted downstream following standard unicast/multicast routing paths.
+   - Carries the sender's $T\text{-spec}$.
+   - Creates "reverse path state" in intermediate routers so that subsequent `RESV` messages know how to route back to the sender.
+2. `RESV` message (receiver to sender):
+   - Transmitted upstream along the reverse path created by `PATH` messages.
+   - Carries the receiver's $R\text{-spec}$ and filter specifications.
+   - Triggers admission control at each intermediate router:
+     - If accepted, the router allocates scheduler resources and installs packet filter rules.
+     - If rejected, the router returns an `ERROR` message to the receiver.
+3. `TEARDOWN` message: Releases a reservation immediately.
+4. `CONFIRMATION` message: Unicast confirmation to the receiver.
+
+### Reservation Styles (Filter Specifications)
+
+When multiple senders and receivers participate in a session (e.g., video/audio conferences), RSVP uses reservation styles to optimize bandwidth:
+
+| Reservation Style    | Filter Type      | Description                                  | Use Case                                   |
+| :------------------- | :--------------- | :------------------------------------------- | :----------------------------------------- |
+| Fixed Filter (FF)    | Explicit Senders | Dedicated resources for specified senders.   | 1-on-1 video calls or multi-video windows. |
+| Wildcard Filter (WF) | No Filter        | Shared reservation for any multicast sender. | Public broadcasts or open audio rooms.     |
+| Shared Explicit (SE) | Dynamic Senders  | Specified senders share one reservation.     | Audio conference.                          |
+
+### IntServ / RSVP Scalability Limitations
+
+Although IntServ provides hard QoS guarantees, it failed to achieve widespread deployment on the public Internet due to:
+
+- Core router scalability: Per-flow state consumes CPU and memory.
+- Complex signalling: Periodic soft-state refreshes create protocol overhead.
+
+---
+
+## Differentiated Services (DiffServ)
+
+Differentiated Services (DiffServ) shifts from per-flow state to aggregate traffic classification.
+
+DiffServ performs per-flow management at the edge and class forwarding in the core.
+
+```
++-------------------------------------------------------------------------+
+|                              EDGE ROUTER                                |
+|  Incoming Flows ---> [ Classification ] ---> [ Metering ] ---> [ Marking ]
++-------------------------------------------------------------------------+
+                                                               |
+                                                               v
++-------------------------------------------------------------------------+
+|                              CORE ROUTER                                |
+|  DSCP-Marked Packets ---> [ Per-Hop Behavior (PHB) Queueing ] ---> Out  |
+|  (Zero Per-Flow State Maintained)                                       |
++-------------------------------------------------------------------------+
+```
+
+### Edge Router Functions
+
+Edge routers process individual incoming flows according to a pre-negotiated Service Level Agreement (SLA):
+
+1. Classification: Identifies flows from header fields.
+2. Metering: Checks the negotiated rate $r$ and burst size $b$.
+3. Marking: Writes the 6-bit Differentiated Services Code Point (DSCP).
+   - Conforming packets are in-profile.
+   - Non-conforming packets are out-of-profile.
+4. Conditioning: Delays, drops, or remarks out-of-profile traffic.
+
+### Core Router Functions & Per-Hop Behaviors (PHB)
+
+Core routers inspect the 6-bit DSCP field. They maintain zero per-flow state and execute a Per-Hop Behavior (PHB) for each class.
+
+#### 1. Expedited Forwarding (EF) PHB ([RFC 3246](https://datatracker.ietf.org/doc/html/rfc3246))
+
+- Guarantees a low-delay, low-loss, low-jitter minimum departure rate.
+- Provides flow isolation so that EF traffic is unaffected by other traffic classes.
+- Used to build a Virtual Leased Line (VLL) service.
+- Non-conformant EF traffic is dropped or shaped at the edge.
+
+#### 2. Assured Forwarding (AF) PHB ([RFC 2597](https://datatracker.ietf.org/doc/html/rfc2597))
+
+- Assures minimum bandwidth while offering tiered relative service levels (e.g., Gold, Silver, Bronze).
+- Defines four traffic classes with three drop-precedence levels each.
+
+| Class / Drop Priority | Low Drop Precedence    | Medium Drop Precedence | High Drop Precedence   |
+| :-------------------- | :--------------------- | :--------------------- | :--------------------- |
+| Class 1 (AF1x)        | `AF11` (DSCP `001010`) | `AF12` (DSCP `001100`) | `AF13` (DSCP `001110`) |
+| Class 2 (AF2x)        | `AF21` (DSCP `010010`) | `AF22` (DSCP `010100`) | `AF23` (DSCP `010110`) |
+| Class 3 (AF3x)        | `AF31` (DSCP `011010`) | `AF32` (DSCP `011100`) | `AF33` (DSCP `011110`) |
+| Class 4 (AF4x)        | `AF41` (DSCP `100010`) | `AF42` (DSCP `100100`) | `AF43` (DSCP `100110`) |
+
+During network congestion, core routers drop packets with higher drop precedence first (e.g., `AF13` is dropped before `AF11`).
+
+---
+
+## IntServ vs. DiffServ Comparison
+
+| Metric              | Integrated Services (IntServ)        | Differentiated Services (DiffServ)       |
+| :------------------ | :----------------------------------- | :--------------------------------------- |
+| Service Granularity | Per-flow (individual connection)     | Aggregate classes of flows               |
+| Core Router State   | State for every active flow ($O(N)$) | No per-flow state ($O(1)$; class queues) |
+| Signalling Protocol | Required (`RSVP` PATH/RESV messages) | None within the core                     |
+| Guarantees Offered  | Hard delay and loss bounds           | Relative service distinctions            |
+| Scalability         | Poor in large core networks          | Excellent in large core networks         |
+| Primary Deployment  | Enterprise and campus networks       | ISP backbones and multi-service networks |

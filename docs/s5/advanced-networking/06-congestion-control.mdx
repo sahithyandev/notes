@@ -1,0 +1,189 @@
+---
+title: Congestion Control
+dateCreated: 2026-09-05T21:01:18.122Z
+lastUpdatedOn: 2026-09-05T22:02:39.584Z
+slug: s5/advanced-networking/congestion-control
+sidebar:
+  order: 6
+prev: true
+next: true
+---
+
+Congestion — offered traffic exceeds available router, link, or processing capacity.
+
+- Packet arrivals initially queue.
+- Persistent overload causes packet drops.
+- Drops and delay trigger retransmissions.
+- Retransmissions increase offered load.
+
+## Congestion Control and Flow Control
+
+Flow control — prevents a sender from overloading one receiver.
+
+Congestion control — prevents overload across routers and links.
+
+| Property  | Flow control         | Congestion control                      |
+| :-------- | :------------------- | :-------------------------------------- |
+| Scope     | Sender and receiver. | Network path.                           |
+| Objective | Receiver protection. | Throughput and delay control.           |
+| Signal    | Receiver window.     | Loss, delay, marks, or router feedback. |
+
+## Control Models
+
+Open-loop control — policies fixed without current network state.
+
+- Example: limit VoIP calls per link.
+- Prevention-oriented.
+
+Closed-loop control — detect congestion, report it, then adapt operation.
+
+### Detection and Feedback
+
+Router indicators:
+
+- Packet-drop rate.
+- Queue length.
+- Link utilisation.
+
+Endpoint indicators:
+
+- Retransmission timeout.
+- Increased packet delay.
+
+Feedback methods:
+
+- Send a control packet to the source or previous router.
+- Mark a packet travelling to the receiver.
+- Let the receiver report the mark to the sender.
+
+## TCP Congestion Window
+
+Congestion window ($cwnd$) — sender-side limit on unacknowledged bytes.
+
+$$W = \min(cwnd, rwnd)$$
+
+$$\text{effective window} = W - (\text{LastByteSent} - \text{LastByteAcked})$$
+
+`rwnd` is the advertised receiver window. TCP treats loss as congestion because transmission errors are rare.
+
+### Additive Increase, Multiplicative Decrease
+
+During congestion avoidance:
+
+$$cwnd \leftarrow cwnd + \frac{MSS^2}{cwnd}$$
+
+per acknowledged segment. This increases $cwnd$ by approximately one $MSS$ per RTT.
+
+After a timeout:
+
+$$cwnd \leftarrow 1\ MSS$$
+
+The congestion threshold becomes half the prior usable window.
+
+## Slow Start and Congestion Avoidance
+
+Slow start — exponential window growth.
+
+- Start at $cwnd = 1\ MSS$.
+- Increase $cwnd$ by one $MSS$ for every ACK.
+- Window approximately doubles each RTT.
+- Use at connection start and after a timeout.
+
+Slow-start threshold ($ssthresh$) — transition point from exponential to linear growth.
+
+- Slow start while $cwnd < ssthresh$.
+- Congestion avoidance while $cwnd \ge ssthresh$.
+- After timeout, set $ssthresh$ to half the previous usable window.
+- Reset $cwnd$ to one $MSS$.
+
+## Fast Retransmit and Fast Recovery
+
+Duplicate ACKs indicate that a segment arrived out of order.
+
+- Three duplicate ACKs trigger fast retransmit.
+- Retransmit the missing segment before timeout expiry.
+- Set $ssthresh$ to half the previous $cwnd$.
+- Fast recovery resumes near $ssthresh$.
+- Slow start is skipped.
+
+## Router-Assisted Congestion Avoidance
+
+### Random Early Detection
+
+Random Early Detection (RED) — active queue management using average queue length.
+
+- Low average queue: accept packets.
+- Rising average queue: randomly drop packets with increasing probability.
+- Full queue: drop all arriving packets.
+
+Early drops signal TCP before queue overflow.
+
+### Explicit Congestion Notification
+
+Explicit Congestion Notification (ECN) — congestion signal encoded in packet headers.
+
+- Router marks packets instead of dropping them.
+- Receiver returns the congestion indication.
+- Sender reduces its rate.
+
+### TCP Vegas
+
+TCP Vegas — host-centric congestion avoidance.
+
+- Detects increasing RTT or a flattening sending rate.
+- Infers queue growth before packet loss.
+- Reduces the sending rate before overflow.
+
+## Network-Layer Methods
+
+### Resource Preallocation
+
+Resource preallocation — reserve buffers and bandwidth before data transmission.
+
+- Common in virtual-circuit networks.
+- Setup selects a path and allocates resources.
+- The network rejects calls lacking sufficient resources.
+
+### Traffic Shaping
+
+Traffic shaping — control the transmission rate and pattern.
+
+- Sender and carrier negotiate a traffic profile during setup.
+- Leaky-bucket shaping enforces a steady output rate.
+
+### Choke Packets
+
+Choke packet — router notification instructing a sender to reduce its rate.
+
+### Isarithmic Control
+
+Isarithmic control — cap the total packets within a subnet.
+
+- A router needs a permit before injecting a packet.
+- The permit count limits in-network packets.
+
+### Virtual Circuits and Datagrams
+
+Virtual-circuit subnets use:
+
+- Admission control.
+- Alternative routes for new circuits.
+- Reservation during circuit setup.
+
+Datagram subnets discard packets when resources are unavailable. The sending host retransmits dropped datagrams. In virtual circuits, the previous-hop router retransmits after missing acknowledgement.
+
+## Load Shedding and Jitter
+
+Load shedding — intentional packet discard during congestion.
+
+Discard policies:
+
+- Oldest packet.
+- Newest packet.
+- Low-priority packet.
+- Random early discard.
+
+Jitter — variation in packet delay.
+
+- Prioritise time-critical packets in router queues.
+- Use receiver buffering to mask remaining variation.

@@ -1,0 +1,95 @@
+---
+title: Multimedia Applications and Video Streaming
+dateCreated: 2026-09-01T19:24:36.011Z
+lastUpdatedOn: 2026-09-05T22:02:39.566Z
+slug: s5/advanced-networking/multimedia-applications-and-streaming
+sidebar:
+  order: 1
+  label: Multimedia Applications and Streaming
+prev: false
+next: true
+---
+
+Multimedia networking focuses on transmitting audio, video, and interactive data over packet-switched IP networks while coping with variable network delay, throughput fluctuations, and packet loss.
+
+For foundational definitions of discrete vs. continuous media and captured vs. synthesized media, see [Multimedia](/s3/data-communication-and-networking/multimedia). For basic analog-to-digital conversion and Pulse Code Modulation (PCM), see [Analog to Digital Encoding](/s3/data-communication-and-networking/analog-to-digital).
+
+## Multimedia Encoding
+
+**Digitisation** — conversion of an analogue signal into digital samples.
+
+**Coding** — representation of digitised media for storage or transmission.
+
+Compression removes spatial and temporal redundancy. See [Multimedia Encodings](/s5/advanced-networking/multimedia-encodings) for codec design, audio coding, video coding, and MPEG.
+
+## Application Categories
+
+Multimedia networking applications fall into three major categories based on interactive delay tolerance and playout constraints:
+
+1. Streaming Stored Audio and Video:
+   - Pre-recorded content hosted on servers (e.g., YouTube, Netflix, Hulu).
+   - Client can begin playout shortly after request while remaining content continues downloading.
+   - Supports user interactivity (pause, seek, fast-forward, rewind).
+   - Tolerates initial buffering delays (2–10 seconds).
+2. Conversational Voice and Video over IP:
+   - Real-time human-to-human interaction (e.g., Skype, Zoom, Teams, VoIP).
+   - Extremely strict delay requirements ($< 150\text{ms}$ preferred, $> 400\text{ms}$ unacceptable).
+   - Cannot tolerate large buffering delays.
+3. Streaming Live Audio and Video:
+   - Live broadcast of events (e.g., sports events, twitch streams).
+   - Playout cannot be fast-forwarded beyond live point.
+   - Moderately strict delay tolerance (typically 3–10 seconds).
+
+## Streaming Stored Video
+
+In stored video streaming, the client renders the video while the server streams the remaining portion over the network.
+
+```
+Server Video File --------> Network (Variable Delay) --------> Client Playout Buffer --------> Display
+```
+
+### Continuous Playout Constraint
+
+Once playback begins, the client must display frames continuously according to their original timing (e.g., 1 frame every $33\text{ ms}$ for 30 fps). If incoming data arrives slower than the playout rate, the client buffer empties, causing the video to freeze (buffer starvation).
+
+### Client-Side Buffering and Dynamics
+
+To absorb network delay jitter and throughput variations, the client delays playout by $t_p$ seconds while filling an application buffer of capacity $B$.
+
+Let:
+
+- $r$ be the constant playout rate (bytes/sec).
+- $x(t)$ be the variable incoming fill rate from the network at time $t$.
+- $Q(t)$ be the buffer fill level at time $t$.
+
+```
+           +-----------------------+
+x(t) ----> | Client Buffer Q(t)    | ----> r (Constant Playout Rate)
+           | Maximum Capacity B    |
+           +-----------------------+
+```
+
+- **Buffer Accumulation ($\bar{x} > r$)**: If average network throughput exceeds playout rate, the buffer fill level increases until saturated.
+- **Buffer Starvation ($\bar{x} < r$)**: If average network throughput drops below playout rate, $Q(t)$ decreases. If $Q(t) = 0$, playout freezes until the buffer refills to a threshold.
+
+The choice of initial playout delay $t_p$ is a key trade-off:
+
+- Larger $t_p$ reduces the probability of video freezing due to temporary network stalls.
+- Smaller $t_p$ provides a faster startup response for the user.
+
+## Transport Mechanisms for Video Streaming
+
+### Streaming over UDP
+
+- Server transmits packets at a constant rate matching the video encoding rate $r$.
+- Encapsulated using [RTP](/s5/advanced-networking/real-time-protocols) over UDP.
+- Maintains short playout delays (2–5 seconds).
+- **Drawbacks**: Unfriendly to network congestion (does not back off); often blocked by corporate firewalls and NAT devices.
+
+### Streaming over HTTP/TCP
+
+- Video file is fetched via standard HTTP `GET` requests over TCP.
+- Server transmits at maximum rate permitted by TCP congestion control and flow control.
+- In-order delivery and retransmissions introduce throughput fluctuations $x(t)$, requiring a larger client playout buffer.
+- **Advantages**: Easily passes through firewalls and middleboxes; leverages existing web infrastructure (CDNs, web caches).
+- Basis for modern Dynamic Adaptive Streaming over HTTP (DASH), where video is chunked into small segments encoded at multiple bitrates, allowing the client to adaptively switch quality based on current TCP throughput.
