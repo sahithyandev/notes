@@ -14,7 +14,10 @@ export const isWip = (slug: string): boolean =>
   WIP_PREFIXES.some((p) => slug === p || slug.startsWith(p + "/"));
 
 // Slug prefixes for elective (non-core) modules.
-export const ELECTIVE_PREFIXES: string[] = ["s5/image-processing"];
+export const ELECTIVE_PREFIXES: string[] = [
+  "s5/image-processing",
+  "s5/advanced-networking",
+];
 
 export const isElective = (slug: string): boolean =>
   ELECTIVE_PREFIXES.some((p) => slug === p || slug.startsWith(p + "/"));
