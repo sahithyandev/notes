@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:53:36.074Z
-lastUpdatedOn: 2026-08-27T16:29:21.213Z
+lastUpdatedOn: 2026-09-06T13:01:26.814Z
 ---
 
 If the starting basis needs artificial variables, either Big-M or two-phase method should be used.
@@ -217,15 +217,15 @@ Uses 2 separate simplex runs, avoiding the arbitrary constant $M$.
 
 ### Phase 1
 
-- Replace the original objective with minimizing the sum of all artificial variables.
+- Replace the original objective with minimizing the sum of all artificial variables. This is the same regardless of whether the original problem maximizes or minimizes; the original objective's direction plays no role in phase 1.
 - Run the simplex algorithm.
 - If the minimum is 0, a basic feasible solution to the original problem was found; proceed to phase 2.
 - If the minimum is positive, the original problem is infeasible. Stop.
 
 ### Phase 2
 
-- Drop the artificial variables and restore the original objective.
-- Use the phase 1 optimal basis as the starting basic feasible solution.
+- Drop the artificial variables and restore the original objective. The original direction only matters here: convert a minimization to $\max\ {-z}$ to fit the tableau convention, or use a maximization objective as is.
+- Use the phase 1 optimal basis as the starting basic feasible solution: keep the same basic variables and the same rows (with the artificial columns dropped) from the phase 1 final tableau, and only replace the objective row with the restored objective, priced out against those same rows.
 - Run the simplex algorithm to optimize the original objective.
 
 Unbounded and alternate/infinite optimal solutions are detected in phase 2 the same way as in the ordinary simplex algorithm.
@@ -343,7 +343,24 @@ Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. Prici
 
 #### Phase 2
 
-Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Price the basic $x_1, x_2$ out of the objective row $(-z) + 4x_1 + x_2 = 0$ using the phase 1 final rows.
+Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Written with all terms on the left, the objective row starts as
+
+$$
+(-z) + 4x_1 + x_2 = 0
+$$
+
+But $x_1, x_2$ are basic (from the phase 1 final tableau), so they must have coefficient $0$ in the objective row. Subtract $4 \times (x_1 \text{ row})$ and $1 \times (x_2 \text{ row})$ of the phase 1 final tableau (columns $x_1, x_2, s_2, s_3$ only, dropping $a_1, a_2$) to eliminate them:
+
+$$
+\begin{aligned}
+x_1:\quad & 4 - 4(1) - 1(0) = 0 \\
+x_2:\quad & 1 - 4(0) - 1(1) = 0 \\
+s_2:\quad & 0 - 4(1/5) - 1(-3/5) = -1/5 \\
+\text{RHS}:\quad & 0 - 4(3/5) - 1(6/5) = -18/5
+\end{aligned}
+$$
+
+This gives the initial objective row below, alongside the phase 1 final rows for $x_1, x_2, s_3$ with the $a_1, a_2$ columns dropped.
 
 <SimplexWalkthrough>
   <SimplexStep

@@ -3,7 +3,7 @@ title: Derivatives
 sidebar:
   order: 4
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-09-04T02:55:52.935Z
+lastUpdatedOn: 2026-09-06T13:01:26.810Z
 slug: s5/calculus/complex-functions/derivatives
 prev: true
 next: true
@@ -54,7 +54,7 @@ The equations follow from forcing the derivative limit to agree along the real a
 
 </Note>
 
-The equations are necessary but not sufficient. They can hold at $z_0$ while $f'(z_0)$ does not exist. See [Sufficient Conditions for Differentiability](/s5/calculus/complex-functions/analytic-functions#sufficient-conditions-for-differentiability).
+The equations are necessary but not sufficient. They can hold at $z_0$ while $f'(z_0)$ does not exist. See [Sufficient Conditions for Differentiability](#sufficient-conditions-for-differentiability).
 
 The Jacobian of $(x,y) \mapsto (u,v)$ is then
 
@@ -68,6 +68,19 @@ Examples:
 
 - $f(z) = z^2$: $u_x = v_y = 2x$, $u_y = -v_x = -2y$, and $f'(z) = 2x + i2y = 2z$.
 - $f(z) = \bar{z}$: $u_x = 1$, $v_y = -1$, so the equations fail everywhere and $\bar{z}$ is nowhere differentiable.
+
+## Sufficient Conditions for Differentiability
+
+Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$. $f'(z_0)$ exists **iff**:
+
+- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist everywhere in $U$.
+- Those partial derivatives are continuous at $(x_0,y_0)$ and satisfy the Cauchy-Riemann equations at $(x_0,y_0)$.
+
+When these hold,
+
+$$
+f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
+$$
 
 ### Polar Form of the Cauchy-Riemann Equations
 

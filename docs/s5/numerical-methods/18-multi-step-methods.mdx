@@ -1,9 +1,7 @@
 ---
 title: Multi-Step Methods
-prereqs:
-  - s5/numerical-methods/runge-kutta-methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-09-01T12:39:12.165Z
+lastUpdatedOn: 2026-09-06T13:01:26.814Z
 slug: s5/numerical-methods/multi-step-methods
 sidebar:
   order: 18
@@ -28,9 +26,9 @@ Starting values $w_0 = \alpha$ and $w_1, \ldots, w_{m-1}$ come from a one-step m
 
 ## Explicit and Implicit Methods
 
-- Explicit
+- Explicit  
   $b_m = 0$. $w_{i+1}$ is given directly by previously determined values.
-- Implicit
+- Implicit  
   $b_m \neq 0$. $w_{i+1}$ appears on both sides and must be solved for.
 
 ## Adams Methods
@@ -101,28 +99,38 @@ The $m$-step Adams-Bashforth method and the $(m-1)$-step Adams-Moulton method bo
 
 Implicit methods usually cannot be solved for $w_{i+1}$ in closed form. An explicit method and an implicit method are combined.
 
-- Predict
+- Predict  
   Compute $w_{i+1}^{(p)}$ with an explicit method.
-- Correct
+- Correct  
   Substitute $w_{i+1}^{(p)}$ into the right side of an implicit method to get $w_{i+1}$.
 
 A standard choice uses Runge-Kutta for the starting values, Adams-Bashforth 4-step as predictor, and Adams-Moulton 3-step as corrector. This is more accurate than either Adams method used alone.
 
 ## Worked Example
 
-IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $h = 0.2$, by Adams-Bashforth 2-step. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$ gives the starting values
+IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $h = 0.2$, by Adams-Bashforth 2-step. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, used only to check the result.
+
+The 2-step method needs $w_0$ and $w_1$ before it can start. $w_0 = \alpha = 0.5$ is given; $w_1$ is computed with one step of [order 4 Runge-Kutta](/s5/numerical-methods/runge-kutta-methods).
+
+Starting value $w_1$ by Runge-Kutta, $t_0 = 0$, $w_0 = 0.5$
 
 $$
-w_0 = 0.5, \qquad w_1 = y(0.2) \approx 0.829299
+\begin{aligned}
+k_1 &= 0.2\, f(0,\ 0.5) = 0.3 \\
+k_2 &= 0.2\, f(0.1,\ 0.5 + 0.15) = 0.328 \\
+k_3 &= 0.2\, f(0.1,\ 0.5 + 0.164) = 0.3308 \\
+k_4 &= 0.2\, f(0.2,\ 0.5 + 0.3308) = 0.35816 \\
+w_1 &= 0.5 + \tfrac{1}{6}\left( k_1 + 2k_2 + 2k_3 + k_4 \right) = 0.829293
+\end{aligned}
 $$
 
-Step to $t_2 = 0.4$
+Step to $t_2 = 0.4$ by Adams-Bashforth
 
 $$
 \begin{aligned}
 f_0 &= w_0 - 0.0^2 + 1 = 1.5 \\
-f_1 &= w_1 - 0.2^2 + 1 = 1.789299 \\
-w_2 &= w_1 + \frac{0.2}{2}\left[ 3 f_1 - f_0 \right] = 0.829299 + 0.1\,(3.867897) = 1.216089
+f_1 &= w_1 - 0.2^2 + 1 = 1.789293 \\
+w_2 &= w_1 + \frac{0.2}{2}\left[ 3 f_1 - f_0 \right] = 0.829293 + 0.1\,(3.867879) = 1.216081
 \end{aligned}
 $$
 

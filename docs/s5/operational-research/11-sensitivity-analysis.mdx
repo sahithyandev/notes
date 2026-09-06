@@ -6,32 +6,221 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:20.131Z
-lastUpdatedOn: 2026-08-28T11:38:57.352Z
+lastUpdatedOn: 2026-09-06T13:01:26.814Z
 ---
 
-Post-optimality analysis: examines how the optimal solution changes as LP data changes, without re-solving from scratch.
+Sensitivity analysis studies how the optimal solution reacts to changes in the LP data, without solving the LP again from the start.
 
-## Change in Cost Coefficient
+The optimal tableau is fixed by the choice of basis $B$. A change in the data keeps the same basis optimal as long as 2 conditions still hold:
 
-- Non-basic variable  
-  Stays optimal as long as its objective row coefficient stays within the range keeping the optimality criterion satisfied.
-- Basic variable  
-  The whole objective row is recomputed; find the coefficient range keeping every entry within the optimality criterion.
+- Feasibility  
+  Every basic variable value stays $\ge 0$.
+- Optimality  
+  Every objective row entry satisfies the optimality criterion. For a maximization problem this means every reduced cost $z_j - c_j \ge 0$, where $c_j$ is the objective coefficient of variable $j$ and $z_j$ is the rate at which $z$ would drop if $x_j$ were forced into the basis.
 
-## Change in RHS (Requirement/Resource)
+If both hold, only the affected numbers are recomputed. If one fails, the tableau is repaired with primal or dual simplex.
 
-The RHS column is recomputed using the current basis inverse. Optimal as long as every basic variable's value stays $\ge 0$. Determines the range over which a resource can change without altering the optimal basis.
+## Notation
 
-## Change in Coefficient Matrix
+- $B$  
+  The columns of the original constraint matrix belonging to the current basic variables.
+- $B^{-1}$  
+  The basis inverse. It is read straight off the optimal tableau, in the columns that held the identity matrix in the initial tableau.
+- $c_B$  
+  The objective coefficients of the basic variables in the original problem, listed in basis order.
+- $b$  
+  The original right hand side vector.
+- $A_j$  
+  The column of variable $j$ in the original constraint matrix, before any pivoting.
+- $c_j$  
+  The objective coefficient of variable $j$.
+- $z_j$  
+  The quantity $c_B^{T} B^{-1} A_j$. It is the amount by which $z$ changes per unit of $x_j$ brought into the basis, through the forced adjustment of the current basic variables.
+- $z_j - c_j$  
+  The reduced cost of variable $j$. It is the objective row entry under column $j$. Non-negative for every $j$ means the basis is optimal for a maximization problem.
 
-A change to a non-basic variable's column only affects its own objective row entry, recomputed from the new column and the current basis inverse. A change to a basic variable's column can alter the basis itself, requiring more extensive recomputation.
+Two quantities drive every case:
+
+$$
+\text{RHS column} = B^{-1} b
+$$
+
+$$
+z_j - c_j = c_B^{T} B^{-1} A_j - c_j
+$$
+
+The RHS column gives the basic variable values, so feasibility needs $B^{-1} b \ge 0$. The reduced cost $z_j - c_j$ is the objective row entry under column $j$, so optimality needs $z_j - c_j \ge 0$ for every $j$ in a maximization problem.
+
+## Change in a Cost Coefficient
+
+### Non-basic variable
+
+Only the objective row entry of that one variable changes.
+
+The coefficient $c_j$ enters $z_j - c_j$ with a minus sign and nowhere else, since $c_j$ is not part of $c_B$. So
+
+$$
+z_j - c_j = (\text{fixed term}) - c_j
+$$
+
+The basis stays optimal while this stays $\ge 0$, which gives an upper bound on $c_j$.
+
+### Basic variable
+
+The whole objective row is recomputed.
+
+Now $c_j$ sits inside $c_B$, so it appears in the reduced cost of every non-basic variable. Write $c_j = c_j^{\text{old}} + \Delta$ and impose $z_k - c_k \ge 0$ for every non-basic $k$. Each inequality bounds $\Delta$. Their intersection is the range over which the basis stays optimal.
+
+## Change in the Right Hand Side
+
+Recompute the RHS column with the current basis inverse.
+
+Replace $b$ by the new vector $b_{\text{new}}$. The new basic variable values are
+
+$$
+B^{-1} b_{\text{new}}
+$$
+
+The basis stays optimal while every entry is $\ge 0$. This gives the range over which a resource can change without altering the optimal basis. The objective value moves by the shadow price of that resource times the change.
+
+## Change in the Coefficient Matrix
+
+- Non-basic variable's column
+  Recompute $B^{-1} A_j$ and then $z_j - c_j$ from the new column. If it stays $\ge 0$ the basis is still optimal.
+- Basic variable's column
+  The matrix $B$ itself changes, so $B^{-1}$ changes. The tableau is rebuilt and the LP effectively re-solved.
 
 ## Addition of a Variable
 
-Treat the new variable as a new column. Compute its objective row coefficient using the current basis inverse; if it violates the optimality criterion, it can enter the basis and improve the objective further.
+Treat the new variable as a new column $A_{\text{new}}$ with cost $c_{\text{new}}$.
+
+Compute its objective row entry with the current basis inverse:
+
+$$
+z_{\text{new}} - c_{\text{new}} = c_B^{T} B^{-1} A_{\text{new}} - c_{\text{new}}
+$$
+
+- Entry $\ge 0$
+  The current solution stays optimal. The new variable stays non-basic at value 0.
+- Entry $< 0$
+  Optimality is violated. The new variable can enter the basis and improve the objective.
 
 ## Addition of a Constraint
 
-If the current optimal solution already satisfies the new constraint, it's still optimal.
+- Current optimal solution satisfies the new constraint
+  It stays optimal. No further work.
+- Current optimal solution violates the new constraint
+  Add the constraint to the optimal tableau with a slack, surplus, or artificial variable, and row-reduce it against the current basis. The new basic variable gets a negative value, so the tableau is optimal but infeasible. Continue with the dual simplex method.
 
-Otherwise, add the constraint (with a slack/surplus/artificial variable) to the optimal tableau and continue with the dual simplex method, since the RHS may go negative while the tableau stays optimal.
+## Worked Example
+
+Base LP, the same as the [simplex worked example](/s5/operational-research/simplex-algorithm#worked-example):
+
+$$
+\begin{aligned}
+\text{maximize} \quad & z = 3x_1 + 5x_2 \\
+\text{subject to} \quad & x_1 \le 4 \\
+& 2x_2 \le 12 \\
+& 3x_1 + 2x_2 \le 18 \\
+& x_1, x_2 \ge 0
+\end{aligned}
+$$
+
+Optimal tableau, basis $(s_1, x_2, x_1)$, $x^{*} = (2, 6)$, $z^{*} = 36$:
+
+| Basic | $x_1$ | $x_2$ | $s_1$ | $s_2$ | $s_3$ | RHS |
+| ----- | ----- | ----- | ----- | ----- | ----- | --- |
+| $z$   | 0     | 0     | 0     | 3/2   | 1     | 36  |
+| $s_1$ | 0     | 0     | 1     | 1/3   | -1/3  | 2   |
+| $x_2$ | 0     | 1     | 0     | 1/2   | 0     | 6   |
+| $x_1$ | 1     | 0     | 0     | -1/3  | 1/3   | 2   |
+
+The basis inverse sits in the $s_1, s_2, s_3$ columns, since those held the identity in the initial tableau:
+
+$$
+B^{-1} = \begin{pmatrix} 1 & 1/3 & -1/3 \\ 0 & 1/2 & 0 \\ 0 & -1/3 & 1/3 \end{pmatrix}
+$$
+
+Values used below:
+
+- $c_B = (c_{s_1}, c_{x_2}, c_{x_1}) = (0, 5, 3)$
+- $A_{s_2} = (0,1,0)^{T}$, the unit column for the second constraint
+- $A_{s_3} = (0,0,1)^{T}$, the unit column for the third constraint
+- original RHS $b = (4, 12, 18)^{T}$
+
+### Cost coefficient of a non-basic variable
+
+$s_2$ is non-basic. Its objective row entry:
+
+$$
+z_{s_2} - c_{s_2} = c_B^{T} B^{-1} A_{s_2} - c_{s_2}
+= \left[(0)\tfrac13 + (5)\tfrac12 + (3)\left(-\tfrac13\right)\right] - c_{s_2}
+= \frac32 - c_{s_2}
+$$
+
+The bracket equals $3/2$ and does not depend on $c_{s_2}$. Optimality needs
+
+$$
+\frac32 - c_{s_2} \ge 0 \implies c_{s_2} \le \frac32
+$$
+
+Currently $c_{s_2} = 0$, which reproduces the stored entry $3/2$. The basis stays optimal for $c_{s_2} \in (-\infty, 3/2]$.
+
+### Cost coefficient of a basic variable
+
+$x_1$ is basic. Set $c_1 = 3 + \Delta$, so $c_B = (0, 5, 3 + \Delta)$. Every non-basic entry must stay $\ge 0$.
+
+For $s_2$, with $B^{-1} A_{s_2} = (1/3, 1/2, -1/3)^{T}$ (the second column of $B^{-1}$):
+
+$$
+z_{s_2} - c_{s_2} = (0)\tfrac13 + (5)\tfrac12 + (3 + \Delta)\left(-\tfrac13\right) - 0
+= \frac32 - \frac{\Delta}{3} \ge 0 \implies \Delta \le \frac92
+$$
+
+For $s_3$, with $B^{-1} A_{s_3} = (-1/3, 0, 1/3)^{T}$ (the third column of $B^{-1}$):
+
+$$
+z_{s_3} - c_{s_3} = (0)\left(-\tfrac13\right) + (5)(0) + (3 + \Delta)\tfrac13 - 0
+= 1 + \frac{\Delta}{3} \ge 0 \implies \Delta \ge -3
+$$
+
+Both together give $-3 \le \Delta \le 9/2$, so $c_1 \in [0, 7.5]$.
+
+### Change in the right hand side
+
+Set $b_1 = 4 + \Delta$, so the new RHS vector is $b + \Delta e_1$ with $e_1 = (1,0,0)^{T}$. The new basic values:
+
+$$
+B^{-1}(b + \Delta e_1) = B^{-1} b + \Delta\, B^{-1} e_1
+= \begin{pmatrix}2\\6\\2\end{pmatrix} + \Delta \begin{pmatrix}1\\0\\0\end{pmatrix}
+= \begin{pmatrix}2 + \Delta\\6\\2\end{pmatrix}
+$$
+
+Here $B^{-1} b = (2,6,2)^{T}$ is the current RHS column and $B^{-1} e_1 = (1,0,0)^{T}$ is the first column of $B^{-1}$. Feasibility needs every entry $\ge 0$:
+
+$$
+2 + \Delta \ge 0 \implies \Delta \ge -2
+$$
+
+Only the $s_1$ row changes, so there is no upper bound. The basis stays optimal for $b_1 \in [2, \infty)$.
+
+### Addition of a variable
+
+Add $x_3$ with cost $c_3 = 4$ and original column $A_3 = (1,1,1)^{T}$, meaning coefficient 1 in each constraint. First transform the column:
+
+$$
+B^{-1} A_3 = \begin{pmatrix}1\\1/2\\0\end{pmatrix}
+$$
+
+Then its objective row entry:
+
+$$
+z_3 - c_3 = c_B^{T} B^{-1} A_3 - c_3
+= (0)(1) + (5)\tfrac12 + (3)(0) - 4 = -\frac32 < 0
+$$
+
+Optimality is violated. $x_3$ can enter the basis and improve $z$.
+
+### Addition of a constraint
+
+Add $x_1 + x_2 \le 5$. The current optimum gives $x_1 + x_2 = 2 + 6 = 8 > 5$, so it violates the new constraint. The tableau stays optimal but becomes infeasible. Continued with the dual simplex method in the [dual simplex worked example](/s5/operational-research/dual-simplex-method#worked-example), reaching the new optimum $x_1 = 0$, $x_2 = 5$, $z = 25$.

@@ -1,7 +1,7 @@
 ---
 title: Initial Value Problems
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-09-01T12:39:12.163Z
+lastUpdatedOn: 2026-09-06T13:01:26.813Z
 slug: s5/numerical-methods/initial-value-problems
 sidebar:
   order: 15
@@ -41,12 +41,7 @@ For example, consider: $y' = 1 + t\sin(ty)$, $0 \leq t \leq 2$, $y(0) = 0$.
 
 Here $\left| \dfrac{\partial f}{\partial y} \right| = |t^2 \cos(ty)| \leq 4$ on $[0, 2] \times \mathbb{R}$, so a unique solution exists.
 
-## Well-Posed Problem
-
-The IVP is well-posed **iff**:
-
-- a unique solution $y(t)$ exists
-- the solution is stable, in the sense defined below
+## Stable Solution
 
 Let $\delta(t)$ be a continuous perturbation of the equation and $\delta_0$ a perturbation of the initial value. The perturbed problem is
 
@@ -54,7 +49,7 @@ $$
 z'(t) = f(t, z) + \delta(t), \quad a \leq t \leq b, \quad z(a) = \alpha + \delta_0
 $$
 
-The solution is stable **iff** constants $\varepsilon_0 > 0$ and $k > 0$ exist such that for every $\varepsilon \in (0, \varepsilon_0)$:
+The solution $y(t)$ is stable **iff** constants $\varepsilon_0 > 0$ and $k > 0$ exist such that for every $\varepsilon \in (0, \varepsilon_0)$:
 
 - whenever $|\delta(t)| < \varepsilon$ for all $t \in [a, b]$ **and** $|\delta_0| < \varepsilon$
 - the perturbed problem has a unique solution $z(t)$
@@ -65,6 +60,13 @@ Here:
 - $k$: stability constant, independent of $\varepsilon$
 
 The perturbed solution stays within $k\varepsilon$ of the original. The change in the solution is bounded proportionally to the size of the perturbations.
+
+## Well-Posed Problem
+
+The IVP is well-posed **iff**:
+
+- a unique solution $y(t)$ exists
+- the solution is stable
 
 Check well-posedness before applying any numerical method.
 
