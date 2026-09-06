@@ -1,10 +1,12 @@
 # AGENTS.md
 
-This file provides guidance to AI coding agents (Claude Code, OpenCode, and others) when working with code in this repository.
+Guidance for AI coding agents (Claude Code, OpenCode, and others) working in this repo.
+
+Astro 6 static site. Notes are Markdown files in `docs/`, loaded via content collections and rendered by the page files in `src/pages/`.
 
 ## Commands
 
-Uses **bun** as the package manager (Node >= 22.12.0 required).
+**bun** is the package manager (Node >= 22.12.0).
 
 ```bash
 bun dev        # dev server at localhost:4321
@@ -14,74 +16,56 @@ bun preview    # preview production build
 
 No test or lint commands are configured.
 
-**Slug maintenance script** — must be run manually whenever `.md` files are added or renamed:
+Run the slug script whenever `.md` files are added or renamed:
 
 ```bash
-bun scripts/auto-slug.ts <path/to/file.md> [...]
-bun scripts/auto-slug.ts --dry-run <path/to/file.md>
+bun scripts/auto-slug.ts <path/to/file.md> [...]   # add --dry-run to preview
 ```
 
-## Architecture
+## Writing notes
 
-Astro 6 static site. All notes are Markdown files in `docs/`, loaded via Astro's content collections and rendered by page files.
+Use the `write-notes` skill whenever writing a new note or editing an existing one, so the content matches Sahithyan's style. For math-heavy or interactive learning content, use `math-teacher`.
 
-**Routing:**
+Do not hand-edit these automatic fields:
 
-- `src/pages/index.astro` — Homepage; groups all notes by semester and renders `SemesterCard` components.
-- `src/pages/[sem].astro` — Semester overview page; lists modules and notes for a given semester.
-- `src/pages/[...slug].astro` — Individual note pages; three-column layout (left sidebar / article / TOC rail). Uses `getStaticPaths()` over all notes.
-- `src/pages/og/[...slug].ts` — Generates Open Graph images per note.
-- `src/pages/sitemap-index.xml.ts` and `src/pages/sitemaps/[sem].xml.ts` — Sitemap generation split by semester.
-- `src/pages/license.astro` — License page.
+- `lastUpdatedOn` frontmatter is set on commit.
+- Numeric file prefixes and `sidebar.order` are managed by `scripts/auto-slug.ts`.
 
-**Content collection** (`src/content.config.ts`): globs `./docs/**/*.{md,mdx}`.
+## Slugs & file naming
 
-Required frontmatter: `title`, `slug`. Optional: `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords`.
+URLs come from the `slug` frontmatter field, not the file path. `auto-slug.ts` derives everything from a numeric filename prefix:
 
-**Components** (`src/components/`):
+- `docs/s2/theory-of-electricity/01-introduction.md` becomes slug `s2/theory-of-electricity/introduction`.
+- The prefix becomes `sidebar.order`.
+- `prev` and `next` are set from position within the directory.
 
-- `nav.astro` — Top navigation bar.
-- `hero.astro` — Homepage hero section.
-- `semester-card.astro` — Card shown per semester on the homepage.
-- `semester-hero.astro` — Hero section on semester overview pages.
-- `note.astro` — Note layout used inside `[...slug].astro`.
-- `note-preview.astro` — Note preview card.
-- `breadcrumb.astro` — Breadcrumb navigation.
-- `search-modal.astro` — Search modal.
-- `stats-band.astro` / `stat-card.astro` — Stats display.
-- `walks-venn-diagram.astro` — One-off diagram component.
+`images/` and `summary/` subdirectories are skipped.
 
-**Utilities** (`src/utils/`):
+Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
-- `index.ts` — Shared helper functions (e.g. `titleize`).
-- `values.ts` — Site-wide constants (`SITE_NAME`, `SITE_DOMAIN`, `SITE_DESCRIPTION`).
+Omit `prereqs` when it only names the previous note (the `prev` / sidebar-order link already conveys that). Keep `prereqs` only for dependencies on notes elsewhere in the module or in other modules.
 
-## Slug & File Naming Convention
+## Routing
 
-URLs come from the `slug` frontmatter field, **not** from the file path. The `auto-slug.ts` script derives slugs automatically:
+- `src/pages/index.astro` — homepage, notes grouped by semester.
+- `src/pages/[sem].astro` — semester overview (modules and notes).
+- `src/pages/[...slug].astro` — individual note pages; three-column layout, hand-written prose CSS, `getStaticPaths()` over all notes.
+- `src/pages/og/[...slug].ts` — per-note Open Graph images.
+- `src/pages/sitemap-index.xml.ts`, `src/pages/sitemaps/[sem].xml.ts` — sitemaps split by semester.
 
-- Files must be named with a numeric prefix: `01-introduction.md`
-- The prefix is stripped from the slug: `docs/s2/theory-of-electricity/01-introduction.md` → slug `s2/theory-of-electricity/introduction`
-- The numeric prefix becomes `sidebar.order` in frontmatter
-- `prev: true/false` and `next: true/false` are set based on position within the directory
-
-Always run the slug script after adding or renaming note files. `images/` and `summary/` subdirectories are excluded from slug processing.
-
-## Computer Security Notes Scope
-
-`docs/s5/computer-security/cipher-algorithms/` holds one note per specific cipher algorithm. Both classical (shift, substitution, playfair, vigenere, permutation, lorenz) and modern (DES, RSA) ciphers are covered. `cipher-algorithms/01-introduction.mdx` is a pure index page for the directory, grouping links to every cipher note by category. It holds no theory content of its own.
-
-Common cipher theory that isn't specific to one algorithm belongs in dedicated top-level notes, not `cipher-algorithms/01-introduction.mdx`: `ciphers.mdx` (encryption/decryption, secret-key definitions, and categorization) and `kerckhoffs-principle.mdx`.
-
-`docs/s5/computer-security/` (top level) holds every other note in the module: security models and threats, CIA triad, and cipher-family concepts not tied to one algorithm (general cipher theory, stream ciphers, block ciphers, block cipher modes, public key cryptography, Diffie-Hellman key exchange).
-
-New note on one specific cipher algorithm → `cipher-algorithms/`. New shared cipher theory → its own top-level note (split further if it covers more than one concept). Anything else in the module → top level.
+Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Components live in `src/components/`, shared helpers in `src/utils/` (`index.ts` for helpers like `titleize`, `values.ts` for site constants).
 
 ## Styling
 
-- Light/dark mode toggled via `data-theme` on `<html>`, persisted to `localStorage` key `sn-theme`.
-- Per-semester accent colors are CSS custom properties `--s1` through `--s8`, defined in `src/styles/global.css`.
-- No Tailwind Typography plugin — prose styles are hand-written CSS in `src/pages/[...slug].astro`.
-- Most component styles are scoped `<style>` blocks inside `.astro` files; `global.css` only defines CSS variables and box-sizing reset.
-- Math rendering: `remark-math` + `rehype-katex`; KaTeX CSS loaded from CDN in `Layout.astro`.
-- Custom Markdown HTML classes: `.callout`, `.term`.
+- Light/dark mode via `data-theme` on `<html>`, persisted to `localStorage` key `sn-theme`.
+- Per-semester accent colors are CSS custom properties `--s1`..`--s8` in `src/styles/global.css`.
+- No Tailwind Typography; prose styles are hand-written in `src/pages/[...slug].astro`. `global.css` holds only CSS variables and the box-sizing reset. Other component styles are scoped `<style>` blocks.
+- Math: `remark-math` + `rehype-katex`; KaTeX CSS from CDN in `Layout.astro`.
+- Custom Markdown classes: `.callout`, `.term`.
+
+## Computer Security notes scope
+
+`docs/s5/computer-security/` module layout:
+
+- `cipher-algorithms/` — one note per specific cipher, classical (shift, substitution, playfair, vigenere, permutation, lorenz) and modern (DES, RSA). `cipher-algorithms/01-introduction.mdx` is a pure index grouping links by category, no theory of its own.
+- Top level — everything else: security models and threats, CIA triad, and cipher-family theory not tied to one algorithm (general cipher theory, stream ciphers, block ciphers, block cipher modes, public key cryptography, Diffie-Hellman). Shared theory such as `ciphers.mdx` and `kerckhoffs-principle.mdx` each gets its own note; split further if a note would cover more than one concept.
