@@ -1,0 +1,112 @@
+---
+title: Program Security
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-07T07:51:10.494Z
+slug: s5/computer-security/program-security
+sidebar:
+  order: 11
+prev: true
+next: true
+---
+
+Program security is the protection of confidentiality, integrity, and availability in the programs a system runs.
+
+Programs to secure:
+
+- Operating system.
+- Device drivers.
+- Network software, e.g. the TCP stack and web servers.
+- Database management systems.
+
+## Security Properties Against an Attacker
+
+Security concerns an honest user and a dishonest attacker. The attacker either disrupts the honest user's use of the system or learns information intended for the user alone.
+
+- Confidentiality
+  An attacker cannot learn information about the system or its users.
+- Integrity
+  The system only reaches states that would occur if there were no attacker.
+- Availability
+  An attacker cannot prevent authorized users from using the system.
+
+## Correctness and Security
+
+- Correctness
+  On expected input the system produces the desired output. Good input gives good output. More features make the system better.
+- Security
+  On unexpected input from an attacker the system does not fail in certain ways. More features give the attacker more to exploit, so the system can get worse.
+
+## Nonmalicious Program Errors
+
+Faults introduced without intent to harm, still exploitable by an attacker.
+
+- [Buffer overflow](/s5/computer-security/buffer-overflow)
+- [Incomplete mediation](/s5/computer-security/incomplete-mediation)
+- [Time-of-check to time-of-use errors](/s5/computer-security/toctou)
+
+## Format String Attacks
+
+A format string attack exploits code that passes attacker-controlled input directly as a format string argument, rather than as a data argument.
+
+```c
+sprintf(buffer, sizeof_buffer, input);
+```
+
+`input` is interpreted as a format string. An attacker who controls `input` can read from or write to the stack.
+
+### Reading from the Stack
+
+An attacker enters `%x%x%x` as `input`:
+
+```c
+sprintf(buffer, sizeof_buffer, "%x%x%x");
+```
+
+Each `%x` fetches the next value from the stack as if it were an argument, printing 3 hex values that were never intended as output.
+
+### Writing to the Stack
+
+The `%n` conversion stores the number of characters printed so far into the memory location of its corresponding argument.
+
+```c
+printf("Testing%n", &test);
+```
+
+Loads the number 7, the length of `"Testing"`, into the memory location of `test`. An attacker who controls the format string can target a chosen memory location and write an attacker-chosen value into it.
+
+## SQL Injection
+
+SQL injection is a technique where a malicious user injects SQL commands into an SQL statement via web page input. The injected commands alter the statement and compromise the security of the application.
+
+Web applications commonly build SQL statements by concatenating user input:
+
+```
+txtUserId = getRequestString("UserId")
+txtSQL = "SELECT * FROM Users WHERE UserId = " + txtUserId
+```
+
+### Always-True Injection
+
+`1=1` is always true. A `txtUserId` of `105 or 1=1` turns the query into:
+
+```sql
+SELECT UserId, Name, Password FROM Users WHERE UserId = 105 or 1=1
+```
+
+Syntactically valid, and returns every row in `Users` instead of one.
+
+The same pattern applies to string comparisons. Injecting `" or ""="` into a username and password field:
+
+```sql
+SELECT * FROM Users WHERE Name ="" or ""="" AND Pass ="" or ""=""
+```
+
+### Batched Statement Injection
+
+Batched SQL statements are separated by a semicolon. Injecting a second statement after the intended one:
+
+```sql
+SELECT * FROM Users WHERE UserId = 105; DROP TABLE Suppliers
+```
+
+Returns the requested row, then executes the injected `DROP TABLE`, deleting the `Suppliers` table.
