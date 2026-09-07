@@ -1,0 +1,64 @@
+---
+title: Block Encryption Schemes
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-07T13:26:44.673Z
+slug: s5/computer-security/block-encryption-schemes
+sidebar:
+  order: 8
+prev: true
+next: true
+---
+
+A scheme that encrypts messages of arbitrary length, built from a [block cipher](/s5/computer-security/block-ciphers) through a mode of operation. Messages $m$ and ciphertexts $c$ are bit strings of any length, under a key $k$. This is the object that targets IND-CPA or IND-CCA security.
+
+## What the Scheme Adds
+
+- Randomisation  
+  An IV or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts.
+- Padding  
+  Extra bytes appended to the last block so the message length is a multiple of $n$.
+- Chaining  
+  Each block's encryption depends on previous blocks, so a repeated plaintext block does not produce a repeated ciphertext block.
+
+## Attack Models
+
+An attack model fixes what the attacker is allowed to do. The attacker never sees the key $k$ and instead interacts through an oracle.
+
+An oracle is a black box that applies $e_k$ or $d_k$ to inputs the attacker chooses and returns the output, without revealing $k$. Real systems act as oracles. There are 2 types of oracles.
+
+- Encryption oracle  
+  A server that encrypts given messages.
+- Decryption oracle  
+  A server that decrypts incoming messages except the challenged ciphertext.
+
+Listed from the weakest attacker capability to the strongest. A scheme secure against a stronger model is also secure against the weaker ones.
+
+### Ciphertext Only
+
+Attacker has only $c$ and searches the key space exhaustively for a $k$ giving a meaningful $d_k(c)$. Requires $|k| > 2^{64}$ to make this infeasible.
+
+### Chosen Plaintext
+
+Attacker queries an encryption oracle on arbitrary plaintext repeatedly (with or without a bound). By using the plaintext-ciphertext pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+If the attacker cannot learn about $k$, then the scheme is said to be _indistinguishable under chosen plaintext attack (IND-CPA)_.
+
+Security is then tested with a game:
+
+1. The attacker picks two equal-length messages $m_0, m_1$ and sends both to the challenger.
+2. The challenger picks a random bit $b \in \{0,1\}$, keeps it secret, and returns the challenge ciphertext $c^* = e_k(m_b)$.
+3. The attacker keeps querying the encryption oracle on any plaintext, then outputs a guess $b'$ for $b$.
+
+The attacker wins if $b' = b$ with probability noticeably above $\tfrac{1}{2}$.
+
+Caesar cipher and one-time pads are _not_ IND-CPA secure.
+
+### Chosen Ciphertext
+
+Attacker queries an encryption oracle and decryption oracle on arbitrary plaintext and ciphertext repeatedly (with or without a bound). By using the plaintext-ciphertext pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+If the attacker cannot learn about $k$, then the scheme is said to be _indistinguishable under chosen ciphertext attack (IND-CCA)_.
+
+Same as IND-CPA, plus a decryption oracle that returns $d_k(c)$ for any ciphertext $c$ except $c^*$. Same winning condition on $b$.
+
+El Gamal cryptosystem is _not_ IND-CCA secure.

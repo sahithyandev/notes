@@ -1,17 +1,13 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-08-04T03:56:01.935Z
+lastUpdatedOn: 2026-09-07T13:26:44.673Z
 slug: s5/computer-security/stream-ciphers
 sidebar:
   order: 6
 prev: true
 next: true
 ---
-
-Since security depends only on the key, the key space must be large enough to make an exhaustive key search infeasible.
-
-## Stream Cipher
 
 Models plaintext as a bit stream, combined with a random keystream via a reversible operation, bitwise XOR.
 
@@ -25,17 +21,17 @@ Both encryption and decryption must generate the identical keystream $k_i$.
   A bit error in a transmitted ciphertext bit corrupts only the corresponding decrypted plaintext bit.
 - Efficient for real-time data (audio, video streaming) when the keystream generation algorithm is fast.
 
-### One-Time Pad
+## Stream Encryption Scheme
 
-A keystream that is different for every message and as long as the message is perfectly secure.
+Generates a keystream from the key and an initialization vector (IV), then combines it with the plaintext one bit or character at a time, usually by XOR. No padding, ciphertext length equals plaintext length. A stream cipher is already a complete scheme.
 
-<Note>
+## One-Time Pad
 
-Not practical, since applications need a short key to encrypt a long message, and reuse of the same key across multiple messages.
+A keystream that is as long as the message and different for every message is perfectly secure.
 
-</Note>
+Impractical as it requires a key as long as the message and never reused, but applications need a short key and reuse it across many messages.
 
-### Keystream Generator
+## Keystream Generator
 
 Practical stream ciphers use a keystream generator: a short secret key expands into a stream of pseudorandom bits $k_0, k_1, k_2, \dots$.
 

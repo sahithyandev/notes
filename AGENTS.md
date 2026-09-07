@@ -43,7 +43,7 @@ URLs come from the `slug` frontmatter field, not the file path. `auto-slug.ts` d
 
 Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
-Omit `prereqs` when it only names the previous note (the `prev` / sidebar-order link already conveys that). Keep `prereqs` only for dependencies on notes elsewhere in the module or in other modules.
+Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order link already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules.
 
 ## Routing
 

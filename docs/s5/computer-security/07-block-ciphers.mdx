@@ -1,7 +1,7 @@
 ---
 title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-08-29T07:00:13.792Z
+lastUpdatedOn: 2026-09-07T13:26:44.673Z
 slug: s5/computer-security/block-ciphers
 sidebar:
   order: 7
@@ -11,40 +11,36 @@ next: true
 
 A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
 
-For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$.
-
-## Block Cipher as a PRP
-
-A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
-
-Large messages are divided into blocks and encrypted independently per block:
+Large messages are divided into blocks and encrypted independently per block.
 
 $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
 $$
 
-Per [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), $e$ and $d$ are public. Only $k$ is secret.
+For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$. Per [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), $e$ and $d$ are public. Only $k$ is secret.
 
-## Attacking a Block Cipher
+A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
 
-- Ciphertext only  
-  Attacker has only $c$ and searches the key space exhaustively for a $k$ giving a meaningful $d_k(c)$. Requires $|K| > 2^{64}$ to make this infeasible.
-- Chosen plaintext (IND-CPA)  
-  Attacker submits chosen plaintexts to an encryption oracle and must not be able to distinguish encryptions of chosen messages better than a coin toss.
-- Chosen ciphertext (IND-CCA)  
-  Attacker has access to an encryption oracle, a decryption oracle (except for the challenge ciphertext), and a left-right oracle producing $c^* = e_k(m_b)$ for $b \in \{0,1\}$. Wins by guessing $b$. A secure scheme limits this to probability 0.5.
-
-<Note>
-
-A large key space alone does not guarantee security against these attacks.
-
-</Note>
-
-A block cipher encrypts a set of bits or characters at a time, whereas a stream cipher encrypts a single bit or character at a time. A stream cipher is used directly as an encryption scheme, but a block cipher is only a building block. The specific design combining a block cipher into a usable encryption scheme is its mode of operation.
+A block cipher encrypts a set of bits or characters at a time, whereas a stream cipher encrypts a single bit or character at a time.
 
 ## Iterated Block Cipher Design
 
-Security comes from repeated application of a round function to the block, over $r$ rounds. Increasing $r$ increases security up to a stable level.
+### Round Design
+
+An iterated block cipher builds $e_k$ by applying a simple keyed transformation, the round function, to the block $r$ times in succession.
+
+- Round  
+  One application of the round function. A single round is weak; security comes from repetition, and increasing $r$ raises security up to a stable level.
+- Round key $k_i$  
+  The key used in round $i$, derived from $k$ by the key schedule.
+- Key schedule  
+  The algorithm that expands $k$ into the round keys $k_1,...,k_r$.
+
+Examples:
+
+- DES: 16 rounds, Feistel structure, 48-bit round keys from a 56-bit key.
+- AES: 10, 12, or 14 rounds for 128, 192, or 256-bit keys, SP-network structure.
+- Triple DES: DES run three times with two or three independent keys.
 
 ### Feistel Cipher
 
@@ -62,11 +58,7 @@ $$
 R_{i-1} \leftarrow L_i, \quad L_{i-1} \leftarrow R_i \oplus F(k_i, L_i)
 $$
 
-<Note>
-
 The round operation is invertible independent of $F$, so the same hardware or software can perform both encryption and decryption by reversing the order of round keys.
-
-</Note>
 
 Design parameters of a Feistel cipher:
 
@@ -87,32 +79,38 @@ Proposed by Claude Shannon in 1945: a series of linked permutation and substitut
 
 ## Modes of Operation
 
-A mode of operation combines a block cipher into a usable block encryption scheme. DES was standardized with 4 modes:
+A mode of operation is a recommended standard for using a block cipher to build a scheme for arbitrary-length messages. Plaintext $m$ is divided into blocks $m_1,...,m_n$ of the length the underlying cipher specifies, padding the last block if needed.
 
-- ECB, useful for encrypting short secrets such as session keys.
-- CBC, useful for bulk data encryption.
-- OFB, useful for real-time streamed content.
-- CFB, useful for streamed content.
+DES was standardized with 4 modes: ECB, CBC, OFB, CFB. CTR was added later to allow parallel encryption of data blocks.
 
-CTR mode, enabling parallel block encryption, was developed later.
+- ECB, for short secrets such as session keys.
+- CBC, for bulk data encryption.
+- OFB, for real-time streamed content.
+- CFB, for streamed content.
+- CTR, for data that must be encrypted or decrypted in parallel.
 
-### ECB
+### ECB Mode
 
-Electronic Code Book: each plaintext block is encrypted independently.
+Electronic Code Book, the simplest mode: each block is encrypted independently.
 
 $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
 $$
 
-<Note>
+Vulnerabilities:
 
-Vulnerabilities: identical plaintext blocks leak as identical ciphertext blocks, an attacker can delete or splice blocks undetected since blocks carry no context, and a ciphertext bit error corrupts only its own block on decryption, with no propagation.
+- Information leakage  
+  Identical plaintext blocks ($m_i = m_j$) produce identical ciphertext blocks ($c_i = c_j$), letting an attacker spot repetition.
+- Block deletion  
+  Blocks are independent, so an attacker can delete blocks in transit and the receiver cannot detect the modification.
+- Block splicing  
+  For the same reason, an attacker can copy blocks from one message into another undetected.
 
-</Note>
+Error propagation: a single bit error in a received ciphertext block corrupts the entire corresponding plaintext block on decryption. There is no propagation into other blocks.
 
-### CBC
+### CBC Mode
 
-Cipher Block Chaining: chains each ciphertext block into the encryption of the next, giving every block context.
+Cipher Block Chaining fixes ECB by chaining ciphertext into each block's encryption, giving every block context from its neighbors.
 
 $$
 c_1 \leftarrow e_k(m_1 \oplus IV), \quad c_i \leftarrow e_k(m_i \oplus c_{i-1}) \text{ for } i > 1
@@ -122,56 +120,48 @@ $$
 m_1 \leftarrow d_k(c_1) \oplus IV, \quad m_i \leftarrow d_k(c_i) \oplus c_{i-1} \text{ for } i > 1
 $$
 
-- A single ciphertext bit error corrupts its own plaintext block fully, plus a single bit in the next block, giving 1-block error propagation.
-- A fixed public IV (e.g. all-0) need not be transmitted. A random nonce IV must be sent alongside the ciphertext.
+The IV can be a fixed public value (e.g. all-zero), which need not be transmitted, or a random nonce, which must be transmitted with the ciphertext as $IV, c_1,...,c_n$.
 
-### OFB
+Error propagation: a single bit error in a received ciphertext block corrupts the entire corresponding plaintext block, plus a single bit in the next block. This is one-block error propagation.
 
-Output Feedback: runs the block cipher as a keystream generator, turning it into a stream cipher.
+### OFB Mode
+
+Output Feedback lets a block cipher operate as a stream cipher: it generates a keystream $Y_i$ of $b$ bits at a time, XORed with the plaintext or ciphertext stream.
 
 $$
 Y_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Y_i, \quad m_i \leftarrow c_i \oplus Y_i
 $$
 
-with $Y_0 \leftarrow IV$. Both encryption and decryption use $e_k$, never $d_k$.
+$Y_0 \leftarrow IV$. Both encryption and decryption use only the encryption operation $e_k$.
 
-<Note>
+The keystream can be precomputed before any ciphertext arrives, so OFB suits real-time streamed content.
 
-A ciphertext bit error corrupts only the corresponding plaintext bit, no propagation. The keystream can be precomputed before ciphertext arrives, making OFB suitable for real-time streaming.
+Error propagation: a single bit error in a received ciphertext block corrupts only the corresponding single bit of plaintext. There is no propagation into other blocks.
 
-</Note>
+### CFB Mode
 
-### CFB
-
-Cipher Feedback: also produces a keystream, but feeds the ciphertext itself back into the cipher input.
+Cipher Feedback also lets a block cipher operate as a stream cipher, similar to OFB, but feeds the ciphertext itself back into the keystream generator.
 
 $$
 Z_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Z_i^*, \quad Y_i \leftarrow Y_{i-1} \ll c_i
 $$
 
-with $Y_0 \leftarrow IV$ and $Z_i^*$ the leading $b$ bits of $Z_i$. Decryption mirrors this using $c_i$ in place of $m_i$.
+$Y_0 \leftarrow IV$, and $Z_i^*$ is the $b$ most-significant bits of $Z_i$. Decryption mirrors this, also using only $e_k$.
 
-<Note>
+Unlike OFB, the keystream depends on the ciphertext and cannot be precomputed before ciphertext arrives, making CFB less useful than OFB for real-time streaming.
 
-A ciphertext bit error corrupts the corresponding plaintext bit, then keeps corrupting the shift register $Y_i$ until it is fully flushed after $n/b$ rounds, causing severe error propagation. Since $Y_i$ depends on the received ciphertext, the keystream cannot be precomputed, making CFB less suited to real-time use than OFB.
+Error propagation: a single bit error in a received ciphertext block corrupts a single bit in the corresponding plaintext block, then keeps corrupting the input buffer $Y_i$ until it is flushed after $n/b$ rounds, completely corrupting $n/b - 1$ further blocks. This causes severe error propagation.
 
-</Note>
+### CTR Mode
 
-### CTR
-
-Counter mode: like ECB, but XORs plaintext with the encryption of a counter rather than encrypting the plaintext directly.
+Counter mode is similar to ECB but removes its disadvantages while keeping its advantage of parallel processing.
 
 $$
 c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_b), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_b)
 $$
 
-where $\langle i \rangle_b$ is the $b$-bit binary representation of $i$.
+$\langle i \rangle_b$ is the binary representation of $i$ as a $b$-bit number.
 
-- Blocks can be encrypted in parallel, like ECB, since each block is independent.
-- The counter provides context, preventing the cut-and-paste and rearrangement attacks possible against ECB.
+Each plaintext block is encrypted independently, like ECB, so blocks can be processed in parallel. The counter also gives each block context, so unlike ECB, an attacker cannot cut-and-paste or rearrange ciphertext blocks undetected.
 
-<Note>
-
-The counter value $IV + i$ must never be reused under the same key.
-
-</Note>
+Vulnerability: the counter input $IV + i$ must never be reused for a subsequent encryption under the same key $k$.
