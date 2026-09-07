@@ -2,8 +2,13 @@
 import { Monitor, Sun, Moon } from "@lucide/astro";
 import SearchModal from "./search-modal.astro";
 import LiveUsersCount from "./live-users-count.astro";
+import Logo from "./icons/Logo.astro";
 
 const shouldStretchFull = Astro.url.pathname.startsWith("/s");
+const semMatch = Astro.url.pathname.match(/^\/(s[1-8])(?:\/|$)/);
+const logoRule = semMatch
+  ? `color-mix(in oklab, var(--${semMatch[1]}) 60%, transparent)`
+  : undefined;
 ---
 
 <nav
@@ -12,8 +17,13 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     ? "padding: 0 12px;"
     : "padding: 0 var(--body-margin-x);"}
 >
-  <a href="/" class="nav-logo">
-    <span class="nav-name">Sahithyan's Notes</span>
+  <a href="/" class="nav-logo" aria-label="Sahithyan's Notes, home">
+    <Logo width={20} height={20} class="nav-mark" rule={logoRule} />
+    <span class="nav-name">
+      <span class="nav-name-owner">Sahithyan's</span><span class="nav-name-main"
+        >Notes</span
+      >
+    </span>
   </a>
 
   <LiveUsersCount />
@@ -122,13 +132,37 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
 
   .nav-logo {
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-primary);
+  }
+
+  .nav-mark {
+    flex-shrink: 0;
+    color: var(--accent);
+    transition: transform 0.15s ease;
+  }
+
+  .nav-logo:hover .nav-mark {
+    transform: rotate(-6deg);
   }
 
   .nav-name {
     font-size: 14.5px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+
+  .nav-name-owner {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .nav-name-main {
     font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
+    margin-left: 0.28em;
   }
 
   .nav-right {

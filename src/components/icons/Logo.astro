@@ -1,0 +1,38 @@
+---
+interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+  /** Colour of the two ruled lines behind the swash. Defaults to a dimmed currentColor. */
+  rule?: string;
+}
+
+const {
+  width = 24,
+  height = 24,
+  class: className,
+  rule = "color-mix(in oklab, currentColor 42%, transparent)",
+} = Astro.props;
+---
+
+<svg
+  class={className}
+  width={width}
+  height={height}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <g stroke={rule} stroke-width="2">
+    <path d="M4.5 9H9.9"></path>
+    <path d="M14.4 9H19.5"></path>
+    <path d="M4.5 15H8.9"></path>
+    <path d="M13.4 15H19.5"></path>
+  </g>
+  <path
+    d="M15.2 4.6C15.2 3 13.4 2.7 12.8 4.1C12.1 5.8 12.6 8.6 11.9 12C11.2 15.5 11.9 18.3 11.2 20C10.6 21.4 8.8 21 8.8 19.4"
+    stroke="currentColor"
+    stroke-width="2"></path>
+</svg>
