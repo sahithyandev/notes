@@ -1,7 +1,7 @@
 ---
 title: Buffer Overflow Basics
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-08-18T07:15:37.878Z
+lastUpdatedOn: 2026-09-07T08:31:09.861Z
 slug: s5/secure-app-dev/buffer-overflow-basics
 sidebar:
   order: 7
@@ -9,7 +9,7 @@ prev: true
 next: true
 ---
 
-A buffer overflow, also called a buffer overrun, is a [spatial memory safety violation](/s5/secure-app-dev/memory-safety) where more input is placed into a buffer than its allocated capacity, overwriting other information. First widely exploited by the Morris Worm in 1988, it remains a major concern despite well-known prevention techniques.
+A buffer overflow, aka. a buffer overrun, is a [spatial memory safety violation](/s5/secure-app-dev/memory-safety) where more input is placed into a buffer than its allocated capacity, overwriting other information. First widely exploited by the Morris Worm in 1988, it remains a major concern despite well-known prevention techniques.
 
 The overflow is a programming error: a process attempts to store data beyond a fixed-size buffer's limits, overwriting adjacent memory locations. Those locations may hold other program variables, parameters, or control flow data. The buffer itself may sit on the stack, in the heap, or in the process's data section.
 
@@ -39,7 +39,7 @@ When one function calls another, it needs somewhere to save the return address, 
 
 ## Stack Buffer Overflow
 
-Also called stack smashing, this overflow occurs when the overflowed buffer sits on the stack, used by the Morris Worm and still widely exploited today.
+Aka. stack smashing, this overflow occurs when the overflowed buffer sits on the stack, used by the Morris Worm and still widely exploited today.
 
 An unchecked call, e.g. `gets()`, copying attacker-controlled input into a fixed-size stack buffer can overwrite adjacent stack contents, including the saved frame pointer and the return address. Overwriting the return address redirects control flow to an address chosen by the attacker on function return.
 

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/application-development
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-06-01T03:58:53.198Z
+lastUpdatedOn: 2026-09-07T08:31:09.852Z
 ---
 
 Applications, as the intermediary between the user and database is discussed here. Can be split into 3:
@@ -211,7 +211,7 @@ Caching at both the server and client side helps boost responsiveness.
 It's a security vulnerability where attackers insert malicious SQL code into input fields, tricking the database into executing harmful commands like data theft or deletion.
 Happens when user inputs are directly concatenated into SQL queries without proper handling.
 
-To avoid SQL injection, prepared statements (also called parameterized queries) are used. Prepared statements separate SQL code from user inputs by using placeholders
+To avoid SQL injection, prepared statements (aka. parameterized queries) are used. Prepared statements separate SQL code from user inputs by using placeholders
 
 ```sql
 -- wrong way ❌
@@ -225,7 +225,7 @@ SELECT  FROM users WHERE username = ?;
 
 ### Cross Site Scripting (XSS)
 
-aka Cross-Site Request Forgery (XSRF or CSRF)
+Aka. Cross-Site Request Forgery (XSRF or CSRF)
 
 A security vulnerability in web applications where attackers inject malicious scripts, usually JavaScript, into trusted websites.
 When users visit these compromised sites or pages, the malicious scripts execute in their browsers without their knowledge.
