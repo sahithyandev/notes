@@ -31,6 +31,29 @@ Do not hand-edit these automatic fields:
 - `lastUpdatedOn` frontmatter is set on commit.
 - Numeric file prefixes and `sidebar.order` are managed by `scripts/auto-slug.ts`.
 
+### Label and description formatting
+
+`label: description` pairs are banned everywhere in note content: list items, prose sentences, and table cells.
+
+When a list item has a label and a description, use the 2-line format. Label on the first line ending with 2 trailing spaces, description indented on the second line:
+
+```
+- Continuous intensity
+  No fixed set of allowed values.
+```
+
+The 2 trailing spaces are required. Without them Markdown collapses the line break.
+
+If a label does not fit the 2-line form, rewrite it as a plain sentence. Never use `- Continuous intensity: no fixed set of allowed values`.
+
+Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Here:` lead-in, such as `- $A$: cross-sectional area`.
+
+### Note components
+
+Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
+
+Never place 2 `<Note>` components next to each other. Merge them into 1, or move one back into the main text.
+
 ## Slugs & file naming
 
 URLs come from the `slug` frontmatter field, not the file path. `auto-slug.ts` derives everything from a numeric filename prefix:
