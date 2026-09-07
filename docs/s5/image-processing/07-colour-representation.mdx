@@ -1,9 +1,9 @@
 ---
 title: Color Representation
 sidebar:
-  order: 9
+  order: 7
 dateCreated: 2026-07-26T04:59:18.528Z
-lastUpdatedOn: 2026-08-04T19:28:52.897Z
+lastUpdatedOn: 2026-09-07T19:01:14.316Z
 slug: s5/image-processing/colour-representation
 prev: true
 next: true
@@ -20,6 +20,12 @@ A digital color image is stored as a multi-channel structure, one image per attr
 
 $$
 Y = f(R,G,B) \qquad C_r = f(R-Y) \qquad C_b = f(B-Y)
+$$
+
+The luminance channel is a weighted sum of the linear RGB components, matching the eye's differing sensitivity to each.
+
+$$
+Y = 0.299\,R + 0.587\,G + 0.114\,B
 $$
 
 - Discarding $C_r, C_b$ gives a monochrome image directly
