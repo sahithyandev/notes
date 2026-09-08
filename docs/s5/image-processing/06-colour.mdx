@@ -1,0 +1,154 @@
+---
+title: Color
+dateCreated: 2026-07-26T04:59:00.680Z
+lastUpdatedOn: 2026-09-08T19:05:18.723Z
+slug: s5/image-processing/colour
+sidebar:
+  order: 6
+prev: true
+next: true
+---
+
+Color is a construct in the brain. It doesn't correspond to a physical phenomenon. Mixing light waves of different wavelengths produces the perception of different colors.
+
+A few narrow wavelength bands are perceived as distinct colors, named primary colors. Primary colors are orthogonal to each other. Mixing primary colors produces the secondary colors we perceive.
+
+Color reaches the eye from an object 2 ways.
+
+## Emission based
+
+The object emits colored light directly. Adding more light gives a brighter color. All primaries together give white, absence of light gives black.
+
+Computer displays are emission based.
+
+## Absorption based
+
+The object absorbs part of the incident white light and reflects the rest. Adding more colorant removes more of the spectrum, giving a darker color. Bare substrate reflects white, full colorant absorbs everything and gives black.
+
+Print is absorption based.
+
+## Color spaces
+
+A color space is a model that represents colors as tuples of numbers.
+
+### RGB
+
+RGB is an emission based color space with primaries red, green and blue.
+
+Each cone type is maximally sensitive to a different wavelength.
+
+- L cones respond best to ~560 nm, red light
+- M cones respond best to ~530 nm, green light
+- S cones respond best to ~420 nm, blue light
+
+Any visible color is the brain's interpretation of signals from these 3 cone types firing at different intensities. RGB primaries are chosen because they align with cone sensitivity. Each wavelength band stimulates a different cone type, making them orthogonal. Any visible color can be recreated by combining red, green and blue light in the right proportions, without the full spectrum.
+
+Each channel is an 8-bit value in $[0, 255]$. All channels at $0$ gives black. All channels at $255$ gives white.
+
+### CMYK
+
+CMYK is an absorption based color space with colorants cyan, magenta, yellow and key.
+
+- $C$: cyan, absorbs red
+- $M$: magenta, absorbs green
+- $Y$: yellow, absorbs blue
+- $K$: key, black ink added to deepen dark tones and reduce colored ink use
+
+Each component is a fraction in $[0, 1]$. All components at $0$ gives white, the bare substrate. $K = 1$ gives black.
+
+Cyan, magenta and yellow are the secondary colors of RGB. Each absorbs one RGB primary, so CMY is the subtractive counterpart of the additive RGB primaries.
+
+### Conversion between RGB and CMYK
+
+Normalize each RGB channel to $[0, 1]$.
+
+$$
+R' = \frac{R}{255} \quad G' = \frac{G}{255} \quad B' = \frac{B}{255}
+$$
+
+$$
+K = 1 - \max(R', G', B')
+$$
+
+$$
+C = \frac{1 - R' - K}{1 - K} \quad
+M = \frac{1 - G' - K}{1 - K} \quad
+Y = \frac{1 - B' - K}{1 - K}
+$$
+
+When $K = 1$, set $C = M = Y = 0$.
+
+The reverse conversion.
+
+$$
+R = 255 (1 - C)(1 - K) \quad
+G = 255 (1 - M)(1 - K) \quad
+B = 255 (1 - Y)(1 - K)
+$$
+
+The RGB gamut and the CMYK gamut differ, so a round trip is not always exact.
+
+<RgbCmykConverter />
+
+## Color representation
+
+A digital color image is stored as a multi-channel structure, one image per attribute.
+
+### Channels
+
+- RGB  
+  Maintains the intensity of red, green and blue in separate channels.
+- Luminance and chrominance  
+  Separates brightness (luminance) from color (chrominance) into separate channels.
+
+$$
+Y = w_r\,R + w_g\,G + w_b\,B
+$$
+
+$Y$ is a weighted sum of the linear RGB components, matching the eye's differing sensitivity to each. $C_r$ and $C_b$ are the red and blue differences from luminance, scaled so each spans $[-0.5, 0.5]$.
+
+$$
+C_r = \frac{R - Y}{2\,(1 - w_r)} \qquad C_b = \frac{B - Y}{2\,(1 - w_b)}
+$$
+
+The weights follow from the RGB primaries and white point fixed by the chosen standard, defined by the ITU Radiocommunication Sector (ITU-R). Different versions define different weights.
+
+- ITU-R BT.601 (SD)  
+  $w_r = 0.299$, $w_g = 0.587$, $w_b = 0.114$
+- ITU-R BT.709 (HD)  
+  $w_r = 0.2126$, $w_g = 0.7152$, $w_b = 0.0722$
+- ITU-R BT.2020 (UHD)  
+  $w_r = 0.2627$, $w_g = 0.6780$, $w_b = 0.0593$
+
+Discarding $C_r, C_b$ gives a monochrome image directly.
+
+The human visual system is more sensitive to luminance than color, so YCrCb formats often allocate bits in a 4:2:2 ratio. Widely used for this inherent compression capability.
+
+## Per-pixel storage
+
+How much color each pixel holds, independent of the channel layout.
+
+- Binary  
+  1 bit per pixel, black or white.
+- Grayscale  
+  A single intensity channel, usually 8-bit.
+- Indexed  
+  Each pixel is an index into a color table. Covered below as palette based representation.
+- True color  
+  Each pixel stores a full color value.
+- High color  
+  15 or 16-bit direct color. Largely historical.
+
+### True color
+
+An image that stores a full color value in every pixel. RGB uses 24 bits per pixel, or 3 bytes. CMYK needs 4 bytes per pixel.
+
+### Palette based representation
+
+Most images use far fewer distinct colors than true color allows. A 1920x1024 image has under 2 million pixels, so at most 2 million distinct colors, against the $2^{24}$ an RGB pixel can encode.
+
+Storing a table of the colors actually used, then storing pointers into that table, is more storage-efficient than true color.
+
+- Palette length determines how many distinct colors can be used at once, out of the full $2^{24}$
+- Bits per pixel in image memory depend on the palette table length
+- The palette table is usually stored with the image, allowing a custom color set per image

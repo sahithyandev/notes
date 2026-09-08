@@ -3,7 +3,7 @@ title: Image Model
 sidebar:
   order: 2
 dateCreated: 2026-07-26T04:58:54.491Z
-lastUpdatedOn: 2026-09-07T19:01:14.313Z
+lastUpdatedOn: 2026-09-08T19:05:18.721Z
 slug: s5/image-processing/image-model
 prev: true
 next: true
@@ -75,25 +75,7 @@ Large grid cells, so a small $m \times n$ and low spatial resolution. Too sparse
 
 - Small features fall between sample points and disappear.
 - Edges and text look blocky. This is pixelation.
-
-Aliasing happens when the pattern in the scene repeats faster than the grid can follow.
-
-- The sampling rate is the number of samples per unit distance, one per grid cell.
-- Capturing a repeating pattern needs at least 2 samples per cycle of that pattern.
-- A pattern with more than 1 cycle per 2 cells is undersampled. The samples then fit a different, lower-frequency pattern that was never in the scene.
-- On fine repeating textures this false pattern shows up as broad curved bands, called moire fringes.
-
-<figure>
-
-![Aliasing](./images/aliasing.jpg)
-
-<figcaption>
-
-Left: Original image. Right: Aliasing effect. Image by [Wikipedia](https://en.wikipedia.org/wiki/Aliasing).
-
-</figcaption>
-
-</figure>
+- Fast repeating patterns reappear as a false slower pattern. This is [aliasing](/s5/image-processing/sampling-and-quantization#aliasing).
 
 ### Coarse quantization
 

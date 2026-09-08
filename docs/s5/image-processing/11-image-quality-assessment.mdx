@@ -1,10 +1,10 @@
 ---
 title: Image Quality Assessment
 dateCreated: 2026-07-26T04:59:41.428Z
-lastUpdatedOn: 2026-09-07T19:01:14.317Z
+lastUpdatedOn: 2026-09-08T19:05:18.726Z
 slug: s5/image-processing/image-quality-assessment
 sidebar:
-  order: 12
+  order: 11
 prev: true
 next: true
 ---
@@ -13,21 +13,20 @@ Image processing aims to reproduce a real-world scene at the same perceptual lev
 
 ## Sources of change
 
-- Artefacts  
-  Unwanted details from side-effects of capture, quantization and processing. Known ahead of time in most instances. Easy to estimate and quantify.
-- Noise  
-  Unwanted details from internal or external sources, mostly from analog stages. Random in most instances, though it may follow a known probability model. Difficult to quantize and estimate.
+### Artefacts
+
+Unwanted details from side-effects of capture, quantization and processing. Known ahead of time in most instances. Easy to estimate and quantify.
+
+### Noise
+
+Unwanted details from internal or external sources, mostly from analog stages. Random in most instances, though it may follow a known probability model. Difficult to quantize and estimate.
 
 ## Objective assessment
 
-Based on mathematical formulae comparing an image to a reference source.
-
-- Always gives the same result, regardless of who performs it
-- Can be automated
-- May not align with artistic or perceptual judgment
+Based on mathematical formulae comparing an image to a reference source. Independent of human judgment. May not align with artistic or perceptual judgment
 
 $$
-MSE = \frac{1}{MN}\sum_{x=1}^{M}\sum_{y=1}^{N}(p(x,y) - r(x,y))^2
+\text{mean squared error} = \frac{1}{MN}\sum_{x=1}^{M}\sum_{y=1}^{N}(p(x,y) - r(x,y))^2
 $$
 
 Here:
@@ -36,11 +35,7 @@ Here:
 - $p(x,y)$: pixel value in the processed image
 - $r(x,y)$: pixel value in the source image
 
-<Note>
-
 A higher MSE means more change between the images, but this isn't necessarily aligned with subjective quality. A restoration process, for instance, deliberately changes pixel values to improve perceived quality.
-
-</Note>
 
 ## Subjective assessment
 

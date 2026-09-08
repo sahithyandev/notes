@@ -1,19 +1,17 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-09-07T19:01:14.317Z
+lastUpdatedOn: 2026-09-08T19:05:18.727Z
 slug: s5/image-processing/point-operations
 sidebar:
-  order: 13
+  order: 12
 prev: true
 next: true
 ---
 
-Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours.
+Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
 
-- Context free
-- May use statistical data relating to other pixels, such as the image histogram
-- Homogeneous **iff** the operation is independent of pixel location
+Homogeneous **iff** the operation is independent of pixel location
 
 ## Lookup tables
 
@@ -52,12 +50,20 @@ $$
 
 Defines the accumulated probability of pixels with intensity level $\le k$.
 
-- Shifting the histogram without changing its width increases brightness, leaving contrast unaffected
-- Histogram width, the intensity difference between the darkest and brightest points, determines contrast
+### Brightness and contrast
+
+Brightness and contrast are the position and the width of the same histogram.
+
+- Brightness  
+  Mean intensity. A shift $s = r + c$ slides the histogram along the intensity axis, keeping its shape and width.
+- Contrast  
+  Spread of intensities. Histogram width, the gap between the darkest and brightest points, measures it. A gain $s = a r$ stretches the histogram wider.
+
+Shifting the histogram changes brightness only. Every pair of pixels keeps the same intensity gap, so contrast is unaffected.
 
 <Note>
 
-Auto-focus algorithms maximize histogram width. Focusing barely changes mean intensity, but blur reduces the standard deviation of pixel intensities.
+Auto-focus algorithms maximize the standard deviation of pixel intensities, a contrast measure insensitive to outliers. Sharp focus gives large jumps between neighbouring pixels and a wide spread. Blur averages each pixel toward its neighbours, narrowing the spread. Mean intensity barely changes, since blur redistributes light rather than adding or removing it.
 
 </Note>
 
@@ -108,9 +114,9 @@ Here:
 - $C_t(g)$: accumulated probability of test level $\le g$
 - $C_r(r)$: accumulated probability of reference level $\le r$
 
-- Histogram equalization is the special case where the reference CDF is linear
-- Matching two levels through equal CDF values preserves their relative ordering
-- For a colour image, each channel is matched independently against the reference channel
+Histogram equalization is the special case where the reference CDF is linear. Matching 2 levels through equal CDF values preserves their relative ordering.
+
+For a colour image, each channel is matched independently against the reference channel.
 
 <Note>
 
@@ -118,13 +124,13 @@ A good reference image gives a smooth reference CDF. A test level can only map t
 
 </Note>
 
-### Code
-
 ```python
 def cdf(pixels):
+    # count how many pixels have each intensity
     hist = [0] * 256
     for v in pixels:
         hist[v] += 1
+    # accumulate the counts and divide by the total to get the CDF
     total = len(pixels)
     running, out = 0, [0.0] * 256
     for i, c in enumerate(hist):
@@ -134,9 +140,23 @@ def cdf(pixels):
 
 def match(test_pixels, ref_cdf):
     ct = cdf(test_pixels)
-    lut = [min(range(256), key=lambda r: abs(ref_cdf[r] - ct[g]))
-           for g in range(256)]
-    return [lut[v] for v in test_pixels]
+    # build the LUT: for each test level g, pick the reference
+    # level r whose CDF value is closest to the test CDF value
+    lut = [0] * 256
+    for g in range(256):
+        best_r = 0
+        best_diff = abs(ref_cdf[0] - ct[g])
+        for r in range(1, 256):
+            diff = abs(ref_cdf[r] - ct[g])
+            if diff < best_diff:
+                best_diff = diff
+                best_r = r
+        lut[g] = best_r
+    # remap every pixel through the LUT
+    out = []
+    for v in test_pixels:
+        out.append(lut[v])
+    return out
 ```
 
 For a colour image, match each channel against that channel's reference CDF.

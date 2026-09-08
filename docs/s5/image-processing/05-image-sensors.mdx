@@ -1,7 +1,7 @@
 ---
 title: Image Sensors
 dateCreated: 2026-07-26T04:59:10.531Z
-lastUpdatedOn: 2026-09-07T19:01:14.315Z
+lastUpdatedOn: 2026-09-08T19:05:18.723Z
 slug: s5/image-processing/image-sensors
 sidebar:
   order: 5
@@ -15,12 +15,15 @@ A photo-sensor produces a weak electrical signal proportional to incident light.
 - Conditioned for DC bias and noise, then amplified through a gain-controlled amplifier
 - Converted to digital format by a fast analog to digital converter
 
-## CCD and CMOS
+## Image sensor types
 
-- CCD  
-  Short for charge coupled device. Photons create charged particles, forming a potential field between 2 terminals. The field integrates over time, so a longer exposure increases the response. The charge is read by the amplifier as a voltage, and must be neutralized before the next frame. Sensitive to illumination, not color.
-- CMOS  
-  Provides a non-integrating dynamic response. Each element gives an addressable single output. Requires relatively larger circuitry than CCD.
+### CCD
+
+Aka. charge coupled device. Photons create charged particles, forming a potential field between 2 terminals. The field integrates over time, so a longer exposure increases the response. The charge is read by the amplifier as a voltage, and must be neutralized before the next frame. Sensitive to illumination, not color.
+
+### CMOS
+
+Provides a non-integrating dynamic response. Each element gives an addressable single output. Requires relatively larger circuitry than CCD.
 
 <Note>
 
@@ -34,12 +37,49 @@ Each photo-receptor must be read fast enough that the captured scene can be cons
 
 - CMOS sensors require direct on-sensor reading through complex multiplexing
 - CCD sensors retain charge like memory, even after light is removed, and can transfer it to a holding memory to be read in the background
-- Delayed reading causes motion blur or the rolling shutter effect
+
+Delayed reading causes motion blur or the rolling shutter effect
+
+<figure>
+
+![Rolling shutter effect on cello strings](./images/rolling-shutter.jpg)
+
+<figcaption>
+
+Vibrating cello strings captured with a rolling shutter. Each sensor row is read at a slightly different time, so the straight strings record as waves. Image by [Ephramac](https://commons.wikimedia.org/wiki/File:Rolling_Shutter_Cello_Strings.jpg), CC BY-SA 4.0.
+
+</figcaption>
+
+</figure>
 
 ## Sensitivity and SNR
 
-An adjustable aperture regulates incident light by controlling the exposed lens surface area. CCD sensors, due to their integrating response, can also regulate output through exposure time.
+An adjustable aperture regulates incident light by controlling the exposed lens surface area. CCD sensors, due to their integrating response, can also regulate the collected signal through exposure time.
 
-- Non-sensitive region: too little light for a usable signal
-- Optimum sensitivity: best signal to noise ratio
-- Saturated region: output stops responding to further light, requiring high-gain amplification and giving a low signal to noise ratio
+The response curve, output signal against incident light, has 3 regions.
+
+- Non-sensitive region  
+  Light is too weak to lift the signal above the sensor's noise floor, so nothing usable is recorded.
+- Optimum sensitivity  
+  Output tracks incident light and stays well above the noise floor, giving the best signal to noise ratio.
+- Saturated region  
+  Wells are full, so output stops responding to further light. Separating detail needs high-gain amplification, which also amplifies noise and gives a low signal to noise ratio.
+
+## Capturing color
+
+By default an image sensor captures only illumination, not color.
+
+### Beam splitting
+
+- A dichroic prism splits incoming light into primary colors
+- A separate image sensor captures each separated beam
+- Structure must be rigid and properly aligned
+- Color and illumination have the same resolution
+
+### Color filter array
+
+Aka. CFA.
+
+- An optical filter allows only one color per sensing element
+- Other color components are estimated from nearby sensors
+- Color resolution is lower than illumination resolution
