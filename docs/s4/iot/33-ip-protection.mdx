@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: false
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:59:21.296Z
+lastUpdatedOn: 2026-09-08T19:46:17.710Z
 ---
 
 Firmware and hardware designs in IoT devices represent significant investment. Several mechanisms protect them from extraction, cloning, and tampering.
@@ -36,7 +36,7 @@ Most MCUs offer graduated levels rather than a binary on/off:
 - AVR lock bits  
   BLB and LB fuse bits independently restrict reading of the application section, boot section, and EEPROM via ISP or JTAG. Clearing lock bits requires a chip erase.
 
-### Trade-off
+### Trade-Off
 
 Enabling read protection makes firmware recovery harder if a device in the field needs re-programming without a bootloader. Production workflows must account for this: typically a bootloader with secure update capability is flashed before protection is enabled, so future updates can still be delivered over UART, USB, or OTA without needing debug access.
 

@@ -6,10 +6,10 @@ slug: s2/data-structures-and-algorithms/algorithms/sorting
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.587Z
-lastUpdatedOn: 2026-06-01T03:58:53.175Z
+lastUpdatedOn: 2026-09-08T19:46:17.674Z
 ---
 
-### Properties of sorting
+### Properties of Sorting
 
 - Comparison / Non Comparison - In non-comparison based sorting, elements are sorted from their intrinsic properties instead.
 - In-place/Outplace – Means if extra memory is used while sorting. In-place algorithms have $O(1)$ space complexity.
@@ -17,22 +17,22 @@ lastUpdatedOn: 2026-06-01T03:58:53.175Z
   accept new data while the procedure is ongoing
 - Stable/Unstable technique – A sorting is stable if the order of elements with the same value is preserved while sorting.
 
-## Common sorting algorithms
+## Common Sorting Algorithms
 
 All sorting algorithms explained below are comparison-based sorting algorithms.
 
-### Bubble sort
+### Bubble Sort
 
 Biggest or smallest elements are _bubbled_ to the end or start by swapping each
 consecutive pair.
 
-### Insertion sort
+### Insertion Sort
 
 Works by building a sorted portion of the array one element at a time.
 
 Start with the second element: Assume the first element is already sorted. Compare the second element with the first, shifting it into the correct position if needed. Move to the next element: Compare it with the sorted portion, shifting larger elements to the right and inserting it into its correct position. Repeat this process for each element until all are sorted.
 
-### Merge sort
+### Merge Sort
 
 The array to be sorted is sorted into two sub arrays, with the length $n/2$. The
 two sub-arrays are sorted recursively and then merged.
@@ -49,7 +49,7 @@ The sub-arrays are then sorted recursively.
 Faster than merge sort. Worst case ($O(n^2)$) occurs when the partition scheme is bad and the list is
 almost sorted.
 
-### Heap sort
+### Heap Sort
 
 Uses a [binary heap](/s2/data-structures-and-algorithms/data-structures/heap/) data structure. Operates in two main phases:
 
@@ -58,7 +58,7 @@ Uses a [binary heap](/s2/data-structures-and-algorithms/data-structures/heap/) d
 
 Slower than quick sort.
 
-### Tim sort
+### Tim Sort
 
 Created by Tim Peters. A highly optimized version of merge sort. Used in
 Python's `List.sort()` and `sorted()` and Java's `Collection.sort()`.
@@ -73,7 +73,7 @@ Begins with quick sort. In large lists, switches to heap sort. The switch
 happens when the recursion depth of quick sort exceeds a level proportional to $\log n$. Switches to insertion sort, once the partition size
 is small enough. Used in C++'s `std::sort()`.
 
-### Dual-Pivot Quick sort
+### Dual-Pivot Quick Sort
 
 Two pivots are selected in each end of the array. Left pivot must be smaller
 than the right pivot. The dataset is partitioned into 3 parts.

@@ -1,7 +1,7 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-08T19:05:46.351Z
+lastUpdatedOn: 2026-09-08T19:46:17.719Z
 slug: s5/computer-security/authentication-protocols
 sidebar:
   order: 16
@@ -11,7 +11,7 @@ next: false
 
 An authentication protocol lets a User and a Server verify each other and set up a shared session key.
 
-## Security objectives
+## Security Objectives
 
 1. The User authenticates that it is talking to the correct Server.
 2. The Server authenticates that it is talking to the correct User.
@@ -26,7 +26,7 @@ The protocol must not be susceptible to:
 - Replay attacks  
   They record legitimate messages and resend them later to impersonate a party or force reuse of an old session key.
 
-## Common assumptions
+## Common Assumptions
 
 - Shared password  
   User $U_{id}$ and Server $S_{id}$ share a secret password $pwd$ that stays secret and has enough entropy.
@@ -41,7 +41,7 @@ The protocol must not be susceptible to:
 
 Each method below is presented with its steps, why it holds, its weakness, and where a [hash function](/s5/computer-security/hash-functions) fits inside a step. None of the methods needs a hash at the protocol level.
 
-### Server has a public encryption key
+### Server Has a Public Encryption Key
 
 The Server has an encryption key pair $(PK_S, SK_S)$, with $PK_S$ in its certificate. The User picks the session key $k$.
 
@@ -74,7 +74,7 @@ Hashing:
 - Con
   None at the protocol level. No protocol field is signed or compared as a bare digest, so no collision property is relied on.
 
-### Server has a digital signature key
+### Server Has a Digital Signature Key
 
 The Server has a signing key pair, with the verification key $PK_S$ in its certificate. The User generates a fresh RSA encryption key pair $((e_U,n_U), d_U)$ and a random nonce $r$. The Server picks the session key $k$.
 
@@ -105,7 +105,7 @@ Hashing:
 - Con
   Forging the reply now needs only a strong collision on the signed fields. They choose both field sets, get the honest set signed, and reuse $\sigma$ on the other, so $H$ must be strong collision resistant.
 
-### Server has a Diffie-Hellman public key
+### Server Has a Diffie-Hellman Public Key
 
 Public parameters: a generator $g$ of $\mathbb{Z}_p^*$ and a large prime modulus $p$. The Server's long-term DH public value $Y_S = g^{x_S} \bmod p$ is in its certificate. The User generates a fresh DH pair $(Y_U, x_U)$ with $Y_U = g^{x_U} \bmod p$. The session key is the shared value $k = g^{x_U x_S} \bmod p$.
 

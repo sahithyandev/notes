@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-09-08T19:05:18.725Z
+lastUpdatedOn: 2026-09-08T19:46:17.721Z
 slug: s5/image-processing/image-resampling
 sidebar:
   order: 10
@@ -17,7 +17,7 @@ Resampled pixels must:
 - Reduce noise
 - Not introduce artefacts
 
-## Scaling by a factor of 2
+## Scaling by a Factor of 2
 
 - Enlarge by replicating each row and column
 - Reduce by removing every other row and column
@@ -29,7 +29,7 @@ Fine, one-pixel-wide details get lost when downscaling. Upscaling causes a check
 
 </Note>
 
-## Backward mapping
+## Backward Mapping
 
 Each pixel $(x, y)$ in the new grid maps back to a source position.
 
@@ -48,7 +48,7 @@ Here:
 
 A non-integer $(s_x, s_y)$ falls between source pixels, so no stored value sits there. The output value is built from the 2&times;2 block of source pixels enclosing it, with corners $(\lfloor s_x \rfloor, \lfloor s_y \rfloor)$ and $(\lceil s_x \rceil, \lceil s_y \rceil)$, using either nearest neighbour or interpolation. Corners outside the source are clipped to the border.
 
-## Nearest neighbour method
+## Nearest Neighbour Method
 
 Replaces each new pixel with the value of the closest corner of the enclosing block, using any distance metric.
 
@@ -81,7 +81,7 @@ An alternative to direct scaling: reconstruct, or estimate, the continuous inten
 
 In 2-D, these become bilinear and bicubic interpolation.
 
-### Bilinear interpolation
+### Bilinear Interpolation
 
 The new pixel value is a weighted sum of the 4 surrounding source pixels, using the fractional offsets of the source position.
 
@@ -151,11 +151,11 @@ def resample(src, sw, sh, dw, dh, mode):
 
 For a colour image, run the same kernel on each channel.
 
-## Multi-scale pyramids
+## Multi-Scale Pyramids
 
 A series of progressively lower-resolution images derived from one source, each level holding a different band of detail.
 
-### Gaussian pyramid
+### Gaussian Pyramid
 
 The stack of smoothed, downsampled images.
 
@@ -164,7 +164,7 @@ The stack of smoothed, downsampled images.
 
 Each level halves the width and height. Smoothing before downsampling removes the high frequencies that would otherwise alias.
 
-### Laplacian pyramid
+### Laplacian Pyramid
 
 The detail lost at each downsampling step, stored as a stack of difference images.
 

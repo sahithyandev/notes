@@ -6,7 +6,7 @@ slug: s3/computer-architecture/pipeline-hazards
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.688Z
-lastUpdatedOn: 2026-06-11T16:40:17.526Z
+lastUpdatedOn: 2026-09-08T19:46:17.694Z
 ---
 
 Situations preventing next instruction from executing in designated clock cycle. Causes the pipeline to [stall](/s3/computer-architecture/pipelining#pipeline-stall).
@@ -25,7 +25,7 @@ $$
 
 3 types.
 
-## Structural hazard
+## Structural Hazard
 
 When 2 different instructions require the same hardware resource(s) simultaneously.
 
@@ -33,7 +33,7 @@ Occurs primarily in special purpose functional units that are less frequently us
 
 One occurence is when both instruction fetch and data access need the same memory. Can be avoided in Harward architecture.
 
-## Data hazard
+## Data Hazard
 
 When an instruction depends on the result of the another instruction which are overlapped.
 
@@ -64,13 +64,13 @@ Aka. bypassing or short-circuiting. An alternate solution to data hazards. Sends
 
 Solves most RAW hazards, but not all. Can't handle data hazards, because reading from memory is much slower.
 
-## Control hazard
+## Control Hazard
 
 Aka. branch hazard. The next instruction depends on a branch/jump, and it's not known yet. Cannot fetch the next instruction branch resolves.
 
 Causes more performance loss compared to data hazards. 4 solutions are commonly used.
 
-### Taken branch
+### Taken Branch
 
 When a branch changes the PC to its target address. Otherwise _untaken branch_.
 
@@ -90,7 +90,7 @@ Branch penalty is constant, cannot be lessened with software optimization.
 
 Used when a misprediction is made (with any branch prediction policy).
 
-### Assume untaken
+### Assume Untaken
 
 Treat all branches are untaken. Fetches next instruction placed sequentially. No branch penalty for untaken branches. If the branch is taken, 2 cycle branch penalty.
 
@@ -98,7 +98,7 @@ Processor state must remain unchanged until the actual branching outcome is know
 
 More performant. Slightly more complex.
 
-### Assume taken
+### Assume Taken
 
 Treat all branches are taken. Requires an early adder and immediate decoder in ID. No branch penalty for taken branches. If the branch is not taken, 1 or 2 cycles branch penalty.
 
@@ -108,7 +108,7 @@ In either assume taken or untaken, the order of instructions can be rearranged t
 
 </Note>
 
-### Delayed branch
+### Delayed Branch
 
 Branch outcome is only known after the EX step. Delayed branch technique is used to run instruction(s) before the EX step, whether the branch is taken or not. Mostly a single instruction delay is used. If longer branch penalty is there, other techniques are used. Compiler is responsible for filling the delay slot with a useful instruction, or a nop.
 

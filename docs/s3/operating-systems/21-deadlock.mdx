@@ -6,7 +6,7 @@ slug: s3/operating-systems/deadlock
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.708Z
-lastUpdatedOn: 2026-04-28T07:56:31.654Z
+lastUpdatedOn: 2026-09-08T19:46:17.704Z
 ---
 
 Occurs when 2 or more threads is blocked and waiting for one another. No thread can continue. Wastes resources and slows down systems.
@@ -27,11 +27,11 @@ A graph of threads, resources (nodes), resource requests and assignments (direct
 
 Cycles in the resource allocation graph indicate potential deadlocks.
 
-### Single-instance case
+### Single-Instance Case
 
 When each resource type has exactly one unit. Cycle implies deadlock.
 
-### Multiple-instance case
+### Multiple-Instance Case
 
 When a resource type may have several units. Cycle does not necessarily imply deadlock. There's a possibility for a deadlock.
 
@@ -66,7 +66,7 @@ Allocate resources only if the resulting state is safe. Good theoritcal problem 
 
 Example: [Banker’s algorithm](/s3/operating-systems/bankers-algorithm).
 
-### Safe state
+### Safe State
 
 When there exists some order in which all processes can finish.
 
@@ -111,13 +111,13 @@ Deadlocks can be handled in several ways, depending on system requirements and c
 
 ## Recovery
 
-### Abort processes
+### Abort Processes
 
 - Abort all deadlocked processes
   or
 - Abort one at a time until cycle is gone
 
-### Resource preemption
+### Resource Preemption
 
 - Select a victim
 - Rollback to safe state

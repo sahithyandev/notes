@@ -3,7 +3,7 @@ title: Gaussian Elimination
 sidebar:
   order: 4
 dateCreated: 2026-07-19T16:40:09.889Z
-lastUpdatedOn: 2026-07-20T07:30:04.389Z
+lastUpdatedOn: 2026-09-08T19:46:17.722Z
 slug: s5/numerical-methods/gaussian-elimination
 prev: true
 next: true
@@ -13,7 +13,7 @@ prereqs:
 
 Gaussian elimination reduces $A\vec{x} = \vec{b}$ to [echelon form](/s1/mathematics/matrices/echelon-form) by [row operations](/s5/numerical-methods/equivalent-systems), then solves it by back substitution.
 
-## Forward elimination
+## Forward Elimination
 
 The pivot element of a column is the entry used to eliminate the other entries in that column.
 
@@ -40,7 +40,7 @@ a_{11} & a_{12} & \cdots & a_{1n} & b_1^{(1)} \\
 \end{pmatrix}
 $$
 
-## Back substitution
+## Back Substitution
 
 Once $[A \mid \vec{b}]$ is upper triangular, each row has 1 fewer unknown than the row above it. The last row has only $x_n$
 
@@ -60,7 +60,7 @@ Here, $\sum_{j=i+1}^{n} a_{ij}^{(i-1)}x_j$ is the contribution of the already-so
 
 Pivoting is interchanging rows to place a useful entry in the pivot position. It only reorders rows, so the system produced is still equivalent to the original.
 
-### Partial pivoting
+### Partial Pivoting
 
 At stage $i$, scan column $i$ from row $i$ to row $n$, and swap the row with the largest absolute entry into row $i$ before eliminating.
 
@@ -72,7 +72,7 @@ Searching both rows and columns for the largest element is called complete pivot
 
 </Note>
 
-### Scaled partial pivoting
+### Scaled Partial Pivoting
 
 Partial pivoting alone can still pick a poor pivot if rows are scaled very differently, since an entry can be large only because its whole row has large entries.
 
@@ -111,7 +111,7 @@ $\dfrac{|a_{21}|}{s_2}$ is larger, so exchange $R_1 \leftrightarrow R_2$. Gauss 
 
 ## Pitfalls
 
-### Zero pivot
+### Zero Pivot
 
 If $a_{ii}^{(i)} = 0$ at any stage, the elimination formula divides by zero, even though the system may still have a unique solution.
 
@@ -121,11 +121,11 @@ Pivoting fixes this by swapping in a row below with a non-zero entry in that col
 
 </Note>
 
-### Small pivot
+### Small Pivot
 
 A pivot that is small rather than zero doesn't stop the algorithm, but dividing by it inflates the multipliers $\frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}$. This amplifies rounding error already present in $a_{ji}^{(i)}$ and $b_j^{(i)}$, which then propagates through every later stage and into back substitution.
 
-### Ill conditioning
+### Ill Conditioning
 
 A problem is ill-conditioned **iff** a small change in any of its elements causes a large change in its solution. Otherwise the problem is well-conditioned.
 

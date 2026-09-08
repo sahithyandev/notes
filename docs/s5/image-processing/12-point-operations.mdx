@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-09-08T19:05:18.727Z
+lastUpdatedOn: 2026-09-08T19:46:17.721Z
 slug: s5/image-processing/point-operations
 sidebar:
   order: 12
@@ -13,7 +13,7 @@ Point operations modify the intensity of a pixel using only that pixel's own val
 
 Homogeneous **iff** the operation is independent of pixel location
 
-## Lookup tables
+## Lookup Tables
 
 A lookup table (LUT) maps the current pixel value to an index, returning a new value from the table.
 
@@ -25,7 +25,7 @@ Examples:
 - Pseudo colouring, e.g. mapping thermal image temperature to RGB
 - Compensating for non-linearity in sensor elements
 
-## Grey level histogram
+## Grey Level Histogram
 
 The grey level histogram shows the frequency of occurrence of each intensity level in an image, regardless of pixel position. Its shape describes overall brightness and contrast.
 
@@ -50,7 +50,7 @@ $$
 
 Defines the accumulated probability of pixels with intensity level $\le k$.
 
-### Brightness and contrast
+### Brightness and Contrast
 
 Brightness and contrast are the position and the width of the same histogram.
 
@@ -67,7 +67,7 @@ Auto-focus algorithms maximize the standard deviation of pixel intensities, a co
 
 </Note>
 
-## Point processing functions
+## Point Processing Functions
 
 Common transformations applied to each pixel, typically implemented as a LUT mapping input intensity $r$ to output intensity $s$.
 
@@ -92,7 +92,7 @@ Common transformations applied to each pixel, typically implemented as a LUT map
 - Histogram equalization  
   Redistributes intensities to make the histogram more uniform.
 
-## Histogram matching
+## Histogram Matching
 
 Histogram matching adjusts a test image so its grey level distribution follows a given reference distribution. Also called histogram specification.
 

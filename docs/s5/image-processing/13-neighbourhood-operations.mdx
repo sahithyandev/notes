@@ -1,7 +1,7 @@
 ---
 title: Neighbourhood Operations
 dateCreated: 2026-08-18T07:18:45.000Z
-lastUpdatedOn: 2026-09-08T19:05:18.727Z
+lastUpdatedOn: 2026-09-08T19:46:17.721Z
 slug: s5/image-processing/neighbourhood-operations
 sidebar:
   order: 13
@@ -23,7 +23,7 @@ Process:
 - Save $P(x,y)$ to the output image
 - Slide the mask by one pixel and repeat for every pixel in the input image
 
-## Spatial filtering
+## Spatial Filtering
 
 Correlation and convolution are the two ways to combine a mask with a neighbourhood, both by a sum of products equivalent to a matrix dot product. They differ only in whether the mask is flipped first.
 
@@ -58,7 +58,7 @@ No difference between convolution and correlation when the mask is symmetrical.
 
 </Note>
 
-### Linear filters
+### Linear Filters
 
 The output pixel is a correlation or convolution of the mask with the neighbourhood, nothing more. Integer filter coefficients with a scaling factor $k$ reduce computational cost:
 
@@ -75,7 +75,7 @@ Properties:
 - Linearity  
   Successive linear filters combine into a single equivalent filter, saving computation.
 
-### Non-linear filters
+### Non-Linear Filters
 
 Share the same sliding-mask algorithm, but compute the output using a non-linear expression: thresholding, sorting, log functions.
 
@@ -86,7 +86,7 @@ Examples:
 
 - $P(x,y) = 1$ if the weighted neighbourhood sum $\ge$ a threshold $t$, else $0$
 
-## Handling image boundaries
+## Handling Image Boundaries
 
 The neighbourhood doesn't fit the mask at image boundaries.
 

@@ -1,7 +1,7 @@
 ---
 title: Color
 dateCreated: 2026-07-26T04:59:00.680Z
-lastUpdatedOn: 2026-09-08T19:05:18.723Z
+lastUpdatedOn: 2026-09-08T19:46:17.720Z
 slug: s5/image-processing/colour
 sidebar:
   order: 6
@@ -15,19 +15,19 @@ A few narrow wavelength bands are perceived as distinct colors, named primary co
 
 Color reaches the eye from an object 2 ways.
 
-## Emission based
+## Emission Based
 
 The object emits colored light directly. Adding more light gives a brighter color. All primaries together give white, absence of light gives black.
 
 Computer displays are emission based.
 
-## Absorption based
+## Absorption Based
 
 The object absorbs part of the incident white light and reflects the rest. Adding more colorant removes more of the spectrum, giving a darker color. Bare substrate reflects white, full colorant absorbs everything and gives black.
 
 Print is absorption based.
 
-## Color spaces
+## Color Spaces
 
 A color space is a model that represents colors as tuples of numbers.
 
@@ -58,7 +58,7 @@ Each component is a fraction in $[0, 1]$. All components at $0$ gives white, the
 
 Cyan, magenta and yellow are the secondary colors of RGB. Each absorbs one RGB primary, so CMY is the subtractive counterpart of the additive RGB primaries.
 
-### Conversion between RGB and CMYK
+### Conversion Between RGB and CMYK
 
 Normalize each RGB channel to $[0, 1]$.
 
@@ -90,7 +90,7 @@ The RGB gamut and the CMYK gamut differ, so a round trip is not always exact.
 
 <RgbCmykConverter />
 
-## Color representation
+## Color Representation
 
 A digital color image is stored as a multi-channel structure, one image per attribute.
 
@@ -124,7 +124,7 @@ Discarding $C_r, C_b$ gives a monochrome image directly.
 
 The human visual system is more sensitive to luminance than color, so YCrCb formats often allocate bits in a 4:2:2 ratio. Widely used for this inherent compression capability.
 
-## Per-pixel storage
+## Per-Pixel Storage
 
 How much color each pixel holds, independent of the channel layout.
 
@@ -139,11 +139,11 @@ How much color each pixel holds, independent of the channel layout.
 - High color  
   15 or 16-bit direct color. Largely historical.
 
-### True color
+### True Color
 
 An image that stores a full color value in every pixel. RGB uses 24 bits per pixel, or 3 bytes. CMYK needs 4 bytes per pixel.
 
-### Palette based representation
+### Palette Based Representation
 
 Most images use far fewer distinct colors than true color allows. A 1920x1024 image has under 2 million pixels, so at most 2 million distinct colors, against the $2^{24}$ an RGB pixel can encode.
 

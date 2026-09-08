@@ -6,7 +6,7 @@ slug: s3/operating-systems/virtual-memory
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-05-31T13:49:07.993Z
+lastUpdatedOn: 2026-09-08T19:46:17.705Z
 ---
 
 A system that allows programs to use more memory than is physically available in RAM. Achieved by combining the use of physical memory and disk space. The operating system uses paging and swapping as techniques to create an illusion of a larger memory space than what is physically available.
@@ -122,7 +122,7 @@ Break page table into multiple page tables. The resulting page tables are paged.
 
 For 32-bit memory space, 2 level paging would be enough.
 
-### Hashed page tables
+### Hashed Page Tables
 
 Used when memory address space is big or sparse. Reduces memory usage by storing only entries that actually exist. Uses hash table for quick lookup.
 
@@ -136,7 +136,7 @@ Each entry stores:
 
 Lookup time is roughly constant on average.
 
-### Inverted page tables
+### Inverted Page Tables
 
 Keeps track of all physical frames instead of pages per process. One entry per physical frame.
 
@@ -180,7 +180,7 @@ iOS asks apps to voluntarily relinquish allocated memory. If not, terminates the
 
 ## Architecture Examples
 
-### Intel IA-32 / x86-64
+### Intel IA-32 / X86-64
 
 Supports both segmentation and paging. 32-bit uses 3-level paging; 64-bit uses 4-level paging. PAE (Page Address Extension) expands 32-bit memory to 64GB.
 

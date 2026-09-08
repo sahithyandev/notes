@@ -1,7 +1,7 @@
 ---
 title: Noise
 dateCreated: 2026-08-18T07:18:54.109Z
-lastUpdatedOn: 2026-09-08T19:05:18.728Z
+lastUpdatedOn: 2026-09-08T19:46:17.722Z
 slug: s5/image-processing/noise
 sidebar:
   order: 14
@@ -109,7 +109,7 @@ Left: Original. Right: With salt and pepper noise on about 5% of pixels, each fo
 
 Noise filtering identifies and reverses the effect of noise on an image, using properties of noise rather than direct observation, since only pixel values after corruption are visible.
 
-## Frame averaging
+## Frame Averaging
 
 For a static scene captured over $n$ frames, averaging corresponding pixels across frames cancels the noise contribution while preserving the scene.
 
@@ -128,7 +128,7 @@ Only works for a static scene, since the derivation assumes $F$ is constant acro
 
 </Note>
 
-## Mean filter
+## Mean Filter
 
 Averages pixel values within a local neighbourhood. Since correlated image features vary slowly relative to sampling resolution, any local variation is assumed to be noise.
 
@@ -160,7 +160,7 @@ $$
 \frac{1}{16}\begin{bmatrix} 1 & 2 & 1 \\ 2 & 4 & 2 \\ 1 & 2 & 1 \end{bmatrix}
 $$
 
-### Gaussian filter
+### Gaussian Filter
 
 Weights arranged according to a 2-D Gaussian surface.
 
@@ -168,7 +168,7 @@ $$
 h(x,y) = \exp\left[-\frac{x^2+y^2}{2\sigma^2}\right]
 $$
 
-### Conditional averaging
+### Conditional Averaging
 
 Reduces blurring by only replacing pixels where the local variation is likely to be noise.
 
@@ -182,7 +182,7 @@ $$
 - $k$-closest averaging  
   Select $k \le M$ pixels with values closest to the pivot before averaging, avoiding outliers that represent real image features. Requires sorting pixel values.
 
-## Median filter
+## Median Filter
 
 Replaces the pivot pixel with the median value of its neighbourhood.
 

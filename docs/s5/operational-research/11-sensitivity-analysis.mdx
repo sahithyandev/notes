@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:20.131Z
-lastUpdatedOn: 2026-09-06T13:01:26.814Z
+lastUpdatedOn: 2026-09-08T19:46:17.724Z
 ---
 
 Sensitivity analysis studies how the optimal solution reacts to changes in the LP data, without solving the LP again from the start.
@@ -53,7 +53,7 @@ The RHS column gives the basic variable values, so feasibility needs $B^{-1} b \
 
 ## Change in a Cost Coefficient
 
-### Non-basic variable
+### Non-Basic Variable
 
 Only the objective row entry of that one variable changes.
 
@@ -65,7 +65,7 @@ $$
 
 The basis stays optimal while this stays $\ge 0$, which gives an upper bound on $c_j$.
 
-### Basic variable
+### Basic Variable
 
 The whole objective row is recomputed.
 
@@ -148,7 +148,7 @@ Values used below:
 - $A_{s_3} = (0,0,1)^{T}$, the unit column for the third constraint
 - original RHS $b = (4, 12, 18)^{T}$
 
-### Cost coefficient of a non-basic variable
+### Cost Coefficient of a Non-Basic Variable
 
 $s_2$ is non-basic. Its objective row entry:
 
@@ -166,7 +166,7 @@ $$
 
 Currently $c_{s_2} = 0$, which reproduces the stored entry $3/2$. The basis stays optimal for $c_{s_2} \in (-\infty, 3/2]$.
 
-### Cost coefficient of a basic variable
+### Cost Coefficient of a Basic Variable
 
 $x_1$ is basic. Set $c_1 = 3 + \Delta$, so $c_B = (0, 5, 3 + \Delta)$. Every non-basic entry must stay $\ge 0$.
 
@@ -186,7 +186,7 @@ $$
 
 Both together give $-3 \le \Delta \le 9/2$, so $c_1 \in [0, 7.5]$.
 
-### Change in the right hand side
+### Change in the Right Hand Side
 
 Set $b_1 = 4 + \Delta$, so the new RHS vector is $b + \Delta e_1$ with $e_1 = (1,0,0)^{T}$. The new basic values:
 
@@ -204,7 +204,7 @@ $$
 
 Only the $s_1$ row changes, so there is no upper bound. The basis stays optimal for $b_1 \in [2, \infty)$.
 
-### Addition of a variable
+### Addition of a Variable
 
 Add $x_3$ with cost $c_3 = 4$ and original column $A_3 = (1,1,1)^{T}$, meaning coefficient 1 in each constraint. First transform the column:
 
@@ -221,6 +221,6 @@ $$
 
 Optimality is violated. $x_3$ can enter the basis and improve $z$.
 
-### Addition of a constraint
+### Addition of a Constraint
 
 Add $x_1 + x_2 \le 5$. The current optimum gives $x_1 + x_2 = 2 + 6 = 8 > 5$, so it violates the new constraint. The tableau stays optimal but becomes infeasible. Continued with the dual simplex method in the [dual simplex worked example](/s5/operational-research/dual-simplex-method#worked-example), reaching the new optimum $x_1 = 0$, $x_2 = 5$, $z = 25$.

@@ -1,7 +1,7 @@
 ---
 title: DES
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-08-29T07:00:13.793Z
+lastUpdatedOn: 2026-09-08T19:46:17.719Z
 slug: s5/computer-security/cipher-algorithms/des
 sidebar:
   order: 10
@@ -30,7 +30,7 @@ A brute-force known-plaintext attack averages $2^{55}$ steps given the 56-bit ke
 
 Encrypting twice with the same key ($c_2 = E_k(E_k(m))$) is broken by the meet-in-the-middle attack, which encrypts $m$ forward and decrypts $c_2$ backward over all keys, matching where results agree, in $2^{56}$ steps.
 
-### Double DES with 2 keys
+### Double DES with 2 Keys
 
 $c_2 = E_{k_2}(E_{k_1}(m))$ gives an effective key length of 112 bits.
 
@@ -38,7 +38,7 @@ $c_2 = E_{k_2}(E_{k_1}(m))$ gives an effective key length of 112 bits.
 
 $c = E_{k_3}(D_{k_2}(E_{k_1}(m)))$, effective key length 168 bits. Setting $k_1 = k_2 = k_3$ reduces it to plain DES.
 
-### 2-key 3DES
+### 2-Key 3DES
 
 Setting $k_1 = k_3$ gives $c = E_{k_1}(D_{k_2}(E_{k_1}(m)))$, effective key length 112 bits.
 

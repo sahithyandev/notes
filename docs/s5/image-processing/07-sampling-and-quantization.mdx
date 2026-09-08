@@ -3,7 +3,7 @@ title: Sampling and Quantization
 sidebar:
   order: 7
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-09-08T19:05:18.724Z
+lastUpdatedOn: 2026-09-08T19:46:17.720Z
 slug: s5/image-processing/sampling-and-quantization
 prev: true
 next: true
@@ -17,7 +17,7 @@ Sampling fixes the spatial resolution. Resolution is the number of samples per u
 
 Coarse sampling has 3 visible effects: loss of information, pixelation, and aliasing.
 
-### Loss of information
+### Loss of Information
 
 Each cell keeps only one value for the region it covers, so any variation finer than a cell is averaged away and cannot be recovered. Worse with large cells and scenes carrying fine detail.
 
@@ -80,7 +80,7 @@ Quantization fixes the grey-level depth. Grey-level depth is the number of discr
 
 Insufficient grey-level depth causes false contouring.
 
-### False contouring
+### False Contouring
 
 Across a smooth gradient, a band of neighbouring intensities collapses onto one level and renders as a flat region. The jump to the next level shows up as a sharp edge that is not in the scene. These false edges resemble contour lines, most visible in skies and other large smooth areas.
 
@@ -94,7 +94,7 @@ Dithering trades spatial resolution for grey-level depth. A device with few outp
 
 Used in newspaper halftoning, laser printing, and exporting photos to a small fixed palette such as GIF.
 
-### Worked example
+### Worked Example
 
 A bi-level device with output levels $0$ and $1$. Target intensity $v = 0.5$ across one $2 \times 2$ block, using the Bayer dither matrix.
 
@@ -111,7 +111,7 @@ Sub-pixel $(i,j)$ is set to $1$ **iff** $v > \dfrac{D_{ij} + 0.5}{4}$.
 
 2 of the 4 sub-pixels are on, so the block averages $0.5$, matching the target. The on sub-pixels form a checkerboard.
 
-## Error diffusion
+## Error Diffusion
 
 Each pixel is rounded to the nearest available level. The rounding error, the gap between the original value and the chosen level, is spread over neighbouring pixels not yet processed. Those neighbours are nudged toward the value the current pixel could not hold, so the error cancels over a small region instead of building up.
 
@@ -132,7 +132,7 @@ $$
 
 Serpentine scanning reverses direction every other row, so the error is not always pushed the same way and directional streaks are avoided.
 
-### Worked example
+### Worked Example
 
 Bi-level device with levels $0$ and $255$. One row of 4 pixels, all at value $128$, using 1D diffusion that passes the whole error to the next pixel.
 

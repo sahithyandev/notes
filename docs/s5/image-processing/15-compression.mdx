@@ -1,7 +1,7 @@
 ---
 title: Compression
 dateCreated: 2026-08-18T07:19:11.017Z
-lastUpdatedOn: 2026-09-08T19:05:18.728Z
+lastUpdatedOn: 2026-09-08T19:46:17.722Z
 slug: s5/image-processing/compression
 sidebar:
   order: 15
@@ -16,7 +16,7 @@ Compression reduces the volume of data required to represent an image, without n
 - Lossy compression  
   Source and reconstructed image may not match pixel to pixel.
 
-## Compression ratio
+## Compression Ratio
 
 For the same information encoded with $n_1$ units of data under scheme $C_1$ and $n_2$ units under scheme $C_2$:
 
@@ -30,14 +30,14 @@ $$
 RD = 1 - \frac{1}{CR}
 $$
 
-## Information vs data
+## Information vs Data
 
 Information is the meaning conveyed by a message. Data is the container used to store or transmit it.
 
 - Information is not compressible, since its meaning doesn't change with the medium
 - Data is compressible, since data capacity can exceed the information it carries
 
-## Redundancy types
+## Redundancy Types
 
 Image compression exploits 3 types of redundancy.
 
@@ -87,7 +87,7 @@ $$
 B_{ave} = 1.5 \text{ bits per pixel}
 $$
 
-## Coding redundancy
+## Coding Redundancy
 
 For grey level $k$ with probability $P(k) = r_k / N$ and codeword length $l(k)$:
 
@@ -108,7 +108,7 @@ The mapping between grey levels and codewords is stored in a codebook.
 
 </Note>
 
-### Huffman coding
+### Huffman Coding
 
 Produces the optimal variable length codeword allocation while preserving decodability.
 
@@ -120,11 +120,11 @@ Produces the optimal variable length codeword allocation while preserving decoda
 
 </Note>
 
-## Interpixel redundancy
+## Interpixel Redundancy
 
 Correlated or repeating pixel patterns, such as texture or constant regions, can be represented more compactly than as independent pixel values.
 
-### Delta coding
+### Delta Coding
 
 Transforms pixels into differences from a neighbour:
 
@@ -135,19 +135,19 @@ $$
 - Differences are typically small integers, since local pixels are correlated
 - Reduces correlation among pixel values, increasing coding efficiency
 
-### Image pyramid coding
+### Image Pyramid Coding
 
 Each layer stores the difference from the layer above, upscaled to match resolution. Removes correlation relative to the previous layer.
 
 - Used for progressive image transmission, updating the receiver incrementally
 
-### Run-length coding
+### Run-Length Coding
 
 Encodes a run of identical pixel values as $(\text{value}, \#\text{times to repeat})$ pairs rather than storing each pixel separately.
 
 - More effective on binary images, which more often contain large regions of constant value
 
-### Bit-plane coding
+### Bit-Plane Coding
 
 Separates an $m$-bit grey level image into $m$ binary bit-planes.
 
@@ -155,7 +155,7 @@ Separates an $m$-bit grey level image into $m$ binary bit-planes.
 - Higher order planes capture larger changes, and hold larger regions of constant value
 - Higher order planes compress better with schemes such as run-length coding
 
-## Psychovisual redundancy
+## Psychovisual Redundancy
 
 Not all image detail is equally perceivable. Removing imperceptible detail doesn't affect apparent quality, but always loses information.
 
@@ -168,7 +168,7 @@ Always results in a lossy compression scheme.
 
 </Note>
 
-## Compression pipeline
+## Compression Pipeline
 
 $$
 \text{Mapper} \to \text{Quantizer} \to \text{Symbol encoder} \to \text{Channel encoder}
@@ -185,7 +185,7 @@ $$
 
 Decompression reverses each stage in order, except quantization, which is non-recoverable.
 
-## JPEG compression
+## JPEG Compression
 
 Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
 
@@ -206,7 +206,7 @@ $$
 - Entropy coding  
   Code coefficients in zig-zag order for optimal coding efficiency.
 
-### Discrete cosine transform
+### Discrete Cosine Transform
 
 Decomposes the image into a set of cosine waveforms at different frequencies, ordered from DC (average intensity) to high frequency (sharp, minor variation).
 

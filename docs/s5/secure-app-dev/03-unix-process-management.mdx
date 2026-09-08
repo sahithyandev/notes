@@ -1,7 +1,7 @@
 ---
 title: Unix Process Management
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-07-05T05:24:28.770Z
+lastUpdatedOn: 2026-09-08T19:46:17.725Z
 slug: s5/secure-app-dev/unix-process-management
 sidebar:
   order: 3
@@ -11,7 +11,7 @@ next: true
 
 Unix identifies each [process](/s5/secure-app-dev/process-abstraction) by a PID, an integer unique among running processes. Additional OS context tracked per process includes the parent PID, process accounting (CPU time used), open files, working directory, signal handlers, and umask.
 
-## Process Creation with fork
+## Process Creation with Fork
 
 ```c
 #include <unistd.h>
@@ -32,7 +32,7 @@ Both parent and child continue executing the instructions after `fork()`. Since 
 
 </Note>
 
-## Executing a New Program with exec
+## Executing a New Program with Exec
 
 `fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family.
 
@@ -129,7 +129,7 @@ Zombie process arises in 2 cases:
 - Child terminates before the parent, and the parent never calls `wait()`  
   The child remains a zombie, potentially filling the process table.
 
-## kill and Signals
+## Kill and Signals
 
 ```c
 int kill(pid_t pid, int sig);
@@ -141,7 +141,7 @@ Sends a signal to a process, the Unix analog of a hardware interrupt, routed thr
 - `SIGKILL`: kill the process.
 - `SIGCONT`: restart a stopped process.
 
-## Implementing fork
+## Implementing Fork
 
 Simplified steps:
 

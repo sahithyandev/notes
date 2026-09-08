@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/mdp
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-05-31T13:49:07.992Z
+lastUpdatedOn: 2026-09-08T19:46:17.693Z
 ---
 
 Aka. MDP. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
@@ -30,7 +30,7 @@ The result of an agent's action is not always predictable; instead, each action 
 
 Stochastic domains are commonly modeled using frameworks like MDPs.
 
-## Transition function
+## Transition Function
 
 Describes the probability of moving from one state to another given an action. Denoted using $T(s,a,s')$. The probability is denoted as $P(s'|s,a)$. Here:
 
@@ -38,7 +38,7 @@ Describes the probability of moving from one state to another given an action. D
 - $a$: action taken
 - $s'$: next state
 
-## Reward function
+## Reward Function
 
 Assigns a numerical value to each state-action pair, indicating the immediate reward received by the agent when transitioning from a state $s$ to a state $s'$ by taking action $a$. Denoted using $R(s,a,s')$. Here:
 
@@ -66,7 +66,7 @@ $$
 V_\pi (s) = \sum_{s'} T\left(s,\pi(s),s'\right) \Big[ R\left(s,\pi(s),s'\right) + \gamma V_\pi(s') \Big]
 $$
 
-### Discounting rewards
+### Discounting Rewards
 
 It's reasonable to prefer rewards sooner. A solution for incorporating discounting rewards is to use a discount factor $\gamma \in (0,1]$ that reduces the importance of future rewards. The discounted reward is denoted as:
 

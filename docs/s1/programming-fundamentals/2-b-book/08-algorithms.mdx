@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.573Z
-lastUpdatedOn: 2026-06-01T03:58:53.157Z
+lastUpdatedOn: 2026-09-08T19:46:17.662Z
 ---
 
 An algorithm is a finite set of instructions, used to solve a problem.
@@ -17,9 +17,9 @@ In s1, only searching and sorting algorithms are discussed.
 
 </Note>
 
-## Searching algorithms
+## Searching Algorithms
 
-### Iterative sequential search
+### Iterative Sequential Search
 
 ```py
 def iterative_sequential_search(a_list, item):
@@ -30,7 +30,7 @@ def iterative_sequential_search(a_list, item):
     return -1
 ```
 
-### Recursive sequential search
+### Recursive Sequential Search
 
 ```py
 def recursive_sequential_search(a_list, item, offset=0):
@@ -43,7 +43,7 @@ def recursive_sequential_search(a_list, item, offset=0):
     return recursive_sequential_search(a_list, item, offset+1)
 ```
 
-### Binary search
+### Binary Search
 
 Works in a sorted array.
 
@@ -69,14 +69,14 @@ def binary_search(a_list, item):
         return None
 ```
 
-### Time complexities
+### Time Complexities
 
 | Algorithms        | Best | Average  | Worst    |
 | ----------------- | ---- | -------- | -------- |
 | Sequential search | O(1) | O(n)     | O(n)     |
 | Binary search     | O(1) | O(log n) | O(log n) |
 
-## Sorting algorithms
+## Sorting Algorithms
 
 A sorting algorithm reorganizes a collection of items into some order as defined
 by values intrinsic to the items.
@@ -90,7 +90,7 @@ by values intrinsic to the items.
 4. Recursive or iterative
 5. Amount of extra space
 
-### Bubble sort
+### Bubble Sort
 
 Makes multiple passes through a collection and compare adjacent items to reorder
 those.
@@ -105,7 +105,7 @@ def bubble_sort(arr: list[int | float]):
         sorted_index_count += 1
 ```
 
-### Selection sort
+### Selection Sort
 
 Iterates through the list to find the smallest (or highest) value. Swaps its
 position with the first (or last) element. Then redo this starting for the
@@ -121,7 +121,7 @@ def selection_sort(arr):
         arr[smallest_index], arr[current_starting_index] = arr[current_starting_index], arr[smallest_index]
 ```
 
-### Insertion sort
+### Insertion Sort
 
 Work through a list starting at one end. Each item from the unsorted portion is
 inserted into its correct position among the items already processed.
@@ -137,7 +137,7 @@ def insertion_sort(arr):
         arr[j + 1] = key
 ```
 
-### Merge sort
+### Merge Sort
 
 Recursive algorithm that continually splits a list in half and sorts them.
 
@@ -181,7 +181,7 @@ def merge_sort(a_list):
     return sorted_list
 ```
 
-### Quick sort
+### Quick Sort
 
 Recursive algorithm that use the divide and conquer strategy to continually
 split a list around a selected value called the split point.
@@ -238,7 +238,7 @@ def partition(a_list, first, last):
     return right_mark
 ```
 
-### Shell sort
+### Shell Sort
 
 A specific "gap" is chosen. Start from any index (which is smaller than gap),
 and use insertion sort to sort the elements that are gap number of indices away.
@@ -266,7 +266,7 @@ def shell_sort(a_list):
             gap_insertion_sort(a_list, starting_index, gap)
 ```
 
-### Heap sort
+### Heap Sort
 
 Uses a [binary heap](/s1/programming-fundamentals/b-book/data-types/#binary-heap).
 
@@ -322,7 +322,7 @@ def heap_sort(a_list):
     heapify(a_list, i, 0)
 ```
 
-### Time complexities
+### Time Complexities
 
 | Algorithms     | Best                | Average               | Worst                 |
 | -------------- | ------------------- | --------------------- | --------------------- |
