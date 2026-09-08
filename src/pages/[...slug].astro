@@ -23,6 +23,7 @@ import TocIcon from "../components/icons/TocIcon.astro";
 import NoteNav from "../components/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note-sidebar.astro";
+import ImageZoom from "../components/image-zoom.astro";
 import { titleize, calculateReadTime, generateDescription } from "../utils";
 
 export const prerender = true;
@@ -212,6 +213,11 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   <script>
     import "../scripts/copy-code";
   </script>
+  <script>
+    import "../scripts/image-zoom";
+  </script>
+
+  <ImageZoom />
 </Layout>
 
 <style>
