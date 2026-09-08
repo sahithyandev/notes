@@ -1,0 +1,139 @@
+---
+title: Authentication Protocols
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-08T19:05:46.351Z
+slug: s5/computer-security/authentication-protocols
+sidebar:
+  order: 16
+prev: true
+next: false
+---
+
+An authentication protocol lets a User and a Server verify each other and set up a shared session key.
+
+## Security objectives
+
+1. The User authenticates that it is talking to the correct Server.
+2. The Server authenticates that it is talking to the correct User.
+3. A shared secret session key $k$ is established for the session.
+
+The protocol must not be susceptible to:
+
+- Man-in-the-middle attacks  
+  They sit between User and Server, relaying and possibly altering messages while each side believes it talks directly to the other.
+- Cut-and-paste attacks  
+  They take valid fields from one protocol message and recombine them into a new message that passes checks in another context.
+- Replay attacks  
+  They record legitimate messages and resend them later to impersonate a party or force reuse of an old session key.
+
+## Common assumptions
+
+- Shared password  
+  User $U_{id}$ and Server $S_{id}$ share a secret password $pwd$ that stays secret and has enough entropy.
+- Server certificate  
+  The User has an authentic copy of the Server's public key in a digital certificate.
+- Available primitives  
+  Symmetric encryption under $k$, checking a password against the stored record, and validating a certificate against the CA.
+- Good randomness  
+  Session keys and nonces come from a good random source.
+
+## Methods
+
+Each method below is presented with its steps, why it holds, its weakness, and where a [hash function](/s5/computer-security/hash-functions) fits inside a step. None of the methods needs a hash at the protocol level.
+
+### Server has a public encryption key
+
+The Server has an encryption key pair $(PK_S, SK_S)$, with $PK_S$ in its certificate. The User picks the session key $k$.
+
+1. User sends $U_{id}$, plus its password and a fresh session key $k$ under $PK_S$.  
+   Only the Server can decrypt this.
+2. Server decrypts with $SK_S$ and checks the password against the stored record.  
+   A match authenticates the User.
+3. Server returns $S_{id}$ and $U_{id}$ encrypted under $k$.  
+   Only a party that decrypted message 1 knows $k$.
+4. User decrypts and confirms $U_{id}$ comes back.  
+   Proves the peer holds $SK_S$, so it is the real Server.
+
+Why it holds:
+
+- Only $SK_S$ decrypts message 1, so only the real Server can return $k$.
+- The password in message 1 authenticates the User.
+- Man-in-the-middle and cut-and-paste fail without $SK_S$.
+
+Weakness:
+
+- No nonce. Freshness rests entirely on the User choosing a new random $k$ each run.
+- Reusing $k$ makes message 1 replayable.
+
+Hashing:
+
+- Where
+  Message 1 pads with a [hash](/s5/computer-security/hash-functions) before encrypting under $PK_S$, as in OAEP.
+- Pro
+  Padding makes the encryption secure against chosen-ciphertext attacks.
+- Con
+  None at the protocol level. No protocol field is signed or compared as a bare digest, so no collision property is relied on.
+
+### Server has a digital signature key
+
+The Server has a signing key pair, with the verification key $PK_S$ in its certificate. The User generates a fresh RSA encryption key pair $((e_U,n_U), d_U)$ and a random nonce $r$. The Server picks the session key $k$.
+
+1. User sends $U_{id}$, the nonce $r$, and its fresh public encryption key $(e_U, n_U)$.
+2. Server signs $r$ and returns the signature $\sigma$ with $k$ encrypted under $(e_U, n_U)$.  
+   The signature binds the reply to the User's nonce.
+3. User verifies $\sigma$ against the $r$ it sent, then decrypts $k$ with $d_U$.  
+   A valid signature on the fresh nonce authenticates the Server and rules out replay.
+4. User sends $U_{id}$ and its password encrypted under $k$.
+5. Server recovers the password and checks it against the stored record.  
+   Authenticates the User.
+
+Why it holds:
+
+- The signed nonce $r$ gives freshness, so replay of message 2 fails.
+
+Weakness:
+
+- The signature covers only $r$, not $U_{id}$ or $(e_U, n_U)$.
+- A man-in-the-middle substitutes their own public key in message 1, learns $k$ from the reply, and relays the rest. Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ closes this.
+
+Hashing:
+
+- Where
+  Step 2 signs a [hash](/s5/computer-security/hash-functions) $H$ of the field set, so $\sigma$ is over $H(r)$, or over $H(r \,\|\, U_{id} \,\|\, (e_U, n_U))$ with the fix. This is the only step where a protocol field is signed as a digest.
+- Pro
+  One signing operation covers the concatenated fields whatever their combined length.
+- Con
+  Forging the reply now needs only a strong collision on the signed fields. They choose both field sets, get the honest set signed, and reuse $\sigma$ on the other, so $H$ must be strong collision resistant.
+
+### Server has a Diffie-Hellman public key
+
+Public parameters: a generator $g$ of $\mathbb{Z}_p^*$ and a large prime modulus $p$. The Server's long-term DH public value $Y_S = g^{x_S} \bmod p$ is in its certificate. The User generates a fresh DH pair $(Y_U, x_U)$ with $Y_U = g^{x_U} \bmod p$. The session key is the shared value $k = g^{x_U x_S} \bmod p$.
+
+1. User sends $U_{id}$ and its fresh DH public value $Y_U$.
+2. Server sends $S_{id}$ and its long-term DH public value $Y_S$.
+3. User checks with the CA that $Y_S$ is certified for $S_{id}$, then computes $k = Y_S^{x_U} \bmod p$.
+4. Server computes the same key $k = Y_U^{x_S} \bmod p$.
+5. User sends $U_{id}$ and its password encrypted under $k$.
+6. Server recovers the password and checks it against the stored record.  
+   Only the Server holding $x_S$ for the certified $Y_S$ could have computed $k$, so the Server is authenticated too.
+
+Why it holds:
+
+- Computing $k$ needs $x_S$ matching the certified $Y_S$, which authenticates the Server.
+- The password sent under $k$ authenticates the User.
+- A man-in-the-middle who swaps $Y_U$ shares a key with the Server but cannot supply $pwd$.
+- One who swaps $Y_S$ fails the CA check.
+
+Weakness:
+
+- $Y_S$ is static. No server-side freshness, no forward secrecy.
+- A fresh $x_U$ per run keeps $k$ fresh.
+
+Hashing:
+
+- Where
+  The raw shared value $g^{x_U x_S} \bmod p$ is hashed with a [hash](/s5/computer-security/hash-functions) function to derive $k$ before use as a symmetric key.
+- Pro
+  Removes algebraic structure from the raw value and yields a key of the length the symmetric cipher needs.
+- Con
+  Adds a step. Using the raw value directly is also valid.
