@@ -1,10 +1,10 @@
 ---
 title: DES
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.086Z
+lastUpdatedOn: 2026-09-09T15:57:13.361Z
 slug: s5/computer-security/des
 sidebar:
-  order: 16
+  order: 17
 prev: true
 next: true
 ---
@@ -25,6 +25,28 @@ The [interactive guide to DES](https://sahithyan.dev/post/interactive-guide-to-d
 ## Attacking DES
 
 A brute-force known-plaintext attack averages $2^{55}$ steps given the 56-bit key.
+
+### Differential Cryptanalysis
+
+A chosen-plaintext attack, not a known-plaintext or chosen-ciphertext attack.
+
+Encrypts plaintext pairs $m, m'$ with a fixed chosen input difference $\Delta m = m \oplus m'$ and studies the output difference $\Delta c = c \oplus c'$ of the ciphertext pair $c, c'$.
+
+Tracks how $\Delta m$ propagates through each round. The linear steps ($E$, the P-box, $IP$, $IP^{-1}$, all defined below) map a given input difference to a fixed output difference. The S-boxes do not: a given input difference maps to output differences with non-uniform probability, so the analysis targets them.
+
+The tracked differences never involve the secret key, since XORing the pair cancels the equal round-key terms.
+
+### Linear Cryptanalysis
+
+A known-plaintext attack, not a chosen-plaintext or chosen-ciphertext attack.
+
+Finds linear approximations
+
+$$
+\bigoplus_{i} m_i \oplus \bigoplus_{j} c_j = \bigoplus_{l} k_l
+$$
+
+relating selected plaintext bits $m_i$, ciphertext bits $c_j$, and key bits $k_l$. Each holds with probability $\tfrac{1}{2} + \varepsilon$, with bias $\varepsilon \ne 0$ coming from the S-boxes. Enough known pairs recover the key bits $k_l$.
 
 ## Variations
 

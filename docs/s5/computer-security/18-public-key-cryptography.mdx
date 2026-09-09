@@ -1,7 +1,7 @@
 ---
 title: Public Key Cryptography
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.086Z
+lastUpdatedOn: 2026-09-09T15:57:13.362Z
 slug: s5/computer-security/public-key-cryptography
 sidebar:
   order: 18
@@ -23,6 +23,12 @@ PKC complements, rather than replaces, symmetric cryptography. Modular arithmeti
   Symmetric cryptography requires either a pre-shared key or a trusted key distribution center (KDC), which must itself be trusted with confidentiality.
 - Digital signatures  
   Electronic documents need a signature scheme that is easy to sign and verify, but difficult to forge, with universal verifiability.
+
+## Discovery
+
+- Whitfield Diffie worked in a "reportorial style", combining interviews with others and his own thinking about the problem.
+- He developed the concept of digital signatures first, which led him to the broader concept of public key cryptography.
+- He considered the public key property, that the encryption key can be made public, the most remarkable aspect of the discovery.
 
 ## PKC Framework
 
@@ -92,3 +98,5 @@ For $n = pq$ (distinct primes) and $0 < m < n$:
 $$
 m^{\phi(n)+1} = m^{(p-1)(q-1)+1} \equiv m \pmod n
 $$
+
+The coprime condition $\gcd(a, n) = 1$ is mandatory. When it fails the theorem gives nothing. For $3^{40} \bmod 15$, $\gcd(3, 15) = 3 \neq 1$, so $3^{\phi(15)} \equiv 1 \pmod{15}$ cannot be assumed and the reduction must be done another way.

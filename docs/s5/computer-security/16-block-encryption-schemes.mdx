@@ -1,24 +1,47 @@
 ---
 title: Block Encryption Schemes
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.086Z
+lastUpdatedOn: 2026-09-09T15:57:13.361Z
 slug: s5/computer-security/block-encryption-schemes
 sidebar:
-  order: 17
+  order: 16
 prev: true
 next: true
 ---
 
 A scheme that encrypts messages of arbitrary length, built from a [block cipher](/s5/computer-security/block-ciphers) through a mode of operation. Messages $m$ and ciphertexts $c$ are bit strings of any length, under a key $k$.
 
-## What the Scheme Adds
+On top of a block cipher, the below operations are added to make it a scheme:
 
 - Randomisation  
-  An IV or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts.
+  An [initialization vector](/s5/computer-security/ciphers) or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts.
 - Padding  
   Extra bytes appended to the last block so the message length is a multiple of $n$.
 - Chaining  
   Each block's encryption depends on previous blocks, so a repeated plaintext block does not produce a repeated ciphertext block.
+
+## Modes of Operation
+
+- ECB and CBC  
+  Process full $n$-bit blocks, where $n$ is the block cipher's block size, so the last block needs padding (such as PKCS#7) to reach a multiple of $n$.
+- OFB and CTR  
+  Turn the block cipher into a stream cipher, generating a keystream that is XORed with the data bit-wise or byte-wise, so no padding is needed.
+
+Here $e_k$ and $d_k$ are the block cipher's encryption and decryption under key $k$, and $m_i$, $c_i$ are the $i$-th plaintext and ciphertext blocks.
+
+### CBC
+
+Ciphertext block $c_i = e_k(m_i \oplus c_{i-1})$, with $c_0$ the IV. Decryption is $m_i = d_k(c_i) \oplus c_{i-1}$.
+
+Encryption is strictly sequential. Decryption can be parallelised since all ciphertext blocks are available at once.
+
+### CFB
+
+$s$-bit CFB processes $s$ bits at a time, feeding each $s$-bit ciphertext unit back into the next input. A single corrupted $s$-bit ciphertext unit scrambles the current unit plus the next $n$ bits of recovered plaintext, after which decryption recovers.
+
+### CTR
+
+Keystream block is $e_k(\text{nonce} \Vert \text{counter})$, with $\Vert$ concatenation, XORed with the plaintext. Reusing a nonce with the same key $k$ produces a two-time pad. The XOR of the two ciphertexts equals the XOR of the two plaintexts, cancelling the keystream, so they can recover both plaintexts.
 
 ## Attack Models
 
@@ -44,11 +67,24 @@ Examples:
 - Not secure  
   Shift, substitution, and Vigenère ciphers, all broken by frequency analysis.
 
+### Known Plaintext
+
+Attacker holds ciphertexts together with their exact plaintexts from past traffic, but cannot choose which messages are encrypted. Using the pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+Examples:
+
+- Secure  
+  One-time pad. AES under a random 128-bit key.
+- Not secure  
+  Shift, substitution, and Vigenère ciphers. ECB mode, where known pairs build a partial codebook.
+
 ### Chosen Plaintext
 
 Attacker queries an encryption oracle on arbitrary plaintext repeatedly (with or without a bound). By using the plaintext-ciphertext pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
 
 If the attacker cannot learn about $k$, then the scheme is said to be _indistinguishable under chosen plaintext attack (IND-CPA)_.
+
+For a public-key scheme the encryption oracle adds nothing, since the attacker knows the public key and can encrypt any plaintext themselves.
 
 Security is then tested with a game:
 
@@ -95,6 +131,7 @@ Examples:
 Adaptive chosen ciphertext attack.
 
 - The attacker queries the decryption oracle both before and after receiving $c^*$.
+- Queries after $c^*$ may be chosen adaptively, based on the answers to earlier decryption queries.
 - Every ciphertext except $c^*$ may be submitted, including ones derived from $c^*$.
 - A scheme that is IND-CCA2 secure is also IND-CCA1 secure.
 

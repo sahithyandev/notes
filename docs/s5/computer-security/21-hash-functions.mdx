@@ -1,15 +1,26 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.087Z
+lastUpdatedOn: 2026-09-09T15:57:13.363Z
 slug: s5/computer-security/hash-functions
 sidebar:
-  order: 25
+  order: 21
 prev: true
 next: true
 ---
 
-A hash function $H$ maps a message $m$ of any length to a fixed $n$-bit digest $H(m)$. It is public, keyless, and deterministic.
+A hash function $H$ maps a message $m$ of any length to a fixed $n$-bit digest $H(m)$. It is public and keyless.
+
+A cryptographically secure hash function is:
+
+- Computationally efficient  
+  $H(m)$ is fast to compute for any $m$.
+- Deterministic  
+  The same $m$ always gives the same digest.
+- One-way  
+  Preimage resistant, defined below.
+- Collision resistant  
+  Defined below.
 
 Cryptographic uses:
 
@@ -19,6 +30,19 @@ Cryptographic uses:
   A signature is computed over $H(m)$, so it covers an input of any length at fixed cost.
 - Key derivation  
   A raw secret is hashed to produce a symmetric key of the required length with no algebraic structure.
+
+Applications:
+
+- File integrity  
+  A published digest lets anyone check a downloaded file was not altered.
+- Blockchain security  
+  Each block stores the digest of the previous block, so any edit breaks the chain.
+- Password storage  
+  The database keeps $H(\text{password})$, not the password. This relies on preimage resistance: even if the database leaks, they cannot reverse the digests back to plaintext passwords.
+
+## Strict Avalanche Criterion
+
+Also called SAC or bit diffusion. When a single input bit is flipped, about 50% of the output bits flip on average, and the probability that any given output bit flips is independent of which input bit was flipped and of the input value.
 
 ## Properties
 

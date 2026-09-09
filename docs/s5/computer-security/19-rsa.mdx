@@ -1,7 +1,7 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.086Z
+lastUpdatedOn: 2026-09-09T15:57:13.362Z
 slug: s5/computer-security/rsa
 sidebar:
   order: 19
@@ -37,6 +37,14 @@ c = m^e \bmod n, \quad m = c^d \bmod n
 $$
 
 Encryption cost is a single exponentiation with a small exponent $e$. Decryption cost is a single exponentiation with an exponent up to the full length of $n$, far more expensive.
+
+### Hybrid Encryption
+
+RSA is not used to encrypt large data directly, since modular exponentiation on large numbers is slow and the message must be smaller than $n$. Instead:
+
+- The sender picks a random symmetric session key $k$ and encrypts the file with a symmetric cipher such as AES under $k$.
+- The sender encrypts $k$ with the receiver's RSA public key and sends both the encrypted file and the encrypted key.
+- The receiver recovers $k$ with their RSA private key, then decrypts the file.
 
 ### Correctness
 

@@ -1,0 +1,56 @@
+---
+title: Digital Signatures
+slug: s5/computer-security/digital-signatures
+dateCreated: 2026-09-09T05:01:24.402Z
+lastUpdatedOn: 2026-09-09T15:57:13.363Z
+sidebar:
+  order: 23
+prev: true
+next: true
+---
+
+A digital signature scheme is a triple of algorithms over a key pair $(PK, SK)$, where $SK$ is the private signing key held only by the signer and $PK$ is the public verification key.
+
+- Key generation  
+  Produces $(PK, SK)$. $PK$ is published, often in a certificate; $SK$ is kept secret.
+- $\text{Sign}(SK, m)$  
+  Outputs a signature $s$ computed from the message $m$ and $SK$. In practice $s$ is over $H(m)$ for a [hash function](/s5/computer-security/hash-functions) $H$, not the whole document. The digest is fixed size, so signing cost stays constant for any length, and it avoids mathematical structure exploits that come from signing large raw data blocks directly.
+- $\text{Verify}(PK, m, s)$  
+  Deterministic check that returns accept only if $s$ matches $m$ under $PK$.
+
+The signature is a mathematical function of both $m$ and $SK$. Changing either input changes the valid signature.
+
+## Properties
+
+- Authentication  
+  A valid $s$ proves the message came from the holder of $SK$.
+- Integrity  
+  Any change to $m$ after signing makes $\text{Verify}$ reject.
+- Non-repudiation  
+  $s$ is bound uniquely to $SK$, which is known only to the signer, so no one else could have produced it. The signer cannot later deny signing $m$.
+
+## Forgery
+
+The signing oracle is the honest signer seen as a black box: they submit a chosen message $m_i$ and receive $s_i = \text{Sign}(SK, m_i)$, without learning $SK$.
+
+An adaptive chosen-message attack lets them query the oracle on messages of their choice, each query picked after seeing earlier answers.
+
+- Existential forgery  
+  They output one valid pair $(m', s')$ where $m'$ was never queried to the oracle. The message need not be meaningful.
+- Selective forgery  
+  They forge a signature on a target message fixed in advance.
+- Universal forgery  
+  They can sign any message, equivalent to recovering $SK$.
+
+A scheme is secure when existential forgery under an adaptive chosen-message attack is infeasible.
+
+## Paper vs Digital
+
+- Paper signature  
+  A static mark tied to the physical medium. The same mark is used regardless of the document text, so it does not depend on the content.
+- Paper verification  
+  Subjective visual comparison against a reference, or forensic handwriting analysis by an expert.
+- Digital signature  
+  A value derived from the message content and $SK$, so it differs for every message.
+- Digital verification  
+  Deterministic checking of $\text{Verify}(PK, m, s)$, with trust in $PK$ established through a Public Key Infrastructure and its certificate trust chains.

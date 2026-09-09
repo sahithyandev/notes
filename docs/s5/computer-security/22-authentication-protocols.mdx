@@ -1,12 +1,12 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.088Z
+lastUpdatedOn: 2026-09-09T15:57:13.363Z
 slug: s5/computer-security/authentication-protocols
 sidebar:
-  order: 26
+  order: 22
 prev: true
-next: false
+next: true
 ---
 
 An authentication protocol lets a User and a Server verify each other and set up a shared session key.
@@ -16,6 +16,8 @@ An authentication protocol lets a User and a Server verify each other and set up
 1. The User authenticates that it is talking to the correct Server.
 2. The Server authenticates that it is talking to the correct User.
 3. A shared secret session key $k$ is established for the session.
+
+A shared password alone lets each side authenticate the other, but does not let the two sides jointly and fairly compute a shared secret key. Fair key establishment needs a public key primitive, such as the Server's encryption key, signature key, or Diffie-Hellman value.
 
 The protocol must not be susceptible to:
 

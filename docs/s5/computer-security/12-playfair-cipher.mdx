@@ -3,28 +3,131 @@ title: Playfair Cipher
 sidebar:
   order: 12
 dateCreated: 2026-07-29T05:53:47.519Z
-lastUpdatedOn: 2026-09-09T04:45:06.085Z
+lastUpdatedOn: 2026-09-09T15:57:13.361Z
 slug: s5/computer-security/playfair-cipher
 prev: true
 next: true
 ---
 
-A [classical cipher](/s5/computer-security/ciphers#classical-ciphers), from the pre-computer era.
+A [classical](/s5/computer-security/ciphers#classical-ciphers) and [polygraphic](/s5/computer-security/ciphers#polygraphic-ciphers) cipher. Invented by Sir Charles Wheatstone in 1854. Named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
 
-Invented by Sir Charles Wheatstone in 1854, named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
+## Encryption
+
+### Key Grid
+
+A 5x5 grid holding the 25 letters of the English alphabet, treating I and J as one letter.
 
 Construction:
 
-- Fill a 5x5 grid with letters of the English alphabet, treating I and J as one letter.
-- Fill the grid starting from the top left with a short secret word containing no repeating letters.
-- Fill the remaining cells with the alphabet in natural order, skipping letters already placed.
+- Write a secret keyword with no repeating letters into the grid, starting from the top left, row by row.
+- Fill the remaining cells with the unused letters in alphabetical order.
 
-Encryption of a bigram:
+### Preparation
 
-- Rectangle rule: if the two letters form a rectangle, replace each with the letter on the same row at the opposite corner.
-- Same column rule: if both letters are in the same column, replace each with the letter below it, wrapping to the top.
-- Same row rule: if both letters are in the same row, replace each with the letter to its right, wrapping to the left.
+Steps:
 
-### Attacking the Playfair Cipher
+- Remove non-letters. Replace J with I. Uppercase the text.
+- Split the plaintext into bigrams from left to right.
+- If a bigram has 2 identical letters, insert a filler letter ($X$, or $Q$) between them and re-split.
+- If the plaintext length is odd, append a filler letter to the last bigram.
+- Encrypt each bigram by 1 of the 3 rules below.
 
-Since there are more than 600 possible bigrams versus only 26 monograms, frequency analysis of bigrams requires a much larger amount of ciphertext to be captured.
+### Bigram Rules
+
+- Same row  
+  Replace each letter with the letter to its right, wrapping from the last column to the first.
+- Same column  
+  Replace each letter with the letter below it, wrapping from the last row to the first.
+- Rectangle  
+  The 2 letters sit at opposite corners of a rectangle. Replace each with the letter on its own row at the other corner.
+
+No plaintext letter encrypts to itself.
+
+## Decryption
+
+The receiver builds the same grid from the keyword and splits the ciphertext into bigrams. Each rule is inverted.
+
+- Same row
+  Replace each letter with the letter to its left, wrapping from the first column to the last.
+- Same column
+  Replace each letter with the letter above it, wrapping from the first row to the last.
+- Rectangle
+  The same swap as encryption, each letter taken to the other corner on its own row.
+
+Filler letters are spotted and dropped by reading the recovered plaintext.
+
+## Attacking
+
+The unit of substitution is the bigram, so a monogram frequency count of the ciphertext is close to uniform.
+
+Weaknesses that a cryptanalyst exploits:
+
+- 600 bigrams carry an uneven frequency distribution, led by `TH`, `HE`, `AN`, `IN`. A long ciphertext still leaks this structure.
+- A bigram and its reverse encrypt to a ciphertext bigram and its reverse. Plaintext pairs like `RE` and `ER` are detectable.
+- A digram never contains a repeated letter, so ciphertext bigrams like `LL` never appear.
+
+Steps for a ciphertext-only attack:
+
+- Count ciphertext bigram frequencies and match the top ones against expected language bigrams.
+- Guess a probable word (a crib) and place it against repeated ciphertext stretches.
+- Each correct guess fixes relative positions of letters in the grid, as a row, column, or rectangle constraint.
+- Propagate the constraints, filling the grid, and confirm against the rest of the ciphertext.
+
+Known-plaintext attacks are far stronger. A few matched bigrams pin enough letters to reconstruct the grid, since the keyword layout is highly constrained.
+
+## Worked Example
+
+Plaintext `instruments` under keyword `MONARCHY`.
+
+The grid built from `MONARCHY`:
+
+```
+M O N A R
+C H Y B D
+E F G I K
+L P Q S T
+U V W X Z
+```
+
+Positions are $(\text{row}, \text{column})$ with both starting at $0$.
+
+`instruments` has 11 letters. No bigram repeats a letter. Append filler $X$.
+
+```
+IN ST RU ME NT SX
+```
+
+Encrypt each bigram by its rule.
+
+- `IN`: $I(2,3)$ and $N(0,2)$ form a rectangle. $I \to (2,2) = G$. $N \to (0,3) = A$. Gives `GA`.
+- `ST`: $S(3,3)$ and $T(3,4)$ share row $3$. $S \to (3,4) = T$. $T \to (3,0) = L$. Gives `TL`.
+- `RU`: $R(0,4)$ and $U(4,0)$ form a rectangle. $R \to (0,0) = M$. $U \to (4,4) = Z$. Gives `MZ`.
+- `ME`: $M(0,0)$ and $E(2,0)$ share column $0$. $M \to (1,0) = C$. $E \to (3,0) = L$. Gives `CL`.
+- `NT`: $N(0,2)$ and $T(3,4)$ form a rectangle. $N \to (0,4) = R$. $T \to (3,2) = Q$. Gives `RQ`.
+- `SX`: $S(3,3)$ and $X(4,3)$ share column $3$. $S \to (4,3) = X$. $X \to (0,3) = A$. Gives `XA`.
+
+Ciphertext is `GATLMZCLRQXA`.
+
+Decryption reverses each rule under the same grid.
+
+- `GA`: rectangle. $G(2,2) \to (2,3) = I$. $A(0,3) \to (0,2) = N$. Gives `IN`.
+- `TL`: row $3$, shift left. $T(3,4) \to (3,3) = S$. $L(3,0) \to (3,4) = T$. Gives `ST`.
+- `MZ`: rectangle. $M(0,0) \to (0,4) = R$. $Z(4,4) \to (4,0) = U$. Gives `RU`.
+- `CL`: column $0$, shift up. $C(1,0) \to (0,0) = M$. $L(3,0) \to (2,0) = E$. Gives `ME`.
+- `RQ`: rectangle. $R(0,4) \to (0,2) = N$. $Q(3,2) \to (3,4) = T$. Gives `NT`.
+- `XA`: column $3$, shift up. $X(4,3) \to (3,3) = S$. $A(0,3) \to (4,3) = X$. Gives `SX`.
+
+Recovered text is `instrumentsx`. Dropping the filler $X$ gives `instruments`.
+
+A known-plaintext attack uses 3 matched bigrams from the run above, with the grid unknown.
+
+```
+plaintext:   me ru nt
+ciphertext:  CL MZ RQ
+```
+
+- `me` to `CL`. The same-column rule places $c$ below $m$ and $l$ below $e$. This holds, so 1 column has $m, c$ adjacent and $e, l$ adjacent.
+- `ru` to `MZ`. The same-column rule would place $m$ below $r$, which breaks the $m, c$ adjacency already fixed. So the bigram is a rectangle. $r$ and $m$ share a row. $m$ and $u$ share the column, filling it as $m, c, e, l, u$.
+- `nt` to `RQ`. A rectangle. $n$ and $r$ share a row. $r$ and $t$ share a column.
+
+More matched bigrams pin the remaining letters the same way. Once most cells are known, the alphabetical order of the trailing letters exposes the keyword, and the full grid follows.

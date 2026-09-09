@@ -1,7 +1,7 @@
 ---
 title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.086Z
+lastUpdatedOn: 2026-09-09T15:57:13.361Z
 slug: s5/computer-security/block-ciphers
 sidebar:
   order: 15
@@ -81,7 +81,7 @@ Proposed by Claude Shannon in 1945: a series of linked permutation and substitut
 
 A mode of operation is a recommended standard for using a block cipher to build a scheme for arbitrary-length messages. Plaintext $m$ is divided into blocks $m_1,...,m_n$ of the length the underlying cipher specifies, padding the last block if needed.
 
-DES was standardized with 4 modes: ECB, CBC, OFB, CFB. CTR was added later to allow parallel encryption of data blocks.
+The first standardized modes were ECB, CBC, OFB, and CFB. CTR was added later to allow parallel encryption of data blocks.
 
 - ECB, for short secrets such as session keys.
 - CBC, for bulk data encryption.
@@ -89,28 +89,25 @@ DES was standardized with 4 modes: ECB, CBC, OFB, CFB. CTR was added later to al
 - CFB, for streamed content.
 - CTR, for data that must be encrypted or decrypted in parallel.
 
+The same key is used for all blocks, in all the modes.
+
 ### ECB Mode
 
-Electronic Code Book, the simplest mode: each block is encrypted independently.
+Aka. Electronic Code Book. The simplest mode, where each block is encrypted independently.
 
 $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
 $$
 
-Vulnerabilities:
+Blocks are independent.
 
-- Information leakage  
-  Identical plaintext blocks ($m_i = m_j$) produce identical ciphertext blocks ($c_i = c_j$), letting an attacker spot repetition.
-- Block deletion  
-  Blocks are independent, so an attacker can delete blocks in transit and the receiver cannot detect the modification.
-- Block splicing  
-  For the same reason, an attacker can copy blocks from one message into another undetected.
+Allows parallel encryption and decryption. Error in a single block does not affect the other blocks. No IV or nonce to generate, transmit, or accidentally reuse.
 
-Error propagation: a single bit error in a received ciphertext block corrupts the entire corresponding plaintext block on decryption. There is no propagation into other blocks.
+Identical plaintext blocks ($m_i = m_j$) produce identical ciphertext blocks ($c_i = c_j$), letting an attacker spot repetition. Attacker can remove or copy-paste blocks in transit without detection.
 
 ### CBC Mode
 
-Cipher Block Chaining fixes ECB by chaining ciphertext into each block's encryption, giving every block context from its neighbors.
+Aka. Cipher Block Chaining. Improves ECB by chaining ciphertext into each block's encryption, giving every block context from its neighbors.
 
 $$
 c_1 \leftarrow e_k(m_1 \oplus IV), \quad c_i \leftarrow e_k(m_i \oplus c_{i-1}) \text{ for } i > 1

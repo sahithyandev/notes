@@ -1,9 +1,9 @@
 ---
 title: Shift Cipher
 sidebar:
-  order: 7
+  order: 8
 dateCreated: 2026-07-29T05:49:37.219Z
-lastUpdatedOn: 2026-09-09T04:45:06.084Z
+lastUpdatedOn: 2026-09-09T15:57:13.360Z
 slug: s5/computer-security/shift-cipher
 prev: true
 next: true
@@ -11,7 +11,13 @@ next: true
 
 A [classical cipher](/s5/computer-security/ciphers#classical-ciphers), from the pre-computer era.
 
-Encryption replaces each letter in the alphabet by a letter located at a specific fixed distance from that letter.
+A [mono-alphabetic cipher](/s5/computer-security/ciphers#mono-alphabetic-ciphers). Every letter is shifted by the same amount, so plaintext letter frequencies are preserved in the ciphertext.
+
+You can find an implementation of the shift cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/shift-cipher.c).
+
+## Encryption
+
+Each letter in the alphabet is replaced by a letter located at a fixed distance from it.
 
 $$
 c = m + k \mod 26
@@ -28,11 +34,17 @@ A shift value of 3 is commonly called the Caesar cipher.
 
 </Note>
 
-You can find an implementation of the shift cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/shift-cipher.c).
-
 Viewed as a stream cipher, a stream of plaintext characters $m_i$ and a stream of keys $k_i$ are input to $c_i = m_i + k_i \mod 26$, producing a stream of ciphertext characters $c_i$. The shift cipher's keystream is a repeating sequence of just one key value $k$.
 
-### Breaking the Shift Cipher
+## Decryption
+
+Each letter is shifted back by the same key $k$.
+
+$$
+m = c - k \mod 26
+$$
+
+## Attacking
 
 The shift cipher has only 26 possible keys, so an attacker can try each in turn until the correct plaintext is recognized. This is called an exhaustive key search attack.
 
@@ -55,3 +67,29 @@ Here:
 - $V$: the set of values which can occur for $X$ or $Y_k$ with non-zero probability
 
 Computing $\Delta[X, Y_k]$ for each of the 26 values of $k$ and taking the smallest value gives the secret key.
+
+## Worked Example
+
+Plaintext `attack` under $k = 3$, with $a = 0$ to $z = 25$.
+
+Each letter adds $3$ modulo $26$.
+
+- $a (0) + 3 = 3 = d$
+- $t (19) + 3 = 22 = w$
+- $c (2) + 3 = 5 = f$
+- $k (10) + 3 = 13 = n$
+
+Ciphertext is `dwwdfn`.
+
+Decryption subtracts $3$ modulo $26$.
+
+- $d (3) - 3 = 0 = a$
+- $w (22) - 3 = 19 = t$
+
+Plaintext is `attack`.
+
+The exhaustive attack tries the 26 keys in turn against `dwwdfn`.
+
+- $k = 1$ gives `cvvcem`, not language.
+- $k = 2$ gives `buubdl`, not language.
+- $k = 3$ gives `attack`, recognised as language. Key is $3$.

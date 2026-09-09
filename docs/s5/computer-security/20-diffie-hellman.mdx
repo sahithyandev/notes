@@ -1,7 +1,7 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T04:45:06.087Z
+lastUpdatedOn: 2026-09-09T15:57:13.363Z
 slug: s5/computer-security/diffie-hellman
 sidebar:
   order: 20
@@ -10,6 +10,9 @@ next: true
 ---
 
 Diffie-Hellman (DH), invented in 1976 by Whitfield Diffie and Martin Hellman, lets 2 parties agree on a shared secret key using only publicly exchanged information. Security rests on the difficulty of computing discrete logarithms.
+
+This is the Discrete Logarithm Problem (DLP) over the finite field $\mathbb{Z}_p^*$: recovering the secret $a$ from $g^a \bmod p$ is computationally intractable for large $p$, while computing $g^a \bmod p$ from $a$ is cheap.
+
 The [interactive guide to Diffie-Hellman key exchange](https://sahithyan.dev/post/diffie-hellman-key-exchange) walks through the exchange and the discrete logarithm problem behind it.
 
 <Note>
@@ -28,6 +31,8 @@ The protocol has 4 parts: define public parameters, generate key pairs, exchange
 $g$ is a primitive root modulo $p$ **iff** every $a$ coprime to $p$ satisfies $a \equiv g^i \pmod p$ for some integer $i$, called the discrete logarithm of $a$ to base $g$.
 
 For prime $p$, the $p - 1$ values $i = 1, \dots, p-1$ generate $\{1, \dots, p-1\}$, in some order, via $g^i \bmod p$.
+
+Choosing $g$ as a primitive root maximises the order of the group it generates to $p - 1$, so its powers span every non-zero residue class modulo $p$ and stay in no small subgroup, where the discrete logarithm would be easy to solve.
 
 <Note>
 
@@ -60,6 +65,12 @@ $p = 23$, $g = 5$, $a = 6$, $b = 15$.
 - $B = 5^{15} \bmod 23$.
 - Alice: $k = B^6 \bmod 23 = 2$.
 - Bob: $k = A^{15} \bmod 23 = 2$.
+
+## Ephemeral Diffie-Hellman
+
+Ephemeral Diffie-Hellman (DHE) generates a fresh key pair for every session and deletes both private keys once the shared secret is set up. Long-term keys authenticate the exchange only, they do not derive the session key.
+
+This gives perfect forward secrecy: if the long-term keys are stolen later, past session keys stay safe, because the private keys that produced them no longer exist and cannot be recovered from the recorded public values.
 
 ## Man-in-the-Middle Attack
 
