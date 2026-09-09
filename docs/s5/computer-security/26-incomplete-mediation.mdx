@@ -1,7 +1,7 @@
 ---
 title: Incomplete Mediation
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T15:57:13.364Z
+lastUpdatedOn: 2026-09-09T21:44:33.562Z
 slug: s5/computer-security/incomplete-mediation
 sidebar:
   order: 26
@@ -9,7 +9,7 @@ prev: true
 next: false
 ---
 
-Incomplete mediation occurs when a system fails to validate all input values against every constraint before acting on them.
+Complete mediation means every input is checked against every constraint on every request. Incomplete mediation occurs when a system fails to do so.
 
 Any input from the user or through the network should be considered invalid and untrusted by default. Exhaustive checks should be performed on all input values to ensure they meet the expected constraints.
 
@@ -38,15 +38,15 @@ Validation must be re-done server-side regardless of what the client already che
 
 ## Server-Side Validation
 
-Complete mediation means every input is checked against every constraint on every request, not just at the point of entry:
+For user-input or network requests, these checks should be performed server-side.
 
 - Type  
-   does the value match the expected data type.
+  Does the value match the expected data type.
 - Range  
-   does the value fall within acceptable bounds.
+  Does the value fall within acceptable bounds.
 - Format  
-   does the value match the expected structure (e.g. a real calendar date).
+  Does the value match the expected structure (e.g. a real calendar date).
 - Allowlist over denylist  
-   reject anything that isn't explicitly permitted, rather than trying to enumerate every bad input.
+  Reject anything that isn't explicitly permitted, rather than trying to enumerate every bad input.
 - Re-check on every request  
-   a value validated once (e.g. at login) can't be trusted as still valid later; state can change or the request can be forged.
+  A value validated once (e.g. at login) can't be trusted as still valid later; state can change or the request can be forged.

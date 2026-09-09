@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image mode" viewBox="0 0 540 370" width="540" height="370" role="img" aria-label="CTR mode. Each block encrypts an independent counter value with the cipher. Encryption XORs the result with plaintext; decryption XORs the same result with ciphertext. Blocks have no chaining dependency, so they can be processed in parallel.">
+  <style>
+    .mode text { fill: currentColor; font: 500 17px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .mode .cap { fill: currentColor; opacity: 0.55; font: 600 13px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.09em; }
+    .mode .sub { opacity: 0.65; font-size: 15px; font-weight: 400; }
+    .mode .enc { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .mode .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .div { stroke: currentColor; stroke-opacity: 0.14; stroke-width: 1; }
+    .mode .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .mode .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .mode .t-ct { fill: var(--dia-ct, #b3541e); }
+    .mode .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .mode .t-key { fill: var(--dia-key, #6d4bb6); }
+    .mode .w-key { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-ctr" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <g>
+    <text x="0" y="12" class="cap">ENCRYPTION</text>
+    <text x="175" y="30" text-anchor="middle" class="sub t-key">IV ⊕ ⟨1⟩</text>
+    <path class="w w-key" d="M175 38 V52" marker-end="url(#ah-ctr)" />
+    <rect class="enc" x="130" y="52" width="90" height="40" rx="2" />
+    <text x="175" y="72" text-anchor="middle">Eₖ</text>
+    <path class="w w-key" d="M175 92 V104" marker-end="url(#ah-ctr)" />
+    <circle class="box" cx="175" cy="116" r="11" />
+    <path class="w" d="M168 116h14M175 109v14" />
+    <text x="95" y="116" text-anchor="middle" class="t-pt">m₁</text>
+    <path class="w w-pt" d="M108 116 H164" marker-end="url(#ah-ctr)" />
+    <path class="w w-ct" d="M175 127 V152" marker-end="url(#ah-ctr)" />
+    <text x="175" y="166" text-anchor="middle" class="t-ct">c₁</text>
+
+    <text x="375" y="30" text-anchor="middle" class="sub t-key">IV ⊕ ⟨2⟩</text>
+    <path class="w w-key" d="M375 38 V52" marker-end="url(#ah-ctr)" />
+    <rect class="enc" x="330" y="52" width="90" height="40" rx="2" />
+    <text x="375" y="72" text-anchor="middle">Eₖ</text>
+    <path class="w w-key" d="M375 92 V104" marker-end="url(#ah-ctr)" />
+    <circle class="box" cx="375" cy="116" r="11" />
+    <path class="w" d="M368 116h14M375 109v14" />
+    <text x="295" y="116" text-anchor="middle" class="t-pt">m₂</text>
+    <path class="w w-pt" d="M308 116 H364" marker-end="url(#ah-ctr)" />
+    <path class="w w-ct" d="M375 127 V152" marker-end="url(#ah-ctr)" />
+    <text x="375" y="166" text-anchor="middle" class="t-ct">c₂</text>
+  </g>
+
+  <line class="div" x1="0" y1="188" x2="540" y2="188" />
+
+  <g transform="translate(0,196)">
+    <text x="0" y="12" class="cap">DECRYPTION</text>
+    <text x="175" y="30" text-anchor="middle" class="sub t-key">IV ⊕ ⟨1⟩</text>
+    <path class="w w-key" d="M175 38 V52" marker-end="url(#ah-ctr)" />
+    <rect class="enc" x="130" y="52" width="90" height="40" rx="2" />
+    <text x="175" y="72" text-anchor="middle">Eₖ</text>
+    <path class="w w-key" d="M175 92 V104" marker-end="url(#ah-ctr)" />
+    <circle class="box" cx="175" cy="116" r="11" />
+    <path class="w" d="M168 116h14M175 109v14" />
+    <text x="95" y="116" text-anchor="middle" class="t-ct">c₁</text>
+    <path class="w w-ct" d="M108 116 H164" marker-end="url(#ah-ctr)" />
+    <path class="w w-pt" d="M175 127 V152" marker-end="url(#ah-ctr)" />
+    <text x="175" y="166" text-anchor="middle" class="t-pt">m₁</text>
+
+    <text x="375" y="30" text-anchor="middle" class="sub t-key">IV ⊕ ⟨2⟩</text>
+    <path class="w w-key" d="M375 38 V52" marker-end="url(#ah-ctr)" />
+    <rect class="enc" x="330" y="52" width="90" height="40" rx="2" />
+    <text x="375" y="72" text-anchor="middle">Eₖ</text>
+    <path class="w w-key" d="M375 92 V104" marker-end="url(#ah-ctr)" />
+    <circle class="box" cx="375" cy="116" r="11" />
+    <path class="w" d="M368 116h14M375 109v14" />
+    <text x="295" y="116" text-anchor="middle" class="t-ct">c₂</text>
+    <path class="w w-ct" d="M308 116 H364" marker-end="url(#ah-ctr)" />
+    <path class="w w-pt" d="M375 127 V152" marker-end="url(#ah-ctr)" />
+    <text x="375" y="166" text-anchor="middle" class="t-pt">m₂</text>
+  </g>
+</svg>

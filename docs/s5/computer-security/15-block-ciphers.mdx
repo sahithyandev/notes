@@ -1,7 +1,7 @@
 ---
 title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T15:57:13.361Z
+lastUpdatedOn: 2026-09-09T21:44:33.560Z
 slug: s5/computer-security/block-ciphers
 sidebar:
   order: 15
@@ -11,7 +11,7 @@ next: true
 
 A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
 
-Large messages are divided into blocks and encrypted independently per block.
+Large messages are divided into blocks and encrypted per block, under a mode of operation.
 
 $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
@@ -68,6 +68,8 @@ Design parameters of a Feistel cipher:
 - Key schedule generating each round key $k_i$ from $k$.
 - Length of the secret key $k$.
 
+You can find an implementation of a generic Feistel cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/feistel-cipher.c).
+
 ### SP-Network
 
 Proposed by Claude Shannon in 1945: a series of linked permutation and substitution operations. AES, the successor to DES, is based on this design, rather than the Feistel structure. Its round operations are visualized in the [interactive guide to AES](https://sahithyan.dev/post/interactive-guide-to-aes).
@@ -79,9 +81,9 @@ Proposed by Claude Shannon in 1945: a series of linked permutation and substitut
 
 ## Modes of Operation
 
-A mode of operation is a recommended standard for using a block cipher to build a scheme for arbitrary-length messages. Plaintext $m$ is divided into blocks $m_1,...,m_n$ of the length the underlying cipher specifies, padding the last block if needed.
+A mode of operation is a recommended standard for using a block cipher to build a scheme for arbitrary-length messages. Plaintext $m$ is divided into $t$ blocks $m_1,...,m_t$ of the $n$-bit block length the underlying cipher specifies, padding the last block if needed.
 
-The first standardized modes were ECB, CBC, OFB, and CFB. CTR was added later to allow parallel encryption of data blocks.
+ECB, CBC, OFB, and CFB were standardized together in FIPS 81 (1980). CTR was proposed by Diffie and Hellman in 1979 but only standardized in 2001 (NIST SP 800-38A), adding a mode built for parallel encryption of data blocks.
 
 - ECB, for short secrets such as session keys.
 - CBC, for bulk data encryption.
@@ -98,6 +100,12 @@ Aka. Electronic Code Book. The simplest mode, where each block is encrypted inde
 $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
 $$
+
+import EcbMode from "./images/ecb-mode.svg";
+
+<EcbMode />
+
+The last block is padded (such as PKCS#7) to a multiple of $n$.
 
 Blocks are independent.
 
@@ -117,48 +125,88 @@ $$
 m_1 \leftarrow d_k(c_1) \oplus IV, \quad m_i \leftarrow d_k(c_i) \oplus c_{i-1} \text{ for } i > 1
 $$
 
-The IV can be a fixed public value (e.g. all-zero), which need not be transmitted, or a random nonce, which must be transmitted with the ciphertext as $IV, c_1,...,c_n$.
+import CbcMode from "./images/cbc-mode.svg";
 
-Error propagation: a single bit error in a received ciphertext block corrupts the entire corresponding plaintext block, plus a single bit in the next block. This is one-block error propagation.
+<CbcMode />
+
+The last block is padded (such as PKCS#7) to a multiple of $n$.
+
+The IV can be a fixed public value (e.g. all-zero), which need not be transmitted, or a random nonce, which must be transmitted with the ciphertext as $IV, c_1,...,c_t$.
+
+Allows parallel decryption as all ciphertext blocks are known initially. Identical plaintext blocks ($m_i = m_j$) produce different ciphertext blocks ($c_i \neq c_j$) (because of the IV and chaining), so an attacker cannot spot repetition. A fixed all-zero IV needs no transmission.
+
+A single bit error in a received ciphertext block corrupts the entire corresponding plaintext block, and a single bit in the next block. This is one-block error propagation. Encryption is strictly sequential. A random IV must be unpredictable and adds one block of transmission overhead. A bit inserted or deleted in transit, rather than flipped, desynchronizes every following block.
 
 ### OFB Mode
 
-Output Feedback lets a block cipher operate as a stream cipher: it generates a keystream $Y_i$ of $b$ bits at a time, XORed with the plaintext or ciphertext stream.
+Aka. Output Feedback. Allows a block cipher operate as a stream cipher. An $n$-bit shift register $S_i$ feeds the cipher. Each step encrypts the register, takes the $b$ most significant bits of the output as the keystream segment $Z_i$, and XORs it with the $b$-bit plaintext or ciphertext segment. The segment size satisfies $1 \le b \le n$, with $b = n$ the full-block case.
 
 $$
-Y_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Y_i, \quad m_i \leftarrow c_i \oplus Y_i
+Z_i \leftarrow \operatorname{MSB}_b(e_k(S_i)), \quad c_i \leftarrow m_i \oplus Z_i, \quad m_i \leftarrow c_i \oplus Z_i
 $$
 
-$Y_0 \leftarrow IV$. Both encryption and decryption use only the encryption operation $e_k$.
+$$
+S_1 \leftarrow IV, \quad S_{i+1} \leftarrow (S_i \ll b) \mathbin{|} Z_i
+$$
 
-The keystream can be precomputed before any ciphertext arrives, so OFB suits real-time streamed content.
+$\operatorname{MSB}_b$ takes the $b$ most significant bits. $S_{i+1}$ shifts the register left by $b$ bits, discarding the top $b$, and feeds $Z_i$ into the low end. With full-block feedback ($b = n$) this reduces to $S_{i+1} \leftarrow e_k(S_i)$. Both encryption and decryption use only $e_k$.
 
-Error propagation: a single bit error in a received ciphertext block corrupts only the corresponding single bit of plaintext. There is no propagation into other blocks.
+import OfbMode from "./images/ofb-mode.svg";
+
+<OfbMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+The keystream can be precomputed before any ciphertext arrives, so OFB suits real-time streamed content. The ciphertext has the same length as the plaintext. Same hardware used for both encryption and decryption.
+
+Encryption and decryption are strictly sequential.
+
+A single bit error in a received ciphertext block corrupts only the corresponding single bit of plaintext. Remaining bits of the current block are not affected. There is no propagation into other blocks as well. The absence of error propagation also makes the ciphertext malleable. An attacker can flip any plaintext bit by flipping the matching ciphertext bit, undetected without a separate integrity check.
+
+Because the keystream depends only on the key and IV, reusing a $(k, IV)$ pair is catastrophic. XORing the two ciphertexts cancels the keystream and leaks the XOR of the plaintexts.
 
 ### CFB Mode
 
-Cipher Feedback also lets a block cipher operate as a stream cipher, similar to OFB, but feeds the ciphertext itself back into the keystream generator.
+Aka. Cipher Feedback. Also lets a block cipher operate as a stream cipher, using the same $n$-bit shift register $S_i$ as OFB, but shifts the ciphertext segment, rather than the keystream, into the register.
 
 $$
-Z_i \leftarrow e_k(Y_{i-1}), \quad c_i \leftarrow m_i \oplus Z_i^*, \quad Y_i \leftarrow Y_{i-1} \ll c_i
+Z_i \leftarrow \operatorname{MSB}_b(e_k(S_i)), \quad c_i \leftarrow m_i \oplus Z_i, \quad m_i \leftarrow c_i \oplus Z_i
 $$
 
-$Y_0 \leftarrow IV$, and $Z_i^*$ is the $b$ most-significant bits of $Z_i$. Decryption mirrors this, also using only $e_k$.
+$$
+S_1 \leftarrow IV, \quad S_{i+1} \leftarrow (S_i \ll b) \mathbin{|} c_i
+$$
 
-Unlike OFB, the keystream depends on the ciphertext and cannot be precomputed before ciphertext arrives, making CFB less useful than OFB for real-time streaming.
+import CfbMode from "./images/cfb-mode.svg";
 
-Error propagation: a single bit error in a received ciphertext block corrupts a single bit in the corresponding plaintext block, then keeps corrupting the input buffer $Y_i$ until it is flushed after $n/b$ rounds, completely corrupting $n/b - 1$ further blocks. This causes severe error propagation.
+<CfbMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+Decryption can be parallel. Same hardware used for both encryption and decryption.
+
+Encryption is strictly sequential. The keystream depends on the ciphertext and cannot be precomputed before ciphertext arrives. Less useful than OFB for real-time streaming.
+
+A single bit error in a received ciphertext block corrupts a single bit in the corresponding plaintext block, then keeps corrupting the shift register $S_i$ until it is flushed after $n/b$ rounds, completely corrupting the next $n/b$ blocks. This causes severe error propagation.
 
 ### CTR Mode
 
-Counter mode is similar to ECB but removes its disadvantages while keeping its advantage of parallel processing.
+Aka. Counter mode. Similar to ECB but removes its disadvantages while keeping its advantage of parallel processing.
 
 $$
-c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_b), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_b)
+c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_n), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_n)
 $$
 
-$\langle i \rangle_b$ is the binary representation of $i$ as a $b$-bit number.
+$\langle i \rangle_n$ is the binary representation of $i$ as an $n$-bit number, matching the block length.
+
+import CtrMode from "./images/ctr-mode.svg";
+
+<CtrMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+Same hardware used for both encryption and decryption.
 
 Each plaintext block is encrypted independently, like ECB, so blocks can be processed in parallel. The counter also gives each block context, so unlike ECB, an attacker cannot cut-and-paste or rearrange ciphertext blocks undetected.
 
-Vulnerability: the counter input $IV + i$ must never be reused for a subsequent encryption under the same key $k$.
+The counter input $IV \oplus i$ must never be reused for a subsequent encryption under the same key $k$.

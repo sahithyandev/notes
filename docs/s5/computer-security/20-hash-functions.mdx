@@ -1,10 +1,10 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T15:57:13.363Z
+lastUpdatedOn: 2026-09-09T21:44:33.561Z
 slug: s5/computer-security/hash-functions
 sidebar:
-  order: 21
+  order: 20
 prev: true
 next: true
 ---
@@ -22,24 +22,6 @@ A cryptographically secure hash function is:
 - Collision resistant  
   Defined below.
 
-Cryptographic uses:
-
-- Padding  
-  Randomised padding schemes such as OAEP mix message bits with hash output before public key encryption.
-- Signing  
-  A signature is computed over $H(m)$, so it covers an input of any length at fixed cost.
-- Key derivation  
-  A raw secret is hashed to produce a symmetric key of the required length with no algebraic structure.
-
-Applications:
-
-- File integrity  
-  A published digest lets anyone check a downloaded file was not altered.
-- Blockchain security  
-  Each block stores the digest of the previous block, so any edit breaks the chain.
-- Password storage  
-  The database keeps $H(\text{password})$, not the password. This relies on preimage resistance: even if the database leaks, they cannot reverse the digests back to plaintext passwords.
-
 ## Strict Avalanche Criterion
 
 Also called SAC or bit diffusion. When a single input bit is flipped, about 50% of the output bits flip on average, and the probability that any given output bit flips is independent of which input bit was flipped and of the input value.
@@ -54,7 +36,7 @@ Given a digest $d$, an attacker cannot find any $m$ with $H(m) = d$. Generic cos
 
 ### Weak Collision Resistance
 
-Given a fixed message $m$, an attacker cannot find a different $m'$ with $H(m') = H(m)$. Also called second-preimage resistance. Generic cost about $2^n$.
+Aka. second-preimage resistance. Given a fixed message $m$, an attacker cannot find a different $m'$ with $H(m') = H(m)$. Generic cost about $2^n$.
 
 ### Strong Collision Resistance
 
@@ -64,11 +46,33 @@ Among $2^{n/2}$ random messages a repeated digest is already likely, since the n
 
 <Note>
 
-Strong collision resistance is the property that matters when an attacker controls both messages, as in forging a signed message. Weak collision resistance suffices when one message is fixed by an honest party.
+Strong collision resistance is the property that matters when an attacker controls both messages, as in forging a signed message.
 
 </Note>
 
-## OAEP
+## Uses
+
+Cryptographic uses:
+
+- Padding  
+  Randomised padding schemes such as OAEP mix message bits with hash output before public key encryption.
+- Signing  
+  A signature is computed over $H(m)$, so it covers an input of any length at fixed cost.
+- Key derivation  
+  A raw secret is hashed to produce a symmetric key of the required length with no algebraic structure.
+
+In real world:
+
+- File integrity  
+  A published digest lets anyone check a downloaded file was not altered.
+- Blockchain security  
+  Each block stores the digest of the previous block, so any edit breaks the chain.
+- Password storage  
+  The database keeps $H(\text{password})$, not the password. Even if the database leaks, the attacker cannot reverse the digests back to plaintext passwords.
+
+## Examples
+
+### OAEP
 
 Optimal Asymmetric Encryption Padding. A randomised padding applied to a message before RSA encryption.
 

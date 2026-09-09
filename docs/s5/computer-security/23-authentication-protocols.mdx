@@ -1,10 +1,10 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T15:57:13.363Z
+lastUpdatedOn: 2026-09-09T21:44:33.562Z
 slug: s5/computer-security/authentication-protocols
 sidebar:
-  order: 22
+  order: 23
 prev: true
 next: true
 ---
@@ -56,25 +56,9 @@ The Server has an encryption key pair $(PK_S, SK_S)$, with $PK_S$ in its certifi
 4. User decrypts and confirms $U_{id}$ comes back.  
    Proves the peer holds $SK_S$, so it is the real Server.
 
-Why it holds:
+Only $SK_S$ decrypts message 1, so only the real Server can return $k$. The password in message 1 authenticates the User. Man-in-the-middle and cut-and-paste fail without $SK_S$.
 
-- Only $SK_S$ decrypts message 1, so only the real Server can return $k$.
-- The password in message 1 authenticates the User.
-- Man-in-the-middle and cut-and-paste fail without $SK_S$.
-
-Weakness:
-
-- No nonce. Freshness rests entirely on the User choosing a new random $k$ each run.
-- Reusing $k$ makes message 1 replayable.
-
-Hashing:
-
-- Where
-  Message 1 pads with a [hash](/s5/computer-security/hash-functions) before encrypting under $PK_S$, as in OAEP.
-- Pro
-  Padding makes the encryption secure against chosen-ciphertext attacks.
-- Con
-  None at the protocol level. No protocol field is signed or compared as a bare digest, so no collision property is relied on.
+There is no nonce, so freshness rests entirely on the User choosing a new random $k$ each run. Reusing $k$ makes message 1 replayable.
 
 ### Server Has a Digital Signature Key
 
@@ -89,53 +73,28 @@ The Server has a signing key pair, with the verification key $PK_S$ in its certi
 5. Server recovers the password and checks it against the stored record.  
    Authenticates the User.
 
-Why it holds:
+The signed nonce $r$ gives freshness, so replay of message 2 fails.
 
-- The signed nonce $r$ gives freshness, so replay of message 2 fails.
+The signature covers only $r$, not $U_{id}$ or $(e_U, n_U)$. A man-in-the-middle substitutes their own public key in message 1, learns $k$ from the reply, and relays the rest. Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ closes this.
 
-Weakness:
+In step 2 the Server may optionally signs $H(r)$ or $H(r \,\|\, U_{id} \,\|\, (e_U, n_U))$ instead of the raw value. This convert the signing to one fixed-size input. Hash-then-sign also blocks the existential forgeries that signing raw algebraic values allows.
 
-- The signature covers only $r$, not $U_{id}$ or $(e_U, n_U)$.
-- A man-in-the-middle substitutes their own public key in message 1, learns $k$ from the reply, and relays the rest. Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ closes this.
-
-Hashing:
-
-- Where
-  Step 2 signs a [hash](/s5/computer-security/hash-functions) $H$ of the field set, so $\sigma$ is over $H(r)$, or over $H(r \,\|\, U_{id} \,\|\, (e_U, n_U))$ with the fix. This is the only step where a protocol field is signed as a digest.
-- Pro
-  One signing operation covers the concatenated fields whatever their combined length.
-- Con
-  Forging the reply now needs only a strong collision on the signed fields. They choose both field sets, get the honest set signed, and reuse $\sigma$ on the other, so $H$ must be strong collision resistant.
+The cost is an extra step. Both parties should agree on a shared choice of hash function. Collisions in $H$, binds the Server to a message it never meant to sign. $H$ must be a strong collision-resistant hash function.
 
 ### Server Has a Diffie-Hellman Public Key
 
-Public parameters: a generator $g$ of $\mathbb{Z}_p^*$ and a large prime modulus $p$. The Server's long-term DH public value $Y_S = g^{x_S} \bmod p$ is in its certificate. The User generates a fresh DH pair $(Y_U, x_U)$ with $Y_U = g^{x_U} \bmod p$. The session key is the shared value $k = g^{x_U x_S} \bmod p$.
+Fix a large prime $p$ and a generator $g$ of $\mathbb{Z}_p^*$. The Server has a long-term secret $b$ and publishes $B = g^b \bmod p$ in its certificate. The User picks a fresh secret $a$ and forms $A = g^a \bmod p$. Each side raises the other's public value to its own secret, so both reach the shared value $k = g^{ab} \bmod p$ and use it as the session key.
 
-1. User sends $U_{id}$ and its fresh DH public value $Y_U$.
-2. Server sends $S_{id}$ and its long-term DH public value $Y_S$.
-3. User checks with the CA that $Y_S$ is certified for $S_{id}$, then computes $k = Y_S^{x_U} \bmod p$.
-4. Server computes the same key $k = Y_U^{x_S} \bmod p$.
+1. User sends $U_{id}$ and $A$.
+2. Server sends $S_{id}$ and $B$.
+3. User confirms with the CA that $B$ is certified for $S_{id}$, then computes $k = B^a \bmod p$.
+4. Server computes the same $k = A^b \bmod p$.
 5. User sends $U_{id}$ and its password encrypted under $k$.
-6. Server recovers the password and checks it against the stored record.  
-   Only the Server holding $x_S$ for the certified $Y_S$ could have computed $k$, so the Server is authenticated too.
+6. Server decrypts and checks the password against the stored record.  
+   A match authenticates the User.
 
-Why it holds:
+Only the holder of $b$ for the certified $B$ can compute $k$, so a correct reply in step 6 authenticates the Server. The password under $k$ authenticates the User. An attacker who replaces $A$ shares a key with the Server but still cannot supply the password, and one who replaces $B$ fails the CA check.
 
-- Computing $k$ needs $x_S$ matching the certified $Y_S$, which authenticates the Server.
-- The password sent under $k$ authenticates the User.
-- A man-in-the-middle who swaps $Y_U$ shares a key with the Server but cannot supply $pwd$.
-- One who swaps $Y_S$ fails the CA check.
+$B$ never changes. The Server adds no freshness, and the protocol has no forward secrecy: leaking $b$ once exposes every past session. Only the User's fresh $a$ keeps each $k$ distinct.
 
-Weakness:
-
-- $Y_S$ is static. No server-side freshness, no forward secrecy.
-- A fresh $x_U$ per run keeps $k$ fresh.
-
-Hashing:
-
-- Where
-  The raw shared value $g^{x_U x_S} \bmod p$ is hashed with a [hash](/s5/computer-security/hash-functions) function to derive $k$ before use as a symmetric key.
-- Pro
-  Removes algebraic structure from the raw value and yields a key of the length the symmetric cipher needs.
-- Con
-  Adds a step. Using the raw value directly is also valid.
+Both sides may instead hash $g^{ab} \bmod p$ to derive $k$. The [hash](/s5/computer-security/hash-functions) strips the algebraic structure of the raw value and returns a key of the length the cipher needs. Using the raw value directly also works.
