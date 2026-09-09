@@ -48,6 +48,20 @@ If a label does not fit the 2-line form, rewrite it as a plain sentence. Never u
 
 Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Here:` lead-in, such as `- $A$: cross-sectional area`.
 
+### Title casing
+
+Headings (`##` to `####`) and the `title` frontmatter field must be in title case, as enforced by the `title-case` Astro integration in `src/integrations/title-case/`. The build and dev server fail on violations.
+
+Rules implemented in `titlecase.ts`:
+
+- Capitalize the first word, the last word, and any word after a colon.
+- Keep minor words lowercase otherwise (articles, coordinating conjunctions, short prepositions). See `MINOR_WORDS` for the full list.
+- Hyphenated compounds are cased segment by segment with the same rules.
+- Domain terms in `ALLOWED_LOWERCASE` (such as `rms`, `setuid`, `sin`) stay lowercase everywhere.
+- Math (`$...$`), code (`` `...` ``), links, paths, and mixed-case acronyms are left untouched.
+
+Add a new domain term to `ALLOWED_LOWERCASE` rather than working around a false positive.
+
 ### Note components
 
 Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
@@ -85,10 +99,3 @@ Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Compo
 - No Tailwind Typography; prose styles are hand-written in `src/pages/[...slug].astro`. `global.css` holds only CSS variables and the box-sizing reset. Other component styles are scoped `<style>` blocks.
 - Math: `remark-math` + `rehype-katex`; KaTeX CSS from CDN in `Layout.astro`.
 - Custom Markdown classes: `.callout`, `.term`.
-
-## Computer Security notes scope
-
-`docs/s5/computer-security/` module layout:
-
-- `cipher-algorithms/` — one note per specific cipher, classical (shift, substitution, playfair, vigenere, permutation, lorenz) and modern (DES, RSA). `cipher-algorithms/01-introduction.mdx` is a pure index grouping links by category, no theory of its own.
-- Top level — everything else: security models and threats, CIA triad, and cipher-family theory not tied to one algorithm (general cipher theory, stream ciphers, block ciphers, block cipher modes, public key cryptography, Diffie-Hellman). Shared theory such as `ciphers.mdx` and `kerckhoffs-principle.mdx` each gets its own note; split further if a note would cover more than one concept.
