@@ -1,7 +1,7 @@
 ---
 title: Data Encryption Standard
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T21:44:33.561Z
+lastUpdatedOn: 2026-09-09T22:27:45.823Z
 slug: s5/computer-security/des
 sidebar:
   order: 17
@@ -127,10 +127,12 @@ Selects 56 bits from the 64-bit key, skipping the 8 parity bits, and permutes th
 
 ### Rotation
 
-Each round left-rotates $C_{i-1}$ and $D_{i-1}$ by $p_i$ positions (1 or 2, per a fixed schedule) to get $C_i, D_i$.
+Each round left-rotates $C_{i-1}$ and $D_{i-1}$ by $p_i$ positions to get $C_i, D_i$, where $p_i$ is 1 or 2 as fixed by the schedule below.
+
+$C_i$ and $D_i$ are 28-bit registers. The 16 shifts sum to 28, so a full left-rotation brings $C_{16}, D_{16}$ back to $C_0, D_0$. Decryption uses this to walk the schedule backwards by right-rotating instead.
 
 <RotationSchedule
-  caption="Cell index is the round i. Cell value is the left-rotation amount pᵢ. Total over 16 rounds is 28, so C₁₆ and D₁₆ return to C₀ and D₀."
+  caption="Cell index is the round number i. Cell value is pᵢ, the left-rotation amount for that round."
   shifts={[1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]}
 />
 
@@ -249,31 +251,9 @@ Given an attacker with $2^{64}$ storage and chosen-plaintext access, both 3-key 
 
 A brute-force known-plaintext attack averages $2^{55}$ steps given the 56-bit key.
 
-### Differential Cryptanalysis
-
-A chosen-plaintext attack.
-
-Encrypts plaintext pairs $m, m'$ with a fixed chosen input difference $\Delta m = m \oplus m'$ and studies the output difference $\Delta c = c \oplus c'$ of the ciphertext pair $c, c'$.
-
-Tracks how $\Delta m$ propagates through each round. The linear steps ($E$, the P-box, $IP$, $IP^{-1}$, all defined above) map a given input difference to a fixed output difference. The S-boxes do not: a given input difference maps to output differences with non-uniform probability, so the analysis targets them.
-
-The tracked differences never involve the secret key, since XORing the pair cancels the equal round-key terms.
-
-### Linear Cryptanalysis
-
-A known-plaintext attack, not a chosen-plaintext or chosen-ciphertext attack.
-
-Finds linear approximations
-
-$$
-\bigoplus_{i} m_i \oplus \bigoplus_{j} c_j = \bigoplus_{l} k_l
-$$
-
-relating selected plaintext bits $m_i$, ciphertext bits $c_j$, and key bits $k_l$. Each holds with probability $\tfrac{1}{2} + \varepsilon$, with bias $\varepsilon \ne 0$ coming from the S-boxes. Enough known pairs recover the key bits $k_l$.
-
 ### Meet in the Middle Attack
 
-Breaks a double encryption $c = E_{k_2}(E_{k_1}(m))$ whose 2 layers can be inverted independently. Trades storage for time instead of searching all $2^{112}$ key pairs.
+A known-plaintext attack. Breaks a double encryption $c = E_{k_2}(E_{k_1}(m))$ whose 2 layers can be inverted independently. Trades storage for time instead of searching all $2^{112}$ key pairs.
 
 - Take one known plaintext-ciphertext pair $(m, c)$.
 - For every key $k_1$, compute $x = E_{k_1}(m)$ and store $(x, k_1)$ in a table.
@@ -281,4 +261,49 @@ Breaks a double encryption $c = E_{k_2}(E_{k_1}(m))$ whose 2 layers can be inver
 - Each hit $x = x'$ gives a candidate pair $(k_1, k_2)$ that agrees at the midpoint.
 - Test surviving candidates against a second known pair to drop false matches.
 
-With $b$-bit keys the cost is about $2^{b+1}$ encryptions and $2^b$ storage, against $2^{2b}$ for brute force. For double DES $b = 56$, so the work drops from $2^{112}$ to roughly $2^{57}$.
+Take $b$-bit keys. The first loop runs $2^b$ encryptions and fills a table of $2^b$ entries. The second loop runs $2^b$ decryptions. The total is $2^b + 2^b = 2^{b+1}$ cipher calls, with $2^b$ storage for the table. Brute force instead tries every $(k_1, k_2)$ pair, $2^b \cdot 2^b = 2^{2b}$ calls, with no storage. For double DES $b = 56$, so the work drops from $2^{112}$ to roughly $2^{57}$.
+
+### Linear Cryptanalysis
+
+A known-plaintext attack, published by Matsui in 1993.
+
+Notation. $m_i$ is bit $i$ of the plaintext, $c_j$ bit $j$ of the ciphertext, $k_l$ bit $l$ of the key. $\bigoplus$ is XOR taken over a chosen set of positions: $I$ in the plaintext, $J$ in the ciphertext, $L$ in the key. XOR of a set of bits is 1 when an odd number of them are 1, so each side of the equation is the parity of its selected bits.
+
+A linear approximation claims these 2 parities are equal:
+
+$$
+\bigoplus_{i \in I} m_i \oplus \bigoplus_{j \in J} c_j = \bigoplus_{l \in L} k_l
+$$
+
+The left side is built only from bits the attacker can see. The right side is 1 fixed bit, the parity of some unknown key bits. It never changes, since the key is fixed.
+
+Example. With $I = \{4, 9\}$, $J = \{7\}$, $L = \{2, 5, 18\}$ the equation reads
+
+$$
+m_4 \oplus m_9 \oplus c_7 = k_2 \oplus k_5 \oplus k_{18}
+$$
+
+For a random pair the left side is 0 half the time and 1 half the time, so it says nothing about the right side. The DES S-boxes are slightly unbalanced, so for a well-chosen $I, J, L$ the left side equals the right side with probability $\tfrac{1}{2} + \varepsilon$ for some bias $\varepsilon \ne 0$.
+
+- Collect $N$ known pairs $(m, c)$.
+- Compute the left side of each.
+- If the left side is 0 in more than half the pairs, the fixed right side is 0, otherwise 1.
+
+That recovers 1 bit of information about the key, the parity $k_2 \oplus k_5 \oplus k_{18}$ in the example. The answer is right with confidence that grows in $N$, needing about $\varepsilon^{-2}$ pairs. Enough different equations pin down enough key-bit parities to solve for the key. Full DES falls to about $2^{43}$ known pairs, below brute force but far more plaintext than an attacker usually holds.
+
+### Differential Cryptanalysis
+
+A chosen-plaintext attack, made public by Biham and Shamir around 1990.
+
+Works with the XOR difference of a plaintext pair $m, m'$, not the values. Fix an input difference $\Delta m = m \oplus m'$ and follow the difference forward through the rounds.
+
+- The linear steps $E$, $P$, $\text{IP}$, $\text{IP}^{-1}$ satisfy $g(x) \oplus g(x') = g(x \oplus x')$. Their output difference is a fixed function of the input difference, free of the actual values and of the key.
+- An S-box is not linear. For a given input difference its output difference is not fixed, but some output differences are far more likely than others. The difference distribution table counts, for each pair of input and output differences, how many of the 64 input pairs produce it.
+
+Chaining high-probability S-box differences across rounds gives a characteristic. This is a predicted difference through the first 15 rounds that holds with some probability $p$.
+
+- Encrypt many plaintext pairs with input difference $\Delta m$.
+- For each guess of the last round key feeding the active S-boxes, undo the last round and check whether the round-15 difference matches the characteristic.
+- The correct guess matches at rate $p$, wrong guesses at the lower random rate. The guess with the most matches is the key.
+
+The pair difference never depends on $k$, since XORing the pair cancels the equal round-key terms. Full DES needs about $2^{47}$ chosen plaintexts. The S-boxes were tuned in 1974 to resist exactly this, so the attack does not threaten DES in practice.
