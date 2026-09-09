@@ -177,7 +177,7 @@ export default defineConfig({
     shikiConfig: {
       themes: {
         light: "github-light",
-        dark: "catppuccin-macchiato",
+        dark: "github-dark-dimmed",
       },
       defaultColor: false,
     },
