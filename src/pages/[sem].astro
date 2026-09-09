@@ -141,18 +141,17 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
   image={`${SITE_HOST_URL}/og/sem-${sem.slice(1)}.jpg`}
   slug={sem}
 >
-  <Nav />
-
-  <div class="mobile-bar">
+  <Nav>
     <button
-      class="mobile-bar-btn"
+      slot="nav-start"
+      class="nav-drawer-btn"
       id="open-sidebar"
       type="button"
       aria-label="Open contents"
     >
       <svg
-        width="16"
-        height="16"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -165,20 +164,19 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
           x2="15"
           y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg
       >
-      <span>Contents</span>
     </button>
     {
       tocHeadings.length > 0 && (
         <button
-          class="mobile-bar-btn right"
+          slot="nav-end"
+          class="nav-drawer-btn"
           id="open-toc"
           type="button"
           aria-label="Open table of contents"
         >
-          <span>On this page</span>
           <svg
-            width="16"
-            height="16"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -198,7 +196,7 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
         </button>
       )
     }
-  </div>
+  </Nav>
   <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
 
   <main
@@ -348,7 +346,7 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
     const openTocBtn = document.getElementById("open-toc");
     const backdrop = document.getElementById("drawer-backdrop");
     const sidebarEl = document.querySelector(".sidebar");
-    const tocEl = document.querySelector(".toc-rail");
+    const tocEl = document.querySelector(".right-sidebar");
     const root = document.documentElement;
 
     const closeDrawers = () => {
@@ -686,41 +684,27 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
     margin: 8px 0;
   }
 
-  /* ── MOBILE ACTION BAR & DRAWER CONTROLS ──────────────────────── */
-  .mobile-bar {
-    display: none;
-    position: sticky;
-    top: var(--nav-h);
-    z-index: 20;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 8px calc(4 * var(--spacing));
-    gap: 8px;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .mobile-bar-btn {
+  /* ── DRAWER CONTROLS ─────────────────────────────────────────── */
+  .nav-drawer-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    font: inherit;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     color: var(--text-secondary);
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 7px;
     cursor: pointer;
+    padding: 0;
     transition:
       background 0.12s,
       color 0.12s,
       border-color 0.12s;
   }
 
-  .mobile-bar-btn:hover,
-  .mobile-bar-btn:active {
+  .nav-drawer-btn:hover,
+  .nav-drawer-btn:active {
     background: var(--sem-bg);
     border-color: var(--sem-border);
     color: var(--sem);
@@ -757,10 +741,6 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
       overflow: visible;
     }
 
-    .mobile-bar {
-      display: flex;
-    }
-
     .drawer-backdrop {
       display: block;
     }
@@ -791,7 +771,7 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
     }
 
     .sem-title {
-      font-size: 1.625rem;
+      font-size: 1.4rem;
     }
   }
 </style>

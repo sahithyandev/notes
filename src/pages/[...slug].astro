@@ -106,32 +106,30 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   canonical={`${SITE_HOST_URL}/${slug}`}
   slug={slug}
 >
-  <Nav />
-
-  <div class="mobile-bar">
+  <Nav>
     <button
-      class="mobile-bar-btn"
+      slot="nav-start"
+      class="nav-drawer-btn"
       id="open-sidebar"
       type="button"
       aria-label="Open contents"
     >
       <MenuIcon />
-      <span>Contents</span>
     </button>
     {
       tocHeadings.length > 0 && (
         <button
-          class="mobile-bar-btn right"
+          slot="nav-end"
+          class="nav-drawer-btn"
           id="open-toc"
           type="button"
           aria-label="Open table of contents"
         >
-          <span>On this page</span>
           <TocIcon />
         </button>
       )
     }
-  </div>
+  </Nav>
   <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
   <main
     data-pagefind-body
@@ -215,6 +213,9 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   </script>
   <script>
     import "../scripts/image-zoom";
+  </script>
+  <script>
+    import "../scripts/table-scroll";
   </script>
 
   <ImageZoom />
@@ -338,9 +339,11 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     color: var(--text-muted);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 48rem) {
     .note-meta {
       flex-direction: column;
+      gap: 10px;
+      font-size: 0.8125rem;
     }
   }
 
@@ -377,41 +380,27 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     color: var(--shiki-dark);
   }
 
-  /* ── MOBILE ACTION BAR & DRAWER CONTROLS ──────────────────────── */
-  .mobile-bar {
-    display: none;
-    position: sticky;
-    top: var(--nav-h);
-    z-index: 20;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 8px calc(4 * var(--spacing));
-    gap: 8px;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .mobile-bar-btn {
+  /* ── DRAWER CONTROLS ─────────────────────────────────────────── */
+  .nav-drawer-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    font: inherit;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     color: var(--text-secondary);
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 7px;
     cursor: pointer;
+    padding: 0;
     transition:
       background 0.12s,
       color 0.12s,
       border-color 0.12s;
   }
 
-  .mobile-bar-btn:hover,
-  .mobile-bar-btn:active {
+  .nav-drawer-btn:hover,
+  .nav-drawer-btn:active {
     background: var(--sem-bg);
     border-color: var(--sem-border);
     color: var(--sem);
@@ -448,10 +437,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       overflow: visible;
     }
 
-    .mobile-bar {
-      display: flex;
-    }
-
     .drawer-backdrop {
       display: block;
     }
@@ -464,15 +449,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
     /* Article tweaks for narrow screens */
     .note-title {
-      font-size: 1.625rem;
-    }
-
-    article {
-      font-size: 0.9375rem;
-    }
-
-    .note-action-btn:first-of-type {
-      margin-left: 0;
+      font-size: 1.4rem;
     }
   }
 </style>

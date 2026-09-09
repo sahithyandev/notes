@@ -17,6 +17,10 @@ const logoRule = semMatch
     ? "padding: 0 12px;"
     : "padding: 0 var(--body-margin-x);"}
 >
+  <span class="nav-drawer-slot nav-drawer-slot-start">
+    <slot name="nav-start" />
+  </span>
+
   <a href="/" class="nav-logo" aria-label="Sahithyan's Notes, home">
     <Logo width={20} height={20} class="nav-mark" rule={logoRule} />
     <span class="nav-name">
@@ -31,6 +35,9 @@ const logoRule = semMatch
   <SearchModal />
 
   <div class="nav-right">
+    <span class="nav-drawer-slot nav-drawer-slot-end">
+      <slot name="nav-end" />
+    </span>
     <button
       class="nav-search"
       id="search-trigger"
@@ -50,7 +57,7 @@ const logoRule = semMatch
         <circle cx="6.5" cy="6.5" r="5"></circle>
         <path d="M10.5 10.5l4 4"></path>
       </svg>
-      Search notes…
+      <span class="nav-search-label">Search notes…</span>
       <kbd>⌘K</kbd>
     </button>
     <button
@@ -123,10 +130,29 @@ const logoRule = semMatch
     gap: 8px;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav {
       padding: 0 36px;
       gap: 0;
+    }
+  }
+
+  .nav-drawer-slot {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-drawer-slot-start {
+    margin-right: 2px;
+  }
+
+  .nav-drawer-slot:not(:has(*)) {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-drawer-slot {
+      display: none;
     }
   }
 
@@ -188,7 +214,7 @@ const logoRule = semMatch
     transition: border-color 0.12s;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav-search {
       padding: 6px 14px;
     }
@@ -196,6 +222,16 @@ const logoRule = semMatch
 
   .nav-search:hover {
     border-color: var(--border-strong);
+  }
+
+  .nav-search-label {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-search-label {
+      display: inline;
+    }
   }
 
   .nav-search kbd {
@@ -210,7 +246,7 @@ const logoRule = semMatch
     margin-left: 4px;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav-search kbd {
       display: inline-block;
     }
@@ -233,6 +269,20 @@ const logoRule = semMatch
       border-color 0.12s;
     flex-shrink: 0;
     padding: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-search {
+      width: 40px;
+      height: 40px;
+      justify-content: center;
+      padding: 0;
+    }
   }
 
   .theme-toggle:hover {

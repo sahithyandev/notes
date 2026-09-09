@@ -62,7 +62,13 @@ const breadcrumbItems = generateBreadcrumb(slug, title);
   {
     breadcrumbItems.map((item, index) => (
       <>
-        {index > 0 && <span class="breadcrumb-sep">/</span>}
+        {index > 0 && (
+          <span
+            class={`breadcrumb-sep${index === breadcrumbItems.length - 1 ? " last" : ""}`}
+          >
+            /
+          </span>
+        )}
         {item.href ? (
           <a href={item.href} class="breadcrumb-link">
             {item.label}
@@ -110,10 +116,17 @@ const breadcrumbItems = generateBreadcrumb(slug, title);
   }
 
   /* Responsive */
-  @media (max-width: 768px) {
+  @media (max-width: 48rem) {
     .breadcrumb {
       font-size: 12px;
       gap: 6px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .breadcrumb-current,
+    .breadcrumb-sep.last {
+      display: none;
     }
   }
 </style>
