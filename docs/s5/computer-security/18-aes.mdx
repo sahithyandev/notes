@@ -1,0 +1,86 @@
+---
+title: Advanced Encryption Standard
+dateCreated: 2026-09-10T00:00:00.000Z
+lastUpdatedOn: 2026-09-10T04:41:03.935Z
+slug: s5/computer-security/aes
+sidebar:
+  order: 18
+  label: AES
+prev: true
+next: true
+---
+
+Aka. AES, originally Rijndael. Selected by NIST in 2001 as FIPS 197, replacing [DES](/s5/computer-security/des). Designed by Joan Daemen and Vincent Rijmen.
+
+AES is an [SP-network](/s5/computer-security/block-ciphers) block cipher, not a Feistel cipher. Each round transforms the whole block at once, rather than half of it.
+
+<Note>
+
+DES is covered in depth as a representative block cipher design. AES is not covered to the same depth, only its basic facts. The round steps below are added for completion. The [interactive guide to AES](https://sahithyan.dev/post/interactive-guide-to-aes) visualizes them.
+
+</Note>
+
+## Design Parameters
+
+- Block length 128 bits.
+- Key length 128, 192, or 256 bits.
+- Rounds $r$ is 10, 12, or 14 for the 128, 192, or 256-bit key.
+- $r + 1$ round keys of 128 bits each, from the key expansion.
+
+## State
+
+The 128-bit block is arranged as a 4 by 4 matrix of bytes. This matrix is the state, updated in place by every round transformation. Each byte is treated as an element of a finite field, so the round steps are field arithmetic rather than bit permutations.
+
+## Round Transformations
+
+Each round is built from 4 byte-level steps, each serving one design goal.
+
+- SubBytes  
+  Replace each byte through a fixed S-box. The only non-linear step. Provides confusion, breaking any simple algebraic relation between key, plaintext, and ciphertext.
+- ShiftRows  
+  Cyclically shift the rows of the state by different amounts, moving bytes between columns.
+- MixColumns  
+  Combine the 4 bytes of each column. Together with ShiftRows this gives diffusion, spreading each input byte's influence across the whole block within 2 rounds.
+- AddRoundKey  
+  XOR the state with the round key.
+
+## Encryption
+
+The 128-bit plaintext block is loaded into the state, then carried through the steps below.
+
+1. Whitening  
+   Apply $\text{AddRoundKey}(k_0)$. Mixing key material in before any non-linear step stops an attacker from working on the raw input.
+2. For $i$ from 1 to $r - 1$  
+   Apply SubBytes, then ShiftRows, then MixColumns, then $\text{AddRoundKey}(k_i)$.
+3. Final round  
+   Apply SubBytes, then ShiftRows, then $\text{AddRoundKey}(k_r)$. MixColumns is omitted, since its matrix is public and invertible so it adds no security in the last position. Omitting it also lets decryption reuse the encryption structure.
+4. Output  
+   Read the state out as the 128-bit ciphertext.
+
+## Key Expansion
+
+Expands the key into the $r + 1$ round keys. Each 4-byte word is derived from an earlier word by XOR, with an S-box step and a round constant injected at fixed intervals. The round constants make every round key different, defeating attacks that exploit repeated or shifted key material.
+
+## Decryption
+
+Runs the inverse of each step in reverse order, with round keys from $k_r$ down to $k_0$. Because AES is an SP-network, this sequence is not identical to encryption, unlike a Feistel cipher. An equivalent inverse cipher rearranges the steps so decryption follows the same pattern as encryption, swapping only the S-box, shift amounts, matrix, and key order.
+
+## Design Goals
+
+- Security  
+  Resistant to differential and linear cryptanalysis by design, with a wide security margin from the round count.
+- Speed  
+  Fast in software on general-purpose CPUs, unlike DES which was tuned for 1970s hardware.
+- Simplicity  
+  Few operations, all byte-aligned, with no lookup tables required beyond the S-box.
+- Flexibility  
+  3 key lengths sharing one round structure.
+
+## Security Properties
+
+- Brute force  
+  A 128-bit key needs $2^{127}$ trials on average, infeasible. The 192 and 256-bit keys guard against future gains.
+- Best known attacks  
+  Only marginal improvements over brute force exist. No practical break is known.
+- Side channels  
+  Naive S-box lookups leak timing through the cache. Constant-time code or the AES-NI hardware instructions remove this.

@@ -1,10 +1,10 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T21:44:33.561Z
+lastUpdatedOn: 2026-09-10T04:41:03.938Z
 slug: s5/computer-security/hash-functions
 sidebar:
-  order: 20
+  order: 21
 prev: true
 next: true
 ---
@@ -28,21 +28,27 @@ Also called SAC or bit diffusion. When a single input bit is flipped, about 50% 
 
 ## Properties
 
-Each property is stated as work an attacker cannot afford. Generic cost is the effort with no weakness in $H$, over an $n$-bit digest.
+Each property is stated as work an attacker cannot afford. $H$ is modelled to be a uniformly random function, for the below analysis.
 
 ### Preimage Resistance
 
-Given a digest $d$, an attacker cannot find any $m$ with $H(m) = d$. Generic cost about $2^n$.
+Given a digest $d$, an attacker cannot find any $m$ with $H(m) = d$ practically.
+
+The attacker is aiming at one fixed digest $d$. Each trial message lands on it with chance $1$ in $2^n$, so about $2^n$ trials are needed.
 
 ### Weak Collision Resistance
 
-Aka. second-preimage resistance. Given a fixed message $m$, an attacker cannot find a different $m'$ with $H(m') = H(m)$. Generic cost about $2^n$.
+Aka. second-preimage resistance. Given a fixed message $m$, an attacker cannot find a different $m'$ with $H(m') = H(m)$.
+
+Again one fixed target, the digest of the given $m$. Each trial $m'$ lands on it with chance $1$ in $2^n$, so about $2^n$ trials are needed, the same as preimage resistance.
 
 ### Strong Collision Resistance
 
-An attacker cannot find any pair $m \neq m'$ with $H(m) = H(m')$, both of their choosing. Generic cost about $2^{n/2}$.
+An attacker cannot find any pair $m \neq m'$ with $H(m) = H(m')$, both of their choosing.
 
-Among $2^{n/2}$ random messages a repeated digest is already likely, since the number of pairs grows as the square. This is the birthday bound, after the same effect in the birthday problem.
+Any two of the attacker's own messages sharing a digest is a win. Each new message can pair with every earlier one, so after hashing $k$ messages there are about $k^2/2$ candidate pairs. That many pairs cover the $2^n$ possible digests once $k \approx 2^{n/2}$, so the work drops to the square root.
+
+Same effect as the birthday problem: matching one given birthday needs about $365$ people, but finding any shared birthday needs only about $23$.
 
 <Note>
 
