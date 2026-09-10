@@ -1,7 +1,7 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-10T04:41:03.938Z
+lastUpdatedOn: 2026-09-10T19:09:06.926Z
 slug: s5/computer-security/diffie-hellman
 sidebar:
   order: 23
@@ -33,6 +33,40 @@ $g$ is a primitive root modulo $p$ **iff** every $a$ coprime to $p$ satisfies $a
 For prime $p$, the $p - 1$ values $i = 1, \dots, p-1$ generate $\{1, \dots, p-1\}$, in some order, via $g^i \bmod p$.
 
 Choosing $g$ as a primitive root maximises the order of the group it generates to $p - 1$, so its powers span every non-zero residue class modulo $p$ and stay in no small subgroup, where the discrete logarithm would be easy to solve.
+
+### Choosing a Modulus
+
+$p$ is chosen as a safe prime: a prime of the form $p = 2q + 1$ where $q$ is also prime.
+
+Here:
+
+- $q$: the Sophie Germain prime paired with $p$
+
+Reasons:
+
+- Pohlig-Hellman reduces the discrete logarithm modulo $p$ to one discrete logarithm per prime factor of $p - 1$. A safe prime forces $p - 1 = 2q$, leaving only the factors $2$ and the large prime $q$.
+- No small-order subgroup exists, so an attacker cannot confine the shared secret to a short list of values.
+- Every $g \neq \pm 1$ has order $q$ or $2q$, so almost any candidate generates a large group.
+
+### Choosing a Generator
+
+Factor $p - 1$ into its distinct prime factors $q_1, \dots, q_k$. Then $g$ is a primitive root modulo $p$ **iff**
+
+$$
+g^{(p-1)/q_i} \not\equiv 1 \pmod p \quad \text{for every } i.
+$$
+
+Here:
+
+- $q_i$: a distinct prime factor of $p - 1$
+
+Test $g = 2, 3, 5, \dots$ in turn. Primitive roots are dense, so a small $g$ passes after few tries. Each candidate costs $k$ modular exponentiations.
+
+Factoring $p - 1$ is the hard step, so $p$ is chosen in advance to keep it known.
+
+A safe prime is a prime $p = 2q + 1$ where $q$ is also prime. Then $p - 1 = 2q$ has 2 prime factors, so $g$ is a primitive root **iff** $g^2 \not\equiv 1 \pmod p$ **and** $g^q \not\equiv 1 \pmod p$. Published standards use safe primes and usually take $g = 2$.
+
+For $p = 23$, $p - 1 = 22 = 2 \cdot 11$. Testing $g = 5$ gives $5^2 \equiv 2$ and $5^{11} \equiv 22$. Neither is $1$, so $5$ is a primitive root. $g = 2$ fails, since $2^{11} \equiv 1 \pmod{23}$.
 
 <Note>
 

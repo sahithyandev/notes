@@ -1,7 +1,7 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-10T04:41:03.937Z
+lastUpdatedOn: 2026-09-10T19:09:06.925Z
 slug: s5/computer-security/rsa
 sidebar:
   order: 20
@@ -21,6 +21,34 @@ The [interactive guide to RSA](https://sahithyan.dev/post/interactive-guide-to-r
 - Compute $d \equiv e^{-1} \pmod{\phi(n)}$, secret.
 
 Public key: $\{e, n\}$. Private key: $\{d\}$. $p$, $q$, and $\phi(n)$ must be destroyed after generation.
+
+### Primality Testing
+
+$p$ and $q$ are found by drawing random odd integers of the target bit length and testing each for primality until one passes.
+
+- Trial division by the first few hundred small primes rejects most candidates in a few operations.
+- Survivors go to the Miller-Rabin probabilistic test.
+
+Miller-Rabin tests an odd $n > 2$. Write $n - 1 = 2^s m$ with $m$ odd. Pick a random base $a$ with $2 \le a \le n - 2$. Then $n$ passes base $a$ **iff** $a^m \equiv 1 \pmod n$ **or** $a^{2^r m} \equiv -1 \pmod n$ for some $r$ with $0 \le r < s$.
+
+A composite $n$ passes at most $1/4$ of the bases. Running $k$ independent random bases bounds the probability of accepting a composite by $4^{-k}$. $k$ around $40$ is standard.
+
+Each base costs 1 modular exponentiation, $O\!\left((\log n)^3\right)$ bit operations with schoolbook multiplication. So a candidate is classified in time polynomial in the key length.
+
+<Note>
+
+Deterministic polynomial-time primality testing exists via the AKS algorithm. Miller-Rabin is still used in practice because it is far faster at cryptographic sizes.
+
+</Note>
+
+Trace for $n = 221$, base $a = 137$:
+
+- $n - 1 = 220 = 2^2 \cdot 55$, so $s = 2$, $m = 55$.
+- $a^m \bmod n = 137^{55} \bmod 221 = 188$, not $1$ and not $220$.
+- $r = 1$: $188^2 \bmod 221 = 205$, not $220$.
+- No residue reached $-1$, so $137$ is a witness and $221$ is composite.
+
+Indeed $221 = 13 \times 17$.
 
 <Note>
 
