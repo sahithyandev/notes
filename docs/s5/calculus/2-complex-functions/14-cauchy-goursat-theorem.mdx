@@ -1,0 +1,53 @@
+---
+title: Cauchy-Goursat Theorem
+sidebar:
+  order: 14
+dateCreated: 2026-09-11T00:00:00.000Z
+lastUpdatedOn: 2026-09-11T07:26:03.359Z
+slug: s5/calculus/complex-functions/cauchy-goursat-theorem
+prereqs:
+  - s5/calculus/complex-functions/analytic-functions
+prev: true
+next: true
+---
+
+Let $f$ be analytic in a simply connected domain $D$. If $C$ is a simple closed contour lying in $D$,
+
+$$
+\int_C f(z)\,\text{d}z = 0
+$$
+
+## Deformation Invariance Theorem
+
+Let $C_1$ and $C_2$ be 2 positively oriented simple closed contours, with $C_2$ lying inside the interior of $C_1$. Let $f$ be analytic in a domain $D$ that contains both $C_1$ and $C_2$, together with the region between them.
+
+$$
+\int_{C_1} f(z)\,\text{d}z = \int_{C_2} f(z)\,\text{d}z
+$$
+
+<Note>
+
+The theorem lets $C_1$ be replaced by any simpler contour $C_2$ enclosing the same singularities of $f$, without changing the value of the integral.
+
+</Note>
+
+## Key Integral
+
+Let $z_0$ be a fixed complex number, and let $C$ be a simple closed contour with positive orientation such that $z_0$ lies inside $C$.
+
+$$
+\int_C \frac{1}{z - z_0}\,\text{d}z = 2\pi i
+$$
+
+$$
+\int_C \frac{1}{(z-z_0)^n}\,\text{d}z = 0, \qquad n \in \mathbb{Z}, n > 1
+$$
+
+<Note title="Proof Hint">
+
+- Deform $C$ to a circle of radius $r$ centered at $z_0$, by the deformation invariance theorem
+- Parametrize the circle as $z = z_0 + re^{i\theta}$, $0 \le \theta \le 2\pi$
+- Substitute and simplify the integrand
+- Integrate directly over $\theta$
+
+</Note>

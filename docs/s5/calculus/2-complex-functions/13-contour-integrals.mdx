@@ -1,0 +1,81 @@
+---
+title: Contour Integrals
+sidebar:
+  order: 13
+dateCreated: 2026-09-11T00:00:00.000Z
+lastUpdatedOn: 2026-09-11T07:26:03.359Z
+slug: s5/calculus/complex-functions/contour-integrals
+prev: true
+next: true
+---
+
+A contour is a curve $C$ in the complex plane constructed by joining finitely many smooth curves end to end.
+
+## Contour Integral
+
+Let $C$ be a contour with initial point $A$ and terminal point $B$.
+
+A partition of $C$ is a finite set of points $P = \{z_0, z_1, \ldots, z_n\}$, occurring in order along $C$, with $z_0 = A$ and $z_n = B$.
+
+$$
+\Delta z_k = z_k - z_{k-1}, \qquad k = 1, 2, \ldots, n
+$$
+
+$c_k$: a point on the part of $C$ between $z_{k-1}$ and $z_k$.
+
+The Riemann sum for this partition is
+
+$$
+\sum_{k=1}^n f(c_k)\Delta z_k
+$$
+
+The contour integral of $f$ over $C$ is
+
+$$
+\int_C f(z)\,\text{d}z = \lim_{\|P\| \to 0} \sum_{k=1}^n f(c_k)\Delta z_k
+$$
+
+provided the limit exists and is independent of the choice of partition and points $c_k$.
+
+$\|P\|$: the maximum length of the subarcs determined by $P$.
+
+## Evaluation via Parametrization
+
+Let $f(z)$ be continuous on a set containing the contour $C$, and let $z = z(t)$, $a \le t \le b$, be a piecewise smooth parametrization of $C$.
+
+$$
+\int_C f(z)\,\text{d}z = \int_a^b f(z(t))z'(t)\,\text{d}t
+$$
+
+When $z(t)$ is only piecewise smooth, the right side is evaluated piecewise.
+
+<Note>
+
+The value of $\int_C f(z)\,\text{d}z$ depends on the path $C$, not just the endpoints, unless $f$ is analytic on a simply connected domain containing $C$.
+
+</Note>
+
+## Integral Triangle Inequality
+
+Let $f(t) = u(t) + iv(t)$ be continuous on $[a,b]$.
+
+$$
+\left|\int_a^b f(t)\,\text{d}t\right| \le \int_a^b |f(t)|\,\text{d}t
+$$
+
+## ML Inequality
+
+Let $f$ be continuous on a contour $C$, with $|f(z)| \le M$ for all $z$ on $C$, and let $L$ be the length of $C$.
+
+$$
+\left|\int_C f(z)\,\text{d}z\right| \le ML
+$$
+
+<Note title="Proof Hint">
+
+- Parametrize $C$ by $z(t)$, $a \le t \le b$
+- Apply the integral triangle inequality to $\int_a^b f(z(t))z'(t)\,\text{d}t$
+- Bound $|f(z(t))|$ by $M$
+- Recognize $\int_a^b |z'(t)|\,\text{d}t$ as $L$
+
+</Note>

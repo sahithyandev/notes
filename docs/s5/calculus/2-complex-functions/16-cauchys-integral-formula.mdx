@@ -1,0 +1,44 @@
+---
+title: Cauchy's Integral Formula
+sidebar:
+  order: 16
+dateCreated: 2026-09-11T00:00:00.000Z
+lastUpdatedOn: 2026-09-11T07:26:03.360Z
+slug: s5/calculus/complex-functions/cauchys-integral-formula
+prereqs:
+  - s5/calculus/complex-functions/cauchy-goursat-theorem
+prev: true
+next: false
+---
+
+Let $f$ be analytic in a simply connected domain $D$, and let $C$ be a positively oriented simple closed contour lying in $D$. If $z_0$ lies inside $C$,
+
+$$
+f(z_0) = \frac{1}{2\pi i}\int_C \frac{f(z)}{z - z_0}\,\text{d}z
+$$
+
+Equivalently,
+
+$$
+\int_C \frac{f(z)}{z - z_0}\,\text{d}z = 2\pi i f(z_0)
+$$
+
+## For Derivatives
+
+Let $f$ be analytic in a simply connected domain $D$, and let $C$ be a positively oriented simple closed contour lying in $D$. If $z_0$ lies inside $C$, for $n = 1, 2, 3, \ldots$,
+
+$$
+f^{(n)}(z_0) = \frac{n!}{2\pi i}\int_C \frac{f(z)}{(z-z_0)^{n+1}}\,\text{d}z
+$$
+
+Equivalently,
+
+$$
+\int_C \frac{f(z)}{(z-z_0)^{n+1}}\,\text{d}z = \frac{2\pi i}{n!}f^{(n)}(z_0)
+$$
+
+<Note>
+
+Analyticity of $f$ on $D$ forces $f$ to be infinitely differentiable there, since $f^{(n)}(z_0)$ exists for every $n$.
+
+</Note>
