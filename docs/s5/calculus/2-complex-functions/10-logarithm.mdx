@@ -1,12 +1,10 @@
 ---
-title: Complex Logarithm
+title: Logarithm
 sidebar:
   order: 10
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-04T02:55:52.936Z
-slug: s5/calculus/complex-functions/complex-logarithm
-prereqs:
-  - s5/calculus/complex-functions/exponential-function
+lastUpdatedOn: 2026-09-11T07:21:53.978Z
+slug: s5/calculus/complex-functions/logarithm
 prev: true
 next: true
 ---
@@ -24,13 +22,29 @@ Here:
 - $\operatorname{Arg} z$: principal argument of $z$, the unique argument with $-\pi < \operatorname{Arg} z \le \pi$
 - $\arg z = \{\operatorname{Arg} z + 2k\pi : k \in \mathbb{Z}\}$
 
+<Note title="Proof Hint">
+
+- Write $z = re^{i\theta}$ with $r = |z| > 0$
+- Set $w = u + iv$ and require $e^w = z$
+- Take the modulus of both sides: $e^u = r$, so $u = \ln r$
+- Match the arguments: $v = \theta + 2k\pi$ for some $k \in \mathbb{Z}$
+- Combine $u$ and $v$ into $w = \ln|z| + i\arg z$
+
+</Note>
+
 $\log z$ is multi-valued.
 
 ## Principal Value
 
+The logarithm value deduced by setting $k=0$.
+
 $$
 \operatorname{Log} z = \ln|z| + i\operatorname{Arg} z, \qquad z \ne 0
 $$
+
+Below you can change $z$ and see how $\operatorname{Log}(z)$ changes.
+
+<ComplexLogExplorer />
 
 ## Properties
 
@@ -47,3 +61,8 @@ The identities hold for the multi-valued $\log$ as equalities of sets. They can 
 $\operatorname{Log}((-1)(-1)) = \operatorname{Log}(1) = 0$, but $\operatorname{Log}(-1) + \operatorname{Log}(-1) = i\pi + i\pi = 2\pi i$.
 
 </Note>
+
+## Examples
+
+- $\log(1+i) = \dfrac{1}{2}\ln 2 + i\left(\dfrac{\pi}{4} + 2k\pi\right)$, $k \in \mathbb{Z}$, with $\operatorname{Log}(1+i) = \dfrac{1}{2}\ln 2 + i\dfrac{\pi}{4}$
+- $\log i = i\left(\dfrac{\pi}{2} + 2k\pi\right)$, $k \in \mathbb{Z}$, with $\operatorname{Log} i = i\dfrac{\pi}{2}$

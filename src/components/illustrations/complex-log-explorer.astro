@@ -1,0 +1,402 @@
+---
+// Pick z on a grid (pointer or keyboard). Only the principal value Log z
+// is plotted, as a second point on the same axes, with the same visual
+// treatment as z itself: dashed projection guides to the axes, and a
+// value label next to it.
+const RE0 = 2;
+const IM0 = 1;
+
+const argOf = (re: number, im: number) => Math.atan2(im, re);
+const fmt = (n: number) => (Object.is(n, -0) ? "0.00" : n.toFixed(2));
+
+const r0 = Math.hypot(RE0, IM0);
+const theta0 = argOf(RE0, IM0);
+const lnr0 = Math.log(r0);
+
+// Domain: Re in [-4.5, 4.5], Im in [-3.2, 3.2] (just wide enough that
+// Arg z, which is at most π, always lands inside). Same px-per-unit scale
+// on both axes, so grid squares and the rays/angles stay true.
+const S = 200;
+const ZD_Y = 3.2;
+const ZD_X = 4.5;
+const PXU = S / (2 * ZD_Y);
+const W = PXU * 2 * ZD_X;
+
+const zx = (re: number) => (re + ZD_X) * PXU;
+const zy = (im: number) => (ZD_Y - im) * PXU;
+const AR = (W / S).toFixed(4);
+---
+
+<figure class="clog">
+  <svg
+    class="explorer"
+    style={`--ar:${AR}`}
+    viewBox={`0 0 ${W} ${S}`}
+    data-zplane
+    role="img"
+    aria-label="Complex plane. Drag or use arrow keys to move z; Log z is plotted as a second point."
+  >
+    {
+      [-4, -3, -2, -1, 0, 1, 2, 3, 4].map((n) => (
+        <line
+          x1={zx(n)}
+          y1={0}
+          x2={zx(n)}
+          y2={S}
+          class={n === 0 ? "axis" : "grid"}
+        />
+      ))
+    }
+    {
+      [-3, -2, -1, 0, 1, 2, 3].map((n) => (
+        <line
+          x1={0}
+          y1={zy(n)}
+          x2={W}
+          y2={zy(n)}
+          class={n === 0 ? "axis" : "grid"}
+        />
+      ))
+    }
+    <text x={W - 6} y={zy(0) - 4} class="axis-label" text-anchor="end">Re</text>
+    <text x={zx(0) + 5} y={10} class="axis-label">Im</text>
+
+    <line
+      x1={zx(RE0)}
+      y1={zy(IM0)}
+      x2={zx(RE0)}
+      y2={zy(0)}
+      class="guide"
+      data-guide-v></line>
+    <line
+      x1={zx(RE0)}
+      y1={zy(IM0)}
+      x2={zx(0)}
+      y2={zy(IM0)}
+      class="guide"
+      data-guide-h></line>
+    <line x1={zx(0)} y1={zy(0)} x2={zx(RE0)} y2={zy(IM0)} class="ray" data-ray
+    ></line>
+
+    <circle cx={zx(0)} cy={zy(0)} r="3" class="origin"></circle>
+
+    <text
+      class="zlabel"
+      data-zlabel
+      x={zx(RE0) + 6}
+      y={zy(IM0) - 6}
+      text-anchor="start"
+      ><tspan data-zlabel-mod>{fmt(r0)}</tspan><tspan> e</tspan><tspan
+        data-zlabel-arg
+        baseline-shift="40%"
+        font-size="0.7em">{`${fmt(theta0)}i`}</tspan
+      ></text
+    >
+
+    <circle
+      cx={zx(RE0)}
+      cy={zy(IM0)}
+      r="3.5"
+      class="handle"
+      data-handle
+      tabindex="0"
+      role="slider"
+      aria-label="z. Drag, or focus and use arrow keys."
+      aria-valuetext={`${fmt(RE0)} + ${fmt(IM0)}i`}></circle>
+
+    <line
+      x1={zx(lnr0)}
+      y1={zy(theta0)}
+      x2={zx(lnr0)}
+      y2={zy(0)}
+      class="guide logz-guide"
+      data-logz-guide-v></line>
+    <line
+      x1={zx(lnr0)}
+      y1={zy(theta0)}
+      x2={zx(0)}
+      y2={zy(theta0)}
+      class="guide logz-guide"
+      data-logz-guide-h></line>
+
+    <text
+      class="zlabel logz-label"
+      data-logz-label
+      x={zx(lnr0) + 6}
+      y={zy(theta0) - 6}
+      text-anchor="start">{`Log z = ${fmt(lnr0)} + ${fmt(theta0)}i`}</text
+    >
+
+    <circle
+      cx={zx(lnr0)}
+      cy={zy(theta0)}
+      r="3.5"
+      class="dot"
+      style={`fill:var(--dia-out)`}
+      data-logz-dot></circle>
+  </svg>
+
+  <p class="live" aria-live="polite" data-live></p>
+</figure>
+
+<style>
+  .clog {
+    margin: 24px auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    overflow: hidden;
+    font-family: var(--font-ui);
+    max-width: 80ch;
+  }
+
+  svg.explorer {
+    max-width: unset;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ar);
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  .grid {
+    stroke: var(--border);
+    stroke-width: 0.5;
+  }
+  .axis {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+  .axis-label {
+    fill: var(--text-muted);
+    font-size: 5px;
+    font-family: var(--font-mono);
+  }
+  .guide {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .ray {
+    stroke: var(--sem, var(--accent));
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .origin {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .zlabel {
+    fill: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 4.5px;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+  }
+  .logz-label {
+    fill: var(--dia-out);
+  }
+  .handle {
+    fill: var(--surface);
+    stroke: var(--sem, var(--accent));
+    stroke-width: 1.25;
+    cursor: grab;
+  }
+  .handle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .dot {
+    stroke: var(--surface);
+    stroke-width: 1;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+    font-size: 0.85rem;
+  }
+  .swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    flex: none;
+  }
+  .klabel {
+    width: 4.2rem;
+    flex: none;
+    color: var(--text-secondary);
+  }
+  .value {
+    color: var(--text-primary);
+  }
+
+  .live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  const S = 200;
+  const ZD_Y = 3.2;
+  const ZD_X = 4.5;
+  const PXU = S / (2 * ZD_Y);
+  const W = PXU * 2 * ZD_X;
+  const MIN_R = 0.1;
+  const KS = [0, 1, -1] as const;
+
+  const zx = (re: number) => (re + ZD_X) * PXU;
+  const zy = (im: number) => (ZD_Y - im) * PXU;
+  const fmt = (n: number) => (Object.is(n, -0) ? "0.00" : n.toFixed(2));
+
+  function initExplorer(root: HTMLElement) {
+    const zplane = root.querySelector<SVGSVGElement>("[data-zplane]")!;
+    const handle = root.querySelector<SVGCircleElement>("[data-handle]")!;
+    const ray = root.querySelector<SVGLineElement>("[data-ray]")!;
+    const guideV = root.querySelector<SVGLineElement>("[data-guide-v]")!;
+    const guideH = root.querySelector<SVGLineElement>("[data-guide-h]")!;
+    const zlabel = root.querySelector<SVGTextElement>("[data-zlabel]")!;
+    const zlabelMod = root.querySelector<SVGTSpanElement>("[data-zlabel-mod]")!;
+    const zlabelArg = root.querySelector<SVGTSpanElement>("[data-zlabel-arg]")!;
+    const logzGuideV = root.querySelector<SVGLineElement>(
+      "[data-logz-guide-v]",
+    )!;
+    const logzGuideH = root.querySelector<SVGLineElement>(
+      "[data-logz-guide-h]",
+    )!;
+    const logzLabel = root.querySelector<SVGTextElement>("[data-logz-label]")!;
+    const logzDot = root.querySelector<SVGCircleElement>("[data-logz-dot]")!;
+    const live = root.querySelector<HTMLElement>("[data-live]")!;
+    const values = new Map(
+      KS.map((k) => [
+        k,
+        root.querySelector<HTMLElement>(`[data-value="${k}"]`)!,
+      ]),
+    );
+
+    let re = 2;
+    let im = 1;
+
+    // Flip which side/edge a label hangs off of near the canvas borders,
+    // so it stays inside the viewBox and clear of its point.
+    function placeLabel(el: SVGTextElement, px: number, py: number) {
+      const anchorRight = px < W - 35;
+      const anchorAbove = py > 12;
+      el.setAttribute("text-anchor", anchorRight ? "start" : "end");
+      el.setAttribute("x", String(px + (anchorRight ? 6 : -6)));
+      el.setAttribute("y", String(py + (anchorAbove ? -6 : 9)));
+    }
+
+    function render() {
+      const r = Math.max(MIN_R, Math.hypot(re, im));
+      const theta = Math.atan2(im, re);
+      const lnr = Math.log(r);
+
+      const hx = zx(re);
+      const hy = zy(im);
+      handle.setAttribute("cx", String(hx));
+      handle.setAttribute("cy", String(hy));
+      handle.setAttribute("aria-valuetext", `${fmt(re)} + ${fmt(im)}i`);
+
+      ray.setAttribute("x2", String(hx));
+      ray.setAttribute("y2", String(hy));
+      guideV.setAttribute("x1", String(hx));
+      guideV.setAttribute("y1", String(hy));
+      guideV.setAttribute("x2", String(hx));
+      guideV.setAttribute("y2", String(zy(0)));
+      guideH.setAttribute("x1", String(hx));
+      guideH.setAttribute("y1", String(hy));
+      guideH.setAttribute("x2", String(zx(0)));
+      guideH.setAttribute("y2", String(hy));
+
+      placeLabel(zlabel, hx, hy);
+      zlabelMod.textContent = fmt(r);
+      zlabelArg.textContent = `${fmt(theta)}i`;
+
+      const lx = zx(lnr);
+      const ly = zy(theta);
+      logzGuideV.setAttribute("x1", String(lx));
+      logzGuideV.setAttribute("y1", String(ly));
+      logzGuideV.setAttribute("x2", String(lx));
+      logzGuideV.setAttribute("y2", String(zy(0)));
+      logzGuideH.setAttribute("x1", String(lx));
+      logzGuideH.setAttribute("y1", String(ly));
+      logzGuideH.setAttribute("x2", String(zx(0)));
+      logzGuideH.setAttribute("y2", String(ly));
+      logzDot.setAttribute("cx", String(lx));
+      logzDot.setAttribute("cy", String(ly));
+      placeLabel(logzLabel, lx, ly);
+      logzLabel.textContent = `Log z = ${fmt(lnr)} + ${fmt(theta)}i`;
+
+      for (const k of KS) {
+        const im_w = theta + 2 * k * Math.PI;
+        values.get(k)!.textContent = `${fmt(lnr)} + ${fmt(im_w)}i`;
+      }
+
+      live.textContent = `z = ${fmt(re)} + ${fmt(im)}i, Log z = ${fmt(lnr)} + ${fmt(theta)}i`;
+    }
+
+    function setFromClient(clientX: number, clientY: number) {
+      const rect = zplane.getBoundingClientRect();
+      const px = ((clientX - rect.left) / rect.width) * W;
+      const py = ((clientY - rect.top) / rect.height) * S;
+      re = Math.round((px / PXU - ZD_X) * 20) / 20;
+      im = Math.round((ZD_Y - py / PXU) * 20) / 20;
+      render();
+    }
+
+    let dragging = false;
+    zplane.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      zplane.setPointerCapture(e.pointerId);
+      setFromClient(e.clientX, e.clientY);
+      handle.focus();
+    });
+    zplane.addEventListener("pointermove", (e) => {
+      if (dragging) setFromClient(e.clientX, e.clientY);
+    });
+    zplane.addEventListener("pointerup", (e) => {
+      dragging = false;
+      zplane.releasePointerCapture(e.pointerId);
+    });
+
+    handle.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.5 : 0.1;
+      switch (e.key) {
+        case "ArrowLeft":
+          re -= step;
+          break;
+        case "ArrowRight":
+          re += step;
+          break;
+        case "ArrowUp":
+          im += step;
+          break;
+        case "ArrowDown":
+          im -= step;
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+      render();
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>(".clog")
+    .forEach((el) => initExplorer(el));
+</script>
