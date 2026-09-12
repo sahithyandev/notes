@@ -3,7 +3,7 @@ import { computeBaselineEntries } from "../src/integrations/notes-style-validato
 import { saveBaseline } from "../src/integrations/notes-style-validator/baseline.ts";
 
 const docsRoot = join(process.cwd(), "docs");
-const entries = computeBaselineEntries(docsRoot);
+const { entries, excludedViolations } = computeBaselineEntries(docsRoot);
 saveBaseline(entries);
 
 const total = entries.reduce((n, e) => n + e.count, 0);
@@ -15,4 +15,9 @@ console.log(
     " violations) covering " +
     new Set(entries.map((e) => e.file)).size +
     " files.",
+);
+console.log(
+  "notes-style-validator: " +
+    excludedViolations +
+    " s5 violation(s) skipped - s5 note issues are never grandfathered.",
 );

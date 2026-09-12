@@ -1,6 +1,10 @@
 import { scanFiles, type ScannedFile } from "./scan.ts";
 import { runPerFileRules, checkBrokenLinks } from "./rules/index.ts";
-import { loadBaseline, violationKey } from "./baseline.ts";
+import {
+  loadBaseline,
+  violationKey,
+  isExcludedFromBaseline,
+} from "./baseline.ts";
 import type { Baseline, BaselineEntry } from "./baseline.ts";
 import { matchesFilter } from "./filter.ts";
 import {
@@ -107,16 +111,27 @@ export function validate(
 
 // Used by scripts/update-style-baseline.ts to regenerate the committed
 // baseline from the current state of docs/.
+export interface ComputedBaseline {
+  entries: BaselineEntry[];
+  /** Violations from excluded semesters (e.g. s5) that were dropped rather than baselined. */
+  excludedViolations: number;
+}
+
 export function computeBaselineEntries(
   docsRoot: string,
   extraValidUrls: Iterable<string> = [],
-): BaselineEntry[] {
+): ComputedBaseline {
   const files = scanFiles(docsRoot);
   const flat = collectViolations(files, extraValidUrls);
   const counts = new Map<string, BaselineEntry>();
+  let excludedViolations = 0;
 
   for (const { file, violation } of flat) {
     const fileRel = toDocsRelative(file, docsRoot);
+    if (isExcludedFromBaseline(fileRel)) {
+      excludedViolations += 1;
+      continue;
+    }
     const key = violationKey(fileRel, violation.rule, violation.snippet);
     const existing = counts.get(key);
     if (existing) {
@@ -131,7 +146,7 @@ export function computeBaselineEntries(
     }
   }
 
-  return [...counts.values()];
+  return { entries: [...counts.values()], excludedViolations };
 }
 
 export async function runValidation(
