@@ -54,22 +54,26 @@ export function printViolationGroup(
 
   logger.warn(`\nnotes-style-validator: ${title} (${total}):\n`);
 
-  // cargo/rustc-style: the message reads naturally on its own line, and the
-  // "--> path:line" reference sits alone right below it. Terminals and
-  // editors (VS Code, iTerm2, etc.) linkify "path:line" wherever it appears
-  // on a line, so this stays just as jumpable as inlining it into the
-  // message — without a long path competing with the message for space.
+  // Grouped by file (one header, so issues in the same file visually
+  // cluster together), but each item keeps its own cargo/rustc-style
+  // "--> path:line" reference: the message reads naturally on its own line,
+  // with the jump target right below it. Terminals and editors (VS Code,
+  // iTerm2, etc.) linkify "path:line" wherever it appears on a line, but
+  // only when the full path is on that same line — the header alone can't
+  // make an indented item clickable, so the path is repeated per item
+  // despite the group header already naming it.
   const shown = reports.slice(0, MAX_FILES);
   for (const { file, violations } of shown) {
     const rel = file.replace(docsRoot + "/", "docs/");
+    logger.warn(rel);
     for (const v of violations.slice(0, MAX_PER_FILE)) {
-      logger.warn(`${v.rule.padEnd(18)} ${v.text}`);
-      logger.warn(`  --> ${rel}:${v.line}`);
-      logger.warn("");
+      logger.warn(`  ${v.rule.padEnd(18)} ${v.text}`);
+      logger.warn(`    --> ${rel}:${v.line}`);
     }
     if (violations.length > MAX_PER_FILE) {
-      logger.warn(`… and ${violations.length - MAX_PER_FILE} more in ${rel}\n`);
+      logger.warn(`  … and ${violations.length - MAX_PER_FILE} more`);
     }
+    logger.warn("");
   }
 
   if (reports.length > MAX_FILES) {
