@@ -1,0 +1,123 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[      4091,        114]
+NotebookOptionsPosition[      2998,         92]
+NotebookOutlinePosition[      3387,        108]
+CellTagsIndexPosition[      3344,        105]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Gaussian Elimination \[LongDash] Scaled Partial Pivoting", "Title",ExpressionUUID->"733e61dc-0fd6-4754-a44a-950ff75da606"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/04-gaussian-elimination.mdx. Edit the \
+parameters cell below (the augmented system), then Kernel \[Rule] Evaluate \
+Notebook.\
+\>", "Text",ExpressionUUID->"fa33eb3c-b5b0-4245-a8eb-689752a551a1"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", \
+"Subsection",ExpressionUUID->"446f2a27-6ad7-44fe-bb74-93df4a55cbee"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"eqs", "=",
+   RowBox[{"{",
+    RowBox[{
+     RowBox[{"{",
+      RowBox[{"30.`", ",", "591400"}], "}"}], ",",
+     RowBox[{"{",
+      RowBox[{"5.291`", ",",
+       RowBox[{"-", "6.13`"}]}], "}"}]}], "}"}]}], ";",
+  RowBox[{"b", "=",
+   RowBox[{"{",
+    RowBox[{"591700", ",", "46.78`"}], "}"}]}]}]], "Input",ExpressionUUID->\
+"3a6e8819-ca47-4e7e-b2c6-31d821e49ba9"],
+
+Cell["Scale factors and scaled ratios", "Subsection",ExpressionUUID->"5a5932f0-c02e-4d75-9e9a-78425da2e805"],
+
+Cell[BoxData[
+ RowBox[{"s", "=",
+  RowBox[{
+   RowBox[{"(",
+    RowBox[{
+     RowBox[{"Max", "[",
+      RowBox[{"Abs", "[", "#1", "]"}], "]"}], "&"}], ")"}], "/@",
+   "eqs"}]}]], "Input",ExpressionUUID->"d85af50f-3f2d-499b-ab2e-9ae29f3d95bf"],
+
+Cell[BoxData[
+ RowBox[{"ratios", "=",
+  FractionBox[
+   RowBox[{"Abs", "[",
+    RowBox[{"eqs", "\[LeftDoubleBracket]",
+     RowBox[{"All", ",", "1"}], "\[RightDoubleBracket]"}], "]"}],
+   "s"]}]], "Input",ExpressionUUID->"5726812e-5db9-47d0-bd3a-f48dbbd9ea1f"],
+
+Cell["Pivot on the larger ratio, then solve", "Subsection",ExpressionUUID->"c764087d-1d73-4539-bb2c-b7d93c1a6934"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"pivotRow", "=",
+   RowBox[{"First", "[",
+    RowBox[{"Ordering", "[",
+     RowBox[{"ratios", ",",
+      RowBox[{"-", "1"}]}], "]"}], "]"}]}], ";",
+  RowBox[{"order", "=",
+   RowBox[{"If", "[",
+    RowBox[{
+     RowBox[{"pivotRow", "\[Equal]", "1"}], ",",
+     RowBox[{"{",
+      RowBox[{"1", ",", "2"}], "}"}], ",",
+     RowBox[{"{",
+      RowBox[{"2", ",", "1"}], "}"}]}], "]"}]}], ";",
+  RowBox[{"sol", "=",
+   RowBox[{"LinearSolve", "[",
+    RowBox[{
+     RowBox[{
+     "eqs", "\[LeftDoubleBracket]", "order", "\[RightDoubleBracket]"}], ",",
+     RowBox[{
+     "b", "\[LeftDoubleBracket]", "order", "\[RightDoubleBracket]"}]}],
+    "]"}]}]}]], "Input",ExpressionUUID->"b6c54aed-706c-4e71-b602-\
+ce36486cf20b"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"465f2ce5-b1fe-4058-83f2-c41907d0d87d"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 128, 0, 70, "Title",ExpressionUUID->"733e61dc-0fd6-4754-a44a-950ff75da606"],
+Cell[685, 22, 244, 4, 70, "Text",ExpressionUUID->"fa33eb3c-b5b0-4245-a8eb-689752a551a1"],
+Cell[932, 28, 141, 1, 70, "Subsection",ExpressionUUID->"446f2a27-6ad7-44fe-bb74-93df4a55cbee"],
+Cell[1076, 31, 408, 13, 70, "Input",ExpressionUUID->"3a6e8819-ca47-4e7e-b2c6-31d821e49ba9"],
+Cell[1487, 46, 108, 0, 70, "Subsection",ExpressionUUID->"5a5932f0-c02e-4d75-9e9a-78425da2e805"],
+Cell[1598, 48, 246, 7, 70, "Input",ExpressionUUID->"d85af50f-3f2d-499b-ab2e-9ae29f3d95bf"],
+Cell[1847, 57, 264, 6, 70, "Input",ExpressionUUID->"5726812e-5db9-47d0-bd3a-f48dbbd9ea1f"],
+Cell[2114, 65, 114, 0, 70, "Subsection",ExpressionUUID->"c764087d-1d73-4539-bb2c-b7d93c1a6934"],
+Cell[2231, 67, 763, 23, 70, "Input",ExpressionUUID->"b6c54aed-706c-4e71-b602-ce36486cf20b"]
+}
+]
+*)
+
+(* End of internal cache information *)

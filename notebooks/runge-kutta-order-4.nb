@@ -1,0 +1,47 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Order 4 Runge-Kutta", "Title",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/17-runge-kutta-methods.mdx. Edit f, the \
+interval, the initial value and N in the parameters cell, then Kernel \[Rule] \
+Evaluate Notebook. Prints k1, k2, k3, k4 and w for every step.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000003"],
+
+Cell["f[t_, y_] := y - t^2 + 1;", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 2;", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-00000000000b"],
+
+Cell["alpha = 0.5;", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-00000000000c"],
+
+Cell["n = 4;", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-00000000000d"],
+
+Cell["exact[t_] := (t + 1)^2 - 0.5 Exp[t];", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-00000000000e"],
+
+Cell["Per-step detail", "Subsection",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000005"],
+
+Cell["h = (b - a)/n; detail[{t_, w_}] := Module[{k1, k2, k3, k4}, k1 = h f[t, w]; k2 = h f[t + h/2, w + k1/2]; k3 = h f[t + h/2, w + k2/2]; k4 = h f[t + h, w + k3]; <|\"t\" -> t, \"w\" -> w, \"k1\" -> k1, \"k2\" -> k2, \"k3\" -> k3, \"k4\" -> k4, \"wNext\" -> w + (k1 + 2 k2 + 2 k3 + k4)/6|>]; step[{t_, w_}] := {t + h, detail[{t, w}][\"wNext\"]}; pts = NestList[step, {a, alpha}, n];", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000006"],
+
+Cell["Step table (last row has no step, its k columns are blank-meaning)", "Subsection",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000007"],
+
+Cell["TableForm[Table[With[{d = detail[pts[[i]]]}, {d[\"t\"], d[\"w\"], d[\"k1\"], d[\"k2\"], d[\"k3\"], d[\"k4\"], d[\"wNext\"], exact[d[\"t\"]], Abs[exact[d[\"t\"]] - d[\"w\"]]}], {i, 1, n + 1}], TableHeadings -> {None, {\"t_i\", \"w_i\", \"k1\", \"k2\", \"k3\", \"k4\", \"w_{i+1}\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000008"],
+
+Cell["Final-point error", "Subsection",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-000000000009"],
+
+Cell["Abs[exact[b] - pts[[-1, 2]]]", "Input",ExpressionUUID->"3a1f0b10-0033-4a10-9a01-00000000000a"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0033-4a10-9a01-0000000000ff"
+]

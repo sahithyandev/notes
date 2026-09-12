@@ -1,0 +1,48 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Runge-Kutta \[LongDash] Modified Euler Method", "Title",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/17-runge-kutta-methods.mdx. Edit f, the \
+interval, the initial value and N in the parameters cell, then Kernel \[Rule] \
+Evaluate Notebook. Prints the left slope, the Euler-predicted point and the \
+right slope for every step.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000003"],
+
+Cell["f[t_, y_] := y - t^2 + 1;", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 2;", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-00000000000b"],
+
+Cell["alpha = 0.5;", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-00000000000c"],
+
+Cell["n = 4;", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-00000000000d"],
+
+Cell["exact[t_] := (t + 1)^2 - 0.5 Exp[t];", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-00000000000e"],
+
+Cell["Iterate", "Subsection",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000005"],
+
+Cell["h = (b - a)/n; step[{t_, w_}] := {t + h, w + h/2 (f[t, w] + f[t + h, w + h f[t, w]])}; pts = NestList[step, {a, alpha}, n];", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000006"],
+
+Cell["Step table (last row has no step, its slope columns are blank-meaning)", "Subsection",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000007"],
+
+Cell["TableForm[Table[With[{t = pts[[i, 1]], w = pts[[i, 2]]}, {t, w, f[t, w], w + h f[t, w], f[t + h, w + h f[t, w]], w + h/2 (f[t, w] + f[t + h, w + h f[t, w]]), exact[t], Abs[exact[t] - w]}], {i, 1, n + 1}], TableHeadings -> {None, {\"t_i\", \"w_i\", \"s_left\", \"y_pred\", \"s_right\", \"w_{i+1}\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000008"],
+
+Cell["Final-point error", "Subsection",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-000000000009"],
+
+Cell["Abs[exact[b] - pts[[-1, 2]]]", "Input",ExpressionUUID->"3a1f0b10-0032-4a10-9a01-00000000000a"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0032-4a10-9a01-0000000000ff"
+]

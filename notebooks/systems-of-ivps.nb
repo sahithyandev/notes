@@ -1,0 +1,48 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Systems of IVPs (Order 4 Runge-Kutta)", "Title",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/19-systems-of-ivps.mdx. The example is \
+y'' - 2 y' + 2 y = e^{2t} sin t reduced to a first-order system. Edit the \
+component functions Fv, the interval, the initial vector and N, then Kernel \
+\[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000003"],
+
+Cell["Fv[t_, u_] := {u[[2]], 2 u[[2]] - 2 u[[1]] + Exp[2 t] Sin[t]};", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 1;", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-00000000000d"],
+
+Cell["alpha = {-0.4, -0.6};", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-00000000000e"],
+
+Cell["n = 10;", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-00000000000f"],
+
+Cell["exact[t_] := 0.2 Exp[2 t] (Sin[t] - 2 Cos[t]);", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000005"],
+
+Cell["Vector RK4 step", "Subsection",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000006"],
+
+Cell["h = (b - a)/n; rk4Step[{t_, u_}] := Module[{k1, k2, k3, k4}, k1 = h Fv[t, u]; k2 = h Fv[t + h/2, u + k1/2]; k3 = h Fv[t + h/2, u + k2/2]; k4 = h Fv[t + h, u + k3]; {t + h, u + (k1 + 2 k2 + 2 k3 + k4)/6}];", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000007"],
+
+Cell["Iterate and compare w_i^{(1)} against y(t_i)", "Subsection",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000008"],
+
+Cell["res = NestList[rk4Step, {a, alpha}, n]; TableForm[Table[{res[[i, 1]], res[[i, 2, 1]], res[[i, 2, 2]], exact[res[[i, 1]]], Abs[exact[res[[i, 1]]] - res[[i, 2, 1]]]}, {i, 1, n + 1}], TableHeadings -> {None, {\"t_i\", \"w1 (y)\", \"w2 (y')\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-000000000009"],
+
+Cell["Check the reduction against NDSolve", "Subsection",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-00000000000a"],
+
+Cell["nds = NDSolveValue[{Y''[t] - 2 Y'[t] + 2 Y[t] == Exp[2 t] Sin[t], Y[a] == alpha[[1]], Y'[a] == alpha[[2]]}, Y, {t, a, b}]; Table[{res[[i, 1]], res[[i, 2, 1]], nds[res[[i, 1]]]}, {i, 1, n + 1}] // TableForm", "Input",ExpressionUUID->"3a1f0b10-0005-4a10-9a01-00000000000b"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0005-4a10-9a01-0000000000ff"
+]
