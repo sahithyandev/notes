@@ -21,6 +21,17 @@ bun install
 | `bun build`   | Build production site to `./dist/`         |
 | `bun preview` | Preview production build locally           |
 
+## Testing
+
+Unit tests use `bun:test` and live next to the code they cover as `*.test.ts`.
+
+```sh
+bun test            # run once
+bun run test:watch  # re-run on file change
+```
+
+`bun test` runs with coverage by default; see `package.json`'s `test` script.
+
 ## Adding Notes
 
 Notes are Markdown files in `docs/`. After adding or renaming any `.md` file, run the slug script:
