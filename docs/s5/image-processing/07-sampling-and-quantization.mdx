@@ -3,7 +3,7 @@ title: Sampling and Quantization
 sidebar:
   order: 7
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-09-08T19:46:17.720Z
+lastUpdatedOn: 2026-09-12T07:51:31.973Z
 slug: s5/image-processing/sampling-and-quantization
 prev: true
 next: true
@@ -136,10 +136,10 @@ Serpentine scanning reverses direction every other row, so the error is not alwa
 
 Bi-level device with levels $0$ and $255$. One row of 4 pixels, all at value $128$, using 1D diffusion that passes the whole error to the next pixel.
 
-- Pixel 1: $128$ rounds to $0$, error $128$. Pixel 2 becomes $128 + 128 = 256$.
-- Pixel 2: $256$ rounds to $255$, error $1$. Pixel 3 becomes $128 + 1 = 129$.
-- Pixel 3: $129$ rounds to $255$, error $-126$. Pixel 4 becomes $128 - 126 = 2$.
-- Pixel 4: $2$ rounds to $0$.
+- Pixel 1's $128$ rounds to $0$, error $128$. Pixel 2 becomes $128 + 128 = 256$.
+- Pixel 2's $256$ rounds to $255$, error $1$. Pixel 3 becomes $128 + 1 = 129$.
+- Pixel 3's $129$ rounds to $255$, error $-126$. Pixel 4 becomes $128 - 126 = 2$.
+- Pixel 4's $2$ rounds to $0$.
 
 Output is $0, 255, 255, 0$, mean $127.5$, matching the target $128$ that no single pixel could represent.
 

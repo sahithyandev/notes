@@ -1,7 +1,7 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-09-10T04:41:03.938Z
+lastUpdatedOn: 2026-09-12T07:51:31.972Z
 slug: s5/computer-security/hash-functions
 sidebar:
   order: 21
@@ -90,9 +90,9 @@ It is a 2-round Feistel network over the message $M$ and a random seed $r$, with
 
 Effects:
 
-- Randomised
+- Randomised  
   The same $M$ encrypts differently each run through $r$.
-- All-or-nothing
+- All-or-nothing  
   Every output bit depends on every bit of $M$ and $r$, so a tampered block fails the padding check on decryption.
 
 This makes RSA encryption secure against chosen-ciphertext attacks. The hash is used only as padding, so no collision property is relied on.

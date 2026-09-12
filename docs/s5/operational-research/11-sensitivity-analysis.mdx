@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:20.131Z
-lastUpdatedOn: 2026-09-08T19:46:17.724Z
+lastUpdatedOn: 2026-09-12T07:51:31.975Z
 ---
 
 Sensitivity analysis studies how the optimal solution reacts to changes in the LP data, without solving the LP again from the start.
@@ -85,9 +85,9 @@ The basis stays optimal while every entry is $\ge 0$. This gives the range over 
 
 ## Change in the Coefficient Matrix
 
-- Non-basic variable's column
+- Non-basic variable's column  
   Recompute $B^{-1} A_j$ and then $z_j - c_j$ from the new column. If it stays $\ge 0$ the basis is still optimal.
-- Basic variable's column
+- Basic variable's column  
   The matrix $B$ itself changes, so $B^{-1}$ changes. The tableau is rebuilt and the LP effectively re-solved.
 
 ## Addition of a Variable
@@ -100,9 +100,9 @@ $$
 z_{\text{new}} - c_{\text{new}} = c_B^{T} B^{-1} A_{\text{new}} - c_{\text{new}}
 $$
 
-- Entry $\ge 0$
+- Entry $\ge 0$  
   The current solution stays optimal. The new variable stays non-basic at value 0.
-- Entry $< 0$
+- Entry $< 0$  
   Optimality is violated. The new variable can enter the basis and improve the objective.
 
 ## Addition of a Constraint

@@ -47,6 +47,8 @@ The 2 trailing spaces are required. Without them Markdown collapses the line bre
 
 If a label does not fit the 2-line form, rewrite it as a plain sentence. Never use `- Continuous intensity: no fixed set of allowed values`.
 
+When fixing a violation inside a list where the other bullets already use the 2-line form, convert it to 2-line format too rather than defaulting to a plain sentence, even for a short label. Only fall back to a plain sentence when the label genuinely has no natural split point, or the surrounding bullets are prose sentences themselves.
+
 Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Here:` lead-in, such as `- $A$: cross-sectional area`.
 
 Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written _without_ the required 2 trailing spaces (or a trailing `\`): that's a rendering bug, not just a style nit, since the label and description silently run together on the published page.
@@ -56,6 +58,10 @@ Enforced by the `notes-style-validator` Astro integration's `label-description` 
 Never use em dashes (—) in note content. Restructure with a comma, period, colon, or parentheses instead.
 
 Enforced by the `em-dash` rule (`src/integrations/notes-style-validator/rules/em-dash.ts`). Exempt: fenced code, inline code, math (`$...$`/`$$...$$`), and a dash used alone as an empty table cell.
+
+### Word choice
+
+Avoid using "meaning" or "that is" as a conjunction to introduce a restatement or clarification (e.g. "How it should be produced, meaning which production procedure to use" or "..., that is, which procedure to use"). Prefer a plain sentence, comma, or colon-free restructuring instead.
 
 ### Title casing
 

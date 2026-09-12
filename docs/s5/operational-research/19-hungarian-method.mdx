@@ -6,15 +6,17 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:55:15.838Z
-lastUpdatedOn: 2026-08-28T11:38:57.354Z
+lastUpdatedOn: 2026-09-12T07:51:31.976Z
 ---
 
 Solves a balanced assignment problem in polynomial time, avoiding the degeneracy the transportation methods would hit.
 
 ## Steps
 
-- Row reduction: subtract the minimum entry of each row from every entry in that row.
-- Column reduction: subtract the minimum entry of each column from every entry in that column.
+- Row reduction  
+  Subtract the minimum entry of each row from every entry in that row.
+- Column reduction  
+  Subtract the minimum entry of each column from every entry in that column.
 - Cover all 0s in the resulting matrix using the minimum number of horizontal and vertical lines.
 - If the number of lines equals $n$, an optimal assignment exists among the 0s. Stop.
 - Otherwise, find the smallest uncovered entry. Subtract it from every uncovered entry, and add it to every entry covered twice (at a line intersection). Repeat the covering step.

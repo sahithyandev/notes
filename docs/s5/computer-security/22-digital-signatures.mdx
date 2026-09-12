@@ -2,7 +2,7 @@
 title: Digital Signatures
 slug: s5/computer-security/digital-signatures
 dateCreated: 2026-09-09T05:01:24.402Z
-lastUpdatedOn: 2026-09-10T04:41:03.938Z
+lastUpdatedOn: 2026-09-12T07:51:31.972Z
 sidebar:
   order: 22
 prev: true
@@ -57,8 +57,10 @@ The two modes differ in whether the message is put through RSA directly or only 
 
 ### Verification
 
-- With recovery: compute $m' = \sigma^e \bmod n$ using the signer's public key, and check it matches the expected message.
-- Without recovery: compute $h' = H(M')$ and $h = \sigma^e \bmod n$, accept **iff** $h = h'$.
+- With recovery  
+  Compute $m' = \sigma^e \bmod n$ using the signer's public key, and check it matches the expected message.
+- Without recovery  
+  Compute $h' = H(M')$ and $h = \sigma^e \bmod n$, accept **iff** $h = h'$.
 
 Signing cost is a hash plus a single exponentiation with a full-length exponent $d$. Verification cost is a hash plus a single exponentiation with the small exponent $e$, plus a comparison.
 

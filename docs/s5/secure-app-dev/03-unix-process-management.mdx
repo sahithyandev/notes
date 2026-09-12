@@ -1,7 +1,7 @@
 ---
 title: Unix Process Management
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-08T19:46:17.725Z
+lastUpdatedOn: 2026-09-12T07:51:31.976Z
 slug: s5/secure-app-dev/unix-process-management
 sidebar:
   order: 3
@@ -22,9 +22,9 @@ int fork(void);
 
 - Data in the child is a copy of the parent's, not shared.
 - The child differs from the parent only in its PID, its PPID, and the return value of `fork()`.
-- Return value in the parent: the child's PID.
-- Return value in the child: 0.
-- Return value on error: negative.
+- In parent, return value is the child's PID.
+- In child, return value is 0.
+- The return value on error is negative.
 
 <Note>
 
