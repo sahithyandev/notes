@@ -1,0 +1,424 @@
+---
+// Interactive message sequence diagram (SIP call flow, RSVP PATH/RESV, etc.).
+// Participants are drawn as lifelines; each step draws one message arrow.
+// Prev / Next / dots step through the flow; the current step is highlighted.
+
+interface Step {
+  from: number;
+  to: number;
+  label: string;
+  kind?: "solid" | "dashed" | "media" | "note";
+  title?: string;
+}
+
+interface Props {
+  participants: { name: string; sub?: string }[];
+  steps: Step[];
+}
+
+const { participants, steps } = Astro.props;
+
+const uid = "seq-" + Math.random().toString(36).slice(2, 9);
+
+const W = 920;
+const PAD_X = 80;
+const HEADER_H = 92;
+const ROW_H = 56;
+const CHIP_W = 132;
+const CHIP_H = 56;
+
+const n = participants.length;
+const xs = participants.map(
+  (_, i) => PAD_X + ((W - 2 * PAD_X) * (i + 0.5)) / n,
+);
+const totalH = HEADER_H + steps.length * ROW_H + 16;
+
+const rows = steps.map((step, i) => {
+  const y = HEADER_H + i * ROW_H + ROW_H / 2;
+  const x1 = xs[step.from];
+  const x2 = xs[step.to];
+  const dir = x2 >= x1 ? 1 : -1;
+  const shaftEnd = 11;
+  const midX = (x1 + x2) / 2;
+
+  let d: string | null = null;
+  let labelX = midX;
+  let labelY = y - 10;
+
+  if (step.kind === "note") {
+    labelX = x2;
+    labelY = y - 6;
+  } else if (step.kind === "media") {
+    const a1 = `M ${x1} ${y - 5} L ${x2 - dir * shaftEnd} ${y - 5} M ${
+      x2 - dir * shaftEnd
+    } ${y - 10} L ${x2} ${y - 5} L ${x2 - dir * shaftEnd} ${y}`;
+    const a2 = `M ${x2} ${y + 5} L ${x1 + dir * shaftEnd} ${y + 5} M ${
+      x1 + dir * shaftEnd
+    } ${y} L ${x1} ${y + 5} L ${x1 + dir * shaftEnd} ${y + 10}`;
+    d = a1 + " " + a2;
+    labelX = midX;
+    labelY = y - 16;
+  } else {
+    d = `M ${x1} ${y} L ${x2 - dir * shaftEnd} ${y} M ${
+      x2 - dir * shaftEnd
+    } ${y - 5} L ${x2} ${y} L ${x2 - dir * shaftEnd} ${y + 5}`;
+  }
+
+  return { ...step, y, x1, x2, d, labelX, labelY };
+});
+---
+
+<figure
+  class="sequence"
+  id={uid}
+  tabindex="0"
+  aria-roledescription="carousel"
+  aria-label="Interactive sequence diagram"
+>
+  <div class="bar">
+    <span class="label" data-label></span>
+    <span class="count"
+      ><span data-current>1</span> / <span data-total>{rows.length}</span></span
+    >
+  </div>
+
+  <div class="scroll">
+    <svg
+      viewBox={`0 0 ${W} ${totalH}`}
+      width="100%"
+      aria-hidden="true"
+      style={`max-height: ${totalH}px; aspect-ratio: ${W} / ${totalH}`}
+    >
+      <g class="lifelines">
+        {
+          participants.map((p, i) => (
+            <g style={`transform: translate(${xs[i]}px, 0)`}>
+              <line
+                x1="0"
+                y1={HEADER_H - 18}
+                x2="0"
+                y2={totalH - 10}
+                class="lifeline"
+              />
+              <g
+                class="chip"
+                style={`transform: translate(${-CHIP_W / 2}px, 8px)`}
+              >
+                <rect width={CHIP_W} height={CHIP_H} rx="10" />
+                <text
+                  x={CHIP_W / 2}
+                  y={p.sub ? CHIP_H / 2 - 4 : CHIP_H / 2 + 4}
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  class="chip-name"
+                >
+                  {p.name}
+                </text>
+                {p.sub && (
+                  <text
+                    x={CHIP_W / 2}
+                    y={CHIP_H / 2 + 15}
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                    class="chip-sub"
+                  >
+                    {p.sub}
+                  </text>
+                )}
+              </g>
+            </g>
+          ))
+        }
+      </g>
+
+      {
+        rows.map((step, i) => (
+          <g
+            class="msg"
+            data-title={step.title ?? ""}
+            role="group"
+            aria-hidden="true"
+          >
+            {step.d && (
+              <path
+                d={step.d}
+                class={`line ${step.kind === "media" ? "media" : ""}`}
+              />
+            )}
+            <text
+              x={step.labelX}
+              y={step.labelY}
+              text-anchor={step.kind === "note" ? "middle" : "middle"}
+              class={step.kind === "note" ? "note-label" : "msg-label"}
+            >
+              {step.label}
+            </text>
+          </g>
+        ))
+      }
+    </svg>
+  </div>
+
+  <div class="foot">
+    <div class="dots" role="tablist"></div>
+    <div class="controls">
+      <button type="button" data-prev disabled aria-label="Previous step">
+        &#9664; Prev
+      </button>
+      <button type="button" data-next aria-label="Next step"
+        >Next &#9654;</button
+      >
+    </div>
+  </div>
+  <p class="live" aria-live="polite"></p>
+</figure>
+
+<style>
+  .sequence {
+    margin: 24px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 14px 16px 16px;
+    font-family: var(--font-ui);
+  }
+  .sequence:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+    min-height: 2.5em;
+  }
+  .label {
+    font-weight: 700;
+    color: var(--text-primary);
+    min-width: 0;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .count {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    padding-top: 2px;
+  }
+
+  .scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  svg {
+    display: block;
+    min-width: 640px;
+  }
+
+  .lifeline {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .chip rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+  .chip-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    fill: var(--text-primary);
+  }
+  .chip-sub {
+    font-size: 0.62rem;
+    font-family: var(--font-mono);
+    fill: var(--text-muted);
+  }
+
+  .msg {
+    transition: opacity 0.25s ease;
+  }
+  .msg path {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .msg path.dashed {
+    stroke-dasharray: 5 4;
+  }
+  .msg path.media {
+    stroke: var(--sem);
+    stroke-width: 1.8;
+  }
+  .msg-label {
+    font-size: 0.62rem;
+    fill: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+  .note-label {
+    font-size: 0.68rem;
+    font-style: italic;
+    fill: var(--text-muted);
+    letter-spacing: 0.2px;
+  }
+
+  .msg.future {
+    opacity: 0.5;
+  }
+  .msg.done {
+    opacity: 0.32;
+  }
+  .msg.current {
+    opacity: 1;
+  }
+  .msg.current path {
+    stroke: var(--sem);
+    stroke-width: 2;
+  }
+  .msg.current .msg-label {
+    fill: var(--sem);
+    font-weight: 700;
+  }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .dots {
+    display: flex;
+    gap: 7px;
+  }
+  .dots :global(.dot) {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    cursor: pointer;
+  }
+  .dots :global(.dot[aria-selected="true"]) {
+    background: var(--sem);
+    border-color: var(--sem);
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+  }
+  .controls button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 5px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .controls button:hover:not(:disabled) {
+    border-color: var(--sem);
+    color: var(--sem);
+  }
+  .controls button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+</style>
+
+<noscript>
+  <style>
+    .sequence .foot {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<script>
+  function initSequence(root: HTMLElement) {
+    const msgs = Array.from(root.querySelectorAll<HTMLElement>(".msg"));
+    if (!msgs.length) return;
+
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]")!;
+    const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+    const label = root.querySelector<HTMLElement>("[data-label]")!;
+    const current = root.querySelector<HTMLElement>("[data-current]")!;
+    const total = root.querySelector<HTMLElement>("[data-total]")!;
+    const dotWrap = root.querySelector<HTMLElement>(".dots")!;
+    const live = root.querySelector<HTMLElement>(".live")!;
+
+    const bodies = msgs.map((m) =>
+      (m.textContent ?? "").replace(/\s+/g, " ").trim(),
+    );
+
+    const dots = msgs.map((m, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "dot";
+      b.setAttribute("aria-label", `Step ${idx + 1}`);
+      b.addEventListener("click", () => show(idx));
+      dotWrap.appendChild(b);
+      return b;
+    });
+
+    let i = 0;
+
+    function show(n: number) {
+      i = Math.max(0, Math.min(msgs.length - 1, n));
+      msgs.forEach((m, idx) => {
+        m.classList.toggle("current", idx === i);
+        m.classList.toggle("done", idx < i);
+        m.classList.toggle("future", idx > i);
+      });
+      dots.forEach((d, idx) =>
+        d.setAttribute("aria-selected", idx === i ? "true" : "false"),
+      );
+      prev.disabled = i === 0;
+      next.disabled = i === msgs.length - 1;
+      const t = (msgs[i].dataset.title ?? "").trim() || bodies[i];
+      label.textContent = t;
+      current.textContent = String(i + 1);
+      live.textContent = `${t}. ${bodies[i]}`;
+    }
+
+    show(0);
+
+    prev.addEventListener("click", () => show(i - 1));
+    next.addEventListener("click", () => show(i + 1));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        show(i - 1);
+        e.preventDefault();
+      } else if (e.key === "ArrowRight") {
+        show(i + 1);
+        e.preventDefault();
+      }
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>(".sequence")
+    .forEach((el) => initSequence(el));
+</script>
