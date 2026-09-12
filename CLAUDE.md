@@ -90,6 +90,14 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 
 After running `bun build`, always check the terminal output for `[notes-style-validator]` lines reporting new violations (the build already fails on them, but read what broke). Existing/grandfathered violations print too; those don't fail the build but are still worth fixing when you're already in the file.
 
+Don't run a full `bun build` just to check note style — it's slow (Vite, image processing, pagefind). `scan.ts`/`validate.ts` have no Astro dependency at all (plain Node fs + gray-matter), so run the checks directly instead:
+
+```bash
+bun run script:check-notes-style
+```
+
+Same 7 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any new violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
+
 ### notes-style-validator baseline
 
 `~1000` pre-existing style violations were grandfathered into a committed baseline (`src/integrations/notes-style-validator/style-baseline.json`) when the validator was introduced, so the build only fails on _new_ violations, not the existing backlog. When you fix one of the backlog violations, regenerate the baseline so it doesn't rot:

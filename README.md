@@ -41,3 +41,9 @@ bun scripts/auto-slug.ts <path/to/file.md>
 ```
 
 Files must be named with a numeric prefix (e.g. `01-introduction.md`). The prefix is stripped from the URL slug and becomes the sidebar order.
+
+To check note content for style/link issues without a full build:
+
+```sh
+bun run script:check-notes-style
+```
