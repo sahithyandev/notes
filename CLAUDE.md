@@ -79,14 +79,16 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 
 ## Astro integrations
 
-`src/integrations/` has 4 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
+`src/integrations/` has 2 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
 
-- `notes-style-validator`: a single shared file scan enforcing 5 prose-style rules over `docs/`: `title-case`, `em-dash`, `adjacent-note`, `label-description`, `collapsed-label`. See the sections above. **The build fails on any new violation.**
-- `link-validator`: validates internal doc links, in-page anchors, and images actually resolve.
-- `prereq-scope`: validates `prereqs` entries don't point at a note in the same module. See "Slugs & file naming" below.
+- `notes-style-validator`: a single shared file scan enforcing 7 rules over `docs/`: `title-case`, `em-dash`, `adjacent-note`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`. See the sections above and below. **The build fails on any new violation.**
 - `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
 
-After running `bun build`, always check the terminal output for lines prefixed `[link-validator]` or `[prereq-scope]` that report violations (anything other than "no ... found"). Treat any such warning as a HIGH severity issue: fix the underlying note content before considering the task done, don't leave the warning in place. `[notes-style-validator]` warnings need the same treatment for _new_ violations, but the build already enforces that for you (see below).
+`prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
+
+`prereq-scope` bans `prereqs` entries that point at a note in the same module — see "Slugs & file naming" below. `broken-link` validates internal doc links, in-page anchors, and relative image paths actually resolve, with fuzzy-match suggestions (`core/similarity.ts`) for near-miss slugs.
+
+After running `bun build`, always check the terminal output for `[notes-style-validator]` lines reporting new violations (the build already fails on them, but read what broke). Existing/grandfathered violations print too; those don't fail the build but are still worth fixing when you're already in the file.
 
 ### notes-style-validator baseline
 
@@ -110,7 +112,7 @@ URLs come from the `slug` frontmatter field, not the file path. `auto-slug.ts` d
 
 Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
-Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order link already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules.
+Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order link already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. Enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
 
 ## Routing
 
