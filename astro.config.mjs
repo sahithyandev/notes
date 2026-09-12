@@ -8,6 +8,7 @@ import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import linkValidator from "./src/integrations/link-validator/index.ts";
 import titleCase from "./src/integrations/title-case/index.ts";
+import prereqScope from "./src/integrations/prereq-scope/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
@@ -169,6 +170,7 @@ export default defineConfig({
     }),
     linkValidator(),
     titleCase(),
+    prereqScope(),
   ],
   markdown: {
     processor: unified({
