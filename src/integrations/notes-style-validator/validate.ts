@@ -1,5 +1,5 @@
-import { scanFiles } from "./scan.ts";
-import { runAllRules } from "./rules/index.ts";
+import { scanFiles, type ScannedFile } from "./scan.ts";
+import { runPerFileRules, checkBrokenLinks } from "./rules/index.ts";
 import { loadBaseline, violationKey } from "./baseline.ts";
 import type { Baseline, BaselineEntry } from "./baseline.ts";
 import {
@@ -22,17 +22,27 @@ function toDocsRelative(file: string, docsRoot: string): string {
   return file.replace(docsRoot + "/", "docs/");
 }
 
-export function validate(
-  docsRoot: string,
-  baseline: Baseline,
-): ValidationResult {
-  const files = scanFiles(docsRoot);
+function collectViolations(
+  files: ScannedFile[],
+  extraValidUrls: Iterable<string>,
+): Array<{ file: string; violation: Violation }> {
   const flat: Array<{ file: string; violation: Violation }> = [];
   for (const f of files) {
-    for (const violation of runAllRules(f)) {
+    for (const violation of runPerFileRules(f)) {
       flat.push({ file: f.file, violation });
     }
   }
+  flat.push(...checkBrokenLinks(files, extraValidUrls));
+  return flat;
+}
+
+export function validate(
+  docsRoot: string,
+  baseline: Baseline,
+  extraValidUrls: Iterable<string> = [],
+): ValidationResult {
+  const files = scanFiles(docsRoot);
+  const flat = collectViolations(files, extraValidUrls);
 
   const budget = new Map<string, number>();
   for (const e of baseline.entries) {
@@ -76,25 +86,27 @@ export function validate(
 
 // Used by scripts/update-style-baseline.ts to regenerate the committed
 // baseline from the current state of docs/.
-export function computeBaselineEntries(docsRoot: string): BaselineEntry[] {
+export function computeBaselineEntries(
+  docsRoot: string,
+  extraValidUrls: Iterable<string> = [],
+): BaselineEntry[] {
   const files = scanFiles(docsRoot);
+  const flat = collectViolations(files, extraValidUrls);
   const counts = new Map<string, BaselineEntry>();
 
-  for (const f of files) {
-    const fileRel = toDocsRelative(f.file, docsRoot);
-    for (const violation of runAllRules(f)) {
-      const key = violationKey(fileRel, violation.rule, violation.snippet);
-      const existing = counts.get(key);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        counts.set(key, {
-          file: fileRel,
-          rule: violation.rule,
-          snippet: violation.snippet,
-          count: 1,
-        });
-      }
+  for (const { file, violation } of flat) {
+    const fileRel = toDocsRelative(file, docsRoot);
+    const key = violationKey(fileRel, violation.rule, violation.snippet);
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      counts.set(key, {
+        file: fileRel,
+        rule: violation.rule,
+        snippet: violation.snippet,
+        count: 1,
+      });
     }
   }
 
@@ -104,10 +116,10 @@ export function computeBaselineEntries(docsRoot: string): BaselineEntry[] {
 export async function runValidation(
   docsRoot: string,
   logger: SimpleLogger,
-  opts: { failOnNew: boolean },
+  opts: { failOnNew: boolean; extraValidUrls?: Iterable<string> },
 ): Promise<void> {
   const baseline = loadBaseline();
-  const result = validate(docsRoot, baseline);
+  const result = validate(docsRoot, baseline, opts.extraValidUrls ?? []);
 
   printViolationGroup("new violations", result.newReports, logger, docsRoot);
   printViolationGroup(
@@ -129,7 +141,7 @@ export async function runValidation(
   }
 
   if (result.newCount === 0 && result.grandfatheredCount === 0) {
-    logger.info("notes-style-validator: no style violations found.");
+    logger.info("notes-style-validator: no violations found.");
   } else if (result.newCount === 0) {
     logger.info(
       "notes-style-validator: no new violations (" +
@@ -142,7 +154,7 @@ export async function runValidation(
     throw new Error(
       "notes-style-validator: " +
         result.newCount +
-        " new style violation(s) found. Fix them, or if pre-existing/intentional, run `bun run script:update-style-baseline`.",
+        " new violation(s) found. Fix them, or if pre-existing/intentional, run `bun run script:update-style-baseline`.",
     );
   }
 }

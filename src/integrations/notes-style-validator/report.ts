@@ -8,7 +8,9 @@ export type RuleId =
   | "em-dash"
   | "adjacent-note"
   | "label-description"
-  | "collapsed-label";
+  | "collapsed-label"
+  | "prereq-scope"
+  | "broken-link";
 
 export interface Violation {
   rule: RuleId;
