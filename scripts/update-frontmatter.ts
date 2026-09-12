@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import matter from "gray-matter";
+import { format } from "prettier";
 
 // updates the frontmatter of mdx files
 // and format with prettier
@@ -20,7 +21,8 @@ import matter from "gray-matter";
 
     file.data = updatedFrontMatter;
     const updatedFileContent = matter.stringify(file.content, file.data);
-    await writeFile(filepath, updatedFileContent);
+    const formattedContent = await format(updatedFileContent, { filepath });
+    await writeFile(filepath, formattedContent);
   }
 })();
 
