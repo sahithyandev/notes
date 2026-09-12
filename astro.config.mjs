@@ -5,9 +5,7 @@ import remarkMath from "remark-math";
 import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import moduleRedirects from "./src/integrations/module-redirects/index.ts";
-import linkValidator from "./src/integrations/link-validator/index.ts";
 import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
-import prereqScope from "./src/integrations/prereq-scope/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
@@ -79,9 +77,7 @@ export default defineConfig({
     mdx({
       optimize: true,
     }),
-    linkValidator(),
     notesStyleValidator(),
-    prereqScope(),
   ],
   markdown: {
     processor: unified({
