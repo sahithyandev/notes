@@ -12,7 +12,10 @@ bun build      # static build to ./dist/
 bun preview    # preview production build
 ```
 
-No test or lint commands are configured.
+```bash
+bun test       # runs *.test.ts files with bun:test
+bun run lint   # prettier --check .
+```
 
 Run the slug script whenever `.md` files are added or renamed:
 
@@ -46,11 +49,19 @@ If a label does not fit the 2-line form, rewrite it as a plain sentence. Never u
 
 Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Here:` lead-in, such as `- $A$: cross-sectional area`.
 
+Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written _without_ the required 2 trailing spaces (or a trailing `\`): that's a rendering bug, not just a style nit, since the label and description silently run together on the published page.
+
+### Em dashes
+
+Never use em dashes (—) in note content. Restructure with a comma, period, colon, or parentheses instead.
+
+Enforced by the `em-dash` rule (`src/integrations/notes-style-validator/rules/em-dash.ts`). Exempt: fenced code, inline code, math (`$...$`/`$$...$$`), and a dash used alone as an empty table cell.
+
 ### Title casing
 
-Headings (`##` to `####`) and the `title` frontmatter field must be in title case, as enforced by the `title-case` Astro integration in `src/integrations/title-case/`. The build and dev server fail on violations.
+Headings (`##` to `####`) and the `title` frontmatter field must be in title case, as enforced by the `title-case` rule of the `notes-style-validator` Astro integration (`src/integrations/notes-style-validator/rules/title-case.ts`, logic in `core/titlecase.ts`). The build and dev server fail on violations.
 
-Rules implemented in `titlecase.ts`:
+Rules implemented in `core/titlecase.ts`:
 
 - Capitalize the first word, the last word, and any word after a colon.
 - Keep minor words lowercase otherwise (articles, coordinating conjunctions, short prepositions). See `MINOR_WORDS` for the full list.
@@ -64,7 +75,28 @@ Add a new domain term to `ALLOWED_LOWERCASE` rather than working around a false 
 
 Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
 
-Never place 2 `<Note>` components next to each other. Merge them into 1, or move one back into the main text.
+Never place 2 `<Note>` components next to each other with the same `type` (default `"note"`). Merge them into 1, or move one back into the main text. Enforced by the `adjacent-note` rule (`src/integrations/notes-style-validator/rules/adjacent-note.ts`).
+
+## Astro integrations
+
+`src/integrations/` has 4 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
+
+- `notes-style-validator`: a single shared file scan enforcing 5 prose-style rules over `docs/`: `title-case`, `em-dash`, `adjacent-note`, `label-description`, `collapsed-label`. See the sections above. **The build fails on any new violation.**
+- `link-validator`: validates internal doc links, in-page anchors, and images actually resolve.
+- `prereq-scope`: validates `prereqs` entries don't point at a note in the same module. See "Slugs & file naming" below.
+- `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
+
+After running `bun build`, always check the terminal output for lines prefixed `[link-validator]` or `[prereq-scope]` that report violations (anything other than "no ... found"). Treat any such warning as a HIGH severity issue: fix the underlying note content before considering the task done, don't leave the warning in place. `[notes-style-validator]` warnings need the same treatment for _new_ violations, but the build already enforces that for you (see below).
+
+### notes-style-validator baseline
+
+`~1000` pre-existing style violations were grandfathered into a committed baseline (`src/integrations/notes-style-validator/style-baseline.json`) when the validator was introduced, so the build only fails on _new_ violations, not the existing backlog. When you fix one of the backlog violations, regenerate the baseline so it doesn't rot:
+
+```bash
+bun run script:update-style-baseline
+```
+
+Never hand-edit `style-baseline.json`. Always regenerate it. If a build fails on a violation you believe is a false positive rather than fixing the note, say so rather than silently baselining it away.
 
 ## Slugs & file naming
 
