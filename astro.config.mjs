@@ -6,7 +6,7 @@ import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import moduleRedirects from "./src/integrations/module-redirects/index.ts";
 import linkValidator from "./src/integrations/link-validator/index.ts";
-import titleCase from "./src/integrations/title-case/index.ts";
+import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
 import prereqScope from "./src/integrations/prereq-scope/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
@@ -80,7 +80,7 @@ export default defineConfig({
       optimize: true,
     }),
     linkValidator(),
-    titleCase(),
+    notesStyleValidator(),
     prereqScope(),
   ],
   markdown: {
