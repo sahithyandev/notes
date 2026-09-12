@@ -2,6 +2,7 @@ import { scanFiles, type ScannedFile } from "./scan.ts";
 import { runPerFileRules, checkBrokenLinks } from "./rules/index.ts";
 import { loadBaseline, violationKey } from "./baseline.ts";
 import type { Baseline, BaselineEntry } from "./baseline.ts";
+import { matchesFilter } from "./filter.ts";
 import {
   groupByFile,
   printViolationGroup,
@@ -16,6 +17,8 @@ export interface ValidationResult {
   staleEntries: BaselineEntry[];
   newCount: number;
   grandfatheredCount: number;
+  /** How many scanned files matched --filter. Lets callers warn on a typo'd filter that matched nothing. */
+  matchedFileCount: number;
 }
 
 function toDocsRelative(file: string, docsRoot: string): string {
@@ -40,6 +43,7 @@ export function validate(
   docsRoot: string,
   baseline: Baseline,
   extraValidUrls: Iterable<string> = [],
+  filter?: string,
 ): ValidationResult {
   const files = scanFiles(docsRoot);
   const flat = collectViolations(files, extraValidUrls);
@@ -50,9 +54,14 @@ export function validate(
     budget.set(key, (budget.get(key) ?? 0) + e.count);
   }
 
+  // Classification (new vs. grandfathered vs. stale) always runs against the
+  // FULL corpus, never the filtered subset — broken-link's cross-file
+  // resolution and stale-entry detection would both be wrong if files
+  // outside the filter were silently dropped from consideration. --filter
+  // only narrows what gets reported and decided on, applied below.
   const seenKeys = new Set<string>();
-  const newItems: typeof flat = [];
-  const grandfatheredItems: typeof flat = [];
+  const newItemsAll: typeof flat = [];
+  const grandfatheredItemsAll: typeof flat = [];
 
   for (const item of flat) {
     const fileRel = toDocsRelative(item.file, docsRoot);
@@ -65,15 +74,26 @@ export function validate(
     const remaining = budget.get(key) ?? 0;
     if (remaining > 0) {
       budget.set(key, remaining - 1);
-      grandfatheredItems.push(item);
+      grandfatheredItemsAll.push(item);
     } else {
-      newItems.push(item);
+      newItemsAll.push(item);
     }
   }
 
-  const staleEntries = baseline.entries.filter(
+  const staleEntriesAll = baseline.entries.filter(
     (e) => !seenKeys.has(violationKey(e.file, e.rule, e.snippet)),
   );
+
+  const inScope = (item: { file: string }) =>
+    matchesFilter(toDocsRelative(item.file, docsRoot), filter);
+  const newItems = newItemsAll.filter(inScope);
+  const grandfatheredItems = grandfatheredItemsAll.filter(inScope);
+  const staleEntries = staleEntriesAll.filter((e) =>
+    matchesFilter(e.file, filter),
+  );
+  const matchedFileCount = files.filter((f) =>
+    matchesFilter(toDocsRelative(f.file, docsRoot), filter),
+  ).length;
 
   return {
     newReports: groupByFile(newItems),
@@ -81,6 +101,7 @@ export function validate(
     staleEntries,
     newCount: newItems.length,
     grandfatheredCount: grandfatheredItems.length,
+    matchedFileCount,
   };
 }
 
@@ -116,10 +137,30 @@ export function computeBaselineEntries(
 export async function runValidation(
   docsRoot: string,
   logger: SimpleLogger,
-  opts: { failOnNew: boolean; extraValidUrls?: Iterable<string> },
+  opts: {
+    failOnNew: boolean;
+    extraValidUrls?: Iterable<string>;
+    /** Scope the report to a semester, module, submodule, or note — e.g. "s1", "s1/mathematics", "s1/mathematics/matrices", or a note name. */
+    filter?: string;
+  },
 ): Promise<void> {
   const baseline = loadBaseline();
-  const result = validate(docsRoot, baseline, opts.extraValidUrls ?? []);
+  const result = validate(
+    docsRoot,
+    baseline,
+    opts.extraValidUrls ?? [],
+    opts.filter,
+  );
+  const scope = opts.filter
+    ? ` (filtered to "${opts.filter}", ${result.matchedFileCount} file(s) matched)`
+    : "";
+
+  if (opts.filter && result.matchedFileCount === 0) {
+    logger.warn(
+      `\nnotes-style-validator: --filter "${opts.filter}" matched no files - check for a typo.\n`,
+    );
+    return;
+  }
 
   printViolationGroup("new violations", result.newReports, logger, docsRoot);
   printViolationGroup(
@@ -141,12 +182,14 @@ export async function runValidation(
   }
 
   if (result.newCount === 0 && result.grandfatheredCount === 0) {
-    logger.info("notes-style-validator: no violations found.");
+    logger.info("notes-style-validator: no violations found" + scope + ".");
   } else if (result.newCount === 0) {
     logger.info(
       "notes-style-validator: no new violations (" +
         result.grandfatheredCount +
-        " grandfathered).",
+        " grandfathered)" +
+        scope +
+        ".",
     );
   }
 
@@ -154,7 +197,9 @@ export async function runValidation(
     throw new Error(
       "notes-style-validator: " +
         result.newCount +
-        " new violation(s) found. Fix them, or if pre-existing/intentional, run `bun run script:update-style-baseline`.",
+        " new violation(s) found" +
+        scope +
+        ". Fix them, or if pre-existing/intentional, run `bun run script:update-style-baseline`.",
     );
   }
 }

@@ -98,6 +98,14 @@ bun run script:check-notes-style
 
 Same 7 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any new violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
 
+Scope the report with `--filter` when you're only working in one area — a semester (`s1`), a module (`s1/mathematics`), a submodule (`s1/mathematics/matrices`), or a single note by name (`diagonalization`). Numeric prefixes are optional either way; matching is case-insensitive and looks for the filter's segments anywhere in the path, not just as a root prefix:
+
+```bash
+bun run script:check-notes-style -- --filter s1/mathematics
+```
+
+`--filter` only narrows what gets _printed and decided on_ — every file is still scanned underneath, since `broken-link` needs the whole corpus to know which slugs are valid; a link into an out-of-scope file is still resolved correctly, just not reported unless it's itself in scope. The same `filter` option (or a `NOTES_STYLE_FILTER` env var, e.g. `NOTES_STYLE_FILTER=s1/mathematics bun dev`) works on the Astro integration too, but only for `bun dev` — `bun build` always ignores it, so a filter left set in your shell can never silently weaken the real build check.
+
 ### notes-style-validator baseline
 
 `~1000` pre-existing style violations were grandfathered into a committed baseline (`src/integrations/notes-style-validator/style-baseline.json`) when the validator was introduced, so the build only fails on _new_ violations, not the existing backlog. When you fix one of the backlog violations, regenerate the baseline so it doesn't rot:

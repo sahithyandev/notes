@@ -29,10 +29,6 @@ export interface FileReport {
 const MAX_FILES = 15;
 const MAX_PER_FILE = 10;
 
-function pad(n: number): string {
-  return `L${n}`.padEnd(6);
-}
-
 export function groupByFile(
   items: Array<{ file: string; violation: Violation }>,
 ): FileReport[] {
@@ -58,19 +54,22 @@ export function printViolationGroup(
 
   logger.warn(`\nnotes-style-validator: ${title} (${total}):\n`);
 
+  // cargo/rustc-style: the message reads naturally on its own line, and the
+  // "--> path:line" reference sits alone right below it. Terminals and
+  // editors (VS Code, iTerm2, etc.) linkify "path:line" wherever it appears
+  // on a line, so this stays just as jumpable as inlining it into the
+  // message — without a long path competing with the message for space.
   const shown = reports.slice(0, MAX_FILES);
   for (const { file, violations } of shown) {
     const rel = file.replace(docsRoot + "/", "docs/");
-    logger.warn(rel);
     for (const v of violations.slice(0, MAX_PER_FILE)) {
-      logger.warn(`  ${pad(v.line)}  ${v.rule.padEnd(18)}  ${v.text}`);
+      logger.warn(`${v.rule.padEnd(18)} ${v.text}`);
+      logger.warn(`  --> ${rel}:${v.line}`);
+      logger.warn("");
     }
     if (violations.length > MAX_PER_FILE) {
-      logger.warn(
-        `  … and ${violations.length - MAX_PER_FILE} more in this file`,
-      );
+      logger.warn(`… and ${violations.length - MAX_PER_FILE} more in ${rel}\n`);
     }
-    logger.warn("");
   }
 
   if (reports.length > MAX_FILES) {

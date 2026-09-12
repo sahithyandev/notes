@@ -47,3 +47,5 @@ To check note content for style/link issues without a full build:
 ```sh
 bun run script:check-notes-style
 ```
+
+Add `-- --filter <name>` to scope it to a semester, module, submodule, or note (e.g. `--filter s1/mathematics`).
