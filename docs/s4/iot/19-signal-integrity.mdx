@@ -3,7 +3,7 @@ title: Signal Integrity
 sidebar:
   order: 19
 dateCreated: 2026-06-12T00:00:00.000Z
-lastUpdatedOn: 2026-09-08T19:46:17.710Z
+lastUpdatedOn: 2026-09-12T09:34:05.047Z
 slug: s4/iot/signal-integrity
 prev: true
 next: true
@@ -90,8 +90,10 @@ The threshold voltage $V_{th}$ is the nominal switching point of a gate. It lies
 
 $V_{th}$ depends on the logic family:
 
-- CMOS: $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
-- TTL: $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
+- CMOS  
+  $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
+- TTL  
+  $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
 
 $V_{th}$ is not a safe operating point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread. No 2 gates switch at exactly the same voltage, and temperature shifts it further.
 
@@ -134,8 +136,10 @@ Many MCU GPIO pins have a Schmitt trigger option that can be enabled per pin. UA
 
 A push-pull output has 2 transistors: a HIGH-side transistor connecting the pin to $V_{CC}$, and a LOW-side transistor connecting it to GND. Exactly 1 is active at a time.
 
-- Driving HIGH: HIGH-side transistor conducts, LOW-side is off. Pin is actively connected to $V_{CC}$.
-- Driving LOW: LOW-side transistor conducts, HIGH-side is off. Pin is actively connected to GND.
+- Driving HIGH  
+  HIGH-side transistor conducts, LOW-side is off. Pin is actively connected to $V_{CC}$.
+- Driving LOW  
+  LOW-side transistor conducts, HIGH-side is off. Pin is actively connected to GND.
 
 Output impedance is low in both states. Transitions are fast: the active transistor charges or discharges the line directly rather than through a resistor. No external pull resistor is required.
 

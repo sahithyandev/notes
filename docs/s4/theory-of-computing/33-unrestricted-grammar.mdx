@@ -6,16 +6,16 @@ slug: s4/theory-of-computing/unrestricted-grammar
 prev: true
 next: true
 dateCreated: 2026-04-30T05:32:24.846Z
-lastUpdatedOn: 2026-06-27T08:46:52.691Z
+lastUpdatedOn: 2026-09-12T09:34:05.335Z
 ---
 
 Aka. phrase-structure grammar. A 4-tuple $G = (V, \Sigma, S, P)$ where:
 
-- $V$ — non-terminals
-- $\Sigma$ — terminals  
+- $V$ are non-terminals
+- $\Sigma$ are terminals  
   $V$ and $\Sigma$ are disjoint.
-- $S$ — start symbol
-- $P$ — productions  
+- $S$ is the start symbol
+- $P$ are productions  
   $\alpha \to \beta$ where $\alpha, \beta \in (V \cup \Sigma)^*$ and $\alpha$ contains $\geq 1$ non-terminal
 
 Productions $\alpha \to \beta$ impose no length constraint. Both the LHS and RHS can contain any mix of terminals and non-terminals.
@@ -37,9 +37,9 @@ A simpler example: $L = \{ww \mid w \in \{a,b\}^+\}$ (strings that are the conca
 
 Productions (sketch):
 
-- $S \to AB$ — separate the 2 halves
-- $A \to aA \mid bA \mid \lambda$ — generate first half
-- $B \to aB \mid bB \mid \lambda$ — generate second half
+- $S \to AB$: separate the 2 halves
+- $A \to aA \mid bA \mid \lambda$: generate first half
+- $B \to aB \mid bB \mid \lambda$: generate second half
 - Synchronization rules force $A$ and $B$ to produce the same string
 
 Full grammars for such languages use auxiliary non-terminals and cross-symbol rewriting that no CFG production $A \to \alpha$ can simulate.

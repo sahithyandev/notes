@@ -161,7 +161,7 @@ Minimum header size: 20 bytes (no options). **Data Offset** field encodes actual
 | SYN  | Synchronize | Both   | Initiates a connection and shares the sender's ISN. Only set in connection establishment.                                                                                        |
 | ACK  | Acknowledge | Both   | Confirms receipt of data. Once the connection is established, nearly every segment has this set. The acknowledgment number field is only valid when ACK=1.                       |
 | FIN  | Finish      | Both   | Signals the sender has no more data to send. Each side must send its own FIN to fully close the connection (four-way teardown).                                                  |
-| RST  | Reset       | Both   | Abruptly kills the connection with no teardown. Used when something is wrong — e.g. a segment arrives for a non-existent connection, or an application crashes.                  |
+| RST  | Reset       | Both   | Abruptly kills the connection with no teardown. Used when something is wrong, e.g. a segment arrives for a non-existent connection, or an application crashes.                   |
 | PSH  | Push        | Sender | Tells the receiver to deliver buffered data to the application immediately, rather than waiting to accumulate more. Common in interactive protocols like SSH or Telnet.          |
 | URG  | Urgent      | Sender | Marks that some data in the segment is urgent and should be prioritized. The Urgent Pointer field then indicates where the urgent data ends. Rarely used in modern applications. |
 

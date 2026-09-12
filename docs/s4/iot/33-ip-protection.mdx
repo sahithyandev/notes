@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: false
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-09-08T19:46:17.710Z
+lastUpdatedOn: 2026-09-12T09:34:05.130Z
 ---
 
 Firmware and hardware designs in IoT devices represent significant investment. Several mechanisms protect them from extraction, cloning, and tampering.
@@ -30,9 +30,12 @@ Once a device moves to production and is deployed in the field, the same open de
 Most MCUs offer graduated levels rather than a binary on/off:
 
 - STM32 RDP
-  - Level 0: default. flash fully readable via debug.
-  - Level 1: debug read disabled. transitioning back to Level 0 triggers a mass erase, destroying the firmware.
-  - Level 2: permanent. debug interface fully and irreversibly disabled.
+  - Level 0  
+    Default. Flash fully readable via debug.
+  - Level 1  
+    Debug read disabled. Transitioning back to Level 0 triggers a mass erase, destroying the firmware.
+  - Level 2  
+    Permanent. Debug interface fully and irreversibly disabled.
 - AVR lock bits  
   BLB and LB fuse bits independently restrict reading of the application section, boot section, and EEPROM via ISP or JTAG. Clearing lock bits requires a chip erase.
 

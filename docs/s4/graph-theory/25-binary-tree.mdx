@@ -6,7 +6,7 @@ slug: s4/graph-theory/binary-tree
 prev: true
 next: true
 dateCreated: 2026-04-27T04:57:01.896Z
-lastUpdatedOn: 2026-05-31T19:40:41.097Z
+lastUpdatedOn: 2026-09-12T09:34:04.965Z
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/tree
 ---
@@ -85,12 +85,12 @@ search(root, key):
 
 BST ordering must be preserved when removing a key. Three cases based on the target node's child count.
 
-- Case 1: leaf node  
-  Can remove directly. And return null to parent.
-- Case 2: one child  
-  Bypass the node. Return the single child to parent.
-- Case 3: 2 children  
-  Find the in-order successor (leftmost node of right subtree or rightmost node of left subtree). Copy its key and value into the current node. Delete the successor from the right subtree (always Case 1 or 2).
+- Case 1  
+  Leaf node. Can remove directly. And return null to parent.
+- Case 2  
+  One child. Bypass the node. Return the single child to parent.
+- Case 3  
+  2 children. Find the in-order successor (leftmost node of right subtree or rightmost node of left subtree). Copy its key and value into the current node. Delete the successor from the right subtree (always Case 1 or 2).
 
 ```py
 delete(root, key):

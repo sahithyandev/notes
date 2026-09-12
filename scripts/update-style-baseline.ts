@@ -19,5 +19,5 @@ console.log(
 console.log(
   "notes-style-validator: " +
     excludedViolations +
-    " s5 violation(s) skipped - s5 note issues are never grandfathered.",
+    " violation(s) as ignored from being grandfathered.",
 );

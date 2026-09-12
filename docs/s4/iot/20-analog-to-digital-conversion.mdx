@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-06-12T02:12:51.444Z
+lastUpdatedOn: 2026-09-12T09:34:05.059Z
 prereqs:
   - s3/data-communication-and-networking/signals
 ---
@@ -44,7 +44,7 @@ Parameters:
 
 $2^n - 1$ comparators in parallel, each with a distinct reference from a resistor ladder. All fire simultaneously. A priority encoder converts the thermometer code to binary.
 
-- Fastest: 1 clock cycle per conversion
+- Fastest of all ADC types, at 1 clock cycle per conversion
 - Hardware cost grows exponentially with bit depth
 - Used in oscilloscopes and high-speed RF sampling
 
@@ -63,7 +63,7 @@ Here:
 
 Conversion time varies with $V_{in}$. Full-scale requires up to $2^n - 1$ cycles.
 
-- Simplest serial design: 1 comparator, 1 counter, 1 DAC
+- The simplest serial design, needing just 1 comparator, 1 counter, and 1 DAC
 - Slower than SAR for most inputs
 - Used in low-cost, low-speed applications
 
@@ -117,7 +117,7 @@ $$
 Result depends only on the ratio of times, not component tolerances. Noise averages out over $T_1$.
 
 - Very high accuracy and noise rejection
-- Slow: conversion takes milliseconds
+- Slow, as conversion takes milliseconds
 - Used in digital multimeters and precision instrumentation
 
 ### Sigma-Delta ADC
@@ -125,7 +125,7 @@ Result depends only on the ratio of times, not component tolerances. Noise avera
 Oversamples far above the [Nyquist rate](/s3/data-communication-and-networking/signals#nyquist-theorem), applies noise shaping, then decimation-filters to a high-resolution output.
 
 - Resolution up to 24 bits
-- Slow: latency proportional to oversampling ratio
+- Slow, with latency proportional to the oversampling ratio
 - Used in audio codecs and precision sensors
 
 ### Comparison

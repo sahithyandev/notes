@@ -6,7 +6,7 @@ slug: s4/computer-networks/data-link-layer
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-09-08T19:46:17.706Z
+lastUpdatedOn: 2026-09-12T09:34:04.719Z
 prereqs:
   - s3/data-communication-and-networking/information-redundancy
   - s3/data-communication-and-networking/mac-protocols
@@ -122,8 +122,10 @@ Sender and receiver maintain send and receive windows. Window state is tracked w
 
 Aka. idle ARQ. Window size 1 in both directions. Sender transmits one frame then waits for ACK (Acknowledgement) or NAK (Negative Acknowledgement) before sending the next.
 
-- ACK received: advance $V(S)$, send next frame.
-- NAK or timeout: retransmit current frame.
+- ACK received  
+  Advance $V(S)$, send next frame.
+- NAK or timeout  
+  Retransmit current frame.
 
 Link is idle for the full propagation round-trip per frame.
 

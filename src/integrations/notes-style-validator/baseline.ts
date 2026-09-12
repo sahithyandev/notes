@@ -23,7 +23,7 @@ export interface Baseline {
 // stay out of the baseline entirely: a new violation there fails the build
 // (or the check script) instead of silently landing in style-baseline.json on
 // the next `bun run script:update-style-baseline`.
-const EXCLUDED_FROM_BASELINE = new Set(["s5"]);
+const EXCLUDED_FROM_BASELINE = new Set(["s4", "s5"]);
 
 /** True for docs-relative paths like "docs/s5/..." that are never grandfathered. */
 export function isExcludedFromBaseline(file: string): boolean {

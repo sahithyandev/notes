@@ -6,7 +6,7 @@ slug: s4/computer-networks/ipv6
 prev: true
 next: true
 dateCreated: 2026-05-03T07:56:35.319Z
-lastUpdatedOn: 2026-09-08T19:46:17.706Z
+lastUpdatedOn: 2026-09-12T09:34:04.809Z
 ---
 
 Uses 128-bit addresses. Consists of 8 groups of 4 hexadecimal digits separated by colons.
@@ -38,11 +38,11 @@ Identifies a single interface.
 
 #### Unspecified
 
-`::` — used when the address is not yet known.
+Denoted by `::`. Used when the address is not yet known.
 
 #### Loopback
 
-`::1` — equivalent to `127.0.0.1` in IPv4. Sends packets to the same host.
+Denoted by `::1`. Equivalent to `127.0.0.1` in IPv4. Sends packets to the same host.
 
 #### Link-Local
 
@@ -154,9 +154,12 @@ SLAAC and EUI-64 are not required. Addresses are typically configured manually.
 
 Structured hierarchy enables route aggregation and reduces routing table size.
 
-- Global Prefix: first 48 bits
-- Subnet ID: 16 bits
-- Interface ID: last 64 bits
+- Global Prefix  
+  First 48 bits.
+- Subnet ID  
+  16 bits.
+- Interface ID  
+  Last 64 bits.
 
 IANA controls the full address space. Blocks of `/12` to `/23` are assigned to the 5 RIRs.
 

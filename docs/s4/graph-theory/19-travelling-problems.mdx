@@ -6,16 +6,19 @@ slug: s4/graph-theory/travelling-problems
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-09-08T19:46:17.708Z
+lastUpdatedOn: 2026-09-12T09:34:04.947Z
 prereqs:
   - s2/data-structures-and-algorithms/algorithms/complexity-analysis
 ---
 
 Modeled using graphs to formalize routes and distances.
 
-- Vertices: locations or cities
-- Edges: paths between locations. may be directed.
-- Weights: cost, distance, or time
+- Vertices  
+  Locations or cities.
+- Edges  
+  Paths between locations. May be directed.
+- Weights  
+  Cost, distance, or time.
 
 ## Travelling Salesman Problem
 
@@ -25,10 +28,10 @@ Defined on a weighted graph. The graph is typically assumed connected and undire
 
 Widely used in:
 
-- route planning (logistics, delivery systems)
-- circuit design (minimizing wiring length)
-- scheduling problems
-- network optimization
+- Route planning (logistics, delivery systems)
+- Circuit design (minimizing wiring length)
+- Scheduling problems
+- Network optimization
 
 ### Brute Force Algorithm
 
@@ -38,13 +41,13 @@ The algorithm systematically generates all possible closed walks and computes th
 
 Steps:
 
-- choose a starting city (e.g., A)
-- list all permutations of other cities
-- for each permutation:
-  - construct route: A → permutation → A
-  - calculate total cost
-- compare all route costs
-- return the minimum cost route
+- Choose a starting city (e.g., A)
+- List all permutations of other cities
+- For each permutation:
+  - Construct the route as A → permutation → A
+  - Calculate total cost
+- Compare all route costs
+- Return the minimum cost route
 
 Time complexity is $O(n!)$. Space complexity is $O(n)$.
 
@@ -54,13 +57,13 @@ A greedy method. Builds a route by repeatedly visiting the closest unvisited ver
 
 Steps:
 
-- select a starting vertex
-- mark it as visited
-- repeat:
-  - find the nearest unvisited vertex
-  - move to that vertex
-  - mark it as visited
-- after visiting all vertices, return to the start
+- Select a starting vertex
+- Mark it as visited
+- Repeat:
+  - Find the nearest unvisited vertex
+  - Move to that vertex
+  - Mark it as visited
+- After visiting all vertices, return to the start
 
 Time complexity is $O(n^2)$. Space complexity is $O(n)$.
 
@@ -106,12 +109,12 @@ The goal is to find/produce a minimal Eulerian circuit. Duplicate edges are adde
 Steps:
 
 - Check if graph is connected
-- find all vertices with odd degree (must be even numbered by [the handshaking lemma](/s4/graph-theory/handshaking-lemma#corollary))
-- if none: Eulerian circuit exists and find it.
-- else:
-  - compute shortest paths between them
-  - find minimum pairing
-  - duplicate corresponding edges to construct Eulerian graph
+- Find all vertices with odd degree (must be even numbered by [the handshaking lemma](/s4/graph-theory/handshaking-lemma#corollary))
+- If none, the Eulerian circuit already exists, so find it
+- Else:
+  - Compute shortest paths between them
+  - Find minimum pairing
+  - Duplicate corresponding edges to construct Eulerian graph
 
 Time complexity is $O(n^k)$ (efficient compared to TSP). Space complexity is.
 

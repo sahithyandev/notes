@@ -3,7 +3,7 @@ title: Non TCP/IP Wireless Protocols
 sidebar:
   order: 28
 dateCreated: 2026-05-31T14:51:47.466Z
-lastUpdatedOn: 2026-06-06T07:03:21.630Z
+lastUpdatedOn: 2026-09-12T09:34:04.884Z
 slug: s4/computer-networks/non-tcp-ip-wireless-protocols
 prev: true
 next: true
@@ -18,10 +18,14 @@ Current relevant protocols: Bluetooth, ZigBee, NFC, Fiber Channel.
 
 Short-range wireless protocol for cable replacement, multiparty data exchange, and personal trusted device connectivity. Developed by Ericsson; managed by the Bluetooth Special Interest Group. Standardized as IEEE 802.15.1. Originally a wireless alternative to RS-232 data cables.
 
-- Band: 2.4–2.48 GHz (ISM).
-- Range: ~10 m.
-- Bandwidth: 2.1 Mbps shared (v2.0).
-- Version 4.0 variants: Classic Bluetooth, Bluetooth High Speed (Wi-Fi-based), Bluetooth Low Energy (BLE).
+- Band  
+  2.4–2.48 GHz (ISM).
+- Range  
+  ~10 m.
+- Bandwidth  
+  2.1 Mbps shared (v2.0).
+- Version 4.0 variants  
+  Classic Bluetooth, Bluetooth High Speed (Wi-Fi-based), Bluetooth Low Energy (BLE).
 
 ### Protocol Stack
 
@@ -29,19 +33,29 @@ Divided into a Transport Protocol group and a Middleware Protocol group.
 
 Transport layers, bottom to top:
 
-- Bluetooth Radio: radio signal modulation and transmission.
-- Baseband: frequency-hopping and time-division multiplexing between master and slaves.
-- Link Manager Protocol (LMP): logical channel establishment, authentication, power management.
-- Host Controller Interface (HCI): software interface to baseband and link manager; exposes hardware status and registers.
-- L2CAP (Logical Link Control and Adaptation Protocol): multiplexes multiple logical connections; provides segmentation and reassembly of on-air packets. Primary layer from the application developer's perspective.
+- Bluetooth Radio  
+  Radio signal modulation and transmission.
+- Baseband  
+  Frequency-hopping and time-division multiplexing between master and slaves.
+- Link Manager Protocol (LMP)  
+  Logical channel establishment, authentication, power management.
+- Host Controller Interface (HCI)  
+  Software interface to baseband and link manager. Exposes hardware status and registers.
+- L2CAP (Logical Link Control and Adaptation Protocol)  
+  Multiplexes multiple logical connections. Provides segmentation and reassembly of on-air packets. Primary layer from the application developer's perspective.
 
 Middleware layers:
 
-- RFCOMM: cable replacement protocol; emulates EIA-232 (RS-232) serial interface.
-- SDP (Service Discovery Protocol): discovers services offered by other Bluetooth devices.
-- TCS-BIN (Telephony Control Specification, Binary): establishes speech and data calls between master and slave.
-- OBEX (Object Exchange Protocol): exchanges structured data objects such as calendars and vCards.
-- Audio: supports audio communication directly on top of Baseband.
+- RFCOMM  
+  Cable replacement protocol. Emulates EIA-232 (RS-232) serial interface.
+- SDP (Service Discovery Protocol)  
+  Discovers services offered by other Bluetooth devices.
+- TCS-BIN (Telephony Control Specification, Binary)  
+  Establishes speech and data calls between master and slave.
+- OBEX (Object Exchange Protocol)  
+  Exchanges structured data objects such as calendars and vCards.
+- Audio  
+  Supports audio communication directly on top of Baseband.
 
 ### Network Topology
 
@@ -62,21 +76,31 @@ A profile is a set of application-layer protocols defining behaviors for a speci
 
 Examples:
 
-- HFP: Hands-Free Profile.
-- BPP: Basic Printing Profile.
-- AVRCP: Audio/Video Remote Control Profile.
-- FTP: File Transfer Profile.
-- HID: Human Interface Device Profile.
-- PAN: Personal Area Networking Profile.
-- GOEP: Generic Object Exchange Profile (uses OBEX).
+- HFP  
+  Hands-Free Profile.
+- BPP  
+  Basic Printing Profile.
+- AVRCP  
+  Audio/Video Remote Control Profile.
+- FTP  
+  File Transfer Profile.
+- HID  
+  Human Interface Device Profile.
+- PAN  
+  Personal Area Networking Profile.
+- GOEP  
+  Generic Object Exchange Profile (uses OBEX).
 
 ## Near Field Communication
 
 Also known as NFC. Short-range wireless communication based on magnetic field induction between readers and tags in RFID systems. Initiated in 2004 by Nokia, Philips, and Sony.
 
-- Frequency: 13.56 MHz.
-- Range: 10 cm or less.
-- Data rate: 106–424 Kbps.
+- Frequency  
+  13.56 MHz.
+- Range  
+  10 cm or less.
+- Data rate  
+  106–424 Kbps.
 
 Advantages: low cost, low energy, no search/pair procedure, minimal configuration, better security.  
 Limitations: low range, low data rate.
@@ -85,8 +109,10 @@ Used in: mobile payments, public transportation, mobile identification, mobile m
 
 ### Modes of Operation
 
-- Active Mode: both devices generate electromagnetic fields and exchange data.
-- Passive Mode: one active device generates the field; the passive device uses that field to exchange data.
+- Active Mode  
+  Both devices generate electromagnetic fields and exchange data.
+- Passive Mode  
+  One active device generates the field. The passive device uses that field to exchange data.
 
 Application interaction patterns: Touch & Go, Touch & Confirm, Touch & Connect.
 
@@ -94,9 +120,12 @@ Application interaction patterns: Touch & Go, Touch & Confirm, Touch & Connect.
 
 Three operational modes, each with distinct stack components:
 
-- Card Emulation Mode: smart card capability for mobile devices.
-- Peer-to-Peer Mode: LLCP (Logical Link Control Protocol) with NFC Forum Protocol Bindings (IP, OBEX).
-- Reader/Writer Mode: RTD (Record Type Definition) with NDEF (NFC Data Exchange Format) and Tag Types 1–4.
+- Card Emulation Mode  
+  Smart card capability for mobile devices.
+- Peer-to-Peer Mode  
+  LLCP (Logical Link Control Protocol) with NFC Forum Protocol Bindings (IP, OBEX).
+- Reader/Writer Mode  
+  RTD (Record Type Definition) with NDEF (NFC Data Exchange Format) and Tag Types 1–4.
 
 Underlying RF layer: ISO 18092 with ISO 14443 Type A/B and FeliCa.
 
@@ -104,8 +133,10 @@ Underlying RF layer: ISO 18092 with ISO 14443 Type A/B and FeliCa.
 
 Low-power, low-data-rate wireless protocol by the ZigBee Alliance. Targets sensor networks and IoT applications.
 
-- Power consumption: months to years of battery life.
-- Max data rate: 250 Kbps.
+- Power consumption  
+  Months to years of battery life.
+- Max data rate  
+  250 Kbps.
 - Low circuit complexity, low cost.
 
 ### Protocol Stack
@@ -114,36 +145,29 @@ Built on IEEE 802.15.4 (physical and MAC layers for low-rate WPAN).
 
 ZigBee adds three layers above 802.15.4:
 
-- NWK (Network Layer): routing, route discovery, route maintenance.
-- APS (Application Support Sub-Layer): service binding and message routing between application objects.
-- APL (Application Layer): Application Objects and ZigBee Device Objects.
+- NWK (Network Layer)  
+  Routing, route discovery, route maintenance.
+- APS (Application Support Sub-Layer)  
+  Service binding and message routing between application objects.
+- APL (Application Layer)  
+  Application Objects and ZigBee Device Objects.
 
 ### Device Types
 
 Defined by IEEE 802.15.4:
 
-- FFD (Full Functional Device): operates as PAN coordinator, coordinator, or simple device; communicates with FFD or RFD.
-- RFD (Reduced Functional Device): communicates only with a specific FFD; suited for low-volume, simple applications.
+- FFD (Full Functional Device)  
+  Operates as PAN coordinator, coordinator, or simple device. Communicates with FFD or RFD.
+- RFD (Reduced Functional Device)  
+  Communicates only with a specific FFD. Suited for low-volume, simple applications.
 
 ### Topologies
 
-Star:
+Star: a central PAN coordinator, with all devices connecting directly to it. Gives easy synchronization and low latency, but scales poorly.
 
-- Central PAN coordinator; all devices connect directly to it.
-- Pros: easy synchronization, low latency.
-- Cons: small scale only.
+Mesh / Peer-to-Peer: devices communicate directly with any in-range device. Gives robust multi-hop communication, multi-path routing, flexibility, and lower latency, at the cost of expensive route discovery and the need to store routing tables.
 
-Mesh / Peer-to-Peer:
-
-- Devices communicate directly with any in-range device.
-- Pros: robust multi-hop communication, multi-path routing, flexible, lower latency.
-- Cons: costly route discovery, requires routing table storage.
-
-Cluster Tree:
-
-- Hierarchical arrangement of coordinators and devices.
-- Pros: low routing cost, multi-hop, scalable.
-- Cons: costly route reconstruction, potentially high latency, root node is a single point of failure.
+Cluster Tree: a hierarchical arrangement of coordinators and devices. Gives low routing cost, multi-hop reach, and scalability, but route reconstruction is costly, latency can be high, and the root node is a single point of failure.
 
 ### Traffic Modes
 
@@ -152,7 +176,7 @@ Beacon Mode:
 - Coordinator periodically broadcasts a beacon.
 - Both coordinator and end device can sleep between beacons.
 - Lowest energy consumption; requires precise timing.
-- Beacon period: milliseconds to minutes.
+- Beacon period ranges from milliseconds to minutes.
 
 Non-Beacon Mode:
 
