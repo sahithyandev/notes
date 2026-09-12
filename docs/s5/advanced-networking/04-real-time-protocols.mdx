@@ -1,10 +1,10 @@
 ---
 title: Real-Time Protocols
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-05T22:02:39.580Z
+lastUpdatedOn: 2026-09-12T20:33:29.808Z
 slug: s5/advanced-networking/real-time-protocols
 sidebar:
-  order: 3
+  order: 4
 prev: true
 next: true
 ---
@@ -50,9 +50,10 @@ RTP ([RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)) standardizes the
   - For $8\text{ kHz}$ audio, the timestamp clock increments by $1$ every $125\text{ }\mu\text{s}$. A $20\text{ ms}$ chunk increases the timestamp by $160$.
 - Synchronization Source Identifier (SSRC — 32 bits): Identifies the RTP source within a session.
 
-> RTP and QoS: RTP is an end-system protocol. Routers treat it as best-effort UDP traffic.
-
----
+<Note>
+  RTP and QoS: RTP is an end-system protocol. Routers treat it as best-effort
+  UDP traffic.
+</Note>
 
 ## Real-Time Control Protocol (RTCP)
 
@@ -80,8 +81,6 @@ RTCP limits control traffic to 5% of session bandwidth.
 - 25% of RTCP bandwidth: reserved for active senders.
 
 Each participant dynamically computes its RTCP transmission interval by dividing the average RTCP packet size by its allocated control bandwidth rate.
-
----
 
 ## Session Initiation Protocol (SIP)
 

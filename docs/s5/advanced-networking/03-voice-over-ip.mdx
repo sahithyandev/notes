@@ -1,10 +1,10 @@
 ---
 title: Voice over IP (VoIP)
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-05T22:02:39.577Z
+lastUpdatedOn: 2026-09-12T20:33:29.808Z
 slug: s5/advanced-networking/voice-over-ip
 sidebar:
-  order: 2
+  order: 3
 prev: true
 next: true
 ---
@@ -74,7 +74,11 @@ To optimize latency, adaptive playout algorithms dynamically adjust the playout 
 4. Talk Spurt Adjustment:  
    Subsequent packets in the same talk spurt are played out at intervals of $20\text{ms}$ relative to $p_i$. Playout delay changes only during silent periods, which are slightly compressed or elongated imperceptibly.
 
-> Talk Spurt Detection: The receiver detects the start of a new talk spurt when the timestamp difference between consecutive packets exceeds $20\text{ms}$ with no gaps in sequence numbers.
+<Note>
+  Talk Spurt Detection: The receiver detects the start of a new talk spurt when
+  the timestamp difference between consecutive packets exceeds $20\text{ms}$
+  with no gaps in sequence numbers.{" "}
+</Note>
 
 ## Loss Recovery Mechanisms
 
@@ -137,5 +141,9 @@ Skype relies on a proprietary peer-to-peer (P2P) network architecture to scale g
 
 When both caller and callee are behind Network Address Translation (NAT) devices or firewalls that reject incoming unsolicited UDP/TCP connections, direct P2P connection fails.
 
-- **Relay Solution**: Both clients establish outbound TCP/UDP connections to a mutually accessible Supernode acting as a **relay**.
+NAT prevents outside peer from initiating connection directly to insider peer who's behind the NAT.
+
+Relay Solution:
+
+- Both clients establish outbound TCP/UDP connections to a mutually accessible Supernode acting as a relay.
 - Audio and video traffic is routed through the relay Supernode, enabling seamless calls across restrictive NAT boundaries.
