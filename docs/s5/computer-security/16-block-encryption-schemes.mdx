@@ -1,0 +1,122 @@
+---
+title: Block Encryption Schemes
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.385Z
+slug: s5/computer-security/block-encryption-schemes
+sidebar:
+  order: 16
+prev: true
+next: true
+---
+
+A scheme that encrypts messages of arbitrary length, built from a [block cipher](/s5/computer-security/block-ciphers) through a mode of operation. Messages $m$ and ciphertexts $c$ are bit strings of any length, under a key $k$.
+
+On top of a block cipher, the below operations are added to make it a scheme:
+
+- Randomisation  
+  An [initialization vector](/s5/computer-security/ciphers) or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts.
+- Padding  
+  Extra bytes appended to the last block so the message length is a multiple of $n$.
+- Chaining  
+  Each block's encryption depends on previous blocks, so a repeated plaintext block does not produce a repeated ciphertext block.
+
+## Attack Models
+
+An attack model fixes what the attacker is allowed to do. The attacker never sees the key $k$ and instead interacts through an oracle.
+
+An oracle is a black box that applies $e_k$ or $d_k$ to inputs the attacker chooses and returns the output, without revealing $k$. Real systems act as oracles. There are 2 types of oracles.
+
+- Encryption oracle  
+  A server that encrypts given messages.
+- Decryption oracle  
+  A server that decrypts incoming messages except the challenged ciphertext.
+
+Listed from the weakest attacker capability to the strongest. A scheme secure against a stronger model is also secure against the weaker ones.
+
+### Ciphertext Only
+
+Attacker has only $c$ and searches the key space exhaustively for a $k$ giving a meaningful $d_k(c)$. Requires $|k| > 2^{64}$ to make this infeasible.
+
+Examples:
+
+- Secure  
+  One-time pad. AES under a random 128-bit key.
+- Not secure  
+  Shift, substitution, and Vigenère ciphers, all broken by frequency analysis.
+
+### Known Plaintext
+
+Attacker holds ciphertexts together with their exact plaintexts from past traffic, but cannot choose which messages are encrypted. Using the pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+Examples:
+
+- Secure  
+  One-time pad. AES under a random 128-bit key.
+- Not secure  
+  Shift, substitution, and Vigenère ciphers. ECB mode, where known pairs build a partial codebook.
+
+### Chosen Plaintext
+
+Attacker queries an encryption oracle on arbitrary plaintext repeatedly (with or without a bound). By using the plaintext-ciphertext pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+If the attacker cannot learn about $k$, then the scheme is said to be _indistinguishable under chosen plaintext attack (IND-CPA)_.
+
+For a public-key scheme the encryption oracle adds nothing, since the attacker knows the public key and can encrypt any plaintext themselves.
+
+Security is then tested with a game:
+
+1. The attacker picks two equal-length messages $m_0, m_1$ and sends both to the challenger.
+2. The challenger picks a random bit $b \in \{0,1\}$, keeps it secret, and returns the challenge ciphertext $c^* = e_k(m_b)$.
+3. The attacker keeps querying the encryption oracle on any plaintext, then outputs a guess $b'$ for $b$.
+
+The attacker wins if $b' = b$ with probability noticeably above $\tfrac{1}{2}$.
+
+Examples:
+
+- Secure  
+  AES in CBC or CTR mode with a random IV or nonce. El Gamal. RSA-OAEP.
+- Not secure  
+  Any deterministic scheme, since equal plaintexts give equal ciphertexts. Caesar cipher, one-time pad under a fixed key, ECB mode, textbook RSA.
+
+### Chosen Ciphertext
+
+Attacker queries an encryption oracle and decryption oracle on arbitrary plaintext and ciphertext repeatedly (with or without a bound). By using the plaintext-ciphertext pairs $(m_i, c_i)$, the attacker tries to learn about the key $k$.
+
+If the attacker cannot learn about $k$, then the scheme is said to be _indistinguishable under chosen ciphertext attack (IND-CCA)_.
+
+Same as IND-CPA, plus a decryption oracle that returns $d_k(c)$ for any ciphertext $c$ except $c^*$. Same winning condition on $b$.
+
+The two variants differ by when the decryption oracle is available.
+
+#### CCA1
+
+Non-adaptive chosen ciphertext attack. Also called a lunchtime attack.
+
+- The attacker queries the decryption oracle only before receiving the challenge ciphertext $c^*$.
+- After $c^*$ is issued, the decryption oracle is withdrawn.
+- Models brief unattended access to a decrypting device.
+
+Examples:
+
+- Secure  
+  El Gamal. Cramer-Shoup. AES-GCM and other authenticated encryption.
+- Not secure  
+  Textbook RSA and ECB mode, where early decryption queries build a codebook that the deterministic challenge then matches against.
+
+#### CCA2
+
+Adaptive chosen ciphertext attack.
+
+- The attacker queries the decryption oracle both before and after receiving $c^*$.
+- Queries after $c^*$ may be chosen adaptively, based on the answers to earlier decryption queries.
+- Every ciphertext except $c^*$ may be submitted, including ones derived from $c^*$.
+- A scheme that is IND-CCA2 secure is also IND-CCA1 secure.
+
+Examples:
+
+- Secure  
+  Cramer-Shoup. RSA-OAEP. Encrypt-then-MAC and AES-GCM.
+- Not secure  
+  El Gamal, unpadded CBC mode, RSA with PKCS#1 v1.5 padding, all malleable.
+
+El Gamal is a scheme that is IND-CCA1 secure but not IND-CCA2 secure. Given $c^* = (c_1, c_2)$, the attacker submits $(c_1, 2 c_2)$ to the decryption oracle and halves the result to recover $m_b$.

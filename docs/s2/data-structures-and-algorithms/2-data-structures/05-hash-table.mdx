@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/data-structures/hash-table
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.590Z
-lastUpdatedOn: 2026-06-01T03:58:53.174Z
+lastUpdatedOn: 2026-09-13T14:55:22.669Z
 ---
 
 A data structure that implements an associative array, a structure that can map
@@ -18,16 +18,19 @@ their efficiency in handling large datasets.
 
 ### Advantages
 
-- Fast Lookups: Average-case time complexity for lookups, insertions, and
-  deletions is $O(1)$.
-- Efficient: Can handle large amounts of data efficiently.
+- Fast Lookups  
+  Average-case time complexity for lookups, insertions, and deletions is $O(1)$.
+- Efficient  
+  Can handle large amounts of data efficiently.
 
 ### Disadvantages
 
-- Collisions: Can degrade performance if not handled properly.
-- Memory Usage: May require more memory compared to other data structures.
+- Collisions  
+  Can degrade performance if not handled properly.
+- Memory Usage  
+  May require more memory compared to other data structures.
 
-## Hash function
+## Hash Function
 
 A function that maps a given key into an index in the array. The efficiency
 of a hash table depends on the quality of the hash function and the method used
@@ -35,7 +38,7 @@ to handle collisions.
 
 It's best if the hash function outputs uniformly distributed values, which reduces the likelihood of collisions.
 
-## Designing hash functions
+## Designing Hash Functions
 
 A good hash function distributes keys uniformly across the array, minimizing collisions. And it should be one-to-one.
 
@@ -84,9 +87,12 @@ $$
 
 Must be kept reasonable for optimal performance. Probably between 0.5 and 0.75.
 
-- Low Load (α < 0.5): Excellent performance
-- Medium Load (0.5 \le α < 0.8): Good performance
-- High Load (α ≥ 0.8): Performance degrades significantly
+- Low load (α < 0.5)  
+  Excellent performance.
+- Medium load (0.5 \le α < 0.8)  
+  Good performance.
+- High load (α ≥ 0.8)  
+  Performance degrades significantly.
 
 ## Collisions
 

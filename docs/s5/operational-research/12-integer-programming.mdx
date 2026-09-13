@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:28.601Z
-lastUpdatedOn: 2026-08-28T11:38:57.353Z
+lastUpdatedOn: 2026-09-13T14:55:24.615Z
 ---
 
 An integer programming problem (IPP) is a linear program with the added restriction that some or all decision variables must be integers.
@@ -26,3 +26,90 @@ Rounding the LP relaxation's solution to the nearest integer doesn't reliably gi
 
 - Branch and bound
 - Gomory's cutting plane method
+
+## Branch and Bound
+
+Searches the IPP's feasible integer solutions by treating the LP relaxation as a search tree, splitting (branching) a fractional solution into 2 stricter subproblems and discarding (bounding) subproblems that can't beat the best integer solution found so far.
+
+A subproblem is the IPP's LP relaxation with extra $\le$ or $\ge$ bound constraints on individual variables, added by earlier branching steps. The search starts with 1 subproblem: the LP relaxation with no added bounds.
+
+### Steps
+
+- Solve the LP relaxation of the current subproblem.
+- If the solution is integral, it's a candidate solution. Update the best solution found so far if it's better.
+- If the subproblem's relaxed objective value is worse than the best solution found so far, discard it (bound). The relaxation's value is an upper bound (maximization) on any integer solution inside the subproblem, so none of them can beat the best solution either.
+- Otherwise, pick any variable $x_j$ whose value $k$ in the relaxed solution isn't an integer, e.g. $x_j = 2.7$. Branch on it: make 2 copies of the current subproblem, keep every constraint the same in both, then add $x_j \le \lfloor k \rfloor$ (here $x_j \le 2$) to 1 copy and $x_j \ge \lceil k \rceil$ (here $x_j \ge 3$) to the other. No integer lies strictly between $\lfloor k \rfloor$ and $\lceil k \rceil$, so every integer point feasible in the parent subproblem stays feasible in 1 of the 2 children, just not $x_j = k$ itself.
+- Repeat on each open subproblem until none remain.
+
+The best solution found when the search ends is the IPP's optimal solution. An infeasible subproblem (empty feasible region) is discarded without branching.
+
+## Gomory's Cutting Plane Method
+
+Solves a pure IPP by adding constraints (cuts) to the LP relaxation's optimal tableau that exclude the fractional solution without excluding any feasible integer solution.
+
+### Fractional Cut
+
+For a basic variable $x_i$ with a fractional value in the optimal tableau's row:
+
+$$
+x_i + \sum_j a_{ij} x_j = b_i
+$$
+
+Split each coefficient into integer and fractional parts, $a_{ij} = \lfloor a_{ij} \rfloor + f_{ij}$ and $b_i = \lfloor b_i \rfloor + f_i$ (with $0 \le f_{ij}, f_i < 1$). The Gomory constraint is:
+
+$$
+\sum_j f_{ij} x_j \ge f_i
+$$
+
+### Steps
+
+- Solve the LP relaxation with simplex.
+- If every basic variable is integral, stop. The solution is optimal for the IPP.
+- Otherwise, pick a row with a fractional basic variable and derive its Gomory constraint.
+- Add the constraint (as a new row with a surplus variable) to the tableau and resolve with the dual simplex method, since the new RHS is negative.
+- Repeat until every basic variable is integral.
+
+## Worked Example
+
+Maximize $Z = 2x_1 + 3x_2$ subject to $x_1 + x_2 \le 5$, $2x_2 \le 7$, $x_1, x_2 \ge 0$ and integer.
+
+LP relaxation optimum: $x_1 = 1.5$, $x_2 = 3.5$, $Z = 13.5$.
+
+### Via Branch and Bound
+
+- Branch on $x_1$ into $x_1 \le 1$ and $x_1 \ge 2$.
+- $x_1 \le 1$: LP optimum $(1, 3.5)$, $Z = 12.5$. Branch on $x_2$ into $x_2 \le 3$ and $x_2 \ge 4$.
+  - $x_2 \le 3$: LP optimum $(1, 3)$, integral, $Z = 11$. Best solution so far.
+  - $x_2 \ge 4$: infeasible, since $2x_2 \le 7$ forces $x_2 \le 3.5$. Discard.
+- $x_1 \ge 2$: LP optimum $(2, 3)$, integral, $Z = 13$. Better than the best solution so far. New best.
+- The $x_1 \le 1$ branch's bound (12.5) is below the best solution (13). No open subproblems remain.
+
+Optimal solution: $x_1 = 2$, $x_2 = 3$, $Z = 13$.
+
+<BranchAndBoundTree />
+
+### Via Gomory's Cutting Plane Method
+
+Standard form: $x_1 + x_2 + s_1 = 5$, $x_2 + 0.5s_2 = 3.5$.
+
+Optimal tableau rows, basis $x_1, x_2$:
+
+$$
+x_1 + s_1 - 0.5s_2 = 1.5
+$$
+
+$$
+x_2 + 0.5s_2 = 3.5
+$$
+
+The $x_1$ row has $b_1 = 1.5$, so $f_1 = 0.5$. Its coefficients split as $f_{1,s_1} = 0$ (since $1$ is already an integer) and $f_{1,s_2} = 0.5$ (since $-0.5 = \lfloor -0.5 \rfloor + 0.5$).
+
+Gomory constraint: $0.5s_2 \ge 0.5$, i.e. $s_2 \ge 1$.
+
+Add $-0.5s_2 + G = -0.5$ to the tableau and resolve with dual simplex:
+
+- $G$'s row leaves ($b = -0.5$).
+- $s_2$ enters, its only negative coefficient.
+- Pivoting on $s_2$ gives $x_1 = 2$, $x_2 = 3$, $s_2 = 1$, all integral.
+
+Optimal solution: $x_1 = 2$, $x_2 = 3$, $Z = 13$. Matches branch and bound.

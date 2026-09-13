@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image mode" viewBox="0 0 540 380" width="540" height="380" role="img" aria-label="ECB mode. Encryption: each plaintext block goes through the cipher independently to a ciphertext block. Decryption: each ciphertext block goes through the inverse cipher independently back to plaintext.">
+  <style>
+    .mode text { fill: currentColor; font: 500 17px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .mode .cap { fill: currentColor; opacity: 0.55; font: 600 13px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.09em; }
+    .mode .sub { opacity: 0.65; font-size: 15px; font-weight: 400; }
+    .mode .enc { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .mode .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .div { stroke: currentColor; stroke-opacity: 0.14; stroke-width: 1; }
+    .mode .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .mode .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .mode .t-ct { fill: var(--dia-ct, #b3541e); }
+    .mode .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .mode .t-key { fill: var(--dia-key, #6d4bb6); }
+    .mode .w-key { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-ecb" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <g>
+    <text x="0" y="12" class="cap">ENCRYPTION</text>
+    <text x="175" y="40" text-anchor="middle" class="t-pt">m₁</text>
+    <path class="w w-pt" d="M175 50 V74" marker-end="url(#ah-ecb)" />
+    <rect class="enc" x="130" y="74" width="90" height="40" rx="2" />
+    <text x="175" y="94" text-anchor="middle">Eₖ</text>
+    <path class="w w-ct" d="M175 114 V150" marker-end="url(#ah-ecb)" />
+    <text x="175" y="164" text-anchor="middle" class="t-ct">c₁</text>
+
+    <text x="375" y="40" text-anchor="middle" class="t-pt">m₂</text>
+    <path class="w w-pt" d="M375 50 V74" marker-end="url(#ah-ecb)" />
+    <rect class="enc" x="330" y="74" width="90" height="40" rx="2" />
+    <text x="375" y="94" text-anchor="middle">Eₖ</text>
+    <path class="w w-ct" d="M375 114 V150" marker-end="url(#ah-ecb)" />
+    <text x="375" y="164" text-anchor="middle" class="t-ct">c₂</text>
+  </g>
+
+  <line class="div" x1="0" y1="196" x2="540" y2="196" />
+
+  <g transform="translate(0,200)">
+    <text x="0" y="12" class="cap">DECRYPTION</text>
+    <text x="175" y="40" text-anchor="middle" class="t-ct">c₁</text>
+    <path class="w w-ct" d="M175 50 V74" marker-end="url(#ah-ecb)" />
+    <rect class="enc" x="130" y="74" width="90" height="40" rx="2" />
+    <text x="175" y="94" text-anchor="middle">Dₖ</text>
+    <path class="w w-pt" d="M175 114 V150" marker-end="url(#ah-ecb)" />
+    <text x="175" y="164" text-anchor="middle" class="t-pt">m₁</text>
+
+    <text x="375" y="40" text-anchor="middle" class="t-ct">c₂</text>
+    <path class="w w-ct" d="M375 50 V74" marker-end="url(#ah-ecb)" />
+    <rect class="enc" x="330" y="74" width="90" height="40" rx="2" />
+    <text x="375" y="94" text-anchor="middle">Dₖ</text>
+    <path class="w w-pt" d="M375 114 V150" marker-end="url(#ah-ecb)" />
+    <text x="375" y="164" text-anchor="middle" class="t-pt">m₂</text>
+  </g>
+</svg>

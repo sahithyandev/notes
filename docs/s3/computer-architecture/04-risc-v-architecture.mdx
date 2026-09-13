@@ -6,7 +6,7 @@ slug: s3/computer-architecture/risc-v-architecture
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.687Z
-lastUpdatedOn: 2026-05-10T07:10:02.681Z
+lastUpdatedOn: 2026-09-13T14:55:23.055Z
 ---
 
 An open-standard ISA based on established RISC principles. Open source. Modular by design. Denoted as <span class="font-mono">RV32I</span> or <span class="font-mono">RV64I</span>. The number represent the bit width of the registers and the address bus. Only 32-bit version is discussed in this module.
@@ -73,7 +73,7 @@ All instructions are 32 bits wide. All the instructions are encoded in different
 
 ![Instruction types](./images/risc-v-instruction-types.jpg)
 
-### R-type
+### R-Type
 
 Register-register operations. Input is 3 registers.
 
@@ -88,7 +88,7 @@ The instruction format:
 | `rd`     | <span class="font-mono">5 [11:7]</span>  | Destination register                     |
 | `opcode` | <span class="font-mono">7 [6:0]</span>   | Operation code                           |
 
-### I-type
+### I-Type
 
 Immediate operations. Input is 2 registers and an immediate value. Immediate value is 12 bits wide, sign-extended.
 
@@ -100,7 +100,7 @@ Immediate operations. Input is 2 registers and an immediate value. Immediate val
 | `rd`        | <span class="font-mono">5 [11:7] </span>  | Destination register     |
 | `opcode`    | <span class="font-mono">7 [6:0] </span>   | Operation code           |
 
-### S-type
+### S-Type
 
 Store operations, from register to memory.
 
@@ -119,7 +119,7 @@ Immediate value is sign-extended. Used as the offset to the target memory addres
 
 As both the instruction size and the address bus size are 32 bits wide, the target memory address cannot be included in 1 instruction. That is why this method is being used. This method also provides the local usage functionality.
 
-### B-type
+### B-Type
 
 Conditional branch operations. Similar to jumps, but for temporary and short-range jumps.
 
@@ -144,7 +144,7 @@ $$
 
 To improve the branch range, the LSB, which is always 0, is not stored in the instruction. When actually executing the instruction, the target address is left shifted by 1 bit.
 
-### U-type
+### U-Type
 
 Upper immediate operations.
 
@@ -158,7 +158,7 @@ The instruction format:
 
 Handle large immediate values (20 bits). Used for `LUI` (Load Upper Immediate) to set the upper 20 bits of a register and `AUIPC` (Add Upper Immediate to PC) for PC-relative addressing. These instructions enable efficient address calculation and large constant loading.
 
-### J-type
+### J-Type
 
 Used for unconditional jump operations. Similar to branch operations, but for long range. Has an unintuitive instruction format for better performance.
 
@@ -205,13 +205,13 @@ Instructions of RISC-V are designed to follow maximum commanility.
 - No privileged instructions in the base ISA  
   User-level ISA is fully separated from privileged instructions (CSR, traps, paging).
   A clean split makes OS design clearer.
-- 32 registers, all general-purpose
+- 32 registers, all general-purpose  
   No “special” registers except x0 = hardwired zero.
   Simplifies compiler register allocation and reduces instruction count.
-- Load–store architecture
+- Load–store architecture  
   Only loads and stores access memory.
   All arithmetic uses registers → easier pipeline, fewer hazards.
-- Simple memory addressing modes
+- Simple memory addressing modes  
   Only base + offset. No complex scaling or indirection.
   Hardware addressing logic is tiny and fast.
 
@@ -243,7 +243,7 @@ Decoding is done in parallel with reading registers. It's possible because
 the register specifiers are at a fixed location in a RISC architecture. This tech-
 nique is known as fixed-field decoding.
 
-### Execution/effective address cycle (EX)
+### Execution/effective Address Cycle (EX)
 
 Only one of the following tasks is performed:
 
@@ -258,12 +258,14 @@ Only one of the following tasks is performed:
 
 The reason is RISC-V is load-store architecture. No instruction needs to simultaneously calculate a data address and perform an operation on the data.
 
-### Memory access (MEM)
+### Memory Access (MEM)
 
 Required only for S instructions. Dummy stage for R, I, U and J instructions. Skipped for B instructions.
 
-- For a load: the memory does a read using the effective address computed in the previous cycle
-- For a store: the memory writes the data from the second register
+- For a load  
+  The memory does a read using the effective address computed in the previous cycle.
+- For a store  
+  The memory writes the data from the second register.
 
 Skipped for B instructions because:
 
@@ -272,13 +274,13 @@ Skipped for B instructions because:
 
 J instructions also has to update PC, but they have to write to `ra` (WB stage). Because of that they go through MEM stage.
 
-### Write-back cycle (WB)
+### Write-Back Cycle (WB)
 
 Write result back to destination register. Skipped for S and B instruction.
 
-- For an ALU instruction
+- For an ALU instruction  
   The ALU’s output is written.
-- For a load instruction
+- For a load instruction  
   The data fetched from memory in MEM stage is written.
 - For jump instruction  
   Return address is stored in the `ra` register.

@@ -1,0 +1,124 @@
+---
+title: Ciphers
+dateCreated: 2026-07-01T06:36:45.904Z
+lastUpdatedOn: 2026-09-13T14:55:24.331Z
+slug: s5/computer-security/ciphers
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+An encryption algorithm ($e$), aka. a cipher, transforms a plaintext ($m$) into a ciphertext ($c$) under the control of a secret key ($k$).
+
+$$
+c = e_k(m)
+$$
+
+The reverse process, decryption ($d$) or decipherment, recovers the plaintext:
+
+$$
+m = d_k(c)
+$$
+
+<Note>
+
+Encryption and decryption algorithms ($e$ and $d$) are public. Only the key is secret, and the ciphertext ($c$) is assumed to be easily, that is publicly, accessible.
+
+</Note>
+
+### Secret Key
+
+The secrecy of plaintext $m$ is totally dependent on the secrecy of the key $k$. The key space must be large enough to make an exhaustive key search infeasible.
+
+Algorithms with this property are called symmetric cryptosystems or secret key cryptosystems. Both parties to a secret communication must know $k$ and keep it secret.
+
+Security also depends on [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), covered in a dedicated note, for what a cryptosystem may safely assume is public.
+
+## Encryption Scheme
+
+A cipher is the core keyed primitive, a fixed function $e_k$ with a defined input size. An encryption scheme is a complete construction that encrypts messages of arbitrary length, built from a cipher by supplying whatever the cipher lacks.
+
+- Arbitrary length  
+  Handling a message that is not exactly one cipher input, through padding or a keystream.
+- Randomisation  
+  Equal plaintexts under the same key $k$ must give different ciphertexts.
+
+### Initialization Vector
+
+A non-secret, fixed-size input to a scheme that randomises encryption, so encrypting the same message twice under the same key $k$ gives different ciphertexts.
+
+Sent alongside the ciphertext or fixed to a public constant. Never reused under the same key. Sometimes required to be unpredictable.
+
+## Categorization
+
+Ciphers are classified along several axes, not mutually exclusive. A modern cipher often falls into multiple categories at once.
+
+### Classical Cipher
+
+The ciphers used in the pre-computer era are called historical ciphers or classical ciphers.
+
+Historical ciphers used plaintext linked to:
+
+- A particular language.
+- The alphabet of symbols or characters used.
+- The peculiar statistical characteristics of the language.
+
+For English:
+
+- A 26 character alphabet (A to Z).
+- Higher usage of characters e, t, a, o, i.
+- Higher appearance of bigrams (th, he, an, in) and trigrams (the, ing, and, her, ere).
+
+### Mono-Alphabetic Cipher
+
+A plaintext character is replaced with a ciphertext character according to a fixed rule.
+
+Preserves the language's statistical characteristics in the ciphertext.
+
+Examples:
+
+- [Shift cipher](/s5/computer-security/shift-cipher)
+- [Substitution cipher](/s5/computer-security/substitution-cipher)
+
+### Poly-Alphabetic Cipher
+
+Uses multiple substitution alphabets, e.g. one alphabet for odd-numbered positions and a different one for even-numbered positions, flattening the character frequency graph.
+
+Using $n$ alphabets in a poly-alphabetic cipher gives a key space of $(26!)^n$ at the cost of remembering a key of length $26n$ characters.
+
+Examples:
+
+- Vigenère cipher
+- Beaufort cipher
+- Running-key cipher
+- Vernam cipher and the one-time pad
+- Enigma machine
+
+### Polygraphic Cipher
+
+One fixed substitution is applied, but over groups of letters rather than single letters. A bigraphic cipher substitutes bigrams.
+
+Effects:
+
+- Single-letter frequencies are partly flattened.
+- Bigram frequencies are preserved.
+
+A polygraphic cipher is not poly-alphabetic. The substitution is fixed and does not change with position. A poly-alphabetic cipher keeps single-letter substitution but varies the alphabet by position.
+
+Examples:
+
+- [Playfair cipher](/s5/computer-security/playfair-cipher)
+- Hill cipher
+
+### Transposition Cipher
+
+Also called a permutation cipher, as a category. Scrambles the positions of the plaintext characters without changing the characters themselves.
+
+One specific cipher in this category is also named the [permutation cipher](/s5/computer-security/permutation-cipher).
+
+The key defines the permutation applied to character positions. Decryption applies the inverse permutation.
+
+Every single-letter frequency is preserved unchanged. Bigram and trigram frequencies are disturbed, since adjacent plaintext letters are pulled apart. This exposes it to anagramming attacks, where the analyst rearranges ciphertext fragments to recover valid plaintext.
+
+A transposition and a substitution can be composed in one cipher. Modern block ciphers use both.

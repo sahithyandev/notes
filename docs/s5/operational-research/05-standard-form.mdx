@@ -6,16 +6,19 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:52:55.534Z
-lastUpdatedOn: 2026-09-04T02:56:25.098Z
+lastUpdatedOn: 2026-09-13T14:55:24.576Z
 ---
 
 The graphical method only works for 2 (or 3) decision variables. An algebraic method is needed beyond that, and it starts by rewriting the linear program in a fixed form.
 
 Given an LP in $n$ variables and $m$ constraints, with $x \in \mathbb{R}^n$, $c \in \mathbb{R}^n$, $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^m$, standard form requires:
 
-- Maximization: replace $\min c^T x$ by $\max (-c^T x)$.
-- Equality constraints: convert every inequality with a slack, surplus, or artificial variable, and scale each row so $b \ge 0$.
-- Non-negative variables: $x \ge 0$.
+- Maximization  
+  Replace $\min c^T x$ by $\max (-c^T x)$.
+- Equality constraints  
+  Convert every inequality with a slack, surplus, or artificial variable, and scale each row so $b \ge 0$.
+- Non-negative variables  
+  $x \ge 0$.
 
 $$
 \begin{aligned}
@@ -35,7 +38,7 @@ Assume $A$ has full row rank $m$ with $n \ge m$. Pick $m$ linearly independent c
 
 A component of $x_B$. Setting $x_N = 0$ gives $x_B = B^{-1} b$. The solution is a basic feasible solution when $B^{-1} b \ge 0$.
 
-### Non-basic Variable
+### Non-Basic Variable
 
 A component of $x_N$, fixed at $0$ while $x_B$ is solved for.
 
@@ -86,7 +89,8 @@ $$
 
 Convert each requirement:
 
-- Objective: minimizing $z$ becomes maximizing $z' = -2x_1 - 3x_2$.
+- Objective  
+  Minimizing $z$ becomes maximizing $z' = -2x_1 - 3x_2$.
 - $(1)$ is $\le$: add slack $s_1$.
 - $(2)$ is $\ge$: subtract surplus $s_2$, then add artificial $a_1$.
 - $(3)$ is $=$: add artificial $a_2$.

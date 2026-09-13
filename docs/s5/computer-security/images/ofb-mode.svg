@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image mode" viewBox="0 0 520 580" width="520" height="580" role="img" aria-label="OFB mode. An n-bit shift register starts as the IV and feeds the block cipher. Each step, the b most significant bits of the cipher output form the keystream segment, which is XORed with the plaintext segment and also shifted into the low end of the register. Decryption runs the identical keystream against the ciphertext.">
+  <style>
+    .mode text { fill: currentColor; font: 500 17px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .mode .cap { fill: currentColor; opacity: 0.55; font: 600 12px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.09em; }
+    .mode .lbl { fill: currentColor; opacity: 0.5; font: 600 10px ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.06em; }
+    .mode .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .mode .enc { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .mode .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .div { stroke: currentColor; stroke-opacity: 0.14; stroke-width: 1; }
+    .mode .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .mode .j { fill: currentColor; }
+    .mode .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .mode .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .mode .t-ct { fill: var(--dia-ct, #b3541e); }
+    .mode .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .mode .t-key { fill: var(--dia-key, #6d4bb6); }
+    .mode .w-key { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-ofb" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <g>
+    <text x="0" y="14" class="cap">ENCRYPTION</text>
+
+    <text x="265" y="30" text-anchor="middle" class="lbl">SHIFT REGISTER S</text>
+    <text x="36" y="56" text-anchor="middle" class="t-key">IV</text>
+    <path class="w w-key" d="M52 56 H170" marker-end="url(#ah-ofb)" />
+    <rect class="box" x="170" y="40" width="190" height="32" />
+    <path class="div" d="M208 40V72 M246 40V72 M284 40V72 M322 40V72" />
+
+    <path class="w w-key" d="M230 72 V104" marker-end="url(#ah-ofb)" />
+    <rect class="enc" x="188" y="104" width="84" height="38" rx="2" />
+    <text x="230" y="123" text-anchor="middle">Eₖ</text>
+
+    <path class="w w-key" d="M230 142 V190" marker-end="url(#ah-ofb)" />
+    <text x="214" y="164" text-anchor="end" class="sub t-key">MSB b</text>
+    <text x="214" y="184" text-anchor="end" class="sub t-key">Z₁</text>
+    <circle class="j" cx="230" cy="168" r="2" />
+    <path class="w w-key" d="M230 168 H430 V56 H362" marker-end="url(#ah-ofb)" />
+    <text x="404" y="42" text-anchor="middle" class="sub">≪ b</text>
+
+    <circle class="box" cx="230" cy="202" r="11" />
+    <path class="w" d="M220 202h20M230 192v20" />
+    <text x="132" y="202" text-anchor="middle" class="t-pt">m₁</text>
+    <path class="w w-pt" d="M146 202 H219" marker-end="url(#ah-ofb)" />
+    <path class="w w-ct" d="M230 213 V242" marker-end="url(#ah-ofb)" />
+    <text x="230" y="258" text-anchor="middle" class="t-ct">c₁</text>
+  </g>
+
+  <line class="div" x1="0" y1="290" x2="520" y2="290" />
+
+  <g transform="translate(0,300)">
+    <text x="0" y="14" class="cap">DECRYPTION</text>
+
+    <text x="265" y="30" text-anchor="middle" class="lbl">SHIFT REGISTER S</text>
+    <text x="36" y="56" text-anchor="middle" class="t-key">IV</text>
+    <path class="w w-key" d="M52 56 H170" marker-end="url(#ah-ofb)" />
+    <rect class="box" x="170" y="40" width="190" height="32" />
+    <path class="div" d="M208 40V72 M246 40V72 M284 40V72 M322 40V72" />
+
+    <path class="w w-key" d="M230 72 V104" marker-end="url(#ah-ofb)" />
+    <rect class="enc" x="188" y="104" width="84" height="38" rx="2" />
+    <text x="230" y="123" text-anchor="middle">Eₖ</text>
+
+    <path class="w w-key" d="M230 142 V190" marker-end="url(#ah-ofb)" />
+    <text x="214" y="164" text-anchor="end" class="sub t-key">MSB b</text>
+    <text x="214" y="184" text-anchor="end" class="sub t-key">Z₁</text>
+    <circle class="j" cx="230" cy="168" r="2" />
+    <path class="w w-key" d="M230 168 H430 V56 H362" marker-end="url(#ah-ofb)" />
+    <text x="404" y="42" text-anchor="middle" class="sub">≪ b</text>
+
+    <circle class="box" cx="230" cy="202" r="11" />
+    <path class="w" d="M220 202h20M230 192v20" />
+    <text x="132" y="202" text-anchor="middle" class="t-ct">c₁</text>
+    <path class="w w-ct" d="M146 202 H219" marker-end="url(#ah-ofb)" />
+    <path class="w w-pt" d="M230 213 V242" marker-end="url(#ah-ofb)" />
+    <text x="230" y="258" text-anchor="middle" class="t-pt">m₁</text>
+  </g>
+</svg>

@@ -4,7 +4,7 @@ slug: s5/secure-app-dev/security-analysis
 sidebar:
   order: 14
 dateCreated: 2026-09-03T05:28:16.620Z
-lastUpdatedOn: 2026-09-03T07:45:46.119Z
+lastUpdatedOn: 2026-09-13T14:55:24.658Z
 prev: true
 next: true
 ---
@@ -73,7 +73,7 @@ Security defect text scanners are grep-like lexers that look for dangerous funct
 
 Security defect finders build an internal model and look for vulnerability patterns. Examples are Coverity, Fortify, cppcheck, and the clang static analyzer. Taint propagation tracks untrusted input from sources to sinks and warns when it reaches a sink unsanitized. It is especially useful for injection and buffer overflow. Control flow analysis follows execution paths to find dangerous sequences like double-free. Property checkers prove a narrow temporal safety property, for example always freeing allocated memory. Many aim to be sound.
 
-Software Composition Analysis (SCA), also called origin analysis, identifies embedded libraries and flags those with known vulnerabilities. It cross-references the NIST National Vulnerability Database. Prefer package-manager data for low false positives.
+Software Composition Analysis (SCA), aka. origin analysis, identifies embedded libraries and flags those with known vulnerabilities. It cross-references the NIST National Vulnerability Database. Prefer package-manager data for low false positives.
 
 Secret scanners look for accidentally committed passwords and private keys. They are built into GitHub and GitLab.
 
@@ -115,9 +115,9 @@ Controls include least privilege and MFA on all accounts, blocking direct pushes
 
 SLSA (Supply chain Levels for Software Artifacts, "salsa") rates how hard a build's provenance is to fake. Provenance is a signed record of how an artifact was built: which source commit, which build system, which inputs. The build track has 3 levels.
 
-- L1
+- L1  
   The build produces a provenance record, but nothing stops someone editing or fabricating it. Catches honest mistakes, not attackers.
-- L2
+- L2  
   The build runs on a hosted build service that writes and signs the provenance itself. Faking it now needs a deliberate attack, and swapping the artifact after the build is detectable.
-- L3
+- L3  
   The build service is hardened and each build runs isolated. One build cannot tamper with another, and signing keys are out of reach of the build steps. Forging provenance means breaking the build platform itself.

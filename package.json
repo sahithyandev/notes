@@ -15,10 +15,12 @@
     "prepare": "husky",
     "script:update-frontmatter": "bun scripts/update-frontmatter.ts",
     "script:auto-slug": "bun scripts/auto-slug.ts",
+    "script:check-notes-style": "bun scripts/check-notes-style.ts",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "generate-db-types": "supabase gen types typescript --project-id qrpfxrgemtvxmkuhmpcg > src/lib/database.types.ts",
-    "test": "bun test --coverage"
+    "test": "bun test --coverage",
+    "test:watch": "bun test --watch"
   },
   "lint-staged": {
     "docs/**/*.{md,mdx}": [

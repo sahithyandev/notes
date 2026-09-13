@@ -1,0 +1,101 @@
+---
+title: Neighbourhood Operations
+dateCreated: 2026-08-18T07:18:45.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.505Z
+slug: s5/image-processing/neighbourhood-operations
+sidebar:
+  order: 13
+prev: true
+next: true
+---
+
+Neighbourhood operations compute an output pixel from a group of pixels in a local region, in contrast to [point operations](/s5/image-processing/point-operations) acting on a single pixel.
+
+The operator is a sub-image, called a filter, mask, kernel, template or window. Each element of the mask acts on a corresponding pixel in the local neighbourhood. The output is saved to a new image, never written back into the input.
+
+The mask cells are addressed by offset from the mask center, which is $(0,0)$. An odd sized mask has one such center cell. $M(i,j)$ is the mask value at offset $(i,j)$.
+
+Process:
+
+- Identify the center pixel $I(x,y)$ the operation applies to
+- Place the mask so its center cell $M(0,0)$ sits on $I(x,y)$. Each other cell $M(i,j)$ then sits on $I(x+i, y+j)$, since the offset that addresses the cell is the offset added to $(x,y)$ to find the pixel under it
+- Compute the output pixel $P(x,y)$ from the mask and the selected neighbourhood
+- Save $P(x,y)$ to the output image
+- Slide the mask by one pixel and repeat for every pixel in the input image
+
+## Spatial Filtering
+
+Correlation and convolution are the two ways to combine a mask with a neighbourhood, both by a sum of products equivalent to a matrix dot product. They differ only in whether the mask is flipped first.
+
+In both sums:
+
+- $M(i,j)$: mask, typically odd sized with dimensions $(2N+1) \times (2M+1)$
+- $I(x,y)$: input image
+
+### Correlation
+
+The mask is applied as given: each cell $M(i,j)$ multiplies the pixel at the matching offset $(x+i, y+j)$, and the products are summed. Denoted $M \circ I$.
+
+$$
+(M \circ I)(x,y) = \sum_{i=-N}^{N} \sum_{j=-M}^{M} M(i,j)\, I(x+i, y+j)
+$$
+
+Used for template matching: the response peaks where the neighbourhood looks most like the mask, so the mask must keep its orientation.
+
+### Convolution
+
+The mask is first rotated 180 degrees, so cell $M(i,j)$ multiplies the pixel at the opposite offset $(x-i, y-j)$. Denoted $M * I$.
+
+$$
+(M * I)(x,y) = \sum_{i=-N}^{N} \sum_{j=-M}^{M} M(i,j)\, I(x-i, y-j)
+$$
+
+The flip makes the operation associative and commutative, so a chain of convolution filters can be merged into one equivalent mask. Used for smoothing and similar operations, where the mask is often symmetric and orientation doesn't matter.
+
+<Note>
+
+No difference between convolution and correlation when the mask is symmetrical.
+
+</Note>
+
+### Linear Filters
+
+The output pixel is a correlation or convolution of the mask with the neighbourhood, nothing more. Integer filter coefficients with a scaling factor $k$ reduce computational cost:
+
+$$
+P(x,y) = \frac{1}{k} \sum_{i=-N}^{N} \sum_{j=-M}^{M} M(i,j) \times I(x+i, y+j)
+$$
+
+Properties:
+
+- Translational invariance  
+  The computation is the same everywhere in the image, only the neighbourhood values change.
+- Locality  
+  The output depends only on pixels within the neighbourhood.
+- Linearity  
+  Successive linear filters combine into a single equivalent filter, saving computation.
+
+### Non-Linear Filters
+
+Share the same sliding-mask algorithm, but compute the output using a non-linear expression: thresholding, sorting, log functions.
+
+- Locality and translational invariance still hold
+- Linearity does not hold
+
+Examples:
+
+- $P(x,y) = 1$ if the weighted neighbourhood sum $\ge$ a threshold $t$, else $0$
+
+## Handling Image Boundaries
+
+The neighbourhood doesn't fit the mask at image boundaries.
+
+- Omit missing pixels  
+  Output is smaller than the input, but requires no algorithm change.
+- Change mask shape at the edge  
+  Requires extra conditional logic, only works for certain filters.
+- Pad the image  
+  Add extra rows and columns with white, black or background coloured pixels.
+- Replicate border pixels
+- Wrap pixels around the image  
+  Can cause artefacts.

@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/data-structures/heap
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.589Z
-lastUpdatedOn: 2026-06-01T03:58:53.173Z
+lastUpdatedOn: 2026-09-13T14:55:22.665Z
 ---
 
 A special type of binary tree with an additional property called _the heap
@@ -16,8 +16,9 @@ Used in:
 
 - [Priority Queues](/s2/data-structures-and-algorithms/data-structures/introduction/#priority-queue)
 - [Heap Sort](/s2/data-structures-and-algorithms/algorithms/sorting/#heap-sort)
-- Graph Algorithms: Used in algorithms like [Dijkstra's shortest path](/s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm/) and
-  [Prim's minimum spanning tree](/s2/data-structures-and-algorithms/algorithms/prims-algorithm/).
+- Graph Algorithms  
+  Used in algorithms like [Dijkstra's shortest path](/s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm/)
+  and [Prim's minimum spanning tree](/s2/data-structures-and-algorithms/algorithms/prims-algorithm/).
 
 2 types:
 
@@ -27,19 +28,19 @@ Used in:
 Here, max heaps are explained. The same reasoning and logic can be adapted for
 min heaps.
 
-### Heap property
+### Heap Property
 
 For any given node $I$, the value of $I$ is greater than or equal to the values
 of its children.
 
 ## Implementation
 
-### Array based
+### Array Based
 
 The relation between the parent node
 and its child node(s) is important. Better than linked based implementation in terms of performance. Array based implementation is used in the below operations section.
 
-#### 0-based index
+#### 0-Based Index
 
 $$
 \text{ParentIndex}(\text{child}) = \bigg\lfloor \frac{\text{child} - 1}{2} \bigg\rfloor
@@ -53,7 +54,7 @@ $$
 \text{RightChildIndex}(\text{parent}) = 2 * \text{parent} + 2
 $$
 
-#### 1-based index
+#### 1-Based Index
 
 $$
 \text{ParentIndex}(\text{child}) = \bigg\lfloor \frac{\text{child}}{2} \bigg\rfloor
@@ -67,7 +68,7 @@ $$
 \text{RightChildIndex}(\text{parent}) = 2 * \text{parent} + 1
 $$
 
-### Linked List based
+### Linked List Based
 
 Less common due to performance considerations. Each node in the linked list represents a node in the heap, with pointers to its left and right children.
 

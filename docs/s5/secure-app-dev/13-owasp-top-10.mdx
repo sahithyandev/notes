@@ -4,7 +4,7 @@ slug: s5/secure-app-dev/owasp-top-10
 sidebar:
   order: 13
 dateCreated: 2026-09-03T07:42:03.136Z
-lastUpdatedOn: 2026-09-03T07:45:46.119Z
+lastUpdatedOn: 2026-09-13T14:55:24.655Z
 prev: true
 next: true
 ---
@@ -25,7 +25,7 @@ Prevented by an unguessable anti-CSRF token per form, a confirmation page before
 
 ## Insecure Direct Object Reference
 
-Exposing an internal object key (file, record id, path) as a URL or form parameter, so an attacker edits it to reach objects they are not authorized for. Also called parameter tampering.
+Exposing an internal object key (file, record id, path) as a URL or form parameter, so an attacker edits it to reach objects they are not authorized for. Aka. parameter tampering.
 
 Prevented by validating all input server-side on every request and checking authorization on every request, for example `... WHERE account_number = ? AND user_id = ?`. Use an indirect reference map with hard-to-guess keys instead of exposing raw ids.
 

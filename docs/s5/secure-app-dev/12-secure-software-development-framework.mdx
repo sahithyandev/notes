@@ -4,9 +4,11 @@ slug: s5/secure-app-dev/secure-software-development-framework
 sidebar:
   order: 12
 dateCreated: 2026-09-03T07:41:50.444Z
-lastUpdatedOn: 2026-09-03T07:45:46.119Z
+lastUpdatedOn: 2026-09-13T14:55:24.652Z
 prev: true
 next: true
+prereqs:
+  - s5/computer-security/security-models-and-threats#access-control
 ---
 
 NIST Special Publication 800-218, the Secure Software Development Framework (SSDF). It defines outcomes to aim for, not tools to run, so it fits Agile, Waterfall, or DevSecOps. 42 tasks grouped into 19 practices under 4 pillars.
@@ -15,60 +17,86 @@ NIST Special Publication 800-218, the Secure Software Development Framework (SSD
 
 Put people, rules, and tooling in place before coding starts.
 
-Staff are trained and vetted. Every new developer takes secure coding training. Anyone touching sensitive code gets a clearance check. Security policies are distributed and quiz-validated.
+### Train and Vet Staff
 
-The toolchain is controlled. Build-system scanners are kept fed with fresh vulnerability data. Libraries come from a curated, pre-vetted list. Unapproved third-party tools are blocked.
+Every new developer takes secure coding training. Anyone touching sensitive code gets a clearance check. Security policies are distributed and quiz-validated.
 
-Security goals are made concrete. A ban list names bug classes that must never reach production. Remediation deadlines are set per severity, for example critical within 7 days. Security tests have a pass mark.
+### Control the Toolchain
 
-The environment is locked down. Developer accounts use MFA and access logging. Build servers sit on an isolated network. Dev and deployment environments are separate. Access is role-based, backed by a formal model ([see Access Control Models](#access-control-models)).
+Build-system scanners are kept fed with fresh vulnerability data. Libraries come from a curated, pre-vetted list. Unapproved third-party tools are blocked.
 
-Progress is tracked with metrics. Training completion and quiz scores. Share of repos with active scanners. Count of unapproved libraries. Releases shipped with known flaws. On-time critical-fix rate. MFA adoption.
+### Define Security Goals
 
-A CI/CD security gate enforces the goals. It must fail hard with exit code 1, so a committed API key or vulnerable library stops the build. Run cheap code checks before expensive dependency builds.
+A ban list names bug classes that must never reach production. Remediation deadlines are set per severity, for example critical within 7 days. Security tests have a pass mark.
 
-### Access Control Models
+### Lock Down the Environment
 
-Each subject and object has a security label. The model is the rule that decides which accesses the labels permit.
+Developer accounts use MFA and access logging. Build servers sit on an isolated network. Dev and deployment environments are separate. Access is role-based, backed by a formal [access control model](/s5/computer-security/security-models-and-threats#access-control).
 
-Bell-LaPadula (BLP) targets confidentiality. Labels are ordered classification levels, for example public, secret, top secret. No read up, so a subject cannot read an object above its level. No write down, so a subject cannot write to an object below its level and leak secrets downward.
+### Track Progress with Metrics
 
-Biba targets integrity. It mirrors BLP over integrity levels, trusted vs untrusted data. No read down and no write up, so low-integrity input cannot corrupt high-integrity code or data.
+Training completion and quiz scores. Share of repos with active scanners. Count of unapproved libraries. Releases shipped with known flaws. On-time critical-fix rate. MFA adoption.
 
-Chinese Wall (Brewer-Nash) targets conflict of interest. Objects are grouped by company, and companies into conflict-of-interest classes, for example all banks. A subject accesses any company freely until the first access. After that they are barred from every competitor in the same class.
+### Enforce a CI/CD Security Gate
+
+The gate must fail hard with exit code 1, so a committed API key or vulnerable library stops the build. Run cheap code checks before expensive dependency builds.
 
 ## Protect the Software (PS)
 
 Stop code and released artifacts from being tampered with or leaked, at rest and in transit.
 
-Protect all forms of code. Source lives in version control with least-privilege access and mandatory review before merge. Sign commits where feasible so authorship is verifiable.
+### Protect All Forms of Code
 
-Verify integrity on release. Publish a cryptographic hash and signature for every release. Consumers then check that the download matches the build.
+Source lives in version control with least-privilege access and mandatory review before merge. Sign commits where feasible so authorship is verifiable.
 
-Archive each release. Keep the exact source, build inputs, and settings for every shipped version. An old release can then be rebuilt and investigated after a vulnerability report.
+### Verify Integrity on Release
 
-Record provenance. List what went into each build: dependencies, build tools, parameters. This is usually a Software Bill of Materials (SBOM). Downstream users use it to assess exposure to a newly disclosed flaw.
+Publish a cryptographic hash and signature for every release. Consumers then check that the download matches the build.
+
+### Archive Each Release
+
+Keep the exact source, build inputs, and settings for every shipped version. An old release can then be rebuilt and investigated after a vulnerability report.
+
+### Record Provenance
+
+List what went into each build: dependencies, build tools, parameters. This is usually a Software Bill of Materials (SBOM). Downstream users use it to assess exposure to a newly disclosed flaw.
 
 ## Produce Well-Secured Software (PW)
 
 Design, write, and test so that few vulnerabilities exist at release, and those that do are found early.
 
-Secure design starts with security requirements. Model how the design could be attacked through data flows, trust boundaries, and abuse cases. Revise the architecture to remove or mitigate each threat.
+### Start with Security Requirements
 
-Reuse well-secured components. Prefer vetted internal or third-party modules over rewriting auth, crypto, or parsing code. Track their versions and known flaws.
+Model how the design could be attacked through data flows, trust boundaries, and abuse cases. Revise the architecture to remove or mitigate each threat.
 
-Follow secure coding practices. Use safer languages and library functions, compiler warnings, and hardening flags. Follow the organization's coding standard. Keep humans away from error-prone tasks a tool can do.
+### Reuse Well-Secured Components
 
-Review and test code. Combine human review with static analysis, then dynamic analysis and fuzzing. Include negative tests for what must not happen. Fix root causes, not symptoms.
+Prefer vetted internal or third-party modules over rewriting auth, crypto, or parsing code. Track their versions and known flaws.
 
-Configure defaults securely. Ship with least privilege, features off, and logging on, so a default install is safe.
+### Follow Secure Coding Practices
+
+Use safer languages and library functions, compiler warnings, and hardening flags. Follow the organization's coding standard. Keep humans away from error-prone tasks a tool can do.
+
+### Review and Test Code
+
+Combine human review with static analysis, then dynamic analysis and fuzzing. Include negative tests for what must not happen. Fix root causes, not symptoms.
+
+### Configure Defaults Securely
+
+Ship with least privilege, features off, and logging on, so a default install is safe.
 
 ## Respond to Vulnerabilities (RV)
 
 Find and fix flaws that reach production, and feed the lessons back into development.
 
-Identify vulnerabilities continuously. Run a disclosure programme with a known intake channel. Monitor advisories for used components. Keep scanning released software.
+### Identify Vulnerabilities Continuously
 
-Assess, prioritise, remediate. Confirm each report. Judge severity and exploitability. Patch within the fix-time rule for that severity. Disclose to affected users.
+Run a disclosure programme with a known intake channel. Monitor advisories for used components. Keep scanning released software.
 
-Analyse root cause. For each confirmed vulnerability, find the underlying cause. Check whether similar flaws exist elsewhere. Update requirements, design, tooling, or training so the class does not recur.
+### Assess, Prioritise, and Remediate
+
+Confirm each report. Judge severity and exploitability. Patch within the fix-time rule for that severity. Disclose to affected users.
+
+### Analyse Root Cause
+
+For each confirmed vulnerability, find the underlying cause. Check whether similar flaws exist elsewhere. Update requirements, design, tooling, or training so the class does not recur.

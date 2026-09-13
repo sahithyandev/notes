@@ -1,0 +1,215 @@
+---
+title: Block Ciphers
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.377Z
+slug: s5/computer-security/block-ciphers
+sidebar:
+  order: 15
+prev: true
+next: true
+---
+
+A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
+
+Large messages are divided into blocks and encrypted per block, under a mode of operation.
+
+$$
+c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
+$$
+
+For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$. Per [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), $e$ and $d$ are public. Only $k$ is secret.
+
+A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
+
+A block cipher encrypts a set of bits or characters at a time, whereas a stream cipher encrypts a single bit or character at a time.
+
+## Iterated Block Cipher Design
+
+### Round Design
+
+An iterated block cipher builds $e_k$ by applying a simple keyed transformation, the round function, to the block $r$ times in succession.
+
+- Round  
+  One application of the round function. A single round is weak; security comes from repetition, and increasing $r$ raises security up to a stable level.
+- Round key $k_i$  
+  The key used in round $i$, derived from $k$ by the key schedule.
+- Key schedule  
+  The algorithm that expands $k$ into the round keys $k_1,...,k_r$.
+
+Examples:
+
+- DES  
+  16 rounds, Feistel structure, 48-bit round keys from a 56-bit key.
+- AES  
+  10, 12, or 14 rounds for 128, 192, or 256-bit keys, SP-network structure.
+- Triple DES  
+  DES run three times with two or three independent keys.
+
+### Feistel Cipher
+
+Named after Horst Feistel. Splits the plaintext block into halves $(L_0, R_0)$ and iterates a round function $F$, keyed by $k_i$, over $r$ rounds, swapping the final halves to produce the ciphertext.
+
+Each encryption round:
+
+$$
+L_i \leftarrow R_{i-1}, \quad R_i \leftarrow L_{i-1} \oplus F(k_i, R_{i-1})
+$$
+
+Each decryption round, using the round keys in reverse order:
+
+$$
+R_{i-1} \leftarrow L_i, \quad L_{i-1} \leftarrow R_i \oplus F(k_i, L_i)
+$$
+
+The round operation is invertible independent of $F$, so the same hardware or software can perform both encryption and decryption by reversing the order of round keys.
+
+Design parameters of a Feistel cipher:
+
+- Block length $n$.
+- Number of rounds $r$.
+- Definition of the round function $F$.
+- Key schedule generating each round key $k_i$ from $k$.
+- Length of the secret key $k$.
+
+You can find an implementation of a generic Feistel cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/feistel-cipher.c).
+
+### SP-Network
+
+Proposed by Claude Shannon in 1945: a series of linked permutation and substitution operations. AES, the successor to DES, is based on this design, rather than the Feistel structure. Its round operations are visualized in the [interactive guide to AES](https://sahithyan.dev/post/interactive-guide-to-aes).
+
+- Diffusion  
+  Permutations disperse the statistical characteristics of each input bit among all output bits.
+- Confusion  
+  Substitutions create a complex relationship between the input and key with the output, providing the cipher's non-linearity.
+
+## Modes of Operation
+
+A mode of operation is a recommended standard for using a block cipher to build a scheme for arbitrary-length messages. Plaintext $m$ is divided into $t$ blocks $m_1,...,m_t$ of the $n$-bit block length the underlying cipher specifies, padding the last block if needed.
+
+ECB, CBC, OFB, and CFB were standardized together in FIPS 81 (1980). CTR was proposed by Diffie and Hellman in 1979 but only standardized in 2001 (NIST SP 800-38A), adding a mode built for parallel encryption of data blocks.
+
+- ECB, for short secrets such as session keys.
+- CBC, for bulk data encryption.
+- OFB, for real-time streamed content.
+- CFB, for streamed content.
+- CTR, for data that must be encrypted or decrypted in parallel.
+
+The same key is used for all blocks, in all the modes.
+
+### ECB Mode
+
+Aka. Electronic Code Book. The simplest mode, where each block is encrypted independently.
+
+$$
+c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
+$$
+
+import EcbMode from "./images/ecb-mode.svg";
+
+<EcbMode />
+
+The last block is padded (such as PKCS#7) to a multiple of $n$.
+
+Blocks are independent.
+
+Allows parallel encryption and decryption. Error in a single block does not affect the other blocks. No IV or nonce to generate, transmit, or accidentally reuse.
+
+Identical plaintext blocks ($m_i = m_j$) produce identical ciphertext blocks ($c_i = c_j$), letting an attacker spot repetition. Attacker can remove or copy-paste blocks in transit without detection.
+
+### CBC Mode
+
+Aka. Cipher Block Chaining. Improves ECB by chaining ciphertext into each block's encryption, giving every block context from its neighbors.
+
+$$
+c_1 \leftarrow e_k(m_1 \oplus IV), \quad c_i \leftarrow e_k(m_i \oplus c_{i-1}) \text{ for } i > 1
+$$
+
+$$
+m_1 \leftarrow d_k(c_1) \oplus IV, \quad m_i \leftarrow d_k(c_i) \oplus c_{i-1} \text{ for } i > 1
+$$
+
+import CbcMode from "./images/cbc-mode.svg";
+
+<CbcMode />
+
+The last block is padded (such as PKCS#7) to a multiple of $n$.
+
+The IV can be a fixed public value (e.g. all-zero), which need not be transmitted, or a random nonce, which must be transmitted with the ciphertext as $IV, c_1,...,c_t$.
+
+Allows parallel decryption as all ciphertext blocks are known initially. Identical plaintext blocks ($m_i = m_j$) produce different ciphertext blocks ($c_i \neq c_j$) (because of the IV and chaining), so an attacker cannot spot repetition. A fixed all-zero IV needs no transmission.
+
+A single bit error in a received ciphertext block corrupts the entire corresponding plaintext block, and a single bit in the next block. This is one-block error propagation. Encryption is strictly sequential. A random IV must be unpredictable and adds one block of transmission overhead. A bit inserted or deleted in transit, rather than flipped, desynchronizes every following block.
+
+### OFB Mode
+
+Aka. Output Feedback. Allows a block cipher operate as a stream cipher. An $n$-bit shift register $S_i$ feeds the cipher. Each step encrypts the register, takes the $b$ most significant bits of the output as the keystream segment $Z_i$, and XORs it with the $b$-bit plaintext or ciphertext segment. The segment size satisfies $1 \le b \le n$, with $b = n$ the full-block case.
+
+$$
+Z_i \leftarrow \operatorname{MSB}_b(e_k(S_i)), \quad c_i \leftarrow m_i \oplus Z_i, \quad m_i \leftarrow c_i \oplus Z_i
+$$
+
+$$
+S_1 \leftarrow IV, \quad S_{i+1} \leftarrow (S_i \ll b) \mathbin{|} Z_i
+$$
+
+$\operatorname{MSB}_b$ takes the $b$ most significant bits. $S_{i+1}$ shifts the register left by $b$ bits, discarding the top $b$, and feeds $Z_i$ into the low end. With full-block feedback ($b = n$) this reduces to $S_{i+1} \leftarrow e_k(S_i)$. Both encryption and decryption use only $e_k$.
+
+import OfbMode from "./images/ofb-mode.svg";
+
+<OfbMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+The keystream can be precomputed before any ciphertext arrives, so OFB suits real-time streamed content. The ciphertext has the same length as the plaintext. Same hardware used for both encryption and decryption.
+
+Encryption and decryption are strictly sequential.
+
+A single bit error in a received ciphertext block corrupts only the corresponding single bit of plaintext. Remaining bits of the current block are not affected. There is no propagation into other blocks as well. The absence of error propagation also makes the ciphertext malleable. An attacker can flip any plaintext bit by flipping the matching ciphertext bit, undetected without a separate integrity check.
+
+Because the keystream depends only on the key and IV, reusing a $(k, IV)$ pair is catastrophic. XORing the two ciphertexts cancels the keystream and leaks the XOR of the plaintexts.
+
+### CFB Mode
+
+Aka. Cipher Feedback. Also lets a block cipher operate as a stream cipher, using the same $n$-bit shift register $S_i$ as OFB, but shifts the ciphertext segment, rather than the keystream, into the register.
+
+$$
+Z_i \leftarrow \operatorname{MSB}_b(e_k(S_i)), \quad c_i \leftarrow m_i \oplus Z_i, \quad m_i \leftarrow c_i \oplus Z_i
+$$
+
+$$
+S_1 \leftarrow IV, \quad S_{i+1} \leftarrow (S_i \ll b) \mathbin{|} c_i
+$$
+
+import CfbMode from "./images/cfb-mode.svg";
+
+<CfbMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+Decryption can be parallel. Same hardware used for both encryption and decryption.
+
+Encryption is strictly sequential. The keystream depends on the ciphertext and cannot be precomputed before ciphertext arrives. Less useful than OFB for real-time streaming.
+
+A single bit error in a received ciphertext block corrupts a single bit in the corresponding plaintext block, then keeps corrupting the shift register $S_i$ until it is flushed after $n/b$ rounds, completely corrupting the next $n/b$ blocks. This causes severe error propagation.
+
+### CTR Mode
+
+Aka. Counter mode. Similar to ECB but removes its disadvantages while keeping its advantage of parallel processing.
+
+$$
+c_i \leftarrow m_i \oplus e_k(IV \oplus \langle i \rangle_n), \quad m_i \leftarrow c_i \oplus e_k(IV \oplus \langle i \rangle_n)
+$$
+
+$\langle i \rangle_n$ is the binary representation of $i$ as an $n$-bit number, matching the block length.
+
+import CtrMode from "./images/ctr-mode.svg";
+
+<CtrMode />
+
+No padding is needed, since the keystream is truncated to the plaintext length.
+
+Same hardware used for both encryption and decryption.
+
+Each plaintext block is encrypted independently, like ECB, so blocks can be processed in parallel. The counter also gives each block context, so unlike ECB, an attacker cannot cut-and-paste or rearrange ciphertext blocks undetected.
+
+The counter input $IV \oplus i$ must never be reused for a subsequent encryption under the same key $k$.

@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/entity-relationship-model
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.694Z
-lastUpdatedOn: 2026-06-01T03:58:53.197Z
+lastUpdatedOn: 2026-09-13T14:55:23.257Z
 ---
 
 A conceptual model to design a database schema. The model is illustrated using a diagram with a consistent notation.
@@ -27,7 +27,7 @@ An entity set is strong **iff** it has its own primary key.
 
 When an entity set is not strong. Depends on another entity set to unique identification. The other entity is called the identifying entity set.
 
-#### Partial key
+#### Partial Key
 
 Aka. discriminator. Unique identifier for a weak entity, given its identifying eneity. Denoted by dashed underlines.
 
@@ -56,15 +56,15 @@ The combination of primary keys of the participating entity sets forms a super k
 
 When the same entity participates in a relationship more than once. Two separate lines are used, each labelled with a different _role_, to represent the relationship.
 
-### Strong relationship
+### Strong Relationship
 
 A relationship is strong **iff** all participating entity sets are strong. Does not depend on existence of an entity set.
 
-### Weak relationship
+### Weak Relationship
 
 When a relationship is not strong. Associates weak entities with their identifying entity sets.
 
-### Identity relationship
+### Identity Relationship
 
 A relationship between a strong entity set and a weak entity set. Illustrated as a double diamond.
 
@@ -151,13 +151,16 @@ A top-down design approach to model inheritance. The process of dividing a broad
 
 Constraint on which entities can be members of a given lower-level entity set:
 
-- condition-defined: E.g.: all customers over 65 years are members of senior citizen entity set
-- user-defined
+- Condition-defined  
+  For example, all customers over 65 years are members of the senior citizen entity set.
+- User-defined.
 
 Constraint on whether or not entities may belong to more than one lower level entity set.
 
-- Disjoint - can belong to only one lower-level entity set
-- Overlapping - can belong to more than one lower level entity set
+- Disjoint  
+  Can belong to only one lower-level entity set.
+- Overlapping  
+  Can belong to more than one lower level entity set.
 
 Completeness constraint: Whether (total) or not (partial) every entity must belong to at least one lower-level entity set.
 

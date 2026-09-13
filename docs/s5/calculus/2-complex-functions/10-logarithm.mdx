@@ -1,0 +1,91 @@
+---
+title: Logarithm
+sidebar:
+  order: 10
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.303Z
+slug: s5/calculus/complex-functions/logarithm
+prev: true
+next: true
+---
+
+For a non-zero complex number $z$, $\log z$ is the set of all $w \in \mathbb{C}$ with $e^w = z$.
+
+Writing $z = re^{i\theta}$ with $r = |z|$ and $w = u + iv$, the condition $e^w = z$ gives $e^u = r$ and $v \in \arg z$. So
+
+$$
+\log z = \ln|z| + i\arg z = \{\,\ln|z| + i(\operatorname{Arg} z + 2k\pi) : k \in \mathbb{Z}\,\}, \qquad z \ne 0
+$$
+
+Here:
+
+- $\operatorname{Arg} z$: principal argument of $z$, the unique argument with $-\pi < \operatorname{Arg} z \le \pi$
+- $\arg z = \{\operatorname{Arg} z + 2k\pi : k \in \mathbb{Z}\}$
+
+<Note title="Proof Hint">
+
+- Write $z = re^{i\theta}$ with $r = |z| > 0$
+- Set $w = u + iv$ and require $e^w = z$
+- Take the modulus of both sides: $e^u = r$, so $u = \ln r$
+- Match the arguments, giving $v = \theta + 2k\pi$ for some $k \in \mathbb{Z}$
+- Combine $u$ and $v$ into $w = \ln|z| + i\arg z$
+
+</Note>
+
+$\log z$ is multi-valued.
+
+## Principal Value
+
+The logarithm value deduced by setting $k=0$.
+
+$$
+\operatorname{Log} z = \ln|z| + i\operatorname{Arg} z, \qquad z \ne 0
+$$
+
+Below you can change $z$ and see how $\operatorname{Log}(z)$ changes.
+
+<ComplexLogExplorer />
+
+## Properties
+
+Let $z_1$ and $z_2$ be non-zero.
+
+- $\log(z_1 z_2) = \log z_1 + \log z_2$
+- $\log\dfrac{z_1}{z_2} = \log z_1 - \log z_2$
+- $\log\dfrac{1}{z} = -\log z$
+
+<Note>
+
+The identities hold for the multi-valued $\log$ as equalities of sets. They can fail for $\operatorname{Log}$.
+
+$\operatorname{Log}((-1)(-1)) = \operatorname{Log}(1) = 0$, but $\operatorname{Log}(-1) + \operatorname{Log}(-1) = i\pi + i\pi = 2\pi i$.
+
+</Note>
+
+## Examples
+
+### $\log(1+i)$
+
+- $|1+i| = \sqrt{2}$
+- $\operatorname{Arg}(1+i) = \dfrac{\pi}{4}$
+
+$$
+\log(1+i) = \dfrac{1}{2}\ln 2 + i\left(\dfrac{\pi}{4} + 2k\pi\right), \qquad k \in \mathbb{Z}
+$$
+
+$$
+\operatorname{Log}(1+i) = \dfrac{1}{2}\ln 2 + i\dfrac{\pi}{4}
+$$
+
+### $\log i$
+
+- $|i| = 1$
+- $\operatorname{Arg}(i) = \dfrac{\pi}{2}$
+
+$$
+\log i = i\left(\dfrac{\pi}{2} + 2k\pi\right), \qquad k \in \mathbb{Z}
+$$
+
+$$
+\operatorname{Log} i = i\dfrac{\pi}{2}
+$$

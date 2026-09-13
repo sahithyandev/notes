@@ -1,7 +1,7 @@
 ---
 title: Runge-Kutta Methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-09-01T12:39:12.164Z
+lastUpdatedOn: 2026-09-13T14:55:24.559Z
 slug: s5/numerical-methods/runge-kutta-methods
 sidebar:
   order: 17
@@ -70,3 +70,61 @@ for $i = 0, 1, \ldots, N-1$. Local error $O(h^4)$.
 | Order 4 Runge-Kutta | $O(h^4)$               |
 
 Higher order gives a better approximation for the same $h$.
+
+## Memorization
+
+All four have the form $w_{i+1} = w_i + h \times (\text{slope estimate})$. They differ only in how the slope is estimated.
+
+- **Euler**\
+  Slope at the left end, $f(t_i, w_i)$. Nothing else.
+- **Midpoint**\
+  Half-step to the middle with Euler, then take the slope there. One evaluation at $\left(t_i + \tfrac{h}{2},\ w_i + \tfrac{h}{2} f(t_i, w_i)\right)$.
+- **Modified Euler**\
+  Average of the two end slopes. Left slope $f(t_i, w_i)$, right slope at the full Euler-predicted point $\left(t_{i+1},\ w_i + h f(t_i, w_i)\right)$, weight $\tfrac{1}{2}$ each.
+- **Order 4 Runge-Kutta**\
+  Weighted average of four slopes with weights $1, 2, 2, 1$ over $6$ (Simpson's rule). Sample points step through $t_i,\ t_i + \tfrac{h}{2},\ t_i + \tfrac{h}{2},\ t_{i+1}$, and each $k_j$ feeds the $y$-argument of the next: $k_1$ into $k_2$, $k_2$ into $k_3$, $k_3$ into $k_4$, all with factor $\tfrac{1}{2}$ except $k_3 \to k_4$ which uses the full $k_3$.
+
+## Worked Example
+
+IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
+
+### Midpoint
+
+$$
+\begin{aligned}
+w_1 &= w_0 + 0.5\, f\big(0.25,\ 0.5 + 0.25 f(0, 0.5)\big) = 0.5 + 0.5\, f(0.25,\ 0.875) = 1.4063 \\
+w_2 &= 2.5977, \quad w_3 = 3.9399, \quad w_4 = 5.2149
+\end{aligned}
+$$
+
+### Modified Euler
+
+$$
+\begin{aligned}
+w_1 &= w_0 + 0.25\left[ f(0, 0.5) + f\big(0.5,\ 0.5 + 0.5 f(0, 0.5)\big) \right] = 0.5 + 0.25\,[1.5 + 2.0] = 1.375 \\
+w_2 &= 2.5156, \quad w_3 = 3.7754, \quad w_4 = 4.9163
+\end{aligned}
+$$
+
+### Order 4 Runge-Kutta
+
+First step, $t_0 = 0$, $w_0 = 0.5$
+
+$$
+\begin{aligned}
+k_1 &= 0.5\, f(0,\ 0.5) = 0.75 \\
+k_2 &= 0.5\, f(0.25,\ 0.5 + 0.375) = 0.9063 \\
+k_3 &= 0.5\, f(0.25,\ 0.5 + 0.4531) = 0.9453 \\
+k_4 &= 0.5\, f(0.5,\ 0.5 + 0.9453) = 1.0977 \\
+w_1 &= 0.5 + \tfrac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4) = 1.4251
+\end{aligned}
+$$
+
+Continuing, $w_2 = 2.6396$, $w_3 = 4.0068$, $w_4 = 5.3016$.
+
+| Method              | $w_4 \approx y(2)$ | Error   |
+| ------------------- | ------------------ | ------- |
+| Euler               | $4.4375$           | $0.868$ |
+| Midpoint            | $5.2149$           | $0.091$ |
+| Modified Euler      | $4.9163$           | $0.389$ |
+| Order 4 Runge-Kutta | $5.3016$           | $0.004$ |

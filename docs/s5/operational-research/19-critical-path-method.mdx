@@ -1,0 +1,36 @@
+---
+title: Critical Path Method
+slug: s5/operational-research/critical-path-method
+sidebar:
+  order: 19
+prev: true
+next: true
+dateCreated: 2026-08-26T11:55:28.918Z
+lastUpdatedOn: 2026-09-13T14:55:24.629Z
+---
+
+Finds the minimum time needed to complete a project, and identifies the activities that determine that duration.
+
+## Earliest Time
+
+- Earliest start time (EST) of an activity  
+  The earliest event time of its start event.
+- Earliest event time  
+  For an event with incoming activities, the maximum over all incoming activities of (their start event's earliest time + their duration). 0 for the initial event.
+
+## Latest Time
+
+- Latest finish time (LFT) of an activity  
+  The latest event time of its end event.
+- Latest event time  
+  For an event with outgoing activities, the minimum over all outgoing activities of (their end event's latest time $-$ their duration). Equal to the earliest time of the final event, for the final event.
+
+Computed by a backward pass through the network, starting from the final event.
+
+## Project Duration
+
+The earliest (= latest) event time of the final event.
+
+## Critical Path
+
+The path from the initial to the final event along which every event's earliest time equals its latest time. Delaying any activity on the critical path delays the entire project.

@@ -1,0 +1,56 @@
+---
+title: Exponents
+sidebar:
+  order: 11
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.305Z
+slug: s5/calculus/complex-functions/exponents
+prev: true
+next: true
+---
+
+Let $c \in \mathbb{C}$ and $z \ne 0$.
+
+$$
+z^c = e^{c\log z}
+$$
+
+$z^c$ is multi-valued, since $\log z$ is multi-valued.
+
+## Principal Value
+
+Obtained by using $\operatorname{Log} z$ in place of $\log z$.
+
+$$
+z^c = e^{c\operatorname{Log} z}
+$$
+
+## Worked Examples
+
+### $\sqrt{1+i}$
+
+$$
+\operatorname{Log}(1+i) = \frac{1}{2}\ln 2 + i\frac{\pi}{4}
+$$
+
+$$
+(1+i)^{1/2} = e^{\frac{1}{2}\operatorname{Log}(1+i)} = e^{\frac{1}{4}\ln 2 + i\frac{\pi}{8}} = 2^{1/4}\left(\cos\frac{\pi}{8} + i\sin\frac{\pi}{8}\right)
+$$
+
+Numerically:
+
+$$
+(1+i)^{1/2} \approx 1.0987 + 0.4551i
+$$
+
+### $i^i$
+
+$$
+\operatorname{Log} i = i\frac{\pi}{2}
+$$
+
+$$
+i^i = e^{i\operatorname{Log} i} = e^{i \cdot i\pi/2} = e^{-\pi/2} \approx 0.2079
+$$
+
+$i^i$ is real for every branch of $\log i$, since $\log i = i(\pi/2 + 2k\pi)$ for $k \in \mathbb{Z}$ gives $i^i = e^{-(\pi/2+2k\pi)}$.

@@ -1,7 +1,7 @@
 ---
 title: Security Models and Threats
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-07-05T05:11:45.001Z
+lastUpdatedOn: 2026-09-13T14:55:24.325Z
 slug: s5/computer-security/security-models-and-threats
 sidebar:
   order: 3
@@ -9,18 +9,56 @@ prev: true
 next: true
 ---
 
-## Access Control
-
 The 3 basic actions of a person on an item of data: viewing (confidentiality), modifying (integrity), using (availability). These are the basic modes of access computer security seeks to preserve.
 
-Access control is the basic model or paradigm of security. Several other models support specific computer security objectives:
+## Access Control
 
-- BLP model  
-  Data confidentiality and sharing, by David Bell and Leonard La Padula.
-- Biba model  
-  Data integrity, by Kenneth Biba.
-- Chinese Wall model  
-  Preventing conflict of interests in shared information systems.
+Access control is the basic model or paradigm of security. Several other models support specific computer security objectives.
+
+### BLP Model
+
+Enforces data confidentiality in multi-level systems. By David Bell and Leonard La Padula.
+
+Every subject has a clearance level. Every object has a classification level. Levels form a lattice.
+
+Rules:
+
+- Simple security property, no read up  
+  A subject can read an object only when the subject clearance is at least as high as the object classification.
+- Star property, no write down  
+  A subject can write an object only when the object classification is at least as high as the subject clearance.
+
+Information flows only upward. A discretionary access matrix applies on top. Declassification needs a trusted subject outside the rules. Says nothing about integrity.
+
+### Biba Model
+
+Enforces data integrity. By Kenneth Biba. The dual of the BLP model, with integrity levels replacing secrecy levels.
+
+Rules:
+
+- Simple integrity property, no read down  
+  A subject can read an object only when the object integrity level is at least as high as the subject integrity level.
+- Star integrity property, no write up  
+  A subject can write an object only when the subject integrity level is at least as high as the object integrity level.
+
+Information flows only downward in integrity. Untrusted data cannot reach a high-integrity subject.
+
+### Chinese Wall Model
+
+Prevents conflict of interests in shared information systems. By David Brewer and Michael Nash.
+
+Objects are grouped into company datasets. Company datasets are grouped into conflict-of-interest classes.
+
+Access is history-based, so the accessible set differs per subject and shrinks over time.
+
+Rules:
+
+- Read  
+  A subject can read an object only when the object is in a company dataset the subject already accessed, or in a conflict class the subject has not yet touched.
+- Write  
+  A subject can write an object only when the subject cannot read any object in a different company dataset.
+
+Effect: no fixed lattice. The policy is dynamic and per-subject.
 
 ## Types of Threats
 

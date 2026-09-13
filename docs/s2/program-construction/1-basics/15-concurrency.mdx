@@ -6,7 +6,7 @@ slug: s2/program-construction/basics/concurrency
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.600Z
-lastUpdatedOn: 2026-06-01T03:58:53.195Z
+lastUpdatedOn: 2026-09-13T14:55:22.859Z
 ---
 
 Concurrency refers to the ability of different parts of a program to be executed
@@ -73,7 +73,7 @@ classes keeps the code more flexible as the task can be executed by different
 executor services and thread pools, not just in a Thread. It also follows the
 principle of composition over inheritance.
 
-### Thread scheduler
+### Thread Scheduler
 
 A part of the operating system that controls how threads are executed. It
 determines which thread should run at any given time and for how long.
@@ -95,7 +95,7 @@ The scheduler follows different algorithms to manage these decisions, such as:
 Modern operating systems use complex scheduling algorithms that combine multiple
 approaches to achieve optimal performance and responsiveness.
 
-### Thread states
+### Thread States
 
 | State           | Description                                                   |
 | --------------- | ------------------------------------------------------------- |
@@ -147,13 +147,13 @@ The `join` method allows one thread to wait for the completition of another.
 When `thread2.join()` is called on `thread1`, until `thread2` finishes `thread1`
 will wait. No-op if `thread2` is already finished. `thread2.join(long ms)` waits for `thread2` to finish for a maximum of `ms` milliseconds.
 
-### Thread priority
+### Thread Priority
 
 Defines the relative important of a thread. Used by the thread scheduler in its algorithm. Ranges from `Thread.MIN_PRIORITY (1)`, to `Thread.MAX_PRIORITY (10)`. Default is `Thread.NORM_PRIORITY (5)`.
 
 How different priority threads are scheduled is highly OS and implementation-dependent.
 
-### Daemon threads
+### Daemon Threads
 
 Background threads that run in the JVM and are typically used for tasks like garbage collection or monitoring. Low-priority threads. Do not prevent the JVM from exiting when all user threads have finished execution. Automatically terminated when the JVM shuts down.
 
@@ -346,7 +346,7 @@ To resolve livelock:
 - Randomized delays can be introduced between retries to reduce the likelihood of repeated interference.
 - Priority-based access can be implemented to ensure one thread can proceed while others wait.
 
-### Producer-Consumer problem
+### Producer-Consumer Problem
 
 A situation where one or more threads produce data that other threads consume. If not properly synchronized, this can lead to issues like:
 
@@ -386,8 +386,10 @@ new Thread(() -> {
 
 ### Thread Pool Issues
 
-- Resource Exhaustion: Too many threads consuming system resources
-- Thread Leakage: Threads not properly returned to the pool
+- Resource Exhaustion  
+  Too many threads consuming system resources.
+- Thread Leakage  
+  Threads not properly returned to the pool.
 
 These issues can be solved by using appropriate thread pool configurations and properly handle exceptions.
 
@@ -402,7 +404,7 @@ try {
 }
 ```
 
-## Solutions for common issues
+## Solutions for Common Issues
 
 - Synchronization primitives (`synchronized`, `volatile`)
 - Locks (`ReentrantLock`, `ReadWriteLock`)
@@ -452,7 +454,7 @@ new Thread(() -> {
 }).start();
 ```
 
-## Best practices
+## Best Practices
 
 1. Minimize shared state
 2. Use immutable objects when possible

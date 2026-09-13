@@ -3,7 +3,7 @@ title: LUP Decomposition
 sidebar:
   order: 8
 dateCreated: 2026-08-09T15:17:42.855Z
-lastUpdatedOn: 2026-08-10T06:34:55.625Z
+lastUpdatedOn: 2026-09-13T14:55:24.535Z
 slug: s5/numerical-methods/lup-decomposition
 prev: true
 next: true
@@ -126,7 +126,7 @@ The recursion is elimination applied to 1 column at a time, exactly as in Gaussi
 - The pivot row for $A'$ is therefore chosen from $A'$'s own first column, not from $A$'s. This is why $P$ cannot be computed in 1 pass: $P_2$ requires $A'$, and $A'$ requires $P_1$.
 - The recursion bottoms out at $n = 1$, where there is nothing left to pivot or eliminate.
 
-### Building $L$, $U$, $P$ From the Base Case
+### Building $L$, $U$, $P$ from the Base Case
 
 The recursion computes $A'$ going down, then builds $L$, $U$, $P$ going back up, 1 level at a time, using the combine formulas.
 
@@ -157,7 +157,7 @@ $$
 $$
 
 - $\bar{a}_{11} = 6$, $\bar{a}_{12}^T = (8 \enspace 8)$, $\bar{a}_{21} = (2 \enspace 0)^T$, $\bar{A}_{22} = \begin{pmatrix} 9 & 0 \\ 5 & 5 \end{pmatrix}$.
-- Multipliers: $\bar{a}_{21}/\bar{a}_{11} = (1/3 \enspace 0)^T$.
+- The multipliers are $\bar{a}_{21}/\bar{a}_{11} = (1/3 \enspace 0)^T$.
 - Schur complement:
 
 $$
@@ -168,7 +168,7 @@ Level 2, recurse on $A'$, $n = 2$:
 
 - Column $1$ is $(19/3 \enspace 5)^T \approx (6.33 \enspace 5)^T$. Largest is row $1$. $i = 1$, so $P_2 = I_2$, no swap.
 - $\bar{a}_{11} = 19/3$, $\bar{a}_{12}^T = (-8/3)$, $\bar{a}_{21} = (5)$, $\bar{A}_{22} = (5)$.
-- Multiplier: $5 / (19/3) = 15/19$.
+- The multiplier is $5 / (19/3) = 15/19$.
 - Schur complement:
 
 $$

@@ -3,7 +3,7 @@ title: Communication Interfaces
 sidebar:
   order: 26
 dateCreated: 2026-06-11T17:49:00.373Z
-lastUpdatedOn: 2026-06-12T01:59:21.295Z
+lastUpdatedOn: 2026-09-13T14:55:23.904Z
 slug: s4/iot/communication-interfaces
 prereqs:
   - s4/computer-networks/non-tcp-ip-wireless-protocols
@@ -53,9 +53,9 @@ Properties:
 
 - Full duplex
 - Point-to-point only (no bus topology)
-- No clock line: receiver samples based on its own internal clock
+- No clock line, so the receiver samples based on its own internal clock
 - Clock drift is tolerated within a single frame but accumulates across many frames
-- Common baud rates: 9600, 115200 bps
+- Common baud rates are 9600 and 115200 bps
 
 Used for: serial debug monitor, GPS modules, Bluetooth adapter modules, GSM modems.
 
@@ -104,11 +104,11 @@ Master and slave must use the same mode. Mode 0 is the most common default.
 
 Properties:
 
-- Full duplex: 1 bit shifted out on `MOSI` and 1 bit shifted in on `MISO` per clock edge simultaneously
+- Full duplex, with 1 bit shifted out on `MOSI` and 1 bit shifted in on `MISO` per clock edge simultaneously
 - Single master, multiple slaves (each slave requires a dedicated `CS̄` line)
-- No addressing: `CS̄` selects the active slave
-- No ACK: master cannot detect if a slave is absent or has failed
-- Fast: typically 10–100+ MHz
+- No addressing, since `CS̄` selects the active slave
+- No ACK, so the master cannot detect if a slave is absent or has failed
+- Fast, typically 10–100+ MHz
 - Pin count scales with slave count: $N$ slaves require $N + 3$ pins total
 
 Used for: displays, SD cards, external ADC/DAC chips, flash memory.
@@ -136,7 +136,7 @@ Properties:
 - Up to 127 devices in 7-bit mode, limited by address space and electrical loading
 - Each device has a unique 7-bit (or 10-bit) address
 - Built-in ACK on every byte
-- Standard mode: 100 kHz. Fast mode: 400 kHz. Fast-plus: 1 MHz
+- Standard mode runs at 100 kHz, fast mode at 400 kHz, and fast-plus at 1 MHz
 
 Used for: IMUs, temperature and pressure sensors, EEPROMs, real-time clocks.
 

@@ -6,7 +6,7 @@ slug: s3/operating-systems/thread
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-04-24T03:19:45.178Z
+lastUpdatedOn: 2026-09-13T14:55:23.479Z
 ---
 
 A thread is the basic unit of CPU utilization, consisting of a program counter, a stack, and a set of registers.
@@ -51,11 +51,11 @@ Threads within the same process share:
 
 Threads can be implemented in user space or kernel space.
 
-### User thread
+### User Thread
 
 Managed by user-level library; no kernel intervention is required. Kernel doesn't know about these. Fast creation and switching. Entire process blocks if one thread makes a blocking syscall. Mapped to 1 or more kernel thread.
 
-### Kernel thread
+### Kernel Thread
 
 Managed by OS kernel. True parallelism on multicore. One blocked thread doesn't affect its siblings. More overhead.
 
@@ -93,13 +93,13 @@ Similar to many-tomany, but allows binding specific user threads to specific ker
 
 Provide APIs to create/manage threads.
 
-### User-level Library
+### User-Level Library
 
 Manages user-level threads. All thread operations happen in user space. Fast, but a blocking system call can block all threads.
 
 Examples: pthreads.
 
-### Kernel-level Library
+### Kernel-Level Library
 
 Manages kernel-level threads. OS manages threads directly.
 

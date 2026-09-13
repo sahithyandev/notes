@@ -83,7 +83,7 @@
     try {
       // Use eval to bypass Vite's static analysis
       // @ts-ignore
-      const pf = await eval('import("/pagefind/pagefind.js")');
+      const pf = await (0, eval)('import("/pagefind/pagefind.js")');
       pagefind = pf;
       await pagefind.init();
       pagefindReady = true;

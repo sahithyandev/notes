@@ -1,12 +1,12 @@
 ---
-title: Integration Over a Real Interval
+title: Integration over a Real Interval
 sidebar:
   order: 12
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-04T02:55:52.937Z
+lastUpdatedOn: 2026-09-13T14:55:24.305Z
 slug: s5/calculus/complex-functions/integration-over-real-interval
 prev: true
-next: false
+next: true
 ---
 
 Let $f(t) = u(t) + iv(t)$ for $a \le t \le b$, where $u$ and $v$ are real-valued continuous functions of the real variable $t$.
@@ -25,9 +25,87 @@ $$
 
 Let $f(t) = u(t) + iv(t)$ and $g(t) = p(t) + iq(t)$ be continuous on $[a,b]$.
 
-- $\displaystyle\int_a^b (f(t) + g(t))\,\text{d}t = \int_a^b f(t)\,\text{d}t + \int_a^b g(t)\,\text{d}t$
-- $\displaystyle\int_a^b f(t)\,\text{d}t = \int_a^c f(t)\,\text{d}t + \int_c^b f(t)\,\text{d}t$, for $a \le c \le b$
-- $\displaystyle\int_a^b \alpha f(t)\,\text{d}t = \alpha \int_a^b f(t)\,\text{d}t$, for a complex constant $\alpha$
-- $\displaystyle\int_a^b f(t)\,\text{d}t = -\int_b^a f(t)\,\text{d}t$
-- $\displaystyle\int_a^b f'(t)\,\text{d}t = f(b) - f(a)$, when $f$ is continuously differentiable on $[a,b]$
-- $\displaystyle\int_a^b f(t)g(t)\,\text{d}t = \int_a^b (u p - v q)\,\text{d}t + i\int_a^b (u q + v p)\,\text{d}t$
+### Sum
+
+$$
+\int_a^b (f(t) + g(t))\,\text{d}t = \int_a^b f(t)\,\text{d}t + \int_a^b g(t)\,\text{d}t
+$$
+
+<Note title="Proof Hint">
+
+- Write $f(t) + g(t) = (u+p) + i(v+q)$
+- Apply linearity of the real integral to $u+p$ and to $v+q$ separately
+- Recombine the 2 real integrals into $\int_a^b f(t)\,\text{d}t + \int_a^b g(t)\,\text{d}t$ using the definition of $\int f\,\text{d}t$
+
+</Note>
+
+### Additivity over Subintervals
+
+$$
+\int_a^b f(t)\,\text{d}t = \int_a^c f(t)\,\text{d}t + \int_c^b f(t)\,\text{d}t, \qquad a \le c \le b
+$$
+
+<Note title="Proof Hint">
+
+- Apply the additivity of the real integral to $u$ over $[a,c]$ and $[c,b]$, and likewise for $v$
+- Recombine the resulting real and imaginary parts using the definition of $\int f\,\text{d}t$
+
+</Note>
+
+### Homogeneity
+
+Let $\alpha = r + is$ be a complex constant.
+
+$$
+\int_a^b \alpha f(t)\,\text{d}t = \alpha \int_a^b f(t)\,\text{d}t
+$$
+
+<Note title="Proof Hint">
+
+- Expand $\alpha f(t) = (ru - sv) + i(rv + su)$
+- Apply linearity of the real integral to $ru - sv$ and to $rv + su$
+- Expand $\alpha\left(\int_a^b u\,\text{d}t + i\int_a^b v\,\text{d}t\right)$ and match the real and imaginary parts to the previous step
+
+</Note>
+
+### Reversal of Limits
+
+$$
+\int_a^b f(t)\,\text{d}t = -\int_b^a f(t)\,\text{d}t
+$$
+
+<Note title="Proof Hint">
+
+- Apply the corresponding reversal property of the real integral to $u$ and to $v$
+- Recombine using the definition of $\int f\,\text{d}t$
+
+</Note>
+
+### Fundamental Theorem
+
+Let $f$ be continuously differentiable on $[a,b]$.
+
+$$
+\int_a^b f'(t)\,\text{d}t = f(b) - f(a)
+$$
+
+<Note title="Proof Hint">
+
+- Write $f'(t) = u'(t) + iv'(t)$
+- Apply the fundamental theorem of calculus to $u'$ and to $v'$ separately: $\int_a^b u' = u(b) - u(a)$, $\int_a^b v' = v(b) - v(a)$
+- Combine into $(u(b) + iv(b)) - (u(a) + iv(a)) = f(b) - f(a)$
+
+</Note>
+
+### Product
+
+$$
+\int_a^b f(t)g(t)\,\text{d}t = \int_a^b (u p - v q)\,\text{d}t + i\int_a^b (u q + v p)\,\text{d}t
+$$
+
+<Note title="Proof Hint">
+
+- Expand $f(t)g(t) = (u+iv)(p+iq) = (up - vq) + i(uq + vp)$
+- Apply the definition of $\int f\,\text{d}t$ to this real and imaginary decomposition
+
+</Note>

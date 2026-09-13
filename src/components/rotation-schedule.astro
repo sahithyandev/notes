@@ -1,0 +1,80 @@
+---
+interface Props {
+  shifts: number[];
+  caption?: string;
+}
+
+const { shifts, caption } = Astro.props;
+---
+
+<figure class="rotsched">
+  <ol class="grid">
+    {
+      shifts.map((p, i) => (
+        <li class:list={["cell", { two: p === 2 }]}>
+          <span class="round">{i + 1}</span>
+          <span class="shift">{p}</span>
+        </li>
+      ))
+    }
+  </ol>
+  {caption && <p class="caption">{caption}</p>}
+</figure>
+
+<style>
+  .rotsched {
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .grid {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(16, 2.5rem);
+    gap: 3px;
+  }
+
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+  }
+
+  .cell.two {
+    background: color-mix(in oklab, var(--dia-key) 14%, var(--surface));
+    border-color: color-mix(in oklab, var(--dia-key) 45%, var(--surface));
+  }
+
+  .round {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    font-size: 0.5rem;
+    line-height: 1;
+    color: var(--text-muted);
+  }
+
+  .shift {
+    margin-top: 0.35em;
+  }
+
+  .caption {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 8px auto 0;
+    max-width: 32rem;
+  }
+</style>

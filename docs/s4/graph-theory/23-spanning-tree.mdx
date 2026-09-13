@@ -6,7 +6,7 @@ slug: s4/graph-theory/spanning-tree
 prev: true
 next: true
 dateCreated: 2026-04-27T04:57:01.895Z
-lastUpdatedOn: 2026-05-31T19:40:41.096Z
+lastUpdatedOn: 2026-09-13T14:55:23.774Z
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/spanning-tree
   - s2/data-structures-and-algorithms/algorithms/breadth-first-search
@@ -52,7 +52,7 @@ Aka. BFS or level-order construction. Builds the spanning tree level by level fr
 **Steps:**
 
 1. Order all vertices arbitrarily.
-2. Select first vertex as root — level 0.
+2. Select first vertex as root (level 0).
 3. Add all edges incident to the root. New vertices form level 1.
 4. For each level-$k$ vertex (in order), add all incident edges not creating a circuit. New vertices form level $k+1$.
 5. Repeat until all vertices are added.
@@ -73,7 +73,7 @@ bfs(V, E):
     S = children of S ordered by original vertex ordering
 ```
 
-#### Connectivity test
+#### Connectivity Test
 
 Apply BFS to $G$ with $n$ vertices. $G$ is connected iff the resulting tree $T$ has $n$ vertices.
 
@@ -86,7 +86,7 @@ Aka. DFS or backtracking algorithm. Proceeds as deep as possible along a path be
 1. Order all vertices arbitrarily.
 2. Select first vertex as root.
 3. Add edge to the highest-priority unvisited adjacent vertex. Move to that vertex.
-4. Repeat — extend the path as far as possible.
+4. Repeat, extending the path as far as possible.
 5. When no extension is possible, backtrack to the previous vertex.
 6. From there, attempt to extend again. Repeat until all vertices added.
 

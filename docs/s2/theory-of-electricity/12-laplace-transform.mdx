@@ -6,7 +6,7 @@ slug: s2/theory-of-electricity/laplace-transform
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-05-31T13:49:07.991Z
+lastUpdatedOn: 2026-09-13T14:55:22.929Z
 ---
 
 A mathematical operation that transforms a function of time $f(t)$, into a function of a complex variable, denoted as $F(s)$. Mathematically, the Laplace Transform of a function $f(t)$ is defined as:
@@ -23,7 +23,7 @@ Here:
 
 Can only be applied to casual functions. Converts a differential equation (time domain) into a linear complex algebraic equation (frequency domain). After Laplace transformation is applied, the resulting functions are capitalized by convention.
 
-### Casual function
+### Casual Function
 
 A function of time $f(t)$ satisfying:
 
@@ -31,7 +31,7 @@ $$
 f(t) = 0 \quad \text{for} \quad t < 0
 $$
 
-### Inverse Laplace transform
+### Inverse Laplace Transform
 
 If $\mathcal{L}\{f(t)\} = F(s)$, then the inverse Laplace Transform is given by:
 
@@ -39,9 +39,9 @@ $$
 f(t) = \mathcal{L}^{-1}\{F(s)\} = \frac{1}{2\pi j} \int_{\sigma - j\infty}^{\sigma + j\infty} e^{st} F(s) \, \text{d}s
 $$
 
-## Special functions
+## Special Functions
 
-### Unit step function
+### Unit Step Function
 
 $$
 u(t) =
@@ -57,7 +57,7 @@ $$
 \mathcal{L}\{u(t)\} = \frac{1}{s}
 $$
 
-### Unit impulse function
+### Unit Impulse Function
 
 $$
 \delta(t) =
@@ -85,7 +85,7 @@ $$
 \int_{-\infty}^{\infty} f(t-k)\,\delta(t)\, \text{d}t = f(k)
 $$
 
-### Unit ramp function
+### Unit Ramp Function
 
 $$
 r(t) =
@@ -101,7 +101,7 @@ $$
 \mathcal{L}\{r(t)\} = \frac{1}{s^2}
 $$
 
-## Circuit transformation
+## Circuit Transformation
 
 Both AC and DC voltage sources are transformed according to the Laplace transform table. Resistors are included as is.
 
@@ -159,13 +159,13 @@ $$
 \mathcal{L}\left\{t^n f(t)\right\} = (-1)^n \frac{\text{d}^n F(s)}{\text{d}s^n}
 $$
 
-### Time shift
+### Time Shift
 
 $$
 \mathcal{L}\left\{f(t - T)\right\} = e^{-sT}F(s)
 $$
 
-### Frequency shift
+### Frequency Shift
 
 $$
 \mathcal{L}^{-1}\{F(s+a)\} = e^{-at}f(t)
@@ -190,7 +190,7 @@ f(\infty) =
 \lim_{s \to 0} sF(s)
 $$
 
-## Laplace transform table
+## Laplace Transform Table
 
 <section class="big-equations">
 

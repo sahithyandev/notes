@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-06-01T03:58:53.177Z
+lastUpdatedOn: 2026-09-13T14:55:22.704Z
 ---
 
 A greedy algorithm to find the shortest path from a single source vertex to all other nodes. Widely used in network routing and other optimization problems.
@@ -99,11 +99,16 @@ import DijkstrasAlgorithmExample from "./images/dijkstras-algorithm-example.svg"
 
 1. Initialize distances: `dist[0] = 0`, all others = `INF`.
 2. Process vertices in order of their current shortest distance:
-   - Start with vertex 0: Update distances to 1 (`2`) and 4 (`1`).
-   - Process vertex 4: Update distance to 2 (`3`) and 3 (`5`).
-   - Process vertex 1: No updates needed.
-   - Process vertex 2: Update distance to 3 (`4`).
-   - Process vertex 3: No updates needed.
+   - Start with vertex 0  
+     Update distances to 1 (`2`) and 4 (`1`).
+   - Process vertex 4  
+     Update distance to 2 (`3`) and 3 (`5`).
+   - Process vertex 1  
+     No updates needed.
+   - Process vertex 2  
+     Update distance to 3 (`4`).
+   - Process vertex 3  
+     No updates needed.
 
 Output:
 
@@ -116,7 +121,7 @@ Vertex  Distance from Source
 4       1
 ```
 
-## Comparison from Bellman Ford's algorithm
+## Comparison from Bellman Ford's Algorithm
 
 | Aspect                   | Bellman-Ford                    | Dijkstra's                 |
 | ------------------------ | ------------------------------- | -------------------------- |

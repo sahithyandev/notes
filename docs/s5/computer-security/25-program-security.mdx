@@ -1,0 +1,148 @@
+---
+title: Program Security
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.444Z
+slug: s5/computer-security/program-security
+sidebar:
+  order: 25
+prev: true
+next: true
+---
+
+Program security is the protection of confidentiality, integrity, and availability in the programs a system runs.
+
+Programs to secure:
+
+- Operating system.
+- Device drivers.
+- Network software, e.g. the TCP stack and web servers.
+- Database management systems.
+
+## Security Properties Against an Attacker
+
+Security concerns an honest user and a dishonest attacker. The attacker either disrupts the honest user's use of the system or learns information intended for the user alone.
+
+- Confidentiality  
+  An attacker cannot learn information about the system or its users.
+- Integrity  
+  The system only reaches states that would occur if there were no attacker.
+- Availability  
+  An attacker cannot prevent authorized users from using the system.
+
+## Correctness and Security
+
+- Correctness  
+  On expected input, the system produces the desired output. Good input gives good output. More features make the system better.
+- Security  
+  On unexpected input from an attacker, the system does not fail in certain ways. More features give the attacker more to exploit, so the system can get worse.
+
+## Nonmalicious Program Errors
+
+Faults introduced without intent to harm, still exploitable by an attacker.
+
+- [Buffer overflow](/s5/computer-security/buffer-overflow)
+- [Incomplete mediation](/s5/computer-security/incomplete-mediation)
+- [Time-of-check to time-of-use errors](#time-of-check-to-time-of-use-errors)
+
+## Time-of-Check to Time-of-Use Errors
+
+A time-of-check to time-of-use (TOCTTOU) error is a concurrency issue where control is given to another process between an access control check and the access operation it guards, letting the checked condition change before it is used.
+
+```c
+int openfile(char *path) {
+    struct stat s;
+    if (stat(path, &s) < 0)
+        return -1;
+    if (!S_ISREG(s.st_mode)) {
+        error("only allowed to regular files");
+        return -1;
+    }
+    return open(path, O_RDONLY);
+}
+```
+
+`stat` checks that `path` is a regular file. Between that check and `open`, an attacker can change what `path` refers to, so the file actually opened is not the one checked.
+
+### Attack Mechanism
+
+`openfile` runs in the kernel. At user level, an adversary-controlled program `P` defines a shared `path` variable and launches 2 threads `T1` and `T2` that both see updates to it.
+
+- `T1` calls `openfile` with `path` set to a regular file.
+- `T2` concurrently sets `path` to point to a directory.
+- If `T2`'s write lands between `T1`'s `stat` and `open`, `openfile` opens the directory despite having checked a regular file.
+
+### Prevention
+
+- Ensure critical parameters are not exposed during pre-emption  
+  `openfile` owns `path` exclusively for the duration of the call.
+- Ensure serial integrity  
+  Make `openfile` atomic, so no pre-emption occurs during its execution.
+- Validate critical parameters  
+  Compute a checksum of `path` before pre-emption and compare it to a checksum taken after.
+
+## Format String Attacks
+
+A format string attack exploits code that passes attacker-controlled input directly as a format string argument, rather than as a data argument.
+
+```c
+sprintf(buffer, sizeof_buffer, input);
+```
+
+`input` is interpreted as a format string. An attacker who controls `input` can read from or write to the stack.
+
+### Reading from the Stack
+
+An attacker enters `%x%x%x` as `input`:
+
+```c
+sprintf(buffer, sizeof_buffer, "%x%x%x");
+```
+
+Each `%x` fetches the next value from the stack as if it were an argument, printing 3 hex values that were never intended as output.
+
+### Writing to the Stack
+
+The `%n` conversion stores the number of characters printed so far into the memory location of its corresponding argument.
+
+```c
+printf("Testing%n", &test);
+```
+
+Loads the number 7, the length of `"Testing"`, into the memory location of `test`. An attacker who controls the format string can target a chosen memory location and write an attacker-chosen value into it.
+
+## SQL Injection
+
+SQL injection is a technique where a malicious user injects SQL commands into an SQL statement via web page input. The injected commands alter the statement and compromise the security of the application.
+
+Web applications commonly build SQL statements by concatenating user input:
+
+```
+txtUserId = getRequestString("UserId")
+txtSQL = "SELECT * FROM Users WHERE UserId = " + txtUserId
+```
+
+### Always-True Injection
+
+`1=1` is always true. A `txtUserId` of `105 or 1=1` turns the query into:
+
+```sql
+SELECT UserId, Name, Password FROM Users WHERE UserId = 105 or 1=1
+```
+
+Syntactically valid, and returns every row in `Users` instead of one.
+
+The same pattern applies to string comparisons. Injecting `" or ""="` into a username and password field:
+
+```sql
+SELECT * FROM Users WHERE Name ="" or ""="" AND Pass ="" or ""=""
+```
+
+### Batched Statement Injection
+
+Batched SQL statements are separated by a semicolon. Injecting a second statement after the intended one:
+
+```sql
+SELECT * FROM Users WHERE UserId = 105; DROP TABLE Suppliers
+```
+
+Returns the requested row, then executes the injected `DROP TABLE`, deleting the `Suppliers` table.

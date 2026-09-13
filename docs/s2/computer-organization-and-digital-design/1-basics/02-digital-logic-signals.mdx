@@ -6,10 +6,10 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.581Z
-lastUpdatedOn: 2026-06-01T03:58:53.166Z
+lastUpdatedOn: 2026-09-13T14:55:22.592Z
 ---
 
-### Logic levels
+### Logic Levels
 
 Ranges of voltages are abstracted away into 0 (LOW) and 1 (HIGH).
 
@@ -20,7 +20,7 @@ Example: CMOS (LV)
 - HIGH - 2V to 3.3V
 - LOW - 0V to 0.8V
 
-## Digital waveforms
+## Digital Waveforms
 
 Voltage levels that are changing back and forth between the digital states.
 
@@ -31,10 +31,12 @@ before returning to the original state.
 
 2 types:
 
-- Positive-going pulse: Sudden change from LOW to HIGH to LOW.
-- Negative-going pulse: Sudden change from HIGH to LOW to HIGH.
+- Positive-going pulse  
+  Sudden change from LOW to HIGH to LOW.
+- Negative-going pulse  
+  Sudden change from HIGH to LOW to HIGH.
 
-### Non-ideal pulse
+### Non-Ideal Pulse
 
 Even though analog signal is abstracted into digital, the analog characteristic
 can be observed when switching states. A non-ideal pulse will take a very short
@@ -42,13 +44,13 @@ time to switch the states.
 
 ![Non-ideal pulse](./images/non-ideal-pulse.jpg)
 
-### Raise and fall time
+### Raise and Fall Time
 
 Ideally a pulse is instantaneous. In non-ideal case, it takes time to transition
 between states. Raise and fall times are measured between the 10% and 90%
 transitions.
 
-### Pulse width
+### Pulse Width
 
 The time a pulse takes. In non-ideal case, the pulse width is
 said to be the time between 50% marks of the transition.
@@ -58,7 +60,7 @@ said to be the time between 50% marks of the transition.
 A series of pulses. They can either be periodic (pulse train) or non-periodic. A
 clock is required along with the waveform to convert it into binary.
 
-### Duty cycle
+### Duty Cycle
 
 Defined for a periodic waveform. Ratio between pulse width ($t_w$) and the
 period ($T$).
@@ -67,7 +69,7 @@ $$
 \text{Duty cycle} = \frac{t_w}{T} \times 100\%
 $$
 
-## Gate delay
+## Gate Delay
 
 Aka. propogation delay. The time it takes for a logic gate to produce an output
 after receiving an input. Caused due to the physical limitations of the gate's
@@ -75,7 +77,7 @@ internal circuitry. Denoted by $t_p$.
 
 Can vary betwen LOW to HIGH ($t_{pLH}$) and HIGH to LOW ($t_{pHL}$).
 
-## Logic family
+## Logic Family
 
 A collection of different integrated circuit (IC) chips/chip building blocks
 that have:
@@ -89,7 +91,7 @@ function.
 Chips from different logic families may or may not be compatible. When they
 aren't, special steps must be taken to interconnect those chips/building blocks.
 
-### Electrical behavior
+### Electrical Behavior
 
 - Logic voltage level
 - DC noise margins  
@@ -157,7 +159,7 @@ circuit is fabricated as a chip.
 
 </Note>
 
-## Data transfer
+## Data Transfer
 
 Data can be transferred in either serial or parallel. Serial transfer takes more
 time while parallel transfer requires more transmission lines.

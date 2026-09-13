@@ -2,7 +2,7 @@ const openSidebarBtn = document.getElementById("open-sidebar");
 const openTocBtn = document.getElementById("open-toc");
 const backdrop = document.getElementById("drawer-backdrop");
 const sidebarEl = document.querySelector(".sidebar");
-const tocEl = document.querySelector(".toc-rail");
+const tocEl = document.querySelector(".right-sidebar");
 const root = document.documentElement;
 
 const closeDrawers = () => {

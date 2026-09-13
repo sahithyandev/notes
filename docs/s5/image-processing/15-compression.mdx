@@ -1,0 +1,215 @@
+---
+title: Compression
+dateCreated: 2026-08-18T07:19:11.017Z
+lastUpdatedOn: 2026-09-13T14:55:24.513Z
+slug: s5/image-processing/compression
+sidebar:
+  order: 15
+prev: true
+next: false
+---
+
+Compression reduces the volume of data required to represent an image, without necessarily reducing its information content.
+
+- Lossless compression  
+  Source and reconstructed image match pixel to pixel.
+- Lossy compression  
+  Source and reconstructed image may not match pixel to pixel.
+
+## Compression Ratio
+
+For the same information encoded with $n_1$ units of data under scheme $C_1$ and $n_2$ units under scheme $C_2$:
+
+$$
+CR = \frac{n_1}{n_2}
+$$
+
+Relative data redundancy of $C_2$ compared to $C_1$:
+
+$$
+RD = 1 - \frac{1}{CR}
+$$
+
+## Information vs Data
+
+Information is the meaning conveyed by a message. Data is the container used to store or transmit it.
+
+- Information is not compressible, since its meaning doesn't change with the medium
+- Data is compressible, since data capacity can exceed the information it carries
+
+## Redundancy Types
+
+Image compression exploits 3 types of redundancy.
+
+- Coding redundancy  
+  The coding scheme uses more space than the information requires, e.g. an 8bpp image stored in 16bpp format.
+- Interpixel redundancy  
+  Pixel values are correlated locally, e.g. a monotonous background or a repeating texture.
+- Psychovisual redundancy  
+  Image detail that isn't visually perceivable.
+
+<Note>
+
+Redundancy also gives resilience against data corruption. Practical schemes retain controlled redundancy, e.g. chunked delta coding or parity bits and checksums, to limit error propagation.
+
+</Note>
+
+## Entropy
+
+Information conveyed by an event is negatively related to its probability.
+
+$$
+H(E) = \log \frac{1}{P(E)} = -\log P(E)
+$$
+
+For an image, entropy is the probability-weighted sum of the information carried by each grey level.
+
+$$
+B_{ave} = -\sum_{i=0}^{L-1} P(l_i) \log_2 P(l_i)
+$$
+
+Here:
+
+- $L$: number of grey levels
+- $P(l_i)$: probability of grey level $l_i$
+
+$B_{ave}$ is the minimum average number of bits per pixel required to represent the image.
+
+Example:
+
+An image has 100 pixels across 3 grey levels: white ($r_k = 50$, $P = 0.5$), grey ($r_k = 25$, $P = 0.25$), black ($r_k = 25$, $P = 0.25$).
+
+$$
+B_{total} = -50\log_2 0.5 - 25\log_2 0.25 - 25\log_2 0.25 = 150 \text{ bits}
+$$
+
+$$
+B_{ave} = 1.5 \text{ bits per pixel}
+$$
+
+## Coding Redundancy
+
+For grey level $k$ with probability $P(k) = r_k / N$ and codeword length $l(k)$:
+
+$$
+L_{ave} = \sum_{k=0}^{L-1} l(k) P(k)
+$$
+
+The smallest $L_{ave}$ is achieved by assigning the shortest codeword to the most probable grey level.
+
+- Fixed length codes  
+  All codewords share the same length.
+- Variable length codes  
+  Codeword length varies by grey level. Must remain uniquely decodable.
+
+<Note>
+
+The mapping between grey levels and codewords is stored in a codebook.
+
+</Note>
+
+### Huffman Coding
+
+Produces the optimal variable length codeword allocation while preserving decodability.
+
+<Note title="Proof Hint">
+
+- Order grey levels by probability, highest to lowest
+- Combine the 2 lowest probability sources into 1, repeat until 1 source remains
+- Code each reduced source starting from the smallest, working back to the original
+
+</Note>
+
+## Interpixel Redundancy
+
+Correlated or repeating pixel patterns, such as texture or constant regions, can be represented more compactly than as independent pixel values.
+
+### Delta Coding
+
+Transforms pixels into differences from a neighbour:
+
+$$
+D(x,y) = I(x+1,y) - I(x,y)
+$$
+
+- Differences are typically small integers, since local pixels are correlated
+- Reduces correlation among pixel values, increasing coding efficiency
+
+### Image Pyramid Coding
+
+Each layer stores the difference from the layer above, upscaled to match resolution. Removes correlation relative to the previous layer.
+
+- Used for progressive image transmission, updating the receiver incrementally
+
+### Run-Length Coding
+
+Encodes a run of identical pixel values as $(\text{value}, \#\text{times to repeat})$ pairs rather than storing each pixel separately.
+
+- More effective on binary images, which more often contain large regions of constant value
+
+### Bit-Plane Coding
+
+Separates an $m$-bit grey level image into $m$ binary bit-planes.
+
+- Lower order planes capture minor grey level changes
+- Higher order planes capture larger changes, and hold larger regions of constant value
+- Higher order planes compress better with schemes such as run-length coding
+
+## Psychovisual Redundancy
+
+Not all image detail is equally perceivable. Removing imperceptible detail doesn't affect apparent quality, but always loses information.
+
+- Re-quantizing with lower grey level depth
+- Smoothing to remove noise and minor variations before coding
+
+<Note>
+
+Always results in a lossy compression scheme.
+
+</Note>
+
+## Compression Pipeline
+
+$$
+\text{Mapper} \to \text{Quantizer} \to \text{Symbol encoder} \to \text{Channel encoder}
+$$
+
+- Mapper  
+  Transform to reduce interpixel correlation.
+- Quantizer  
+  Resample to reduce bit depth. Lossy, and optional.
+- Symbol encoder  
+  Entropy coding for optimal symbol allocation.
+- Channel encoder  
+  Add controlled redundancy for error recovery.
+
+Decompression reverses each stage in order, except quantization, which is non-recoverable.
+
+## JPEG Compression
+
+Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
+
+- Compression ratios up to about 20:1 without noticeable artefacts, up to about 100:1 with minor artefacts
+- Supports both lossless and lossy modes
+- User selectable compression to file size tradeoff
+
+Pipeline:
+
+$$
+\text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
+$$
+
+- Forward DCT  
+  Convert to YCrCb, divide into 8x8 tiles, apply the discrete cosine transform to each tile.
+- Quantization  
+  Optional. Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality.
+- Entropy coding  
+  Code coefficients in zig-zag order for optimal coding efficiency.
+
+### Discrete Cosine Transform
+
+Decomposes the image into a set of cosine waveforms at different frequencies, ordered from DC (average intensity) to high frequency (sharp, minor variation).
+
+- Coefficients are uncorrelated, giving better entropy than raw pixel values
+- Zeroing a coefficient removes its corresponding frequency from the reconstructed image
+- Inverse DCT reconstructs the image from its coefficients

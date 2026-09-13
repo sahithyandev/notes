@@ -1,0 +1,65 @@
+---
+title: Atbash Cipher
+sidebar:
+  order: 7
+dateCreated: 2026-08-11T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.344Z
+slug: s5/computer-security/atbash-cipher
+prev: true
+next: true
+---
+
+A [classical](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. Each letter maps to one fixed letter, so plaintext letter frequencies are preserved in the ciphertext.
+
+Originally devised for the Hebrew alphabet, then applied to Latin and other alphabets.
+
+You can find an implementation of the Atbash cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/atbash-cipher.c).
+
+## Encryption
+
+Each letter in the alphabet is replaced with the letter at its mirrored position, counting from the opposite end.
+
+$$
+c = 25 - m \mod 26
+$$
+
+Here:
+
+- $m$: plaintext letter, encoded as an integer 0 (a) to 25 (z)
+- $c$: ciphertext letter, same encoding
+
+Atbash has no key. a always maps to z, b to y, and so on.
+
+## Decryption
+
+The mirror map is its own inverse, so decryption applies the same operation.
+
+$$
+m = 25 - c \mod 26
+$$
+
+## Attacking
+
+There is no key to search. Recovering the plaintext is a single substitution away once Atbash is suspected.
+
+## Worked Example
+
+Plaintext `attack`, with $a = 0$ to $z = 25$.
+
+Each letter maps to its mirror $c = 25 - m$.
+
+- $a (0) \to 25 = z$
+- $t (19) \to 6 = g$
+- $c (2) \to 23 = x$
+- $k (10) \to 15 = p$
+
+Ciphertext is `zggzxp`.
+
+Decryption applies the same map again.
+
+- $z (25) \to 0 = a$
+- $g (6) \to 19 = t$
+
+Plaintext is `attack`.
+
+No key exists, so testing the single Atbash substitution against the ciphertext confirms it in one step.

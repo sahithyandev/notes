@@ -7,12 +7,12 @@ slug: s2/program-construction/design-patterns/behavioral
 prev: true
 next: false
 dateCreated: 2026-04-22T07:07:02.601Z
-lastUpdatedOn: 2026-06-01T03:58:53.196Z
+lastUpdatedOn: 2026-09-13T14:55:22.877Z
 ---
 
 Deals with how different kinds of objects interact with each other.
 
-## Chain of Responsibility pattern
+## Chain of Responsibility Pattern
 
 Allows a request to be passed along a chain of handlers until it is handled. Each handler decides whether to process the request or pass it to the next handler in the chain.
 
@@ -94,7 +94,7 @@ Drawbacks:
 - Debugging can be difficult due to dynamic request flow
 - Can become complex with long chains
 
-## Command pattern
+## Command Pattern
 
 Turns a request into a standalone Command object. Can be passed, queued, logged.
 
@@ -184,7 +184,7 @@ Drawbacks:
   command interface may need modifications, leading to possible changes in other
   parts of the system.
 
-## Interpreter pattern
+## Interpreter Pattern
 
 Defines a way to evaluate sentences in a language by representing its grammar as a class hierarchy. Each rule in the grammar is represented by a class, and the interpretation is done by traversing the structure.
 
@@ -268,7 +268,7 @@ Drawbacks:
 - Can become complex with large grammars
 - Performance issues with deeply nested expressions
 
-## Iterator pattern
+## Iterator Pattern
 
 Provides a way to access elements of a collection sequentially without exposing the underlying representation.
 
@@ -330,7 +330,7 @@ Drawbacks:
 - May not be suitable for very large collections due to memory overhead
 - Can increase complexity for custom collections
 
-## Mediator pattern
+## Mediator Pattern
 
 Defines an object that encapsulates how a set of objects interact. This pattern promotes loose coupling by keeping objects from referring to each other explicitly and allows their interaction to be varied independently.
 
@@ -422,7 +422,7 @@ Drawbacks:
 - Can become a bottleneck if the mediator grows too complex
 - May introduce a single point of failure
 
-## Momento pattern
+## Momento Pattern
 
 Provides a way to store and restore the internal state of an object, without
 breaking encapsulation. Used for implementing undo/redo.
@@ -551,7 +551,7 @@ public class MementoPatternExample {
 
 Encapsulation property is maintained. Not suitable when the state is complex, or large, or frequently changing.
 
-## Observer pattern
+## Observer Pattern
 
 Defines a one-to-many relationship between objects so that when one object
 changes state, all its dependents are notified and updated automatically.
@@ -625,7 +625,7 @@ Drawbacks:
 - Unexpected updates if order of notification matters
 - Performance impact with many observers
 
-## Strategy pattern
+## Strategy Pattern
 
 Defines a family of algorithms, encapsulates each one, and makes them
 interchangeable. Strategy lets the algorithm vary independently from clients
@@ -688,7 +688,7 @@ Drawbacks:
 - Client must be aware of different strategies
 - Strategy and Context interfaces may become complex
 
-## State pattern
+## State Pattern
 
 Allows an object to alter its behavior when its internal state changes,
 appearing to change its class.
@@ -782,7 +782,7 @@ Drawbacks:
 - Increased number of classes
 - State transitions can become complex
 
-## Template method pattern
+## Template Method Pattern
 
 Defines the structure of an algorithm and allows the steps of
 the algorithm to be implemented or overridden by subclasses.
@@ -831,7 +831,7 @@ public class Main {
 }
 ```
 
-## Visitor pattern
+## Visitor Pattern
 
 Allows adding new operations to objects without modifying them. The operation is
 abstracted into a separate class.

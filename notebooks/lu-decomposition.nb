@@ -1,0 +1,110 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[      3683,        101]
+NotebookOptionsPosition[      2410,         77]
+NotebookOutlinePosition[      2799,         93]
+CellTagsIndexPosition[      2756,         90]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["LU Decomposition", "Title",ExpressionUUID->"9a1473e5-df7f-448e-b832-b3c95bc9db8b"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/07-lu-decomposition.mdx. Edit A in the \
+parameters cell below, then Kernel \[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"2f5b8111-5668-4104-9f09-0de084c874b3"],
+
+Cell["Parameters \[LongDash] edit this and re-evaluate the notebook", \
+"Subsection",ExpressionUUID->"ef01cafc-e7da-46f1-aaa8-2b8e1dca1e1d"],
+
+Cell[BoxData[
+ RowBox[{"A", "=",
+  RowBox[{"{",
+   RowBox[{
+    RowBox[{"{",
+     RowBox[{"2", ",",
+      RowBox[{"-", "1"}], ",", "1"}], "}"}], ",",
+    RowBox[{"{",
+     RowBox[{"4", ",", "1", ",",
+      RowBox[{"-", "1"}]}], "}"}], ",",
+    RowBox[{"{",
+     RowBox[{
+      RowBox[{"-", "2"}], ",", "5", ",", "2"}], "}"}]}], "}"}]}]], "Input",Exp\
+ressionUUID->"b7bc8677-d7fe-4e13-8e5c-cff88365f0e5"],
+
+Cell["Decompose", "Subsection",ExpressionUUID->"a79c5da1-3063-4784-9fdc-627c4b6ec5c8"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"{",
+   RowBox[{"Lm", ",", "Um", ",", "Pm", ",", "cond"}], "}"}], "=",
+  RowBox[{"LUDecomposition", "[", "A", "]"}]}]], "Input",ExpressionUUID->\
+"747aacf6-bb78-494c-aa3c-41e28a0f5685"],
+
+Cell[BoxData[
+ RowBox[{"L", "=",
+  RowBox[{"Normal", "[", "Lm", "]"}]}]], "Input",ExpressionUUID->"cb73f624-\
+f342-45c7-91f2-05dbfff81132"],
+
+Cell[BoxData[
+ RowBox[{"U", "=",
+  RowBox[{"Normal", "[", "Um", "]"}]}]], "Input",ExpressionUUID->"f6d6326a-\
+ed81-4d06-8860-dcf119fa9be0"],
+
+Cell[BoxData[
+ RowBox[{"P", "=",
+  RowBox[{"Normal", "[", "Pm", "]"}]}]], "Input",ExpressionUUID->"7161abd0-\
+d698-4209-af91-f10a13c82ca0"],
+
+Cell["Verify", "Subsection",ExpressionUUID->"1fb77666-28ca-4857-adfb-97a0934e184f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"P", ".", "A"}], "-",
+  RowBox[{"L", ".", "U"}]}]], "Input",ExpressionUUID->"b608255e-0fc1-4454-\
+886f-4ca35e6feb73"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"a83bd6d1-c378-4ba4-8c49-4f0e587986a8"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 88, 0, 70, "Title",ExpressionUUID->"9a1473e5-df7f-448e-b832-b3c95bc9db8b"],
+Cell[645, 22, 220, 3, 70, "Text",ExpressionUUID->"2f5b8111-5668-4104-9f09-0de084c874b3"],
+Cell[868, 27, 140, 1, 70, "Subsection",ExpressionUUID->"ef01cafc-e7da-46f1-aaa8-2b8e1dca1e1d"],
+Cell[1011, 30, 412, 13, 70, "Input",ExpressionUUID->"b7bc8677-d7fe-4e13-8e5c-cff88365f0e5"],
+Cell[1426, 45, 86, 0, 70, "Subsection",ExpressionUUID->"a79c5da1-3063-4784-9fdc-627c4b6ec5c8"],
+Cell[1515, 47, 221, 5, 70, "Input",ExpressionUUID->"747aacf6-bb78-494c-aa3c-41e28a0f5685"],
+Cell[1739, 54, 140, 3, 70, "Input",ExpressionUUID->"cb73f624-f342-45c7-91f2-05dbfff81132"],
+Cell[1882, 59, 140, 3, 70, "Input",ExpressionUUID->"f6d6326a-ed81-4d06-8860-dcf119fa9be0"],
+Cell[2025, 64, 140, 3, 70, "Input",ExpressionUUID->"7161abd0-d698-4209-af91-f10a13c82ca0"],
+Cell[2168, 69, 83, 0, 70, "Subsection",ExpressionUUID->"1fb77666-28ca-4857-adfb-97a0934e184f"],
+Cell[2254, 71, 152, 4, 70, "Input",ExpressionUUID->"b608255e-0fc1-4454-886f-4ca35e6feb73"]
+}
+]
+*)
+
+(* End of internal cache information *)

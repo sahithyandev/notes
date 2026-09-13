@@ -6,7 +6,7 @@ slug: s3/applied-statistics/two-sample-mean-test
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.682Z
-lastUpdatedOn: 2026-05-31T13:49:07.991Z
+lastUpdatedOn: 2026-09-13T14:55:22.955Z
 ---
 
 Suppose two independent random samples of size $n_1$ and $n_2$ respectively are drawn
@@ -24,10 +24,13 @@ The appropriate test statistics depends on $\sigma_1$ and $\sigma_2$ are known o
 
 ### Assumptions
 
-- Independence: samples are independent within and across groups
-- Distribution: each population is normal, or samples are large (CLT)
-- Known vs unknown variances: choose Z or t accordingly
-- Equal-variance assumption only for pooled t; otherwise use Welch t
+- Independence  
+  Samples are independent within and across groups.
+- Distribution  
+  Each population is normal, or samples are large (CLT).
+- Known vs unknown variances  
+  Choose Z or t accordingly.
+- Equal-variance assumption only for pooled t; otherwise use Welch t.
 
 ## Test Statistic
 
@@ -42,9 +45,12 @@ $$
 
 Decision
 
-- Two-tailed: reject $H_0$ **if** $|Z|\ge z_{1-\alpha/2}$
-- Right-tailed $(>)$: reject **if** $Z\ge z_{1-\alpha}$
-- Left-tailed $(<)$: reject **if** $Z\le -z_{1-\alpha}$
+- Two-tailed  
+  Reject $H_0$ **if** $|Z|\ge z_{1-\alpha/2}$.
+- Right-tailed $(>)$  
+  Reject **if** $Z\ge z_{1-\alpha}$.
+- Left-tailed $(<)$  
+  Reject **if** $Z\le -z_{1-\alpha}$.
 
 Confidence interval for $d_0$:
 
@@ -77,9 +83,12 @@ $$
 
 Decision
 
-- Two-tailed: reject **if** $|t|\ge t_{v,,1-\alpha/2}$
-- Right-tailed: reject **if** $t\ge t_{v,,1-\alpha}$
-- Left-tailed: reject **if** $t\le -t_{v,,1-\alpha}$
+- Two-tailed  
+  Reject **if** $|t|\ge t_{v,,1-\alpha/2}$.
+- Right-tailed  
+  Reject **if** $t\ge t_{v,,1-\alpha}$.
+- Left-tailed  
+  Reject **if** $t\le -t_{v,,1-\alpha}$.
 
 Confidence interval for $d_0$:
 
@@ -109,7 +118,7 @@ $$
 (\bar X_1 - \bar X_2) \pm t_{v,\,1-\alpha/2}\, \sqrt{\tfrac{s_1^2}{n_1} + \tfrac{s_2^2}{n_2}}
 $$
 
-## P-value
+## P-Value
 
 For any computed statistic $T$:
 

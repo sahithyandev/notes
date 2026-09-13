@@ -3,7 +3,7 @@ title: Databases
 sidebar:
   order: 21
 dateCreated: 2026-05-17T18:12:05.694Z
-lastUpdatedOn: 2026-06-04T05:37:58.600Z
+lastUpdatedOn: 2026-09-13T14:55:24.012Z
 slug: s4/operating-systems-security/databases
 prev: true
 next: true
@@ -28,21 +28,22 @@ Protection mechanisms:
 - Periodic full backups
 - Transaction logs  
   Record all changes. Used to replay operations after failure.
-- Recovery procedure: restore backup → replay log → reach consistent state.
+- Recovery procedure  
+  Restore backup, replay log, reach consistent state.
 
-**Two-phase update** — atomic write protocol.
+**Two-phase update**: atomic write protocol.
 
-- Phase 1 (Intent): prepare all data, lock records, write commit flag.
-- Phase 2 (Write): execute all writes, remove commit flag.
+- Phase 1 (Intent) prepares all data, locks records, and writes the commit flag.
+- Phase 2 (Write) executes all writes and removes the commit flag.
 - Failure in either phase is recoverable without data corruption.
 
-**Redundancy/internal consistency** — shadow fields or check bits detect internal inconsistencies.
+**Redundancy/internal consistency**: shadow fields or check bits detect internal inconsistencies.
 
 ### Element Accuracy
 
 Only correct value is written to the database. Enforced by field checks.
 
-### Element integrity
+### Element Integrity
 
 Values written/changed only by authorized users. Enforced by access controls.
 

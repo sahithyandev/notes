@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/functional-dependencies
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-06-01T03:58:53.197Z
+lastUpdatedOn: 2026-09-13T14:55:23.268Z
 ---
 
 Describes a relationship between attributes in a relation. Defines if one set of attributes can determine another.
@@ -30,7 +30,7 @@ Functional dependencies help identify candidate keys and are essential for desig
 
 A functional dependency is trivial **if** it is satisfied by all instances of a relation. Of the form $A \rightarrow B$ where $B \subseteq A$.
 
-## Legal instance
+## Legal Instance
 
 For a relation: An instance of a relation that satisfies all real-world constraints.
 
@@ -40,22 +40,30 @@ For a database: an instance of a database in which all the relations are legel.
 
 If a set of functional dependencies $F$ is legal under a relation schema $R$, it's mentioned as $F$ holds on $R$.
 
-## Armstrong's axioms
+## Armstrong's Axioms
 
-- Reflexivity: **If** $\beta \subseteq \alpha$ **then** $\alpha \rightarrow \beta$
-- Augmentation: **If** $\alpha \rightarrow \beta$ **then** $\gamma\alpha \rightarrow \gamma\beta$
-- Transitivity: **If** $\alpha \rightarrow \beta$ and $\beta \rightarrow \gamma$ **and** $\alpha \rightarrow \gamma$
+- Reflexivity  
+  **If** $\beta \subseteq \alpha$ **then** $\alpha \rightarrow \beta$
+- Augmentation  
+  **If** $\alpha \rightarrow \beta$ **then** $\gamma\alpha \rightarrow \gamma\beta$
+- Transitivity  
+  **If** $\alpha \rightarrow \beta$ and $\beta \rightarrow \gamma$ **and** $\alpha \rightarrow \gamma$
 
 The above rules are:
 
-- sound - generate functional dependencies that hold
-- complete - generate all functional dependencies that hold
+- Sound  
+  Generate functional dependencies that hold.
+- Complete  
+  Generate all functional dependencies that hold.
 
 Other inferred rules:
 
-- union: **If** $\alpha \rightarrow \beta$ and $\alpha \rightarrow \gamma$ **then** $\alpha \rightarrow \beta\gamma$
-- decomposition: **If** $\alpha \rightarrow \beta\gamma$ **then** $\alpha \rightarrow \gamma$ and $\alpha \rightarrow \beta$
-- pseudotransitivity: **If** $\alpha \rightarrow \beta$ and $\gamma\beta \rightarrow \delta$ **then** $\alpha\gamma \rightarrow \delta$
+- Union  
+  **If** $\alpha \rightarrow \beta$ and $\alpha \rightarrow \gamma$ **then** $\alpha \rightarrow \beta\gamma$
+- Decomposition  
+  **If** $\alpha \rightarrow \beta\gamma$ **then** $\alpha \rightarrow \gamma$ and $\alpha \rightarrow \beta$
+- Pseudotransitivity  
+  **If** $\alpha \rightarrow \beta$ and $\gamma\beta \rightarrow \delta$ **then** $\alpha\gamma \rightarrow \delta$
 
 ## Closure
 
@@ -65,7 +73,7 @@ Closure of $F$, denoted as $F^+$, is the complete set of all functional dependen
 
 $F^+$ can be computed by:
 
-#### Step-by-step procedure
+#### Step-by-Step Procedure
 
 1. Initialize $F^+$ = F
 2. For each functional dependency of $F^+$, apply Armstrong’s axioms:

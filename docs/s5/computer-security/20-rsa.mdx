@@ -1,0 +1,105 @@
+---
+title: RSA
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.415Z
+slug: s5/computer-security/rsa
+sidebar:
+  order: 20
+prev: true
+next: true
+---
+
+Named after Rivest, Shamir, Adleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures. Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
+The [interactive guide to RSA](https://sahithyan.dev/post/interactive-guide-to-rsa) steps through key generation, encryption, and why factoring $n$ is hard.
+
+### Key Pair Generation
+
+- Choose 2 large, distinct, equal-size primes $p, q$, kept secret.
+- Compute $n = pq$, public, its bit length is the RSA key length.
+- Compute $\phi(n) = (p-1)(q-1)$, kept secret.
+- Choose $e$ with $1 < e < \phi(n)$ and $\gcd(e, \phi(n)) = 1$, public.
+- Compute $d \equiv e^{-1} \pmod{\phi(n)}$, secret.
+
+Public key: $\{e, n\}$. Private key: $\{d\}$. $p$, $q$, and $\phi(n)$ must be destroyed after generation.
+
+### Primality Testing
+
+$p$ and $q$ are found by drawing random odd integers of the target bit length and testing each for primality until one passes.
+
+- Trial division by the first few hundred small primes rejects most candidates in a few operations.
+- Survivors go to the Miller-Rabin probabilistic test.
+
+Miller-Rabin tests an odd $n > 2$. Write $n - 1 = 2^s m$ with $m$ odd. Pick a random base $a$ with $2 \le a \le n - 2$. Then $n$ passes base $a$ **iff** $a^m \equiv 1 \pmod n$ **or** $a^{2^r m} \equiv -1 \pmod n$ for some $r$ with $0 \le r < s$.
+
+A composite $n$ passes at most $1/4$ of the bases. Running $k$ independent random bases bounds the probability of accepting a composite by $4^{-k}$. $k$ around $40$ is standard.
+
+Each base costs 1 modular exponentiation, $O\!\left((\log n)^3\right)$ bit operations with schoolbook multiplication. So a candidate is classified in time polynomial in the key length.
+
+<Note>
+
+Deterministic polynomial-time primality testing exists via the AKS algorithm. Miller-Rabin is still used in practice because it is far faster at cryptographic sizes.
+
+</Note>
+
+Trace for $n = 221$, base $a = 137$:
+
+- $n - 1 = 220 = 2^2 \cdot 55$, so $s = 2$, $m = 55$.
+- $a^m \bmod n = 137^{55} \bmod 221 = 188$, not $1$ and not $220$.
+- $r = 1$: $188^2 \bmod 221 = 205$, not $220$.
+- No residue reached $-1$, so $137$ is a witness and $221$ is composite.
+
+Indeed $221 = 13 \times 17$.
+
+<Note>
+
+$e = 2^{16}+1 = 65537$ is a common choice, small enough for cheap encryption while avoiding weaknesses of very small exponents.
+
+</Note>
+
+### Encryption and Decryption
+
+$$
+c = m^e \bmod n, \quad m = c^d \bmod n
+$$
+
+Encryption cost is a single exponentiation with a small exponent $e$. Decryption cost is a single exponentiation with an exponent up to the full length of $n$, far more expensive.
+
+### Hybrid Encryption
+
+RSA is not used to encrypt large data directly, since modular exponentiation on large numbers is slow and the message must be smaller than $n$. Instead:
+
+- The sender picks a random symmetric session key $k$ and encrypts the file with a symmetric cipher such as AES under $k$.
+- The sender encrypts $k$ with the receiver's RSA public key and sends both the encrypted file and the encrypted key.
+- The receiver recovers $k$ with their RSA private key, then decrypts the file.
+
+### Correctness
+
+$$
+(m^e \bmod n)^d \bmod n = m
+$$
+
+<Note title="Proof Hint">
+
+- Since $ed \equiv 1 \pmod{\phi(n)}$, write $ed = k\phi(n) + 1$ for some integer $k$.
+- $(m^e)^d \bmod n = m^{ed} \bmod n = m^{k\phi(n)} \cdot m \bmod n$.
+- By Euler's theorem, $m^{\phi(n)} \equiv 1 \pmod n$ when $m$ and $n$ are coprime, so $m^{k\phi(n)} \equiv 1$.
+- Result reduces to $m \bmod n = m$, since $m < n$.
+
+</Note>
+
+### Worked Example
+
+$p = 17$, $q = 11$.
+
+- $n = 187$.
+- $\phi(n) = 16 \times 10 = 160$.
+- $e = 7$, since $\gcd(7, 160) = 1$.
+- $d = 23$, since $23 \times 7 = 161 = 160 + 1$.
+- Public key $\{7, 187\}$, private key $\{23\}$.
+- For $m = 88$: $c = 88^7 \bmod 187 = 11$, and $m = 11^{23} \bmod 187 = 88$.
+
+<Note>
+
+It is widely believed, but not proven, that breaking RSA encryption is as hard as factoring $n$.
+
+</Note>

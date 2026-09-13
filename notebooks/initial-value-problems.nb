@@ -1,0 +1,49 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Initial Value Problems (Well-Posedness)", "Title",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/15-initial-value-problems.mdx. Edit f, \
+the interval and the initial value in the parameters cell, then Kernel \
+\[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000003"],
+
+Cell["f[t_, y_] := y - t^2 + 1;", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 2;", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000010"],
+
+Cell["alpha = 0.5;", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000011"],
+
+Cell["Lipschitz constant from the partial derivative test", "Subsection",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000005"],
+
+Cell["dfdy = D[f[t, y], y]", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000006"],
+
+Cell["L = MaxValue[{Abs[dfdy], a <= t <= b}, {t, y}]", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000007"],
+
+Cell["Exact solution and a perturbed solution", "Subsection",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000008"],
+
+Cell["ysol = DSolveValue[{y'[t] == f[t, y[t]], y[a] == alpha}, y[t], t] // FullSimplify", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-000000000009"],
+
+Cell["zsol = DSolveValue[{z'[t] == f[t, z[t]] + d, z[a] == alpha + d0}, z[t], t] // FullSimplify", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-00000000000a"],
+
+Cell["diff = FullSimplify[zsol - ysol]", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-00000000000b"],
+
+Cell["Stability bound: |z(t) - y(t)| <= k epsilon with |d| < epsilon and |d0| < epsilon", "Subsection",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-00000000000c"],
+
+Cell["k = MaxValue[{Abs[diff] /. {d -> eps s1, d0 -> eps s2}, a <= t <= b && -1 <= s1 <= 1 && -1 <= s2 <= 1 && eps > 0}, {t, s1, s2}] / eps // FullSimplify", "Input",ExpressionUUID->"3a1f0b10-0001-4a10-9a01-00000000000d"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0001-4a10-9a01-0000000000ff"
+]

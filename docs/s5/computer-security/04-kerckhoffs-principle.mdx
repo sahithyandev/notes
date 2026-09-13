@@ -1,0 +1,51 @@
+---
+title: Kerckhoffs's Principle
+dateCreated: 2026-07-01T06:36:45.904Z
+lastUpdatedOn: 2026-09-13T14:55:24.329Z
+slug: s5/computer-security/kerckhoffs-principle
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+A cryptosystem must remain secure even if everything about the system, except the key, is public knowledge.
+
+Originates from 6 design guidelines Auguste Kerckhoffs wrote for military ciphers:
+
+- Practical indecipherability  
+  The system must be practically, if not mathematically, indecipherable.
+- Compromise tolerance  
+  It should not require secrecy, and it should not be a problem if it falls into enemy hands.
+- Memorable, changeable keys  
+  The key must be easy to communicate and remember, without requiring written notes, and correspondents must be able to change or modify it at will.
+- Telegraph compatibility  
+  It must be applicable to telegraph communications.
+- Portability  
+  It must be portable, and its use must not require several people.
+- Ease of use  
+  Given the circumstances in which it is used, the system must be easy to use, requiring neither mental strain nor knowledge of a long series of rules.
+
+## Security Through Obscurity
+
+Relying on secrecy of the design, algorithm, or architecture itself for security.
+
+Contrast with Kerckhoffs's principle:
+
+- Secret  
+  Kerckhoffs's principle keeps only the key secret. Obscurity keeps the whole algorithm and architecture secret.
+- Assumed attacker  
+  Kerckhoffs's principle assumes they know the full system. Obscurity assumes they know nothing.
+
+A single leak or reverse-engineering of the secret design compromises the entire system, and the key cannot be rotated to recover.
+
+Proprietary or closed crypto loses public peer review. Hidden flaws and backdoors stay undetected until attackers find and exploit them. Open, peer-reviewed standards are preferred.
+
+Secret ciphers broken after reverse-engineering:
+
+- DVD CSS  
+  40-bit key, broken in 1999.
+- GSM A5/1  
+  Stream cipher, design leaked in 1994, broken in practice.
+- TETRA:BURST  
+  2023 disclosure of flaws in the secret TETRA radio ciphers, including a reduced-strength TEA1.

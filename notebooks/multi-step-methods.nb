@@ -1,0 +1,51 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Multi-Step Methods", "Title",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/18-multi-step-methods.mdx. Edit f, the \
+interval, the initial value and N in the parameters cell, then Kernel \[Rule] \
+Evaluate Notebook. Starting values come from order 4 Runge-Kutta.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000003"],
+
+Cell["f[t_, y_] := y - t^2 + 1;", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 2;", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000d"],
+
+Cell["alpha = 0.5;", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000e"],
+
+Cell["n = 10;", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000f"],
+
+Cell["exact[t_] := (t + 1)^2 - 0.5 Exp[t];", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000010"],
+
+Cell["h = (b - a)/n; tm[i_] := a + i h; fw[i_, ws_] := f[tm[i], ws[[i + 1]]];", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000005"],
+
+Cell["Starting values w_0 .. w_3 from RK4", "Subsection",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000006"],
+
+Cell["rk4Step[{t_, w_}] := Module[{k1, k2, k3, k4}, k1 = h f[t, w]; k2 = h f[t + h/2, w + k1/2]; k3 = h f[t + h/2, w + k2/2]; k4 = h f[t + h, w + k3]; {t + h, w + (k1 + 2 k2 + 2 k3 + k4)/6}]; start = NestList[rk4Step, {a, alpha}, 3][[All, 2]];", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000007"],
+
+Cell["Adams-Bashforth 4-step predictor with Adams-Moulton 3-step corrector", "Subsection",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000008"],
+
+Cell["w = Fold[Function[{ws, i}, Module[{fp = f[tm[i], ws[[i + 1]]], fm1 = f[tm[i - 1], ws[[i]]], fm2 = f[tm[i - 2], ws[[i - 1]]], fm3 = f[tm[i - 3], ws[[i - 2]]], wp}, wp = ws[[i + 1]] + h/24 (55 fp - 59 fm1 + 37 fm2 - 9 fm3); Append[ws, ws[[i + 1]] + h/24 (9 f[tm[i + 1], wp] + 19 fp - 5 fm1 + fm2)]]], start, Range[3, n - 1]];", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-000000000009"],
+
+Cell["TableForm[Table[{tm[i], w[[i + 1]], exact[tm[i]], Abs[exact[tm[i]] - w[[i + 1]]]}, {i, 0, n}], TableHeadings -> {None, {\"t_i\", \"w_i\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000a"],
+
+Cell["Adams-Bashforth 2-step alone, for comparison", "Subsection",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000b"],
+
+Cell["wab2 = Fold[Function[{ws, i}, Append[ws, ws[[i + 1]] + h/2 (3 f[tm[i], ws[[i + 1]]] - f[tm[i - 1], ws[[i]]])]], start[[1 ;; 2]], Range[1, n - 1]]; TableForm[Table[{tm[i], wab2[[i + 1]], exact[tm[i]], Abs[exact[tm[i]] - wab2[[i + 1]]]}, {i, 0, n}], TableHeadings -> {None, {\"t_i\", \"w_i\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0004-4a10-9a01-00000000000c"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0004-4a10-9a01-0000000000ff"
+]

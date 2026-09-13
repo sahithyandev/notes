@@ -3,7 +3,7 @@ title: Signal Integrity
 sidebar:
   order: 19
 dateCreated: 2026-06-12T00:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:43:02.294Z
+lastUpdatedOn: 2026-09-13T14:55:23.863Z
 slug: s4/iot/signal-integrity
 prev: true
 next: true
@@ -15,7 +15,7 @@ prereqs:
 
 A floating input pin has no external driver. The MCU samples whatever noise or leakage is present, producing unpredictable readings. A pull resistor ties the pin to a known voltage through a high-value resistor (typically $1\ \text{k}\Omega$–$100\ \text{k}\Omega$).
 
-### Pull-up Resistor
+### Pull-Up Resistor
 
 Connects the pin to $V_{CC}$. Pin reads HIGH when nothing drives it. A device pulling the line LOW overrides the resistor.
 
@@ -30,15 +30,15 @@ Connects the pin to $V_{CC}$. Pin reads HIGH when nothing drives it. A device pu
 - Safe default on disconnect  
   If the peripheral loses power or is removed, the pull-up holds the input at a known HIGH.
 
-### Pull-down Resistor
+### Pull-Down Resistor
 
 Connects the pin to GND. Pin reads LOW when nothing drives it. A device pulling the line HIGH overrides the resistor.
 
-### Resistor Value Trade-off
+### Resistor Value Trade-Off
 
 The pull resistor value must satisfy 2 conflicting constraints.
 
-#### Lower bound
+#### Lower Bound
 
 Set by current. For a pull-up with the line driven LOW:
 
@@ -48,7 +48,7 @@ $$
 
 Current flows continuously while the line is asserted. Too low a resistance wastes power, stresses the driving transistor, and heats the resistor.
 
-#### Upper bound
+#### Upper Bound
 
 Set by edge speed. The resistor and line capacitance $C_\text{line}$ form an RC circuit:
 
@@ -90,8 +90,10 @@ The threshold voltage $V_{th}$ is the nominal switching point of a gate. It lies
 
 $V_{th}$ depends on the logic family:
 
-- CMOS: $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
-- TTL: $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
+- CMOS  
+  $V_{th} \approx V_{CC}/2$. Scales with supply voltage. Symmetric noise margins.
+- TTL  
+  $V_{th} \approx 1.4\ \text{V}$. Fixed regardless of supply. Asymmetric noise margins (LOW margin is narrower).
 
 $V_{th}$ is not a safe operating point. A signal held exactly at $V_{th}$ leaves the output in a high-gain linear region, consuming maximum current and producing maximum noise. The forbidden band exists because $V_{th}$ has manufacturing spread. No 2 gates switch at exactly the same voltage, and temperature shifts it further.
 
@@ -134,8 +136,10 @@ Many MCU GPIO pins have a Schmitt trigger option that can be enabled per pin. UA
 
 A push-pull output has 2 transistors: a HIGH-side transistor connecting the pin to $V_{CC}$, and a LOW-side transistor connecting it to GND. Exactly 1 is active at a time.
 
-- Driving HIGH: HIGH-side transistor conducts, LOW-side is off. Pin is actively connected to $V_{CC}$.
-- Driving LOW: LOW-side transistor conducts, HIGH-side is off. Pin is actively connected to GND.
+- Driving HIGH  
+  HIGH-side transistor conducts, LOW-side is off. Pin is actively connected to $V_{CC}$.
+- Driving LOW  
+  LOW-side transistor conducts, HIGH-side is off. Pin is actively connected to GND.
 
 Output impedance is low in both states. Transitions are fast: the active transistor charges or discharges the line directly rather than through a resistor. No external pull resistor is required.
 

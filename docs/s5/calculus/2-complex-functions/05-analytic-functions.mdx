@@ -3,30 +3,39 @@ title: Analytic Functions
 sidebar:
   order: 5
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-04T02:55:52.935Z
+lastUpdatedOn: 2026-09-13T14:55:24.295Z
 slug: s5/calculus/complex-functions/analytic-functions
 prev: true
 next: true
 ---
 
-A function $f$ is analytic at $z_0$ **iff** it is differentiable at each point in some neighborhood of $z_0$. $f$ is analytic in an open set **iff** it is differentiable at every point in that open set.
+A function $f$ is analytic at $z_0$ **iff** it is differentiable at every point of some neighborhood of $z_0$. $f$ is analytic on an open set $G$ **iff** it is analytic at every point of $G$.
 
-If $f$ is analytic at $z_0$, it is analytic in some neighborhood of $z_0$. If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
+If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
 
-## Sufficient Conditions for Differentiability
+Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) throughout $U$.
 
-Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$. $f'(z_0)$ exists **iff**:
+## Properties of Analytic Functions
 
-- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist everywhere in $U$.
-- Those partial derivatives are continuous at $(x_0,y_0)$ and satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#cauchy-riemann-equations) at $(x_0,y_0)$.
+Let $f$ be analytic on a domain $D$.
 
-When these hold,
+- $f'$ is analytic on $D$. So $f$ is infinitely differentiable on $D$.
+- $\operatorname{Re} f$ and $\operatorname{Im} f$ are [harmonic](/s5/calculus/complex-functions/harmonic-functions) on $D$.
+- If $f'(z) = 0$ throughout $D$, then $f$ is constant on $D$.
+- If $|f|$ is constant on $D$, then $f$ is constant on $D$.
+- If $\operatorname{Re} f$ is constant on $D$, or $\operatorname{Im} f$ is constant on $D$, then $f$ is constant on $D$.
+- If $f$ is not constant on $D$, its zeros are isolated.
 
-$$
-f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
-$$
+<Note title="Proof Hint">
 
-Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the Cauchy-Riemann equations throughout $U$.
+For $|f|$ constant:
+
+- If $|f| = 0$, then $f = 0$
+- Otherwise write $|f|^2 = u^2+v^2 = c$ with $c > 0$
+- Differentiate in $x$ and $y$, apply the Cauchy-Riemann equations
+- Get $u_x = u_y = v_x = v_y = 0$, so $f' = 0$
+
+</Note>
 
 ## Algebra of Analytic Functions
 
@@ -56,15 +65,29 @@ $z_0$ is a singular point (singularity) of $f$ **iff** $f$ fails to be analytic 
 
 ### Isolated Singularity
 
-$z_0$ is an isolated singularity of $f$ **iff** $f$ is analytic throughout some punctured disc $D_r(z_0) \setminus \{z_0\}$ but not analytic at $z_0$.
-
-$z_0$ is a non-isolated singularity of $f$ **iff** $z_0$ is a singular point that is not isolated.
+$z_0$ is an isolated singularity of $f$ **iff** $f$ is analytic on some punctured disc $D_r(z_0) \setminus \{z_0\}$ but not analytic at $z_0$. Equivalently, $z_0$ is a singular point and some punctured disc around $z_0$ contains no other singular point of $f$.
 
 Examples:
 
 - $z = 0$ is an isolated singularity of $f(z) = 1/z$.
-- $f(z) = |z|^2$ has no singular points, since it is not analytic at any point in any neighborhood of any point.
+- $z = i$ and $z = -i$ are isolated singularities of $f(z) = 1/(z^2+1)$.
+- Every $z = n\pi$, $n \in \mathbb{Z}$, is an isolated singularity of $f(z) = \cot z$.
 
-## Zero Derivative on a Domain
+### Non-Isolated Singularity
 
-If $f'(z) = 0$ everywhere in a domain $D$, then $f$ is constant throughout $D$.
+$z_0$ is a non-isolated singularity of $f$ **iff** $z_0$ is a singular point and every punctured disc $D_r(z_0) \setminus \{z_0\}$ contains at least one other singular point of $f$.
+
+This happens when singular points accumulate at $z_0$, or when $f$ is singular along a whole curve or region through $z_0$.
+
+Examples:
+
+- $z = 0$ is a non-isolated singularity of $f(z) = 1/\sin(1/z)$. The singular points $z = 1/(n\pi)$, $n \in \mathbb{Z} \setminus \{0\}$, accumulate at $0$, so no punctured disc around $0$ is free of them.
+- $z = 0$ is a non-isolated singularity of $f(z) = \tan(1/z)$, with the singular points $z = 2/((2n+1)\pi)$ accumulating at $0$.
+- $z = 0$ is a non-isolated singularity of $f(z) = 1/(e^{1/z}-1)$, with the singular points $z = 1/(2\pi i n)$ accumulating at $0$.
+- Every point of the non-positive real axis is a non-isolated singularity of the principal logarithm $\operatorname{Log} z$, since $\operatorname{Log}$ is discontinuous at every point of that ray.
+
+<Note>
+
+$f(z) = |z|^2$ has no singular points. It is not analytic at any point in any neighborhood of any point, so no point satisfies the definition of a singular point.
+
+</Note>

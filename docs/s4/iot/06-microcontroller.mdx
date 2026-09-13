@@ -6,7 +6,7 @@ slug: s4/iot/microcontroller
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-06-12T01:43:02.289Z
+lastUpdatedOn: 2026-09-13T14:55:23.801Z
 prereqs:
   - s2/computer-organization-and-digital-design/basics/digital-logic-signals
 ---
@@ -85,7 +85,7 @@ A memory map partitions the address space into regions:
 - Peripheral registers (read/write, with hardware side effects)
 - Boot ROM / configuration fuses
 
-Writing to a peripheral register address does not store a value in RAM — it sends a command to the hardware. Reading from a status register address reads the current hardware state, not a cached value.
+Writing to a peripheral register address does not store a value in RAM: it sends a command to the hardware. Reading from a status register address reads the current hardware state, not a cached value.
 
 Used by: ARM Cortex-M, AVR, PIC, ESP8266/ESP32, and most modern MCUs.
 
@@ -150,7 +150,7 @@ Flash is non-volatile: contents survive power loss. This makes it suitable for p
 
 ##### Why Read-Only During Execution
 
-Flash cells can only be erased in large blocks (pages or sectors), not byte by byte. Erasing forces all bits in the block to 1; writing then selectively drives bits to 0. This erase-before-write cycle takes milliseconds — orders of magnitude slower than instruction execution.
+Flash cells can only be erased in large blocks (pages or sectors), not byte by byte. Erasing forces all bits in the block to 1; writing then selectively drives bits to 0. This erase-before-write cycle takes milliseconds, orders of magnitude slower than instruction execution.
 
 Writing to flash while executing from the same flash block causes a bus conflict: the CPU fetch and the write controller both need the flash bus simultaneously. Most MCUs prevent this in hardware.
 
@@ -169,7 +169,7 @@ Stores variables and temporary program data. Often implemented as RAM. Sometimes
 
 #### Hardware Stack
 
-A dedicated, fixed-depth set of internal registers that stores return addresses for subroutine calls and interrupts. Managed entirely by the CPU in hardware — no software stack pointer maintenance required.
+A dedicated, fixed-depth set of internal registers that stores return addresses for subroutine calls and interrupts. Managed entirely by the CPU in hardware, with no software stack pointer maintenance required.
 
 On a software stack (used by ARM, AVR, x86), the stack pointer (SP) register points into a region of RAM. The stack grows into RAM on each call and shrinks on return. On a hardware stack, the return addresses are stored in a separate on-chip register file with no RAM involvement.
 
@@ -186,7 +186,7 @@ On a software stack (used by ARM, AVR, x86), the stack pointer (SP) register poi
 
 ##### Limitations
 
-- Fixed depth — PIC has 8 or 31 levels depending on the device; exceeding it silently overwrites the oldest return address
+- Depth is fixed. PIC has 8 or 31 levels depending on the device, and exceeding it silently overwrites the oldest return address
 - Deep recursion is impossible
 - The programmer must track call depth and ensure nesting never exceeds the limit
 

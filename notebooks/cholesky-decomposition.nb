@@ -1,0 +1,228 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[      7075,        218]
+NotebookOptionsPosition[      5243,        175]
+NotebookOutlinePosition[      5635,        191]
+CellTagsIndexPosition[      5592,        188]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Cholesky Decomposition", "Title",ExpressionUUID->"f96f1e01-68bf-43e2-980e-ce4c3a9d76f4"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/09-cholesky-decomposition.mdx. Edit A \
+in the parameters cell below (must stay symmetric positive definite), then \
+Kernel \[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"d43889af-09bf-49b8-984a-3d18c27451d8"],
+
+Cell[CellGroupData[{
+
+Cell["Parameters \[LongDash] edit this and re-evaluate the notebook", \
+"Subsection",ExpressionUUID->"91c37a55-11c1-4d29-adfd-2c26fa2d1bbf"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"A", "=", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"2", ",", 
+      RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"-", "1"}], ",", "2", ",", 
+      RowBox[{"-", "1"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", 
+      RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.995357443787919*^9, 3.995357469891808*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"1caf3aa5-b9f7-498f-9c7e-870880809970"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"2", ",", 
+     RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "1"}], ",", "2", ",", 
+     RowBox[{"-", "1"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"0", ",", 
+     RowBox[{"-", "1"}], ",", "2"}], "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.995357470942451*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"b6e23665-cf47-4a06-bfd5-ab2759e2c6c6"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Decompose", "Subsection",ExpressionUUID->"69968731-38b6-4432-8665-1b325a19fd3b"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"L", "=", 
+  RowBox[{"N", "[", 
+   TemplateBox[{
+     RowBox[{"CholeskyDecomposition", "[", "A", "]"}]},
+    "Transpose"], "]"}]}]], "Input",
+ CellLabel->"In[2]:=",ExpressionUUID->"3bbbe6e5-ce3d-4a1f-a929-17256e6f7369"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"1.4142135623730951`", ",", "0.`", ",", "0.`"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "0.7071067811865475`"}], ",", "1.224744871391589`", ",", 
+     "0.`"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"0.`", ",", 
+     RowBox[{"-", "0.816496580927726`"}], ",", "1.1547005383792517`"}], 
+    "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.995357472720166*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"60024c41-b219-43d2-96af-bed56bff5f98"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"L", " ", "//", "MatrixForm"}]], "Input",
+ CellChangeTimes->{{3.9953574872220182`*^9, 3.9953574889851713`*^9}},
+ NumberMarks->False,
+ CellLabel->"In[5]:=",ExpressionUUID->"4f37c2ae-345e-4476-9432-874f6676dfc7"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"1.4142135623730951`", "0.`", "0.`"},
+     {
+      RowBox[{"-", "0.7071067811865475`"}], "1.224744871391589`", "0.`"},
+     {"0.`", 
+      RowBox[{"-", "0.816496580927726`"}], "1.1547005383792517`"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{3.995357489360737*^9},
+ CellLabel->
+  "Out[5]//MatrixForm=",ExpressionUUID->"eaf3a081-c4c1-4cf2-8e4e-\
+37f9e49bb821"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Verify L.L\[Transpose] = A", "Subsection",ExpressionUUID->"26f2e864-48d8-4136-af35-eefc8c00fba4"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"L", ".", 
+   TemplateBox[{"L"},
+    "Transpose"]}], "-", 
+  RowBox[{"N", "[", "A", "]"}]}]], "Input",
+ CellLabel->"In[3]:=",ExpressionUUID->"68b416e7-a76d-493d-a433-3d32af193c0c"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"4.440892098500626`*^-16", ",", "0.`", ",", "0.`"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"0.`", ",", 
+     RowBox[{"-", "4.440892098500626`*^-16"}], ",", 
+     "1.1102230246251565`*^-16"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+    "0.`", ",", "1.1102230246251565`*^-16", ",", "4.440892098500626`*^-16"}], 
+    "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.995357476567919*^9},
+ CellLabel->"Out[3]=",ExpressionUUID->"25920ffe-ff5b-4c2e-9733-d980549468b9"]
+}, Open  ]],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.995357478416459*^9, 
+  3.995357478774289*^9}},ExpressionUUID->"458f3f9b-ec24-4117-bd13-\
+bdf23f8cbb7d"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"75548de5-9641-4668-928d-cc024b88ff81"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[576, 22, 94, 0, 120, "Title",ExpressionUUID->"f96f1e01-68bf-43e2-980e-ce4c3a9d76f4"],
+Cell[673, 24, 268, 4, 42, "Text",ExpressionUUID->"d43889af-09bf-49b8-984a-3d18c27451d8"],
+Cell[CellGroupData[{
+Cell[966, 32, 140, 1, 66, "Subsection",ExpressionUUID->"91c37a55-11c1-4d29-adfd-2c26fa2d1bbf"],
+Cell[CellGroupData[{
+Cell[1131, 37, 521, 15, 36, "Input",ExpressionUUID->"1caf3aa5-b9f7-498f-9c7e-870880809970"],
+Cell[1655, 54, 464, 14, 41, "Output",ExpressionUUID->"b6e23665-cf47-4a06-bfd5-ab2759e2c6c6"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2168, 74, 86, 0, 66, "Subsection",ExpressionUUID->"69968731-38b6-4432-8665-1b325a19fd3b"],
+Cell[CellGroupData[{
+Cell[2279, 78, 242, 6, 39, "Input",ExpressionUUID->"3bbbe6e5-ce3d-4a1f-a929-17256e6f7369"],
+Cell[2524, 86, 529, 14, 41, "Output",ExpressionUUID->"60024c41-b219-43d2-96af-bed56bff5f98"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3090, 105, 233, 4, 36, "Input",ExpressionUUID->"4f37c2ae-345e-4476-9432-874f6676dfc7"],
+Cell[3326, 111, 791, 22, 96, "Output",ExpressionUUID->"eaf3a081-c4c1-4cf2-8e4e-37f9e49bb821"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4166, 139, 103, 0, 66, "Subsection",ExpressionUUID->"26f2e864-48d8-4136-af35-eefc8c00fba4"],
+Cell[CellGroupData[{
+Cell[4294, 143, 214, 6, 36, "Input",ExpressionUUID->"68b416e7-a76d-493d-a433-3d32af193c0c"],
+Cell[4511, 151, 537, 14, 44, "Output",ExpressionUUID->"25920ffe-ff5b-4c2e-9733-d980549468b9"]
+}, Open  ]],
+Cell[5063, 168, 152, 3, 36, "Input",ExpressionUUID->"458f3f9b-ec24-4117-bd13-bdf23f8cbb7d"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+

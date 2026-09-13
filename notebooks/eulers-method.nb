@@ -1,0 +1,51 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+
+Cell["Euler's Method", "Title",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000001"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/16-eulers-method.mdx. Edit f, the \
+interval, the initial value and the step count N in the parameters cell, then \
+Kernel \[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000002"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000003"],
+
+Cell["f[t_, y_] := y - t^2 + 1;", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000004"],
+
+Cell["a = 0; b = 2;", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000d"],
+
+Cell["alpha = 0.5;", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000e"],
+
+Cell["n = 4;", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000f"],
+
+Cell["exact[t_] := (t + 1)^2 - 0.5 Exp[t];", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000010"],
+
+Cell["Euler iteration", "Subsection",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000005"],
+
+Cell["h = (b - a)/n; steps = NestList[Function[p, {p[[1]] + h, p[[2]] + h f[p[[1]], p[[2]]]}], {a, alpha}, n];", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000006"],
+
+Cell["TableForm[Table[{steps[[i, 1]], steps[[i, 2]], exact[steps[[i, 1]]], Abs[exact[steps[[i, 1]]] - steps[[i, 2]]]}, {i, 1, n + 1}], TableHeadings -> {None, {\"t_i\", \"w_i\", \"y(t_i)\", \"error\"}}]", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000007"],
+
+Cell["Theoretical error bound: (h M)/(2 L) (e^{L (t_i - a)} - 1)", "Subsection",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000008"],
+
+Cell["L = MaxValue[{Abs[D[f[t, y], y]], a <= t <= b}, {t, y}]; M = MaxValue[{Abs[exact''[t]], a <= t <= b}, t];", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-000000000009"],
+
+Cell["TableForm[Table[With[{ti = steps[[i, 1]]}, {ti, Abs[exact[ti] - steps[[i, 2]]], (h M)/(2 L) (Exp[L (ti - a)] - 1)}], {i, 1, n + 1}], TableHeadings -> {None, {\"t_i\", \"actual error\", \"bound\"}}]", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000a"],
+
+Cell["Optimal step size with per-step round-off delta", "Subsection",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000b"],
+
+Cell["delta = 10^-8; hOpt = Sqrt[2 delta/M]", "Input",ExpressionUUID->"3a1f0b10-0002-4a10-9a01-00000000000c"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3a1f0b10-0002-4a10-9a01-0000000000ff"
+]

@@ -6,7 +6,7 @@ slug: s3/database-systems/sql/views
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.698Z
-lastUpdatedOn: 2026-06-27T08:46:52.688Z
+lastUpdatedOn: 2026-09-13T14:55:23.356Z
 ---
 
 A named, virtual relation or table defined by a SQL query. It does not store data itself, but presents data from one or more base tables (or other views) according to its definition. Views encapsulate complex queries, provide abstraction, and can restrict access to sensitive data.
@@ -43,7 +43,7 @@ The view's definition is substituted into the referencing query, and the resulti
 
 When insert, update, and delete operations are allowed on a view. The changes will be automatically synced with the underlying base table.
 
-### When a view is updatable
+### When a View Is Updatable
 
 A view is updatable **iff** the DBMS can trace each row in the view back to a single row in a single base table. The view must represent a direct mapping to the base data, without ambiguity or derived values.
 
@@ -79,6 +79,9 @@ Materialized views must be refreshed to stay up-to-date.
 
 Refresh can be:
 
-- Immediate (On Commit): The view is updated whenever the base tables change.
-- Manual (On Demand): The view is refreshed only when explicitly requested.
-- Scheduled: The view is refreshed at regular intervals.
+- Immediate (on commit)  
+  The view is updated whenever the base tables change.
+- Manual (on demand)  
+  The view is refreshed only when explicitly requested.
+- Scheduled  
+  The view is refreshed at regular intervals.

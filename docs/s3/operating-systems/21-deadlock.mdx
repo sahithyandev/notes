@@ -6,7 +6,7 @@ slug: s3/operating-systems/deadlock
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.708Z
-lastUpdatedOn: 2026-04-28T07:56:31.654Z
+lastUpdatedOn: 2026-09-13T14:55:23.511Z
 ---
 
 Occurs when 2 or more threads is blocked and waiting for one another. No thread can continue. Wastes resources and slows down systems.
@@ -27,11 +27,11 @@ A graph of threads, resources (nodes), resource requests and assignments (direct
 
 Cycles in the resource allocation graph indicate potential deadlocks.
 
-### Single-instance case
+### Single-Instance Case
 
 When each resource type has exactly one unit. Cycle implies deadlock.
 
-### Multiple-instance case
+### Multiple-Instance Case
 
 When a resource type may have several units. Cycle does not necessarily imply deadlock. There's a possibility for a deadlock.
 
@@ -66,7 +66,7 @@ Allocate resources only if the resulting state is safe. Good theoritcal problem 
 
 Example: [Banker’s algorithm](/s3/operating-systems/bankers-algorithm).
 
-### Safe state
+### Safe State
 
 When there exists some order in which all processes can finish.
 
@@ -95,15 +95,16 @@ Once detected, recovery is done by:
 
 Deadlocks can be classified based on the resources and processes involved:
 
-- Resource Deadlock: The classic form, where processes compete for exclusive access to resources (e.g., files, printers, memory). Each process holds one or more resources and waits for others, resulting in a cycle.
-
-- Communication Deadlock: Occurs when processes wait for messages or signals from each other. For example, two processes each waiting to receive a message from the other, but neither sends.
-
-- Thread Deadlock: In multithreaded applications, threads within the same process can deadlock by waiting for locks or synchronization primitives held by each other.
-
-- Database Deadlock: In database systems, transactions may lock tables or rows and wait for locks held by other transactions, causing a deadlock.
-
-- Distributed Deadlock: In distributed systems, deadlocks can span multiple machines or nodes, making detection and resolution more complex.
+- Resource deadlock  
+  The classic form, where processes compete for exclusive access to resources (e.g., files, printers, memory). Each process holds one or more resources and waits for others, resulting in a cycle.
+- Communication deadlock  
+  Occurs when processes wait for messages or signals from each other. For example, 2 processes each waiting to receive a message from the other, but neither sends.
+- Thread deadlock  
+  In multithreaded applications, threads within the same process can deadlock by waiting for locks or synchronization primitives held by each other.
+- Database deadlock  
+  In database systems, transactions may lock tables or rows and wait for locks held by other transactions, causing a deadlock.
+- Distributed deadlock  
+  In distributed systems, deadlocks can span multiple machines or nodes, making detection and resolution more complex.
 
 Each type of deadlock may require different detection and resolution strategies, depending on the system and resources involved.
 
@@ -111,13 +112,13 @@ Deadlocks can be handled in several ways, depending on system requirements and c
 
 ## Recovery
 
-### Abort processes
+### Abort Processes
 
 - Abort all deadlocked processes
   or
 - Abort one at a time until cycle is gone
 
-### Resource preemption
+### Resource Preemption
 
 - Select a victim
 - Rollback to safe state

@@ -6,7 +6,7 @@ slug: s3/computer-architecture/compiler-optimizations
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.688Z
-lastUpdatedOn: 2026-06-11T16:40:17.527Z
+lastUpdatedOn: 2026-09-13T14:55:23.098Z
 ---
 
 Optimization techniques are employed to improve the translated code in terms of performance.
@@ -17,16 +17,20 @@ Otions provided by compilers to control the optimization level. These flags inst
 
 For example, `gcc` provides a variety of optimization flags that can be used to control the optimization process. Some of the most commonly used flags include:
 
-- <span class="font-mono">O0</span>: No optimization. Default. Fastest.
-  Generates the most straightforward, often least performant, machine code.
-- <span class="font-mono">O1</span>: Basic optimization. Reduces code size,
-  execution time. Does not take an excessive amount of compilation time.
-- <span class="font-mono">O2</span>: Further optimization. Includes almost all
-  recommended optimizations that do not involve a space-speed trade-off.
-- <span class="font-mono">O3</span>: Full optimization. Including those that
-  might increase the generated code size.
-- <span class="font-mono">Os</span>: Optimise for size. Prioritises reducing the
-  code size over execution speed.
+- `O0`  
+  No optimization. Default. Fastest. Generates the most straightforward, often
+  least performant, machine code.
+- `O1`  
+  Basic optimization. Reduces code size and execution time. Does not take an
+  excessive amount of compilation time.
+- `O2`  
+  Further optimization. Includes almost all recommended optimizations that do
+  not involve a space-speed trade-off.
+- `O3`  
+  Full optimization. Including those that might increase the generated code
+  size.
+- `Os`  
+  Optimise for size. Prioritises reducing the code size over execution speed.
 
 ## Instruction Compression
 
@@ -75,6 +79,6 @@ Split loop into:
 
 Replacing a function call with the actual body of the function. Avoids the overhead of function calling. Causes duplicated code; bigger executable file.
 
-### Precompute values
+### Precompute Values
 
 Replacing computations with their values at compile time. Beneficial when dealing with invariant values inside loops or frequently called functions.

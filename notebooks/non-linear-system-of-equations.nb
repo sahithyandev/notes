@@ -1,0 +1,122 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[      4001,        113]
+NotebookOptionsPosition[      3001,         92]
+NotebookOutlinePosition[      3390,        108]
+CellTagsIndexPosition[      3347,        105]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Non-linear System of Equations", "Title",ExpressionUUID->"b7198d40-448e-4e4d-ab5f-ae5215346682"],
+
+Cell["\<\
+Companion to docs/s5/numerical-methods/10-non-linear-system-of-equations.mdx. \
+Edit the coordinate functions or evaluation point in the parameters cell \
+below, then Kernel \[Rule] Evaluate Notebook.\
+\>", "Text",ExpressionUUID->"50cc099b-9b0e-4be8-bdc9-a19ab473b62a"],
+
+Cell["Parameters \[LongDash] edit these and re-evaluate the notebook", \
+"Subsection",ExpressionUUID->"7d2579e7-bc41-4537-a7b9-4003d7735b25"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[",
+    RowBox[{"x1_", ",", "x2_", ",", "x3_"}], "]"}], ":=",
+   RowBox[{
+    RowBox[{"3", " ", "x1"}], "-",
+    RowBox[{"Cos", "[",
+     RowBox[{"x2", " ", "x3"}], "]"}], "-",
+    FractionBox["1", "2"]}]}], ";",
+  RowBox[{
+   RowBox[{"f2", "[",
+    RowBox[{"x1_", ",", "x2_", ",", "x3_"}], "]"}], ":=",
+   RowBox[{
+    SuperscriptBox["x1", "2"], "-",
+    RowBox[{"81", " ",
+     SuperscriptBox[
+      RowBox[{"(",
+       RowBox[{"x2", "+", "0.1`"}], ")"}], "2"]}], "+",
+    RowBox[{"Sin", "[", "x3", "]"}], "+", "1.06`"}]}], ";",
+  RowBox[{
+   RowBox[{"f3", "[",
+    RowBox[{"x1_", ",", "x2_", ",", "x3_"}], "]"}], ":=",
+   RowBox[{
+    RowBox[{"Exp", "[",
+     RowBox[{
+      RowBox[{"-", "x1"}], " ", "x2"}], "]"}], "+",
+    RowBox[{"20", " ", "x3"}], "+",
+    RowBox[{
+     FractionBox["1", "3"], " ",
+     RowBox[{"(",
+      RowBox[{
+       RowBox[{"10", " ", "\[Pi]"}], "-", "3"}], ")"}]}]}]}], ";",
+  RowBox[{
+   RowBox[{"F", "[", "x_", "]"}], ":=",
+   RowBox[{"{",
+    RowBox[{
+     RowBox[{"f1", "@@", "x"}], ",",
+     RowBox[{"f2", "@@", "x"}], ",",
+     RowBox[{"f3", "@@", "x"}]}], "}"}]}], ";",
+  RowBox[{"pt", "=",
+   RowBox[{"{",
+    RowBox[{"0.1`", ",", "0.1`", ",",
+     RowBox[{"-", "0.1`"}]}], "}"}]}]}]], "Input",ExpressionUUID->"f697013f-\
+5e55-4a60-b030-041bc992dea3"],
+
+Cell["Evaluate F at the point", "Subsection",ExpressionUUID->"cf80c456-f3b8-4917-a6be-09051286a017"],
+
+Cell[BoxData[
+ RowBox[{"F", "[", "pt", "]"}]], "Input",ExpressionUUID->"0c9b4f8b-64c8-42ca-8213-7c15b0c6d742"],
+
+Cell["Check a candidate root", "Subsection",ExpressionUUID->"9585bce6-79a3-4b47-b965-7d9730c2425c"],
+
+Cell[BoxData[
+ RowBox[{"F", "[",
+  RowBox[{"{",
+   RowBox[{"0.5`", ",", "0", ",",
+    RowBox[{"-",
+     FractionBox["\[Pi]", "6"]}]}], "}"}], "]"}]], "Input",ExpressionUUID->\
+"b7b0a752-511a-44ad-8f2a-a8379f6283a2"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"75548de5-9641-4668-928d-cc024b88ff81"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 102, 0, 70, "Title",ExpressionUUID->"b7198d40-448e-4e4d-ab5f-ae5215346682"],
+Cell[659, 22, 279, 4, 70, "Text",ExpressionUUID->"50cc099b-9b0e-4be8-bdc9-a19ab473b62a"],
+Cell[941, 28, 141, 1, 70, "Subsection",ExpressionUUID->"7d2579e7-bc41-4537-a7b9-4003d7735b25"],
+Cell[1085, 31, 1372, 44, 70, "Input",ExpressionUUID->"f697013f-5e55-4a60-b030-041bc992dea3"],
+Cell[2460, 77, 100, 0, 70, "Subsection",ExpressionUUID->"cf80c456-f3b8-4917-a6be-09051286a017"],
+Cell[2563, 79, 110, 1, 70, "Input",ExpressionUUID->"0c9b4f8b-64c8-42ca-8213-7c15b0c6d742"],
+Cell[2676, 82, 99, 0, 70, "Subsection",ExpressionUUID->"9585bce6-79a3-4b47-b965-7d9730c2425c"],
+Cell[2778, 84, 219, 6, 70, "Input",ExpressionUUID->"b7b0a752-511a-44ad-8f2a-a8379f6283a2"]
+}
+]
+*)
+
+(* End of internal cache information *)

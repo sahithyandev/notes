@@ -6,7 +6,7 @@ slug: s3/operating-systems/virtual-memory
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-05-31T13:49:07.993Z
+lastUpdatedOn: 2026-09-13T14:55:23.537Z
 ---
 
 A system that allows programs to use more memory than is physically available in RAM. Achieved by combining the use of physical memory and disk space. The operating system uses paging and swapping as techniques to create an illusion of a larger memory space than what is physically available.
@@ -28,9 +28,9 @@ Virtual memory is divided into fixed-size _pages_. Page size is equal to [frame]
 
 Virtual memory address is composed of:
 
-- Page number
+- Page number  
   Index into page table.
-- Page offset
+- Page offset  
   Location within the page.
 
 Advantages:
@@ -48,10 +48,10 @@ Maps virtual page numbers to physical frame numbers. Indexed by virtual page num
 
 Each entry includes:
 
-- a valid bit: to identify if the page belongs to the process' address space
-- a reference bit
-- a dirt bit
-- physical frame number
+- A valid bit, to identify if the page belongs to the process' address space
+- A reference bit
+- A dirty bit
+- Physical frame number
 
 Kept in main memory. Because of this, every memory operation now requires 2 accesses.
 
@@ -122,7 +122,7 @@ Break page table into multiple page tables. The resulting page tables are paged.
 
 For 32-bit memory space, 2 level paging would be enough.
 
-### Hashed page tables
+### Hashed Page Tables
 
 Used when memory address space is big or sparse. Reduces memory usage by storing only entries that actually exist. Uses hash table for quick lookup.
 
@@ -136,7 +136,7 @@ Each entry stores:
 
 Lookup time is roughly constant on average.
 
-### Inverted page tables
+### Inverted Page Tables
 
 Keeps track of all physical frames instead of pages per process. One entry per physical frame.
 
@@ -153,8 +153,10 @@ Hash table can be used to decrease lookup time. TLB can accelerate access. Share
 
 The technique of moving processes moved from/to swap space which is on secondary disk. Used when total process memory is higher than the physical memory. OS maintains tables to track which virtual memory pages are in RAM and which are on disk. Swap space would also be split into pages.
 
-- Page-out: Pages are written (swapped) from RAM to swap space.
-- Page-in: When swapped pages are needed again, they’re read back into RAM.
+- Page-out  
+  Pages are written (swapped) from RAM to swap space.
+- Page-in  
+  When swapped pages are needed again, they're read back into RAM.
 
 Swapped out processes can be loaded into a different physical address space if no pending I/O and if the address binding method allows.
 
@@ -180,7 +182,7 @@ iOS asks apps to voluntarily relinquish allocated memory. If not, terminates the
 
 ## Architecture Examples
 
-### Intel IA-32 / x86-64
+### Intel IA-32 / X86-64
 
 Supports both segmentation and paging. 32-bit uses 3-level paging; 64-bit uses 4-level paging. PAE (Page Address Extension) expands 32-bit memory to 64GB.
 

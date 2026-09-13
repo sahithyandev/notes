@@ -6,7 +6,7 @@ slug: s2/program-construction/basics/streams
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.600Z
-lastUpdatedOn: 2026-06-01T03:58:53.194Z
+lastUpdatedOn: 2026-09-13T14:55:22.840Z
 ---
 
 import StreamsExample from "./images/streams-example.svg";
@@ -20,9 +20,9 @@ In Java, streams are used to perform input and output (I/O) operations.
 
 ## Types
 
-### Based on data format
+### Based on Data Format
 
-#### Byte-oriented
+#### Byte-Oriented
 
 Handles data in raw binary format. Used for byte by byte input and output.
 
@@ -42,7 +42,7 @@ Handles data in raw binary format. Used for byte by byte input and output.
 | `FilterInputStream`           | Abstract class for creating input streams that filter data as it is read. Subclasses include `BufferedInputStream` and `DataInputStream`.       |
 | `FilterOutputStream`          | Abstract class for creating output streams that filter data as it is written. Subclasses include `BufferedOutputStream` and `DataOutputStream`. |
 
-#### Character-oriented
+#### Character-Oriented
 
 Handles data in the form of characters (16-bit Unicode). Used for input and
 output of characters. Built on top of byte oriented streams. Automatically handle character encoding, line endings. In Java, the main classes to work with character streams
@@ -81,9 +81,9 @@ public class CharacterStreamExample {
 | `PrintWriter`                        | Writes formatted representations of objects to a text-output stream. Offers `print()`, `println()`, `printf()`, and auto-flushing. Preferred over `PrintStream` for text output due to character handling. |
 | `CharArrayReader`, `CharArrayWriter` | Reads characters from or writes characters to a character array. Useful for temporary storage and manipulation of character data in memory.                                                                |
 
-### Based on direction of data flow
+### Based on Direction of Data Flow
 
-#### Input stream
+#### Input Stream
 
 - `InputStream` - an abstract class that represents an input stream of bytes.
   Provides methods to read bytes from a source.
@@ -101,7 +101,7 @@ Common subclasses of `Reader` include:
 - `CharArrayReader`
 - `BufferedReader`
 
-#### Output stream
+#### Output Stream
 
 In Java:
 
@@ -121,9 +121,9 @@ Common subclasses of `Writer` include:
 - `CharArrayWriter`
 - `BufferedWriter`
 
-### Based on connection
+### Based on Connection
 
-#### Connection stream
+#### Connection Stream
 
 A stream that connects to a source or destination. A file or socket, or a network connection.
 
@@ -132,7 +132,7 @@ Examples:
 - `FileInputStream`
 - `FileOutputStream`
 
-#### Chain stream
+#### Chain Stream
 
 Aka. filtered stream, wrapper streams. A stream that reads from or writes to a connection stream. Works only if chained to other streams. Adheres to decorator pattern.
 

@@ -6,7 +6,7 @@ slug: s4/computer-networks/data-link-layer
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.620Z
-lastUpdatedOn: 2026-06-04T19:53:54.362Z
+lastUpdatedOn: 2026-09-13T14:55:23.608Z
 prereqs:
   - s3/data-communication-and-networking/information-redundancy
   - s3/data-communication-and-networking/mac-protocols
@@ -29,17 +29,17 @@ The mechanism by which the receiver locates the boundaries of each data unit wit
 
 Frames wrap network-layer packets. The receiver must detect frame boundaries. 3 delimiting methods.
 
-### Character count
+### Character Count
 
 Frame begins with a length prefix. Receiver reads that many bytes. If that's corrupted, the receiver loses synchronisation.
 
-### Character-oriented
+### Character-Oriented
 
 Special control characters such as Start of Text (STX) and End of Text (ETX) are used.
 
 Byte stuffing is done to avoid flag patterns from appearing inside frame data. Before transmission, sender scans the payload and insert escape characters before any occurence of control or escape characters.
 
-### Bit-oriented
+### Bit-Oriented
 
 Special flag bit pattern defines the boundary.
 
@@ -122,8 +122,10 @@ Sender and receiver maintain send and receive windows. Window state is tracked w
 
 Aka. idle ARQ. Window size 1 in both directions. Sender transmits one frame then waits for ACK (Acknowledgement) or NAK (Negative Acknowledgement) before sending the next.
 
-- ACK received: advance $V(S)$, send next frame.
-- NAK or timeout: retransmit current frame.
+- ACK received  
+  Advance $V(S)$, send next frame.
+- NAK or timeout  
+  Retransmit current frame.
 
 Link is idle for the full propagation round-trip per frame.
 
@@ -151,15 +153,15 @@ Go-Back-N ARQ and Selective Reject ARQ are continuous ARQ typed.
 
 Prevents a fast sender from overwhelming the receiver's buffer. Different methods exist for receiver to signal sender when to pause and resume.
 
-### In-band
+### In-Band
 
 Control signals travel within the same channel as the data. X-OFF (ASCII DC3, `0x13`) pauses the sender; X-ON (ASCII DC1, `0x11`) resumes it. Ambiguous if the payload contains these bytes.
 
-### Out-of-band
+### Out-of-Band
 
 Control signals travel on a separate channel, outside the data stream. Sender asserts Request To Send (RTS). Receiver asserts Clear To Send (CTS) when buffer space is available. No ambiguity with payload content.
 
-### Sliding window
+### Sliding Window
 
 The window is the range of sequence numbers the sender may use without waiting for acknowledgement. Its size equals the maximum number of unacknowledged frames allowed in flight at once.
 
@@ -217,7 +219,7 @@ On detecting a collision, aborts and broadcasts a jam signal, then waits a rando
 
 Used in Ethernet (IEEE 802.3). Not usable on wireless links where a transmitting node cannot simultaneously receive.
 
-#### Collision-free carrier sense
+#### Collision-Free Carrier Sense
 
 Eliminates collisions rather than recovering from them. Nodes claim transmission rights in a controlled, contention-free order via a timer or arbiter. No collisions.
 

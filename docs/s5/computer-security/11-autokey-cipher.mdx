@@ -1,0 +1,85 @@
+---
+title: Autokey Cipher
+sidebar:
+  order: 11
+dateCreated: 2026-08-26T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.360Z
+slug: s5/computer-security/autokey-cipher
+prev: true
+next: true
+---
+
+A [classical](/s5/computer-security/ciphers#classical-cipher) and [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Originally created by Blaise de Vigenère. Provides higher security than the [Bellaso variant](./vigenere-cipher). This was <b>NOT</b> covered in the class; only included here for the sake of completeness.
+
+You may find an implementation of Autokey cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/autokey-cipher.c).
+
+## Encryption
+
+A short secret key is used to encrypt only the first few characters of the plaintext. From there, the keystream continues with the plaintext itself, shifted by the key length, rather than repeating the short key.
+
+Each position adds its keystream letter modulo $26$.
+
+Since the keystream is never a short repeating sequence, the Kasiski test cannot be used to find a key length, making this cipher more secure than the repeating-key (Bellaso) variant.
+
+## Decryption
+
+Only the short primer key is known at the start. Each position subtracts its keystream letter modulo $26$. Every recovered plaintext letter is appended to the keystream and used to decrypt a later position, so the keystream is rebuilt as decryption proceeds.
+
+## Attacking
+
+Still vulnerable to statistical attacks, since the key length is typically much shorter than the message, so most of the keystream is plaintext of the same language, whose letter frequencies are known.
+
+The primer is short, so its length $L$ is guessed and each value tried.
+
+For a fixed $L$, every position past the primer has keystream equal to the plaintext $L$ places earlier, so
+
+$$
+C_i = P_i + P_{i - L} \pmod{26}
+$$
+
+Here $C_i$ is the numeric value of the $i$-th ciphertext letter and $P_i$ likewise for plaintext. $A = 0$ to $Z = 25$.
+
+Applying $P_i = C_i - P_{i - L}$ repeatedly walks back in steps of $L$ until it hits the primer:
+
+$$
+P_i = C_i - C_{i - L} + C_{i - 2L} - \dots \pm k_r
+$$
+
+where $k_r$ is the one primer letter in residue class $r = i \bmod L$. Each of the $L$ classes is then fixed by a single unknown letter. Its 26 values are tried and the one whose column matches the language's letter frequencies is kept. The correct $L$ makes all $L$ columns come out as the language. No probable word is needed.
+
+## Worked Example
+
+Plaintext `attackatdawn` under primer key `QUEENLY`, with $A = 0$ to $Z = 25$.
+
+The keystream is the primer key followed by the plaintext itself, truncated to the plaintext length.
+
+```
+plaintext:   a t t a c k a t d a w n
+keystream:   Q U E E N L Y A T T A C
+ciphertext:  Q N X E P V Y T W T W P
+```
+
+Each position adds the keystream letter modulo $26$.
+
+- $a (0) + Q (16) = 16 = Q$
+- $t (19) + U (20) = 39 \equiv 13 = N$
+
+Ciphertext is `QNXEPVYTWTWP`.
+
+For decryption, only the primer key `QUEENLY` is known at the start. Each recovered plaintext letter is appended to the keystream and used to decrypt later positions.
+
+- $Q (16) - Q (16) = 0 = a$
+- $N (13) - U (20) = -7 \equiv 19 = t$
+
+After 7 positions the primer key is exhausted and the keystream continues with the recovered plaintext `attac`.
+
+- $T (19) - a (0) = 19 = t$
+- $W (22) - t (19) = 3 = d$
+
+Plaintext is `attackatdawn`.
+
+For the attack, take ciphertext `KBRXUHMFQMSE` with $L = 3$. Class $r = 1$ holds positions $1, 4, 7, 10$ with ciphertext values $10, 23, 12, 12$. As a function of the unknown primer letter $x$, the class decrypts to
+
+$$10 - x, \quad 13 + x, \quad 25 - x, \quad 13 + x$$
+
+Only $x = 17$ (`R`) gives language: `t e i e`. The other 2 classes resolve the same way, giving primer `RUN` and plaintext `theendisnear`.

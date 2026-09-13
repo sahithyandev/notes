@@ -6,7 +6,7 @@ slug: s3/artificial-intelligence/bayesian-network
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-05-10T07:10:02.681Z
+lastUpdatedOn: 2026-09-13T14:55:23.029Z
 ---
 
 A graphical model that represents the probabilistic relationships among a set of random variables. Uses a directed acyclic graph.
@@ -99,12 +99,15 @@ Steps:
 
 1. List all paths between the 2 variables (ignore arrow direction).
 2. For each path, identify the type of connection at each intermediate node
-   - Chain: $A → B → C$ or $A ← B ← C$
-   - Fork: $A ← B → C$
-   - Collider: $A → B ← C$
+   - Chain  
+     $A → B → C$ or $A ← B ← C$
+   - Fork  
+     $A ← B → C$
+   - Collider  
+     $A → B ← C$
 3. Apply blocking rules
-   - For chain or fork: path is blocked **if** middle node is conditioned
-   - For collider: path is blocked **if** both collider and its descendents are not conditioned
+   - For a chain or fork, the path is blocked **if** the middle node is conditioned.
+   - For a collider, the path is blocked **if** both the collider and its descendents are not conditioned.
 4. They are independent **iff** all paths between the 2 nodes are blocked.
 
 <Note>

@@ -1,17 +1,13 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-08-04T03:56:01.935Z
+lastUpdatedOn: 2026-09-13T14:55:24.338Z
 slug: s5/computer-security/stream-ciphers
 sidebar:
   order: 6
 prev: true
 next: true
 ---
-
-Since security depends only on the key, the key space must be large enough to make an exhaustive key search infeasible.
-
-## Stream Cipher
 
 Models plaintext as a bit stream, combined with a random keystream via a reversible operation, bitwise XOR.
 
@@ -25,19 +21,20 @@ Both encryption and decryption must generate the identical keystream $k_i$.
   A bit error in a transmitted ciphertext bit corrupts only the corresponding decrypted plaintext bit.
 - Efficient for real-time data (audio, video streaming) when the keystream generation algorithm is fast.
 
-### One-Time Pad
+## Stream Encryption Scheme
 
-A keystream that is different for every message and as long as the message is perfectly secure.
+A stream cipher is already a complete [encryption scheme](/s5/computer-security/ciphers). It needs no mode of operation.
 
-<Note>
+- Arbitrary length  
+  The keystream is generated to any length and XORed with the plaintext bit by bit. No padding, and ciphertext length equals plaintext length.
+- Randomisation  
+  The keystream generator takes an [initialization vector](/s5/computer-security/ciphers) alongside the key, so the same plaintext under the same key gives different ciphertext for different IVs.
 
-Not practical, since applications need a short key to encrypt a long message, and reuse of the same key across multiple messages.
+A block cipher lacks both. It maps one fixed-size block deterministically, so it needs a [mode of operation](/s5/computer-security/block-ciphers) to become a scheme.
 
-</Note>
+## Keystream Generator
 
-### Keystream Generator
-
-Practical stream ciphers use a keystream generator: a short secret key expands into a stream of pseudorandom bits $k_0, k_1, k_2, \dots$.
+A function that generates a stream of pseudorandom bits $k_0, k_1, k_2, \dots$ from a short secret key. Used in practical stream ciphers.
 
 A secure keystream generator must satisfy:
 
@@ -48,12 +45,43 @@ A secure keystream generator must satisfy:
 - Unpredictability  
   Computationally infeasible to determine the full keystream from any part of it, of any length.
 
-### Attacking a Stream Cipher
+### Malleability
 
-Reusing a key produces related ciphertexts for different messages.
+An encryption scheme is malleable **iff** an attacker can transform a ciphertext of an unknown message $m$ into a ciphertext of a related message $f(m)$, without knowing $m$ or the key.
+
+The XOR-combiner stream cipher is malleable. Given $c = m \oplus k$, the attacker chooses a mask $\Delta$ and sends $c' = c \oplus \Delta$.
+
+$$
+c' \oplus k = (m \oplus k \oplus \Delta) \oplus k = m \oplus \Delta
+$$
+
+The plaintext changes by exactly $\Delta$, an attacker-chosen relation, with no other change. Flipping bit $i$ of $c$ flips bit $i$ of the plaintext.
+
+Malleability here follows from 2 properties together, not from the keystream being random or pseudorandom.
+
+- The combiner is XOR, which is linear and known to the attacker.
+- No integrity check covers the ciphertext.
+
+Removing either property breaks the attack. A self-synchronising stream cipher feeds past ciphertext bits into the keystream, so a flipped bit garbles a run of following plaintext instead of one clean bit.
+
+A scheme is non-malleable **iff** any tampering with the ciphertext makes it decrypt to a value unrelated to $m$, or makes decryption reject. A [message authentication code](/s5/computer-security/hash-functions) or an authenticated [mode of operation](/s5/computer-security/block-ciphers) over the ciphertext provides this.
+
+### Breaking the Cipher
+
+Reusing a keystream $k$ across 2 messages $m_1$ and $m_2$ produces ciphertexts $c_1 = m_1 \oplus k$ and $c_2 = m_2 \oplus k$.
 
 $$
 c_1 \oplus c_2 = (m_1 \oplus k) \oplus (m_2 \oplus k) = m_1 \oplus m_2
 $$
 
-An attacker who captures ciphertext streams can construct a new ciphertext, without knowing the key, that decrypts predictably. This is an existential forgery attack.
+The keystream cancels. An attacker holding $c_1$ and $c_2$ recovers $m_1 \oplus m_2$ without $k$. Plaintext redundancy separates it into $m_1$ and $m_2$. Knowing one plaintext gives the other directly.
+
+Knowing one plaintext also recovers the keystream, $k = c_1 \oplus m_1$. Any further message under the same $k$ can then be forged. The attacker picks $m'$ and sends $c' = m' \oplus k$, which decrypts to $m'$, an existential forgery.
+
+## Examples
+
+### One-Time Pad
+
+To encrypt a message $m$ (of length $n$), a keystream $k$ (of length $n$) is generated that is random and never reused. The message bits are XORed with the keystream bits to produce the ciphertext.
+
+Impractical as it requires a key as long as the message and never reused, but applications need a short key and reuse it across many messages.

@@ -1,9 +1,9 @@
 ---
-title: Cloud-based Software
+title: Cloud-Based Software
 sidebar:
   order: 27
 dateCreated: 2026-06-01T09:34:22.607Z
-lastUpdatedOn: 2026-06-09T03:05:56.968Z
+lastUpdatedOn: 2026-09-13T14:55:24.126Z
 slug: s4/software-engineering/cloud-based-software
 prev: true
 next: true
@@ -28,9 +28,12 @@ Three defining properties:
 
 3 interdependent architectural decisions:
 
-- Database organization: multi-tenant or multi-instance?
-- Scalability and resilience: what are the load and fault-tolerance requirements?
-- Software structure: monolithic or service-oriented?
+- Database organization  
+  Multi-tenant or multi-instance?
+- Scalability and resilience  
+  What are the load and fault-tolerance requirements?
+- Software structure  
+  Monolithic or service-oriented?
 
 ## Database Organization
 
@@ -47,11 +50,11 @@ Multi-tenant preferred for very large, uniform databases where optimization effo
 
 ## Scalability
 
-### Scaling out
+### Scaling Out
 
 Add more server replicas. Normal approach in cloud systems. Software components must be stateless and replicable, runnable in parallel.
 
-### Scaling up
+### Scaling Up
 
 Increase power of existing server. Less common.
 
@@ -60,20 +63,20 @@ Increase power of existing server. Less common.
 Resilience via redundancy:
 
 - Software and data replicas at multiple physical locations.
-- Database mirroring: standby DB kept in sync with operational DB.
-- System monitor: detects failures and triggers automatic failover to standby.
+- Database mirroring, a standby DB kept in sync with the operational DB.
+- A system monitor that detects failures and triggers automatic failover to standby.
 
 3 standby configurations.
 
-### Hot standby
+### Hot Standby
 
 Backup powered on and running in parallel with the primary. Immediate failover.
 
-### Cold standby
+### Cold Standby
 
 Backup offline until needed. Slowest recovery, lowest resource cost.
 
-### Warm standby
+### Warm Standby
 
 Backup in a low-power ready-to-operate state. Faster switching than cold standby, lower energy use than hot standby.
 
@@ -86,7 +89,7 @@ Large components, shared database, client-server model. Traditional multi-tier s
 Strengths:
 
 - Simple to develop and deploy initially.
-- Easier testing and debugging: all code runs in one process.
+- Easier testing and debugging since all code runs in one process.
 - Lower operational overhead.
 - Better performance due to in-process method calls.
 - Suited to small and medium-sized systems.
@@ -102,7 +105,7 @@ Strengths:
 - Fault isolation limits the blast radius of failures.
 - Teams can develop and release services independently.
 
-#### Polyglot development
+#### Polyglot Development
 
 Where each service can use a different language or runtime.
 
@@ -114,7 +117,7 @@ Types of platforms:
 
 - General-purpose (AWS, Azure, GCP).
 - Application-specific (SAP Business Technology Platform).
-- Smaller national providers: fewer services, more customer adaptability.
+- Smaller national providers, offering fewer services but more customer adaptability.
 
 Technical selection factors:
 

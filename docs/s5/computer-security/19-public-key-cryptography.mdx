@@ -1,0 +1,102 @@
+---
+title: Public Key Cryptography
+dateCreated: 2026-07-05T00:00:00.000Z
+lastUpdatedOn: 2026-09-13T14:55:24.411Z
+slug: s5/computer-security/public-key-cryptography
+sidebar:
+  order: 19
+prev: true
+next: true
+---
+
+Public key cryptography (PKC) uses a key pair, a public key and a private key, rather than a single shared secret key. It is based on Number Theory, not substitution-permutation networks, and is asymmetric.
+
+<Note>
+
+PKC complements, rather than replaces, symmetric cryptography. Modular arithmetic operations (addition, multiplication, inversion, exponentiation) make PKC computationally more expensive, and therefore slower, than symmetric ciphers at equivalent security strength.
+
+</Note>
+
+## Motivation
+
+- Key distribution  
+  Symmetric cryptography requires either a pre-shared key or a trusted key distribution center (KDC), which must itself be trusted with confidentiality.
+- Digital signatures  
+  Electronic documents need a signature scheme that is easy to sign and verify, but difficult to forge, with universal verifiability.
+
+## Discovery
+
+- Whitfield Diffie worked in a "reportorial style", combining interviews with others and his own thinking about the problem.
+- He developed the concept of digital signatures first, which led him to the broader concept of public key cryptography.
+- He considered the public key property, that the encryption key can be made public, the most remarkable aspect of the discovery.
+
+## PKC Framework
+
+A key pair's public key is known to everyone. The private key is known only to its owner. Given the public key and the algorithm, it is computationally infeasible to derive the private key.
+
+- Confidentiality  
+  Sender encrypts with the receiver's public key. Only the receiver, holding the private key, can decrypt.
+- Authentication  
+  Signer encrypts a fingerprint (authenticator) of the message with their private key. Anyone can verify it using the signer's public key. The authenticator must be infeasible to forge without changing the message.
+
+## Groups over Finite Sets
+
+Number-theoretic PKC computes over finite groups, since infinite groups ($\mathbb{Q}, \mathbb{Z}, \mathbb{R}$) are unusable for computation.
+
+- $\mathbb{Z}_n$  
+  The group of integers modulo $n$: $\{0, 1, \dots, n-1\}$.
+- $\mathbb{Z}_n^*$  
+  The subgroup of $\mathbb{Z}_n$ relatively prime to $n$, excluding 0 by convention.
+
+If $n$ is prime, every nonzero element of $\mathbb{Z}_n$ is coprime to $n$, so $\mathbb{Z}_n^* = \{1, \dots, n-1\}$.
+
+The order of a group is its number of elements. $|\mathbb{Z}_n| = n$, and for prime $p$, $|\mathbb{Z}_p| = p$.
+
+Example: $\mathbb{Z}_{10}^* = \{1, 3, 7, 9\}$, removing multiples of the prime factors 2 and 5 from $\mathbb{Z}_{10}$.
+
+### Euler's Totient Function
+
+The number of positive integers less than $n$ relatively prime to $n$. Denoted by $\phi(n)$.
+
+- $\phi(p) = p - 1$ for prime $p$.
+- $\phi(pq) = \phi(p)\phi(q) = (p-1)(q-1)$ for distinct primes $p, q$.
+
+<Note title="Proof Hint">
+
+- $\mathbb{Z}_n = \{0, 1, \dots, pq - 1\}$ for $n = pq$.
+- Residues not coprime to $n$ are the multiples of $p$ and $q$ below $n$: $\{p, 2p, \dots, (q-1)p\} \cup \{q, 2q, \dots, (p-1)q\}$.
+- $\phi(n) = pq - (q-1) - (p-1) - 1 = (p-1)(q-1)$.
+
+</Note>
+
+## Fermat's Theorem
+
+For prime $p$ and positive integer $a$ not divisible by $p$:
+
+$$
+a^{p-1} \equiv 1 \pmod p
+$$
+
+<Note title="Proof Hint">
+
+- The map $m \mapsto am \bmod p$ over $m \in \mathbb{Z}_p$ permutes $\{1, \dots, p-1\}$, since $a \cdot 0 \equiv 0$.
+- Multiply all $p - 1$ images together: $(p-1)! \, a^{p-1} \equiv (p-1)! \pmod p$.
+- $p$ and $(p-1)!$ are coprime, so cancel $(p-1)!$ from both sides.
+
+</Note>
+
+## Euler's Theorem
+
+Generalizes Fermat's theorem to any modulus. For $a, n$ relatively prime:
+
+$$
+a^{\phi(n)} \equiv 1 \pmod n
+$$
+
+For $n = pq$ (distinct primes) and $0 < m < n$:
+
+$$
+m^{\phi(n)+1} = m^{(p-1)(q-1)+1} \equiv m \pmod n
+$$
+
+The coprime condition $\gcd(a, n) = 1$ is mandatory. When it fails the theorem gives nothing. For $3^{40} \bmod 15$, $\gcd(3, 15) = 3 \neq 1$, so $3^{\phi(15)} \equiv 1 \pmod{15}$ cannot be assumed and the reduction must be done another way.

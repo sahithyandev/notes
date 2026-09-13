@@ -1,0 +1,241 @@
+---
+import katex from "katex";
+
+interface Props {
+  variable: "s_2" | "x_1";
+  baseC: number;
+  value: number;
+  deltaMin: number;
+  deltaMax: number;
+}
+
+const { variable, baseC, value, deltaMin, deltaMax } = Astro.props;
+
+const tex = (v: string) =>
+  katex.renderToString(v, { throwOnError: false, strict: false });
+
+const columns = ["x_1", "x_2", "s_1", "s_2", "s_3"];
+const baseReduced: Record<string, number> = { s_2: 1.5, s_3: 1 };
+
+const MULT: Record<string, Record<string, number>> = {
+  s_2: { s_2: -1, s_3: 0 },
+  x_1: { s_2: -1 / 3, s_3: 1 / 3 },
+};
+
+const mult = MULT[variable];
+---
+
+<div class="cost-slider">
+  <table class="tableau">
+    <thead>
+      <tr>
+        <th class="basic">Basic</th>
+        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        <th class="num rhs">RHS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="basic" set:html={tex("z")} />
+        {
+          columns.map((c) => {
+            if (c in baseReduced) {
+              return (
+                <td
+                  class="num"
+                  data-cost-for={c}
+                  data-base={baseReduced[c]}
+                  data-mult={mult[c]}
+                >
+                  {baseReduced[c]}
+                </td>
+              );
+            }
+            return <td class="num" set:html={tex("0")} />;
+          })
+        }
+        <td class="num rhs" data-cost-for="z" data-base={36} data-mult={value}>
+          36
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="control">
+    <label for={`cost-delta-${variable}`}>
+      &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
+        " "
+      }
+      {baseC}
+    </label>
+    <input
+      id={`cost-delta-${variable}`}
+      type="range"
+      min={deltaMin}
+      max={deltaMax}
+      step="0.01"
+      value="0"
+    />
+    <output for={`cost-delta-${variable}`} data-delta>0</output>
+  </div>
+
+  <div class="status" data-status data-optimal="true">
+    Optimal. Basis stays optimal.
+  </div>
+</div>
+
+<script>
+  const SUBSCRIPT: Record<string, string> = { "1": "₁", "2": "₂", "3": "₃" };
+
+  const label = (name: string) => {
+    const [base, idx] = name.split("_");
+    return `${base}${SUBSCRIPT[idx] ?? idx}`;
+  };
+
+  const fmt = (n: number) => {
+    const rounded = Math.round(n * 100) / 100;
+    return Object.is(rounded, -0) ? "0" : String(rounded);
+  };
+
+  document
+    .querySelectorAll<HTMLDivElement>(".cost-slider")
+    .forEach((widget) => {
+      const slider = widget.querySelector<HTMLInputElement>(
+        'input[type="range"]',
+      )!;
+      const deltaOut = widget.querySelector<HTMLElement>("[data-delta]")!;
+      const cells = Array.from(
+        widget.querySelectorAll<HTMLElement>("[data-cost-for]"),
+      );
+      const status = widget.querySelector<HTMLElement>("[data-status]")!;
+
+      const render = () => {
+        const delta = Number(slider.value);
+        deltaOut.textContent = fmt(delta);
+
+        let violated: { name: string; value: number } | null = null;
+
+        cells.forEach((cell) => {
+          const name = cell.dataset.costFor!;
+          const base = Number(cell.dataset.base);
+          const mult = Number(cell.dataset.mult);
+          const val = base + delta * mult;
+
+          cell.textContent = fmt(val);
+          cell.classList.toggle("changed", mult !== 0 && delta !== 0);
+
+          if (name !== "z" && val < 0 && !violated) {
+            violated = { name, value: val };
+          }
+        });
+
+        const optimal = violated === null;
+        status.dataset.optimal = String(optimal);
+        status.textContent = optimal
+          ? "Optimal. Basis stays optimal."
+          : `Not optimal. ${label(
+              violated!.name,
+            )}'s reduced cost is ${fmt(violated!.value)}, negative, so it can enter the basis and improve z.`;
+      };
+
+      slider.addEventListener("input", render);
+      render();
+    });
+</script>
+
+<style>
+  .cost-slider {
+    margin: 24px 0;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  table.tableau {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+  }
+
+  .tableau th,
+  .tableau td {
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tableau thead tr {
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .tableau tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .tableau th.basic,
+  .tableau td.basic {
+    text-align: left;
+    color: var(--text-secondary);
+  }
+  .tableau td.num,
+  .tableau th.num {
+    font-variant-numeric: tabular-nums;
+  }
+  .tableau .rhs {
+    border-left: 2px solid var(--border-strong);
+  }
+  .tableau td.changed {
+    color: var(--accent);
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .control label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .control input[type="range"] {
+    flex: 1 1 160px;
+    accent-color: var(--s5);
+  }
+
+  .control output {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--s5);
+    min-width: 4ch;
+    text-align: right;
+  }
+
+  .status {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .status[data-optimal="true"] {
+    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
+    border-color: var(--s3-border);
+  }
+
+  .status[data-optimal="false"] {
+    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
+    border-color: var(--s4-border);
+  }
+</style>

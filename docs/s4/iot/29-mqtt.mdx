@@ -7,7 +7,7 @@ slug: s4/iot/mqtt
 prev: true
 next: true
 dateCreated: 2026-06-06T00:00:00.000Z
-lastUpdatedOn: 2026-06-12T01:59:21.296Z
+lastUpdatedOn: 2026-09-13T14:55:23.923Z
 ---
 
 A lightweight publish-subscribe messaging protocol for constrained devices and low-bandwidth, high-latency networks. Developed by IBM in 1999. Runs over TCP/IP on port 1883 (port 8883 for TLS). Runs at application layer.
@@ -122,15 +122,19 @@ Present only in certain packet types. Contains packet-specific metadata.
   Topic name (2-byte length prefix + UTF-8 string), then packet identifier (2 bytes, only for QoS 1 and 2).
 - CONNECT  
   Protocol name, protocol level, connect flags, keep-alive timer.
-- CONNACK, PUBACK, SUBACK, etc.: packet identifier and return/reason codes.
+- CONNACK, PUBACK, SUBACK, etc.  
+  Packet identifier and return/reason codes.
 
 ### Payload
 
 Present only in certain packet types. Content is packet-specific.
 
-- CONNECT payload: client ID, will topic/message, username, password.
-- PUBLISH payload: application message bytes. No type encoding — format is opaque to the broker.
-- SUBSCRIBE payload: list of topic filters with requested QoS.
+- CONNECT payload  
+  Client ID, will topic/message, username, password.
+- PUBLISH payload  
+  Application message bytes. No type encoding: format is opaque to the broker.
+- SUBSCRIBE payload  
+  List of topic filters with requested QoS.
 
 No independent size field. Size derived from the remaining-length value minus the variable-header size.
 

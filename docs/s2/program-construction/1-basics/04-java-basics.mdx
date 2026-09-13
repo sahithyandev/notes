@@ -6,7 +6,7 @@ slug: s2/program-construction/basics/java-basics
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.598Z
-lastUpdatedOn: 2026-06-01T03:58:53.193Z
+lastUpdatedOn: 2026-09-13T14:55:22.826Z
 ---
 
 import CollectionsFramework from "./images/collections-framework.svg";
@@ -47,24 +47,24 @@ Defines the structure of a class. Can include state variable definitions but not
 values. Can include method signatures. After Java 8, can also include method
 body.
 
-### Child class
+### Child Class
 
 Aka. sub class, derived class. A class extending another class (all public and
 protected members), which is called its super class. Members can be overridden
 by defining a member again in the sub class. New members can be declared.
 `super` keyword can be used to access methods of super class.
 
-### Abstract class
+### Abstract Class
 
 A special type of class, which cannot be used to instantiate objects from.
 Defined by `abstract` keyword. Can only be extended from.
 
-### Abstract methods
+### Abstract Methods
 
 Can only be defined inside abstract classes. Defined by `abstract` keyword. Any
 child class must either override the abstract method or declare itself abstract
 
-### Access modifiers
+### Access Modifiers
 
 In Java, access modifiers control visibility and accessibility of classes,
 methods, and variables:
@@ -88,7 +88,7 @@ For attributes:
 - `default`: Only accessible in same package
 - `private`: Only accessible within declaring class
 
-### Non-access modifiers
+### Non-Access Modifiers
 
 For classes:
 
@@ -111,7 +111,7 @@ For attributes:
 - `transient`: Attribute will not be serialized
 - `volatile`: Attribute value may be changed by multiple threads
 
-### Static members
+### Static Members
 
 Aka. class members. Used to store data on a class
 instead of an instance. There can be static variables and static methods. Static
@@ -149,16 +149,20 @@ dog.fetch(); // Access subclass-specific method
 
 Upcasting is common in method arguments and collections. Downcasting is used when subclass-specific behavior is needed.
 
-## Object overhead
+## Object Overhead
 
 In Java, objects have additional memory overhead due to metadata stored alongside the actual data.
 
 For example, in a 32-bit system, a primitive `int` requires 4 bytes of memory; An `Integer` object, requires 16 bytes. The extra memory is used to store object metadata:
 
-- class pointer: A reference to the class metadata that defines the object's structure and behavior.
-- flags: Indicators used to store object-specific state information, such as garbage collection status.
-- synchronization locks: Mechanisms to manage thread-safe access to the object. More on this [here](/s2/program-construction/basics/concurrency).
-- object size information: Data about the memory footprint of the object.
+- Class pointer  
+  A reference to the class metadata that defines the object's structure and behavior.
+- Flags  
+  Indicators used to store object-specific state information, such as garbage collection status.
+- Synchronization locks  
+  Mechanisms to manage thread-safe access to the object. More on this [here](/s2/program-construction/basics/concurrency).
+- Object size information  
+  Data about the memory footprint of the object.
 
 These metadata are essential for the Java Virtual Machine (JVM) to manage objects effectively.
 
@@ -170,7 +174,7 @@ These metadata are essential for the Java Virtual Machine (JVM) to manage object
 | LinkedList  | 24                      | Additionally, each item has 24 bytes overhead.                      |
 | ArrayList   | 32                      | Includes capacity overhead for resizing and internal array storage. |
 
-## Collections framework
+## Collections Framework
 
 A Java framework that includes production-grade implementations for commonly
 used data structures. The implementation is done using interfaces, abstract

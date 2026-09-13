@@ -6,7 +6,7 @@ slug: s4/iot/microcontroller-programming
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.625Z
-lastUpdatedOn: 2026-06-12T01:43:02.292Z
+lastUpdatedOn: 2026-09-13T14:55:23.837Z
 ---
 
 To program a microcontroller, a basic development setup is required, which includes:
@@ -66,7 +66,7 @@ A cross-compilation toolchain contains three components:
 - Binutils  
   Assembler, object dump, and format conversion tools. The `objcopy` tool converts the linked ELF binary to Intel HEX or raw binary for upload.
 
-### Why Cross Compilation is Required
+### Why Cross Compilation Is Required
 
 - MCUs lack the RAM, storage, and OS to run a compiler.
 - Target ISA differs from the host; host-compiled binaries cannot execute on the MCU.
@@ -96,9 +96,12 @@ A hardware programmer (e.g. AVRISP, USBasp, ST-Link) connects to dedicated progr
 
 Programming pins used:
 
-- AVR (SPI-based ICSP): MOSI, MISO, SCK, RESET
-- PIC (2-wire ICSP): ICSPDAT, ICSPCLK plus MCLR for entry
-- ARM Cortex-M: SWD (SWDIO, SWDCLK) or JTAG
+- AVR (SPI-based ICSP)  
+  MOSI, MISO, SCK, RESET
+- PIC (2-wire ICSP)  
+  ICSPDAT, ICSPCLK plus MCLR for entry
+- ARM Cortex-M  
+  SWD (SWDIO, SWDCLK) or JTAG
 
 ### ICSP vs Bootloader
 

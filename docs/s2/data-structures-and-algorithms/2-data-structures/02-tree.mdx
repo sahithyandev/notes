@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/data-structures/tree
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.589Z
-lastUpdatedOn: 2026-06-01T03:58:53.173Z
+lastUpdatedOn: 2026-09-13T14:55:22.660Z
 ---
 
 A widely used abstract data type that simulates a hierarchical tree structure
@@ -56,14 +56,22 @@ The length of the path from the root to a node.
 
 ## Common Operations
 
-- Insertion: Adding a node to the tree.
-- Deletion: Removing a node from the tree.
-- Traversal: Visiting all the nodes in some order
-  - In-order Traversal: left, root, right
-  - Pre-order Traversal: root, left, right
-  - Post-order Traversal: left, right, root
-  - Level-order Traversal: Visit nodes level by level from top to bottom.
-- [Searching](/s2/data-structures-and-algorithms/algorithms/depth-first-search): Finding a node in the tree.
+- Insertion  
+  Adding a node to the tree.
+- Deletion  
+  Removing a node from the tree.
+- Traversal  
+  Visiting all the nodes in some order.
+  - In-order Traversal  
+    Left, root, right.
+  - Pre-order Traversal  
+    Root, left, right.
+  - Post-order Traversal  
+    Left, right, root.
+  - Level-order Traversal  
+    Visit nodes level by level from top to bottom.
+- [Searching](/s2/data-structures-and-algorithms/algorithms/depth-first-search)  
+  Finding a node in the tree.
 
 ## Binary Tree
 
@@ -86,24 +94,28 @@ $$
 
 After adding the new node, the tree must remain valid.
 
-- Start at the Root: Begin at the root node.
-- Compare Values: Compare the value to be inserted with the value of the current
-  node.
-- Move Left or Right:
+- Start at the Root  
+  Begin at the root node.
+- Compare Values  
+  Compare the value to be inserted with the value of the current node.
+- Move Left or Right
   - If the value is less than the current node's value, move to the left child.
   - If the value is greater than the current node's value, move to the right
     child.
-- Insert the Node: When a `null` position is reached, the new node is inserted.
+- Insert the Node  
+  When a `null` position is reached, the new node is inserted.
 
 ### Deletion Logic
 
 Deletion algorithm depends on the node to be deleted.
 
-- Node with No Children: Simply remove the node.
-- Node with One Child: Remove the node and replace it with its child.
-- Node with Two Children: Find the in-order successor (smallest node in the
-  right subtree), replace the node's value with the successor's value, and then
-  delete the successor.
+- Node with No Children  
+  Simply remove the node.
+- Node with One Child  
+  Remove the node and replace it with its child.
+- Node with Two Children  
+  Find the in-order successor (smallest node in the right subtree), replace the
+  node's value with the successor's value, and then delete the successor.
 
 ## Types
 

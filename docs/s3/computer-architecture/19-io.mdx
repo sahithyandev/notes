@@ -6,19 +6,21 @@ slug: s3/computer-architecture/io
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-06-11T16:40:17.528Z
+lastUpdatedOn: 2026-09-13T14:55:23.113Z
 ---
 
 ### Keyboard and Monitor
 
 Traditional human-computer interaction devices.
 
-- Keyboard: sends characters (each encoded in 7-bit ASCII).
+- Keyboard  
+  Sends characters, each encoded in 7-bit ASCII.
   - Types:
     - Printable (letters, digits, symbols)
     - Control (non-printable; e.g., carriage return, backspace)
 
-- Monitor: displays output from the system.
+- Monitor  
+  Displays output from the system.
 
 ## I/O Module
 
@@ -55,7 +57,7 @@ Typical sequence:
 - When status shows "ready" or "data available," CPU performs the read or write.
 - CPU continues with other work (or repeats polling) after the transfer.
 
-### Interrupt-driven I/O
+### Interrupt-Driven I/O
 
 CPU continues its operation. When the I/O device is ready, it [interrupts](/s3/operating-systems/io-system#interrupt-driven) the CPU. Saves the current context (to the stack), handles the interrupt, restores the context (from the stack), and resumes execution. More efficient than programmed I/O. Requires special hardware.
 
@@ -122,7 +124,7 @@ Aka. isolated I/O or port mapped. I/O devices have a separate address space. Spe
 ## I/O Channel Architecture
 
 - Specialized processors managing multiple I/O devices.
-- Example: **PCIe architecture**
+- Example, **PCIe architecture**:
   - Uses **root complex** (chipset).
   - Supports device-to-device communication (not just CPU-to-device).
 
