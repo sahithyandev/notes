@@ -6,7 +6,7 @@ slug: s2/data-structures-and-algorithms/algorithms/bellman-ford-algorithm
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-09-08T19:46:17.675Z
+lastUpdatedOn: 2026-09-13T04:43:42.334Z
 ---
 
 A dynamic algorithm to find the shortest paths from a source node to all other node in a weighted graph. Can handle graphs with negative weight edges. Fails for graphs with negative weight cycle.
@@ -90,24 +90,36 @@ import BellmanFordAlgorithmExample from "./images/bellman-ford-algorithm-example
 
 <BellmanFordAlgorithmExample />
 
-- Initialize: $d[0] = 0$, $d[1] = d[2] = d[3] = d[4] = \infty$, predecessors = null.
+- Initialize  
+  $d[0] = 0$, $d[1] = d[2] = d[3] = d[4] = \infty$, predecessors = null.
 - Relax Edges (4 iterations):
   - Iteration 1:
-    - 0→1: $0+2=2$, $d[1]=2$, $pred[1]=0$.
-    - 0→2: $0+3=3$, $d[2]=3$, $pred[2]=0$.
-    - 0→4: $0+1=1$, $d[4]=1$, $pred[4]=0$.
-    - 4→3: $1+2=3$, $d[3]=3$, $pred[3]=4$.
-  - Iterations 2-4: No further updates.
-- Check Negative Cycles: No distances decrease, so no negative cycles.
+    - 0→1  
+      $0+2=2$, $d[1]=2$, $pred[1]=0$.
+    - 0→2  
+      $0+3=3$, $d[2]=3$, $pred[2]=0$.
+    - 0→4  
+      $0+1=1$, $d[4]=1$, $pred[4]=0$.
+    - 4→3  
+      $1+2=3$, $d[3]=3$, $pred[3]=4$.
+  - Iterations 2-4  
+    No further updates.
+- Check Negative Cycles  
+  No distances decrease, so no negative cycles.
 
 Final Results:
 
-- Distances: $d[0]=0$, $d[1]=2$, $d[2]=3$, $d[3]=3$, $d[4]=1$.
+- Distances  
+  $d[0]=0$, $d[1]=2$, $d[2]=3$, $d[3]=3$, $d[4]=1$.
 - Paths:
-  - 0→1: $0\to1$ (2)
-  - 0→2: $0\to2$ (3)
-  - 0→3: $0\to4\to3$ (1+2=3)
-  - 0→4: $0\to4$ (1)
+  - 0→1  
+    $0\to1$ (2)
+  - 0→2  
+    $0\to2$ (3)
+  - 0→3  
+    $0\to4\to3$ (1+2=3)
+  - 0→4  
+    $0\to4$ (1)
 
 Bellman-Ford works by relaxing all edges $|V|-1$ times, handling negative weights if present (none here).
 

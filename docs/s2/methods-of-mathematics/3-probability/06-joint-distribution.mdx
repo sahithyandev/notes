@@ -6,7 +6,7 @@ slug: s2/methods-of-mathematics/probability/joint-distribution
 prev: true
 next: true
 dateCreated: 2026-04-22T07:07:02.596Z
-lastUpdatedOn: 2026-09-08T19:46:17.680Z
+lastUpdatedOn: 2026-09-13T04:43:42.368Z
 ---
 
 Specifies the probability of observing a combination of values for two or more random variables. Characterizes the relationship between multiple random variables, including their dependencies and correlations.
@@ -15,8 +15,10 @@ Specifies the probability of observing a combination of values for two or more r
 
 For two random variables $X$ and $Y$, the joint probability distribution gives the probability that $X$ and $Y$ simultaneously take on specific values. This can be expressed as:
 
-- For discrete random variables: $P(X = x, Y = y)$ or $P_{X,Y}(x, y)$
-- For continuous random variables: $f_{X,Y}(x, y)$
+- Discrete random variables  
+  $P(X = x, Y = y)$ or $P_{X,Y}(x, y)$.
+- Continuous random variables  
+  $f_{X,Y}(x, y)$.
 
 For a joint probability distribution $P(A \cap B)$, $P(A)$ and $P(B)$ are the marginal probabilities.
 
@@ -28,10 +30,10 @@ $$
 \mathrm{Cov}(X, Y) = \sum_{x} \sum_{y} (x - \mu_X)(y - \mu_Y) \, P(X = x, Y = y)
 $$
 
-- Positive covariance: Indicates that higher than mean values of one variable tend to be
-  paired with higher than mean values of other variable.
-- Negative covariance: Indicates that higher than mean values of one variable tend to be
-  paired with lower than mean values of other variable.
+- Positive covariance means higher than mean values of one variable tend to be
+  paired with higher than mean values of the other variable.
+- Negative covariance means higher than mean values of one variable tend to be
+  paired with lower than mean values of the other variable.
 - If the two random variables are independent then the covariance will
   be zero.
 
@@ -66,42 +68,55 @@ $$
 
 ### Non-Negativity
 
-- Discrete case: $\forall x,y\;\;P(X = x, Y = y) \geq 0$
-- Continuous case: $\forall x,y\;\;f_{X,Y}(x, y) \geq 0$
+- Discrete case  
+  $\forall x,y\;\;P(X = x, Y = y) \geq 0$
+- Continuous case  
+  $\forall x,y\;\;f_{X,Y}(x, y) \geq 0$
 
 ### Total Probability Equals 1
 
-- Discrete case: $\sum_x \sum_y P(X = x, Y = y) = 1$
-- Continuous case: $\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy \, dx = 1$
+- Discrete case  
+  $\sum_x \sum_y P(X = x, Y = y) = 1$
+- Continuous case  
+  $\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy \, dx = 1$
 
 ### Marginal Distributions
 
 The distribution of an individual variable can be derived from the joint distribution:
 
-- Discrete case: $P(X = x) = \sum_y P(X = x, Y = y)$
-- Continuous case: $f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy$
+- Discrete case  
+  $P(X = x) = \sum_y P(X = x, Y = y)$
+- Continuous case  
+  $f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) \, dy$
 
 ### Conditional Distributions
 
 The distribution of one variable given a specific value of the other:
 
-- Discrete case: $P(X = x | Y = y) = \frac{P(X = x, Y = y)}{P(Y = y)}$
-- Continuous case: $f_{X|Y}(x|y) = \frac{f_{X,Y}(x, y)}{f_Y(y)}$
+- Discrete case  
+  $P(X = x | Y = y) = \frac{P(X = x, Y = y)}{P(Y = y)}$
+- Continuous case  
+  $f_{X|Y}(x|y) = \frac{f_{X,Y}(x, y)}{f_Y(y)}$
 
 ### Independence
 
 Random variables $X$ and $Y$ are independent **iff**:
 
-- Discrete case: $\forall x,y\;\; P(X = x, Y = y) = P(X = x) \cdot P(Y = y)$
-- Continuous case: $\forall x,y\;\; f_{X,Y}(x, y) = f_X(x) \cdot f_Y(y)$
+- Discrete case  
+  $\forall x,y\;\; P(X = x, Y = y) = P(X = x) \cdot P(Y = y)$
+- Continuous case  
+  $\forall x,y\;\; f_{X,Y}(x, y) = f_X(x) \cdot f_Y(y)$
 
 ## Representation
 
 Joint distributions can be represented in various ways:
 
-- For discrete variables: probability mass tables or matrices
-- For continuous variables: joint density functions or contour plots
-- Copulas: functions that describe the dependence structure between variables
+- Discrete variables  
+  Probability mass tables or matrices.
+- Continuous variables  
+  Joint density functions or contour plots.
+- Copulas  
+  Functions that describe the dependence structure between variables.
 
 ## Types
 
