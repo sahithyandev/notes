@@ -430,6 +430,14 @@
     }
 
     figure {
+      /* Interactive illustration components anchor a visually-hidden
+         aria-live region with position:absolute. Without a positioned
+         ancestor, Chromium/WebKit (not Firefox) can place that box far
+         outside the figure and blow out the page's scroll height. Every
+         illustration is rooted in <figure>, so this containing block
+         covers them all instead of each component setting it. */
+      position: relative;
+
       img {
         border-radius: 0.375rem;
       }
