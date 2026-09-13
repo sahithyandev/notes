@@ -6,7 +6,7 @@ slug: s3/operating-systems/critical-section-problem
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-09-08T19:46:17.704Z
+lastUpdatedOn: 2026-09-13T04:35:59.914Z
 ---
 
 Each process contains a critical section. From all the threads sharing some resource, only 1 thread must be allowed to run its critical section at a given point of time. If not achieved, data corruption and race conditions are possible.
@@ -31,21 +31,23 @@ Hardware-level solution. Turning off interrupts in entry section and turning the
 
 Only available at kernel level. Not reliable. If critical section runs for too long or interrupts are not turned on again, whole system will freeze. Not scalable for multiple CPUs. Starvation is possible.
 
-- Mutual Exclusion: Satisfied\*  
-  Not satisfied on multiprocessor or multicore systems. Interrupts are only turned off on the current CPU/core. Other CPUs/cores can still run other threads that may enter their critical sections.
-- Progress: Satisfied\*  
-  Not satisfied on multiprocessor or multicore systems.
-- Bounded Waiting: Not satisfied.  
-  Depends on OS scheduler. A thread may be delayed indefinitely if higher-priority threads keep getting scheduled.
+- Mutual exclusion  
+  Satisfied\*, but not on multiprocessor or multicore systems. Interrupts are only turned off on the current CPU/core. Other CPUs/cores can still run other threads that may enter their critical sections.
+- Progress  
+  Satisfied\*, but not on multiprocessor or multicore systems.
+- Bounded waiting  
+  Not satisfied. Depends on OS scheduler. A thread may be delayed indefinitely if higher-priority threads keep getting scheduled.
 
 ### Strict Alternation
 
 Software-only solution. Explained already in [Mutual Exclusion](/s3/operating-systems/mutual-exclusion#strict-alternation).
 
-- Mutual exclusion: Satisfied.
-- Progress: Not satisfied.
-- Bounded Waiting: Satisfied.  
-  $N-1$ is the upperbound on the number of threads that can enter their critical section after a thread requests to enter.
+- Mutual exclusion  
+  Satisfied.
+- Progress  
+  Not satisfied.
+- Bounded waiting  
+  Satisfied. $N-1$ is the upperbound on the number of threads that can enter their critical section after a thread requests to enter.
 
 ### Peterson's Algorithm
 
@@ -72,12 +74,12 @@ bool test_and_set(bool *target) {
 }
 ```
 
-- Mutual exclusion - Satisfied.  
-  `test_and_set` ensures only one thread sees `old = false` and enters the critical section. Everyone else spins.
-- Progress - Not satisfied.
-  If more than 1 threads keep calling `test_and_set`, the CPU may keep picking the same unlucky thread, making another thread starve forever.
-- Bounded waiting - No satisfied.
-  `test_and_set` gives no upper bound on how long a thread waits. A thread can be overtaken infinitely many times.
+- Mutual exclusion  
+  Satisfied. `test_and_set` ensures only one thread sees `old = false` and enters the critical section. Everyone else spins.
+- Progress  
+  Not satisfied. If more than 1 threads keep calling `test_and_set`, the CPU may keep picking the same unlucky thread, making another thread starve forever.
+- Bounded waiting  
+  Not satisfied. `test_and_set` gives no upper bound on how long a thread waits. A thread can be overtaken infinitely many times.
 
 #### `compare_and_swap`
 

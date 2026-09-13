@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/digital-to-digital
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.691Z
-lastUpdatedOn: 2026-09-08T19:46:17.695Z
+lastUpdatedOn: 2026-09-13T04:35:59.681Z
 ---
 
 ### Multilevel Binary
@@ -42,7 +42,7 @@ Short for Non-Return to Zero-Inverted. A differential encoding scheme. Constant 
 
 <Note title="Pros & Cons of NRZ">
 
-NRZ is used in magnetic recording. Not often used for signal transmission.
+NRZ is used in magnetic recording, not often for signal transmission. For the same error rate, it's more power efficient compared to multilevel binary.
 
 - Pros
   - Easy to implement
@@ -51,12 +51,6 @@ NRZ is used in magnetic recording. Not often used for signal transmission.
   - No built-in error detection
   - DC component won't be transmitted
   - Receiver may lose timing due to lack of transitions
-
-</Note>
-
-<Note>
-
-For the same error rate, NRZ is more power efficient compared to multilevel binary.
 
 </Note>
 
@@ -85,8 +79,10 @@ Opposite of AMI. No advantage or disadvantage compared to AMI.
 
 Aka. Phase encoding, or PE. A [biphase encoding scheme](/s3/data-communication-and-networking/encoding-decoding#biphase-encoding). Each bit is represented by a transition at the middle part of the bit period.
 
-- Low to high: 1
-- High to low: 0
+- Low to high  
+  Represents 1.
+- High to low  
+  Represents 0.
 
 2 types of transitions:
 
@@ -128,11 +124,11 @@ Maintains clock synchronization. Avoids long run of 0s. Signal will be DC-balanc
 When 4 consecutive 0s are detected:
 
 - Count positive (+) and negative (-) pulses since last violation (<span class="font-mono">V</span>). If the difference (_imbalance_) is:
-  - Odd: use <span class="font-mono">000V</span>
-  - Even: use <span class="font-mono">B00V</span>
+  - Odd, use <span class="font-mono">000V</span>
+  - Even, use <span class="font-mono">B00V</span>
 - Check the polarity of the pulse before <span class="font-mono">0000</span>:
-  - For <span class="font-mono">000V</span>: <span class="font-mono">V</span> = same polarity as last pulse
-  - For <span class="font-mono">B00V</span>: <span class="font-mono">B</span> and <span class="font-mono">V</span> = opposite polarity of last pulse
+  - For <span class="font-mono">000V</span>, <span class="font-mono">V</span> has the same polarity as the last pulse
+  - For <span class="font-mono">B00V</span>, <span class="font-mono">B</span> and <span class="font-mono">V</span> have the opposite polarity of the last pulse
 
 | Imbalance of non-zero pulses | Substitution pattern                | Meaning                                                                                        |
 | ---------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------- |

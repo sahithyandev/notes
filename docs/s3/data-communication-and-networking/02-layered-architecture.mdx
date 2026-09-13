@@ -6,7 +6,7 @@ slug: s3/data-communication-and-networking/layered-architecture
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.690Z
-lastUpdatedOn: 2026-04-24T07:36:29.640Z
+lastUpdatedOn: 2026-09-13T04:35:59.662Z
 ---
 
 Functionality of communication through the network is split into separate layers.
@@ -69,10 +69,13 @@ Provide a means of controlling the dialogue between two users (applications).
 
 Handles:
 
-- Session management: starts and ends communication sessions
-- Dialog control (full vs half duplex): who can send data and when. prevents data collisions. ensures proper ordering of data packets.
+- Session management  
+  Starts and ends communication sessions.
+- Dialog control (full vs half duplex)  
+  Decides who can send data and when. Prevents data collisions and ensures proper ordering of data packets.
 - Token management
-- Synchronization: manages the timing of data transmission to ensure that data is transmitted at the right time.
+- Synchronization  
+  Manages the timing of data transmission to ensure that data is transmitted at the right time.
 - Recovery management
 
 Not often implemented separately in real systems, because it is usually integrated into the transport layer or application layer. Modern applications handle sessions by their own standards.
@@ -110,8 +113,10 @@ Transmits packets (aka. datagrams) across different networks from source to dest
 
 Handles:
 
-- Logical addressing: which machine to send the packet to
-- Routing: how to reach the destination efficiently
+- Logical addressing  
+  Determines which machine to send the packet to.
+- Routing  
+  Determines how to reach the destination efficiently.
 - Datagram encapsulation
 
 Examples:
@@ -127,11 +132,12 @@ Transmits _frames_ with headers, control and addres information. Provides reliab
 
 Handles:
 
-- data framing: dividing a data stream into manageable chunks
-- error detection and correction
-- flow control  
-  Manages frame flow rate to prevent overflow
-- addressing and routing
+- Data framing  
+  Divides a data stream into manageable chunks.
+- Error detection and correction
+- Flow control  
+  Manages frame flow rate to prevent overflow.
+- Addressing and routing
 
 #### Media Access Control (MAC)
 
@@ -145,6 +151,7 @@ Transmits a raw string of bits over a physical medium. Can either be wired or wi
 
 Handles:
 
-- Bit rate: how fast the bits are sent
+- Bit rate  
+  How fast the bits are sent.
 - Encoding
 - Signaling

@@ -6,7 +6,7 @@ slug: s3/operating-systems/virtual-memory
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-09-08T19:46:17.705Z
+lastUpdatedOn: 2026-09-13T04:35:59.933Z
 ---
 
 A system that allows programs to use more memory than is physically available in RAM. Achieved by combining the use of physical memory and disk space. The operating system uses paging and swapping as techniques to create an illusion of a larger memory space than what is physically available.
@@ -28,9 +28,9 @@ Virtual memory is divided into fixed-size _pages_. Page size is equal to [frame]
 
 Virtual memory address is composed of:
 
-- Page number
+- Page number  
   Index into page table.
-- Page offset
+- Page offset  
   Location within the page.
 
 Advantages:
@@ -48,10 +48,10 @@ Maps virtual page numbers to physical frame numbers. Indexed by virtual page num
 
 Each entry includes:
 
-- a valid bit: to identify if the page belongs to the process' address space
-- a reference bit
-- a dirt bit
-- physical frame number
+- A valid bit, to identify if the page belongs to the process' address space
+- A reference bit
+- A dirty bit
+- Physical frame number
 
 Kept in main memory. Because of this, every memory operation now requires 2 accesses.
 
@@ -153,8 +153,10 @@ Hash table can be used to decrease lookup time. TLB can accelerate access. Share
 
 The technique of moving processes moved from/to swap space which is on secondary disk. Used when total process memory is higher than the physical memory. OS maintains tables to track which virtual memory pages are in RAM and which are on disk. Swap space would also be split into pages.
 
-- Page-out: Pages are written (swapped) from RAM to swap space.
-- Page-in: When swapped pages are needed again, they’re read back into RAM.
+- Page-out  
+  Pages are written (swapped) from RAM to swap space.
+- Page-in  
+  When swapped pages are needed again, they're read back into RAM.
 
 Swapped out processes can be loaded into a different physical address space if no pending I/O and if the address binding method allows.
 

@@ -6,7 +6,7 @@ slug: s3/operating-systems/mutual-exclusion
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-09-08T19:46:17.703Z
+lastUpdatedOn: 2026-09-13T04:35:59.911Z
 ---
 
 Ensuring that only one thread (per a shared resource) at a time can run its critical section.
@@ -34,12 +34,14 @@ while (true) {
 }
 ```
 
-- Mutual exclusion: Satisfied  
-  `turn` can take only 1 value at a time.
-- No deadlock: Satisfied
-- No starvation: Satisfied
-- Starvation in absence of contention: fails  
-  If a process halts in its non-critical section, the other may be permanently blocked.
+- Mutual exclusion  
+  Satisfied. `turn` can take only 1 value at a time.
+- No deadlock  
+  Satisfied.
+- No starvation  
+  Satisfied.
+- Starvation in absence of contention  
+  Fails. If a process halts in its non-critical section, the other may be permanently blocked.
 
 Even if both processes are guaranteed to not halt in their non-critical sections, unnecessary waiting may occur. For example, if P1 is in its critical section and P2 is in its non-critical section, P2 must wait for P1 to finish even if P1 has no intention of re-entering its critical section.
 
@@ -78,7 +80,7 @@ while (true) {
 }
 ```
 
-- Mutual exclusion: Satisfied  
-  `c1` can only become 1 if P1 finishes its critical section.
-- No Deadlock: Not satisfied  
-  If both `c1` and `c2` is set to 0.
+- Mutual exclusion  
+  Satisfied. `c1` can only become 1 if P1 finishes its critical section.
+- No deadlock  
+  Not satisfied, if both `c1` and `c2` are set to 0.

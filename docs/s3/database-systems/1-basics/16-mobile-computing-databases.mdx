@@ -6,16 +6,19 @@ slug: s3/database-systems/basics/mobile-computing-databases
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-06-01T03:58:53.200Z
+lastUpdatedOn: 2026-09-13T04:35:59.802Z
 ---
 
 Mobiles operates in environments with wireless communication, limited bandwidth, and intermittent connectivity.
 
 Consists of:
 
-- Mobile hosts: laptops, phones, or tablets.
-- Wired hosts: servers or fixed systems.
-- Communication network: Wi-Fi, 4G, 5G, Bluetooth.
+- Mobile hosts  
+  Laptops, phones, or tablets.
+- Wired hosts  
+  Servers or fixed systems.
+- Communication network  
+  Wi-Fi, 4G, 5G, Bluetooth.
 
 Communication can either be:
 
@@ -26,21 +29,31 @@ Communication can either be:
 
 Applications which rely on a database must handle:
 
-- Query optimization: minimize data transferred and network cost.
-- Energy consumption: transmission uses more energy than receiving.
-- Location services: queries depend on device location.
-- Data broadcast: base stations broadcast shared data.
-- Disconnection: must maintain cached local data and sync later.
-- Consistency: local copies can become outdated.
+- Query optimization  
+  Minimize data transferred and network cost.
+- Energy consumption  
+  Transmission uses more energy than receiving.
+- Location services  
+  Queries depend on device location.
+- Data broadcast  
+  Base stations broadcast shared data.
+- Disconnection  
+  Must maintain cached local data and sync later.
+- Consistency  
+  Local copies can become outdated.
 
 ## Routing and Query Processing
 
 Optimization balances:
 
-- User time: query response delay.
-- Communication cost: data transfer charges.
-- Energy: minimize transmission usage. Reception requires much less energy than transmission.
-- Timing: off-peak vs peak network costs.
+- User time  
+  Query response delay.
+- Communication cost  
+  Data transfer charges.
+- Energy  
+  Minimize transmission usage. Reception requires much less energy than transmission.
+- Timing  
+  Off-peak vs peak network costs.
 
 ## Data Broadcast
 
@@ -59,8 +72,10 @@ When devices are offline:
 
 Challenges:
 
-- Recoverability: updates may be lost.
-- Consistency: local data may not match server state.
+- Recoverability  
+  Updates may be lost.
+- Consistency  
+  Local data may not match server state.
 
 ## Mobile Updates
 
@@ -69,7 +84,7 @@ Challenges:
 - Version numbering used to track document versions.
 - Sometimes manual reconciliation is required.
 
-## Detecting Inconsistent Updates — Version Vector Scheme
+## Detecting Inconsistent Updates: Version Vector Scheme
 
 Each host maintains a version vector per document.
 
@@ -127,7 +142,7 @@ Key features:
 
 - Designed for mobile and field-force environments.
 - Provides secure offline access and syncs when connected.
-- Synchronization: async, event-driven, conflict-aware.
+- Synchronization is async, event-driven, and conflict-aware.
 - Supports automatic reconciliation and device management.
 
 Architecture:
@@ -138,7 +153,7 @@ Architecture:
 ## Summary
 
 - Embedded databases run inside applications, require no DBA, and have small footprints.
-- Two architectures: lightly embedded (external engine) and deeply embedded (in-process).
+- There are 2 architectures, lightly embedded (external engine) and deeply embedded (in-process).
 - Mobile databases face challenges with energy, connectivity, and consistency.
 - Version vectors help detect conflicts after disconnections.
-- Oracle’s embedded solutions—TimesTen, Berkeley DB, and Database Lite—illustrate different deployment and synchronization models.
+- Oracle's embedded solutions (TimesTen, Berkeley DB, and Database Lite) illustrate different deployment and synchronization models.

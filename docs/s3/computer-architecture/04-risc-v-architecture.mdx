@@ -6,7 +6,7 @@ slug: s3/computer-architecture/risc-v-architecture
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.687Z
-lastUpdatedOn: 2026-09-08T19:46:17.693Z
+lastUpdatedOn: 2026-09-13T04:35:59.559Z
 ---
 
 An open-standard ISA based on established RISC principles. Open source. Modular by design. Denoted as <span class="font-mono">RV32I</span> or <span class="font-mono">RV64I</span>. The number represent the bit width of the registers and the address bus. Only 32-bit version is discussed in this module.
@@ -205,13 +205,13 @@ Instructions of RISC-V are designed to follow maximum commanility.
 - No privileged instructions in the base ISA  
   User-level ISA is fully separated from privileged instructions (CSR, traps, paging).
   A clean split makes OS design clearer.
-- 32 registers, all general-purpose
+- 32 registers, all general-purpose  
   No “special” registers except x0 = hardwired zero.
   Simplifies compiler register allocation and reduces instruction count.
-- Load–store architecture
+- Load–store architecture  
   Only loads and stores access memory.
   All arithmetic uses registers → easier pipeline, fewer hazards.
-- Simple memory addressing modes
+- Simple memory addressing modes  
   Only base + offset. No complex scaling or indirection.
   Hardware addressing logic is tiny and fast.
 
@@ -262,8 +262,10 @@ The reason is RISC-V is load-store architecture. No instruction needs to simulta
 
 Required only for S instructions. Dummy stage for R, I, U and J instructions. Skipped for B instructions.
 
-- For a load: the memory does a read using the effective address computed in the previous cycle
-- For a store: the memory writes the data from the second register
+- For a load  
+  The memory does a read using the effective address computed in the previous cycle.
+- For a store  
+  The memory writes the data from the second register.
 
 Skipped for B instructions because:
 
@@ -276,9 +278,9 @@ J instructions also has to update PC, but they have to write to `ra` (WB stage).
 
 Write result back to destination register. Skipped for S and B instruction.
 
-- For an ALU instruction
+- For an ALU instruction  
   The ALU’s output is written.
-- For a load instruction
+- For a load instruction  
   The data fetched from memory in MEM stage is written.
 - For jump instruction  
   Return address is stored in the `ra` register.

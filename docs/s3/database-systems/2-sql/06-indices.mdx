@@ -6,7 +6,7 @@ slug: s3/database-systems/sql/indices
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.698Z
-lastUpdatedOn: 2026-06-27T08:46:52.688Z
+lastUpdatedOn: 2026-09-13T04:35:59.834Z
 ---
 
 Refer to [Indexing](/s3/database-systems/basics/indexing) before continuing. Primary key is indexed by default.
@@ -50,7 +50,11 @@ DROP INDEX idx_employee_name ON Employees;
 
 ## When Not to Index
 
-- Small tables: full scan is faster than an index lookup
-- Columns with low cardinality (e.g. boolean flags): index provides little selectivity
-- Columns that are frequently updated: index maintenance adds write overhead
-- Tables with heavy write workloads: each write must update all applicable indices
+- Small tables  
+  Full scan is faster than an index lookup.
+- Columns with low cardinality (e.g. boolean flags)  
+  Index provides little selectivity.
+- Columns that are frequently updated  
+  Index maintenance adds write overhead.
+- Tables with heavy write workloads  
+  Each write must update all applicable indices.

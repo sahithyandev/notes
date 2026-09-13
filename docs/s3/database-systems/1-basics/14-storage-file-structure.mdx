@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/storage-file-structure
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-09-08T19:46:17.699Z
+lastUpdatedOn: 2026-09-13T04:35:59.792Z
 ---
 
 Explains how data is stored and managed at the physical level in a DBMS. It introduces the types of storage media, performance measures, disk organization, and techniques for efficient data access.
@@ -76,12 +76,12 @@ A way to organize variable-length records inside a single disk block. Allows dat
 
 Each page has two main parts:
 
-- Header — contains:
+- Header, containing:
   - Number of records.
   - Pointer to end of free space.
-  - Table of _slots_ — each slot stores the _offset and length_ of a record.
+  - A table of _slots_, where each slot stores the _offset and length_ of a record.
 
-- Data area — where actual records are stored, packed from the end of the page backward.
+- Data area, where actual records are stored, packed from the end of the page backward.
 
 New records are added at the end of free space; a new slot entry is created in the header.
 When a record is deleted, its slot is marked empty; space may be reused later.

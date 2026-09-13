@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/indexing
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-06-01T03:58:53.200Z
+lastUpdatedOn: 2026-09-13T04:35:59.809Z
 ---
 
 Indexing and hashing is used to speed up data retrieval in databases. Instead of scanning an entire file, indexes provide fast access paths to records using keys. When a file is modified, every index on the file must be updated.
@@ -41,10 +41,14 @@ Slightly higher space and update overhead. Still, dominant indexing method in mo
 
 When comparing index types, measure:
 
-- Access time: how quickly data is found.
-- Insertion/deletion time: update performance.
-- Space overhead: extra storage used by index.
-- Supported access types: exact-match or range-based.
+- Access time  
+  How quickly data is found.
+- Insertion/deletion time  
+  Update performance.
+- Space overhead  
+  Extra storage used by index.
+- Supported access types  
+  Exact-match or range-based.
 
 ## Dense Index
 
@@ -101,7 +105,7 @@ $$
 
 - Each bucket is typically one disk block.
 - Used for equality search (not range queries).
-- Example: `h(DeptName) = sum(char codes) mod 10`.
+- For example, `h(DeptName) = sum(char codes) mod 10`.
 
 ### Bucket Overflow
 
@@ -109,7 +113,7 @@ Occurs when too few buckets or non-uniform data distribution.
 
 ### Handling Overflow
 
-- Overflow chaining: overflow buckets linked in a list.
+- Overflow chaining links overflow buckets in a list.
 - Called closed hashing.
 - Open hashing (without overflow buckets) is unsuitable for DBMS use.
 

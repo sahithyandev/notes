@@ -6,7 +6,7 @@ slug: s3/operating-systems/semaphore
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-04-24T03:19:45.179Z
+lastUpdatedOn: 2026-09-13T04:35:59.919Z
 ---
 
 A shared integer variable. Can allow a 1 or certain number of threads to access a resource simultaneously. Name adapted from the railway flags.
@@ -99,8 +99,10 @@ Implemented using waiting queues (1 per semaphore). Each semaphore has a value a
 
 Has 2 operations:
 
-- block: place current thread on waiting queue
-- wakeup: remove one process from waiting queue to ready queue
+- `block`  
+  Places the current thread on the waiting queue.
+- `wakeup`  
+  Removes one process from the waiting queue to the ready queue.
 
 ```c
 typedef struct {

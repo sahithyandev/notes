@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/application-development
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-08T19:46:17.699Z
+lastUpdatedOn: 2026-09-13T04:35:59.762Z
 ---
 
 Applications, as the intermediary between the user and database is discussed here. Can be split into 3:
@@ -25,15 +25,16 @@ The World Wide Web, which is a system of linked web pages and resources that we 
 
 It has several benefits:
 
-- Organizes content: It helps separate web traffic from other services that might use the same domain (like mail.example.com).
-- Eases technical management: Web servers can be configured specifically for "www" for performance, cookies, and caching control.
-- Supports scalability: Allows large sites to distribute traffic across multiple servers or domains more easily.
-- SEO and branding: Using "www" keeps the website's URL consistent and avoids conflicts in URLs, which helps in search engine optimization (SEO) and maintains a clear brand identity.
+- Organizes content  
+  It helps separate web traffic from other services that might use the same domain (like mail.example.com).
+- Eases technical management  
+  Web servers can be configured specifically for "www" for performance, cookies, and caching control.
+- Supports scalability  
+  Allows large sites to distribute traffic across multiple servers or domains more easily.
+- SEO and branding  
+  Using "www" keeps the website's URL consistent and avoids conflicts in URLs, which helps in search engine optimization (SEO) and maintains a clear brand identity.
 
-</Note>
-
-<Note title="0.0.0.0">
-The IP address 0.0.0.0 is a special number used in different ways:
+The IP address 0.0.0.0 is a separate special number used in different ways:
 
 - As a source address, it means the device doesn't have a real IP yet, like when it’s just starting up or asking for an IP.
 - As a destination address, it’s mostly invalid, but can mean "all IPs" for servers to listen on all network connections or as a default route in networking.
@@ -106,9 +107,11 @@ This makes it easier to connect a web interface to a database because:
 
 Various server-side scripting languages are used today, including:
 
-- JSP (Java Server Pages) : It's compiled into Java + Servlets, and allows new tags to be defined, in tag libraries
+- JSP (Java Server Pages)  
+  Compiled into Java and Servlets, and allows new tags to be defined in tag libraries.
 
-- PHP : It's widely used for Web server scripting.
+- PHP  
+  Widely used for Web server scripting.
 
 - General-purpose scripting languages like VBScript, Perl, and Python
 
@@ -233,11 +236,14 @@ This can lead to attackers stealing sensitive data, such as cookies and session 
 
 There are different types of XSS attacks:
 
-- Reflected XSS: Malicious script is reflected off a web server in response to a user request.
+- Reflected XSS  
+  Malicious script is reflected off a web server in response to a user request.
 
-- Stored XSS: The malicious script is permanently stored on the server and executed when users view infected content.
+- Stored XSS  
+  The malicious script is permanently stored on the server and executed when users view infected content.
 
-- DOM-based XSS: The vulnerability exists in client-side code, manipulating the Document Object Model in the browser.
+- DOM-based XSS  
+  The vulnerability exists in client-side code, manipulating the Document Object Model in the browser.
 
 To prevent Cross Site Scripting (XSS) attacks:
 
@@ -335,8 +341,10 @@ Instead of trying every possible character combination like brute force, diction
 
 Databases widely support encryption to protect data. Encryption can be applied at different levels:
 
-- Disk block: Each disk block encrypted with a key managed by database software; protects data even if disk is accessed.
-- Relations or attributes: Only sensitive relations or attributes are encrypted; primary/foreign key attributes cannot be encrypted.
+- Disk block  
+  Each disk block encrypted with a key managed by database software, protecting data even if disk is accessed.
+- Relations or attributes  
+  Only sensitive relations or attributes are encrypted, and primary/foreign key attributes cannot be encrypted.
 
 Usually, single master key used to protect multiple encryption/decryption keys stored in database.
 

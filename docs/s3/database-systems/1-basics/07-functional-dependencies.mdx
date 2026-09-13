@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/functional-dependencies
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-08T19:46:17.698Z
+lastUpdatedOn: 2026-09-13T04:35:59.757Z
 ---
 
 Describes a relationship between attributes in a relation. Defines if one set of attributes can determine another.
@@ -42,20 +42,28 @@ If a set of functional dependencies $F$ is legal under a relation schema $R$, it
 
 ## Armstrong's Axioms
 
-- Reflexivity: **If** $\beta \subseteq \alpha$ **then** $\alpha \rightarrow \beta$
-- Augmentation: **If** $\alpha \rightarrow \beta$ **then** $\gamma\alpha \rightarrow \gamma\beta$
-- Transitivity: **If** $\alpha \rightarrow \beta$ and $\beta \rightarrow \gamma$ **and** $\alpha \rightarrow \gamma$
+- Reflexivity  
+  **If** $\beta \subseteq \alpha$ **then** $\alpha \rightarrow \beta$
+- Augmentation  
+  **If** $\alpha \rightarrow \beta$ **then** $\gamma\alpha \rightarrow \gamma\beta$
+- Transitivity  
+  **If** $\alpha \rightarrow \beta$ and $\beta \rightarrow \gamma$ **and** $\alpha \rightarrow \gamma$
 
 The above rules are:
 
-- sound - generate functional dependencies that hold
-- complete - generate all functional dependencies that hold
+- Sound  
+  Generate functional dependencies that hold.
+- Complete  
+  Generate all functional dependencies that hold.
 
 Other inferred rules:
 
-- union: **If** $\alpha \rightarrow \beta$ and $\alpha \rightarrow \gamma$ **then** $\alpha \rightarrow \beta\gamma$
-- decomposition: **If** $\alpha \rightarrow \beta\gamma$ **then** $\alpha \rightarrow \gamma$ and $\alpha \rightarrow \beta$
-- pseudotransitivity: **If** $\alpha \rightarrow \beta$ and $\gamma\beta \rightarrow \delta$ **then** $\alpha\gamma \rightarrow \delta$
+- Union  
+  **If** $\alpha \rightarrow \beta$ and $\alpha \rightarrow \gamma$ **then** $\alpha \rightarrow \beta\gamma$
+- Decomposition  
+  **If** $\alpha \rightarrow \beta\gamma$ **then** $\alpha \rightarrow \gamma$ and $\alpha \rightarrow \beta$
+- Pseudotransitivity  
+  **If** $\alpha \rightarrow \beta$ and $\gamma\beta \rightarrow \delta$ **then** $\alpha\gamma \rightarrow \delta$
 
 ## Closure
 
