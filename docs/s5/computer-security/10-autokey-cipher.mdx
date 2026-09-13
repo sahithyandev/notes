@@ -1,15 +1,15 @@
 ---
 title: Autokey Cipher
 sidebar:
-  order: 11
+  order: 10
 dateCreated: 2026-08-26T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T17:00:42.065Z
+lastUpdatedOn: 2026-09-13T18:09:50.012Z
 slug: s5/computer-security/autokey-cipher
 prev: true
 next: true
 ---
 
-A [classical](/s5/computer-security/ciphers#classical-cipher) and [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Originally created by Blaise de Vigenère. Provides higher security than the [Bellaso variant](./vigenere-cipher). This was <b>NOT</b> covered in the class; only included here for the sake of completeness.
+A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Created by Blaise de Vigenère. Provides higher security than the [Bellaso variant](./vigenere-cipher). This was <b>NOT</b> covered in the class; only included here for the sake of completeness.
 
 You may find an implementation of Autokey cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/autokey-cipher.c).
 
@@ -49,37 +49,37 @@ where $k_r$ is the one primer letter in residue class $r = i \bmod L$. Each of t
 
 ## Worked Example
 
-Plaintext `attackatdawn` under primer key `QUEENLY`, with $A = 0$ to $Z = 25$.
+Plaintext `imakemyownluck` under primer key `PATRIC`, with $A = 0$ to $Z = 25$.
 
 The keystream is the primer key followed by the plaintext itself, truncated to the plaintext length.
 
 ```
-plaintext:   a t t a c k a t d a w n
-keystream:   Q U E E N L Y A T T A C
-ciphertext:  Q N X E P V Y T W T W P
+plaintext:   i m a k e m y o w n l u c k
+keystream:   P A T R I C I M A K E M Y O
+ciphertext:  X M T B M O G A W X P G A Y
 ```
 
 Each position adds the keystream letter modulo $26$.
 
-- $a (0) + Q (16) = 16 = Q$
-- $t (19) + U (20) = 39 \equiv 13 = N$
+- $i (8) + P (15) = 23 = X$
+- $m (12) + A (0) = 12 = M$
 
-Ciphertext is `QNXEPVYTWTWP`.
+Ciphertext is `XMTBMOGAWXPGAY`.
 
-For decryption, only the primer key `QUEENLY` is known at the start. Each recovered plaintext letter is appended to the keystream and used to decrypt later positions.
+For decryption, only the primer key `PATRIC` is known at the start. Each recovered plaintext letter is appended to the keystream and used to decrypt later positions.
 
-- $Q (16) - Q (16) = 0 = a$
-- $N (13) - U (20) = -7 \equiv 19 = t$
+- $X (23) - P (15) = 8 = i$
+- $M (12) - A (0) = 12 = m$
 
-After 7 positions the primer key is exhausted and the keystream continues with the recovered plaintext `attac`.
+After 6 positions the primer key is exhausted and the keystream continues with the recovered plaintext `imakem`.
 
-- $T (19) - a (0) = 19 = t$
-- $W (22) - t (19) = 3 = d$
+- $G (6) - i (8) = -2 \equiv 24 = y$
+- $A (0) - m (12) = -12 \equiv 14 = o$
 
-Plaintext is `attackatdawn`.
+Plaintext is `imakemyownluck`.
 
-For the attack, take ciphertext `KBRXUHMFQMSE` with $L = 3$. Class $r = 1$ holds positions $1, 4, 7, 10$ with ciphertext values $10, 23, 12, 12$. As a function of the unknown primer letter $x$, the class decrypts to
+For the attack, take ciphertext `UIHGTQANBLIGBBRBPRB` with $L = 3$. Class $r = 1$ holds positions $1, 4, 7, 10$ with ciphertext values $20, 6, 0, 11$. As a function of the unknown primer letter $x$, the class decrypts to
 
-$$10 - x, \quad 13 + x, \quad 25 - x, \quad 13 + x$$
+$$20 - x, \quad 12 + x, \quad 14 - x, \quad 23 + x$$
 
-Only $x = 17$ (`R`) gives language: `t e i e`. The other 2 classes resolve the same way, giving primer `RUN` and plaintext `theendisnear`.
+Only $x = 1$ (`B`) gives language: `t n n y`. The other 2 classes resolve the same way, giving primer `BUZ` and plaintext `toinfinityandbeyond`.

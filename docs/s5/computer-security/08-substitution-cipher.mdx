@@ -1,9 +1,9 @@
 ---
 title: Substitution Cipher
 sidebar:
-  order: 9
+  order: 8
 dateCreated: 2026-07-29T05:50:15.139Z
-lastUpdatedOn: 2026-09-09T17:00:42.065Z
+lastUpdatedOn: 2026-09-13T18:09:50.001Z
 slug: s5/computer-security/substitution-cipher
 prev: true
 next: true
@@ -37,29 +37,29 @@ Steps:
 
 ## Worked Example
 
-Key alphabet `ZEBRASCDFGHIJKLMNOPQTUVWXY`, so plaintext `a` maps to `Z`, `b` to `E`, `c` to `B`, and so on.
+Key alphabet `LOBSTERACDFGHIJKMNPQUVWXYZ`, so plaintext `a` maps to `L`, `b` to `O`, `c` to `B`, and so on.
 
 Each plaintext letter is looked up in the key alphabet.
 
-- `a` maps to `Z`
-- `t` maps to `Q`
-- `c` maps to `B`
-- `k` maps to `H`
+- `h` maps to `A`
+- `o` maps to `J`
+- `w` maps to `W`
+- `y` maps to `Y`
 
-Plaintext `attack` gives ciphertext `ZQQZBH`.
+Plaintext `howyoudoin` gives ciphertext `AJWYJUSJCI`.
 
 The inverse map sends each ciphertext letter back.
 
-- `Z` maps to `a`
-- `Q` maps to `t`
-- `B` maps to `c`
-- `H` maps to `k`
+- `A` maps to `h`
+- `J` maps to `o`
+- `W` maps to `w`
+- `Y` maps to `y`
 
-Ciphertext `ZQQZBH` gives plaintext `attack`.
+Ciphertext `AJWYJUSJCI` gives plaintext `howyoudoin`.
 
 For a longer ciphertext in this key, a frequency count leads the recovery.
 
 - The most frequent ciphertext letter is matched to `e`, the next to `t`, and so on down the English frequency rank.
-- The digram `QD` recurs, matched to `th`, which fixes `Q` to `t` and `D` to `h`.
-- `QDA` then reads `the`, fixing `A` to `e`.
+- The digram `QA` recurs, matched to `th`, which fixes `Q` to `t` and `A` to `h`.
+- `QAT` then reads `the`, fixing `T` to `e`.
 - Remaining letters are filled by trial, checking that partially decrypted words are valid.

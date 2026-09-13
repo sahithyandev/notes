@@ -1,9 +1,9 @@
 ---
 title: Atbash Cipher
 sidebar:
-  order: 7
+  order: 6
 dateCreated: 2026-08-11T00:00:00.000Z
-lastUpdatedOn: 2026-09-09T21:44:33.559Z
+lastUpdatedOn: 2026-09-13T18:09:49.991Z
 slug: s5/computer-security/atbash-cipher
 prev: true
 next: true
@@ -44,22 +44,22 @@ There is no key to search. Recovering the plaintext is a single substitution awa
 
 ## Worked Example
 
-Plaintext `attack`, with $a = 0$ to $z = 25$.
+Plaintext `nothingistrue`, with $a = 0$ to $z = 25$.
 
 Each letter maps to its mirror $c = 25 - m$.
 
-- $a (0) \to 25 = z$
+- $n (13) \to 12 = m$
+- $o (14) \to 11 = l$
 - $t (19) \to 6 = g$
-- $c (2) \to 23 = x$
-- $k (10) \to 15 = p$
+- $h (7) \to 18 = s$
 
-Ciphertext is `zggzxp`.
+Ciphertext is `mlgsrmtrhgifv`.
 
 Decryption applies the same map again.
 
-- $z (25) \to 0 = a$
-- $g (6) \to 19 = t$
+- $m (12) \to 13 = n$
+- $l (11) \to 14 = o$
 
-Plaintext is `attack`.
+Plaintext is `nothingistrue`.
 
 No key exists, so testing the single Atbash substitution against the ciphertext confirms it in one step.

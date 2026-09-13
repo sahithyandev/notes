@@ -1,10 +1,10 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-12T07:51:31.972Z
+lastUpdatedOn: 2026-09-13T18:09:50.130Z
 slug: s5/computer-security/diffie-hellman
 sidebar:
-  order: 23
+  order: 22
 prev: true
 next: true
 ---
@@ -106,6 +106,32 @@ Ephemeral Diffie-Hellman (DHE) generates a fresh key pair for every session and 
 
 This gives perfect forward secrecy: if the long-term keys are stolen later, past session keys stay safe, because the private keys that produced them no longer exist and cannot be recovered from the recorded public values.
 
+### Static DH
+
+Both parties reuse the same key pair across every session instead of generating a fresh one.
+
+- A single compromised private key exposes every past and future session, since the same $a$ or $b$ derives every session's shared secret.
+- Costs 1 exponentiation total per party, instead of 1 per session.
+
+### Authenticating the Ephemeral Keys
+
+Raw DH has no identity binding, so a fresh, unsigned $A$ or $B$ is exactly what a [man-in-the-middle](#man-in-the-middle-attack) substitutes. DHE fixes this by signing the ephemeral public key with a separate long-term signing key, not by deriving the session key from it.
+
+- Alice signs $A$ with her long-term private signing key, sends $(A, \text{signature})$.
+- Bob verifies the signature against Alice's long-term public key, then proceeds with $A$ exactly as in plain DH.
+
+<Note>
+
+TLS cipher suites name this split explicitly. `DHE_RSA` signs the ephemeral exchange with a long-term RSA key, `DHE_DSS` with DSA, `ECDHE_RSA` and `ECDHE_ECDSA` the elliptic-curve analogue. The long-term key authenticates $A$ and $B$, it never enters the shared secret computation.
+
+</Note>
+
+Why forward secrecy holds:
+
+- $a$ and $b$ are generated fresh per session and destroyed once $k$ is computed.
+- Recovering $a$ from the recorded public $A$ requires solving the DLP, not merely knowing the long-term signing key.
+- A long-term key compromised later lets an attacker forge future signatures, but supplies no way to recompute a past session's $a$ or $b$.
+
 ## Man-in-the-Middle Attack
 
 The basic DH protocol has no authentication of public keys, so it is vulnerable to a man-in-the-middle attack.
@@ -122,3 +148,22 @@ The basic DH protocol has no authentication of public keys, so it is vulnerable 
 </Note>
 
 Mallory now holds a separate shared key with each party, and can decrypt, inspect, modify, or inject messages in the supposedly secure channel between Alice and Bob.
+
+### Preventing the Attack
+
+The attack works because $A$ and $B$ carry no proof of who sent them. Every fix binds the exchanged keys to a verified identity.
+
+- Digital signature  
+  Sign the exchanged public key with a long-term signing key, as in [ephemeral DH authentication](#authenticating-the-ephemeral-keys). Bob verifies the signature before trusting $A$.
+- Certificate  
+  A CA-issued certificate binds a long-term public key to an identity, letting Bob verify Alice's signing key without a prior direct exchange with her.
+- Station-to-Station protocol  
+  Each party signs both exchanged values $A$ and $B$ together and encrypts the signature under the just-derived shared key. Mallory's substituted keys cannot produce a valid signature over the real $A$ and $B$.
+- Out-of-band verification  
+  Compare a short fingerprint of the exchanged keys over a separate trusted channel, e.g. reading it aloud on a phone call.
+
+<Note>
+
+Every fix needs a trust anchor Mallory cannot also forge or intercept, a long-term signing key, a CA, or a side channel. Plain DH supplies none of these on its own.
+
+</Note>

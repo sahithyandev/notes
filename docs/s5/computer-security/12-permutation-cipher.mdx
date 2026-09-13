@@ -1,9 +1,9 @@
 ---
 title: Permutation Cipher
 sidebar:
-  order: 13
+  order: 12
 dateCreated: 2026-07-29T05:53:52.082Z
-lastUpdatedOn: 2026-09-09T15:57:13.361Z
+lastUpdatedOn: 2026-09-13T18:09:50.029Z
 slug: s5/computer-security/permutation-cipher
 prev: true
 next: true
@@ -66,33 +66,31 @@ Recovering the permutation $\sigma$:
 
 ## Worked Example
 
-Key: $\sigma(1) = 2$, $\sigma(2) = 4$, $\sigma(3) = 1$, $\sigma(4) = 3$, $\sigma(5) = 5$. Plaintext HELLO, one block of 5.
+Key: $\sigma(1) = 2$, $\sigma(2) = 4$, $\sigma(3) = 1$, $\sigma(4) = 3$, $\sigma(5) = 5$. Plaintext `GETTOTHECHOPPER` splits into 3 blocks of 5: `GETTO`, `THECH`, `OPPER`.
 
-Encryption places $m_i$ at position $\sigma(i)$:
+Encryption places $m_i$ at position $\sigma(i)$ within each block. For the first block:
 
-- $m_1 = \text{H} \to$ position 2
+- $m_1 = \text{G} \to$ position 2
 - $m_2 = \text{E} \to$ position 4
-- $m_3 = \text{L} \to$ position 1
-- $m_4 = \text{L} \to$ position 3
+- $m_3 = \text{T} \to$ position 1
+- $m_4 = \text{T} \to$ position 3
 - $m_5 = \text{O} \to$ position 5
 
-Reading positions 1 to 5: L, H, L, E, O.
+Reading positions 1 to 5: T, G, T, E, O.
 
-Ciphertext: LHLEO.
+The other 2 blocks follow the same rule.
 
-Decryption reads $m_i$ from position $\sigma(i)$:
+- `THECH` becomes `ETCHH`.
+- `OPPER` becomes `POEPR`.
 
-- $m_1 = c_2 = \text{H}$
-- $m_2 = c_4 = \text{E}$
-- $m_3 = c_1 = \text{L}$
-- $m_4 = c_3 = \text{L}$
-- $m_5 = c_5 = \text{O}$
+Ciphertext: TGTEOETCHHPOEPR.
 
-Plaintext: HELLO.
+Decryption reads $m_i$ from position $\sigma(i)$ of each block, recovering `GETTO`, `THECH`, `OPPER`.
 
-The attack starts from ciphertext blocks with the block length unknown.
+Plaintext: `GETTOTHECHOPPER`.
 
-- The group `LHL` recurs, starting at positions 1 and 11. The gap $11 - 1 = 10$ is a multiple of $n$. A second repeated group gives a gap of $15$. Their gcd is $5$, so $n = 5$.
+The attack starts from ciphertext blocks with the block length unknown. With a longer message under the same key, a plaintext word repeating at the same offset within its block would produce an identical ciphertext group each time, letting the gcd of the gaps between occurrences recover $n$, as described above. Once $n = 5$ is fixed:
+
 - Cut the ciphertext into blocks of 5.
 - Each of the $5! = 120$ candidate permutations is applied in inverse to every block.
 - The candidate $\sigma(1) = 2$, $\sigma(2) = 4$, $\sigma(3) = 1$, $\sigma(4) = 3$, $\sigma(5) = 5$ turns every block into readable text and is kept.
