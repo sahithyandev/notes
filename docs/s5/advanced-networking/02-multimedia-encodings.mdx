@@ -1,7 +1,7 @@
 ---
 title: Multimedia Encodings
 dateCreated: 2026-09-05T21:01:18.369Z
-lastUpdatedOn: 2026-09-12T20:33:29.807Z
+lastUpdatedOn: 2026-09-13T22:30:43.610Z
 slug: s5/advanced-networking/multimedia-encodings
 sidebar:
   order: 2
@@ -9,13 +9,13 @@ prev: true
 next: true
 ---
 
-Encoding — conversion of a physical signal into a digital bit stream.
+Encoding - conversion of a physical signal into a digital bit stream.
 
-Codec — encoder and decoder pair for a media representation.
+Codec - encoder and decoder pair for a media representation.
 
 ## Digitisation, Coding, and Containers
 
-Digitisation — analogue-to-digital conversion.
+Digitisation - analogue-to-digital conversion.
 
 Audio parameters:
 
@@ -29,7 +29,7 @@ Video parameters:
 - Interlacing.
 - Pixel depth and colour representation.
 
-Coding — compression and representation after digitisation. Codec objectives conflict:
+Coding - compression and representation after digitisation. Codec objectives conflict:
 
 - Low data rate.
 - High reconstruction quality.
@@ -37,25 +37,29 @@ Coding — compression and representation after digitisation. Codec objectives c
 - Low complexity and power use.
 - Packet-loss resilience.
 
-Container — file or stream structure holding one or more media streams.
+Container - file or stream structure holding one or more media streams.
 
-- Streams: audio, video, text, slides, or whiteboard data.
-- Examples: AVI, ASF, WMV, FLV, MPEG.
+- Streams  
+  Audio, video, text, slides, or whiteboard data.
+- Examples  
+  AVI, ASF, WMV, FLV, MPEG.
 - A container is not a codec.
 
 ## Codec Classes
 
-Lossless codec — reconstructs the original bit stream exactly.
+Lossless codec - reconstructs the original bit stream exactly.
 
-- Uses: fax, presentation files, medical images.
+- Uses  
+  Fax, presentation files, medical images.
 
-Lossy codec — discards selected information.
+Lossy codec - discards selected information.
 
-- Uses: audio and video.
+- Uses  
+  Audio and video.
 
-Constant bit rate (CBR) — fixed output rate. Suitable for fixed-rate channels and streaming.
+Constant bit rate (CBR) - fixed output rate. Suitable for fixed-rate channels and streaming.
 
-Variable bit rate (VBR) — output rate varies with content complexity. Suitable for packet-switched networks and stored media.
+Variable bit rate (VBR) - output rate varies with content complexity. Suitable for packet-switched networks and stored media.
 
 ## Audio Coding
 
@@ -75,7 +79,7 @@ A speech codec performs poorly on music.
 
 ### Pulse Code Modulation
 
-Pulse Code Modulation (PCM) — sample and quantise the waveform directly.
+Pulse Code Modulation (PCM) - sample and quantise the waveform directly.
 
 G.711 telephony uses $8{,}000$ samples/second and $8$ bits/sample:
 
@@ -83,29 +87,32 @@ $$8{,}000 \times 8 = 64\ \text{kbps}$$
 
 Companding variants:
 
-- $\mu$-law — maps 14-bit samples to 8 bits. Used in North America and Japan.
-- A-law — maps 13-bit samples to 8 bits. Used in Europe.
+- $\mu$-law - maps 14-bit samples to 8 bits. Used in North America and Japan.
+- A-law - maps 13-bit samples to 8 bits. Used in Europe.
 
 ### Differential PCM
 
-Differential Pulse Code Modulation (DPCM) — transmit prediction error rather than each sample.
+Differential Pulse Code Modulation (DPCM) - transmit prediction error rather than each sample.
 
 $$e_n = x_n - \hat{x}_n$$
 
 $x_n$ is the actual sample. $\hat{x}_n$ is the predicted sample. Encoder and decoder use the same predictor.
 
-Adaptive DPCM (ADPCM) — predictor and quantiser adapt to waveform changes.
+Adaptive DPCM (ADPCM) - predictor and quantiser adapt to waveform changes.
 
 - G.721 uses eight preceding samples.
 - Four-bit errors produce a $32\ \text{kbps}$ stream.
 
 ### Linear Predictive Coding
 
-Linear Predictive Coding (LPC) — speech source-filter model.
+Linear Predictive Coding (LPC) - speech source-filter model.
 
-- Source: voiced buzz or unvoiced noise.
-- Filter: vocal-tract resonance.
-- Formants: resonance peaks in the frequency spectrum.
+- Source  
+  Voiced buzz or unvoiced noise.
+- Filter  
+  Vocal-tract resonance.
+- Formants  
+  Resonance peaks in the frequency spectrum.
 
 LPC operates on approximately $20\ \text{ms}$ of speech.
 
@@ -113,7 +120,7 @@ LPC operates on approximately $20\ \text{ms}$ of speech.
 - Determine pitch for voiced speech.
 - Encode linear-prediction coefficients.
 
-Code-Excited Linear Prediction (CELP) — transmit a reference into a shared excitation codebook.
+Code-Excited Linear Prediction (CELP) - transmit a reference into a shared excitation codebook.
 
 - Speex uses CELP.
 
@@ -129,22 +136,25 @@ AAC at $96\ \text{kbps}$ exceeds MP3 quality at $128\ \text{kbps}$.
 
 ## Video Characterisation
 
-Luminance — pixel intensity component.
+Luminance - pixel intensity component.
 
-Chrominance — pixel colour component.
+Chrominance - pixel colour component.
 
 Video properties:
 
-- Frame rate — frames per second.
-- Frame dimensions — pixel width and height.
-- Pixel depth — bits per pixel.
-- Colour model — RGB or YUV.
+- Frame rate - frames per second.
+- Frame dimensions - pixel width and height.
+- Pixel depth - bits per pixel.
+- Colour model - RGB or YUV.
 
 Common frame rates:
 
-- Motion perception: approximately $12\ \text{fps}$.
-- Cinema: $24\ \text{fps}$.
-- PAL television: $25\ \text{fps}$.
+- Motion perception  
+  Approximately $12\ \text{fps}$.
+- Cinema  
+  $24\ \text{fps}$.
+- PAL television  
+  $25\ \text{fps}$.
 
 Raw $768 \times 576$ video, $24$ bits/pixel, at $25\ \text{fps}$ requires:
 
@@ -154,45 +164,45 @@ $$768 \times 576 \times 24 \times 25 = 265{,}420{,}800\ \text{bps}$$
 
 ### General-Purpose Methods
 
-Run-length encoding (RLE) — replace a repeated-symbol run with its symbol and length.
+Run-length encoding (RLE) - replace a repeated-symbol run with its symbol and length.
 
 - Effective for long uniform runs.
 - Suitable for graphics and cartoons.
 
-Relative encoding — encode the difference from the preceding value.
+Relative encoding - encode the difference from the preceding value.
 
-Huffman coding — variable-length code. Frequent symbols receive shorter codes.
+Huffman coding - variable-length code. Frequent symbols receive shorter codes.
 
-Arithmetic coding — encodes a symbol sequence as one interval value.
+Arithmetic coding - encodes a symbol sequence as one interval value.
 
 - More efficient than Huffman coding for arbitrary probabilities.
 - More complex.
 
 ### Intraframe Compression
 
-Intraframe compression — compression within one frame. Exploits spatial redundancy.
+Intraframe compression - compression within one frame. Exploits spatial redundancy.
 
-- Subsampling — retain fewer pixels or replace regions with average values.
-- Coarse quantisation — use fewer bits per pixel.
-- Vector quantisation — replace each input block with its nearest codebook pattern.
-- Transform coding — transform spatial samples into frequency coefficients.
+- Subsampling - retain fewer pixels or replace regions with average values.
+- Coarse quantisation - use fewer bits per pixel.
+- Vector quantisation - replace each input block with its nearest codebook pattern.
+- Transform coding - transform spatial samples into frequency coefficients.
 
 Discrete cosine transform (DCT) coding uses $8 \times 8$ blocks. Quantisation, run-length coding, and entropy coding reduce the coefficient representation.
 
 ### Interframe Compression
 
-Interframe compression — compression across a frame sequence. Exploits temporal redundancy.
+Interframe compression - compression across a frame sequence. Exploits temporal redundancy.
 
-- Frame subsampling — transmit only selected frames.
-- Difference coding — transmit changed pixels.
-- Block difference coding — transmit significantly changed blocks.
-- Block motion compensation — transmit motion vectors and residual differences.
+- Frame subsampling - transmit only selected frames.
+- Difference coding - transmit changed pixels.
+- Block difference coding - transmit significantly changed blocks.
+- Block motion compensation - transmit motion vectors and residual differences.
 
 Motion compensation searches a reference frame for a match to each current block. The displacement is the motion vector.
 
 ## MPEG Video
 
-MPEG — Moving Picture Experts Group standards for audio and video coding.
+MPEG - Moving Picture Experts Group standards for audio and video coding.
 
 | Standard       | Scope                                                                     |
 | :------------- | :------------------------------------------------------------------------ |
@@ -222,7 +232,7 @@ MPEG temporal processing uses $16 \times 16$ macroblocks. Motion vectors referen
 | P-frame | References a preceding I- or P-frame.              | About one-third of an I-frame. |
 | B-frame | References preceding and following I- or P-frames. | About one-sixth of an I-frame. |
 
-Group of Pictures (GOP) — consecutive frames decodable from their contained references.
+Group of Pictures (GOP) - consecutive frames decodable from their contained references.
 
 - Usually 12 or 15 frames.
 - Random access begins at an I-frame.
@@ -232,12 +242,12 @@ If no close motion match exists, encode the macroblock as an I-block. Scene chan
 
 ## MPEG Systems
 
-Program Stream (PS) — container for reliable media such as disks.
+Program Stream (PS) - container for reliable media such as disks.
 
-Transport Stream (TS) — container for lossy network or broadcast links.
+Transport Stream (TS) - container for lossy network or broadcast links.
 
 ### Audio-Video Synchronisation
 
-Presentation timestamp — time at which a decoded sample or frame is presented.
+Presentation timestamp - time at which a decoded sample or frame is presented.
 
 MPEG-2 uses a $90\ \text{kHz}$ clock. Program Clock Reference (PCR) timestamps let the receiver align its clock. A phase-locked loop (PLL) synchronises receiver timing to the sender.

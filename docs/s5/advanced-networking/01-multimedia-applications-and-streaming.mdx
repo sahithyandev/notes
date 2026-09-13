@@ -1,7 +1,7 @@
 ---
 title: Multimedia Applications and Video Streaming
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-12T20:33:29.804Z
+lastUpdatedOn: 2026-09-13T22:30:43.449Z
 slug: s5/advanced-networking/multimedia-applications-and-streaming
 sidebar:
   order: 1
@@ -16,9 +16,9 @@ For foundational definitions of discrete vs. continuous media and captured vs. s
 
 ## Multimedia Encoding
 
-**Digitisation** — conversion of an analogue signal into digital samples.
+Digitisation - conversion of an analogue signal into digital samples.
 
-**Coding** — representation of digitised media for storage or transmission.
+Coding - representation of digitised media for storage or transmission.
 
 Compression removes spatial and temporal redundancy. See [Multimedia Encodings](/s5/advanced-networking/multimedia-encodings) for codec design, audio coding, video coding, and MPEG.
 
@@ -44,9 +44,45 @@ Multimedia networking applications fall into three major categories based on int
 
 In stored video streaming, the client renders the video while the server streams the remaining portion over the network.
 
-```
-Server Video File --------> Network (Variable Delay) --------> Client Playout Buffer --------> Display
-```
+<FlowDiagram
+  sbw={100}
+  rows={[
+    {
+      boxes: [
+        { label: "Server Video File" },
+        { label: "Network", sub: "variable delay" },
+        { label: "Client Playout Buffer" },
+        { label: "Display" },
+      ],
+    },
+  ]}
+  links={[
+    {
+      from: [0, 0],
+      to: [0, 1],
+      label: "stream",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "The server pushes the video into the network at its storage rate.",
+    },
+    {
+      from: [0, 1],
+      to: [0, 2],
+      label: "delay/jitter",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "The network introduces variable delay, so packets arrive with jitter.",
+    },
+    {
+      from: [0, 2],
+      to: [0, 3],
+      label: "render",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "The playout buffer decouples playout from network timing.",
+    },
+  ]}
+/>
 
 ### Continuous Playout Constraint
 
@@ -68,12 +104,36 @@ Let:
 - $x(t)$ be the variable incoming fill rate from the network at time $t$.
 - $Q(t)$ be the buffer fill level at time $t$.
 
-```
-           +-----------------------+
-x(t) ----> | Client Buffer Q(t)    | ----> r (Constant Playout Rate)
-           | Maximum Capacity B    |
-           +-----------------------+
-```
+<FlowDiagram
+  sbw={100}
+  rows={[
+    {
+      boxes: [
+        { label: "x(t)", sub: "variable incoming fill rate" },
+        { label: "Client Buffer Q(t)", sub: "maximum capacity B" },
+        { label: "r", sub: "constant playout rate" },
+      ],
+    },
+  ]}
+  links={[
+    {
+      from: [0, 0],
+      to: [0, 1],
+      label: "fills",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "Packets from the network fill the application buffer of capacity B.",
+    },
+    {
+      from: [0, 1],
+      to: [0, 2],
+      label: "drains",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "The client drains the buffer at the constant playout rate r.",
+    },
+  ]}
+/>
 
 - **Buffer Starvation ($\bar{x} < r$)**: If average network throughput drops below playout rate, $Q(t)$ decreases. If $Q(t) = 0$, playout freezes until the buffer refills to a threshold.
 - **Buffer Accumulation ($\bar{x} > r$)**: If average network throughput exceeds playout rate, the buffer fill level increases until saturated.
@@ -90,7 +150,10 @@ The choice of initial playout delay $t_p$ is a key trade-off:
 - Server transmits packets at a constant rate matching the video encoding rate $r$.
 - Encapsulated using [RTP](/s5/advanced-networking/real-time-protocols) over UDP.
 - Maintains short playout delays (2–5 seconds).
-- **Drawbacks**: Unfriendly to network congestion (does not back off); often blocked by corporate firewalls and NAT devices.
+- Advantages  
+  Low overhead, simple implementation.
+- Drawbacks  
+  Unfriendly to network congestion (does not back off); often blocked by corporate firewalls and NAT devices.
 
 ### Streaming over HTTP/TCP
 
@@ -98,4 +161,5 @@ The choice of initial playout delay $t_p$ is a key trade-off:
 - Server transmits at maximum rate permitted by TCP congestion control and flow control.
 - In-order delivery and retransmissions introduce throughput fluctuations $x(t)$, requiring a larger client playout buffer.
 - Basis for modern Dynamic Adaptive Streaming over HTTP (DASH), where video is chunked into small segments encoded at multiple bitrates, allowing the client to adaptively switch quality based on current TCP throughput.
-- **Advantages**: Easily passes through firewalls and middleboxes; leverages existing web infrastructure (CDNs, web caches).
+- Advantages  
+  Easily passes through firewalls and middleboxes; leverages existing web infrastructure (CDNs, web caches).

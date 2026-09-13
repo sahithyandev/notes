@@ -1,54 +1,139 @@
 ---
 title: Real-Time Protocols
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-12T20:33:29.808Z
+lastUpdatedOn: 2026-09-13T22:30:43.665Z
 slug: s5/advanced-networking/real-time-protocols
 sidebar:
   order: 4
+  label: "RTP, RTCP, and SIP"
 prev: true
 next: true
 ---
 
 Real-time multimedia applications rely on RTP, RTCP, and SIP for transport, feedback, and signalling.
 
+<Note>
+  - SIP = establishes/manages the session - RTP = carries real-time media - RTCP
+  = provides control/feedback about RTP
+</Note>
+
 ## Real-Time Transport Protocol (RTP)
 
-RTP ([RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)) standardizes the packet structure for delivering real-time data such as audio and video over network transport.
+RTP standardizes the packet structure for delivering real-time data such as audio and video over network transport.
 
 - RTP runs in end systems and is encapsulated directly inside [UDP](/s4/computer-networks/udp) segments.
 - It extends UDP by adding payload identification, sequence numbers, and sampling timestamps.
 
 ```
-+-------------------+-------------------+------------------+
-| IP Header (20 B)  | UDP Header (8 B)  | RTP Header (12 B)| Audio/Video Payload
-+-------------------+-------------------+------------------+
++-------------------+-------------------+-------------------+-----------------------+
+| IP Header (20 B)  | UDP Header (8 B)  | RTP Header (12 B) |  Audio/Video Payload  |
++-------------------+-------------------+-------------------+-----------------------+
 ```
 
 ### RTP Header Fields
 
-```
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|V=2|P|X|  CC   |M|     PT      |       Sequence Number         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                           Timestamp                           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Synchronization Source (SSRC) Identifier            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-```
+The fixed 12-byte RTP header:
 
-- Payload Type (PT — 7 bits): Identifies the audio/video encoding format. Allows dynamic encoding changes.
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="32" style="width:3.125%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          0
+        </th>
+        <th colspan="4" style="padding:2px;font-weight:normal;text-align:left">
+          4
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          8
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:left">
+          16
+        </th>
+        <th colspan="8" style="padding:2px;font-weight:normal;text-align:right">
+          32
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="2"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          V
+        </td>
+        <td
+          colspan="1"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          P
+        </td>
+        <td
+          colspan="1"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          X
+        </td>
+        <td
+          colspan="4"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          CC
+        </td>
+        <td
+          colspan="1"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          M
+        </td>
+        <td
+          colspan="7"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          PT
+        </td>
+        <td
+          colspan="16"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Sequence Number
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Timestamp
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="32"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Synchronization Source (SSRC) Identifier
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+- **Payload Type (7 bits):** Identifies the audio/video encoding format.
   - `0`: PCM $\mu$-law ($64\text{ kbps}$)
   - `3`: GSM ($13\text{ kbps}$)
   - `7`: LPC ($2.4\text{ kbps}$)
   - `26`: Motion JPEG
   - `31`: H.261
   - `33`: MPEG2 Video
-- Sequence Number (16 bits): Increments by $1$ for each RTP packet sent. Detects loss and restores order.
-- Timestamp (32 bits): Sampling instant of the first RTP payload byte. Supports jitter removal and playout synchronisation.
-  - For $8\text{ kHz}$ audio, the timestamp clock increments by $1$ every $125\text{ }\mu\text{s}$. A $20\text{ ms}$ chunk increases the timestamp by $160$.
-- Synchronization Source Identifier (SSRC — 32 bits): Identifies the RTP source within a session.
+- **Sequence Number (16 bits):** Increments by $1$ for each RTP packet sent. Detects loss and restores order.
+- **Timestamp (32 bits):** Sampling instant of the first RTP payload byte. Supports jitter removal and playout synchronisation.
+  - For $8\text{ kHz}$ audio, the timestamp clock increments by $1$ every $125\mu\text{s}$. A $20\text{ms}$ chunk increases the timestamp by $160$.
+- **SSRC (32 bits):** Identifies the RTP source within a session. Each stream in RTP session has distinct SSRC.
 
 <Note>
   RTP and QoS: RTP is an end-system protocol. Routers treat it as best-effort
@@ -57,7 +142,7 @@ RTP ([RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)) standardizes the
 
 ## Real-Time Control Protocol (RTCP)
 
-RTCP works in tandem with RTP ([RFC 3550](https://datatracker.ietf.org/doc/html/rfc3550)). While RTP delivers media data, RTCP transmits out-of-band control packets periodically to all participants in an RTP session.
+RTCP works in conjunction with RTP. While RTP delivers media data, RTCP transmits out-of-band control packets periodically to all participants in an RTP session.
 
 - RTP and RTCP use adjacent port numbers (e.g., RTP on UDP port $P$, RTCP on UDP port $P+1$).
 
@@ -65,7 +150,7 @@ RTCP works in tandem with RTP ([RFC 3550](https://datatracker.ietf.org/doc/html/
 
 1. Receiver Report (RR): Sent by receivers; reports loss and jitter statistics.
 2. Sender Report (SR): SSRC, wall-clock time, RTP timestamp, packet count, and byte count.
-3. Source Description (SDES): Source metadata such as `CNAME`.
+3. Source Description (SDES): Source metadata such as `email address`, `sender's name`, `SSRC`.
 
 ### Stream Synchronization (Lip Sync)
 
@@ -76,37 +161,69 @@ RTCP Sender Reports map media RTP timestamps to wall-clock time. Receivers use t
 ### RTCP Bandwidth Scaling
 
 RTCP limits control traffic to 5% of session bandwidth.
+Eg: For sending video at $2\text{Mbps}$ session, RTCP traffic is limited to $100\text{kbps}$.
 
-- 75% of RTCP bandwidth: shared by receivers.
-- 25% of RTCP bandwidth: reserved for active senders.
+- 75% of RTCP bandwidth  
+  Shared by receivers.
+- 25% of RTCP bandwidth  
+  Reserved for active senders.
 
 Each participant dynamically computes its RTCP transmission interval by dividing the average RTCP packet size by its allocated control bandwidth rate.
 
 ## Session Initiation Protocol (SIP)
 
-SIP ([RFC 3261](https://datatracker.ietf.org/doc/html/rfc3261)) is an application-layer signaling protocol designed by the IETF for creating, modifying, and terminating multimedia sessions over IP networks.
+SIP is an application-layer signaling protocol designed by the IETF (Internet Engineering Task Force) for creating, modifying, and terminating multimedia sessions over IP networks.
 
 ### Core Functions of SIP
 
 1. Address resolution: Maps SIP URIs to current IP addresses.
-2. Media capability negotiation: Agrees on codecs and media parameters using SDP.
+2. Media capability negotiation: Agrees on codecs and media parameters using SDP (Session Description Protocol).
 3. Session management: Supports setup, rejection, hold, transfer, and new media streams.
 
 ### Basic Call Setup Scenario
 
-When Alice (`167.180.112.24`) calls Bob (`193.64.210.89`):
+When Alice (`167.180.112.24`) calls Bob (`193.64.210.89`), the signaling and media flow look like this:
 
-```
-Alice (167.180.112.24)                                  Bob (193.64.210.89)
-       |                                                       |
-       | --- INVITE (Port 5060, SDP: PCM, Port 38060) -------> |
-       |                                                       | (Ringing)
-       | <--- 200 OK (Port 5060, SDP: GSM, Port 48753) --------- |
-       |                                                       |
-       | --- ACK (Port 5060) --------------------------------> |
-       |                                                       |
-       | <================ RTP Media Stream ================> |
-```
+<SequenceDiagram
+  participants={[
+    { name: "Alice", sub: "167.180.112.24" },
+    { name: "Bob", sub: "193.64.210.89" },
+  ]}
+  steps={[
+    {
+      from: 0,
+      to: 1,
+      label: "INVITE (Port 5060, SDP: PCM, Port 38060)",
+      title: "Alice sends INVITE with her media address, port, and codec.",
+    },
+    {
+      from: 1,
+      to: 1,
+      kind: "note",
+      label: "(Ringing)",
+      title: "Bob's phone rings.",
+    },
+    {
+      from: 1,
+      to: 0,
+      label: "200 OK (Port 5060, SDP: GSM, Port 48753)",
+      title: "Bob responds with his media address, port, and codec.",
+    },
+    {
+      from: 0,
+      to: 1,
+      label: "ACK (Port 5060)",
+      title: "Alice confirms the call setup.",
+    },
+    {
+      from: 0,
+      to: 1,
+      kind: "media",
+      label: "RTP Media Stream (bidirectional)",
+      title: "Endpoints exchange RTP media packets directly.",
+    },
+  ]}
+/>
 
 1. INVITE: Alice supplies her media address, port, and codec.
 2. 200 OK: Bob returns his media address, port, and codec.
@@ -115,20 +232,94 @@ Alice (167.180.112.24)                                  Bob (193.64.210.89)
 
 ### SIP Server Architecture
 
-In real-world networks, users change locations and IP addresses dynamically via DHCP. SIP defines two core infrastructure server roles:
+In real-world networks, users move between addresses and networks, so SIP needs servers that can locate and route calls.
 
-```
-[ Alice ] ----> [ SIP Proxy Server ] ----> [ SIP Registrar Server ] ----> [ Bob ]
-```
+<FlowDiagram
+  sbw={110}
+  rows={[
+    {
+      boxes: [{ label: "SIP Registrar", sub: "stores locations" }],
+    },
+    {
+      boxes: [{ label: "SIP Proxy", sub: "routes calls" }],
+    },
+    {
+      boxes: [
+        { label: "Alice", sub: "caller" },
+        { label: "Bob", sub: "callee" },
+      ],
+    },
+  ]}
+  links={[
+    {
+      from: [2, 0],
+      to: [1, 0],
+      label: "INVITE",
+      horizontalAlign: "right",
+      verticalAlign: "bottom",
+      horizontalPadding: 50,
+      verticalPadding: -5,
+      note: "Alice sends the session request to the proxy.",
+    },
+    {
+      from: [1, 0],
+      to: [0, 0],
+      label: "lookup",
+      horizontalAlign: "right",
+      verticalAlign: "center",
+      horizontalPadding: 50,
+      verticalPadding: 10,
+      note: "The proxy asks the registrar for Bob's current address.",
+      sbw: 200,
+    },
+    {
+      from: [0, 0],
+      to: [1, 0],
+      label: "return addr",
+      horizontalAlign: "left",
+      verticalAlign: "center",
+      horizontalPadding: 10,
+      verticalPadding: 10,
+      note: "The registrar returns Bob's location.",
+      sbw: 200,
+    },
+    {
+      from: [1, 0],
+      to: [2, 1],
+      label: "forward",
+      horizontalAlign: "left",
+      verticalAlign: "center",
+      horizontalPadding: 5,
+      verticalPadding: 0,
+      note: "The proxy forwards the INVITE to Bob.",
+    },
+    {
+      from: [2, 0],
+      to: [2, 1],
+      label: "RTP",
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      horizontalPadding: 0,
+      verticalPadding: 5,
+      note: "Direct media flows between clients after setup.",
+      bidirectional: true,
+      sbw: 180,
+    },
+  ]}
+/>
 
-- SIP Registrar: Stores endpoint locations from `REGISTER` requests.
-- SIP Proxy: Routes SIP messages to the callee.
+- SIP Registrar  
+  Keeps track of where users are currently reachable and returns their current address when asked.
+- SIP Proxy  
+  Receives the call, queries the registrar, and forwards the request to the callee.
 
 ### SIP vs. H.323
+
+H.323 is another signaling/communication protocol suite for real-time multimedia communication.
 
 | Feature              | SIP (Session Initiation Protocol)                  | H.323                                       |
 | :------------------- | :------------------------------------------------- | :------------------------------------------ |
 | Standardization body | IETF                                               | ITU-T                                       |
-| Design philosophy    | Modular; follows KISS.                             | Complete, vertically integrated suite.      |
+| Design philosophy    | Modular; follows KISS (Keep It Simple Stupid).     | Complete, vertically integrated suite.      |
 | Syntax               | Text-based HTTP-like syntax.                       | Binary ASN.1 encoding.                      |
 | Flexibility          | Combines with web protocols and generic transport. | Rigid admission and control state machines. |

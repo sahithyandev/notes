@@ -1,7 +1,7 @@
 ---
 title: Congestion Control
 dateCreated: 2026-09-05T21:01:18.122Z
-lastUpdatedOn: 2026-09-12T20:33:29.809Z
+lastUpdatedOn: 2026-09-13T22:30:43.724Z
 slug: s5/advanced-networking/congestion-control
 sidebar:
   order: 7
@@ -9,7 +9,7 @@ prev: true
 next: false
 ---
 
-Congestion — offered traffic exceeds available router, link, or processing capacity.
+Congestion - offered traffic exceeds available router, link, or processing capacity.
 
 - Packet arrivals initially queue.
 - Persistent overload causes packet drops.
@@ -18,9 +18,9 @@ Congestion — offered traffic exceeds available router, link, or processing cap
 
 ## Congestion Control and Flow Control
 
-Flow control — prevents a sender from overloading one receiver.
+Flow control - prevents a sender from overloading one receiver.
 
-Congestion control — prevents overload across routers and links.
+Congestion control - prevents overload across routers and links.
 
 | Property  | Flow control         | Congestion control                      |
 | :-------- | :------------------- | :-------------------------------------- |
@@ -30,12 +30,13 @@ Congestion control — prevents overload across routers and links.
 
 ## Control Models
 
-Open-loop control — policies fixed without current network state.
+Open-loop control - policies fixed without current network state.
 
-- Example: limit VoIP calls per link.
+- Example  
+  Limit VoIP calls per link.
 - Prevention-oriented.
 
-Closed-loop control — detect congestion, report it, then adapt operation.
+Closed-loop control - detect congestion, report it, then adapt operation.
 
 ### Detection and Feedback
 
@@ -58,7 +59,7 @@ Feedback methods:
 
 ## TCP Congestion Window
 
-Congestion window ($cwnd$) — sender-side limit on unacknowledged bytes.
+Congestion window ($cwnd$) - sender-side limit on unacknowledged bytes.
 
 $$W = \min(cwnd, rwnd)$$
 
@@ -82,14 +83,14 @@ The congestion threshold becomes half the prior usable window.
 
 ## Slow Start and Congestion Avoidance
 
-Slow start — exponential window growth.
+Slow start - exponential window growth.
 
 - Start at $cwnd = 1\ MSS$.
 - Increase $cwnd$ by one $MSS$ for every ACK.
 - Window approximately doubles each RTT.
 - Use at connection start and after a timeout.
 
-Slow-start threshold ($ssthresh$) — transition point from exponential to linear growth.
+Slow-start threshold ($ssthresh$) - transition point from exponential to linear growth.
 
 - Slow start while $cwnd < ssthresh$.
 - Congestion avoidance while $cwnd \ge ssthresh$.
@@ -110,17 +111,20 @@ Duplicate ACKs indicate that a segment arrived out of order.
 
 ### Random Early Detection
 
-Random Early Detection (RED) — active queue management using average queue length.
+Random Early Detection (RED) - active queue management using average queue length.
 
-- Low average queue: accept packets.
-- Rising average queue: randomly drop packets with increasing probability.
-- Full queue: drop all arriving packets.
+- Low average queue  
+  Accept packets.
+- Rising average queue  
+  Randomly drop packets with increasing probability.
+- Full queue  
+  Drop all arriving packets.
 
 Early drops signal TCP before queue overflow.
 
 ### Explicit Congestion Notification
 
-Explicit Congestion Notification (ECN) — congestion signal encoded in packet headers.
+Explicit Congestion Notification (ECN) - congestion signal encoded in packet headers.
 
 - Router marks packets instead of dropping them.
 - Receiver returns the congestion indication.
@@ -128,7 +132,7 @@ Explicit Congestion Notification (ECN) — congestion signal encoded in packet h
 
 ### TCP Vegas
 
-TCP Vegas — host-centric congestion avoidance.
+TCP Vegas - host-centric congestion avoidance.
 
 - Detects increasing RTT or a flattening sending rate.
 - Infers queue growth before packet loss.
@@ -138,7 +142,7 @@ TCP Vegas — host-centric congestion avoidance.
 
 ### Resource Preallocation
 
-Resource preallocation — reserve buffers and bandwidth before data transmission.
+Resource preallocation - reserve buffers and bandwidth before data transmission.
 
 - Common in virtual-circuit networks.
 - Setup selects a path and allocates resources.
@@ -146,18 +150,18 @@ Resource preallocation — reserve buffers and bandwidth before data transmissio
 
 ### Traffic Shaping
 
-Traffic shaping — control the transmission rate and pattern.
+Traffic shaping - control the transmission rate and pattern.
 
 - Sender and carrier negotiate a traffic profile during setup.
 - Leaky-bucket shaping enforces a steady output rate.
 
 ### Choke Packets
 
-Choke packet — router notification instructing a sender to reduce its rate.
+Choke packet - router notification instructing a sender to reduce its rate.
 
 ### Isarithmic Control
 
-Isarithmic control — cap the total packets within a subnet.
+Isarithmic control - cap the total packets within a subnet.
 
 - A router needs a permit before injecting a packet.
 - The permit count limits in-network packets.
@@ -174,7 +178,7 @@ Datagram subnets discard packets when resources are unavailable. The sending hos
 
 ## Load Shedding and Jitter
 
-Load shedding — intentional packet discard during congestion.
+Load shedding - intentional packet discard during congestion.
 
 Discard policies:
 
@@ -183,7 +187,7 @@ Discard policies:
 - Low-priority packet.
 - Random early discard.
 
-Jitter — variation in packet delay.
+Jitter - variation in packet delay.
 
 - Prioritise time-critical packets in router queues.
 - Use receiver buffering to mask remaining variation.

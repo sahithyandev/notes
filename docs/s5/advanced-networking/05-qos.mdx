@@ -1,5 +1,5 @@
 ---
-title: "QoS Principles, Scheduling, and Policing"
+title: Quality of Service Principles
 dateCreated: 2026-09-01T19:24:36.011Z
 lastUpdatedOn: 2026-09-12T20:33:29.808Z
 slug: s5/advanced-networking/qos
@@ -18,28 +18,24 @@ For per-flow reservations and aggregate QoS architecture, see [Integrated Servic
 
 1. Dimensioning best-effort networks:
    - Overprovision link capacity so that link utilization remains low and congestion never occurs.
-   - Advantage: Low complexity; no special scheduling or queue management needed in routers.
-   - Disadvantage: High bandwidth costs; difficult to estimate maximum traffic demand spikes.
+   - Advantage  
+     Low complexity; no special scheduling or queue management needed in routers.
+   - Disadvantage  
+     High bandwidth costs; difficult to estimate maximum traffic demand spikes.
 2. Quality of Service (QoS) guarantees:
    - Classify, prioritize, shape, and police traffic so that delay-sensitive flows receive guaranteed network treatment.
 
 ## Four Principles for QoS Guarantees
 
-```
-+------------------+     +-------------------+     +------------------+     +-------------------+
-|  1. Packet       | --> |  2. Flow          | --> |  3. Efficient    | --> |  4. Call          |
-|     Marking      |     |     Isolation     |     |     Sharing      |     |     Admission     |
-+------------------+     +-------------------+     +------------------+     +-------------------+
-```
-
-- Principle 1: Packet marking and class-based forwarding.
-  Routers must distinguish between traffic classes. Edge devices mark packets (e.g., audio vs. HTTP web browsing), and interior routers execute scheduling policies to treat higher-priority classes preferentially.
-- Principle 2: Class isolation and policing.
-  The network must protect compliant flows from misbehaving applications. If a VoIP application sends data faster than its declared rate, policing mechanisms at the edge must drop or remark non-compliant packets.
-- Principle 3: Efficient resource sharing.
-  While providing isolation, resources should be shared efficiently. Allocating fixed, non-sharable bandwidth (such as circuit switching) wastes network capacity when flows are idle.
-- Principle 4: Call admission control (CAC).
-  Because network capacity is finite, an application must declare its QoS requirements during session setup. The network will block new calls (returning a busy signal) if it cannot satisfy requested guarantees without degrading existing flows.
+1. Packet marking and class-based forwarding:
+   - Routers must distinguish between traffic classes. Edge devices mark packets (e.g., audio vs. HTTP web browsing).
+2. Class isolation and policing:
+   - The network must protect compliant flows from misbehaving applications.
+   - If a VoIP application sends data faster than its declared rate, policing mechanisms at the edge must drop or remark non-compliant packets.
+3. Efficient resource sharing:
+   - While providing isolation, resources should be shared efficiently.
+4. Call admission control (CAC):
+   - Because network capacity is finite, an application must declare its QoS requirements during session setup. The network will block new calls (returning a busy signal) if it cannot satisfy requested guarantees without degrading existing flows.
 
 ## Packet Scheduling Mechanisms
 
@@ -53,7 +49,8 @@ Packets are transmitted in exact order of arrival. Does not support class differ
 
 Packets are classified and placed into distinct priority queues. The router always transmits from the highest-priority non-empty queue.
 
-- Risk: High-priority traffic can completely starve lower-priority queues.
+- Risk  
+  High-priority traffic can completely starve lower-priority queues.
 
 ### 3. Round-Robin Queueing
 
@@ -67,12 +64,6 @@ An advanced generalized round-robin scheduler. Each traffic class $i$ is assigne
   $$\text{Throughput}_i = R \times \frac{w_i}{\sum_j w_j}$$
   where $R$ is the total outgoing link capacity.
 
-```
-Queue 1 (VoIP)     [Pkt] [Pkt] ---> \
-Queue 2 (Video)    [Pkt]       ---> ===> WFQ Scheduler (Weights w1, w2, w3) ---> Output Link R
-Queue 3 (Web HTTP) [Pkt] [Pkt] ---> /
-```
-
 ## Traffic Policing Mechanisms
 
 Policing limits traffic to ensure it does not exceed declared parameters:
@@ -85,47 +76,17 @@ Policing limits traffic to ensure it does not exceed declared parameters:
 
 The token bucket mechanism enforces burst size and average rate constraints:
 
-```
-Token Generation Rate r (tokens/sec)
-         |
-         v
-  +--------------+
-  | Bucket Size  | (Holds up to b tokens)
-  |      b       |
-  +--------------+
-         |
-         v (1 Token per packet)
-  Packets In ----> [ Packet Admission Filter ] ----> Packets Out
-```
-
 - A bucket holds up to $b$ tokens.
 - Tokens are generated at a constant rate $r$ tokens/second. If the bucket is full, arriving tokens are discarded.
 - When a packet of size 1 unit arrives, it must consume 1 token to be transmitted. If no token is available, the packet is queued or dropped.
-- Burst bound: Over any time interval $t$, the maximum number of packets admitted into the network is bounded by:
+- Burst bound  
+  Over any time interval $t$, the maximum number of packets admitted into the network is bounded by:
   $$\text{Max Packets} \le r \cdot t + b$$
 
-### Guaranteed Upper Bound on Delay ($D_{\max}$)
+### Guaranteed Upper Bound on Delay
 
 When a token-bucket flow $(r, b)$ receives WFQ rate $R$, its burst-delay component is bounded by:
 
 $$D_{\max} = \frac{b}{R}$$
 
 The bound applies when the reservation and scheduler admit the flow.
-
-## DiffServ Architecture Details
-
-Differentiated Services (DiffServ) scales QoS across large networks by enforcing per-flow state only at edge routers and aggregating traffic into classes in core routers.
-
-### Edge Router Functions
-
-1. Classification and metering: Measures incoming flow rates against declared profiles $(r, b)$.
-2. Marking and conditioning: Sets the 6-bit Differentiated Services Code Point (DSCP) field in the IP header.
-   - Conforming packets are in-profile.
-   - Non-conforming packets are out-of-profile, dropped, or remarked to lower priority.
-
-### Core Router Functions: Per-Hop Behaviors (PHB)
-
-Core routers inspect only the DSCP bits to execute a Per-Hop Behavior (PHB):
-
-- Expedited Forwarding (EF): Guaranteed minimum departure rate regardless of other traffic.
-- Assured Forwarding (AF): Four traffic classes and three drop-precedence levels per class.
