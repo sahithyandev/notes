@@ -39,7 +39,7 @@ const logger = {
 
 try {
   await runValidation(docsRoot, logger, {
-    failOnNew: true,
+    failOnViolations: true,
     extraValidUrls,
     filter,
   });

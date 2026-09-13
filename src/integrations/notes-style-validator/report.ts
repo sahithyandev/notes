@@ -17,7 +17,7 @@ export interface Violation {
   line: number;
   /** Short human-readable line shown in the report, e.g. the offending text or a description. */
   text: string;
-  /** Stable, rule-specific fragment used to key this violation in the baseline. Never a line number. */
+  /** Stable, rule-specific fragment identifying this violation. Never a line number. */
   snippet: string;
 }
 

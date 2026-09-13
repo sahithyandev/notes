@@ -43,7 +43,7 @@ export default function notesStyleValidator(
 
       "astro:server:start": async ({ logger }) => {
         await runValidation(docsRoot, logger, {
-          failOnNew: false,
+          failOnViolations: false,
           extraValidUrls: redirectUrls(),
           filter,
         });
@@ -56,7 +56,7 @@ export default function notesStyleValidator(
       // their shell from an earlier `bun dev` session.
       "astro:build:start": async ({ logger }) => {
         await runValidation(docsRoot, logger, {
-          failOnNew: true,
+          failOnViolations: true,
           extraValidUrls: redirectUrls(),
         });
       },
