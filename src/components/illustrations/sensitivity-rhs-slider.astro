@@ -1,0 +1,242 @@
+---
+import katex from "katex";
+
+interface Props {
+  slack: "s_1" | "s_2" | "s_3";
+  baseB: number;
+  deltaMin: number;
+  deltaMax: number;
+}
+
+const { slack, baseB, deltaMin, deltaMax } = Astro.props;
+
+const tex = (v: string) =>
+  katex.renderToString(v, { throwOnError: false, strict: false });
+
+const columns = ["x_1", "x_2", "s_1", "s_2", "s_3"];
+const rows = [
+  { basic: "z", cells: ["0", "0", "0", "3/2", "1"], rhs: 36 },
+  { basic: "s_1", cells: ["0", "0", "1", "1/3", "-1/3"], rhs: 2 },
+  { basic: "x_2", cells: ["0", "1", "0", "1/2", "0"], rhs: 6 },
+  { basic: "x_1", cells: ["1", "0", "0", "-1/3", "1/3"], rhs: 2 },
+];
+
+const MULT: Record<string, Record<string, number>> = {
+  s_1: { z: 0, s_1: 1, x_2: 0, x_1: 0 },
+  s_2: { z: 1.5, s_1: 1 / 3, x_2: 0.5, x_1: -1 / 3 },
+  s_3: { z: 1, s_1: -1 / 3, x_2: 0, x_1: 1 / 3 },
+};
+
+const mult = MULT[slack];
+const bIndex = slack.split("_")[1];
+---
+
+<div class="rhs-slider">
+  <table class="tableau">
+    <thead>
+      <tr>
+        <th class="basic">Basic</th>
+        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        <th class="num rhs">RHS</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr>
+            <td class="basic" set:html={tex(r.basic)} />
+            {r.cells.map((cell) => (
+              <td class="num" set:html={tex(cell)} />
+            ))}
+            <td
+              class="num rhs"
+              data-rhs-for={r.basic}
+              data-base={r.rhs}
+              data-mult={mult[r.basic]}
+            >
+              {r.rhs}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <div class="control">
+    <label for={`rhs-delta-${slack}`}>
+      &Delta;, change to <span set:html={tex(`b_${bIndex}`)} />, currently{" "}
+      {baseB}
+    </label>
+    <input
+      id={`rhs-delta-${slack}`}
+      type="range"
+      min={deltaMin}
+      max={deltaMax}
+      step="0.01"
+      value="0"
+    />
+    <output for={`rhs-delta-${slack}`} data-delta>0</output>
+  </div>
+
+  <div class="status" data-status data-feasible="true">
+    Feasible. Basis stays optimal.
+  </div>
+</div>
+
+<script>
+  const SUBSCRIPT: Record<string, string> = {
+    "1": "₁",
+    "2": "₂",
+    "3": "₃",
+  };
+
+  const label = (name: string) => {
+    const [base, idx] = name.split("_");
+    return `${base}${SUBSCRIPT[idx] ?? idx}`;
+  };
+
+  const fmt = (n: number) => {
+    const rounded = Math.round(n * 100) / 100;
+    return Object.is(rounded, -0) ? "0" : String(rounded);
+  };
+
+  document.querySelectorAll<HTMLDivElement>(".rhs-slider").forEach((widget) => {
+    const slider = widget.querySelector<HTMLInputElement>(
+      'input[type="range"]',
+    )!;
+    const deltaOut = widget.querySelector<HTMLElement>("[data-delta]")!;
+    const cells = Array.from(
+      widget.querySelectorAll<HTMLElement>("[data-rhs-for]"),
+    );
+    const status = widget.querySelector<HTMLElement>("[data-status]")!;
+
+    const render = () => {
+      const delta = Number(slider.value);
+      deltaOut.textContent = fmt(delta);
+
+      let infeasible: { name: string; value: number } | null = null;
+
+      cells.forEach((cell) => {
+        const name = cell.dataset.rhsFor!;
+        const base = Number(cell.dataset.base);
+        const mult = Number(cell.dataset.mult);
+        const value = base + delta * mult;
+
+        cell.textContent = fmt(value);
+        cell.classList.toggle("changed", mult !== 0 && delta !== 0);
+
+        if (name !== "z" && value < 0 && !infeasible) {
+          infeasible = { name, value };
+        }
+      });
+
+      const feasible = infeasible === null;
+      status.dataset.feasible = String(feasible);
+      status.textContent = feasible
+        ? "Feasible. Basis stays optimal."
+        : `Infeasible. ${label(infeasible!.name)} = ${fmt(
+            infeasible!.value,
+          )} would be negative, so the basis breaks down and needs a dual simplex repair.`;
+    };
+
+    slider.addEventListener("input", render);
+    render();
+  });
+</script>
+
+<style>
+  .rhs-slider {
+    margin: 24px 0;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  table.tableau {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+  }
+
+  .tableau th,
+  .tableau td {
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tableau thead tr {
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .tableau tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .tableau th.basic,
+  .tableau td.basic {
+    text-align: left;
+    color: var(--text-secondary);
+  }
+  .tableau td.num,
+  .tableau th.num {
+    font-variant-numeric: tabular-nums;
+  }
+  .tableau .rhs {
+    border-left: 2px solid var(--border-strong);
+  }
+  .tableau td.changed {
+    color: var(--accent);
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .control label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .control input[type="range"] {
+    flex: 1 1 160px;
+    accent-color: var(--s5);
+  }
+
+  .control output {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--s5);
+    min-width: 4ch;
+    text-align: right;
+  }
+
+  .status {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .status[data-feasible="true"] {
+    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
+    border-color: var(--s3-border);
+  }
+
+  .status[data-feasible="false"] {
+    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
+    border-color: var(--s4-border);
+  }
+</style>

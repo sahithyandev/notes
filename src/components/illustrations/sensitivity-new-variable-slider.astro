@@ -1,0 +1,170 @@
+---
+import katex from "katex";
+
+interface Props {
+  zTerm: number;
+  deltaMin: number;
+  deltaMax: number;
+}
+
+const { zTerm, deltaMin, deltaMax } = Astro.props;
+
+const tex = (v: string) =>
+  katex.renderToString(v, { throwOnError: false, strict: false });
+---
+
+<div class="new-var-slider">
+  <div class="row">
+    <span class="label">
+      <span set:html={tex("z_{\\text{new}} - c_{\\text{new}}")} /> ={" "}
+      {zTerm} - <span set:html={tex("c_{\\text{new}}")} />
+    </span>
+    <span class="value" data-reduced-cost data-base={zTerm}>
+      {zTerm}
+    </span>
+  </div>
+
+  <div class="control">
+    <label for="new-var-cost">
+      <span set:html={tex("c_{\\text{new}}")} />
+    </label>
+    <input
+      id="new-var-cost"
+      type="range"
+      min={deltaMin}
+      max={deltaMax}
+      step="0.01"
+      value="0"
+    />
+    <output for="new-var-cost" data-c>0</output>
+  </div>
+
+  <div class="status" data-status data-optimal="true">
+    Reduced cost &ge; 0. The new variable stays non-basic at value 0.
+  </div>
+</div>
+
+<script>
+  const fmt = (n: number) => {
+    const rounded = Math.round(n * 100) / 100;
+    return Object.is(rounded, -0) ? "0" : String(rounded);
+  };
+
+  document
+    .querySelectorAll<HTMLDivElement>(".new-var-slider")
+    .forEach((widget) => {
+      const slider = widget.querySelector<HTMLInputElement>(
+        'input[type="range"]',
+      )!;
+      const cOut = widget.querySelector<HTMLElement>("[data-c]")!;
+      const reducedCostEl = widget.querySelector<HTMLElement>(
+        "[data-reduced-cost]",
+      )!;
+      const base = Number(reducedCostEl.dataset.base);
+      const status = widget.querySelector<HTMLElement>("[data-status]")!;
+
+      const render = () => {
+        const cNew = Number(slider.value);
+        const reducedCost = base - cNew;
+
+        cOut.textContent = fmt(cNew);
+        reducedCostEl.textContent = fmt(reducedCost);
+        reducedCostEl.classList.toggle("changed", cNew !== 0);
+
+        const optimal = reducedCost >= 0;
+        status.dataset.optimal = String(optimal);
+        status.textContent = optimal
+          ? "Reduced cost ≥ 0. The new variable stays non-basic at value 0."
+          : `Reduced cost ${fmt(reducedCost)} < 0. The new variable can enter the basis and improve z.`;
+      };
+
+      slider.addEventListener("input", render);
+      render();
+    });
+</script>
+
+<style>
+  .new-var-slider {
+    margin: 24px 0;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+  }
+
+  .row .label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+  }
+
+  .row .value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .row .value.changed {
+    color: var(--accent);
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .control label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .control input[type="range"] {
+    flex: 1 1 160px;
+    accent-color: var(--s5);
+  }
+
+  .control output {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--s5);
+    min-width: 4ch;
+    text-align: right;
+  }
+
+  .status {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .status[data-optimal="true"] {
+    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
+    border-color: var(--s3-border);
+  }
+
+  .status[data-optimal="false"] {
+    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
+    border-color: var(--s4-border);
+  }
+</style>

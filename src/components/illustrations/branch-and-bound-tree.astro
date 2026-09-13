@@ -1,0 +1,182 @@
+<svg id="bb-tree" width="100%" viewBox="0 0 620 370" role="img">
+  <title>Branch and bound search tree for the worked example</title>
+  <desc
+    >The LP relaxation branches on x1 into x1 ≤ 1 and x1 ≥ 2. The x1 ≥ 2 branch
+    is already integral and becomes the best solution. The x1 ≤ 1 branch
+    branches again on x2, giving one integral but worse solution and one
+    infeasible subproblem.</desc
+  >
+
+  <!-- edges (drawn first, under the nodes) -->
+  <g class="edge">
+    <line x1="310" y1="76" x2="125" y2="146"></line>
+    <rect class="lb" x="168" y="98" width="62" height="24" rx="5"></rect>
+    <text class="lt" x="199" y="110" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> ≤ 1</text
+    >
+  </g>
+  <g class="edge">
+    <line x1="310" y1="76" x2="490" y2="146"></line>
+    <rect class="lb" x="392" y="98" width="66" height="24" rx="5"></rect>
+    <text class="lt" x="425" y="110" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> ≥ 2</text
+    >
+  </g>
+  <g class="edge">
+    <line x1="125" y1="206" x2="90" y2="270"></line>
+    <rect class="lb" x="52" y="228" width="62" height="24" rx="5"></rect>
+    <text class="lt" x="83" y="240" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">2</tspan> ≤ 3</text
+    >
+  </g>
+  <g class="edge">
+    <line x1="125" y1="206" x2="270" y2="270"></line>
+    <rect class="lb" x="220" y="228" width="66" height="24" rx="5"></rect>
+    <text class="lt" x="253" y="240" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">2</tspan> ≥ 4</text
+    >
+  </g>
+
+  <!-- root: LP relaxation -->
+  <g class="node">
+    <rect x="210" y="16" width="200" height="60" rx="8"></rect>
+    <text class="hd" x="310" y="34" text-anchor="middle">LP relaxation</text>
+    <text class="bd" x="310" y="52" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> = 1.5, x<tspan
+        baseline-shift="-20%"
+        font-size="0.7em">2</tspan
+      > = 3.5</text
+    >
+    <text class="bd" x="310" y="68" text-anchor="middle">Z = 13.5</text>
+  </g>
+
+  <!-- x1 <= 1 -->
+  <g class="node">
+    <rect x="30" y="146" width="190" height="60" rx="8"></rect>
+    <text class="bd" x="125" y="166" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> = 1, x<tspan
+        baseline-shift="-20%"
+        font-size="0.7em">2</tspan
+      > = 3.5</text
+    >
+    <text class="bd" x="125" y="182" text-anchor="middle">Z = 12.5</text>
+    <text class="tag" x="125" y="198" text-anchor="middle"
+      >fractional, branch again</text
+    >
+  </g>
+
+  <!-- x1 >= 2, the winning leaf -->
+  <g class="node best">
+    <rect x="390" y="146" width="200" height="64" rx="8"></rect>
+    <text class="bd" x="490" y="166" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> = 2, x<tspan
+        baseline-shift="-20%"
+        font-size="0.7em">2</tspan
+      > = 3</text
+    >
+    <text class="bd" x="490" y="182" text-anchor="middle">Z = 13</text>
+    <text class="tag best-tag" x="490" y="200" text-anchor="middle"
+      >integral, best solution</text
+    >
+  </g>
+
+  <!-- x2 <= 3, integral but beaten -->
+  <g class="node">
+    <rect x="10" y="270" width="160" height="64" rx="8"></rect>
+    <text class="bd" x="90" y="290" text-anchor="middle"
+      >x<tspan baseline-shift="-20%" font-size="0.7em">1</tspan> = 1, x<tspan
+        baseline-shift="-20%"
+        font-size="0.7em">2</tspan
+      > = 3</text
+    >
+    <text class="bd" x="90" y="306" text-anchor="middle">Z = 11</text>
+    <text class="tag" x="90" y="322" text-anchor="middle"
+      >integral, beaten by 13</text
+    >
+  </g>
+
+  <!-- x2 >= 4, infeasible -->
+  <g class="node discarded">
+    <rect x="190" y="270" width="160" height="56" rx="8"></rect>
+    <text class="bd" x="270" y="294" text-anchor="middle">infeasible</text>
+    <text class="tag" x="270" y="312" text-anchor="middle">discarded</text>
+  </g>
+</svg>
+
+<style>
+  #bb-tree {
+    --s5: #3e28b8;
+    --s5-bg: #e0dff6;
+    --s5-border: #9a90e0;
+    --border: #d0d0de;
+    --text: #1a1a24;
+    --text-secondary: #58586a;
+    --bg2: #ffffff;
+  }
+  :root[data-theme="dark"] #bb-tree {
+    --s5: #a596f5;
+    --s5-bg: color-mix(in oklab, var(--s5) 16%, #1c1e28);
+    --s5-border: color-mix(in oklab, var(--s5) 45%, #1c1e28);
+    --border: #35373d;
+    --text: #e8e8ee;
+    --text-secondary: #a4a4b4;
+    --bg2: #1c1e28;
+  }
+
+  #bb-tree .edge line {
+    stroke: var(--border);
+    stroke-width: 1.5;
+  }
+  #bb-tree .edge .lb {
+    fill: var(--bg2);
+    stroke: var(--border);
+    stroke-width: 0.5;
+  }
+  #bb-tree .edge .lt {
+    font-size: 11px;
+    fill: var(--text-secondary);
+    font-family: var(--font-ui, sans-serif);
+  }
+
+  #bb-tree .node rect {
+    fill: var(--bg2);
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+  #bb-tree .node .hd {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--text-secondary);
+    font-family: var(--font-ui, sans-serif);
+  }
+  #bb-tree .node .bd {
+    font-size: 12px;
+    fill: var(--text);
+    font-family: var(--font-ui, sans-serif);
+  }
+  #bb-tree .node .tag {
+    font-size: 10px;
+    fill: var(--text-secondary);
+    font-family: var(--font-ui, sans-serif);
+  }
+
+  #bb-tree .node.best rect {
+    fill: var(--s5-bg);
+    stroke: var(--s5-border);
+    stroke-width: 1.5;
+  }
+  #bb-tree .node.best .best-tag {
+    fill: var(--s5);
+    font-weight: 600;
+  }
+
+  #bb-tree .node.discarded rect {
+    fill: var(--bg2);
+    stroke: var(--border);
+    stroke-dasharray: 4 3;
+  }
+  #bb-tree .node.discarded .bd,
+  #bb-tree .node.discarded .tag {
+    fill: var(--text-secondary);
+  }
+</style>

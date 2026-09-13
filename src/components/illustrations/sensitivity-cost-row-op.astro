@@ -1,0 +1,294 @@
+---
+import katex from "katex";
+
+interface Props {
+  variable: string;
+  baseC: number;
+  deltaMin: number;
+  deltaMax: number;
+}
+
+const { variable, baseC, deltaMin, deltaMax } = Astro.props;
+
+const tex = (v: string) =>
+  katex.renderToString(v, { throwOnError: false, strict: false });
+
+const columns = ["x_1", "x_2", "s_1", "s_2", "s_3"];
+const rows = [
+  { basic: "z", cells: ["0", "0", "0", "3/2", "1"], rhs: 36 },
+  { basic: "s_1", cells: ["0", "0", "1", "1/3", "-1/3"], rhs: 2 },
+  { basic: "x_2", cells: ["0", "1", "0", "1/2", "0"], rhs: 6 },
+  { basic: "x_1", cells: ["1", "0", "0", "-1/3", "1/3"], rhs: 2 },
+];
+
+const toNum = (s: string) => {
+  const neg = s.startsWith("-");
+  const body = neg ? s.slice(1) : s;
+  const [n, d] = body.split("/");
+  const val = d ? Number(n) / Number(d) : Number(n);
+  return neg ? -val : val;
+};
+
+const zRow = rows.find((r) => r.basic === "z")!;
+const sourceRow = rows.find((r) => r.basic === variable)!;
+const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
+---
+
+<div class="row-op">
+  <p class="formula">
+    <span
+      set:html={tex("z\\text{-row} \\leftarrow z\\text{-row} + \\Delta \\cdot")}
+    />
+    <span set:html={tex(`${variable}\\text{'s row}`)} />
+  </p>
+
+  <table class="tableau">
+    <thead>
+      <tr>
+        <th class="basic">Basic</th>
+        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        <th class="num rhs">RHS</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr class:list={{ "source-row": r.basic === variable }}>
+            <td class="basic" set:html={tex(r.basic)} />
+            {r.cells.map((cell, i) => {
+              const col = columns[i];
+              if (r.basic === "z" && nonBasicCols.includes(col)) {
+                const mult = toNum(sourceRow.cells[i]);
+                return (
+                  <td
+                    class="num target-cell"
+                    data-cost-for={col}
+                    data-base={toNum(cell)}
+                    data-mult={mult}
+                  >
+                    {cell}
+                  </td>
+                );
+              }
+              return <td class="num" set:html={tex(cell)} />;
+            })}
+            {r.basic === "z" ? (
+              <td
+                class="num rhs target-cell"
+                data-cost-for="z"
+                data-base={zRow.rhs}
+                data-mult={sourceRow.rhs}
+              >
+                {zRow.rhs}
+              </td>
+            ) : (
+              <td class="num rhs" set:html={tex(String(r.rhs))} />
+            )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <div class="control">
+    <label for={`row-op-delta-${variable}`}>
+      &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
+        " "
+      }
+      {baseC}
+    </label>
+    <input
+      id={`row-op-delta-${variable}`}
+      type="range"
+      min={deltaMin}
+      max={deltaMax}
+      step="0.01"
+      value="0"
+    />
+    <output for={`row-op-delta-${variable}`} data-delta>0</output>
+  </div>
+
+  <div class="status" data-status data-optimal="true">
+    Optimal. Basis stays optimal.
+  </div>
+</div>
+
+<script>
+  const SUBSCRIPT: Record<string, string> = { "1": "₁", "2": "₂", "3": "₃" };
+
+  const label = (name: string) => {
+    const [base, idx] = name.split("_");
+    return `${base}${SUBSCRIPT[idx] ?? idx}`;
+  };
+
+  const fmt = (n: number) => {
+    const rounded = Math.round(n * 100) / 100;
+    return Object.is(rounded, -0) ? "0" : String(rounded);
+  };
+
+  document.querySelectorAll<HTMLDivElement>(".row-op").forEach((widget) => {
+    const slider = widget.querySelector<HTMLInputElement>(
+      'input[type="range"]',
+    )!;
+    const deltaOut = widget.querySelector<HTMLElement>("[data-delta]")!;
+    const cells = Array.from(
+      widget.querySelectorAll<HTMLElement>("[data-cost-for]"),
+    );
+    const status = widget.querySelector<HTMLElement>("[data-status]")!;
+
+    const render = () => {
+      const delta = Number(slider.value);
+      deltaOut.textContent = fmt(delta);
+
+      let violated: { name: string; value: number } | null = null;
+
+      cells.forEach((cell) => {
+        const name = cell.dataset.costFor!;
+        const base = Number(cell.dataset.base);
+        const mult = Number(cell.dataset.mult);
+        const val = base + delta * mult;
+
+        cell.textContent = fmt(val);
+        cell.classList.toggle("changed", delta !== 0);
+
+        if (name !== "z" && val < 0 && !violated) {
+          violated = { name, value: val };
+        }
+      });
+
+      const optimal = violated === null;
+      status.dataset.optimal = String(optimal);
+      status.textContent = optimal
+        ? "Optimal. Basis stays optimal."
+        : `Not optimal. ${label(
+            violated!.name,
+          )}'s reduced cost is ${fmt(violated!.value)}, negative, so it can enter the basis and improve z.`;
+    };
+
+    slider.addEventListener("input", render);
+    render();
+  });
+</script>
+
+<style>
+  .row-op {
+    margin: 24px 0;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  .formula {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  table.tableau {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+  }
+
+  .tableau th,
+  .tableau td {
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .tableau thead tr {
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .tableau tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .tableau th.basic,
+  .tableau td.basic {
+    text-align: left;
+    color: var(--text-secondary);
+  }
+  .tableau td.num,
+  .tableau th.num {
+    font-variant-numeric: tabular-nums;
+  }
+  .tableau .rhs {
+    border-left: 2px solid var(--border-strong);
+  }
+
+  /* Source row: the basic variable's row being scaled by Δ. */
+  .tableau tr.source-row td {
+    background: color-mix(in oklab, var(--s5) 14%, var(--surface));
+  }
+  .tableau tr.source-row td.basic {
+    color: var(--s5);
+    font-weight: 700;
+  }
+
+  /* Target cells: the objective row entries that row gets added into. */
+  .tableau td.target-cell {
+    background: var(--accent-subtle);
+  }
+  .tableau td.target-cell.changed {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .control label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .control input[type="range"] {
+    flex: 1 1 160px;
+    accent-color: var(--s5);
+  }
+
+  .control output {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--s5);
+    min-width: 4ch;
+    text-align: right;
+  }
+
+  .status {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .status[data-optimal="true"] {
+    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
+    border-color: var(--s3-border);
+  }
+
+  .status[data-optimal="false"] {
+    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
+    border-color: var(--s4-border);
+  }
+</style>
