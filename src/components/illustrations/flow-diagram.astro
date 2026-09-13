@@ -18,6 +18,13 @@ interface Link {
   dash?: boolean;
   bend?: boolean;
   sbw?: number;
+  bidirectional?: boolean;
+  horizontalPosition?: "left" | "right" | "center";
+  verticalPosition?: "top" | "bottom" | "center";
+  horizontalPadding?: number;
+  verticalPadding?: number;
+  horizontalAlign?: "left" | "right" | "center";
+  verticalAlign?: "top" | "bottom" | "center";
 }
 
 interface Props {
@@ -162,6 +169,28 @@ type LinkDraw = {
   dst: [number, number];
 };
 
+function resolveHorizontalPosition(link: Link): "left" | "right" | "center" {
+  if (link.horizontalPosition) return link.horizontalPosition;
+  if (link.horizontalAlign === "left") return "left";
+  if (link.horizontalAlign === "right") return "right";
+  return "center";
+}
+
+function resolveVerticalPosition(link: Link): "top" | "bottom" | "center" {
+  if (link.verticalPosition) return link.verticalPosition;
+  if (link.verticalAlign === "top") return "top";
+  if (link.verticalAlign === "bottom") return "bottom";
+  return "top";
+}
+
+function resolveHorizontalPadding(link: Link): number {
+  return Number(link.horizontalPadding ?? 18);
+}
+
+function resolveVerticalPadding(link: Link): number {
+  return Number(link.verticalPadding ?? 18);
+}
+
 function drawLink(link: Link): LinkDraw {
   const [sr, sc] = link.from;
   const [tr, tc] = link.to;
@@ -176,21 +205,70 @@ function drawLink(link: Link): LinkDraw {
   let labelX: number;
   let labelY: number;
   let anchor: "middle" | "start" = "middle";
+  let headD: string;
+  const horizontalPosition = resolveHorizontalPosition(link);
+  const verticalPosition = resolveVerticalPosition(link);
+  const horizontalPadding = resolveHorizontalPadding(link);
+  const verticalPadding = resolveVerticalPadding(link);
+
+  const applyTextPlacement = (
+    baseX: number,
+    baseY: number,
+  ): { x: number; y: number } => {
+    const xShift =
+      horizontalPosition === "right"
+        ? -horizontalPadding
+        : horizontalPosition === "left"
+          ? horizontalPadding
+          : 0;
+    const yShift =
+      verticalPosition === "bottom"
+        ? -verticalPadding
+        : verticalPosition === "top"
+          ? verticalPadding
+          : 0;
+    return {
+      x: baseX + xShift,
+      y: baseY + yShift,
+    };
+  };
 
   if (sr === tr && tc > sc) {
     p1 = s.right;
     p2 = t.left;
     headUx = 1;
     shaftD = `M ${p1.x} ${p1.y} L ${p2.x - LINK_LEN} ${p2.y}`;
-    labelX = (p1.x + p2.x) / 2;
-    labelY = p1.y - 12;
+    ({ x: labelX, y: labelY } = applyTextPlacement(
+      (p1.x + p2.x) / 2,
+      p1.y - 14,
+    ));
+    headD = chevron(p2.x, p2.y, headUx, headUy);
+    if (link.bidirectional) {
+      headD = `${chevron(p1.x, p1.y, -1, 0)} ${chevron(p2.x, p2.y, 1, 0)}`;
+      shaftD = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+      ({ x: labelX, y: labelY } = applyTextPlacement(
+        (p1.x + p2.x) / 2,
+        p1.y - 14,
+      ));
+    }
   } else if (sr === tr && tc < sc) {
     p1 = s.left;
     p2 = t.right;
     headUx = -1;
     shaftD = `M ${p1.x} ${p1.y} L ${p2.x + LINK_LEN} ${p2.y}`;
-    labelX = (p1.x + p2.x) / 2;
-    labelY = p1.y + 17;
+    ({ x: labelX, y: labelY } = applyTextPlacement(
+      (p1.x + p2.x) / 2,
+      p1.y - 14,
+    ));
+    headD = chevron(p2.x, p2.y, headUx, headUy);
+    if (link.bidirectional) {
+      headD = `${chevron(p1.x, p1.y, 1, 0)} ${chevron(p2.x, p2.y, -1, 0)}`;
+      shaftD = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+      ({ x: labelX, y: labelY } = applyTextPlacement(
+        (p1.x + p2.x) / 2,
+        p1.y - 14,
+      ));
+    }
   } else {
     const up = tr > sr;
     p1 = up ? s.bottom : s.top;
@@ -200,8 +278,11 @@ function drawLink(link: Link): LinkDraw {
       const by = p2.y - (up ? LINK_LEN : -LINK_LEN);
       shaftD = `M ${p1.x} ${p1.y} L ${p1.x} ${bendY} L ${p2.x} ${bendY} L ${p2.x} ${by}`;
       headUy = up ? 1 : -1;
-      labelX = (p1.x + p2.x) / 2;
-      labelY = Math.min(p1.y, bendY) - 7;
+      ({ x: labelX, y: labelY } = applyTextPlacement(
+        (p1.x + p2.x) / 2,
+        Math.min(p1.y, bendY) - 7,
+      ));
+      headD = chevron(p2.x, p2.y, headUx, headUy);
     } else {
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
@@ -211,13 +292,18 @@ function drawLink(link: Link): LinkDraw {
       const bx = p2.x - headUx * LINK_LEN;
       const by = p2.y - headUy * LINK_LEN;
       shaftD = `M ${p1.x} ${p1.y} L ${bx} ${by}`;
-      labelX = (p1.x + p2.x) / 2 + 18;
-      labelY = (p1.y + p2.y) / 2;
       anchor = "start";
+      ({ x: labelX, y: labelY } = applyTextPlacement(
+        (p1.x + p2.x) / 2,
+        (p1.y + p2.y) / 2 - 10,
+      ));
+      headD = chevron(p2.x, p2.y, headUx, headUy);
     }
   }
 
-  const headD = chevron(p2.x, p2.y, headUx, headUy);
+  if (!link.bidirectional && !link.bend && sr !== tr) {
+    headD = chevron(p2.x, p2.y, headUx, headUy);
+  }
 
   return {
     shaftD,
