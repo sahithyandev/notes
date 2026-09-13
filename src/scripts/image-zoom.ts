@@ -59,6 +59,7 @@ function init() {
 
     if (!doc.startViewTransition) {
       img.style.visibility = "hidden";
+      if (fig) fig.style.visibility = "hidden";
       showDialog();
       return;
     }
@@ -69,7 +70,10 @@ function init() {
     const vt = doc.startViewTransition(() => {
       img.style.visibility = "hidden";
       img.style.viewTransitionName = "";
-      if (fig) fig.style.viewTransitionName = "";
+      if (fig) {
+        fig.style.visibility = "hidden";
+        fig.style.viewTransitionName = "";
+      }
       zoomImg.style.viewTransitionName = "zoom-image";
       if (fig) caption.style.viewTransitionName = "zoom-caption";
       showDialog();
@@ -84,7 +88,10 @@ function init() {
   const cleanup = (img: HTMLImageElement, fig: HTMLElement | null) => {
     img.style.visibility = "";
     img.style.viewTransitionName = "";
-    if (fig) fig.style.viewTransitionName = "";
+    if (fig) {
+      fig.style.visibility = "";
+      fig.style.viewTransitionName = "";
+    }
     zoomImg.style.viewTransitionName = "";
     caption.style.viewTransitionName = "";
     zoomImg.removeAttribute("src");
@@ -111,7 +118,10 @@ function init() {
       caption.style.viewTransitionName = "";
       img.style.visibility = "";
       img.style.viewTransitionName = "zoom-image";
-      if (hasCaption && fig) fig.style.viewTransitionName = "zoom-caption";
+      if (hasCaption && fig) {
+        fig.style.visibility = "";
+        fig.style.viewTransitionName = "zoom-caption";
+      }
       hideDialog();
     });
 

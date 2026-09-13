@@ -64,8 +64,10 @@
   #image-zoom-img {
     flex: 0 1 auto;
     min-height: 0;
-    max-width: 100%;
-    max-height: 100%;
+    /* Always render at up to 80vw -- a definite width (not just a cap) so a
+       small in-text image actually enlarges instead of appearing unchanged. */
+    width: min(80vw, calc(100vw - 3rem));
+    max-height: 82dvh;
     object-fit: contain;
     border-radius: 0.375rem;
   }
@@ -133,15 +135,17 @@
 <style is:global>
   /* The dialog opens/closes inside document.startViewTransition(), so the
      browser morphs the thumbnail into the full-screen image (and its caption)
-     for free. Only the tagged groups animate; the rest of the page holds still. */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
+     for free. Root (the backdrop dimming and the close button, since neither
+     is individually named) gets the default cross-fade -- give it the same
+     timing as the named groups so everything settles together. */
+  ::view-transition-group(root) {
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   ::view-transition-group(zoom-image) {
-    animation-duration: 0.22s;
-    animation-timing-function: ease-out;
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   ::view-transition-image-pair(zoom-image) {
@@ -153,8 +157,8 @@
      pixel size in both snapshots, so only the box translates -- the glyphs
      never scale or smear. */
   ::view-transition-group(zoom-caption) {
-    animation-duration: 0.22s;
-    animation-timing-function: ease-out;
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   ::view-transition-old(zoom-caption),
@@ -166,6 +170,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(root),
     ::view-transition-group(zoom-image),
     ::view-transition-group(zoom-caption),
     ::view-transition-old(zoom-image),
