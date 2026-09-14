@@ -1,7 +1,7 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-13T18:09:50.139Z
+lastUpdatedOn: 2026-09-14T04:24:23.063Z
 slug: s5/computer-security/authentication-protocols
 sidebar:
   order: 23
@@ -38,6 +38,21 @@ The protocol must not be susceptible to:
   Symmetric encryption under $k$, checking a password against the stored record, and validating a certificate against the CA.
 - Good randomness  
   Session keys and nonces come from a good random source.
+
+Users behave less carefully than servers. They reuse $nonce$, $k$, and temporary key pairs across separate protocol runs, and reuse $pwd$ across multiple servers. Servers keep long-lived key pairs in certificates and avoid reusing temporary values, but a protocol should stay secure even if a server reuses them, since a compromised server can exhaust its random pool.
+
+## Attacker Profile
+
+The level of damage an attacker can do depends on which class they belong to.
+
+- Passive  
+  Observes all communications without altering them.
+- Weak active  
+  Replays captured messages verbatim.
+- Active  
+  Modifies message contents before replaying them.
+- Powerful active  
+  Blocks messages and inserts itself into the protocol run, as in a man-in-the-middle attack.
 
 ## Methods
 
@@ -97,4 +112,41 @@ Only the holder of $b$ for the certified $B$ can compute $k$, so a correct reply
 
 $B$ never changes. The Server adds no freshness, and the protocol has no forward secrecy: leaking $b$ once exposes every past session. Only the User's fresh $a$ keeps each $k$ distinct.
 
+Because $k = B^a \bmod p$ is a deterministic function of $A$, an attacker who replays steps 1 and 5 verbatim (same $A$, same ciphertext) is authenticated as the User in step 6, without ever learning $k$. Adding a Server nonce that the User must echo back inside the step 5 ciphertext, and having the Server verify it before accepting, restores freshness without weakening the key agreement.
+
 Both sides may instead hash $g^{ab} \bmod p$ to derive $k$. The [hash](/s5/computer-security/hash-functions) strips the algebraic structure of the raw value and returns a key of the length the cipher needs. Using the raw value directly also works.
+
+### Timestamp-Based Freshness
+
+Any of the 3 methods above can use a $timestamp$ instead of a $nonce$ to prove freshness. The Server includes $timestamp$ in the value it encrypts or signs, and the User checks the recovered $timestamp$ against the one it sent.
+
+- Requires clock synchronization between User and Server, typically via NTP, with a small tolerance window.
+- A stale $timestamp$ is rejected outright, so a passive replay after the tolerance window fails.
+- An attacker acting within the tolerance window can still succeed, so the window must stay small.
+- $password$ can piggyback on the same message as $timestamp$, collapsing the exchange to 1 round trip at the cost of tighter clock synchronization.
+
+A $timestamp$ only proves freshness when the Server signs or encrypts it back to the User as an unpredictable challenge response. It must never substitute for a $nonce$ used purely as a random challenge value, since timestamps are predictable.
+
+## Attack Patterns
+
+### Cut-and-Paste Attacks
+
+A cut-and-paste attack against these protocols succeeds when:
+
+- The User reuses the same $pwd$ across 2 servers $S_1$ and $S_2$.
+- The attacker runs a simultaneous session with $S_2$ and intercepts $S_1$'s reply meant for the User.
+- Message routing happens at the network layer while the protocol logic that ties a reply to a specific server runs at the application layer, so the attacker's substituted values pass unnoticed.
+
+The attacker forwards $S_2$'s challenge to the User in place of $S_1$'s, then relays the User's credential message, built for $S_2$ at the application layer but addressed to $S_1$ at the network layer, on to $S_2$. $S_2$ authenticates the attacker as the User, though the attacker never learns the session $k$. Binding the intended $S_{id}$ into whatever the Server signs or encrypts closes this gap, since a credential built for $S_2$ then fails to verify at $S_1$ and vice versa.
+
+### Interleaving Attacks
+
+An interleaving attack succeeds when:
+
+- The User reuses the same $pwd$ with 2 servers $S_1$ and $S_2$ in simultaneous sessions.
+- Both servers derive the session $k$ deterministically as $\text{Hash}(pwd \,\|\, nonce)$, and the $nonce$ generator is not reset between the 2 sessions, so both servers compute the identical $k$.
+- The attacker already holds limited access to $S_2$ and wants to escalate the privilege level $S_1$ would grant.
+
+With the identical $k$, the attacker swaps the encrypted privilege tokens returned by $S_1$ and $S_2$ in transit. The User ends up holding the token $S_1$ meant to keep for itself. Deriving $k$ from $pwd$ and $nonce$ alone makes it predictable across servers when both inputs repeat. Including $S_{id}$ in the hash, or generating $k$ from fresh randomness instead of a hash of reused values, closes this gap.
+
+A single login granting access to multiple servers without repeating these 2-party protocols per server is covered in [Kerberos](/s5/computer-security/kerberos).
