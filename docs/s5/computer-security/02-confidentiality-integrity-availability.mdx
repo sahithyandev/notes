@@ -1,7 +1,7 @@
 ---
 title: "Confidentiality, Integrity, and Availability"
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-14T04:24:22.961Z
+lastUpdatedOn: 2026-09-14T06:36:55.587Z
 slug: s5/computer-security/confidentiality-integrity-availability
 sidebar:
   order: 2
@@ -9,6 +9,7 @@ prev: true
 next: true
 prereqs:
   - s4/operating-systems-security/cia-triad
+  - s4/operating-systems-security/access-control
 ---
 
 The 3 basic actions of a person on an item of data: viewing (confidentiality), modifying (integrity), using (availability).
@@ -81,7 +82,7 @@ Availability overlaps with related non-functional requirements: capacity, perfor
 
 ## Access Control
 
-Access control is the basic model or paradigm of security. Several other models support specific computer security objectives.
+Builds on the paradigm, reference monitor, and matrix/ACL/capability/RBAC mechanisms covered in [Access Control](/s4/operating-systems-security/access-control). The models below extend that base for specific computer security objectives.
 
 ### BLP Model
 
@@ -89,14 +90,29 @@ Enforces data confidentiality in multi-level systems. By David Bell and Leonard 
 
 Every subject has a clearance level. Every object has a classification level. Levels form a lattice.
 
+A class is a pair $\langle \text{rank}, \text{compartment} \rangle$ assigned to both subjects and objects.
+
+- Rank  
+  A sensitivity level, e.g. top secret, secret, confidential, restricted, unclassified.
+- Compartment  
+  A category grouping related information, e.g. a project name or region.
+
+Class $D_1 \le D_2$ **iff** $\text{rank}_1 \le \text{rank}_2$ **and** $\text{compartment}_1 \subseteq \text{compartment}_2$. This dominance relation applies to subjects (clearance) and objects (classification) alike.
+
 Rules:
 
 - Simple security property, no read up  
-  A subject can read an object only when the subject clearance is at least as high as the object classification.
+  A subject can read an object only when the subject clearance dominates the object classification.
 - Star property, no write down  
-  A subject can write an object only when the object classification is at least as high as the subject clearance.
+  A subject can write an object only when the object classification dominates the subject clearance.
 
 Information flows only upward. A discretionary access matrix applies on top. Declassification needs a trusted subject outside the rules. Says nothing about integrity.
+
+<Note>
+
+These policies cannot be represented using an [access control matrix](/s4/operating-systems-security/access-control#access-control-matrix), since the matrix has no notion of a dominance relation between classes.
+
+</Note>
 
 ### Biba Model
 
@@ -110,6 +126,20 @@ Rules:
   A subject can write an object only when the subject integrity level is at least as high as the object integrity level.
 
 Information flows only downward in integrity. Untrusted data cannot reach a high-integrity subject.
+
+### Separation of Duty
+
+Separation of duty requires that a sensitive action need approval from 2 or more distinct authorized people, so no single person can act alone.
+
+- A check over $10,000 is only valid if signed by 2 authorized people.
+- The 2 signers must be different people.
+- The policy involves both role membership and an inequality between the signers, which a matrix entry cannot express.
+
+<Note>
+
+This policy cannot be represented using an [access control matrix](/s4/operating-systems-security/access-control#access-control-matrix), since the matrix has no notion of a relationship between 2 permissions.
+
+</Note>
 
 ### Chinese Wall Model
 
@@ -127,3 +157,52 @@ Rules:
   A subject can write an object only when the subject cannot read any object in a different company dataset.
 
 Effect: no fixed lattice. The policy is dynamic and per-subject.
+
+<Note>
+
+The Chinese wall policy cannot be represented using an [access control matrix](/s4/operating-systems-security/access-control#access-control-matrix), since access depends on the subject's history, not on a fixed classification.
+
+</Note>
+
+Examples:
+
+- Lawyers $L_1$ and $L_2$ work at the same firm.
+- If company $C_1$ competes with $C_2$, $L_1$ and $L_2$ can each work for either $C_1$ or $C_2$, but no lawyer can work for both competing firms.
+- Whether a permission is granted depends on which other permissions that subject has already used.
+
+### Capabilities in Amoeba
+
+Amoeba is a distributed capability-based operating system, implementing the [capability](/s4/operating-systems-security/access-control#capability) concept across multiple processors connected by a network.
+
+- Each object resides on a server, identified within a capability by a server port and an object number, alongside a rights field and a check field.
+- The check field is an unforgeable random value the server uses to verify a capability was not forged, letting protection be enforced entirely by the user-level server process, without special OS support.
+- An owner capability grants every right. The owner can derive a capability with fewer rights, whose check field is computed from the original so the server can still verify it.
+
+<Note>
+
+Revocation of a capability is possible through indirection: a capability points to a pointer to the resource, rather than to the resource directly. Revoking capability $C$ pointing to pointer $P$ pointing to resource $R$ is done by setting $P = 0$.
+
+</Note>
+
+### Unix File Security
+
+Every Unix file has an owner and a group, with read, write, and execute permissions set separately for owner, group, and other. Only the owner or root can change a file's permissions.
+
+- Each process carries a real, effective, and saved user ID.
+- The effective ID determines the process's actual permissions.
+- The setuid bit on an executable file lets a process temporarily run with the file owner's identity instead of the caller's.
+
+<Note>
+
+An EUID of $0$ means root, which can do anything. Setuid programs must be careful not to get tricked into acting on an attacker's behalf while running as root.
+
+</Note>
+
+Setuid scripts are a bad idea, historically prone to race conditions where an attacker changes the contents of a program after it begins executing but before it loads.
+
+### Windows Access Control
+
+Windows NTFS extends the same access list idea: each object carries a security descriptor with an owner, a group, and a discretionary access control list (DACL) of allowed users and groups, checked by priority of explicit deny, explicit allow, inherited deny, then inherited allow.
+
+- A security identifier (SID) replaces the Unix UID as the identity of a principal.
+- An impersonation token lets a thread temporarily adopt another user's security context, similar in purpose to Unix setuid.

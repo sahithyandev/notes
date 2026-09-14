@@ -1,0 +1,49 @@
+---
+title: Information Flow Control
+dateCreated: 2026-09-14T04:37:20.381Z
+lastUpdatedOn: 2026-09-14T06:36:55.684Z
+slug: s5/computer-security/information-flow-control
+sidebar:
+  order: 28
+prev: true
+next: true
+---
+
+Information flow control restricts what a process's low outputs may depend on, rather than only restricting reads and writes to objects.
+
+## Noninterference
+
+A process takes high inputs and low inputs and produces high outputs and low outputs. Noninterference requires that the low outputs never depend on the high inputs.
+
+$$
+\forall L\ \forall H_1\ \forall H_2: \text{LowOutput}(H_1, L) = \text{LowOutput}(H_2, L)
+$$
+
+Here:
+
+- $L$: the low input
+- $H_1, H_2$: any 2 possible high inputs
+- $\text{LowOutput}(H, L)$: the low output produced given high input $H$ and low input $L$
+
+Changing the high input while holding the low input fixed must never change the low output.
+
+## Information Flow Analysis
+
+A first approach marks each expression in a program as high or low, then flags any assignment of a high value into a low location.
+
+<Note>
+
+Marking expressions high or low resembles Perl's tainting.
+
+</Note>
+
+This first approach misses implicit flows, where information leaks through control flow rather than through a direct assignment:
+
+```
+if (x_high > 0) y_low = 0;
+else y_low = 1;
+```
+
+No high value is ever assigned to `y_low` directly, yet `y_low` reveals whether `x_high` is positive.
+
+State of the art relies on type systems and program analysis to trace information flow through both direct and implicit channels.
