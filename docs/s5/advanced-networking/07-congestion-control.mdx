@@ -1,7 +1,7 @@
 ---
 title: Congestion Control
 dateCreated: 2026-09-05T21:01:18.122Z
-lastUpdatedOn: 2026-09-13T22:30:43.724Z
+lastUpdatedOn: 2026-09-14T21:59:36.139Z
 slug: s5/advanced-networking/congestion-control
 sidebar:
   order: 7
@@ -57,47 +57,69 @@ Feedback methods:
 - Mark a packet travelling to the receiver.
 - Let the receiver report the mark to the sender.
 
-## TCP Congestion Window
+## Congestion Avoidance in Transport Layer
 
-Congestion window ($cwnd$) - sender-side limit on unacknowledged bytes.
+### TCP Congestion Window
 
-$$W = \min(cwnd, rwnd)$$
+Congestion window - sender-side limit on unacknowledged bytes.
 
-$$\text{effective window} = W - (\text{LastByteSent} - \text{LastByteAcked})$$
+Advertised window - receiver-side limit on unacknowledged bytes.
 
-`rwnd` is the advertised receiver window. TCP treats loss as congestion because transmission errors are rare.
+<Note title="TCP Effective Window">
+  - $$maxWindow = \min(CongestionWindow, AdvertisedWindow)$$
+  - $$\text{Effective Window} = maxWindow - (\text{LastByteSent} - \text{LastByteAcked})$$
+</Note>
 
-### Additive Increase, Multiplicative Decrease
+TCP treats loss as congestion because transmission errors are rare.
+
+#### Additive Increase, Multiplicative Decrease
 
 During congestion avoidance:
 
-$$cwnd \leftarrow cwnd + \frac{MSS^2}{cwnd}$$
+$$CongestionWindow \leftarrow CongestionWindow + \frac{MSS^2}{CongestionWindow}$$
 
-per acknowledged segment. This increases $cwnd$ by approximately one $MSS$ per RTT.
+per acknowledged segment. This increases $CongestionWindow$ by approximately one Maximum-Segment-Size ($MSS$) per Round-Trip-Transmission (RTT).
 
 After a timeout:
 
-$$cwnd \leftarrow 1\ MSS$$
+$$CongestionWindow \leftarrow 1\ MSS$$
 
 The congestion threshold becomes half the prior usable window.
 
-## Slow Start and Congestion Avoidance
+### Slow Start
 
-Slow start - exponential window growth.
+Exponential window growth.
 
-- Start at $cwnd = 1\ MSS$.
-- Increase $cwnd$ by one $MSS$ for every ACK.
+import TcpSlowStart from "./images/tcp-slow-start.svg";
+
+<TcpSlowStart />
+
+- Start at $CongestionWindow = 1\ MSS$.
+- Increase $CongestionWindow$ by one $MSS$ for every ACK.
 - Window approximately doubles each RTT.
 - Use at connection start and after a timeout.
 
-Slow-start threshold ($ssthresh$) - transition point from exponential to linear growth.
+A timeout returns the window to $1\ MSS$. Slow start then repeats.
 
-- Slow start while $cwnd < ssthresh$.
-- Congestion avoidance while $cwnd \ge ssthresh$.
-- After timeout, set $ssthresh$ to half the previous usable window.
-- Reset $cwnd$ to one $MSS$.
+### TCP Linear Increase Threshold
 
-## Fast Retransmit and Fast Recovery
+Slow-start threshold ($ssthresh$) - the congestion window where exponential slow-start growth changes to linear congestion-avoidance growth.
+
+import TcpLinearIncreaseThreshold from "./images/tcp-linear-increase-threshold.svg";
+
+<TcpLinearIncreaseThreshold />
+
+- Initial $ssthresh$: $64\text{KB}$.
+- Initial $CongestionWindow$: $1\text{ MSS}$.
+- While $CongestionWindow < ssthresh$: increase $CongestionWindow$ by $1\text{ MSS}$ for every ACK.
+- After each RTT below $ssthresh$: $CongestionWindow$ approximately doubles.
+- When $CongestionWindow \ge ssthresh$: increase $CongestionWindow$ by approximately $1\text{ MSS}$ per RTT.
+- After a timeout  
+  Reset $CongestionWindow$ to $1\text{ MSS}$. Set $ssthresh$ to half the previous usable window.
+
+The usable window is the smaller of the congestion window and the advertised receiver window.
+
+### Fast Retransmit and Fast Recovery
 
 Duplicate ACKs indicate that a segment arrived out of order.
 
@@ -107,11 +129,19 @@ Duplicate ACKs indicate that a segment arrived out of order.
 - Fast recovery resumes near $ssthresh$.
 - Slow start is skipped.
 
+### TCP Vegas
+
+Host-centric congestion avoidance.
+
+- Detects increasing RTT or a flattening sending rate.
+- Infers queue growth before packet loss.
+- Reduces the sending rate before overflow.
+
 ## Router-Assisted Congestion Avoidance
 
-### Random Early Detection
+### Random Early Detection (RED)
 
-Random Early Detection (RED) - active queue management using average queue length.
+Active queue management using average queue length.
 
 - Low average queue  
   Accept packets.
@@ -122,27 +152,19 @@ Random Early Detection (RED) - active queue management using average queue lengt
 
 Early drops signal TCP before queue overflow.
 
-### Explicit Congestion Notification
+### Explicit Congestion Notification (ECN)
 
-Explicit Congestion Notification (ECN) - congestion signal encoded in packet headers.
+Congestion signal encoded in packet headers.
 
 - Router marks packets instead of dropping them.
 - Receiver returns the congestion indication.
 - Sender reduces its rate.
 
-### TCP Vegas
-
-TCP Vegas - host-centric congestion avoidance.
-
-- Detects increasing RTT or a flattening sending rate.
-- Infers queue growth before packet loss.
-- Reduces the sending rate before overflow.
-
-## Network-Layer Methods
+## Congestion Avoidance in Network Layer
 
 ### Resource Preallocation
 
-Resource preallocation - reserve buffers and bandwidth before data transmission.
+Reserve buffers and bandwidth before data transmission.
 
 - Common in virtual-circuit networks.
 - Setup selects a path and allocates resources.
@@ -150,18 +172,18 @@ Resource preallocation - reserve buffers and bandwidth before data transmission.
 
 ### Traffic Shaping
 
-Traffic shaping - control the transmission rate and pattern.
+Control the transmission rate and pattern.
 
 - Sender and carrier negotiate a traffic profile during setup.
 - Leaky-bucket shaping enforces a steady output rate.
 
 ### Choke Packets
 
-Choke packet - router notification instructing a sender to reduce its rate.
+Router notification instructing a sender to reduce its rate.
 
 ### Isarithmic Control
 
-Isarithmic control - cap the total packets within a subnet.
+Cap the total packets within a subnet.
 
 - A router needs a permit before injecting a packet.
 - The permit count limits in-network packets.
@@ -176,9 +198,17 @@ Virtual-circuit subnets use:
 
 Datagram subnets discard packets when resources are unavailable. The sending host retransmits dropped datagrams. In virtual circuits, the previous-hop router retransmits after missing acknowledgement.
 
-## Load Shedding and Jitter
+## Congestion Avoidance in Data Link Layer
 
-Load shedding - intentional packet discard during congestion.
+- Retransmission policy
+- Out-of-order caching policy
+- Packet discard policy
+- Load Shedding
+- Jitter Control
+
+### Load Shedding
+
+Intentional packet discard during congestion.
 
 Discard policies:
 
@@ -187,7 +217,9 @@ Discard policies:
 - Low-priority packet.
 - Random early discard.
 
-Jitter - variation in packet delay.
+### Jitter Control
+
+Jitter - variation in packet-delay / packet inter-arrival-time.
 
 - Prioritise time-critical packets in router queues.
 - Use receiver buffering to mask remaining variation.

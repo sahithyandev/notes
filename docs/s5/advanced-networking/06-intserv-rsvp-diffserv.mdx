@@ -1,7 +1,7 @@
 ---
 title: Implementing Quality of Service
 dateCreated: 2026-09-01T19:24:36.012Z
-lastUpdatedOn: 2026-09-12T20:33:29.809Z
+lastUpdatedOn: 2026-09-14T21:59:36.039Z
 slug: s5/advanced-networking/intserv-rsvp-diffserv
 sidebar:
   order: 6
@@ -93,43 +93,9 @@ $T\text{-spec}$ and $R\text{-spec}$ use RSVP to communicate QoS requirements to 
 3. `TEARDOWN` message: Releases a reservation immediately.
 4. `CONFIRMATION` message: Unicast confirmation to the receiver.
 
-<SequenceDiagram
-  participants={[
-    { name: "Sender" },
-    { name: "Intermediate Routers" },
-    { name: "Receiver" },
-  ]}
-  steps={[
-    {
-      from: 0,
-      to: 1,
-      label: "PATH (T-spec)",
-      title:
-        "PATH messages travel downstream following unicast/multicast routing paths.",
-    },
-    {
-      from: 1,
-      to: 2,
-      label: "PATH (T-spec)",
-      title:
-        "Each router records reverse-path state so RESV messages can find their way back.",
-    },
-    {
-      from: 2,
-      to: 1,
-      label: "RESV (R-spec)",
-      title:
-        "The receiver sends RESV upstream along the reverse path, triggering admission control.",
-    },
-    {
-      from: 1,
-      to: 0,
-      label: "RESV (R-spec)",
-      title:
-        "Accepted routers allocate scheduler resources and install packet filter rules.",
-    },
-  ]}
-/>
+import RsvpPathResv from "./images/rsvp-path-resv.svg";
+
+<RsvpPathResv />
 
 ### Reservation Styles (Filter Specifications)
 
@@ -224,9 +190,11 @@ At the edge, it manages individual flows; in the core, it forwards packets by cl
   ]}
 />
 
-<Note>
-  Packet marking happens in: - IPv4 Type of Service (ToS) field. - IPv6 Traffic
-  Class field.
+<Note title='Packet marking happens in'>
+  IPv4: Type of Service (ToS) field.
+
+IPv6: Traffic Class field.
+
 </Note>
 
 ### Edge Router Functions

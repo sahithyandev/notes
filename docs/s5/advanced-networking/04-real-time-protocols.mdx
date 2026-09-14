@@ -1,7 +1,7 @@
 ---
 title: Real-Time Protocols
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-13T22:30:43.665Z
+lastUpdatedOn: 2026-09-14T21:59:35.895Z
 slug: s5/advanced-networking/real-time-protocols
 sidebar:
   order: 4
@@ -184,46 +184,9 @@ SIP is an application-layer signaling protocol designed by the IETF (Internet En
 
 When Alice (`167.180.112.24`) calls Bob (`193.64.210.89`), the signaling and media flow look like this:
 
-<SequenceDiagram
-  participants={[
-    { name: "Alice", sub: "167.180.112.24" },
-    { name: "Bob", sub: "193.64.210.89" },
-  ]}
-  steps={[
-    {
-      from: 0,
-      to: 1,
-      label: "INVITE (Port 5060, SDP: PCM, Port 38060)",
-      title: "Alice sends INVITE with her media address, port, and codec.",
-    },
-    {
-      from: 1,
-      to: 1,
-      kind: "note",
-      label: "(Ringing)",
-      title: "Bob's phone rings.",
-    },
-    {
-      from: 1,
-      to: 0,
-      label: "200 OK (Port 5060, SDP: GSM, Port 48753)",
-      title: "Bob responds with his media address, port, and codec.",
-    },
-    {
-      from: 0,
-      to: 1,
-      label: "ACK (Port 5060)",
-      title: "Alice confirms the call setup.",
-    },
-    {
-      from: 0,
-      to: 1,
-      kind: "media",
-      label: "RTP Media Stream (bidirectional)",
-      title: "Endpoints exchange RTP media packets directly.",
-    },
-  ]}
-/>
+import SipCallSetup from "./images/sip-call-setup.svg";
+
+<SipCallSetup />
 
 1. INVITE: Alice supplies her media address, port, and codec.
 2. 200 OK: Bob returns his media address, port, and codec.

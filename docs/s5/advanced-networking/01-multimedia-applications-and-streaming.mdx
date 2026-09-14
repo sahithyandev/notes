@@ -1,7 +1,7 @@
 ---
 title: Multimedia Applications and Video Streaming
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-13T22:30:43.449Z
+lastUpdatedOn: 2026-09-14T21:59:35.558Z
 slug: s5/advanced-networking/multimedia-applications-and-streaming
 sidebar:
   order: 1
@@ -104,39 +104,12 @@ Let:
 - $x(t)$ be the variable incoming fill rate from the network at time $t$.
 - $Q(t)$ be the buffer fill level at time $t$.
 
-<FlowDiagram
-  sbw={100}
-  rows={[
-    {
-      boxes: [
-        { label: "x(t)", sub: "variable incoming fill rate" },
-        { label: "Client Buffer Q(t)", sub: "maximum capacity B" },
-        { label: "r", sub: "constant playout rate" },
-      ],
-    },
-  ]}
-  links={[
-    {
-      from: [0, 0],
-      to: [0, 1],
-      label: "fills",
-      horizontalAlign: "center",
-      verticalAlign: "bottom",
-      note: "Packets from the network fill the application buffer of capacity B.",
-    },
-    {
-      from: [0, 1],
-      to: [0, 2],
-      label: "drains",
-      horizontalAlign: "center",
-      verticalAlign: "bottom",
-      note: "The client drains the buffer at the constant playout rate r.",
-    },
-  ]}
-/>
+Packets from the network fill the buffer at rate $x(t)$. The client drains it at the constant playout rate $r$.
 
-- **Buffer Starvation ($\bar{x} < r$)**: If average network throughput drops below playout rate, $Q(t)$ decreases. If $Q(t) = 0$, playout freezes until the buffer refills to a threshold.
-- **Buffer Accumulation ($\bar{x} > r$)**: If average network throughput exceeds playout rate, the buffer fill level increases until saturated.
+- **Buffer Starvation** ($\bar{x} < r$)  
+  If average network throughput drops below playout rate, $Q(t)$ decreases. If $Q(t) = 0$, playout freezes until the buffer refills to a threshold.
+- **Buffer Accumulation** ($\bar{x} > r$)  
+  If average network throughput exceeds playout rate, the buffer fill level increases until saturated.
 
 The choice of initial playout delay $t_p$ is a key trade-off:
 
