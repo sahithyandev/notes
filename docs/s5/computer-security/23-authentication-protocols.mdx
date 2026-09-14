@@ -1,7 +1,7 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-14T04:24:23.063Z
+lastUpdatedOn: 2026-09-14T06:36:42.977Z
 slug: s5/computer-security/authentication-protocols
 sidebar:
   order: 23
@@ -27,6 +27,8 @@ The protocol must not be susceptible to:
   They take valid fields from one protocol message and recombine them into a new message that passes checks in another context.
 - Replay attacks  
   They record legitimate messages and resend them later to impersonate a party or force reuse of an old session key.
+- Denial-of-service attacks  
+  They flood the Server with bogus requests that each trigger expensive computation, such as a private-key decryption or a modular exponentiation, before the Server can tell the request is illegitimate.
 
 ## Common Assumptions
 
@@ -71,6 +73,10 @@ The Server has an encryption key pair $(PK_S, SK_S)$, with $PK_S$ in its certifi
 4. User decrypts and confirms $U_{id}$ comes back.  
    Proves the peer holds $SK_S$, so it is the real Server.
 
+import PublicKeyProtocol from "./images/public-key-protocol.svg";
+
+<PublicKeyProtocol />
+
 Only $SK_S$ decrypts message 1, so only the real Server can return $k$. The password in message 1 authenticates the User. Man-in-the-middle and cut-and-paste fail without $SK_S$.
 
 There is no nonce, so freshness rests entirely on the User choosing a new random $k$ each run. Reusing $k$ makes message 1 replayable.
@@ -87,6 +93,10 @@ The Server has a signing key pair, with the verification key $PK_S$ in its certi
 4. User sends $U_{id}$ and its password encrypted under $k$.
 5. Server recovers the password and checks it against the stored record.  
    Authenticates the User.
+
+import SignatureKeyProtocol from "./images/signature-key-protocol.svg";
+
+<SignatureKeyProtocol />
 
 The signed nonce $r$ gives freshness, so replay of message 2 fails.
 
@@ -108,6 +118,10 @@ Fix a large prime $p$ and a generator $g$ of $\mathbb{Z}_p^*$. The Server has a 
 6. Server decrypts and checks the password against the stored record.  
    A match authenticates the User.
 
+import DiffieHellmanProtocol from "./images/diffie-hellman-protocol.svg";
+
+<DiffieHellmanProtocol />
+
 Only the holder of $b$ for the certified $B$ can compute $k$, so a correct reply in step 6 authenticates the Server. The password under $k$ authenticates the User. An attacker who replaces $A$ shares a key with the Server but still cannot supply the password, and one who replaces $B$ fails the CA check.
 
 $B$ never changes. The Server adds no freshness, and the protocol has no forward secrecy: leaking $b$ once exposes every past session. Only the User's fresh $a$ keeps each $k$ distinct.
@@ -116,7 +130,7 @@ Because $k = B^a \bmod p$ is a deterministic function of $A$, an attacker who re
 
 Both sides may instead hash $g^{ab} \bmod p$ to derive $k$. The [hash](/s5/computer-security/hash-functions) strips the algebraic structure of the raw value and returns a key of the length the cipher needs. Using the raw value directly also works.
 
-### Timestamp-Based Freshness
+## Timestamp-Based Freshness
 
 Any of the 3 methods above can use a $timestamp$ instead of a $nonce$ to prove freshness. The Server includes $timestamp$ in the value it encrypts or signs, and the User checks the recovered $timestamp$ against the one it sent.
 
@@ -129,6 +143,19 @@ A $timestamp$ only proves freshness when the Server signs or encrypts it back to
 
 ## Attack Patterns
 
+### Man-in-the-Middle Attacks
+
+A man-in-the-middle attack succeeds when a signed or encrypted value binds only part of a message, leaving room for the attacker to substitute the rest while relaying between the User and the Server.
+
+In the [Digital Signature Key method](#server-has-a-digital-signature-key), the Server signs only the nonce $r$, not $U_{id}$ or $(e_U, n_U)$.
+
+- The attacker intercepts message 1 and substitutes its own fresh public key for $(e_U, n_U)$, forwarding $U_{id}$ and $r$ unchanged.
+- The Server signs $r$ and returns $k$ encrypted under the attacker's substituted key.
+- The attacker decrypts $k$, re-encrypts it under the User's real $(e_U, n_U)$, and forwards it.
+- The attacker now knows $k$ and can read or alter the encrypted password exchange in step 4, while both sides believe they are talking to each other directly.
+
+Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ instead of $r$ alone binds the reply to the User's actual identity and key, closing the gap.
+
 ### Cut-and-Paste Attacks
 
 A cut-and-paste attack against these protocols succeeds when:
@@ -138,6 +165,24 @@ A cut-and-paste attack against these protocols succeeds when:
 - Message routing happens at the network layer while the protocol logic that ties a reply to a specific server runs at the application layer, so the attacker's substituted values pass unnoticed.
 
 The attacker forwards $S_2$'s challenge to the User in place of $S_1$'s, then relays the User's credential message, built for $S_2$ at the application layer but addressed to $S_1$ at the network layer, on to $S_2$. $S_2$ authenticates the attacker as the User, though the attacker never learns the session $k$. Binding the intended $S_{id}$ into whatever the Server signs or encrypts closes this gap, since a credential built for $S_2$ then fails to verify at $S_1$ and vice versa.
+
+### Replay Attacks
+
+A replay attack succeeds when a protocol's freshness relies entirely on a value the attacker can also record and resend, rather than on a fresh challenge that the other side actively verifies.
+
+- In the [Public Encryption Key method](#server-has-a-public-encryption-key), message 1 carries no nonce. If the User reuses the same session key $k$, an attacker who recorded a previous message 1 can resend it verbatim, and the Server issues a fresh valid session under the same old $k$.
+- In the [Diffie-Hellman method](#server-has-a-diffie-hellman-public-key), the Server's value $B$ never changes. Since $k = B^a \bmod p$ is a deterministic function of $A$, an attacker who replays steps 1 and 5 verbatim is authenticated as the User in step 6, without ever learning $k$.
+
+Both cases are closed by tying each run to a value that changes every time and that the other side actively verifies, e.g. a fresh nonce or a Server challenge echoed back inside an encrypted step.
+
+### Denial-of-Service Attacks
+
+A denial-of-service attack succeeds when the Server performs expensive computation before it can tell whether the request is legitimate.
+
+- In the [Public Encryption Key method](#server-has-a-public-encryption-key), the Server must decrypt message 1 with $SK_S$ before it can check the password, so a flood of bogus message 1's forces a full private-key decryption each time.
+- In the [Diffie-Hellman method](#server-has-a-diffie-hellman-public-key), the Server must compute $k = A^b \bmod p$ for every $A$ it receives, so a flood of distinct $A$ values forces a fresh modular exponentiation each time.
+
+An attacker needs no valid password or key to mount this, since the expensive step happens before the Server authenticates anyone. Requiring the Server to first return a cheap, unpredictable challenge that the User must echo back before any expensive computation shifts the cost of a bogus request back onto the attacker.
 
 ### Interleaving Attacks
 

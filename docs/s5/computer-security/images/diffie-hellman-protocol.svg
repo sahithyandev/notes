@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 540 400" width="540" height="400" role="img" aria-label="Server has a Diffie-Hellman public key. The User sends its id and a fresh Diffie-Hellman value A. The Server replies with its id and its certified value B. The User checks B against the certificate and both sides compute the shared key k. The User then sends its id and password encrypted under k, and the Server checks the password.">
+  <style>
+    .proto text { fill: currentColor; font: 500 16px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 14px; font-weight: 400; }
+    .proto .enc { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-key { fill: var(--dia-key, #6d4bb6); }
+    .proto .w-key { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-dh" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="75" y="6" width="90" height="28" rx="4" />
+  <text x="120" y="20" text-anchor="middle">User</text>
+  <rect class="box" x="375" y="6" width="90" height="28" rx="4" />
+  <text x="420" y="20" text-anchor="middle">Server</text>
+
+  <path class="life" d="M120 34 V182" />
+  <path class="life" d="M120 220 V386" />
+  <path class="life" d="M420 34 V216" />
+  <path class="life" d="M420 254 V336" />
+  <path class="life" d="M420 374 V386" />
+
+  <text x="270" y="60" text-anchor="middle" class="t-key">Uid, A</text>
+  <path class="w w-key" d="M120 72 H420" marker-end="url(#ah-dh)" />
+
+  <text x="270" y="98" text-anchor="middle" class="t-key">Sid, B</text>
+  <path class="w w-key" d="M420 110 H120" marker-end="url(#ah-dh)" />
+
+  <rect class="enc" x="15" y="182" width="210" height="38" rx="3" />
+  <text x="120" y="201" text-anchor="middle" class="sub">check B via CA, k ← Bᵃ</text>
+
+  <rect class="enc" x="315" y="216" width="210" height="38" rx="3" />
+  <text x="420" y="235" text-anchor="middle" class="sub">k ← Aᵇ</text>
+
+  <text x="270" y="272" text-anchor="middle" class="t-ct">Uid, pwd</text>
+  <path class="w w-ct" d="M120 284 H420" marker-end="url(#ah-dh)" />
+  <text x="270" y="304" text-anchor="middle" class="sub">encrypted under k</text>
+
+  <rect class="enc" x="315" y="336" width="210" height="38" rx="3" />
+  <text x="420" y="355" text-anchor="middle" class="sub">check pwd</text>
+</svg>
