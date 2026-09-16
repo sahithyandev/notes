@@ -28,6 +28,7 @@ import NoteFeedback from "../components/note-feedback.astro";
 import NoteAuthors from "../components/note-authors.astro";
 import RightSidebar from "../components/right-sidebar.astro";
 import Article from "../components/article.astro";
+import ScrollableTable from "../components/scrollable-table.astro";
 import Prereqs from "../components/prereqs.astro";
 import Packet from "../components/packet.astro";
 import PermutationTable from "../components/permutation-table.astro";
@@ -211,6 +212,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
             TransportationTable,
             TransportationStep,
             TransportationWalkthrough,
+            table: ScrollableTable,
           }}
         />
       </Article>
@@ -254,9 +256,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   </script>
   <script>
     import "../scripts/image-zoom";
-  </script>
-  <script>
-    import "../scripts/table-scroll";
   </script>
 
   <ImageZoom />

@@ -1,0 +1,9 @@
+---
+// MDX `table` override: wraps only literal Markdown tables for horizontal
+// scroll. Tables rendered inside illustration components never pass
+// through this override, so they can't be caught by it by accident.
+---
+
+<div class="table-scroll">
+  <table><slot /></table>
+</div>

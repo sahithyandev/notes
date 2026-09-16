@@ -75,7 +75,10 @@ export default defineConfig({
   integrations: [
     moduleRedirects(),
     mdx({
-      optimize: true,
+      // optimize hoists/pre-renders literal Markdown HTML elements in a way
+      // that bypasses <Content components={{...}} /> overrides (e.g. the
+      // `table` override below never fires with this on).
+      optimize: false,
     }),
     notesStyleValidator(),
   ],
