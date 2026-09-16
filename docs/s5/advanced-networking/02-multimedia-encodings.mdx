@@ -1,7 +1,7 @@
 ---
 title: Multimedia Encodings
 dateCreated: 2026-09-05T21:01:18.369Z
-lastUpdatedOn: 2026-09-13T22:30:43.610Z
+lastUpdatedOn: 2026-09-16T05:32:53.522Z
 slug: s5/advanced-networking/multimedia-encodings
 sidebar:
   order: 2
@@ -9,13 +9,16 @@ prev: true
 next: true
 ---
 
-Encoding - conversion of a physical signal into a digital bit stream.
+Converting huge amounts of audio/video data into a smaller digital representation while maintaining acceptable quality.
+Encoding is covered in [Data Communication and Networking](/s3/data-communication-and-networking/encoding-decoding) module.
 
-Codec - encoder and decoder pair for a media representation.
+**Encoding** - conversion of a physical signal into a digital bit stream.
+
+**Codec** - encoder and decoder pair for a media representation.
 
 ## Digitisation, Coding, and Containers
 
-Digitisation - analogue-to-digital conversion.
+Digitisation - converting the analogue signal into digital samples.
 
 Audio parameters:
 
@@ -29,13 +32,14 @@ Video parameters:
 - Interlacing.
 - Pixel depth and colour representation.
 
-Coding - compression and representation after digitisation. Codec objectives conflict:
+Coding - representing/compressing the digital samples efficiently. Codec objectives conflict:
 
 - Low data rate.
 - High reconstruction quality.
 - Low coding delay.
 - Low complexity and power use.
 - Packet-loss resilience.
+- Higher compression usually comes at the cost of quality, processing complexity, or delay.
 
 Container - file or stream structure holding one or more media streams.
 
@@ -98,7 +102,7 @@ $$e_n = x_n - \hat{x}_n$$
 
 $x_n$ is the actual sample. $\hat{x}_n$ is the predicted sample. Encoder and decoder use the same predictor.
 
-Adaptive DPCM (ADPCM) - predictor and quantiser adapt to waveform changes.
+**Adaptive DPCM (ADPCM)** - predictor and quantiser adapt to waveform changes.
 
 - G.721 uses eight preceding samples.
 - Four-bit errors produce a $32\ \text{kbps}$ stream.
