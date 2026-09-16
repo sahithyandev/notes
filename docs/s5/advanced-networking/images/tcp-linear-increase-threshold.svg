@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     class="block-image tcp-chart"
+     viewBox="0 0 540 400"
+     width="540"
+     height="400"
+     role="img"
+     aria-label="TCP congestion window showing slow start, congestion avoidance, threshold, and reduction after congestion.">
+
+  <style>
+    .tcp-chart text {
+      fill: currentColor;
+      font: 500 14px ui-sans-serif, system-ui, -apple-system,
+            "Segoe UI", sans-serif;
+    }
+
+    .tcp-chart .axis {
+      stroke: currentColor;
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .tcp-chart .grid {
+      stroke: currentColor;
+      stroke-opacity: 0.13;
+      stroke-width: 1;
+    }
+
+    .tcp-chart .curve {
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .tcp-chart .threshold {
+      stroke: var(--dia-ct, #b3541e);
+      stroke-width: 1.5;
+      stroke-dasharray: 7 5;
+      fill: none;
+    }
+
+    .tcp-chart .reset {
+      stroke: var(--dia-key, #6d4bb6);
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .tcp-chart .label-threshold {
+      fill: var(--dia-ct, #b3541e);
+    }
+
+    .tcp-chart .label-reset {
+      fill: var(--dia-key, #6d4bb6);
+    }
+
+    .tcp-chart .muted {
+      opacity: 0.68;
+    }
+  </style>
+
+  <defs>
+    <marker id="tcp-linear-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="7"
+            markerHeight="7"
+            orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <!-- Grid -->
+  <g class="grid">
+    <path d="
+      M65 335H510
+      M65 285H510
+      M65 235H510
+      M65 185H510
+      M65 135H510
+      M65 85H510" />
+
+    <path d="
+      M122 35V335
+      M179 35V335
+      M236 35V335
+      M293 35V335
+      M350 35V335
+      M407 35V335
+      M464 35V335" />
+  </g>
+
+  <!-- Axes -->
+  <path class="axis"
+        d="M65 335V30
+           M65 335H516"
+        marker-end="url(#tcp-linear-arrow)" />
+
+  <path class="axis"
+        d="M59 85H65
+           M59 135H65
+           M59 185H65
+           M59 235H65
+           M59 285H65
+           M59 335H65" />
+
+  <!-- Labels -->
+  <text x="65" y="20" class="muted">
+    Congestion window
+  </text>
+
+  <!-- <text x="65" y="37" class="muted">
+    (cwnd)
+  </text> -->
+
+  <text x="510" y="365"
+        text-anchor="end"
+        class="muted">
+    Round-trip transmissions
+  </text>
+
+  <!-- Y-axis values -->
+  <text x="54" y="95"
+        text-anchor="end"
+        class="muted">
+    40
+  </text>
+
+  <text x="54" y="199"
+        text-anchor="end"
+        class="muted">
+    18
+  </text>
+
+  <text x="54" y="339"
+        text-anchor="end"
+        class="muted">
+    1 MSS
+  </text>
+
+  <!-- Original ssthresh -->
+  <path class="threshold"
+        d="M65 115H183" />
+
+  <text x="174"
+        y="106"
+        text-anchor="end"
+        class="label-threshold">
+    ssthresh
+  </text>
+
+  <!-- Slow start -->
+  <path class="curve"
+        d="M65 335
+           C84 333 97 325 108 310
+           C121 291 130 260 137 220
+           C145 177 157 120 183 115" />
+
+  <!-- Congestion avoidance -->
+  <path class="curve"
+        d="M183 115
+           L204 111
+           L225 107
+           L246 103
+           L267 99
+           L288 95
+           L305 91" />
+
+  <!-- Congestion point / timeout -->
+  <path class="reset"
+        d="M305 91V335" />
+
+  <!-- New ssthresh -->
+  <path class="threshold"
+        d="M305 195H510" />
+
+  <text x="500"
+        y="186"
+        text-anchor="end"
+        class="label-threshold">
+    new ssthresh
+  </text>
+
+  <!-- Slow start after timeout -->
+  <path class="curve"
+        d="M305 335
+           C324 333 337 325 348 310
+           C361 291 370 260 377 220
+           C385 201 395 195 408 195" />
+
+  <!-- Congestion avoidance after new ssthresh -->
+  <path class="curve"
+        d="M408 195
+           L429 191
+           L450 187
+           L471 183
+           L492 179
+           L510 175" />
+
+  <!-- Labels -->
+  <text x="105"
+        y="145"
+        class="muted">
+    Slow start
+  </text>
+
+  <text x="235"
+        y="48"
+        class="muted">
+    Congestion avoidance
+  </text>
+
+  <text x="363"
+        y="305"
+        class="label-reset">
+    Timeout
+  </text>
+
+  <path class="reset"
+        d="M385 300L315 328"
+        marker-end="url(#tcp-linear-arrow)" />
+
+</svg>

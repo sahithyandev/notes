@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     class="block-image sip-seq"
+     viewBox="0 0 540 400"
+     width="540"
+     height="400"
+     role="img"
+     aria-label="SIP basic call setup. INVITE and ACK travel from Alice to Bob, 200 OK returns from Bob to Alice, and RTP media flows bidirectionally.">
+
+  <style>
+    .sip-seq text {
+      fill: currentColor;
+      font: 500 14px ui-sans-serif, system-ui, -apple-system,
+            "Segoe UI", sans-serif;
+    }
+
+    .sip-seq .chip {
+      fill: none;
+      stroke: currentColor;
+      stroke-opacity: 0.5;
+      stroke-width: 1.4;
+    }
+
+    .sip-seq .chip-name {
+      font-weight: 700;
+      text-anchor: middle;
+    }
+
+    .sip-seq .chip-sub {
+      font-size: 12px;
+      font-family: var(--font-mono, monospace);
+      opacity: 0.68;
+      text-anchor: middle;
+    }
+
+    .sip-seq .lifeline {
+      stroke: currentColor;
+      stroke-opacity: 0.25;
+      stroke-width: 1.2;
+      stroke-dasharray: 4 4;
+    }
+
+    .sip-seq .msg {
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .sip-seq .signaling {
+      stroke: var(--dia-key, #6d4bb6);
+    }
+
+    .sip-seq .media {
+      stroke: var(--dia-ct, #b3541e);
+    }
+
+    .sip-seq .signaling-label {
+      fill: var(--dia-key, #6d4bb6);
+    }
+
+    .sip-seq .media-label {
+      fill: var(--dia-ct, #b3541e);
+    }
+
+    .sip-seq .msg-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-anchor: middle;
+    }
+
+    .sip-seq .msg-detail {
+      font-size: 11px;
+      font-family: var(--font-mono, monospace);
+      opacity: 0.72;
+      text-anchor: middle;
+    }
+
+    .sip-seq .note {
+      font-style: italic;
+      opacity: 0.68;
+      font-size: 13px;
+    }
+
+    .sip-seq .legend-label {
+      font-size: 13px;
+      opacity: 0.68;
+    }
+  </style>
+
+  <defs>
+    <marker id="sip-seq-arrow"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <!-- Lifelines -->
+  <g class="lifeline">
+    <line x1="130" y1="90" x2="130" y2="372" />
+    <line x1="410" y1="90" x2="410" y2="372" />
+  </g>
+
+  <!-- Participant chips -->
+  <g>
+    <rect class="chip"
+          x="55" y="20"
+          width="150" height="62"
+          rx="12" />
+
+    <text class="chip-name"
+          x="130" y="47">
+      Alice
+    </text>
+
+    <text class="chip-sub"
+          x="130" y="67">
+      167.180.112.24
+    </text>
+
+    <rect class="chip"
+          x="335" y="20"
+          width="150" height="62"
+          rx="12" />
+
+    <text class="chip-name"
+          x="410" y="47">
+      Bob
+    </text>
+
+    <text class="chip-sub"
+          x="410" y="67">
+      193.64.210.89
+    </text>
+  </g>
+
+  <!-- INVITE -->
+  <path class="msg signaling"
+        d="M130 142 L402 142"
+        marker-end="url(#sip-seq-arrow)" />
+
+  <text class="msg-label signaling-label"
+        x="270" y="120">
+    INVITE
+  </text>
+
+  <text class="msg-detail"
+        x="270" y="134">
+    (Port 5060, SDP: PCM, Port 38060)
+  </text>
+
+  <!-- Ringing -->
+  <text class="note"
+        x="422" y="192">
+    (Ringing)
+  </text>
+
+  <!-- 200 OK -->
+  <path class="msg signaling"
+        d="M410 232 L138 232"
+        marker-end="url(#sip-seq-arrow)" />
+
+  <text class="msg-label signaling-label"
+        x="270" y="210">
+    200 OK
+  </text>
+
+  <text class="msg-detail"
+        x="270" y="224">
+    (Port 5060, SDP: GSM, Port 48753)
+  </text>
+
+  <!-- ACK -->
+  <path class="msg signaling"
+        d="M130 282 L402 282"
+        marker-end="url(#sip-seq-arrow)" />
+
+  <text class="msg-label signaling-label"
+        x="270" y="260">
+    ACK
+  </text>
+
+  <text class="msg-detail"
+        x="270" y="274">
+    (Port 5060)
+  </text>
+
+  <!-- RTP media stream -->
+  <path class="msg media"
+        d="M410 330 L142 330"
+        marker-end="url(#sip-seq-arrow)" />
+
+  <path class="msg media"
+        d="M130 340 L398 340"
+        marker-end="url(#sip-seq-arrow)" />
+
+  <text class="msg-label media-label"
+        x="270" y="312">
+    RTP Media Stream
+  </text>
+
+  <!-- Legend -->
+  <g>
+    <line class="signaling"
+          x1="80" y1="376"
+          x2="112" y2="376"
+          stroke-width="2.4" />
+
+    <text class="legend-label"
+          x="120" y="380">
+      SIP signaling
+    </text>
+
+    <line class="media"
+          x1="310" y1="376"
+          x2="342" y2="376"
+          stroke-width="2.4" />
+
+    <text class="legend-label"
+          x="350" y="380">
+      RTP media stream
+    </text>
+  </g>
+
+</svg>

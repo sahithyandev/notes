@@ -1,0 +1,238 @@
+---
+title: Implementing Quality of Service
+dateCreated: 2026-09-01T19:24:36.012Z
+lastUpdatedOn: 2026-09-16T05:32:54.429Z
+slug: s5/advanced-networking/intserv-rsvp-diffserv
+sidebar:
+  order: 6
+  label: "IntServ, RSVP, DiffServ"
+prev: true
+next: true
+---
+
+The IETF defined two QoS architectures: Integrated Services (IntServ), using RSVP, and Differentiated Services (DiffServ).
+
+## Application Taxonomy and Elasticity
+
+Applications handle network delays and packet drops differently, placing distinct demands on network QoS:
+
+1. Elastic applications:
+   - Traditional data applications.
+   - Can adjust output rates dynamically based on TCP congestion control.
+   - Faster throughput is preferred, but arbitrary delays do not break application correctness.
+   - Examples  
+     HTTP web browsing, email, file transfer, and cloud storage.
+2. Tolerant real-time applications:
+   - Applications that stream audio or video.
+   - Can adapt to minor network delay fluctuations and packet drops by lowering resolution or adjusting frame rates.
+   - Examples  
+     Video streaming, video conferencing, and VoIP.
+3. Intolerant real-time applications:
+   - Require absolute, non-negotiable upper bounds on delay and jitter. Arriving past the deadline renders data useless.
+   - Examples  
+     High-precision control systems, remote surgery, or interactive gaming.
+
+## Integrated Services (IntServ)
+
+Integrated Services (IntServ) provides fine-grained per-flow QoS guarantees. A flow reserves resources at every router along its path.
+
+As the number of flows increases, the number of reservations grows linearly, creating _scalability_ issues in core routers.
+That's why [DiffServ](intserv-rsvp-diffserv#differentiated-services-diffserv) was developed: it provides aggregate QoS guarantees without per-flow state in core routers.
+
+### IntServ Service Models
+
+IntServ defines two primary service levels:
+
+#### 1. Guaranteed Service
+
+- Designed for intolerant real-time applications (eg: Remote surgery).
+- Mathematically guarantees bandwidth, delay, and jitter.
+- Uses a Token Bucket $(r, b)$ traffic specification combined with Weighted Fair Queueing (WFQ) in routers. [#](qos#guaranteed-upper-bound-on-delay)
+
+#### 2. Controlled Load Service
+
+- Designed for tolerant real-time applications (eg: Video streaming, VoIP).
+- Guarantees performance equivalent to an unloaded network during congestion.
+- Uses measurement-based admission control instead of strict mathematical bounds.
+
+### IntServ Service Interface
+
+Applications communicate QoS requirements to routers using two parameters:
+
+- $T\text{-spec}$ (Traffic Specification): Flow characteristics such as token-bucket rate $r$ and bucket size $b$.
+- $R\text{-spec}$ (Reservation Specification): Requested QoS, such as rate $R$.
+
+## Resource ReSerVation Protocol (RSVP)
+
+RSVP is the IntServ signalling protocol. It operates directly over IP as protocol number 46.
+
+$T\text{-spec}$ and $R\text{-spec}$ use RSVP to communicate QoS requirements to the routers along the path.
+
+### Key Design Principles of RSVP
+
+1. Receiver-initiated reservation:
+   - The receiver sends `RESV` messages upstream.
+   - Supports heterogeneous receivers in multicast groups (e.g., a high-bandwidth receiver requests a $2\text{ Mbps}$ video stream while a low-bandwidth mobile receiver requests only $128\text{ kbps}$).
+2. Soft-state paradigm:
+   - Router reservation state is not permanent. Senders and receivers periodically send `PATH` and `RESV` refresh messages.
+   - A reservation times out without refresh messages.
+   - Enables self-healing during network topology or routing changes.
+
+### RSVP Message Types and Flow
+
+1. `PATH` message (sender to receiver):
+   - Transmitted downstream following standard unicast/multicast routing paths.
+   - Carries the sender's $T\text{-spec}$.
+   - Creates "reverse path state" in intermediate routers so that subsequent `RESV` messages know how to route back to the sender.
+2. `RESV` message (receiver to sender):
+   - Transmitted upstream along the reverse path created by `PATH` messages.
+   - Carries the receiver's $R\text{-spec}$ and filter specifications.
+   - Triggers admission control at each intermediate router:
+     - If accepted, the router allocates scheduler resources and installs packet filter rules.
+     - If rejected, the router returns an `ERROR` message to the receiver.
+3. `TEARDOWN` message: Releases a reservation immediately.
+4. `CONFIRMATION` message: Unicast confirmation to the receiver.
+
+import RsvpPathResv from "./images/rsvp-path-resv.svg";
+
+<RsvpPathResv />
+
+### Reservation Styles (Filter Specifications)
+
+When multiple senders and receivers participate in a session (e.g., video/audio conferences), RSVP uses reservation styles to optimize bandwidth:
+
+| Reservation Style    | Filter Type      | Description                                  | Use Case                                   |
+| :------------------- | :--------------- | :------------------------------------------- | :----------------------------------------- |
+| Fixed Filter (FF)    | Explicit Senders | Dedicated resources for specified senders.   | 1-on-1 video calls or multi-video windows. |
+| Wildcard Filter (WF) | No Filter        | Shared reservation for any multicast sender. | Public broadcasts or open audio rooms.     |
+| Shared Explicit (SE) | Dynamic Senders  | Specified senders share one reservation.     | Audio conference.                          |
+
+### IntServ / RSVP Scalability Limitations
+
+Although IntServ provides hard QoS guarantees, it failed to achieve widespread deployment on the public Internet due to:
+
+- Core router scalability  
+  Per-flow state consumes CPU and memory.
+- Complex signalling  
+  Periodic soft-state refreshes create protocol overhead.
+
+## Differentiated Services (DiffServ)
+
+Differentiated Services (DiffServ) moves away from per-flow state and instead, groups traffic into classes.
+
+At the edge, it manages individual flows; in the core, it forwards packets by class.
+
+<FlowDiagram
+  rows={[
+    {
+      title: "Edge Router",
+      boxes: [
+        { label: "Incoming Flows" },
+        { label: "Classification" },
+        { label: "Metering" },
+        { label: "Marking" },
+      ],
+    },
+    {
+      title: "Core Router",
+      boxes: [
+        { label: "DSCP-Marked Packets" },
+        { label: "PHB Queueing" },
+        { label: "Out" },
+      ],
+    },
+  ]}
+  links={[
+    {
+      from: [0, 0],
+      to: [0, 1],
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "Classification: identifies flows from header fields according to the Service Level Agreement.",
+    },
+    {
+      from: [0, 1],
+      to: [0, 2],
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "Metering: checks the negotiated rate r and burst size b of each flow.",
+    },
+    {
+      from: [0, 2],
+      to: [0, 3],
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "Marking: writes the 6-bit DSCP. Conforming packets are in-profile; others are out-of-profile.",
+    },
+    {
+      from: [0, 3],
+      to: [1, 0],
+      dash: true,
+      bend: true,
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "Only the aggregated class state moves into the core - no per-flow state is maintained.",
+    },
+    {
+      from: [1, 0],
+      to: [1, 1],
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "Core routers inspect only the 6-bit DSCP field to select a Per-Hop Behavior.",
+    },
+    {
+      from: [1, 1],
+      to: [1, 2],
+      horizontalAlign: "center",
+      verticalAlign: "center",
+      note: "The PHB queues and forwards packets according to the traffic class (EF or AF).",
+    },
+  ]}
+/>
+
+<Note title='Packet marking happens in'>
+  IPv4: Type of Service (ToS) field.
+
+IPv6: Traffic Class field.
+
+</Note>
+
+### Edge Router Functions
+
+Edge routers process individual incoming flows according to a pre-negotiated Service Level Agreement (SLA):
+
+1. Classification: Identifies flows from header fields.
+2. Metering: Checks the negotiated rate $r$ and burst size $b$.
+3. Marking: Writes the 6-bit Differentiated Services Code Point (DSCP).
+   - Conforming packets are in-profile.
+   - Non-conforming packets are out-of-profile.
+4. Conditioning: Delays, drops, or remarks out-of-profile traffic.
+
+### Core Router Functions
+
+Core routers inspect the 6-bit DSCP field. They maintain zero per-flow state and execute a Per-Hop Behavior (PHB) for each class.
+
+#### 1. Expedited Forwarding (EF) PHB
+
+- Guarantees a low-delay, low-loss, low-jitter minimum departure rate.
+- Provides flow isolation so that EF traffic is unaffected by other traffic classes.
+- Used to build a Virtual Leased Line (VLL) service.
+- Non-conformant EF traffic is dropped or shaped at the edge.
+
+#### 2. Assured Forwarding (AF) PHB
+
+- Assures minimum bandwidth while offering tiered relative service levels (e.g., Gold, Silver, Bronze).
+- Defines four traffic classes with three drop-precedence levels each.
+
+During network congestion, core routers drop packets with higher drop precedence first.
+
+## IntServ vs. DiffServ Comparison
+
+| Metric              | Integrated Services (IntServ)        | Differentiated Services (DiffServ)       |
+| :------------------ | :----------------------------------- | :--------------------------------------- |
+| Service Granularity | Per-flow (individual connection)     | Aggregate classes of flows               |
+| Core Router State   | State for every active flow ($O(N)$) | No per-flow state ($O(1)$; class queues) |
+| Signalling Protocol | Required (`RSVP` PATH/RESV messages) | None within the core                     |
+| Guarantees Offered  | Hard delay and loss bounds           | Relative service distinctions            |
+| Scalability         | Poor in large core networks          | Excellent in large core networks         |
+| Primary Deployment  | Enterprise and campus networks       | ISP backbones and multi-service networks |

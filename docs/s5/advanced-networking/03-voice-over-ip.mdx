@@ -1,0 +1,265 @@
+---
+title: Voice over IP (VoIP)
+dateCreated: 2026-09-01T19:24:36.011Z
+lastUpdatedOn: 2026-09-13T22:30:43.634Z
+slug: s5/advanced-networking/voice-over-ip
+sidebar:
+  order: 3
+prev: true
+next: true
+---
+
+Voice over IP (VoIP) enables real-time, interactive voice communications over packet-switched IP networks. Because human conversation requires tight feedback loops, VoIP demands low end-to-end latency and specialized playout algorithms.
+
+## Conversational Performance Requirements
+
+The end-to-end delay consists of sender packetization delay, network propagation and queuing delay, and receiver playout buffering delay.
+
+- $< 150\text{ms}$: Excellent quality; imperceptible delay to human callers.
+- $150\text{ms} - 400\text{ms}$: Acceptable quality, though slight conversational interference may be felt.
+- $> 400\text{ms}$: Unacceptable; impairs interactive conversation.
+
+### Traffic Model: Talk Spurts and Silence Periods
+
+Conversational voice alternates between active talk spurts and silent periods (pauses between words/sentences).
+
+- During talk spurts, audio is sampled and packetized into fixed chunks (typically $20\text{ms}$ of audio).
+- At $64\text{kbps}$ PCM coding, a $20\text{ms}$ chunk contains $160\text{bytes}$ of audio payload.
+- Packets are generated and transmitted every $20\text{ms}$ during active periods. Silence suppression avoids sending packets during idle periods to save bandwidth.
+
+## Packet Loss in VoIP
+
+A packet is considered lost in VoIP under two conditions:
+
+1. Network Loss: IP datagram is dropped by intermediate routers due to queue buffer overflow.
+2. Delay Loss: Datagram arrives at the receiver after its scheduled playout deadline.
+
+Depending on the voice codec and loss concealment algorithm, VoIP applications can tolerate packet loss rates between 1% and 10%.
+
+## Receiver Playout Strategies
+
+Network jitter causes packets sent at uniform $20\text{ms}$ intervals to arrive with variable spacing. The receiver uses a playout buffer to smooth out jitter.
+
+### Fixed Playout Delay
+
+The receiver delays the playout of every chunk by a fixed duration $q$ relative to its generation timestamp $t$.
+
+- A chunk generated at timestamp $t$ is played out at time $t + q$.
+- Any chunk arriving after $t + q$ is discarded as a delay loss.
+- Trade-off  
+  Larger $q$ reduces delay loss but increases conversational latency.
+
+### Adaptive Playout Delay
+
+To optimize latency, adaptive playout algorithms dynamically adjust the playout delay $q$ at the beginning of each talk spurt.
+
+1. Network Delay Estimation:  
+   The receiver calculates an Exponentially Weighted Moving Average (EWMA) of the network delay $d_i$ for packet $i$:
+   $$d_i = (1 - \alpha) d_{i-1} + \alpha (r_i - t_i)$$
+   where $r_i$ is the arrival time, $t_i$ is the sending timestamp, and $\alpha \approx 0.1$.
+
+2. Jitter Estimation:  
+   The receiver estimates average delay variation $v_i$:
+   $$v_i = (1 - \beta) v_{i-1} + \beta |r_i - t_i - d_i|$$
+   where $\beta \approx 0.1$.
+
+3. Playout Computation:  
+   For the first packet in a talk spurt, playout deadline $p_i$ is set to:
+   $$p_i = t_i + d_i + K \cdot v_i$$
+   where $K$ (typically $4$) ensures a high probability of on-time arrival.
+
+4. Talk Spurt Adjustment:  
+   Subsequent packets in the same talk spurt are played out at intervals of $20\text{ms}$ relative to $p_i$. Playout delay changes only during silent periods, which are slightly compressed or elongated imperceptibly.
+
+<Note>
+  Talk Spurt Detection: The receiver detects the start of a new talk spurt when
+  the timestamp difference between consecutive packets exceeds $20\text{ms}$
+  with no gaps in sequence numbers.{" "}
+</Note>
+
+## Loss Recovery Mechanisms
+
+Because retransmission protocols like [TCP](/s4/computer-networks/tcp) add full Round-Trip Times (RTTs), VoIP applications use forward recovery mechanisms over [UDP](/s4/computer-networks/udp).
+
+### Forward Error Correction (FEC)
+
+#### 1. Simple XOR FEC
+
+For every group of $n$ original audio chunks, the sender generates a redundant chunk by XORing the $n$ chunks. The sender transmits $n + 1$ packets.
+
+- Bandwidth overhead increases by a factor of $1/n$.
+- If at most one chunk in the group of $n+1$ is lost, the receiver reconstructs it.
+- Introduces playout delay equal to $n$ chunk durations.
+
+#### 2. Piggybacked Lower-Quality FEC
+
+The sender piggybacks a lower-resolution version of previous chunks along with the current primary chunk.
+
+- Example  
+  Primary stream uses $64\text{ kbps}$ PCM; redundant stream attaches $13\text{ kbps}$ GSM audio of packet $i-1$ to packet $i$.
+- If packet $i-1$ is lost, the receiver plays back the GSM version received in packet $i$.
+- Non-consecutive packet drops are concealed with minimal quality loss.
+
+<div style="overflow-x:auto;margin:1em 0">
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:.8em;text-align:center;color:var(--text-primary)">
+    <colgroup>
+      <col span="8" style="width:25%" />
+      <col span="12" style="width:37.5%" />
+      <col span="12" style="width:37.5%" />
+    </colgroup>
+    <thead>
+      <tr style="font-size:.72em;color:var(--text-secondary)">
+        <th
+          colspan="8"
+          style="padding:2px;font-weight:normal;text-align:center"
+        >
+          Packet
+        </th>
+        <th
+          colspan="12"
+          style="padding:2px;font-weight:normal;text-align:center"
+        >
+          Primary (PCM)
+        </th>
+        <th
+          colspan="12"
+          style="padding:2px;font-weight:normal;text-align:center"
+        >
+          Piggybacked (GSM)
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Packet i-1
+        </td>
+        <td
+          colspan="12"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Chunk i-1
+        </td>
+        <td
+          colspan="12"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Chunk i-2
+        </td>
+      </tr>
+      <tr>
+        <td
+          colspan="8"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Packet i
+        </td>
+        <td
+          colspan="12"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Chunk i
+        </td>
+        <td
+          colspan="12"
+          style="border:1px solid var(--border-strong);padding:6px 2px"
+        >
+          Chunk i-1
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Interleaving
+
+Instead of adding redundant bits, interleaving splits $20\text{ms}$ audio chunks into smaller $5\text{ms}$ units and shuffles them across different packets.
+
+- If a packet is lost in transit, the loss is spread across multiple chunks as tiny $5\text{ms}$ missing fragments rather than losing an entire continuous $20\text{ms}$ chunk.
+- Human perception easily bridges small isolated gaps.
+- Advantage  
+  Zero bandwidth overhead.
+- Disadvantage  
+  Increases playout buffering delay proportional to the interleaving depth.
+
+## Peer-to-Peer VoIP: Skype
+
+Skype relies on a proprietary peer-to-peer (P2P) network architecture to scale global voice and video calls.
+
+<FlowDiagram
+  sbw={100}
+  rows={[
+    {
+      boxes: [
+        { label: "Skype Client A", sub: "user endpoint" },
+        { label: "Supernode Overlay", sub: "routing & directory" },
+        { label: "Skype Client B", sub: "user endpoint" },
+      ],
+    },
+    {
+      boxes: [
+        { spacer: true },
+        { label: "Login Server", sub: "authentication" },
+        { spacer: true },
+      ],
+    },
+  ]}
+  links={[
+    {
+      from: [0, 0],
+      to: [0, 1],
+      label: "TCP",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "Each client keeps a host cache of known Supernodes and maintains a TCP connection to one for the whole time it is online.",
+    },
+    {
+      from: [1, 1],
+      to: [0, 1],
+      dash: true,
+      label: "login",
+      horizontalAlign: "center",
+      verticalAlign: "top",
+      note: "At login the client authenticates its username and password with the central Login Server, which keeps user names unique and maps users to current IP addresses.",
+    },
+    {
+      from: [0, 1],
+      to: [0, 2],
+      label: "locate",
+      horizontalAlign: "center",
+      verticalAlign: "bottom",
+      note: "To place a call, a client queries the Supernode overlay, which acts as the distributed directory that knows the callee's current IP address.",
+    },
+  ]}
+/>
+
+- Skype Clients (SC)  
+  Standard user endpoints running the Skype application.
+- Supernodes (SN)  
+  Well-connected peers with public IP addresses and high bandwidth that execute routing and directory lookup functions.
+- Login Server  
+  Centralized server used strictly for user authentication and user-to-IP directory mapping.
+
+The directory data of online users is distributed across the Supernode overlay in Skype.
+Each client also keeps a local host cache (a list of reachable Supernode _IP:port_ pairs) that it uses to connect to the overlay.
+
+### Call Setup and Directory Lookup
+
+1. Client connects to a known Supernode via TCP.
+2. Client authenticates with the central Skype Login Server.
+3. To place a call, SC queries the SN overlay network to locate the current IP address of the callee.
+4. Once the callee's IP address is retrieved, a direct peer-to-peer audio stream is established. _Calls are not routed through the Supernodes - they are used only to find the callee._
+
+### NAT Traversal Using Relays
+
+When both caller and callee are behind Network Address Translation (NAT) devices or firewalls that reject incoming unsolicited UDP/TCP connections, direct P2P connection fails.
+
+NAT prevents outside peer from initiating connection directly to insider peer who's behind the NAT.
+
+Relay Solution:
+
+- Both clients establish outbound TCP/UDP connections to a mutually accessible Supernode acting as a relay.
+- Audio and video traffic is routed through the relay Supernode, enabling seamless calls across restrictive NAT boundaries.
