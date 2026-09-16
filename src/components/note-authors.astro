@@ -4,6 +4,7 @@ interface Author {
     slug: string;
     name: string;
     url?: string;
+    color: string;
   };
 }
 
@@ -44,7 +45,10 @@ const metaLine = [formattedDate, `${readTime} min read`]
 
       <ul class="note-authors-list">
         {authors.map((author) => (
-          <li class="note-authors-item">
+          <li
+            class="note-authors-item"
+            style={`--author-color: ${author.data.color}`}
+          >
             <span class="note-authors-avatar" aria-hidden="true">
               {initials(author.data.name)}
             </span>
@@ -99,6 +103,12 @@ const metaLine = [formattedDate, `${readTime} min read`]
     display: flex;
     align-items: center;
     gap: 10px;
+    --author-bg: color-mix(in oklab, var(--author-color) 13%, var(--surface));
+    --author-border: color-mix(
+      in oklab,
+      var(--author-color) 32%,
+      var(--surface)
+    );
   }
 
   .note-authors-avatar {
@@ -108,9 +118,9 @@ const metaLine = [formattedDate, `${readTime} min read`]
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: var(--sem-bg);
-    color: var(--sem-text);
-    border: 1px solid var(--sem-border);
+    background: var(--author-bg);
+    color: var(--author-color);
+    border: 1px solid var(--author-border);
     font-size: 0.6875rem;
     font-weight: 700;
     flex-shrink: 0;
@@ -125,7 +135,7 @@ const metaLine = [formattedDate, `${readTime} min read`]
   }
 
   .note-authors-link:hover {
-    color: var(--sem);
+    color: var(--author-color);
     text-decoration: underline;
   }
 

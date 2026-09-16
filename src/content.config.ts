@@ -8,6 +8,9 @@ const authors = defineCollection({
     slug: z.string(),
     name: z.string(),
     url: z.string().url().optional(),
+    color: z
+      .string()
+      .regex(/^#[0-9a-f]{6}$/i, "color must be a 6-digit hex code"),
   }),
 });
 
