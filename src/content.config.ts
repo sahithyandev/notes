@@ -1,4 +1,4 @@
-import { defineCollection } from "astro:content";
+import { defineCollection, reference } from "astro:content";
 import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
 
@@ -28,6 +28,9 @@ const notes = defineCollection({
     lastUpdatedOn: z.date().optional(),
     keywords: z.optional(z.array(z.string())),
     prereqs: z.optional(z.array(z.string())),
+    authors: z
+      .array(reference("authors"))
+      .default([{ collection: "authors", id: "sahithyan" }]),
   }),
 });
 
