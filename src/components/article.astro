@@ -7,7 +7,7 @@
 </article>
 
 <style>
-  article {
+  :where(article) {
     margin-top: calc(var(--spacing) * 10);
     font-family: var(--font-body);
     font-size: 1rem;
@@ -213,14 +213,6 @@
     }
 
     /* Table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-      margin: 20px 0;
-      font-family: var(--font-ui);
-    }
-
     thead tr {
       border-bottom: 2px solid var(--border-strong);
     }
@@ -241,7 +233,7 @@
       line-height: 1.45;
     }
 
-    tr:last-child td {
+    :where(tr:last-child td) {
       border-bottom: none;
     }
 
@@ -344,9 +336,12 @@
       display: none;
     }
 
-    table {
+    :where(table) {
       width: 100%;
       border-collapse: collapse;
+      font-size: 0.875rem;
+      margin: 20px 0;
+      font-family: var(--font-ui);
 
       thead,
       tbody,
