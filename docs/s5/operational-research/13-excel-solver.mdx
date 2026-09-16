@@ -1,0 +1,80 @@
+---
+title: Excel Solver
+sidebar:
+  order: 13
+dateCreated: 2026-09-16T16:54:07.618Z
+lastUpdatedOn: 2026-09-16T18:42:32.861Z
+slug: s5/operational-research/excel-solver
+prev: true
+next: true
+---
+
+Excel Solver is an add-on that finds the optimal value of a target cell by changing a set of decision-variable cells, subject to constraints defined on other cells.
+
+## Installation
+
+Solver ships with Excel but is not enabled by default.
+
+- Open File > Options > Add-ins.
+- At the bottom, set the Manage dropdown to Excel Add-ins and click Go.
+- Check Solver Add-in and click OK.
+- A Solver button appears in the Data tab, under the Analyze group.
+
+On macOS, the path is Tools > Excel Add-ins instead of File > Options.
+
+## Setting up a Problem
+
+Every problem is expressed on the worksheet before Solver is opened.
+
+- Objective cell  
+  A single cell holding a formula for the objective function, in terms of the decision variable cells.
+- Variable cells  
+  A range of empty or seeded cells representing the decision variables.
+- Constraint cells  
+  Formulas whose values are compared against bounds using $\le$, $\ge$, or $=$.
+
+In the Solver Parameters dialog:
+
+- Set Objective references the objective cell, with Max, Min, or a target Value.
+- By Changing Variable Cells references the decision variable range.
+- Subject to the Constraints lists each constraint as a cell reference, an operator, and a bound.
+
+## Solving Methods
+
+Solver offers 3 solving methods, chosen from the Select a Solving Method dropdown.
+
+- Simplex LP  
+  Uses the simplex algorithm. Required when the objective and every constraint are linear.
+- GRG Nonlinear  
+  Uses the generalized reduced gradient method. For smooth nonlinear problems.
+- Evolutionary  
+  Uses a genetic algorithm. For non-smooth or discontinuous problems where GRG cannot compute gradients.
+
+<Note>
+
+Checking "Make Unconstrained Variables Non-Negative" restricts every variable cell to $\ge 0$ without adding explicit constraints for it.
+
+</Note>
+
+For a linear program, Simplex LP also produces sensitivity and limits reports from the results dialog, showing shadow prices and allowable ranges for the right-hand sides and objective coefficients.
+
+## When to Use
+
+Solver is suited to problems small enough to lay out on a worksheet:
+
+- Linear programs with a handful of decision variables and constraints.
+- Integer and binary programs, by adding `int` or `bin` constraints on the variable cells.
+- Transportation and assignment problems, modelled directly as a grid of supply and demand cells.
+- Quick sensitivity checks on an already-solved model, without re-deriving the dual by hand.
+
+## Limitations
+
+- The standard Solver caps a problem at 200 variable cells and a bounded number of constraints.  
+  Too small for large-scale industrial LPs. More than enough for this module.
+- Simplex LP fails silently on genuinely nonlinear formulas.  
+  Reports the wrong optimum instead of an error if a non-linear formula is left in the objective or a constraint.
+- GRG Nonlinear only finds a local optimum, since it relies on gradient information. The result depends on the initial values in the variable cells.
+- Evolutionary gives no optimality guarantee.  
+  Reports the best solution found within its iteration or time limit, which may not be the global optimum.
+- Results are cell values, not symbolic formulas. Re-deriving a general solution for a family of inputs requires re-running Solver for each input.
+- Model logic is spread across worksheet formulas rather than a single readable statement, which makes large models harder to audit than a formulation in dedicated LP software.
