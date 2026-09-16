@@ -1,4 +1,6 @@
 ---
+import { calculateReadTime } from "../utils";
+
 interface Author {
   data: {
     slug: string;
@@ -11,10 +13,11 @@ interface Author {
 interface Props {
   authors: Author[];
   lastUpdatedOn?: Date;
-  readTime: number;
+  wordCount: number;
 }
 
-const { authors, lastUpdatedOn, readTime } = Astro.props;
+const { authors, lastUpdatedOn, wordCount } = Astro.props;
+const readTime = calculateReadTime(wordCount);
 
 function initials(name: string) {
   return name
@@ -33,9 +36,8 @@ const formattedDate = lastUpdatedOn
     }).format(lastUpdatedOn)
   : null;
 
-const metaLine = [formattedDate, `${readTime} min read`]
-  .filter(Boolean)
-  .join(" · ");
+const readTimeLabel = `${readTime} min read`;
+const wordCountLabel = `${wordCount} words`;
 ---
 
 {
@@ -68,7 +70,11 @@ const metaLine = [formattedDate, `${readTime} min read`]
         ))}
       </ul>
 
-      {metaLine && <span class="note-authors-meta">{metaLine}</span>}
+      <span class="note-authors-meta">
+        {formattedDate && <span>{formattedDate}</span>}
+        {formattedDate && <span aria-hidden="true"> · </span>}
+        <span title={wordCountLabel}>{readTimeLabel}</span>
+      </span>
     </div>
   )
 }

@@ -39,7 +39,12 @@ import NoteNav from "../components/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note-sidebar.astro";
 import ImageZoom from "../components/image-zoom.astro";
-import { titleize, calculateReadTime, generateDescription } from "../utils";
+import {
+  titleize,
+  calculateReadTime,
+  calculateWordCount,
+  generateDescription,
+} from "../utils";
 
 export const prerender = true;
 
@@ -109,7 +114,7 @@ const tocHeadings = cleanHeadings.filter(
 // Pass raw ISO date for client-side calculation
 const lastUpdatedIso = notesEntry.data.lastUpdatedOn;
 
-const readTime = calculateReadTime(notesEntry.body || "");
+const wordCount = calculateWordCount(notesEntry.body || "");
 const description = generateDescription(notesEntry.body || "");
 
 const topic = notesEntry.data.title;
@@ -213,7 +218,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       <NoteAuthors
         authors={authorEntries}
         lastUpdatedOn={lastUpdatedIso}
-        readTime={readTime}
+        wordCount={wordCount}
       />
 
       <NoteFeedback slug={slug} />
