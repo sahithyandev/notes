@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import { getEntry } from "astro:content";
+import { getEntry, getEntries } from "astro:content";
 import Nav from "../components/nav.astro";
 import Breadcrumb from "../components/breadcrumb.astro";
 import { SITE_NAME, SITE_HOST_URL, isWip } from "../utils/values";
@@ -22,6 +22,7 @@ import SensitivityNewConstraintSlider from "../components/illustrations/sensitiv
 import BranchAndBoundTree from "../components/illustrations/branch-and-bound-tree.astro";
 import TocRail from "../components/toc-rail.astro";
 import NoteFeedback from "../components/note-feedback.astro";
+import NoteAuthors from "../components/note-authors.astro";
 import RightSidebar from "../components/right-sidebar.astro";
 import Article from "../components/article.astro";
 import Prereqs from "../components/prereqs.astro";
@@ -92,6 +93,8 @@ const prereqEntries = notesEntry.data.prereqs
     ).filter((e): e is NonNullable<typeof e> => !!e)
   : [];
 
+const authorEntries = await getEntries(notesEntry.data.authors);
+
 const sidebarData = await getSidebarData(slug);
 const wip = isWip(slug);
 
@@ -116,6 +119,12 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   image={`${SITE_HOST_URL}/og/${slug}.jpg`}
   canonical={`${SITE_HOST_URL}/${slug}`}
   slug={slug}
+  authors={authorEntries.map((author) => ({
+    name: author.data.name,
+    url: author.data.url,
+  }))}
+  datePublished={notesEntry.data.dateCreated}
+  dateModified={notesEntry.data.lastUpdatedOn}
 >
   <Nav>
     <button
@@ -201,6 +210,12 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
           }}
         />
       </Article>
+
+      <NoteAuthors
+        authors={authorEntries}
+        lastUpdatedOn={lastUpdatedIso}
+        readTime={readTime}
+      />
 
       <NoteFeedback slug={slug} />
 

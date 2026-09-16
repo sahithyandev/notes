@@ -86,6 +86,7 @@ pages["default.jpg"] = {
   data: {
     title: SITE_NAME,
     slug: "default",
+    authors: [],
   },
 };
 
@@ -106,6 +107,7 @@ for (const semester of semesters) {
     data: {
       title: `Semester ${semester.slice(1)}`,
       slug: semester,
+      authors: [],
     },
   };
 }
