@@ -1,0 +1,207 @@
+---
+title: Principles of Secure System Design
+dateCreated: 2026-09-14T04:38:13.728Z
+lastUpdatedOn: 2026-09-16T05:43:01.017Z
+slug: s5/computer-security/secure-system-design
+sidebar:
+  order: 29
+prev: true
+next: false
+---
+
+## Compartmentalization
+
+Compartmentalization divides a system into modules, each serving a specific purpose, with different access rights assigned to different modules, e.g. read/write access to files, reading user or network input, or executing privileged instructions such as Unix root operations.
+
+The principle of least privilege gives each module only the rights it needs.
+
+## Defense in Depth
+
+Defense in depth combines multiple, independent security mechanisms rather than relying on a single one.
+
+- Use more than one security mechanism.
+- Secure the weakest link, since an attacker targets the easiest point of entry.
+- Fail securely, so that a failure in one mechanism does not grant access by default.
+
+## Keep It Simple
+
+A simpler system is easier to verify and has fewer places for a vulnerability to hide.
+
+## Consult Experts
+
+Open review is effective and informative. Prefer borrowing an existing, reviewed component over building a new one.
+
+## Worked Example: Qmail
+
+Sendmail, a complicated mail transport agent with many past vulnerabilities, runs entirely as root: it needs root privilege to bind port 25 and later to write to user mailboxes, but keeps root privilege the whole time even though it is not needed in between.
+
+Qmail, written by Dan Bernstein starting in 1995, applies least privilege throughout instead.
+
+- Each module uses the least privilege necessary.
+- Only 1 program, `qmail-queue`, is setuid, and only to a dedicated qmail user ID, never to root. Its only function is to add a new message to the queue.
+- Only 1 program, `qmail-lspawn`, runs as root, and only to spawn the local delivery program under the UID and GID of the recipient. It never delivers to root, and always changes its effective UID to the recipient before running a user-specified program.
+
+### Structure
+
+- `qmail-smtpd` and `qmail-inject` accept incoming mail, over SMTP or otherwise, and pass it to `qmail-queue`.
+- `qmail-queue` splits the message into 3 files, the message contents and 2 copies of the header, then signals `qmail-send`.
+- `qmail-send` signals `qmail-lspawn` for local mail or `qmail-rspawn` for remote mail.
+- `qmail-lspawn` spawns `qmail-local`, which runs with the ID of the user receiving local mail, handles alias expansion, delivers local mail, and calls `qmail-queue` again if needed.
+- `qmail-rspawn` spawns `qmail-remote`, which delivers the message to a remote mail transport agent.
+
+Each qmail process runs under its own dedicated UID: `qmail-smtpd` as `qmaild`, `qmail-queue` as `qmailq`, `qmail-inject` as the invoking user, `qmail-rspawn` as `qmailr`, `qmail-remote` inheriting `qmailr`, and `qmail-send` as `qmails`, with only `qmail-lspawn` running as root before setuid-ing to the recipient.
+
+Of 20 sample Sendmail security holes, 11 worked only because the entire Sendmail system is setuid. Qmail was offered a $500 reward for a successful attack, and no one has collected it.
+
+## Worked Example: Multics
+
+Multics is an operating system, designed 1964 to 1967 at MIT Project MAC, Bell Labs, and GE, with extensive security mechanisms that influenced many subsequent systems.
+
+- At its peak, around 100 Multics sites existed.
+- Its last system, at the Canadian Department of Defense in Nova Scotia, shut down in October 2000.
+- Innovations included segmented virtual memory, a high-level language implementation in PL/1, and a shared memory multiprocessor design.
+- Multics received the first B2 security rating under the Orange Book criteria below, the only system rated that highly for years.
+
+### Ring Structure
+
+A ring is a domain in which a process executes.
+
+- Rings are numbered $0, 1, 2, \ldots$, with the kernel running in ring 0.
+- Privileges are graduated, so a process at ring $i$ has the privileges of every ring $j > i$.
+
+Each data area or procedure in Multics is called a segment.
+
+- Segments are dynamically linked, and a linking process uses the file system to find a segment.
+- A segment may be shared by several processes.
+- Segment protection is a triple $\langle b_1, b_2, b_3 \rangle$ with $b_1 \le b_2 \le b_3$.
+  - A process or data can be accessed from rings $b_1$ through $b_2$.
+  - A process from rings $b_2$ through $b_3$ can only call the segment at restricted entry points, going through a gatekeeper.
+
+Access to a segment depends on 2 mechanisms:
+
+- Per-segment access control  
+  The file's author specifies which users have access to it.
+- Concentric rings of protection  
+  A process may call or read/write segments in outer rings, but must go through a gatekeeper to access an inner ring.
+
+Interprocess communication in Multics happens through channels.
+
+### Orange Book Criteria
+
+The Orange Book (TCSEC) rates a system's security from D to A1.
+
+- Level D  
+  No security requirements.
+- Level C  
+  For environments with cooperating users. C1 requires a protected mode OS, authenticated login, discretionary access control, and security testing and documentation. C2 adds discretionary access control to the level of an individual user, object initialization, and auditing.
+- Level B  
+  All users and objects must be assigned a security label, and the system must enforce the [Bell-LaPadula model](/s5/computer-security/confidentiality-integrity-availability#blp-model). B1 adds classification and Bell-LaPadula. B2 requires a top-down modular design that can be verified, with covert channels analyzed. B3 requires access control lists with users and groups, a formal trusted computing base, adequate security auditing, and secure crash recovery.
+- Level A1  
+  Requires a formal proof of the protection system, a formal proof that the model is correct, a demonstration that the implementation conforms to the model, and a formal covert channel analysis.
+
+## Worked Example: Chrome
+
+Chrome treats a web browser as an operating system, protecting content based on origin instead of user identity, and leveraging OS isolation mechanisms to enforce it.
+
+| Operating system                                | Web browser                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| Primitives, system calls, processes, disk       | Primitives, document object model, frames, cookies/localStorage |
+| Principals, users, discretionary access control | Principals, origins, mandatory access control                   |
+| Vulnerabilities, buffer overflow, root exploit  | Vulnerabilities, cross-site scripting, universal scripting      |
+
+### Browser Security Policy
+
+- Frame-frame relationships  
+  `canScript(A, B)` asks whether frame $A$ can execute a script that manipulates arbitrary or nontrivial DOM elements of frame $B$. `canNavigate(A, B)` asks whether frame $A$ can change the origin of content shown in frame $B$.
+- Frame-principal relationships  
+  `readCookie(A, S)` and `writeCookie(A, S)` ask whether frame $A$ can read or write cookies belonging to site $S$.
+
+### Multi-Process Architecture
+
+Chromium separates the browser kernel from the content it renders.
+
+- Browser kernel  
+  Runs with full privileges (file system, networking) and handles the cookie database, history database, password database, window management, location bar, safe browsing blacklist, network stack, SSL/TLS, disk cache, download manager, and clipboard.
+- Rendering engine  
+  Up to 20 sandboxed processes, handling HTML parsing, CSS parsing, image decoding, the JavaScript interpreter, regular expressions, layout, the document object model, rendering, SVG, XML parsing, and XSLT.
+- One process per plugin, running with the full privileges of the browser.
+
+The browser kernel and rendering engine communicate over IPC, exchanging HTML and JavaScript for a rendered bitmap.
+
+### Threat Model
+
+- Malware  
+  An attacker cannot write arbitrary files.
+- File theft  
+  An attacker cannot read arbitrary files.
+- Keylogger  
+  An attacker cannot listen to the user's keystrokes in other applications.
+- Out of scope  
+  Cookie theft, password theft, and similar.
+
+### Design Decisions
+
+- Compatibility  
+  Sites rely on the existing browser security policy, and a browser is only as useful as the sites it can render, which rules out a clean-slate redesign.
+- Black box  
+  Only the renderer may parse HTML or JavaScript. The kernel enforces a coarse-grained security policy, and the renderer enforces finer-grained policy decisions.
+- Minimize user decisions.
+
+### Leveraging OS Isolation
+
+The sandbox for the rendering engine rests on 4 OS mechanisms: a restricted token, the Windows job object, the Windows desktop object, and, on Windows Vista, integrity levels.
+
+- A restricted token is built by converting SIDs to deny-only, adding a restricted SID, and calling `AdjustTokenPrivileges`.
+- The Windows job object restricts the renderer's ability to create new processes, read or write the clipboard, and similar operations.
+- The renderer runs on a separate desktop, mitigating lax security checking in some Windows APIs.
+
+A broker process holds an interception manager and policy engine outside the sandbox, communicating over IPC with each sandboxed target's IPC client and policy engine client.
+
+## Worked Example: Android
+
+Android applies OS-level user isolation to individual applications, and uses a reference monitor to mediate communication between them.
+
+### Application Sandbox
+
+Each application runs with its own UID, inside its own Dalvik virtual machine.
+
+- Provides CPU protection and memory protection between applications.
+- Authenticated communication between applications uses Unix domain sockets.
+- Only `ping` and `zygote`, which spawns other processes, run as root.
+
+Each application announces the permissions it requires. A whitelist model asks the user to grant access, but to avoid asking often, every permission question is asked at install time rather than at each use.
+
+### Inter-Component Communication Reference Monitor
+
+Android middleware mediates inter-component communication (ICC) between applications, since each application executes as its own user identity and cannot otherwise access another application's components.
+
+- Each application declares permission labels for its components.
+- A component inherits the permission labels of the application that contains it.
+- Component $A$ in one application can access components $B$ and $C$ in another application only if $A$'s permission labels are equal to or dominate the target application's labels.
+
+### Application Components
+
+- Activity  
+  A one-user task, e.g. scrolling through an inbox. An email client comprises many activities.
+- Service  
+  A Java daemon that runs in the background, e.g. an application that streams an mp3.
+- Intent  
+  An asynchronous message that switches from one activity to another, e.g. a click on an inbox entry firing an intent to a viewer activity.
+- Content provider  
+  Stores and shares data using a relational database interface.
+- Broadcast receiver  
+  A mailbox for messages from other applications.
+
+### Exploit Prevention
+
+Android's runtime combines around 100 open source libraries with around 500 million lines of new code, with no obscurity to fall back on since the code is open source.
+
+- ProPolice stack protection, first ported to the ARM architecture.
+- Chunk consolidation checks in `dlmalloc`, adapted from OpenBSD.
+- Stack and heap non-execute protections and address space layout randomization (ASLR) were decided against in the initial release, for time-to-market and battery life reasons, and because many pre-linked images could not be installed differently on different devices in the factory. ASLR was later developed and contributed by outside researchers.
+
+`dlmalloc`, by Doug Lea, stores its metadata in band with the allocated memory.
+
+A heap overflow can overwrite the pointers to the previous and next unconsolidated chunks stored in that metadata. Overwriting these pointers during consolidation can be used to achieve remote code execution.
+
+The fix checks the integrity of the forward and backward pointers before trusting them: if $f$ is the forward pointer and $b$ is the backward pointer, checking that $b \to f \to b$ recovers $b$, i.e. $f(b(f)) = f$.

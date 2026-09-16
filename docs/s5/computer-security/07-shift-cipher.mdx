@@ -1,9 +1,9 @@
 ---
 title: Shift Cipher
 sidebar:
-  order: 8
+  order: 7
 dateCreated: 2026-07-29T05:49:37.219Z
-lastUpdatedOn: 2026-09-13T14:55:24.346Z
+lastUpdatedOn: 2026-09-16T05:42:59.500Z
 slug: s5/computer-security/shift-cipher
 prev: true
 next: true
@@ -68,26 +68,26 @@ Computing $\Delta[X, Y_k]$ for each of the 26 values of $k$ and taking the small
 
 ## Worked Example
 
-Plaintext `attack` under $k = 3$, with $a = 0$ to $z = 25$.
+Plaintext `bazinga` under $k = 3$, with $a = 0$ to $z = 25$.
 
 Each letter adds $3$ modulo $26$.
 
+- $b (1) + 3 = 4 = e$
 - $a (0) + 3 = 3 = d$
-- $t (19) + 3 = 22 = w$
-- $c (2) + 3 = 5 = f$
-- $k (10) + 3 = 13 = n$
+- $z (25) + 3 = 2 = c$
+- $i (8) + 3 = 11 = l$
 
-Ciphertext is `dwwdfn`.
+Ciphertext is `edclqjd`.
 
 Decryption subtracts $3$ modulo $26$.
 
+- $e (4) - 3 = 1 = b$
 - $d (3) - 3 = 0 = a$
-- $w (22) - 3 = 19 = t$
 
-Plaintext is `attack`.
+Plaintext is `bazinga`.
 
-The exhaustive attack tries the 26 keys in turn against `dwwdfn`.
+The exhaustive attack tries the 26 keys in turn against `edclqjd`.
 
-- $k = 1$ gives `cvvcem`, not language.
-- $k = 2$ gives `buubdl`, not language.
-- $k = 3$ gives `attack`, recognised as language. Key is $3$.
+- $k = 1$ gives `dcbkpic`, not language.
+- $k = 2$ gives `cbajohb`, not language.
+- $k = 3$ gives `bazinga`, recognised as language. Key is $3$.

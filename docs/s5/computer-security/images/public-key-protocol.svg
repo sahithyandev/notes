@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 540 280" width="540" height="280" role="img" aria-label="Server has a public encryption key. The User sends its id, password, and a fresh session key k, all encrypted under the Server's public key. The Server decrypts with its private key, checks the password, then returns the Server and User ids encrypted under k. The User decrypts and confirms its id comes back.">
+  <style>
+    .proto text { fill: currentColor; font: 500 16px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 14px; font-weight: 400; }
+    .proto .enc { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-key { fill: var(--dia-key, #6d4bb6); }
+    .proto .w-key { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-pk" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="75" y="6" width="90" height="28" rx="4" />
+  <text x="120" y="20" text-anchor="middle">User</text>
+  <rect class="box" x="375" y="6" width="90" height="28" rx="4" />
+  <text x="420" y="20" text-anchor="middle">Server</text>
+
+  <path class="life" d="M120 34 V220" />
+  <path class="life" d="M120 258 V270" />
+  <path class="life" d="M420 34 V104" />
+  <path class="life" d="M420 142 V270" />
+
+  <text x="270" y="60" text-anchor="middle" class="t-ct">Uid, pwd, k</text>
+  <path class="w w-ct" d="M120 72 H420" marker-end="url(#ah-pk)" />
+  <text x="270" y="90" text-anchor="middle" class="sub">encrypted under PKₛ</text>
+
+  <rect class="enc" x="315" y="104" width="210" height="38" rx="3" />
+  <text x="420" y="123" text-anchor="middle" class="sub">decrypt, check pwd</text>
+
+  <text x="270" y="176" text-anchor="middle" class="t-ct">Sid, Uid</text>
+  <path class="w w-ct" d="M420 188 H120" marker-end="url(#ah-pk)" />
+  <text x="270" y="206" text-anchor="middle" class="sub">encrypted under k</text>
+
+  <rect class="enc" x="15" y="220" width="210" height="38" rx="3" />
+  <text x="120" y="239" text-anchor="middle" class="sub">decrypt, confirm Uid</text>
+</svg>

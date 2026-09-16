@@ -1,0 +1,197 @@
+---
+title: Authentication Protocols
+dateCreated: 2026-09-07T00:00:00.000Z
+lastUpdatedOn: 2026-09-16T05:43:00.702Z
+slug: s5/computer-security/authentication-protocols
+sidebar:
+  order: 23
+prev: true
+next: true
+---
+
+An authentication protocol lets a User and a Server verify each other and set up a shared session key.
+
+## Security Objectives
+
+1. The User authenticates that it is talking to the correct Server.
+2. The Server authenticates that it is talking to the correct User.
+3. A shared secret session key $k$ is established for the session.
+
+A shared password alone lets each side authenticate the other, but does not let the two sides jointly and fairly compute a shared secret key. Fair key establishment needs a public key primitive, such as the Server's encryption key, signature key, or Diffie-Hellman value.
+
+The protocol must not be susceptible to:
+
+- Man-in-the-middle attacks  
+  They sit between User and Server, relaying and possibly altering messages while each side believes it talks directly to the other.
+- Cut-and-paste attacks  
+  They take valid fields from one protocol message and recombine them into a new message that passes checks in another context.
+- Replay attacks  
+  They record legitimate messages and resend them later to impersonate a party or force reuse of an old session key.
+- Denial-of-service attacks  
+  They flood the Server with bogus requests that each trigger expensive computation, such as a private-key decryption or a modular exponentiation, before the Server can tell the request is illegitimate.
+
+## Common Assumptions
+
+- Shared password  
+  User $U_{id}$ and Server $S_{id}$ share a secret password $pwd$ that stays secret and has enough entropy.
+- Server certificate  
+  The User has an authentic copy of the Server's public key in a digital certificate.
+- Available primitives  
+  Symmetric encryption under $k$, checking a password against the stored record, and validating a certificate against the CA.
+- Good randomness  
+  Session keys and nonces come from a good random source.
+
+Users behave less carefully than servers. They reuse $nonce$, $k$, and temporary key pairs across separate protocol runs, and reuse $pwd$ across multiple servers. Servers keep long-lived key pairs in certificates and avoid reusing temporary values, but a protocol should stay secure even if a server reuses them, since a compromised server can exhaust its random pool.
+
+## Attacker Profile
+
+The level of damage an attacker can do depends on which class they belong to.
+
+- Passive  
+  Observes all communications without altering them.
+- Weak active  
+  Replays captured messages verbatim.
+- Active  
+  Modifies message contents before replaying them.
+- Powerful active  
+  Blocks messages and inserts itself into the protocol run, as in a man-in-the-middle attack.
+
+## Methods
+
+Each method below is presented with its steps, why it holds, its weakness, and where a [hash function](/s5/computer-security/hash-functions) fits inside a step. None of the methods needs a hash at the protocol level.
+
+### Server Has a Public Encryption Key
+
+The Server has an encryption key pair $(PK_S, SK_S)$, with $PK_S$ in its certificate. The User picks the session key $k$.
+
+1. User sends $U_{id}$, plus its password and a fresh session key $k$ under $PK_S$.  
+   Only the Server can decrypt this.
+2. Server decrypts with $SK_S$ and checks the password against the stored record.  
+   A match authenticates the User.
+3. Server returns $S_{id}$ and $U_{id}$ encrypted under $k$.  
+   Only a party that decrypted message 1 knows $k$.
+4. User decrypts and confirms $U_{id}$ comes back.  
+   Proves the peer holds $SK_S$, so it is the real Server.
+
+import PublicKeyProtocol from "./images/public-key-protocol.svg";
+
+<PublicKeyProtocol />
+
+Only $SK_S$ decrypts message 1, so only the real Server can return $k$. The password in message 1 authenticates the User. Man-in-the-middle and cut-and-paste fail without $SK_S$.
+
+There is no nonce, so freshness rests entirely on the User choosing a new random $k$ each run. Reusing $k$ makes message 1 replayable.
+
+### Server Has a Digital Signature Key
+
+The Server has a signing key pair, with the verification key $PK_S$ in its certificate. The User generates a fresh RSA encryption key pair $((e_U,n_U), d_U)$ and a random nonce $r$. The Server picks the session key $k$.
+
+1. User sends $U_{id}$, the nonce $r$, and its fresh public encryption key $(e_U, n_U)$.
+2. Server signs $r$ and returns the signature $\sigma$ with $k$ encrypted under $(e_U, n_U)$.  
+   The signature binds the reply to the User's nonce.
+3. User verifies $\sigma$ against the $r$ it sent, then decrypts $k$ with $d_U$.  
+   A valid signature on the fresh nonce authenticates the Server and rules out replay.
+4. User sends $U_{id}$ and its password encrypted under $k$.
+5. Server recovers the password and checks it against the stored record.  
+   Authenticates the User.
+
+import SignatureKeyProtocol from "./images/signature-key-protocol.svg";
+
+<SignatureKeyProtocol />
+
+The signed nonce $r$ gives freshness, so replay of message 2 fails.
+
+The signature covers only $r$, not $U_{id}$ or $(e_U, n_U)$. A man-in-the-middle substitutes their own public key in message 1, learns $k$ from the reply, and relays the rest. Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ closes this.
+
+In step 2 the Server may optionally signs $H(r)$ or $H(r \,\|\, U_{id} \,\|\, (e_U, n_U))$ instead of the raw value. This convert the signing to one fixed-size input. Hash-then-sign also blocks the existential forgeries that signing raw algebraic values allows.
+
+The cost is an extra step. Both parties should agree on a shared choice of hash function. Collisions in $H$, binds the Server to a message it never meant to sign. $H$ must be a strong collision-resistant hash function.
+
+### Server Has a Diffie-Hellman Public Key
+
+Fix a large prime $p$ and a generator $g$ of $\mathbb{Z}_p^*$. The Server has a long-term secret $b$ and publishes $B = g^b \bmod p$ in its certificate. The User picks a fresh secret $a$ and forms $A = g^a \bmod p$. Each side raises the other's public value to its own secret, so both reach the shared value $k = g^{ab} \bmod p$ and use it as the session key.
+
+1. User sends $U_{id}$ and $A$.
+2. Server sends $S_{id}$ and $B$.
+3. User confirms with the CA that $B$ is certified for $S_{id}$, then computes $k = B^a \bmod p$.
+4. Server computes the same $k = A^b \bmod p$.
+5. User sends $U_{id}$ and its password encrypted under $k$.
+6. Server decrypts and checks the password against the stored record.  
+   A match authenticates the User.
+
+import DiffieHellmanProtocol from "./images/diffie-hellman-protocol.svg";
+
+<DiffieHellmanProtocol />
+
+Only the holder of $b$ for the certified $B$ can compute $k$, so a correct reply in step 6 authenticates the Server. The password under $k$ authenticates the User. An attacker who replaces $A$ shares a key with the Server but still cannot supply the password, and one who replaces $B$ fails the CA check.
+
+$B$ never changes. The Server adds no freshness, and the protocol has no forward secrecy: leaking $b$ once exposes every past session. Only the User's fresh $a$ keeps each $k$ distinct.
+
+Because $k = B^a \bmod p$ is a deterministic function of $A$, an attacker who replays steps 1 and 5 verbatim (same $A$, same ciphertext) is authenticated as the User in step 6, without ever learning $k$. Adding a Server nonce that the User must echo back inside the step 5 ciphertext, and having the Server verify it before accepting, restores freshness without weakening the key agreement.
+
+Both sides may instead hash $g^{ab} \bmod p$ to derive $k$. The [hash](/s5/computer-security/hash-functions) strips the algebraic structure of the raw value and returns a key of the length the cipher needs. Using the raw value directly also works.
+
+## Timestamp-Based Freshness
+
+Any of the 3 methods above can use a $timestamp$ instead of a $nonce$ to prove freshness. The Server includes $timestamp$ in the value it encrypts or signs, and the User checks the recovered $timestamp$ against the one it sent.
+
+- Requires clock synchronization between User and Server, typically via NTP, with a small tolerance window.
+- A stale $timestamp$ is rejected outright, so a passive replay after the tolerance window fails.
+- An attacker acting within the tolerance window can still succeed, so the window must stay small.
+- $password$ can piggyback on the same message as $timestamp$, collapsing the exchange to 1 round trip at the cost of tighter clock synchronization.
+
+A $timestamp$ only proves freshness when the Server signs or encrypts it back to the User as an unpredictable challenge response. It must never substitute for a $nonce$ used purely as a random challenge value, since timestamps are predictable.
+
+## Attack Patterns
+
+### Man-in-the-Middle Attacks
+
+A man-in-the-middle attack succeeds when a signed or encrypted value binds only part of a message, leaving room for the attacker to substitute the rest while relaying between the User and the Server.
+
+In the [Digital Signature Key method](#server-has-a-digital-signature-key), the Server signs only the nonce $r$, not $U_{id}$ or $(e_U, n_U)$.
+
+- The attacker intercepts message 1 and substitutes its own fresh public key for $(e_U, n_U)$, forwarding $U_{id}$ and $r$ unchanged.
+- The Server signs $r$ and returns $k$ encrypted under the attacker's substituted key.
+- The attacker decrypts $k$, re-encrypts it under the User's real $(e_U, n_U)$, and forwards it.
+- The attacker now knows $k$ and can read or alter the encrypted password exchange in step 4, while both sides believe they are talking to each other directly.
+
+Signing $r \,\|\, U_{id} \,\|\, (e_U, n_U)$ instead of $r$ alone binds the reply to the User's actual identity and key, closing the gap.
+
+### Cut-and-Paste Attacks
+
+A cut-and-paste attack against these protocols succeeds when:
+
+- The User reuses the same $pwd$ across 2 servers $S_1$ and $S_2$.
+- The attacker runs a simultaneous session with $S_2$ and intercepts $S_1$'s reply meant for the User.
+- Message routing happens at the network layer while the protocol logic that ties a reply to a specific server runs at the application layer, so the attacker's substituted values pass unnoticed.
+
+The attacker forwards $S_2$'s challenge to the User in place of $S_1$'s, then relays the User's credential message, built for $S_2$ at the application layer but addressed to $S_1$ at the network layer, on to $S_2$. $S_2$ authenticates the attacker as the User, though the attacker never learns the session $k$. Binding the intended $S_{id}$ into whatever the Server signs or encrypts closes this gap, since a credential built for $S_2$ then fails to verify at $S_1$ and vice versa.
+
+### Replay Attacks
+
+A replay attack succeeds when a protocol's freshness relies entirely on a value the attacker can also record and resend, rather than on a fresh challenge that the other side actively verifies.
+
+- In the [Public Encryption Key method](#server-has-a-public-encryption-key), message 1 carries no nonce. If the User reuses the same session key $k$, an attacker who recorded a previous message 1 can resend it verbatim, and the Server issues a fresh valid session under the same old $k$.
+- In the [Diffie-Hellman method](#server-has-a-diffie-hellman-public-key), the Server's value $B$ never changes. Since $k = B^a \bmod p$ is a deterministic function of $A$, an attacker who replays steps 1 and 5 verbatim is authenticated as the User in step 6, without ever learning $k$.
+
+Both cases are closed by tying each run to a value that changes every time and that the other side actively verifies, e.g. a fresh nonce or a Server challenge echoed back inside an encrypted step.
+
+### Denial-of-Service Attacks
+
+A denial-of-service attack succeeds when the Server performs expensive computation before it can tell whether the request is legitimate.
+
+- In the [Public Encryption Key method](#server-has-a-public-encryption-key), the Server must decrypt message 1 with $SK_S$ before it can check the password, so a flood of bogus message 1's forces a full private-key decryption each time.
+- In the [Diffie-Hellman method](#server-has-a-diffie-hellman-public-key), the Server must compute $k = A^b \bmod p$ for every $A$ it receives, so a flood of distinct $A$ values forces a fresh modular exponentiation each time.
+
+An attacker needs no valid password or key to mount this, since the expensive step happens before the Server authenticates anyone. Requiring the Server to first return a cheap, unpredictable challenge that the User must echo back before any expensive computation shifts the cost of a bogus request back onto the attacker.
+
+### Interleaving Attacks
+
+An interleaving attack succeeds when:
+
+- The User reuses the same $pwd$ with 2 servers $S_1$ and $S_2$ in simultaneous sessions.
+- Both servers derive the session $k$ deterministically as $\text{Hash}(pwd \,\|\, nonce)$, and the $nonce$ generator is not reset between the 2 sessions, so both servers compute the identical $k$.
+- The attacker already holds limited access to $S_2$ and wants to escalate the privilege level $S_1$ would grant.
+
+With the identical $k$, the attacker swaps the encrypted privilege tokens returned by $S_1$ and $S_2$ in transit. The User ends up holding the token $S_1$ meant to keep for itself. Deriving $k$ from $pwd$ and $nonce$ alone makes it predictable across servers when both inputs repeat. Including $S_{id}$ in the hash, or generating $k$ from fresh randomness instead of a hash of reused values, closes this gap.
+
+A single login granting access to multiple servers without repeating these 2-party protocols per server is covered in [Kerberos](/s5/computer-security/kerberos).

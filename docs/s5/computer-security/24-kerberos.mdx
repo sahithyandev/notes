@@ -1,0 +1,135 @@
+---
+title: Kerberos
+dateCreated: 2026-09-14T00:00:00.000Z
+lastUpdatedOn: 2026-09-16T05:43:00.827Z
+slug: s5/computer-security/kerberos
+sidebar:
+  order: 24
+prev: true
+next: true
+---
+
+Kerberos is a distributed authentication and access control system giving a User single sign-on access to multiple Services in a Realm after 1 initial login.
+
+It solves 2 problems the [2-party authentication protocols](/s5/computer-security/authentication-protocols) don't:
+
+- A small number of shared client workstations serve a much larger number of Users, so there is no secure local place to store long-term secrets. A compromised workstation must not break security for everyone.
+- A distributed system has many independent Services (file, print, mail, proxy), and a User should not have to authenticate separately to each one.
+
+## Key Components
+
+- Realm  
+  Administrative domain operating a shared identity database and a set of Services, e.g. `uom.lk`.
+- $C$  
+  Principal, the uniquely identifiable name of the client (User) within a Realm, e.g. `user.name@uom.lk`.
+- $V$  
+  Principal of the target Service.
+- $T$  
+  Principal of the Ticket Granting Server, conventionally `krbtgt/REALM@REALM`.
+- $IP\text{-}list$  
+  Optional list of IP addresses the client sends to the Authentication Server as acceptable request origins. May be filtered or ignored entirely.
+- KDC  
+  Key Distribution Centre, holds the long-term secret key of every Principal in the Realm.
+- AS  
+  Authentication Server, issues the Ticket Granting Ticket.
+- TGS  
+  Ticket Granting Server, issues Service Granting Tickets.
+- TGT  
+  Ticket Granting Ticket, proof that $C$ has authenticated to the AS. Encrypted under $K_T$, so only the AS and TGS can read it, not $C$.
+- SGT  
+  Service Granting Ticket, proof that $C$ has authenticated to the TGS for $V$. Encrypted under $K_V$, so only the TGS and $V$ can read it, not $C$.
+
+Each workstation runs a client installed once by the sysadmin with root permission, regardless of how many Users later log in through it.
+
+## Keys
+
+- $K_C$  
+  Long-term key shared between $C$ and the AS, computed as $\text{Hash}(pwd \,\|\, salt)$ from the User's password and a stored salt. Never stored, only computed on demand and discarded.
+- $K_T$  
+  Long-term key shared between the AS and the TGS.
+- $K_V$  
+  Long-term key shared between the TGS and $V$.
+- $K_{C,T}$  
+  Session key for $C$ and the TGS, chosen fresh by the AS for this login.
+- $K_{C,V}$  
+  Session key for $C$ and $V$, chosen fresh by the TGS for this request.
+
+$pwd$ itself is stored nowhere, not on any workstation and not at the KDC. Only $K_C$, derived from it, is stored at the KDC for verification. $C$ shares exactly 1 long-term secret with the AS ($K_C$) and 0 with the TGS or with any Service, since $K_{C,T}$ and $K_{C,V}$ are freshly generated session keys rather than long-term shared secrets. The AS and TGS share exactly 1 long-term key ($K_T$), and a Service shares exactly 1 long-term key with the TGS ($K_V$) but 0 with the AS.
+
+Because $K_C$ never changes across logins, an attacker who captures 1 $AS\_REP$ can mount an offline dictionary attack against $pwd$ at leisure, without further interaction with the AS. This is the main weakness of password-based Kerberos.
+
+## Protocol Flow
+
+### 1. Authentication Server Request
+
+$C$ sends an unencrypted request to the AS for a TGT.
+
+$$
+AS\_REQ = [C, T, IP\text{-}list, lifetime_{requested}]
+$$
+
+### 2. Authentication Server Reply
+
+The AS checks $C$ and $T$ exist in the KDC database, then generates a fresh $K_{C,T}$ and embeds it in a TGT.
+
+$$
+TGT = \text{Enc}_{K_T}(C, IP\text{-}list_{modified}, timestamp_{AS}, lifetime_{granted}, K_{C,T})
+$$
+
+$$
+AS\_REP = [\text{Enc}_{K_C}(T, timestamp_{AS}, lifetime_{granted}, K_{C,T}), TGT]
+$$
+
+The client prompts the User for $pwd$, computes $K_C$, and decrypts the reply to recover $K_{C,T}$. It stores $K_{C,T}$ and the TGT in the User's credential cache. $K_C$ is recomputed every login and never persisted, so the client never needs to store the User's password.
+
+### 3. Ticket Granting Server Request
+
+To reach $V$, $C$ requests an SGT from the TGS, presenting the TGT with a freshly built Authenticator.
+
+$$
+Authenticator_1 = \text{Enc}_{K_{C,T}}(C, timestamp_C)
+$$
+
+$$
+TGS\_REQ = [V, lifetime_{requested}, Authenticator_1, \text{Enc}_{K_T}(TGT)]
+$$
+
+### 4. Ticket Granting Server Reply
+
+The TGS checks $V$ exists in the KDC database, decrypts the TGT with $K_T$ to recover $K_{C,T}$, then decrypts $Authenticator_1$ with $K_{C,T}$.
+
+Before issuing an SGT, the TGS checks:
+
+- The TGT has not expired.
+- $Authenticator_1$ has not expired.
+- The $C$ in $Authenticator_1$ matches the $C$ in the TGT.
+- $Authenticator_1$ is not present in the replay cache.
+- If $IP\text{-}list_{modified}$ is non-empty, the source IP of the $TGS\_REQ$ matches an entry in it.
+
+If all checks pass, the TGS generates a fresh $K_{C,V}$ and embeds it in an SGT.
+
+$$
+SGT = \text{Enc}_{K_V}(C, IP\text{-}list_{modified}, timestamp_{TGS}, lifetime_{granted}, K_{C,V})
+$$
+
+$$
+TGS\_REP = [\text{Enc}_{K_{C,T}}(V, timestamp_{TGS}, lifetime_{granted}, K_{C,V}), SGT]
+$$
+
+### 5. Application Request
+
+$C$ uses the SGT as its credential to reach $V$, building a second Authenticator secured under $K_{C,V}$.
+
+$$
+Authenticator_2 = \text{Enc}_{K_{C,V}}(C, timestamp_C)
+$$
+
+$$
+AP\_REQ = [Authenticator_2, \text{Enc}_{K_V}(SGT)]
+$$
+
+$V$ decrypts the SGT with $K_V$ to recover $K_{C,V}$, then decrypts $Authenticator_2$ and runs the same 5 checks the TGS ran in step 4, substituting the SGT for the TGT. A pass grants $C$ access to the Service.
+
+Steps 3 to 5 repeat for every Service $C$ wants to reach, each time presenting a fresh Authenticator but reusing the TGT until it expires. Only steps 1 to 2 need the User's password.
+
+Only $AS\_REQ$ travels fully in the clear. Every later message carries fields encrypted under whichever key its sender shares with the intended reader of that field, so confidentiality is per-field rather than per-channel: the AS creates the TGT under $K_T$ and the rest of $AS\_REP$ under $K_C$, $C$ creates each Authenticator under that step's session key ($K_{C,T}$ or $K_{C,V}$), and the TGS creates the SGT under $K_V$ and the rest of $TGS\_REP$ under $K_{C,T}$.

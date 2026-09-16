@@ -1,10 +1,10 @@
 ---
 title: Data Encryption Standard
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-13T14:55:24.390Z
+lastUpdatedOn: 2026-09-16T05:43:00.099Z
 slug: s5/computer-security/des
 sidebar:
-  order: 17
+  order: 16
   label: DES
 prev: true
 next: true
@@ -246,6 +246,19 @@ Setting $k_1 = k_3$ gives $c = E_{k_1}(D_{k_2}(E_{k_1}(m)))$, effective key leng
 Given an attacker with $2^{64}$ storage and chosen-plaintext access, both 3-key and 2-key 3DES reduce to effective key lengths of 112 bits and 56 bits respectively.
 
 </Note>
+
+## Why Not Extend DES
+
+3DES already composed DES instead of redesigning it. 3 problems remained.
+
+- Block size  
+  Still 64 bits. Birthday-bound collisions appear after about $2^{32}$ blocks under 1 key, no matter the key length.
+- Composition loss  
+  Double DES's 112-bit key space drops to about $2^{57}$ effective strength under a [meet-in-the-middle attack](#meet-in-the-middle-attack). Reaching close to the nominal strength needs the full 3-stage 3DES structure.
+- Speed  
+  3DES runs the DES round function 3 times per block, on top of DES already being tuned for 1970s hardware rather than software.
+
+Widening DES's key or block does not inherit its security margin. The margin comes from the specific interaction between the 16 rounds, the Feistel structure, and the 6-bit S-boxes, not from a formula that scales with the numbers. Changing any of those needs the same fresh cryptanalysis a new cipher would. NIST ran an open competition instead, which also settled decades of suspicion around the NSA's undisclosed role in choosing the original S-boxes.
 
 ## Attacking DES
 

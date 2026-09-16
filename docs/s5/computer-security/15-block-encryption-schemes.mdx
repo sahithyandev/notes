@@ -1,10 +1,10 @@
 ---
 title: Block Encryption Schemes
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-13T14:55:24.385Z
+lastUpdatedOn: 2026-09-16T05:43:00.021Z
 slug: s5/computer-security/block-encryption-schemes
 sidebar:
-  order: 16
+  order: 15
 prev: true
 next: true
 ---
@@ -14,7 +14,7 @@ A scheme that encrypts messages of arbitrary length, built from a [block cipher]
 On top of a block cipher, the below operations are added to make it a scheme:
 
 - Randomisation  
-  An [initialization vector](/s5/computer-security/ciphers) or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts.
+  An [initialization vector](/s5/computer-security/ciphers) or nonce fed into the first block, so encrypting the same message twice under the same key $k$ gives different ciphertexts. Without this, equal plaintexts leak through equal ciphertexts. Authentication modes such as CBC-MAC fix the IV to zero instead. They compute a deterministic tag for verification, so randomisation would work against the goal rather than for it.
 - Padding  
   Extra bytes appended to the last block so the message length is a multiple of $n$.
 - Chaining  

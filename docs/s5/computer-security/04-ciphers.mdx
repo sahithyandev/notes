@@ -1,15 +1,15 @@
 ---
 title: Ciphers
 dateCreated: 2026-07-01T06:36:45.904Z
-lastUpdatedOn: 2026-09-13T14:55:24.331Z
+lastUpdatedOn: 2026-09-16T05:42:59.339Z
 slug: s5/computer-security/ciphers
 sidebar:
-  order: 5
+  order: 4
 prev: true
 next: true
 ---
 
-An encryption algorithm ($e$), aka. a cipher, transforms a plaintext ($m$) into a ciphertext ($c$) under the control of a secret key ($k$).
+Aka. encryption algorithm. A function that ($e$) transforms a plaintext ($m$) into a ciphertext ($c$) under the control of a secret key ($k$). A cipher may have a fixed-sized input.
 
 $$
 c = e_k(m)
@@ -21,11 +21,7 @@ $$
 m = d_k(c)
 $$
 
-<Note>
-
 Encryption and decryption algorithms ($e$ and $d$) are public. Only the key is secret, and the ciphertext ($c$) is assumed to be easily, that is publicly, accessible.
-
-</Note>
 
 ### Secret Key
 
@@ -33,7 +29,7 @@ The secrecy of plaintext $m$ is totally dependent on the secrecy of the key $k$.
 
 Algorithms with this property are called symmetric cryptosystems or secret key cryptosystems. Both parties to a secret communication must know $k$ and keep it secret.
 
-Security also depends on [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), covered in a dedicated note, for what a cryptosystem may safely assume is public.
+Security also depends on [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle) for what a cryptosystem may safely assume is public.
 
 ## Encryption Scheme
 
@@ -48,7 +44,9 @@ A cipher is the core keyed primitive, a fixed function $e_k$ with a defined inpu
 
 A non-secret, fixed-size input to a scheme that randomises encryption, so encrypting the same message twice under the same key $k$ gives different ciphertexts.
 
-Sent alongside the ciphertext or fixed to a public constant. Never reused under the same key. Sometimes required to be unpredictable.
+Sent alongside the ciphertext. Never reused under the same key. Sometimes required to be unpredictable rather than merely unique.
+
+This uniqueness requirement is specific to randomising encryption. Some [authentication modes](/s5/computer-security/block-encryption-schemes) fix the IV to zero instead, since they need a deterministic tag rather than randomised ciphertext.
 
 ## Categorization
 
@@ -56,7 +54,7 @@ Ciphers are classified along several axes, not mutually exclusive. A modern ciph
 
 ### Classical Cipher
 
-The ciphers used in the pre-computer era are called historical ciphers or classical ciphers.
+Aka. historical cipher. The ciphers used in the pre-computer.
 
 Historical ciphers used plaintext linked to:
 
