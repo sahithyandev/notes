@@ -14,9 +14,10 @@ interface Props {
   rows: Row[];
   entering?: number;
   leaving?: number;
+  ratioRow?: string[];
 }
 
-const { label, columns, rows, entering, leaving } = Astro.props;
+const { label, columns, rows, entering, leaving, ratioRow } = Astro.props;
 
 const tex = (v: string) =>
   katex.renderToString(v, { throwOnError: false, strict: false });
@@ -72,6 +73,18 @@ const colCount = columns.length;
             <td class="num ratio">{r.ratio ?? ""}</td>
           </tr>
         ))
+      }
+      {
+        ratioRow && (
+          <tr class="ratio-row">
+            <td class="basic ratio-label">Ratio</td>
+            {ratioRow.map((v) => (
+              <td class="num ratio-cell" set:html={v ? tex(v) : ""} />
+            ))}
+            <td class="num rhs" />
+            <td class="num" />
+          </tr>
+        )
       }
     </tbody>
   </table>
@@ -129,6 +142,14 @@ const colCount = columns.length;
   .tableau td.ratio {
     color: var(--text-secondary);
     font-size: 0.8rem;
+  }
+  .tableau tr.ratio-row td {
+    border-top: 2px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+  .tableau td.ratio-label {
+    font-style: italic;
   }
 
   /* Only background and text color change, with a plain fade. */
