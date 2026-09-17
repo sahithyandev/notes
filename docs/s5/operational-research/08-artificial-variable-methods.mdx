@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:53:36.074Z
-lastUpdatedOn: 2026-09-13T14:55:24.593Z
+lastUpdatedOn: 2026-09-17T02:36:53.571Z
 ---
 
 If the starting basis needs artificial variables, either Big-M or two-phase method should be used.
@@ -51,40 +51,39 @@ x_1 + 2x_2 + s_3 &= 4
 \tag{2}
 $$
 
-The tableau convention maximizes and stops when all objective row coefficients are $\ge 0$. Minimizing $z$ means maximizing $-z$, so the objective is $\max\ -z - M a_1 - M a_2$. Written with all terms on the left, the objective row starts as
-
-$$
-z + 4x_1 + x_2 + M a_1 + M a_2 = 0
-\tag{3}
-$$
-
-But $a_1, a_2$ are basic, so they must have coefficient $0$ in the objective row. Subtract $M \times (a_1 \text{ row})$ and $M \times (a_2 \text{ row})$ of $(2)$ from $(3)$ to eliminate them:
-
-$$
-\begin{aligned}
-x_1:\quad & 4 - 3M - 4M = 4 - 7M \\
-x_2:\quad & 1 - 1M - 3M = 1 - 4M \\
-s_2:\quad & 0 - 0 - (-M) = M \\
-\text{RHS}:\quad & 0 - 3M - 6M = -9M
-\end{aligned}
-$$
-
-The two subtracted coefficients in each line are the $x_1$ (or $x_2$, $s_2$) entries of the $a_1$ row and the $a_2$ row. This gives the initial objective row below. Its RHS is the value of the maximand $-z$; negate it for $z$.
+The tableau convention maximizes and stops when all objective row coefficients are $\ge 0$. Minimizing $z$ means maximizing $-z$, so the objective is $\max\ -z - M a_1 - M a_2$. The natural starting basis is $(a_1, a_2, s_3) = (3, 6, 4)$, read straight off $(2)$.
 
 <SimplexWalkthrough>
   <SimplexStep
-    label="Initial tableau"
+    label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
     rows={[
-      { basic: "z", cells: ["4 - 7M", "1 - 4M", "M", "0", "0", "0"], rhs: "-9M" },
+      { basic: "z", cells: ["4", "1", "0", "0", "M", "M"], rhs: "0" },
       { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
       { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
       { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
     ]}
   >
-    Basis $(a_1, a_2, s_3) = (3, 6, 4)$. For large $M$ the coefficients $4 - 7M$
-    and $1 - 4M$ are both negative, so not optimal.
+    Basis $(a_1, a_2, s_3) = (3, 6, 4)$. But $a_1, a_2$ are basic with a
+    nonzero coefficient $M$ in the objective row, so it isn't canonical yet:
+    subtract $M \times (a_1 \text{ row})$ and $M \times (a_2 \text{ row})$
+    from the objective row to zero them out.
   </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    { basic: "z", cells: ["4 - 7M", "1 - 4M", "M", "0", "0", "0"], rhs: "-9M" },
+    { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+    { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+    { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+  ]}
+>
+  Objective row after eliminating $a_1, a_2$. Its RHS is the value of the
+  maximand $-z$; negate it for $z$. For large $M$ the coefficients $4 - 7M$ and
+  $1 - 4M$ are both negative, so not optimal.
+</SimplexStep>
 
 <SimplexStep
   label="Iteration 1"
@@ -236,22 +235,37 @@ Same LP $(1)$ and standard form $(2)$ as the Big-M example.
 
 #### Phase 1
 
-Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. Pricing out the basic artificials from $w + a_1 + a_2 = 0$ (subtract each artificial's row) gives the initial $w$ row.
+Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. The natural starting basis is again $(a_1, a_2, s_3) = (3, 6, 4)$.
 
 <SimplexWalkthrough>
   <SimplexStep
-    label="Initial tableau"
+    label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
     rows={[
-      { basic: "w", cells: ["-7", "-4", "1", "0", "0", "0"], rhs: "-9" },
+      { basic: "w", cells: ["0", "0", "0", "0", "1", "1"], rhs: "0" },
       { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
       { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
       { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
     ]}
   >
-    Phase 1 basis $(a_1, a_2, s_3)$ with $w = -9$. Coefficients $-7$ and $-4$
-    are negative, so not optimal.
+    Basis $(a_1, a_2, s_3) = (3, 6, 4)$. But $a_1, a_2$ are basic with
+    coefficient $1$ in the $w$ row, so it isn't canonical yet: subtract the
+    $a_1$ row and the $a_2$ row from the $w$ row to zero them out.
   </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    { basic: "w", cells: ["-7", "-4", "1", "0", "0", "0"], rhs: "-9" },
+    { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+    { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+    { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+  ]}
+>
+  $w$ row after eliminating $a_1, a_2$: $w = -9$. Coefficients $-7$ and $-4$ are
+  negative, so not optimal.
+</SimplexStep>
 
 <SimplexStep
   label="Iteration 1"
@@ -343,39 +357,39 @@ Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. Prici
 
 #### Phase 2
 
-Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Written with all terms on the left, the objective row starts as
-
-$$
-(-z) + 4x_1 + x_2 = 0
-$$
-
-But $x_1, x_2$ are basic (from the phase 1 final tableau), so they must have coefficient $0$ in the objective row. Subtract $4 \times (x_1 \text{ row})$ and $1 \times (x_2 \text{ row})$ of the phase 1 final tableau (columns $x_1, x_2, s_2, s_3$ only, dropping $a_1, a_2$) to eliminate them:
-
-$$
-\begin{aligned}
-x_1:\quad & 4 - 4(1) - 1(0) = 0 \\
-x_2:\quad & 1 - 4(0) - 1(1) = 0 \\
-s_2:\quad & 0 - 4(1/5) - 1(-3/5) = -1/5 \\
-\text{RHS}:\quad & 0 - 4(3/5) - 1(6/5) = -18/5
-\end{aligned}
-$$
-
-This gives the initial objective row below, alongside the phase 1 final rows for $x_1, x_2, s_3$ with the $a_1, a_2$ columns dropped.
+Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Carry over the phase 1 final basis $(x_1, x_2, s_3) = (3/5, 6/5, 1)$, columns $x_1, x_2, s_2, s_3$ only.
 
 <SimplexWalkthrough>
   <SimplexStep
-    label="Initial tableau"
+    label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3"]}
     rows={[
-      { basic: "z", cells: ["0", "0", "-1/5", "0"], rhs: "-18/5" },
+      { basic: "z", cells: ["4", "1", "0", "0"], rhs: "0" },
       { basic: "x_1", cells: ["1", "0", "1/5", "0"], rhs: "3/5" },
       { basic: "x_2", cells: ["0", "1", "-3/5", "0"], rhs: "6/5" },
       { basic: "s_3", cells: ["0", "0", "1", "1"], rhs: "1" },
     ]}
   >
-    Starts from the phase 1 basis $(x_1, x_2, s_3)$. Coefficient $-1/5$ in
-    column $s_2$ is negative, so not optimal.
+    Basis $(x_1, x_2, s_3) = (3/5, 6/5, 1)$, carried over from the phase 1
+    final tableau. But $x_1, x_2$ are basic with nonzero coefficients $4$ and
+    $1$ in the objective row, so it isn't canonical yet: subtract
+    $4 \times (x_1 \text{ row})$ and $1 \times (x_2 \text{ row})$ to zero
+    them out.
   </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3"]}
+  rows={[
+    { basic: "z", cells: ["0", "0", "-1/5", "0"], rhs: "-18/5" },
+    { basic: "x_1", cells: ["1", "0", "1/5", "0"], rhs: "3/5" },
+    { basic: "x_2", cells: ["0", "1", "-3/5", "0"], rhs: "6/5" },
+    { basic: "s_3", cells: ["0", "0", "1", "1"], rhs: "1" },
+  ]}
+>
+  Objective row after eliminating $x_1, x_2$. Coefficient $-1/5$ in column $s_2$
+  is negative, so not optimal.
+</SimplexStep>
 
 <SimplexStep
   label="Iteration 1"

@@ -3,7 +3,7 @@ title: Excel Solver
 sidebar:
   order: 13
 dateCreated: 2026-09-16T16:54:07.618Z
-lastUpdatedOn: 2026-09-16T18:42:32.861Z
+lastUpdatedOn: 2026-09-17T02:36:53.684Z
 slug: s5/operational-research/excel-solver
 prev: true
 next: true
@@ -78,3 +78,72 @@ Solver is suited to problems small enough to lay out on a worksheet:
   Reports the best solution found within its iteration or time limit, which may not be the global optimum.
 - Results are cell values, not symbolic formulas. Re-deriving a general solution for a family of inputs requires re-running Solver for each input.
 - Model logic is spread across worksheet formulas rather than a single readable statement, which makes large models harder to audit than a formulation in dedicated LP software.
+
+## Worked Example
+
+A manufacturer makes tables and chairs. Profit per table is 40, and profit per chair is 30. Each table needs 2 hours of carpentry and 1 hour of finishing. Each chair needs 1 hour of carpentry and 2 hours of finishing. 40 hours of carpentry and 50 hours of finishing are available.
+
+$x_1$ is the number of tables produced. $x_2$ is the number of chairs produced.
+
+$$
+\max z = 40x_1 + 30x_2
+$$
+
+Subject to:
+
+- $2x_1 + x_2 \le 40$
+- $x_1 + 2x_2 \le 50$
+- $x_1, x_2 \ge 0$
+
+Coefficients are kept separate from the variables, so the same variable cells are reused by every `SUMPRODUCT` formula.
+
+Worksheet layout:
+
+<ExcelSheet
+  rows={[
+    [
+      null,
+      { text: "Tables", type: "label" },
+      { text: "Chairs", type: "label" },
+    ],
+    [
+      { text: "Quantity", type: "label" },
+      { text: "0", type: "input" },
+      { text: "0", type: "input" },
+    ],
+    [],
+    [
+      { text: "Profit", type: "label" },
+      { text: "40", type: "input" },
+      { text: "30", type: "input" },
+      { text: "=SUMPRODUCT(B4:C4,$B$2:$C$2)", type: "formula" },
+    ],
+    [],
+    [
+      { text: "Carpentry", type: "label" },
+      { text: "2", type: "input" },
+      { text: "1", type: "input" },
+      { text: "=SUMPRODUCT(B6:C6,$B$2:$C$2)", type: "formula" },
+      { text: "40", type: "limit" },
+    ],
+    [
+      { text: "Finishing", type: "label" },
+      { text: "1", type: "input" },
+      { text: "2", type: "input" },
+      { text: "=SUMPRODUCT(B7:C7,$B$2:$C$2)", type: "formula" },
+      { text: "50", type: "limit" },
+    ],
+  ]}
+/>
+
+`B2:C2` are the decision variable cells. `D4` is the objective cell, pairing the profit coefficients in `B4:C4` with the variable cells. `D6` and `D7` are the constraint cells, pairing the carpentry and finishing coefficients with the same variable cells, compared against the hour limits in `E6` and `E7`.
+
+Solver Parameters:
+
+- Set Objective references `D4`, set to Max.
+- By Changing Variable Cells references `B2:C2`.
+- Subject to the Constraints lists `D6 <= E6` and `D7 <= E7`.
+- Make Unconstrained Variables Non-Negative is checked.
+- Select a Solving Method is set to Simplex LP.
+
+Running Solver returns $x_1 = 10$, $x_2 = 20$, with `D4` showing $z = 1000$. Both `D6` and `D7` equal `E6` and `E7` exactly, so both constraints bind at the optimum.
