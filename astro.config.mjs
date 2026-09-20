@@ -69,6 +69,9 @@ export default defineConfig({
   output: "server",
   // ponytail: v7 changed default to 'jsx'; preserve v6 whitespace behavior
   compressHTML: true,
+  redirects: {
+    "/security": "https://sahithyan.dev/security",
+  },
   server: {
     allowedHosts: process.env.NODE_ENV == "development" ? true : undefined,
   },
