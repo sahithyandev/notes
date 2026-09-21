@@ -14,7 +14,8 @@ export type RuleId =
   | "collapsed-label"
   | "prereq-scope"
   | "broken-link"
-  | "filename";
+  | "filename"
+  | "title-heading-duplicate";
 
 export interface Violation {
   rule: RuleId;

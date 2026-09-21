@@ -11,6 +11,7 @@ import { checkCollapsedLabel } from "./collapsed-label.ts";
 import { checkPrereqScope } from "./prereq-scope.ts";
 import { checkBrokenLinks } from "./broken-link.ts";
 import { checkFilename } from "./filename.ts";
+import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 
 export { checkBrokenLinks };
 
@@ -28,6 +29,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkCollapsedLabel,
   checkPrereqScope,
   checkFilename,
+  checkTitleHeadingDuplicate,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {
