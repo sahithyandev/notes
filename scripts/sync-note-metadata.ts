@@ -73,7 +73,17 @@ async function renumberFiles(
 export async function syncNoteMetadata(
   mdFilePaths: string[],
   dryRun: boolean = false,
+  explicitFiles: Set<string> = new Set(),
 ) {
+  // Every file in a touched note's directory gets pulled in below (for
+  // prev/next/order, which depend on the whole directory's listing), but
+  // only files actually passed in should get a fresh lastUpdatedOn — an
+  // empty set means "no filter", i.e. every path passed in is explicit,
+  // which keeps direct CLI usage (`sync-note-metadata.ts <file>`) and old
+  // callers stamping everything they're given.
+  const isExplicit = mdFilePaths.map(
+    (p) => explicitFiles.size === 0 || explicitFiles.has(p),
+  );
   mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
@@ -115,13 +125,16 @@ export async function syncNoteMetadata(
       return undefined;
     };
 
-    // dateCreated is set once and kept; lastUpdatedOn is stamped fresh on
-    // every commit, per CLAUDE.md ("lastUpdatedOn frontmatter is set on
-    // commit").
+    // dateCreated is set once and kept; lastUpdatedOn is stamped fresh only
+    // for files actually changed (per CLAUDE.md, "lastUpdatedOn frontmatter
+    // is set on commit"). Sibling files pulled in just to recompute
+    // prev/next/order keep their existing lastUpdatedOn.
     file.data = {
       ...currentFrontMatter,
       dateCreated: toDate(currentFrontMatter.dateCreated) ?? stat.birthtime,
-      lastUpdatedOn: new Date(),
+      lastUpdatedOn: isExplicit[i]
+        ? new Date()
+        : (toDate(currentFrontMatter.lastUpdatedOn) ?? new Date()),
     };
 
     const slugSection = relativeFromDocsDirectory.replace(".mdx", "");
@@ -200,6 +213,7 @@ export async function syncNoteMetadata(
 if (require.main === module) {
   const directories: Array<string> = [];
   const filePaths: Array<string> = [];
+  const explicitFiles = new Set<string>();
 
   // Check for --dry-run flag
   const dryRun = process.argv.includes("--dry-run");
@@ -208,6 +222,7 @@ if (require.main === module) {
     : process.argv.slice(2);
 
   for (const changedFile of argsToProcess) {
+    explicitFiles.add(changedFile);
     const changedDirectory = dirname(changedFile);
     if (directories.includes(changedDirectory)) {
       continue;
@@ -224,5 +239,5 @@ if (require.main === module) {
     console.log("=== DRY RUN MODE - No files will be modified ===");
   }
 
-  syncNoteMetadata(filePaths, dryRun);
+  syncNoteMetadata(filePaths, dryRun, explicitFiles);
 }
