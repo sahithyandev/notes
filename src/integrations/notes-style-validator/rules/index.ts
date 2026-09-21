@@ -4,6 +4,7 @@ import { checkTitleCaseRule } from "./title-case.ts";
 import { checkTitleParens } from "./title-parens.ts";
 import { checkTitleEmDash } from "./title-em-dash.ts";
 import { checkEmDash } from "./em-dash.ts";
+import { checkMathDelimiters } from "./math-delimiters.ts";
 import { checkAdjacentNote } from "./adjacent-note.ts";
 import { checkLabelDescription } from "./label-description.ts";
 import { checkCollapsedLabel } from "./collapsed-label.ts";
@@ -21,6 +22,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleParens,
   checkTitleEmDash,
   checkEmDash,
+  checkMathDelimiters,
   checkAdjacentNote,
   checkLabelDescription,
   checkCollapsedLabel,

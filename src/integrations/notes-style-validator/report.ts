@@ -8,6 +8,7 @@ export type RuleId =
   | "title-parens"
   | "title-em-dash"
   | "em-dash"
+  | "math-delimiters"
   | "adjacent-note"
   | "label-description"
   | "collapsed-label"
