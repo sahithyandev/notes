@@ -1,0 +1,106 @@
+---
+// Static PPF (Production Possibilities Frontier) diagram: a concave curve
+// on 2 axes, with a point on the boundary (efficient), inside (inefficient
+// / unemployed resources) and outside (unattainable).
+---
+
+<figure id="ppf-diagram">
+  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Production Possibilities Frontier</title>
+
+    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
+    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
+    <text class="axis-label" x="50" y="14" text-anchor="middle">Good Y</text>
+    <text class="axis-label" x="390" y="315" text-anchor="end">Good X</text>
+
+    <path class="curve" d="M 50 40 C 60 160, 150 270, 370 280"></path>
+
+    <circle class="pt on-curve" cx="200" cy="150" r="5"></circle>
+    <text class="pt-label" x="210" y="140">A</text>
+
+    <circle class="pt inside" cx="150" cy="230" r="5"></circle>
+    <text class="pt-label" x="160" y="222">B</text>
+
+    <circle class="pt outside" cx="270" cy="120" r="5"></circle>
+    <text class="pt-label" x="280" y="112">C</text>
+  </svg>
+  <figcaption>
+    <span class="on-curve">A</span> on the boundary, efficient.
+    <span class="inside">B</span> inside, resources unemployed or inefficient.
+    <span class="outside">C</span> outside, unattainable.
+  </figcaption>
+</figure>
+
+<style>
+  #ppf-diagram {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  #ppf-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #ppf-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #ppf-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #ppf-diagram .curve {
+    fill: none;
+    stroke: var(--s5);
+    stroke-width: 2.5;
+  }
+
+  #ppf-diagram .pt {
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+
+  #ppf-diagram .pt.on-curve {
+    fill: var(--dia-pt);
+  }
+
+  #ppf-diagram .pt.inside {
+    fill: var(--dia-key);
+  }
+
+  #ppf-diagram .pt.outside {
+    fill: var(--dia-ct);
+  }
+
+  #ppf-diagram .pt-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #ppf-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #ppf-diagram figcaption span {
+    font-weight: 600;
+  }
+
+  #ppf-diagram figcaption .on-curve {
+    color: var(--dia-pt);
+  }
+
+  #ppf-diagram figcaption .inside {
+    color: var(--dia-key);
+  }
+
+  #ppf-diagram figcaption .outside {
+    color: var(--dia-ct);
+  }
+</style>
