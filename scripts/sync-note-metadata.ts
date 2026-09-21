@@ -2,6 +2,7 @@ import { readdirSync } from "node:fs";
 import { lstat, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import matter from "gray-matter";
+import { format, resolveConfig } from "prettier";
 
 const PATTERN_TITLE_PREFIX = /(\d+)-/;
 
@@ -69,7 +70,10 @@ async function renumberFiles(
   return filePaths.map((p) => renames.get(p) ?? p);
 }
 
-export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
+export async function syncNoteMetadata(
+  mdFilePaths: string[],
+  dryRun: boolean = false,
+) {
   mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
@@ -111,10 +115,13 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
       return undefined;
     };
 
+    // dateCreated is set once and kept; lastUpdatedOn is stamped fresh on
+    // every commit, per CLAUDE.md ("lastUpdatedOn frontmatter is set on
+    // commit").
     file.data = {
       ...currentFrontMatter,
       dateCreated: toDate(currentFrontMatter.dateCreated) ?? stat.birthtime,
-      lastUpdatedOn: toDate(currentFrontMatter.lastUpdatedOn) ?? stat.mtime,
+      lastUpdatedOn: new Date(),
     };
 
     const slugSection = relativeFromDocsDirectory.replace(".mdx", "");
@@ -179,13 +186,17 @@ export async function autoSlug(mdFilePaths: string[], dryRun: boolean = false) {
       console.log(`[DRY RUN] New slug: ${file.data.slug}`);
       console.log(`[DRY RUN] Prev: ${file.data.prev}, Next: ${file.data.next}`);
     } else {
-      const updatedFileContent = matter.stringify(file, {});
-      writeFile(newFilePath, updatedFileContent);
+      const updatedFileContent = matter.stringify(file.content, file.data);
+      const config = await resolveConfig(newFilePath);
+      const formattedContent = await format(updatedFileContent, {
+        ...config,
+        filepath: newFilePath,
+      });
+      await writeFile(newFilePath, formattedContent);
     }
   }
 }
 
-// updates the frontmatter of mdx files
 if (require.main === module) {
   const directories: Array<string> = [];
   const filePaths: Array<string> = [];
@@ -213,5 +224,5 @@ if (require.main === module) {
     console.log("=== DRY RUN MODE - No files will be modified ===");
   }
 
-  autoSlug(filePaths, dryRun);
+  syncNoteMetadata(filePaths, dryRun);
 }

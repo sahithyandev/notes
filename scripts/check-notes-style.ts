@@ -3,11 +3,11 @@
 // scans docs/ in isolation so it's fast enough to run after every edit.
 //
 // Usage:
-//   bun run script:check-notes-style
-//   bun run script:check-notes-style -- --filter s1
-//   bun run script:check-notes-style -- --filter s1/mathematics
-//   bun run script:check-notes-style -- --filter s1/mathematics/matrices
-//   bun run script:check-notes-style -- --filter diagonalization
+//   bun run check-notes-style
+//   bun run check-notes-style -- --filter s1
+//   bun run check-notes-style -- --filter s1/mathematics
+//   bun run check-notes-style -- --filter s1/mathematics/matrices
+//   bun run check-notes-style -- --filter diagonalization
 import { join } from "node:path";
 import { runValidation } from "../src/integrations/notes-style-validator/validate.ts";
 import { scanModuleRedirects } from "../src/integrations/module-redirects/scan.ts";

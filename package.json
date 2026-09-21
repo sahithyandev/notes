@@ -13,9 +13,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "husky",
-    "script:update-frontmatter": "bun scripts/update-frontmatter.ts",
-    "script:auto-slug": "bun scripts/auto-slug.ts",
-    "script:check-notes-style": "bun scripts/check-notes-style.ts",
+    "sync-note-metadata": "bun scripts/sync-note-metadata.ts",
+    "check-notes-style": "bun scripts/check-notes-style.ts",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "generate-db-types": "supabase gen types typescript --project-id qrpfxrgemtvxmkuhmpcg > src/lib/database.types.ts",
@@ -24,8 +23,7 @@
   },
   "lint-staged": {
     "docs/**/*.{md,mdx}": [
-      "bun run script:auto-slug",
-      "bun run script:update-frontmatter"
+      "bun run sync-note-metadata"
     ],
     "**/*.{js,ts,astro,css,json,xml,md,mdx}": [
       "prettier --write"

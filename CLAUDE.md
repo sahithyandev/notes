@@ -17,10 +17,10 @@ bun test       # runs *.test.ts files with bun:test
 bun run lint   # prettier --check .
 ```
 
-Run the slug script whenever `.md` files are added or renamed:
+Run the metadata sync script whenever `.md` files are added or renamed:
 
 ```bash
-bun scripts/auto-slug.ts <path/to/file.md> [...]   # add --dry-run to preview
+bun scripts/sync-note-metadata.ts <path/to/file.md> [...]   # add --dry-run to preview
 ```
 
 ## Writing notes
@@ -30,7 +30,7 @@ Use the `write-notes` skill whenever writing a new note or editing an existing o
 Do not hand-edit these automatic fields:
 
 - `lastUpdatedOn` frontmatter is set on commit.
-- Numeric file prefixes and `sidebar.order` are managed by `scripts/auto-slug.ts`.
+- Numeric file prefixes and `sidebar.order` are managed by `scripts/sync-note-metadata.ts`.
 
 ### Label and description formatting
 
@@ -92,14 +92,14 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
 
-`prereq-scope` bans `prereqs` entries that point at a note in the same module — see "Slugs & file naming" below. `broken-link` validates internal doc links, in-page anchors, and relative image paths actually resolve, with fuzzy-match suggestions (`core/similarity.ts`) for near-miss slugs. `filename` (`rules/filename.ts`) bans uppercase letters anywhere in a note's filename, since slugs and sidebar order are derived from it by `auto-slug.ts` and an uppercase letter there leaks into the URL, and separately bans the `.md` extension in favor of `.mdx` (a file can trip both checks at once, each reported as its own violation).
+`prereq-scope` bans `prereqs` entries that point at a note in the same module — see "Slugs & file naming" below. `broken-link` validates internal doc links, in-page anchors, and relative image paths actually resolve, with fuzzy-match suggestions (`core/similarity.ts`) for near-miss slugs. `filename` (`rules/filename.ts`) bans uppercase letters anywhere in a note's filename, since slugs and sidebar order are derived from it by `sync-note-metadata.ts` and an uppercase letter there leaks into the URL, and separately bans the `.md` extension in favor of `.mdx` (a file can trip both checks at once, each reported as its own violation).
 
 After running `bun build`, always check the terminal output for `[notes-style-validator]` lines reporting violations (the build already fails on them, but read what broke).
 
 Don't run a full `bun build` just to check note style — it's slow (Vite, image processing, pagefind). `scan.ts`/`validate.ts` have no Astro dependency at all (plain Node fs + gray-matter), so run the checks directly instead:
 
 ```bash
-bun run script:check-notes-style
+bun run check-notes-style
 ```
 
 Same 8 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
@@ -107,14 +107,14 @@ Same 8 rules, same redirect-awareness, same pass/fail semantics as the build (ex
 Scope the report with `--filter` when you're only working in one area — a semester (`s1`), a module (`s1/mathematics`), a submodule (`s1/mathematics/matrices`), or a single note by name (`diagonalization`). Numeric prefixes are optional either way; matching is case-insensitive and looks for the filter's segments anywhere in the path, not just as a root prefix:
 
 ```bash
-bun run script:check-notes-style -- --filter s1/mathematics
+bun run check-notes-style -- --filter s1/mathematics
 ```
 
 `--filter` only narrows what gets _printed and decided on_ — every file is still scanned underneath, since `broken-link` needs the whole corpus to know which slugs are valid; a link into an out-of-scope file is still resolved correctly, just not reported unless it's itself in scope. The same `filter` option (or a `NOTES_STYLE_FILTER` env var, e.g. `NOTES_STYLE_FILTER=s1/mathematics bun dev`) works on the Astro integration too, but only for `bun dev` — `bun build` always ignores it, so a filter left set in your shell can never silently weaken the real build check.
 
 ## Slugs & file naming
 
-URLs come from the `slug` frontmatter field, not the file path. `auto-slug.ts` derives everything from a numeric filename prefix:
+URLs come from the `slug` frontmatter field, not the file path. `sync-note-metadata.ts` derives everything from a numeric filename prefix:
 
 - `docs/s2/theory-of-electricity/01-introduction.md` becomes slug `s2/theory-of-electricity/introduction`.
 - The prefix becomes `sidebar.order`.
