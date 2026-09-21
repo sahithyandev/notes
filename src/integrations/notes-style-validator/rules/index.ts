@@ -9,6 +9,7 @@ import { checkLabelDescription } from "./label-description.ts";
 import { checkCollapsedLabel } from "./collapsed-label.ts";
 import { checkPrereqScope } from "./prereq-scope.ts";
 import { checkBrokenLinks } from "./broken-link.ts";
+import { checkFilename } from "./filename.ts";
 
 export { checkBrokenLinks };
 
@@ -24,6 +25,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkLabelDescription,
   checkCollapsedLabel,
   checkPrereqScope,
+  checkFilename,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {

@@ -12,7 +12,8 @@ export type RuleId =
   | "label-description"
   | "collapsed-label"
   | "prereq-scope"
-  | "broken-link";
+  | "broken-link"
+  | "filename";
 
 export interface Violation {
   rule: RuleId;
