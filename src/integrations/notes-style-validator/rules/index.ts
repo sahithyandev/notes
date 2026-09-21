@@ -2,8 +2,8 @@ import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
 import { checkTitleCaseRule } from "./title-case.ts";
 import { checkTitleParens } from "./title-parens.ts";
-import { checkTitleEmDash } from "./title-em-dash.ts";
-import { checkEmDash } from "./em-dash.ts";
+import { checkTitleDash } from "./title-dash.ts";
+import { checkDash } from "./dash.ts";
 import { checkMathDelimiters } from "./math-delimiters.ts";
 import { checkAdjacentNote } from "./adjacent-note.ts";
 import { checkLabelDescription } from "./label-description.ts";
@@ -20,8 +20,8 @@ export { checkBrokenLinks };
 const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleCaseRule,
   checkTitleParens,
-  checkTitleEmDash,
-  checkEmDash,
+  checkTitleDash,
+  checkDash,
   checkMathDelimiters,
   checkAdjacentNote,
   checkLabelDescription,

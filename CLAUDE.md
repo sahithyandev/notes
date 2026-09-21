@@ -53,11 +53,13 @@ Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Her
 
 Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written _without_ the required 2 trailing spaces (or a trailing `\`): that's a rendering bug, not just a style nit, since the label and description silently run together on the published page.
 
-### Em dashes
+### Dashes
 
-Never use em dashes (—) in note content. Restructure with a comma, period, colon, or parentheses instead.
+Never use an em dash (—), or an en dash (–) with a space on either side, in note content as a substitute for a comma, period, colon, or parentheses. Restructure the sentence instead.
 
-Enforced by the `em-dash` rule (`src/integrations/notes-style-validator/rules/em-dash.ts`). Exempt: fenced code, inline code, math (`$...$`/`$$...$$`), and a dash used alone as an empty table cell.
+An en dash packed tight against non-whitespace on both sides is still allowed: a numeric range (`1978–2020`, `0.1–100`) or a two-part proper noun / compound (`Beattie–Bridgeman Equation`, `T–S Diagram`).
+
+Enforced by the `dash` rule (`src/integrations/notes-style-validator/rules/dash.ts`). Exempt: fenced code, inline code, math (`$...$`/`$$...$$`), and a dash used alone as an empty table cell.
 
 ### Math delimiters
 
@@ -93,7 +95,7 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 
 `src/integrations/` has 2 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
 
-- `notes-style-validator`: a single shared file scan enforcing 9 rules over `docs/`: `title-case`, `em-dash`, `math-delimiters`, `adjacent-note`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`. See the sections above and below. **The build fails on any violation.**
+- `notes-style-validator`: a single shared file scan enforcing 9 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`. See the sections above and below. **The build fails on any violation.**
 - `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.

@@ -6,8 +6,8 @@ export interface SimpleLogger {
 export type RuleId =
   | "title-case"
   | "title-parens"
-  | "title-em-dash"
-  | "em-dash"
+  | "title-dash"
+  | "dash"
   | "math-delimiters"
   | "adjacent-note"
   | "label-description"

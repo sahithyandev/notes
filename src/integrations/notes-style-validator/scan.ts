@@ -284,7 +284,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
     const { lines, maskedLines, lineIsCode } = maskFile(raw);
 
     // Frontmatter is never prose: mask it so YAML colons/dashes can't trip
-    // the prose rules (label-description, em-dash, collapsed-label).
+    // the prose rules (label-description, dash, collapsed-label).
     const fmLines = frontmatterLineCount(raw);
     for (let i = 0; i < fmLines && i < lines.length; i++) {
       lineIsCode[i] = true;
