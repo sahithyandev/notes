@@ -6,7 +6,7 @@ slug: s3/computer-architecture/io
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-09-13T14:55:23.113Z
+lastUpdatedOn: 2026-09-21T13:41:33.609Z
 ---
 
 ### Keyboard and Monitor
@@ -30,9 +30,12 @@ Handles timing, buffering, device-specific communication, and error detection.
 
 Categories:
 
-- Human-readable – monitor, printer.
-- Machine-readable – disks, sensors, actuators.
-- Communication – remote devices, other computers.
+- Human-readable  
+  Monitor, printer.
+- Machine-readable  
+  Disks, sensors, actuators.
+- Communication  
+  Remote devices, other computers.
 
 ## I/O Commands
 
@@ -92,11 +95,16 @@ Aka. isolated I/O or port mapped. I/O devices have a separate address space. Spe
 
 **Methods:**
 
-1. **Multiple interrupt lines** – each module has dedicated line.
-2. **Software poll** – CPU checks modules sequentially (slow).
-3. **Daisy chain (hardware poll)** – modules connected in chain; first ready device handles.
-4. **Vectored interrupt** – device sends vector (address of its service routine).
-5. **Bus arbitration** – device must first control bus to request interrupt.
+1. Multiple interrupt lines  
+   Each module has a dedicated line.
+2. Software poll  
+   CPU checks modules sequentially (slow).
+3. Daisy chain (hardware poll)  
+   Modules connected in a chain; the first ready device handles it.
+4. Vectored interrupt  
+   Device sends a vector (address of its service routine).
+5. Bus arbitration  
+   Device must first control the bus to request an interrupt.
 
 ## Drawbacks of Programmed / Interrupt I/O
 
@@ -115,9 +123,9 @@ Aka. isolated I/O or port mapped. I/O devices have a separate address space. Spe
 ## Evolution of I/O Function
 
 1. CPU directly controls device.
-2. I/O controller added – **programmed I/O**.
-3. **Interrupts** introduced – more efficient.
-4. **DMA** added – block transfer without CPU.
+2. I/O controller added, enabling **programmed I/O**.
+3. **Interrupts** introduced, making I/O more efficient.
+4. **DMA** added, enabling block transfer without the CPU.
 5. I/O module becomes **processor-like** (own instruction set).
 6. I/O module gains **local memory** → acts as mini-computer (e.g., GPU).
 
