@@ -12,6 +12,8 @@
 // itself, so copying the full className reproduces the per-flag toggling
 // exactly while also picking up simplex's row-level `leave` class for free.
 
+import { createDot } from "./dots";
+
 function tableOf(stage: HTMLElement): HTMLTableElement {
   return stage.tagName === "TABLE"
     ? (stage as HTMLTableElement)
@@ -42,19 +44,11 @@ export function initWalkthrough(root: HTMLElement): void {
 
   total.textContent = String(steps.length);
 
-  const dots = steps.map((s, idx) => {
-    const b = (
-      dotTemplate
-        ? dotTemplate.content.firstElementChild!.cloneNode(true)
-        : document.createElement("button")
-    ) as HTMLButtonElement;
-    b.type = "button";
-    if (!dotTemplate) b.className = "dot";
-    b.setAttribute("aria-label", s.dataset.label ?? `Step ${idx + 1}`);
-    b.addEventListener("click", () => show(idx));
-    dotWrap.appendChild(b);
-    return b;
-  });
+  const dots = steps.map((s, idx) =>
+    createDot(dotWrap, dotTemplate, s.dataset.label ?? `Step ${idx + 1}`, () =>
+      show(idx),
+    ),
+  );
 
   let i = 0;
 

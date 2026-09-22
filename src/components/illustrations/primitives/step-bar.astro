@@ -1,12 +1,20 @@
 ---
 // Label + "n / total" counter row at the top of a walkthrough. Filled in by
 // the shared controller (lib/walkthrough.ts) via the data- hooks below.
+// `total` is an optional server-rendered starting value for the ones that
+// know their step count up front and never overwrite it client-side (the
+// flow/sequence diagrams); lib/walkthrough.ts always overwrites it anyway.
+interface Props {
+  total?: number;
+}
+
+const { total } = Astro.props;
 ---
 
 <div class="bar">
   <span class="label" data-label></span>
   <span class="count"
-    ><span data-current>1</span> / <span data-total></span></span
+    ><span data-current>1</span> / <span data-total>{total}</span></span
   >
 </div>
 

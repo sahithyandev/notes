@@ -3,6 +3,12 @@
 // the shared controller (lib/walkthrough.ts). The dot template lets the
 // controller clone a real element that carries this component's own
 // scoped-CSS id, so ".dots .dot" styles normally with no :global() escape.
+//
+// The active-dot/hover colour reads --nav-accent (falling back to
+// var(--accent)), so a consumer that wants a different colour (the
+// semester-accented flow/sequence diagrams use var(--sem)) can just set
+// that custom property on its own root - it inherits through the DOM
+// regardless of the component-scoping boundary.
 ---
 
 <div class="foot">
@@ -48,8 +54,8 @@
     cursor: pointer;
   }
   .dots .dot[aria-selected="true"] {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--nav-accent, var(--accent));
+    border-color: var(--nav-accent, var(--accent));
   }
 
   .controls {
@@ -67,8 +73,8 @@
     cursor: pointer;
   }
   .controls button:hover:not(:disabled) {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--nav-accent, var(--accent));
+    color: var(--nav-accent, var(--accent));
   }
   .controls button:disabled {
     opacity: 0.4;
