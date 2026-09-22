@@ -1,6 +1,9 @@
 ---
 import "../../styles/tableau.css";
 import { tex } from "../../utils/tex";
+import Panel from "./primitives/panel.astro";
+import SliderControl from "./primitives/slider-control.astro";
+import StatusNote from "./primitives/status-note.astro";
 
 interface Props {
   variable: string;
@@ -32,7 +35,7 @@ const sourceRow = rows.find((r) => r.basic === variable)!;
 const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
 ---
 
-<div class="row-op">
+<Panel class="row-op">
   <p class="formula">
     <span
       set:html={tex("z\\text{-row} \\leftarrow z\\text{-row} + \\Delta \\cdot")}
@@ -88,41 +91,24 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
     </tbody>
   </table>
 
-  <div class="control">
-    <label for={`row-op-delta-${variable}`}>
-      &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
-        " "
-      }
-      {baseC}
-    </label>
-    <input
-      id={`row-op-delta-${variable}`}
-      type="range"
-      min={deltaMin}
-      max={deltaMax}
-      step="0.01"
-      value="0"
-    />
-    <output for={`row-op-delta-${variable}`} data-delta>0</output>
-  </div>
+  <SliderControl
+    id={`row-op-delta-${variable}`}
+    min={deltaMin}
+    max={deltaMax}
+    step={0.01}
+    value={0}
+  >
+    &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
+      " "
+    }
+    {baseC}
+  </SliderControl>
 
-  <div class="status" data-status data-optimal="true">
-    Optimal. Basis stays optimal.
-  </div>
-</div>
+  <StatusNote ok={true}>Optimal. Basis stays optimal.</StatusNote>
+</Panel>
 
 <script>
-  const SUBSCRIPT: Record<string, string> = { "1": "₁", "2": "₂", "3": "₃" };
-
-  const label = (name: string) => {
-    const [base, idx] = name.split("_");
-    return `${base}${SUBSCRIPT[idx] ?? idx}`;
-  };
-
-  const fmt = (n: number) => {
-    const rounded = Math.round(n * 100) / 100;
-    return Object.is(rounded, -0) ? "0" : String(rounded);
-  };
+  import { fmt, label } from "./lib/format";
 
   document.querySelectorAll<HTMLDivElement>(".row-op").forEach((widget) => {
     const slider = widget.querySelector<HTMLInputElement>(
@@ -155,7 +141,7 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
       });
 
       const optimal = violated === null;
-      status.dataset.optimal = String(optimal);
+      status.dataset.state = optimal ? "ok" : "bad";
       status.textContent = optimal
         ? "Optimal. Basis stays optimal."
         : `Not optimal. ${label(
@@ -169,12 +155,9 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
 </script>
 
 <style>
-  .row-op {
-    margin: 24px 0;
+  :global(.panel.row-op) {
     padding: 16px 18px 18px;
-    border: 1px solid var(--border);
     border-radius: 10px;
-    background: var(--surface);
   }
 
   .formula {
@@ -210,53 +193,5 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
   .tableau td.target-cell.changed {
     color: var(--accent);
     font-weight: 600;
-  }
-
-  .control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .control label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-
-  .control input[type="range"] {
-    flex: 1 1 160px;
-    accent-color: var(--s5);
-  }
-
-  .control output {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--s5);
-    min-width: 4ch;
-    text-align: right;
-  }
-
-  .status {
-    margin-top: 12px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 12.5px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-  }
-
-  .status[data-optimal="true"] {
-    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
-    border-color: var(--s3-border);
-  }
-
-  .status[data-optimal="false"] {
-    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
-    border-color: var(--s4-border);
   }
 </style>

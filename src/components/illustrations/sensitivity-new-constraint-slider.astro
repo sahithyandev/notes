@@ -1,5 +1,8 @@
 ---
 import { tex } from "../../utils/tex";
+import Panel from "./primitives/panel.astro";
+import SliderControl from "./primitives/slider-control.astro";
+import StatusNote from "./primitives/status-note.astro";
 
 interface Props {
   currentSum: number;
@@ -10,7 +13,7 @@ interface Props {
 const { currentSum, min, max } = Astro.props;
 ---
 
-<div class="new-constraint-slider">
+<Panel class="new-constraint-slider">
   <div class="row">
     <span class="label">
       <span set:html={tex("x_1 + x_2")} /> at the current optimum
@@ -18,32 +21,22 @@ const { currentSum, min, max } = Astro.props;
     <span class="value">{currentSum}</span>
   </div>
 
-  <div class="control">
-    <label for="new-constraint-k">
-      Limit <span set:html={tex("k")} /> in{" "}
-      <span set:html={tex("x_1 + x_2 \\le k")} />
-    </label>
-    <input
-      id="new-constraint-k"
-      type="range"
-      min={min}
-      max={max}
-      step="0.01"
-      value={max}
-    />
-    <output for="new-constraint-k" data-k>{max}</output>
-  </div>
+  <SliderControl
+    id="new-constraint-k"
+    min={min}
+    max={max}
+    step={0.01}
+    value={max}
+  >
+    Limit <span set:html={tex("k")} /> in{" "}
+    <span set:html={tex("x_1 + x_2 \\le k")} />
+  </SliderControl>
 
-  <div class="status" data-status data-satisfied="true">
-    Satisfied. The optimum stays as is.
-  </div>
-</div>
+  <StatusNote ok={true}>Satisfied. The optimum stays as is.</StatusNote>
+</Panel>
 
 <script>
-  const fmt = (n: number) => {
-    const rounded = Math.round(n * 100) / 100;
-    return Object.is(rounded, -0) ? "0" : String(rounded);
-  };
+  import { fmt } from "./lib/format";
 
   document
     .querySelectorAll<HTMLDivElement>(".new-constraint-slider")
@@ -51,7 +44,7 @@ const { currentSum, min, max } = Astro.props;
       const slider = widget.querySelector<HTMLInputElement>(
         'input[type="range"]',
       )!;
-      const kOut = widget.querySelector<HTMLElement>("[data-k]")!;
+      const kOut = widget.querySelector<HTMLElement>("[data-delta]")!;
       const sum = Number(
         widget.querySelector<HTMLElement>(".row .value")!.textContent,
       );
@@ -62,7 +55,7 @@ const { currentSum, min, max } = Astro.props;
         kOut.textContent = fmt(k);
 
         const satisfied = sum <= k;
-        status.dataset.satisfied = String(satisfied);
+        status.dataset.state = satisfied ? "ok" : "bad";
         status.textContent = satisfied
           ? "Satisfied. The optimum stays as is, no further work."
           : `Violated. ${fmt(sum)} > ${fmt(k)}, so the tableau is optimal but infeasible and needs a dual simplex repair.`;
@@ -74,12 +67,9 @@ const { currentSum, min, max } = Astro.props;
 </script>
 
 <style>
-  .new-constraint-slider {
-    margin: 24px 0;
+  :global(.panel.new-constraint-slider) {
     padding: 16px 18px 18px;
-    border: 1px solid var(--border);
     border-radius: 10px;
-    background: var(--surface);
   }
 
   .row {
@@ -102,53 +92,5 @@ const { currentSum, min, max } = Astro.props;
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
     color: var(--text-primary);
-  }
-
-  .control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .control label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-
-  .control input[type="range"] {
-    flex: 1 1 160px;
-    accent-color: var(--s5);
-  }
-
-  .control output {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--s5);
-    min-width: 4ch;
-    text-align: right;
-  }
-
-  .status {
-    margin-top: 12px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 12.5px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-  }
-
-  .status[data-satisfied="true"] {
-    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
-    border-color: var(--s3-border);
-  }
-
-  .status[data-satisfied="false"] {
-    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
-    border-color: var(--s4-border);
   }
 </style>
