@@ -1,4 +1,5 @@
 ---
+import "../../styles/tableau.css";
 import { tex } from "../../utils/tex";
 
 interface Row {
@@ -90,16 +91,11 @@ const colCount = columns.length;
 </div>
 
 <style>
+  /* Fixed layout: data columns share the leftover space equally, so widths
+     stay put as cells swap between steps. Below min-width the parent .scroll
+     scrolls horizontally. */
   table.tableau {
-    border-collapse: collapse;
-    /* Fixed layout: data columns share the leftover space equally, so widths
-       stay put as cells swap between steps. Below min-width the parent .scroll
-       scrolls horizontally. */
-    table-layout: fixed;
-    width: 100%;
     min-width: 34rem;
-    font-size: 0.9rem;
-    font-family: var(--font-ui);
   }
   .tableau col.c-basic {
     width: 3rem;
@@ -111,31 +107,6 @@ const colCount = columns.length;
     width: 5rem;
   }
 
-  .tableau th,
-  .tableau td {
-    padding: 6px 8px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .tableau thead tr {
-    border-bottom: 2px solid var(--border-strong);
-  }
-  .tableau tbody tr:last-child td {
-    border-bottom: none;
-  }
-  .tableau th.basic,
-  .tableau td.basic {
-    text-align: left;
-    color: var(--text-secondary);
-  }
-  .tableau td.num,
-  .tableau th.num {
-    font-variant-numeric: tabular-nums;
-  }
-  .tableau .rhs {
-    border-left: 2px solid var(--border-strong);
-  }
   .tableau td.ratio {
     color: var(--text-secondary);
     font-size: 0.8rem;

@@ -1,4 +1,5 @@
 ---
+import "../../styles/tableau.css";
 import { tex } from "../../utils/tex";
 
 interface Props {
@@ -186,41 +187,11 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
     color: var(--text-secondary);
   }
 
-  table.tableau {
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-    font-size: 0.9rem;
-    font-family: var(--font-ui);
-  }
-
   .tableau th,
   .tableau td {
-    padding: 6px 8px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
-  }
-  .tableau thead tr {
-    border-bottom: 2px solid var(--border-strong);
-  }
-  .tableau tbody tr:last-child td {
-    border-bottom: none;
-  }
-  .tableau th.basic,
-  .tableau td.basic {
-    text-align: left;
-    color: var(--text-secondary);
-  }
-  .tableau td.num,
-  .tableau th.num {
-    font-variant-numeric: tabular-nums;
-  }
-  .tableau .rhs {
-    border-left: 2px solid var(--border-strong);
   }
 
   /* Source row: the basic variable's row being scaled by Δ. */

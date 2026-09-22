@@ -1,0 +1,39 @@
+/* Shared base for the small "Basic | columns | RHS" simplex-shaped tables:
+   simplex-step and the sensitivity sliders that render the same tableau.
+   Each importer still owns its own transitions, .changed/.pivot/.enter
+   treatment, and column widths in a scoped <style> block, since those
+   diverge per component. */
+
+table.tableau {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+}
+
+.tableau th,
+.tableau td {
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tableau thead tr {
+  border-bottom: 2px solid var(--border-strong);
+}
+.tableau tbody tr:last-child td {
+  border-bottom: none;
+}
+.tableau th.basic,
+.tableau td.basic {
+  text-align: left;
+  color: var(--text-secondary);
+}
+.tableau td.num,
+.tableau th.num {
+  font-variant-numeric: tabular-nums;
+}
+.tableau .rhs {
+  border-left: 2px solid var(--border-strong);
+}
