@@ -1,6 +1,7 @@
 ---
 import "../../styles/tableau.css";
 import { tex } from "../../utils/tex";
+import StepNote from "./primitives/step-note.astro";
 
 interface Row {
   basic: string;
@@ -87,7 +88,7 @@ const colCount = columns.length;
     </tbody>
   </table>
 
-  <div class="step-note"><slot /></div>
+  <StepNote><slot /></StepNote>
 </div>
 
 <style>
@@ -150,19 +151,5 @@ const colCount = columns.length;
     .tableau td {
       transition: none;
     }
-  }
-
-  .step-note {
-    margin: 12px 0 0;
-    min-height: 2.8em;
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: var(--text-secondary);
-  }
-  .step-note :global(p) {
-    margin: 0;
-  }
-  .step-note :global(.katex) {
-    font-size: 1em;
   }
 </style>

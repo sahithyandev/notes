@@ -3,9 +3,9 @@
 // the sensitivity sliders. Attributes beyond `class` (tabindex,
 // aria-roledescription, id, ...) are passed through to the root element so
 // carousel-specific semantics stay in the component that needs them.
-interface Props {
-  class?: string;
-}
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"figure"> {}
 
 const { class: className, ...rest } = Astro.props;
 ---

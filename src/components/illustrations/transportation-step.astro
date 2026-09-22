@@ -1,70 +1,16 @@
 ---
+import type { ComponentProps } from "astro/types";
 import TransportationTable from "./transportation-table.astro";
+import StepNote from "./primitives/step-note.astro";
 
-interface Props {
+type Props = Omit<ComponentProps<typeof TransportationTable>, "dataSource"> & {
   label: string;
-  rows: string[];
-  cols: string[];
-  costs: number[][];
-  supply: number[];
-  demand: number[];
-  allocations?: (number | null)[][];
-  highlight?: [number, number][];
-  loop?: { row: number; col: number; sign: "+" | "-" }[];
-  rowPenalties?: (number | null)[];
-  colPenalties?: (number | null)[];
-  selectedPenalty?: { axis: "row" | "col"; index: number };
-  total?: string;
-}
+};
 
-const {
-  label,
-  rows,
-  cols,
-  costs,
-  supply,
-  demand,
-  allocations,
-  highlight,
-  loop,
-  rowPenalties,
-  colPenalties,
-  selectedPenalty,
-  total,
-} = Astro.props;
+const { label, ...table } = Astro.props;
 ---
 
 <div class="step" data-label={label}>
-  <TransportationTable
-    dataSource
-    rows={rows}
-    cols={cols}
-    costs={costs}
-    supply={supply}
-    demand={demand}
-    allocations={allocations}
-    highlight={highlight}
-    loop={loop}
-    rowPenalties={rowPenalties}
-    colPenalties={colPenalties}
-    selectedPenalty={selectedPenalty}
-    total={total}
-  />
-  <div class="step-note"><slot /></div>
+  <TransportationTable dataSource {...table} />
+  <StepNote><slot /></StepNote>
 </div>
-
-<style>
-  .step-note {
-    margin: 12px 0 0;
-    min-height: 2.8em;
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: var(--text-secondary);
-  }
-  .step-note :global(p) {
-    margin: 0;
-  }
-  .step-note :global(.katex) {
-    font-size: 1em;
-  }
-</style>
