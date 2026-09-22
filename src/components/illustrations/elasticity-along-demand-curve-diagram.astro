@@ -1,0 +1,146 @@
+---
+// Static diagram: a single straight-line demand curve split into 3
+// colored segments to show that elasticity changes along the curve
+// even though its slope stays constant.
+---
+
+<figure id="elasticity-along-demand-curve-diagram">
+  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Elasticity Along a Linear Demand Curve</title>
+
+    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
+    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
+    <text class="axis-label" x="50" y="14" text-anchor="middle">Price</text>
+    <text class="axis-label" x="390" y="315" text-anchor="end"
+      >Quantity Demanded</text
+    >
+
+    <line class="seg elastic" x1="90" y1="45" x2="180" y2="120"></line>
+    <line class="seg unit" x1="180" y1="120" x2="260" y2="190"></line>
+    <line class="seg inelastic" x1="260" y1="190" x2="350" y2="265"></line>
+
+    <circle class="pt elastic" cx="90" cy="45" r="4"></circle>
+    <circle class="pt unit" cx="180" cy="120" r="4"></circle>
+    <circle class="pt unit" cx="260" cy="190" r="4"></circle>
+    <circle class="pt inelastic" cx="350" cy="265" r="4"></circle>
+
+    <text class="seg-label elastic" x="98" y="78">More elastic</text>
+    <text class="seg-label unit" x="205" y="145">Unit elastic</text>
+    <text class="seg-label inelastic" x="255" y="245">More inelastic</text>
+
+    <text class="curve-label" x="360" y="255">D</text>
+  </svg>
+  <figcaption>
+    Elasticity falls moving down the same straight-line demand curve
+    <span class="curve">D</span>: the
+    <span class="elastic">upper-left region</span> is more elastic, the
+    <span class="unit">middle region</span> is unit elastic, and the
+    <span class="inelastic">lower-right region</span> is more inelastic.
+  </figcaption>
+</figure>
+
+<style>
+  #elasticity-along-demand-curve-diagram {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  #elasticity-along-demand-curve-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #elasticity-along-demand-curve-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #elasticity-along-demand-curve-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #elasticity-along-demand-curve-diagram .seg {
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  #elasticity-along-demand-curve-diagram .seg.elastic {
+    stroke: var(--dia-key);
+  }
+
+  #elasticity-along-demand-curve-diagram .seg.unit {
+    stroke: var(--dia-pt);
+  }
+
+  #elasticity-along-demand-curve-diagram .seg.inelastic {
+    stroke: var(--dia-ct);
+  }
+
+  #elasticity-along-demand-curve-diagram .pt {
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+
+  #elasticity-along-demand-curve-diagram .pt.elastic {
+    fill: var(--dia-key);
+  }
+
+  #elasticity-along-demand-curve-diagram .pt.unit {
+    fill: var(--dia-pt);
+  }
+
+  #elasticity-along-demand-curve-diagram .pt.inelastic {
+    fill: var(--dia-ct);
+  }
+
+  #elasticity-along-demand-curve-diagram .seg-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  #elasticity-along-demand-curve-diagram .seg-label.elastic {
+    fill: var(--dia-key);
+  }
+
+  #elasticity-along-demand-curve-diagram .seg-label.unit {
+    fill: var(--dia-pt);
+  }
+
+  #elasticity-along-demand-curve-diagram .seg-label.inelastic {
+    fill: var(--dia-ct);
+  }
+
+  #elasticity-along-demand-curve-diagram .curve-label {
+    fill: var(--s5);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption span {
+    font-weight: 600;
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption .curve {
+    color: var(--s5);
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption .elastic {
+    color: var(--dia-key);
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption .unit {
+    color: var(--dia-pt);
+  }
+
+  #elasticity-along-demand-curve-diagram figcaption .inelastic {
+    color: var(--dia-ct);
+  }
+</style>
