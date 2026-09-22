@@ -1,0 +1,115 @@
+---
+// Static supply curve diagram: upward-sloping curve on price/quantity
+// axes, with a dashed curve shifted left (decrease) and right (increase)
+// to illustrate a shift of the entire curve.
+---
+
+<figure id="supply-curve-diagram">
+  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Supply Curve</title>
+
+    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
+    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
+    <text class="axis-label" x="50" y="14" text-anchor="middle">Price</text>
+    <text class="axis-label" x="390" y="315" text-anchor="end"
+      >Quantity Supplied</text
+    >
+
+    <path class="curve shift-left" d="M 200 270 C 220 180, 240 100, 260 40"
+    ></path>
+    <path class="curve shift-right" d="M 60 270 C 80 180, 100 100, 120 40"
+    ></path>
+    <path class="curve main" d="M 130 270 C 150 180, 170 100, 190 40"></path>
+
+    <text class="curve-label main" x="195" y="55">S</text>
+    <text class="curve-label shift-left" x="265" y="55">S&#8321;</text>
+    <text class="curve-label shift-right" x="125" y="55">S&#8322;</text>
+  </svg>
+  <figcaption>
+    <span class="main">S</span> the original supply curve.
+    <span class="shift-left">S&#8321;</span> a decrease in supply, curve shifts left.
+    <span class="shift-right">S&#8322;</span> an increase in supply, curve shifts
+    right.
+  </figcaption>
+</figure>
+
+<style>
+  #supply-curve-diagram {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  #supply-curve-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #supply-curve-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #supply-curve-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #supply-curve-diagram .curve {
+    fill: none;
+    stroke-width: 2.5;
+  }
+
+  #supply-curve-diagram .curve.main {
+    stroke: var(--s5);
+  }
+
+  #supply-curve-diagram .curve.shift-left {
+    stroke: var(--dia-ct);
+    stroke-dasharray: 6 5;
+  }
+
+  #supply-curve-diagram .curve.shift-right {
+    stroke: var(--dia-pt);
+    stroke-dasharray: 6 5;
+  }
+
+  #supply-curve-diagram .curve-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #supply-curve-diagram .curve-label.main {
+    fill: var(--s5);
+  }
+
+  #supply-curve-diagram .curve-label.shift-left {
+    fill: var(--dia-ct);
+  }
+
+  #supply-curve-diagram .curve-label.shift-right {
+    fill: var(--dia-pt);
+  }
+
+  #supply-curve-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #supply-curve-diagram figcaption span {
+    font-weight: 600;
+  }
+
+  #supply-curve-diagram figcaption .main {
+    color: var(--s5);
+  }
+
+  #supply-curve-diagram figcaption .shift-left {
+    color: var(--dia-ct);
+  }
+
+  #supply-curve-diagram figcaption .shift-right {
+    color: var(--dia-pt);
+  }
+</style>
