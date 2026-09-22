@@ -117,7 +117,7 @@ const uid = "simplex-" + Math.random().toString(36).slice(2, 9);
   }
 
   /* The hidden data tables inside each step; only notes stay visible. */
-  .stack :global(.step .tableau) {
+  .stack :global(.step [data-stage]) {
     display: none;
   }
 
@@ -214,8 +214,8 @@ const uid = "simplex-" + Math.random().toString(36).slice(2, 9);
       visibility: visible;
       margin-top: 16px;
     }
-    .simplex .stack .step > .tableau {
-      display: table;
+    .simplex .stack .step > [data-stage] {
+      display: revert;
     }
     .simplex .foot {
       display: none;
@@ -239,7 +239,7 @@ const uid = "simplex-" + Math.random().toString(36).slice(2, 9);
 
     // The persistent table: a clone of the first step's data table.
     const liveTable = steps[0]
-      .querySelector<HTMLTableElement>(".tableau")!
+      .querySelector<HTMLTableElement>("[data-stage]")!
       .cloneNode(true) as HTMLTableElement;
     liveTable.removeAttribute("aria-hidden");
     holder.appendChild(liveTable);
@@ -260,7 +260,7 @@ const uid = "simplex-" + Math.random().toString(36).slice(2, 9);
 
     function show(n: number) {
       i = Math.max(0, Math.min(steps.length - 1, n));
-      const src = steps[i].querySelector<HTMLTableElement>(".tableau")!;
+      const src = steps[i].querySelector<HTMLTableElement>("[data-stage]")!;
 
       const srcRows = src.querySelectorAll("tr");
       const dstRows = liveTable.querySelectorAll("tr");
@@ -296,7 +296,7 @@ const uid = "simplex-" + Math.random().toString(36).slice(2, 9);
     }
 
     // Initial paint without flashing every cell.
-    const first = steps[0].querySelector<HTMLTableElement>(".tableau")!;
+    const first = steps[0].querySelector<HTMLTableElement>("[data-stage]")!;
     first.querySelectorAll("tr").forEach((sr, ri) => {
       const dr = liveTable.querySelectorAll("tr")[ri];
       if (dr) dr.classList.toggle("leave", sr.classList.contains("leave"));

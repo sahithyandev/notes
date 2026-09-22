@@ -126,7 +126,7 @@ const uid = "transport-walk-" + Math.random().toString(36).slice(2, 9);
   }
 
   /* The hidden data tables inside each step; only notes stay visible. */
-  .stack :global(.step > .transport) {
+  .stack :global(.step > [data-stage]) {
     display: none;
   }
 
@@ -223,11 +223,11 @@ const uid = "transport-walk-" + Math.random().toString(36).slice(2, 9);
       visibility: visible;
       margin-top: 16px;
     }
-    .tw .stack .step > .transport {
-      display: block;
+    .tw .stack .step > [data-stage] {
+      display: revert;
     }
-    .tw .stack .step > .transport table {
-      display: table;
+    .tw .stack .step > [data-stage] table {
+      display: revert;
     }
     .tw .foot {
       display: none;
@@ -251,7 +251,7 @@ const uid = "transport-walk-" + Math.random().toString(36).slice(2, 9);
 
     // The persistent figure: a clone of the first step's transportation table.
     const liveFigure = steps[0]
-      .querySelector<HTMLElement>(".transport")!
+      .querySelector<HTMLElement>("[data-stage]")!
       .cloneNode(true) as HTMLElement;
     liveFigure.querySelector("table")?.removeAttribute("aria-hidden");
     holder.appendChild(liveFigure);
@@ -272,7 +272,7 @@ const uid = "transport-walk-" + Math.random().toString(36).slice(2, 9);
 
     function show(n: number) {
       i = Math.max(0, Math.min(steps.length - 1, n));
-      const srcFigure = steps[i].querySelector<HTMLElement>(".transport")!;
+      const srcFigure = steps[i].querySelector<HTMLElement>("[data-stage]")!;
       const srcTable = srcFigure.querySelector("table")!;
       const dstTable = liveFigure.querySelector("table")!;
 

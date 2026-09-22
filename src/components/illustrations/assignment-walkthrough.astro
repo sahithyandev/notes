@@ -131,7 +131,7 @@ const uid = "assignment-walk-" + Math.random().toString(36).slice(2, 9);
   }
 
   /* The hidden data tables inside each step; only notes stay visible. */
-  .stack :global(.step > .assignment) {
+  .stack :global(.step > [data-stage]) {
     display: none;
   }
 
@@ -228,11 +228,11 @@ const uid = "assignment-walk-" + Math.random().toString(36).slice(2, 9);
       visibility: visible;
       margin-top: 16px;
     }
-    .aw .stack .step > .assignment {
-      display: block;
+    .aw .stack .step > [data-stage] {
+      display: revert;
     }
-    .aw .stack .step > .assignment table {
-      display: table;
+    .aw .stack .step > [data-stage] table {
+      display: revert;
     }
     .aw .foot {
       display: none;
@@ -256,7 +256,7 @@ const uid = "assignment-walk-" + Math.random().toString(36).slice(2, 9);
 
     // The persistent figure: a clone of the first step's assignment table.
     const liveFigure = steps[0]
-      .querySelector<HTMLElement>(".assignment")!
+      .querySelector<HTMLElement>("[data-stage]")!
       .cloneNode(true) as HTMLElement;
     liveFigure.querySelector("table")?.removeAttribute("aria-hidden");
     holder.appendChild(liveFigure);
@@ -277,7 +277,7 @@ const uid = "assignment-walk-" + Math.random().toString(36).slice(2, 9);
 
     function show(n: number) {
       i = Math.max(0, Math.min(steps.length - 1, n));
-      const srcFigure = steps[i].querySelector<HTMLElement>(".assignment")!;
+      const srcFigure = steps[i].querySelector<HTMLElement>("[data-stage]")!;
       const srcTable = srcFigure.querySelector("table")!;
       const dstTable = liveFigure.querySelector("table")!;
 
