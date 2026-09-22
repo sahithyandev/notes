@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:53:36.074Z
-lastUpdatedOn: 2026-09-17T02:36:53.571Z
+lastUpdatedOn: 2026-09-22T17:38:56.522Z
 ---
 
 If the starting basis needs artificial variables, either Big-M or two-phase method should be used.
@@ -53,7 +53,7 @@ $$
 
 The tableau convention maximizes and stops when all objective row coefficients are $\ge 0$. Minimizing $z$ means maximizing $-z$, so the objective is $\max\ -z - M a_1 - M a_2$. The natural starting basis is $(a_1, a_2, s_3) = (3, 6, 4)$, read straight off $(2)$.
 
-<SimplexWalkthrough>
+<Walkthrough variant="simplex">
   <SimplexStep
     label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
@@ -208,7 +208,7 @@ The tableau convention maximizes and stops when all objective row coefficients a
     Optimal at $x_1 = 2/5$, $x_2 = 9/5$, maximand $-z = -17/5$, so
     $z = 17/5 = 3.4$.
   </SimplexStep>
-</SimplexWalkthrough>
+</Walkthrough>
 
 ## Two-Phase Method
 
@@ -237,7 +237,7 @@ Same LP $(1)$ and standard form $(2)$ as the Big-M example.
 
 Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. The natural starting basis is again $(a_1, a_2, s_3) = (3, 6, 4)$.
 
-<SimplexWalkthrough>
+<Walkthrough variant="simplex">
   <SimplexStep
     label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
@@ -353,13 +353,13 @@ Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. The n
     non-basic, so $(x_1, x_2, s_3) = (3/5, 6/5, 1)$ is a basic feasible solution
     of the original problem.
   </SimplexStep>
-</SimplexWalkthrough>
+</Walkthrough>
 
 #### Phase 2
 
 Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Carry over the phase 1 final basis $(x_1, x_2, s_3) = (3/5, 6/5, 1)$, columns $x_1, x_2, s_2, s_3$ only.
 
-<SimplexWalkthrough>
+<Walkthrough variant="simplex">
   <SimplexStep
     label="Setup: raw objective row"
     columns={["x_1", "x_2", "s_2", "s_3"]}
@@ -430,4 +430,4 @@ Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Carry over 
     All objective coefficients are non-negative. Optimal at $x_1 = 2/5$,
     $x_2 = 9/5$, so $z = 17/5 = 3.4$, matching the Big-M result.
   </SimplexStep>
-</SimplexWalkthrough>
+</Walkthrough>

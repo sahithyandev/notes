@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:50.043Z
-lastUpdatedOn: 2026-09-22T16:12:16.720Z
+lastUpdatedOn: 2026-09-22T17:38:56.577Z
 ---
 
 Minimizes the cost of shipping a single commodity from $m$ supply points to $n$ demand points, given a per-unit shipping cost $c_{ij}$ for every supply-demand pair.
@@ -159,7 +159,7 @@ Solving the table from [Transportation Table](#transportation-table). Total supp
 
 Least cost method proceeds as follows:
 
-<TransportationWalkthrough>
+<Walkthrough variant="transportation">
   <TransportationStep
     label="Step 1"
     rows={["O_1", "O_2", "O_3"]}
@@ -294,11 +294,11 @@ Least cost method proceeds as follows:
     Only $O_1 D_2$ remains. Allocate the remaining 20. 6 basic variables
     equals $m+n-1$, non-degenerate.
   </TransportationStep>
-</TransportationWalkthrough>
+</Walkthrough>
 
 Vogel's approximation method proceeds as follows:
 
-<TransportationWalkthrough>
+<Walkthrough variant="transportation">
   <TransportationStep
     label="Round 1: Penalties"
     rows={["O_1", "O_2", "O_3"]}
@@ -544,11 +544,11 @@ Vogel's approximation method proceeds as follows:
     Allocate $O_3 D_1 = 25$. 6 basic variables equals $m+n-1$,
     non-degenerate.
   </TransportationStep>
-</TransportationWalkthrough>
+</Walkthrough>
 
 Applying the stepping stone method to the least cost method's BFS above (occupied cells $O_1 D_2$, $O_2 D_1$, $O_2 D_2$, $O_2 D_3$, $O_2 D_4$, $O_3 D_1$). Each step below traces the loop for one unoccupied cell, with $+$ and $-$ marking the alternating signs around it.
 
-<TransportationWalkthrough>
+<Walkthrough variant="transportation">
   <TransportationStep
     label="BFS"
     rows={["O_1", "O_2", "O_3"]}
@@ -813,6 +813,6 @@ Applying the stepping stone method to the least cost method's BFS above (occupie
     optimal at $z = 255$. $O_3 D_4 = 0$ gives an alternate optimal
     solution.
   </TransportationStep>
-</TransportationWalkthrough>
+</Walkthrough>
 
 This matches Vogel's approximation method's result exactly, both in allocations and cost: VAM reached the optimum directly, while the least cost method needed 1 stepping stone iteration to get there.

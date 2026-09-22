@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:28.601Z
-lastUpdatedOn: 2026-09-16T19:48:47.495Z
+lastUpdatedOn: 2026-09-22T17:38:56.565Z
 ---
 
 An integer programming problem (IPP) is a linear program with the added restriction that some or all decision variables must be integers.
@@ -106,7 +106,7 @@ The $x_1$ row has $b_1 = 1.5$, so $f_1 = 0.5$. Its coefficients split as $f_{1,s
 
 Gomory constraint: $0.5s_2 \ge 0.5$, i.e. $s_2 \ge 1$.
 
-<SimplexWalkthrough>
+<Walkthrough variant="simplex">
   <SimplexStep
     label="Cut added"
     entering={3}
@@ -137,6 +137,6 @@ Gomory constraint: $0.5s_2 \ge 0.5$, i.e. $s_2 \ge 1$.
     Every RHS is $\ge 0$ and $x_1$, $x_2$, $s_2$ are all integral. Optimal at
     $x_1 = 2$, $x_2 = 3$, $Z = 13$.
   </SimplexStep>
-</SimplexWalkthrough>
+</Walkthrough>
 
 Optimal solution: $x_1 = 2$, $x_2 = 3$, $Z = 13$. Matches branch and bound.
