@@ -24,5 +24,14 @@ export function checkFilename(f: ScannedFile): Violation[] {
     });
   }
 
+  if (/introduction/i.test(name) && !/^01-/.test(name)) {
+    violations.push({
+      rule: "filename",
+      line: 1,
+      text: `filename "${name}" contains "introduction" but doesn't start with "01-"`,
+      snippet: name,
+    });
+  }
+
   return violations;
 }
