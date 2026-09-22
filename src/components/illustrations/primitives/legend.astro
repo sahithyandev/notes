@@ -1,0 +1,102 @@
+---
+// The small key-and-swatch row above a walkthrough's live table. The 14
+// chips across the three walkthrough families are not all colour swatches
+// (assignment uses a "0" glyph and a dotted rule; simplex's "changed" chip
+// is text-only), so each item declares its own `kind` rather than the
+// legend guessing from a class name.
+export type ChipKind = "swatch" | "outline" | "line" | "glyph" | "text";
+
+export interface Chip {
+  label: string;
+  kind: ChipKind;
+  /** CSS colour (often a var(--token)) used as the swatch/glyph colour. */
+  fill?: string;
+  /** CSS colour for the swatch/outline/line border. Swatches default to
+   *  var(--border-strong); pass "transparent" to opt out of a border. */
+  border?: string;
+  /** Single character rendered by kind="glyph" (e.g. "0"). */
+  glyph?: string;
+}
+
+interface Props {
+  items: Chip[];
+}
+
+const { items } = Astro.props;
+
+const chipVars = ({ fill, border }: Chip) =>
+  [fill && `--chip-fill:${fill}`, border && `--chip-border:${border}`]
+    .filter(Boolean)
+    .join(";") || undefined;
+---
+
+<p class="legend">
+  {
+    items.map((chip) => (
+      <span
+        class:list={["chip", chip.kind]}
+        style={chipVars(chip)}
+        data-glyph={chip.glyph}
+      >
+        {chip.label}
+      </span>
+    ))
+  }
+</p>
+
+<style>
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 0 0 12px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip::before {
+    content: "";
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    flex: none;
+  }
+
+  .chip.swatch::before {
+    background: var(--chip-fill, transparent);
+    border: 1px solid var(--chip-border, var(--border-strong));
+  }
+  .chip.outline::before {
+    background: transparent;
+    border: 2px solid var(--chip-border, var(--accent));
+  }
+  .chip.line::before {
+    width: 14px;
+    height: 0;
+    border: none;
+    border-top: 2px dotted var(--chip-border, var(--accent));
+    border-radius: 0;
+  }
+  .chip.glyph::before {
+    content: attr(data-glyph);
+    width: auto;
+    height: auto;
+    border: none;
+    border-radius: 0;
+    color: var(--chip-fill, var(--accent));
+    font-weight: 700;
+    font-size: 0.85em;
+    line-height: 1;
+  }
+  .chip.text::before {
+    display: none;
+  }
+  .chip.text {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
