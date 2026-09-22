@@ -1,6 +1,6 @@
 Guidance for AI coding agents (Claude Code, OpenCode, and others) working in this repo.
 
-Astro 6 static site. Notes are Markdown files in `docs/`, loaded via content collections and rendered by the page files in `src/pages/`.
+Astro 7 static site. Notes are Markdown files in `docs/`, loaded via content collections and rendered by the page files in `src/pages/`.
 
 ## Commands
 
@@ -147,6 +147,19 @@ Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order l
 - `src/pages/sitemap-index.xml.ts`, `src/pages/sitemaps/[sem].xml.ts` — sitemaps split by semester.
 
 Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Components live in `src/components/`, shared helpers in `src/utils/` (`index.ts` for helpers like `titleize`, `values.ts` for site constants).
+
+## Illustration components
+
+`src/components/illustrations/` holds the interactive diagrams (walkthroughs, tables, sensitivity sliders, SVG diagrams) used across notes. It's layered:
+
+- **Leaf illustrations** — the domain-specific components (`simplex-step.astro`, `transportation-table.astro`, `sensitivity-rhs-slider.astro`, `flow-diagram.astro`, ...). These carry the actual math/data and are what notes reference in MDX.
+- **Composites** — components that assemble primitives into a reusable shape. `walkthrough.astro` is the one generic step carousel (`<Walkthrough variant="simplex" | "transportation" | "assignment">`); step components (`simplex-step.astro`, etc.) render into it via a hidden `[data-stage]` element that the shared controller clones and updates.
+- **`primitives/`** — chrome with no domain knowledge: `panel.astro` (bordered surface box), `step-bar.astro` (label + counter), `legend.astro` (a closed vocabulary of chip kinds: `swatch` / `outline` / `line` / `glyph` / `text`), `step-nav.astro` (dots + prev/next + aria-live), `step-note.astro`, `slider-control.astro`, `status-note.astro`.
+- **`lib/`** — pure TS, no markup: `walkthrough.ts` (the shared carousel driver), `dots.ts` (clones a dot button from `step-nav.astro`'s `<template>` so it carries that component's scoped-CSS id), `format.ts` (slider number formatting), `legend-presets.ts` (per-`variant` legend chips), plus `src/utils/tex.ts` for the shared KaTeX render helper used across the directory.
+
+**When adding a new interactive illustration, compose the existing primitives instead of copying chrome from another component.** If a primitive doesn't fit (e.g. it needs a different accent colour or box padding), extend the primitive with a CSS custom property or a scoped `:global()` override in the consuming component's own `<style>` block, rather than duplicating its markup and CSS — see `flow-diagram.astro`'s `--nav-accent` override for the pattern.
+
+`src/components/illustrations/index.ts` re-exports every illustration component; `[...slug].astro` imports it once (`import * as Illustrations from "../components/illustrations"`) and spreads it into the MDX `components` map, rather than hand-listing each one.
 
 ## Styling
 
