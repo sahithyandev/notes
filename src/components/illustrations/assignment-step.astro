@@ -1,0 +1,55 @@
+---
+import AssignmentTable from "./assignment-table.astro";
+
+interface Props {
+  label: string;
+  agents: string[];
+  tasks: string[];
+  costs: number[][];
+  coveredRows?: number[];
+  coveredCols?: number[];
+  assigned?: [number, number][];
+  total?: string;
+}
+
+const {
+  label,
+  agents,
+  tasks,
+  costs,
+  coveredRows,
+  coveredCols,
+  assigned,
+  total,
+} = Astro.props;
+---
+
+<div class="step" data-label={label}>
+  <AssignmentTable
+    dataSource
+    agents={agents}
+    tasks={tasks}
+    costs={costs}
+    coveredRows={coveredRows}
+    coveredCols={coveredCols}
+    assigned={assigned}
+    total={total}
+  />
+  <div class="step-note"><slot /></div>
+</div>
+
+<style>
+  .step-note {
+    margin: 12px 0 0;
+    min-height: 2.8em;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+  .step-note :global(p) {
+    margin: 0;
+  }
+  .step-note :global(.katex) {
+    font-size: 1em;
+  }
+</style>

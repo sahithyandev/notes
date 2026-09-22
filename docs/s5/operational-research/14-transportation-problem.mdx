@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:50.043Z
-lastUpdatedOn: 2026-09-13T14:55:24.620Z
+lastUpdatedOn: 2026-09-22T16:12:16.720Z
 ---
 
 Minimizes the cost of shipping a single commodity from $m$ supply points to $n$ demand points, given a per-unit shipping cost $c_{ij}$ for every supply-demand pair.
@@ -29,7 +29,9 @@ Total supply equals total demand: $\sum_i a_i = \sum_j b_j$. Every constraint be
 
 A feasible solution exists **iff** the problem is balanced.
 
-A balanced transportation problem with $m$ supply and $n$ demand points has $m + n - 1$ basic variables in any basic feasible solution (BFS).
+A balanced transportation problem with $m$ supply and $n$ demand points has $m + n - 1$ basic variables in any basic feasible solution (BFS), the most positive allocations a BFS can have.
+
+Balance makes the last of the $m + n$ supply/demand equality constraints redundant, since it follows from the rest once totals match, leaving $m + n - 1$ independent constraints. A [basic solution](/s5/operational-research/solutions-of-lp#basic-solution) has exactly 1 basic variable per independent constraint.
 
 ### Unbalanced
 
@@ -73,16 +75,6 @@ Total supply is $115$, total demand is $75$: unbalanced.
 ### Loop
 
 A closed path of occupied cells (plus a chosen unoccupied cell) that alternates horizontal and vertical moves, turning only at occupied cells, and returns to the unoccupied cell. Exactly one such loop exists for a given unoccupied cell in a non-degenerate BFS.
-
-## Degenerate BFS
-
-A BFS is non-degenerate when it has exactly $m+n-1$ positive allocations. Every unoccupied cell then has exactly 1 loop, and the stepping stone method computes every improvement index directly.
-
-A BFS is degenerate when an allocation exhausts a row and a column simultaneously before all supply/demand is used, leaving fewer than $m+n-1$ positive allocations. Add a 0 allocation to an unoccupied cell (chosen so the solution stays a basic feasible solution) to restore the count. From then on the 0-allocated cell counts as occupied for tracing loops, even though it ships nothing.
-
-Degeneracy can also appear mid-solution: if a stepping stone pivot ties 2 or more $-$ cells at the same minimum allocation, only 1 leaves the basis, but every tied cell drops to 0, again leaving fewer than $m+n-1$ positive allocations.
-
-An allocation to a dummy row or column represents unmet demand or unused supply rather than an actual shipment, since its cost is 0. It is still an ordinary basic variable: it counts toward $m+n-1$, and it participates in loops like any other occupied cell.
 
 ## Solving Transportation Method
 
@@ -131,6 +123,23 @@ Repeat until every improvement index is $\ge 0$.
 Occurs when an unoccupied cell has an improvement index of 0 at optimality. Any allocation along its loop gives another solution with the same optimal cost.
 
 </Note>
+
+## Degenerate BFS
+
+A BFS is degenerate **iff** it has fewer than $m+n-1$ positive allocations.
+
+A non-degenerate BFS has exactly $m+n-1$ positive allocations. Every unoccupied cell then has exactly 1 loop back to the occupied cells, which the stepping stone method needs to compute improvement indices.
+
+Causes:
+
+- Initial allocation  
+  1 allocation exhausts its row and column together. Example: supply $(10,10)$, demand $(10,10)$. Allocating $10$ to $(1,1)$ empties row $1$ and column $1$ at once, leaving only 1 more allocation instead of the expected $m+n-1=3$.
+- Pivot tie  
+  A pivot's loop has 2 or more $-$ cells tied at the minimum allocation. Only 1 leaves the basis. The rest drop to $0$ too.
+
+Fix: allocate $0$ to an unoccupied cell that doesn't close a loop with the occupied cells. This restores the count to $m+n-1$, and the cell counts as occupied in loops despite shipping nothing.
+
+A dummy row or column's allocation is a real basic variable, not a placeholder: it counts toward $m+n-1$ and takes part in loops like any other occupied cell.
 
 ## Worked Example
 
