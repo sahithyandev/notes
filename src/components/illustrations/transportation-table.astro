@@ -1,5 +1,5 @@
 ---
-import katex from "katex";
+import { tex } from "../../utils/tex";
 
 interface Props {
   rows: string[];
@@ -64,9 +64,6 @@ const isSelectedRow = (ri: number) =>
   selectedPenalty?.axis === "row" && selectedPenalty.index === ri;
 const isSelectedCol = (ci: number) =>
   selectedPenalty?.axis === "col" && selectedPenalty.index === ci;
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
 ---
 
 <figure class="transport">

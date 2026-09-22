@@ -1,5 +1,5 @@
 ---
-import katex from "katex";
+import { tex } from "../../utils/tex";
 
 interface Props {
   zTerm: number;
@@ -8,9 +8,6 @@ interface Props {
 }
 
 const { zTerm, deltaMin, deltaMax } = Astro.props;
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
 ---
 
 <div class="new-var-slider">

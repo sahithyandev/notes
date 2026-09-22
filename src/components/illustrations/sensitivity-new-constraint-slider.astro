@@ -1,5 +1,5 @@
 ---
-import katex from "katex";
+import { tex } from "../../utils/tex";
 
 interface Props {
   currentSum: number;
@@ -8,9 +8,6 @@ interface Props {
 }
 
 const { currentSum, min, max } = Astro.props;
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
 ---
 
 <div class="new-constraint-slider">

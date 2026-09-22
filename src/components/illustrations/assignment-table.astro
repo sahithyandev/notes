@@ -1,5 +1,5 @@
 ---
-import katex from "katex";
+import { tex } from "../../utils/tex";
 
 interface Props {
   agents: string[];
@@ -27,9 +27,6 @@ const isRowCovered = (ri: number) => coveredRows.includes(ri);
 const isColCovered = (ci: number) => coveredCols.includes(ci);
 const isAssigned = (ri: number, ci: number) =>
   assigned.some(([ar, ac]) => ar === ri && ac === ci);
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
 ---
 
 <figure class="assignment">
