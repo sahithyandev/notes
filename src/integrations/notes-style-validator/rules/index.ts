@@ -3,6 +3,7 @@ import type { Violation } from "../report.ts";
 import { checkTitleCaseRule } from "./title-case.ts";
 import { checkTitleParens } from "./title-parens.ts";
 import { checkTitleDash } from "./title-dash.ts";
+import { checkTitleLength } from "./title-length.ts";
 import { checkDash } from "./dash.ts";
 import { checkMathDelimiters } from "./math-delimiters.ts";
 import { checkAdjacentNote } from "./adjacent-note.ts";
@@ -22,6 +23,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleCaseRule,
   checkTitleParens,
   checkTitleDash,
+  checkTitleLength,
   checkDash,
   checkMathDelimiters,
   checkAdjacentNote,

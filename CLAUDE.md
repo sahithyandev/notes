@@ -85,6 +85,12 @@ Rules implemented in `core/titlecase.ts`:
 
 Add a new domain term to `ALLOWED_LOWERCASE` rather than working around a false positive.
 
+### Title length
+
+The `title` frontmatter field must be 40 characters or fewer, enforced by the `title-length` rule (`src/integrations/notes-style-validator/rules/title-length.ts`). Titles render standalone (sidebar, page header, browser tab, OG image), so a long one wraps or gets truncated instead of just reading as a dense sentence the way it would in prose. Prefer a shorter, more specific title or a well-known abbreviation over a literal restatement of the note's full scope.
+
+Exempt: a title starting with `Introduction to `, since that's a fixed opener pattern used across the corpus for module/topic-level notes and reads fine at any length.
+
 ### Note components
 
 Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
