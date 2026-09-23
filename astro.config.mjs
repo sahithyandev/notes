@@ -141,6 +141,10 @@ export default defineConfig({
   adapter: vercel({
     isr: {
       expiration: 60 * 60 * 24, // 24 hours default; per-page revalidate overrides this
+      // API routes must run per request: the ISR function only forwards the
+      // Astro path param, so query params like ?slug=... get stripped and
+      // every slug shares one cached GET response.
+      exclude: [/^\/api\//],
     },
   }),
 });

@@ -81,6 +81,7 @@ const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
     )!;
 
     let inflight = false;
+    let voted = false;
 
     function markActive(vote: number | null) {
       btns.forEach((btn) => {
@@ -106,7 +107,9 @@ const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
     fetch(`/api/votes?slug=${encodeURIComponent(slug)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && typeof data.up === "number") {
+        // A click may have already landed (and its own POST response
+        // applied) while this was in flight; don't clobber it.
+        if (!voted && data && typeof data.up === "number") {
           setCounts(data.up, data.down);
         }
       })
@@ -115,6 +118,7 @@ const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
     btns.forEach((btn) => {
       btn.addEventListener("click", () => {
         if (inflight) return;
+        voted = true;
         const vote = Number(btn.dataset.vote) as 1 | -1;
         const prevVote = localStorage.getItem(storageKey);
         const isUndo = prevVote === String(vote);
