@@ -1,39 +1,138 @@
 ---
-// Static PPF (Production Possibilities Frontier) diagram: a concave curve
-// on 2 axes, with a point on the boundary (efficient), inside (inefficient
-// / unemployed resources) and outside (unattainable).
+// Production Possibilities Frontier (PPF)
+// A = efficient point on the frontier
+// B = inefficient point inside the frontier
+// C = unattainable point outside the frontier
 ---
 
 <figure id="ppf-diagram">
-  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
-    <title>Production Possibilities Frontier</title>
+  <svg
+    viewBox="0 0 560 430"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby="ppf-title ppf-desc"
+  >
+    <title id="ppf-title">Production Possibilities Frontier</title>
+    <desc id="ppf-desc">
+      A is on the production possibilities frontier and represents an efficient
+      combination. B is inside the frontier and represents an inefficient
+      combination. C is outside the frontier and is unattainable.
+    </desc>
 
-    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
-    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
-    <text class="axis-label" x="50" y="14" text-anchor="middle">Good Y</text>
-    <text class="axis-label" x="390" y="315" text-anchor="end">Good X</text>
+    <!-- =========================
+         Axes
+    ========================== -->
 
-    <path class="curve" d="M 50 40 C 60 160, 150 270, 370 280"></path>
+    <line class="axis" x1="70" y1="360" x2="70" y2="45"></line>
 
-    <circle class="pt on-curve" cx="200" cy="150" r="5"></circle>
-    <text class="pt-label" x="210" y="140">A</text>
+    <line class="axis" x1="70" y1="360" x2="505" y2="360"></line>
 
-    <circle class="pt inside" cx="150" cy="230" r="5"></circle>
-    <text class="pt-label" x="160" y="222">B</text>
+    <!-- Axis labels -->
+    <text class="axis-label" x="70" y="30" text-anchor="middle"> Good Y </text>
 
-    <circle class="pt outside" cx="270" cy="120" r="5"></circle>
-    <text class="pt-label" x="280" y="112">C</text>
+    <text class="axis-label" x="505" y="392" text-anchor="end"> Good X </text>
+
+    <!-- Origin -->
+    <text class="origin" x="55" y="378"> 0 </text>
+
+    <!-- =========================
+         Feasible region
+    ========================== -->
+
+    <path
+      class="feasible-area"
+      d="
+        M 70 75
+        C 120 75, 165 95, 215 135
+        C 285 190, 350 260, 410 360
+        L 70 360
+        Z
+      "
+    ></path>
+
+    <!-- =========================
+         PPF curve
+         Concave / bowed outward
+    ========================== -->
+
+    <path
+      class="curve"
+      d="
+        M 70 75
+        C 125 75, 175 100, 220 140
+        C 285 195, 350 265, 410 360
+      "
+    ></path>
+
+    <!-- =========================
+         Point A
+         ON the PPF
+    ========================== -->
+
+    <!-- guide lines -->
+    <line class="guide" x1="220" y1="140" x2="220" y2="360"></line>
+
+    <line class="guide" x1="70" y1="140" x2="220" y2="140"></line>
+
+    <circle class="point point-a" cx="220" cy="140" r="7"></circle>
+
+    <text class="point-label" x="232" y="130"> A </text>
+
+    <!-- =========================
+         Point B
+         INSIDE the PPF
+    ========================== -->
+
+    <!-- guide lines -->
+    <line class="guide" x1="170" y1="220" x2="170" y2="360"></line>
+
+    <line class="guide" x1="70" y1="220" x2="170" y2="220"></line>
+
+    <circle class="point point-b" cx="170" cy="220" r="7"></circle>
+
+    <text class="point-label" x="182" y="210"> B </text>
+
+    <!-- =========================
+         Point C
+         OUTSIDE the PPF
+    ========================== -->
+
+    <!-- guide lines -->
+    <line class="guide" x1="355" y1="115" x2="355" y2="360"></line>
+
+    <line class="guide" x1="70" y1="115" x2="355" y2="115"></line>
+
+    <circle class="point point-c" cx="355" cy="115" r="7"></circle>
+
+    <text class="point-label" x="367" y="105"> C </text>
+
+    <!-- =========================
+         Point descriptions
+    ========================== -->
+
+    <text class="description efficient" x="220" y="410" text-anchor="middle">
+      A = Efficient
+    </text>
+
+    <text class="description inefficient" x="350" y="410" text-anchor="middle">
+      B = Inefficient
+    </text>
+
+    <text class="description unattainable" x="480" y="410" text-anchor="end">
+      C = Unattainable
+    </text>
   </svg>
+
   <figcaption>
-    <span class="on-curve">A</span> on the boundary, efficient.
-    <span class="inside">B</span> inside, resources unemployed or inefficient.
-    <span class="outside">C</span> outside, unattainable.
+    <span class="efficient">A</span> on the frontier, efficient.
+    <span class="inefficient">B</span> inside the frontier, inefficient.
+    <span class="unattainable">C</span> outside the frontier, unattainable.
   </figcaption>
 </figure>
 
 <style>
   #ppf-diagram {
-    max-width: 420px;
+    max-width: 560px;
     margin: 24px auto;
   }
 
@@ -42,65 +141,102 @@
     height: auto;
   }
 
+  /* Axes */
   #ppf-diagram .axis {
     stroke: var(--text-muted);
-    stroke-width: 1.5;
+    stroke-width: 2;
   }
 
+  /* Axis labels */
   #ppf-diagram .axis-label {
     fill: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  #ppf-diagram .origin {
+    fill: var(--text-muted);
     font-size: 13px;
   }
 
+  /* Feasible region */
+  #ppf-diagram .feasible-area {
+    fill: var(--s5);
+    opacity: 0.07;
+  }
+
+  /* PPF */
   #ppf-diagram .curve {
     fill: none;
     stroke: var(--s5);
-    stroke-width: 2.5;
+    stroke-width: 3;
+    stroke-linecap: round;
   }
 
-  #ppf-diagram .pt {
+  /* Dashed projection lines */
+  #ppf-diagram .guide {
+    stroke: var(--text-muted);
+    stroke-width: 1.2;
+    stroke-dasharray: 5 5;
+    opacity: 0.7;
+  }
+
+  /* Points */
+  #ppf-diagram .point {
     stroke: var(--surface);
-    stroke-width: 1.5;
+    stroke-width: 2;
   }
 
-  #ppf-diagram .pt.on-curve {
+  #ppf-diagram .point-a {
     fill: var(--dia-pt);
   }
 
-  #ppf-diagram .pt.inside {
+  #ppf-diagram .point-b {
     fill: var(--dia-key);
   }
 
-  #ppf-diagram .pt.outside {
+  #ppf-diagram .point-c {
     fill: var(--dia-ct);
   }
 
-  #ppf-diagram .pt-label {
+  /* Point labels */
+  #ppf-diagram .point-label {
     fill: var(--text-primary);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
   }
 
+  /* Description labels */
+  #ppf-diagram .description {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  #ppf-diagram .efficient {
+    color: var(--dia-pt);
+    fill: var(--dia-pt);
+  }
+
+  #ppf-diagram .inefficient {
+    color: var(--dia-key);
+    fill: var(--dia-key);
+  }
+
+  #ppf-diagram .unattainable {
+    color: var(--dia-ct);
+    fill: var(--dia-ct);
+  }
+
+  /* Caption */
   #ppf-diagram figcaption {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 0.85rem;
     color: var(--text-secondary);
     text-align: center;
+    line-height: 1.5;
   }
 
   #ppf-diagram figcaption span {
     font-weight: 600;
-  }
-
-  #ppf-diagram figcaption .on-curve {
-    color: var(--dia-pt);
-  }
-
-  #ppf-diagram figcaption .inside {
-    color: var(--dia-key);
-  }
-
-  #ppf-diagram figcaption .outside {
-    color: var(--dia-ct);
   }
 </style>
