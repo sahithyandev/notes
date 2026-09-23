@@ -11,6 +11,7 @@ const authors = defineCollection({
     color: z
       .string()
       .regex(/^#[0-9a-f]{6}$/i, "color must be a 6-digit hex code"),
+    github_id: z.string().optional(),
   }),
 });
 

@@ -1,14 +1,8 @@
 ---
+import type { CollectionEntry } from "astro:content";
 import { calculateReadTime } from "../utils";
 
-interface Author {
-  data: {
-    slug: string;
-    name: string;
-    url?: string;
-    color: string;
-  };
-}
+type Author = CollectionEntry<"authors">;
 
 interface Props {
   authors: Author[];
@@ -26,6 +20,10 @@ function initials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("");
+}
+
+function githubProfileUrl(githubId: string) {
+  return `https://github.com/${githubId}.png?size=64`;
 }
 
 const formattedDate = lastUpdatedOn
@@ -51,9 +49,16 @@ const wordCountLabel = `${wordCount} words`;
             class="note-authors-item"
             style={`--author-color: ${author.data.color}`}
           >
-            <span class="note-authors-avatar" aria-hidden="true">
-              {initials(author.data.name)}
-            </span>
+            <div class="note-authors-avatar" aria-hidden="true">
+              {author.data.github_id ? (
+                <img
+                  src={githubProfileUrl(author.data.github_id)}
+                  alt={author.data.name}
+                />
+              ) : (
+                initials(author.data.name)
+              )}
+            </div>
             {author.data.url ? (
               <a
                 class="note-authors-link"
@@ -130,6 +135,7 @@ const wordCountLabel = `${wordCount} words`;
     font-size: 0.6875rem;
     font-weight: 700;
     flex-shrink: 0;
+    overflow: hidden;
   }
 
   .note-authors-name,
