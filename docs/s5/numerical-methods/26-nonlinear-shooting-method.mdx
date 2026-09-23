@@ -1,0 +1,74 @@
+---
+title: Nonlinear Shooting Method
+dateCreated: 2026-09-23T08:09:15.101Z
+lastUpdatedOn: 2026-09-23T08:17:14.027Z
+slug: s5/numerical-methods/nonlinear-shooting-method
+sidebar:
+  order: 26
+prev: true
+next: true
+---
+
+The nonlinear shooting method solves a nonlinear [BVP](/s5/numerical-methods/boundary-value-problems) by approximating the initial slope $y'(a)$ that makes an initial value problem's solution hit the far boundary condition.
+
+## Standard Form
+
+$$
+y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+## Idea
+
+For a guess $t$, let $y(x,t)$ solve the IVP
+
+$$
+y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t
+$$
+
+The method finds $t$ such that $y(b,t) - \beta = 0$, using [Newton's method](/s5/numerical-methods/newtons-method).
+
+## Newton Iteration
+
+$$
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{y'(b,t_{k-1})}
+$$
+
+$y'(b,t_{k-1})$ can't be obtained analytically since $y(b,t_{k-1})$ is only a point approximation. Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
+
+$$
+z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+$$
+
+Substituting $z(b,t_{k-1})$ for $y'(b,t_{k-1})$
+
+$$
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
+$$
+
+## Procedure
+
+- Choose an initial guess $t_0$
+- Repeat for $k = 0, 1, 2, \ldots$ until $|y(b,t_k) - \beta|$ is sufficiently small
+  - Approximate $y_k(x) = y(x,t_k)$ from
+
+    $$
+    y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t_k
+    $$
+
+  - Approximate $z_k(x) = z(x,t_k)$ from
+
+    $$
+    z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+    $$
+
+  - Update
+
+    $$
+    t_{k+1} = t_k - \frac{y_k(b) - \beta}{z_k(b)}
+    $$
+
+<Note>
+
+Both IVPs are reduced to first-order systems and solved with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
+
+</Note>

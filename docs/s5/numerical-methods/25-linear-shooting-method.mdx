@@ -1,0 +1,45 @@
+---
+title: Linear Shooting Method
+dateCreated: 2026-09-23T08:09:15.082Z
+lastUpdatedOn: 2026-09-23T08:17:14.026Z
+slug: s5/numerical-methods/linear-shooting-method
+sidebar:
+  order: 25
+prev: true
+next: true
+---
+
+The linear shooting method solves a linear [BVP](/s5/numerical-methods/boundary-value-problems) by combining solutions to 2 initial value problems.
+
+## Standard Form
+
+$$
+y'' = p(x)y' + q(x)y + r(x), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+A unique solution exists **iff**
+
+- $p$, $q$, $r$ are continuous on $[a,b]$
+- $q(x) > 0$ for $x \in [a,b]$
+
+## Auxiliary IVPs
+
+Solve
+
+$$
+y_1'' = p(x)y_1' + q(x)y_1 + r(x), \quad a \leq x \leq b, \quad y_1(a) = \alpha,\ y_1'(a) = 0
+$$
+
+$$
+y_2'' = p(x)y_2' + q(x)y_2, \quad a \leq x \leq b, \quad y_2(a) = 0,\ y_2'(a) = 1
+$$
+
+by reducing each to a first-order system and applying [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps). $q(x) > 0$ guarantees $y_2(b) \neq 0$ whenever $y_2$ is non-constant.
+
+## Combining Solutions
+
+$$
+y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\, y_2(x)
+$$
+
+is the unique solution to the BVP.
