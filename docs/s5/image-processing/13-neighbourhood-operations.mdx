@@ -1,7 +1,7 @@
 ---
 title: Neighbourhood Operations
 dateCreated: 2026-08-18T07:18:45.000Z
-lastUpdatedOn: 2026-09-13T14:55:24.505Z
+lastUpdatedOn: 2026-09-23T12:22:54.370Z
 slug: s5/image-processing/neighbourhood-operations
 sidebar:
   order: 13
@@ -9,23 +9,29 @@ prev: true
 next: true
 ---
 
-Neighbourhood operations compute an output pixel from a group of pixels in a local region, in contrast to [point operations](/s5/image-processing/point-operations) acting on a single pixel.
+Neighbourhood operations compute an output pixel from a group of pixels in a local region.
 
-The operator is a sub-image, called a filter, mask, kernel, template or window. Each element of the mask acts on a corresponding pixel in the local neighbourhood. The output is saved to a new image, never written back into the input.
+### Kernel
+
+Aka. filter, mask, template or window. Operator of a neighbourhood operation.
+
+Each element of the mask acts on a corresponding pixel in the local neighbourhood. The output is saved to a new image, never written back into the input.
 
 The mask cells are addressed by offset from the mask center, which is $(0,0)$. An odd sized mask has one such center cell. $M(i,j)$ is the mask value at offset $(i,j)$.
 
-Process:
+### Process
 
 - Identify the center pixel $I(x,y)$ the operation applies to
 - Place the mask so its center cell $M(0,0)$ sits on $I(x,y)$. Each other cell $M(i,j)$ then sits on $I(x+i, y+j)$, since the offset that addresses the cell is the offset added to $(x,y)$ to find the pixel under it
 - Compute the output pixel $P(x,y)$ from the mask and the selected neighbourhood
 - Save $P(x,y)$ to the output image
-- Slide the mask by one pixel and repeat for every pixel in the input image
+- Repeat for every pixel in the input image
 
 ## Spatial Filtering
 
-Correlation and convolution are the two ways to combine a mask with a neighbourhood, both by a sum of products equivalent to a matrix dot product. They differ only in whether the mask is flipped first.
+A neighbourhood operation that computes each output pixel directly from the intensities in the input image's spatial domain, by sliding a mask over it.
+
+Correlation and convolution are the two ways to combine the mask with a neighbourhood, both by a sum of products equivalent to a matrix dot product. They differ only in whether the mask is flipped first.
 
 In both sums:
 
@@ -54,13 +60,26 @@ The flip makes the operation associative and commutative, so a chain of convolut
 
 <Note>
 
-No difference between convolution and correlation when the mask is symmetrical.
+When the mask is symmetrical, there are no difference between convolution and correlation.
 
 </Note>
 
-### Linear Filters
+## Frequency Domain Filtering
 
-The output pixel is a correlation or convolution of the mask with the neighbourhood, nothing more. Integer filter coefficients with a scaling factor $k$ reduce computational cost:
+A filtering method that transforms the image to the frequency domain via the Fourier transform, multiplies it by a filter function there, then inverse-transforms back to the spatial domain.
+
+By the convolution theorem, multiplication in the frequency domain is equivalent to convolution in the spatial domain, so any spatial filter has a frequency domain counterpart.
+
+- Low-pass filter  
+  Keeps low frequencies, removing high-frequency detail and noise. Smooths the image.
+- High-pass filter  
+  Keeps high frequencies, removing low-frequency content. Sharpens edges.
+
+## Linearity of Filters
+
+### Linear Filter
+
+Output pixel is a correlation or convolution of the mask with the neighbourhood. Integer filter coefficients with a scaling factor $k$ reduce computational cost:
 
 $$
 P(x,y) = \frac{1}{k} \sum_{i=-N}^{N} \sum_{j=-M}^{M} M(i,j) \times I(x+i, y+j)
@@ -75,9 +94,9 @@ Properties:
 - Linearity  
   Successive linear filters combine into a single equivalent filter, saving computation.
 
-### Non-Linear Filters
+### Non-Linear Filter
 
-Share the same sliding-mask algorithm, but compute the output using a non-linear expression: thresholding, sorting, log functions.
+Output pixel comes from a non-linear expression applied to the neighbourhood: thresholding, sorting, log functions.
 
 - Locality and translational invariance still hold
 - Linearity does not hold
