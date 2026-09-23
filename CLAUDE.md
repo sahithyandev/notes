@@ -168,3 +168,8 @@ Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Compo
 - No Tailwind Typography; prose styles are hand-written in `src/pages/[...slug].astro`. `global.css` holds only CSS variables and the box-sizing reset. Other component styles are scoped `<style>` blocks.
 - Math: `remark-math` + `rehype-katex`; KaTeX CSS from CDN in `Layout.astro`.
 - Custom Markdown classes: `.callout`, `.term`.
+
+## Commit conventions
+
+Never add "Co-Authored-By" lines to commits. Do not include Claude attribution
+in commit messages, PR descriptions, or any git metadata.
