@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:55:23.746Z
-lastUpdatedOn: 2026-09-23T07:19:58.282Z
+lastUpdatedOn: 2026-09-23T07:53:12.413Z
 ---
 
 Project management represents a project as a network of activities and events, used to schedule and analyze the project's timeline.
@@ -69,7 +69,7 @@ $E(j) = 0$ for the initial event, which has no incoming activities.
 
 Earliest start time of an activity $(i,j)$ is $E(i)$, the earliest event time of the event it starts at.
 
-### Latest Time
+### Latest Event Time
 
 Latest event time $L(i)$ of an event $i$:
 
@@ -110,6 +110,40 @@ Every activity still has to complete for the project to finish, not only the one
 3. Project duration is $E$ of the final event.
 4. Critical path  
    The events with $E(i) = L(i)$.
+
+## Float
+
+The slack in an activity's schedule, how much it can be delayed without consequence. 0 for every activity on the critical path.
+
+For an activity $(i,j)$ starting at event $i$ and ending at event $j$, with duration $t_{ij}$:
+
+### Total Float
+
+$$
+\text{Total float} = L(j) - E(i) - t_{ij}
+$$
+
+How much an activity can be delayed without delaying the project's completion. Delaying it by more than its total float may still delay other activities.
+
+### Free Float
+
+$$
+\text{Free float} = E(j) - E(i) - t_{ij}
+$$
+
+How much an activity can be delayed without delaying the earliest start of any following activity.
+
+### Independent Float
+
+$$
+\text{Independent float} = \max\big(E(j) - L(i) - t_{ij},\ 0\big)
+$$
+
+How much an activity can be delayed without affecting any preceding or following activity's float. Negative values are treated as 0.
+
+$$
+\text{Independent float} \le \text{Free float} \le \text{Total float}
+$$
 
 ## Worked Example
 
@@ -219,3 +253,21 @@ Comparing $E(i)$ and $L(i)$ per event identifies the critical path:
 </Walkthrough>
 
 The dummy activity $D$ carries 0 duration and sits off the critical path here, but it still enforces that $F$ can't start until both $C$ and $B$ finish.
+
+Total, free, and independent float for every activity, using $E(i)$ and $L(i)$ from the passes above:
+
+| Activity    | $(i,j)$ | Duration | $E(i)$ | $E(j)$ | $L(i)$ | $L(j)$ | Total float | Free float | Independent float |
+| ----------- | ------- | -------- | ------ | ------ | ------ | ------ | ----------- | ---------- | ----------------- |
+| $A$         | 1, 2    | 4        | 0      | 4      | 0      | 7      | 3           | 0          | 0                 |
+| $B$         | 1, 3    | 3        | 0      | 3      | 0      | 3      | 0           | 0          | 0                 |
+| $C$         | 2, 4    | 2        | 4      | 6      | 7      | 9      | 3           | 0          | 0                 |
+| $D$ (dummy) | 3, 4    | 0        | 3      | 6      | 3      | 9      | 6           | 3          | 3                 |
+| $E$         | 3, 5    | 5        | 3      | 8      | 3      | 8      | 0           | 0          | 0                 |
+| $F$         | 4, 6    | 3        | 6      | 12     | 9      | 12     | 3           | 3          | 0                 |
+| $G$         | 5, 6    | 4        | 8      | 12     | 8      | 12     | 0           | 0          | 0                 |
+
+For $A$: total float $= L(2) - E(1) - 4 = 7 - 0 - 4 = 3$, free float $= E(2) - E(1) - 4 = 4 - 0 - 4 = 0$, independent float $= E(2) - L(1) - 4 = 4 - 0 - 4 = 0$.
+
+For $C$: total float $= L(4) - E(2) - 2 = 9 - 4 - 2 = 3$, but independent float $= E(4) - L(2) - 2 = 6 - 7 - 2 = -3$, treated as $0$.
+
+$B$, $E$, $G$, the activities on the critical path, all have total float $0$, matching the critical path found above.
