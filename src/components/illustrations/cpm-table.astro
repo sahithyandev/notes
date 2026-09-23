@@ -1,0 +1,108 @@
+---
+import { tex } from "../../utils/tex";
+
+interface Props {
+  events: string[];
+  earliest: string[];
+  latest: string[];
+  critical?: number[];
+  dataSource?: boolean;
+}
+
+const {
+  events,
+  earliest,
+  latest,
+  critical = [],
+  dataSource = false,
+} = Astro.props;
+
+const isCritical = (ei: number) => critical.includes(ei);
+---
+
+<table
+  class="tableau"
+  data-stage={dataSource ? "" : undefined}
+  aria-hidden={dataSource ? "true" : undefined}
+>
+  <colgroup>
+    <col class="c-label" />
+    <col class="c-data" />
+    <col class="c-data" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th class="num" set:html={tex("E(i)")} />
+      <th class="num" set:html={tex("L(i)")} />
+    </tr>
+  </thead>
+  <tbody>
+    {
+      events.map((e, ei) => (
+        <tr class:list={{ critical: isCritical(ei) }}>
+          <th set:html={tex(e)} />
+          <td class="num" set:html={earliest[ei] ? tex(earliest[ei]) : ""} />
+          <td class="num" set:html={latest[ei] ? tex(latest[ei]) : ""} />
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<style>
+  table.tableau {
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  col.c-label {
+    width: 4.5rem;
+  }
+  col.c-data {
+    width: 5rem;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  thead th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  tbody th {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  td.num {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  td.num.changed {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  tr.critical th,
+  tr.critical td {
+    background: var(--accent-subtle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    td.num {
+      transition: none;
+    }
+  }
+</style>

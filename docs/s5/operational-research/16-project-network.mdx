@@ -6,26 +6,216 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:55:23.746Z
-lastUpdatedOn: 2026-09-22T16:12:16.773Z
+lastUpdatedOn: 2026-09-23T07:19:58.282Z
 ---
 
-Project management represents a project as a network of activities (tasks) and events (milestones marking an activity's start or completion), used to schedule and analyze the project's timeline.
+Project management represents a project as a network of activities and events, used to schedule and analyze the project's timeline.
+
+A project completes only when every activity finishes. Since activities have predecessors, the project duration is bounded by its slowest chain of dependent activities, the path from initial to final event with the largest sum of durations.
 
 ## Activity
 
 A task consuming time and resources. Represented as an arrow between 2 events.
 
-- Predecessor  
-  An activity that must finish before another can start.
-- Dummy activity  
-  Consumes 0 time and resources. Added only to preserve correct precedence when 2 activities share the same start and end events, or to represent a precedence relationship the diagram couldn't otherwise express.
+### Predecessor
+
+An activity that must finish before another can start.
+
+### Dummy Activity
+
+Consumes 0 time and resources. Added only to preserve correct precedence when 2 activities share the same start and end events, or to represent a precedence relationship the diagram couldn't otherwise express.
 
 ## Event
 
 An instantaneous point in time marking the start or completion of one or more activities. Represented as a node.
+
+An event isn't a task and consumes no time or resources itself. It's a milestone: the moment every activity ending there has finished, so every activity starting there is now free to begin.
+
+### Incoming Activity
+
+An activity ending at that event.
+
+### Outgoing Activity
+
+An activity starting at that event.
 
 ## Network Construction Rules
 
 - Every activity has exactly one start and one end event.
 - No 2 activities can share both the same start and end event (use a dummy activity to separate them).
 - The network must have no cycles: an event can't depend on an activity that (directly or indirectly) depends on it.
+
+## Critical Path Method
+
+Critical Path Method finds that duration, and identifies the activities on that slowest chain.
+
+### Earliest Event Time
+
+Earliest event time $E(j)$ of an event $j$:
+
+$$
+E(j) = \max_{(i,j)} \big(E(i) + t_{ij}\big)
+$$
+
+Here:
+
+- $(i,j)$: an activity incoming to $j$, starting at event $i$
+- $t_{ij}$: duration of that activity
+- The max ranges over every activity incoming to $j$.
+
+$E(j) = 0$ for the initial event, which has no incoming activities.
+
+### Earliest Start Time
+
+Earliest start time of an activity $(i,j)$ is $E(i)$, the earliest event time of the event it starts at.
+
+### Latest Time
+
+Latest event time $L(i)$ of an event $i$:
+
+$$
+L(i) = \min_{(i,j)} \big(L(j) - t_{ij}\big)
+$$
+
+Here:
+
+- $(i,j)$: an activity outgoing from $i$, ending at event $j$
+- $t_{ij}$: duration of that activity
+- The min ranges over every activity outgoing from $i$.
+
+$L(i) = E(i)$ for the final event, which has no outgoing activities.
+
+### Latest Finish Time
+
+Latest finish time of an activity $(i,j)$ is $L(j)$, the latest event time of the event it ends at.
+
+Computed by a backward pass through the network, starting from the final event.
+
+### Project Duration
+
+The earliest (= latest) event time of the final event. Equal to the length of the longest path from the initial to the final event, since every activity on that path must finish in sequence before the final event is reached.
+
+### Critical Path
+
+The path from the initial to the final event along which every event's earliest time equals its latest time. Delaying any activity on the critical path delays the entire project.
+
+Every activity still has to complete for the project to finish, not only the ones on the critical path. An activity off the critical path has slack, room to start later or take longer without pushing the project duration past what the critical path already fixes.
+
+### Steps
+
+1. Forward pass  
+   Compute the earliest event time $E(i)$ for every event, from the initial event to the final event.
+2. Backward pass  
+   Compute the latest event time $L(i)$ for every event, from the final event back to the initial event.
+3. Project duration is $E$ of the final event.
+4. Critical path  
+   The events with $E(i) = L(i)$.
+
+## Worked Example
+
+A project has 7 activities. The table is the network's edge list. Start event and end event are node labels, not points in time.
+
+| Activity    | Start event | End event | Duration | Predecessor |
+| ----------- | ----------- | --------- | -------- | ----------- |
+| $A$         | 1           | 2         | 4        | none        |
+| $B$         | 1           | 3         | 3        | none        |
+| $C$         | 2           | 4         | 2        | $A$         |
+| $D$ (dummy) | 3           | 4         | 0        | $B$         |
+| $E$         | 3           | 5         | 5        | $B$         |
+| $F$         | 4           | 6         | 3        | $C$, $D$    |
+| $G$         | 5           | 6         | 4        | $E$         |
+
+<NetworkDiagram
+  nodes={[
+    { id: "1", x: 60, y: 150 },
+    { id: "2", x: 220, y: 70 },
+    { id: "3", x: 220, y: 230 },
+    { id: "4", x: 380, y: 110 },
+    { id: "5", x: 380, y: 230 },
+    { id: "6", x: 540, y: 170 },
+  ]}
+  edges={[
+    { from: "1", to: "2", label: "A, 4" },
+    { from: "1", to: "3", label: "B, 3" },
+    { from: "2", to: "4", label: "C, 2" },
+    { from: "3", to: "4", label: "D, 0", dashed: true },
+    { from: "3", to: "5", label: "E, 5" },
+    { from: "4", to: "6", label: "F, 3" },
+    { from: "5", to: "6", label: "G, 4" },
+  ]}
+/>
+
+<Note>
+
+$F$ depends on both $B$ and $C$, but $B$'s arrow already ends at event 3, where $E$ starts, and an activity can only have one end event. Merging events 3 and 4 to let $B$ reach $F$ directly would wrongly make $E$ depend on $C$ too, since $E$ would then start no earlier than event 4's own earliest time. The dummy $D$ (event 3 to event 4, duration $0$) carries the precedence "$F$ waits for $B$" into event 4 without touching event 3's own timing.
+
+</Note>
+
+Forward pass, earliest event time $E(i)$:
+
+- $E(1) = 0$
+- $E(2) = E(1) + 4 = 4$
+- $E(3) = E(1) + 3 = 3$
+- $E(4) = \max(E(2) + 2,\ E(3) + 0) = \max(6, 3) = 6$
+- $E(5) = E(3) + 5 = 8$
+- $E(6) = \max(E(4) + 3,\ E(5) + 4) = \max(9, 12) = 12$
+
+Project duration is $E(6) = 12$.
+
+Backward pass, latest event time $L(i)$, starting from $L(6) = E(6) = 12$:
+
+- $L(6) = 12$
+- $L(5) = L(6) - 4 = 8$
+- $L(4) = L(6) - 3 = 9$
+- $L(3) = \min(L(4) - 0,\ L(5) - 5) = \min(9, 3) = 3$
+- $L(2) = L(4) - 2 = 7$
+- $L(1) = \min(L(2) - 4,\ L(3) - 3) = \min(3, 0) = 0$
+
+Comparing $E(i)$ and $L(i)$ per event identifies the critical path:
+
+<Walkthrough variant="cpm">
+  <CpmStep
+    label="Network events"
+    events={["1", "2", "3", "4", "5", "6"]}
+    earliest={["", "", "", "", "", ""]}
+    latest={["", "", "", "", "", ""]}
+  >
+    6 events, joined by activities $A$ through $G$ (with dummy $D$). $E(i)$
+    fills left to right with a forward pass, $L(i)$ fills right to left with
+    a backward pass.
+  </CpmStep>
+
+<CpmStep
+  label="Forward pass"
+  events={["1", "2", "3", "4", "5", "6"]}
+  earliest={["0", "4", "3", "6", "8", "12"]}
+  latest={["", "", "", "", "", ""]}
+>
+  $E(4) = \max(E(2)+2,\ E(3)+0) = 6$ and $E(6) = \max(E(4)+3,\ E(5)+4) = 12$.
+  Project duration is $E(6) = 12$.
+</CpmStep>
+
+<CpmStep
+  label="Backward pass"
+  events={["1", "2", "3", "4", "5", "6"]}
+  earliest={["0", "4", "3", "6", "8", "12"]}
+  latest={["0", "7", "3", "9", "8", "12"]}
+>
+  Starting from $L(6) = E(6) = 12$: $L(3) = \min(L(4)-0,\ L(5)-5) = \min(9, 3) =
+  3$ and $L(1) = \min(L(2)-4,\ L(3)-3) = \min(3, 0) = 0$.
+</CpmStep>
+
+  <CpmStep
+    label="Critical path"
+    events={["1", "2", "3", "4", "5", "6"]}
+    earliest={["0", "4", "3", "6", "8", "12"]}
+    latest={["0", "7", "3", "9", "8", "12"]}
+    critical={[0, 2, 4, 5]}
+  >
+    Events 1, 3, 5, 6 satisfy $E(i) = L(i)$ and form a connected path:
+    $1 \to 3 \to 5 \to 6$, covering activities $B$, $E$, $G$. Duration
+    $3 + 5 + 4 = 12$, matching the project duration.
+  </CpmStep>
+</Walkthrough>
+
+The dummy activity $D$ carries 0 duration and sits off the critical path here, but it still enforces that $F$ can't start until both $C$ and $B$ finish.

@@ -69,6 +69,16 @@ export const WALKTHROUGH_PRESETS = {
       { label: "updated this step", kind: "text" },
     ] satisfies Chip[],
   },
+  cpm: {
+    legend: [
+      {
+        label: "critical event (E(i) = L(i))",
+        kind: "swatch",
+        fill: "var(--accent-subtle)",
+      },
+      { label: "updated this step", kind: "text" },
+    ] satisfies Chip[],
+  },
 } satisfies Record<string, { legend: Chip[] }>;
 
 export type WalkthroughVariant = keyof typeof WALKTHROUGH_PRESETS;
