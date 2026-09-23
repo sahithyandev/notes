@@ -71,6 +71,8 @@ Enforced by the `math-delimiters` rule (`src/integrations/notes-style-validator/
 
 Avoid using "meaning" or "that is" as a conjunction to introduce a restatement or clarification (e.g. "How it should be produced, meaning which production procedure to use" or "..., that is, which procedure to use"). Prefer a plain sentence, comma, or colon-free restructuring instead.
 
+Avoid casual filler or emphasis remarks, such as "nothing more" tacked onto a definition, shorthand fragment comparisons like "Same sliding mask, but ...", or unnecessary contrast clauses like "instead of a correlation or convolution sum". State the fact directly as a complete, self-contained sentence instead.
+
 ### Title casing
 
 Headings (`##` to `####`) and the `title` frontmatter field must be in title case, as enforced by the `title-case` rule of the `notes-style-validator` Astro integration (`src/integrations/notes-style-validator/rules/title-case.ts`, logic in `core/titlecase.ts`). The build and dev server fail on violations.
