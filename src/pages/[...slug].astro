@@ -2,29 +2,25 @@
 import { getCollection, render } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { getEntry, getEntries } from "astro:content";
-import Nav from "../components/nav.astro";
-import Breadcrumb from "../components/breadcrumb.astro";
+import Nav from "../components/layout/nav.astro";
+import Breadcrumb from "../components/layout/breadcrumb.astro";
 import { SITE_NAME, SITE_HOST_URL, isWip } from "../utils/values";
-import Note from "../components/note.astro";
-import WalksVennDiagram from "../components/walks-venn-diagram.astro";
+import Note from "../components/mdx/note.astro";
 import * as Illustrations from "../components/illustrations";
-import TocRail from "../components/toc-rail.astro";
-import NoteFeedback from "../components/note-feedback.astro";
-import NoteAuthors from "../components/note-authors.astro";
-import RightSidebar from "../components/right-sidebar.astro";
-import Article from "../components/article.astro";
-import ScrollableTable from "../components/scrollable-table.astro";
-import Prereqs from "../components/prereqs.astro";
-import Packet from "../components/packet.astro";
-import PermutationTable from "../components/permutation-table.astro";
-import RotationSchedule from "../components/rotation-schedule.astro";
-import AiLinks from "../components/ai-links.astro";
-import MenuIcon from "../components/icons/MenuIcon.astro";
-import TocIcon from "../components/icons/TocIcon.astro";
-import NoteNav from "../components/note-nav.astro";
+import TocRail from "../components/note/toc-rail.astro";
+import NoteFeedback from "../components/note/note-feedback.astro";
+import NoteAuthors from "../components/note/note-authors.astro";
+import RightSidebar from "../components/note/right-sidebar.astro";
+import Article from "../components/note/article.astro";
+import ScrollableTable from "../components/mdx/scrollable-table.astro";
+import Prereqs from "../components/note/prereqs.astro";
+import AiLinks from "../components/note/ai-links.astro";
+import MenuIcon from "../components/icons/menu-icon.astro";
+import TocIcon from "../components/icons/toc-icon.astro";
+import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
-import NoteSidebar from "../components/note-sidebar.astro";
-import ImageZoom from "../components/image-zoom.astro";
+import NoteSidebar from "../components/note/note-sidebar.astro";
+import ImageZoom from "../components/note/image-zoom.astro";
 import {
   titleize,
   calculateReadTime,
@@ -177,10 +173,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
         <Content
           components={{
             Note,
-            WalksVennDiagram,
-            Packet,
-            PermutationTable,
-            RotationSchedule,
             ...Illustrations,
             table: ScrollableTable,
           }}

@@ -146,7 +146,7 @@ Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order l
 - `src/pages/og/[...slug].ts` — per-note Open Graph images.
 - `src/pages/sitemap-index.xml.ts`, `src/pages/sitemaps/[sem].xml.ts` — sitemaps split by semester.
 
-Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Components live in `src/components/`, shared helpers in `src/utils/` (`index.ts` for helpers like `titleize`, `values.ts` for site constants).
+Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Components live in `src/components/`, grouped by role: `icons/` (SVG icon components), `illustrations/` (see below), `layout/` (site chrome: nav, footer, search, breadcrumb), `home/` (homepage/listing pieces: hero, stats, semester and note cards), `note/` (note-page chrome: article shell, sidebars, toc, author/feedback blocks), and `mdx/` (components a note's Markdown body renders through, like `Note` and the table wrapper). Shared helpers live in `src/utils/` (`index.ts` for helpers like `titleize`, `values.ts` for site constants).
 
 ## Illustration components
 
