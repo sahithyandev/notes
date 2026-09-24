@@ -7,9 +7,9 @@ import { PassThrough } from "node:stream";
 import {
   ClaudeStreamAdapter,
   OpenCodeAdapter,
-  checkOpenCodeHasProvider,
   type AgentEvent,
 } from "./agent.ts";
+import { SYSTEM_PROMPT } from "./prompt.ts";
 
 // A fake `claude` child process: no real binary involved. stdout is a
 // PassThrough we push NDJSON lines into to simulate agent output; stdin
@@ -267,26 +267,30 @@ async function withScratchCwd<T>(fn: (cwd: string) => Promise<T>): Promise<T> {
   }
 }
 
-// Unlike ClaudeStreamAdapter, OpenCodeAdapter writes its agent config file
-// (real mkdir + writeFile) before every spawn, so spawnFn is never called
-// synchronously within send()'s first tick - it's called after that I/O
-// resolves. Writing to a fake child's stdout right after collect(send())
-// would race that write and be lost (the "close" listener isn't attached
-// until spawnFn returns). This wraps spawnFn so a test can await the
-// moment each child actually gets spawned before touching its streams.
+// Writing to a fake child's stdout right after collect(send()) would race
+// the adapter attaching its own listeners over that child: spawnFn returns
+// the child synchronously, but the async generator only wires up its "close"
+// handler once the turn starts, and collect() awaits that. This wraps
+// spawnFn so a test can await the moment each child actually gets spawned
+// before touching its streams.
 function makeSequentialSpawn(
   children: ReturnType<typeof makeFakeOpenCodeChild>[],
 ) {
   let idx = 0;
   const waiters: Array<() => void> = [];
+  const pending: ReturnType<typeof makeFakeOpenCodeChild>[] = [];
   const spawnCalls: string[][] = [];
   const spawnFn = ((_cmd: string, args: string[]) => {
     spawnCalls.push(args);
     const current = children[idx++];
-    waiters.shift()?.();
+    const waiter = waiters.shift();
+    if (waiter) waiter(current);
+    else pending.push(current);
     return current.child;
   }) as any;
-  function nextSpawned(): Promise<void> {
+  function nextSpawned(): Promise<ReturnType<typeof makeFakeOpenCodeChild>> {
+    const current = pending.shift();
+    if (current) return Promise.resolve(current);
     return new Promise((resolve) => waiters.push(resolve));
   }
   return { spawnFn, nextSpawned, spawnCalls };
@@ -304,14 +308,13 @@ test("OpenCodeAdapter: send() runs then exports the result", async () =>
     await nextSpawned();
     run.stdout.write(
       line({
-        type: "message.part.updated",
+        type: "tool_use",
         sessionID: "ses_abc123",
-        properties: {
-          part: {
-            type: "tool",
-            tool: "read",
-            state: { input: { filePath: "docs/x.md" } },
-          },
+        part: {
+          type: "tool",
+          tool: "read",
+          callID: "call_1",
+          state: { status: "completed", input: { filePath: "docs/x.md" } },
         },
       }),
     );
@@ -345,6 +348,111 @@ test("OpenCodeAdapter: send() runs then exports the result", async () =>
       isError: false,
       costUsd: 0.01,
     });
+
+    adapter.dispose();
+  }));
+
+test("OpenCodeAdapter: send() still surfaces progress for the legacy event shapes", async () =>
+  withScratchCwd(async (cwd) => {
+    const run = makeFakeOpenCodeChild();
+    const exp = makeFakeOpenCodeChild();
+    const { spawnFn, nextSpawned } = makeSequentialSpawn([run, exp]);
+
+    const adapter = new OpenCodeAdapter({ cwd, spawnFn });
+    const eventsPromise = collect(adapter.send("hello"));
+
+    await nextSpawned();
+    run.stdout.write(
+      line({
+        type: "tool",
+        tool: "read",
+        sessionID: "ses_abc123",
+        state: { input: { filePath: "docs/a.md" } },
+      }),
+    );
+    run.stdout.write(
+      line({
+        type: "message.part.updated",
+        sessionID: "ses_abc123",
+        properties: {
+          part: {
+            type: "tool",
+            tool: "glob",
+            state: { input: { pattern: "**/*.md" } },
+          },
+        },
+      }),
+    );
+    run.close(0);
+
+    await nextSpawned();
+    exp.stdout.write(
+      JSON.stringify({
+        messages: [{ info: { role: "assistant" }, parts: [] }],
+      }),
+    );
+    exp.close(0);
+
+    const events = await eventsPromise;
+    expect(events).toContainEqual({
+      type: "progress",
+      label: "read: docs/a.md",
+    });
+    expect(events).toContainEqual({
+      type: "progress",
+      label: "glob: **/*.md",
+    });
+
+    adapter.dispose();
+  }));
+
+test("OpenCodeAdapter: spawns the default agent with SYSTEM_PROMPT inlined on a new session only", async () =>
+  withScratchCwd(async (cwd) => {
+    const children = [
+      makeFakeOpenCodeChild(),
+      makeFakeOpenCodeChild(),
+      makeFakeOpenCodeChild(),
+      makeFakeOpenCodeChild(),
+    ];
+    const { spawnFn, nextSpawned, spawnCalls } = makeSequentialSpawn(children);
+
+    const adapter = new OpenCodeAdapter({ cwd, spawnFn });
+
+    const first = collect(adapter.send("first"));
+    await nextSpawned();
+    children[0].stdout.write(line({ sessionID: "ses_123" }));
+    children[0].close(0);
+    await nextSpawned();
+    children[1].stdout.write(
+      JSON.stringify({
+        messages: [{ info: { role: "assistant" }, parts: [] }],
+      }),
+    );
+    children[1].close(0);
+    await first;
+
+    const second = collect(adapter.send("second"));
+    await nextSpawned();
+    children[2].stdout.write(line({ sessionID: "ses_123" }));
+    children[2].close(0);
+    await nextSpawned();
+    children[3].stdout.write(
+      JSON.stringify({
+        messages: [{ info: { role: "assistant" }, parts: [] }],
+      }),
+    );
+    children[3].close(0);
+    await second;
+
+    // Never passes --agent: the free tier only serves the default agent.
+    expect(spawnCalls[0]).not.toContain("--agent");
+    expect(spawnCalls[2]).not.toContain("--agent");
+    // The SYSTEM_PROMPT rides along in the first message of a session, and
+    // the bare prompt on resumed turns (opencode persists messages
+    // server-side, so a resumed session already carries it).
+    expect(spawnCalls[0].at(-1)).toContain(SYSTEM_PROMPT);
+    expect(spawnCalls[0].at(-1)).toContain("first");
+    expect(spawnCalls[2].at(-1)).toBe("second");
 
     adapter.dispose();
   }));
@@ -416,47 +524,3 @@ test("OpenCodeAdapter: send() reports a process-error when no session ever start
 
     adapter.dispose();
   }));
-
-// --- checkOpenCodeHasProvider --------------------------------------------
-
-test("checkOpenCodeHasProvider: unavailable when `opencode providers list` reports 0 credentials", async () => {
-  const child = makeFakeOpenCodeChild();
-  const spawnFn = (() => child.child) as any;
-
-  const resultPromise = checkOpenCodeHasProvider(spawnFn);
-  child.stdout.write("┌  Credentials ~/.local/share/opencode/auth.json\n");
-  child.stdout.write("└  0 credentials\n");
-  child.close(0);
-
-  expect(await resultPromise).toEqual({
-    available: false,
-    reason:
-      "no opencode provider is configured (run `opencode providers login`)",
-  });
-});
-
-test("checkOpenCodeHasProvider: available when at least one credential is configured", async () => {
-  const child = makeFakeOpenCodeChild();
-  const spawnFn = (() => child.child) as any;
-
-  const resultPromise = checkOpenCodeHasProvider(spawnFn);
-  child.stdout.write("└  2 credentials\n");
-  child.close(0);
-
-  expect(await resultPromise).toEqual({ available: true });
-});
-
-test("checkOpenCodeHasProvider: unavailable when opencode can't be spawned", async () => {
-  const child = makeFakeOpenCodeChild();
-  const spawnFn = (() => child.child) as any;
-
-  const resultPromise = checkOpenCodeHasProvider(spawnFn);
-  const err = Object.assign(new Error("spawn opencode ENOENT"), {
-    code: "ENOENT",
-  });
-  child.child.emit("error", err);
-
-  const result = await resultPromise;
-  expect(result.available).toBe(false);
-  expect(result.reason).toContain("spawn opencode ENOENT");
-});

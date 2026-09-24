@@ -4,8 +4,6 @@ import {
   type ChildProcessWithoutNullStreams,
 } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import readline from "node:readline";
 import { SYSTEM_PROMPT } from "./prompt.ts";
 
@@ -326,50 +324,15 @@ function describeToolUse(block: Record<string, unknown>): string {
 // reading one message per line from a long-lived process's stdin. So each
 // send() here spawns and exits its own one-shot `opencode run` process
 // instead of feeding a shared child.
-
-const OPENCODE_AGENT_NAME = "live-edit";
-
-// Written once per process, before the first opencode spawn, rather than
-// checked into the repo: this keeps the agent's system prompt and tool
-// restrictions derived from the single source of truth (SYSTEM_PROMPT,
-// shared with the Claude backend) instead of a hand-maintained duplicate
-// that can drift. Frontmatter schema: https://opencode.ai/docs/agent.
-// "edit"/"bash"/"webfetch" are both excluded from `tools` *and* explicitly
-// denied under `permission` - belt and suspenders, mirroring the Bash
-// lesson from ClaudeStreamAdapter above (a tool being merely "not listed"
-// isn't the same as it being refused).
-async function ensureOpenCodeAgentConfig(cwd: string): Promise<void> {
-  const dir = join(cwd, ".opencode", "agent");
-  await mkdir(dir, { recursive: true });
-  const frontmatter = [
-    "---",
-    "description: Headless notes-editing feedback agent for the live-edit dev integration (auto-generated, do not edit by hand)",
-    "mode: primary",
-    "tools:",
-    "  read: true",
-    "  glob: true",
-    "  grep: true",
-    "  skill: true",
-    "  bash: false",
-    "  edit: false",
-    "  webfetch: false",
-    "  task: false",
-    "  todowrite: false",
-    "  websearch: false",
-    "  lsp: false",
-    "permission:",
-    "  edit: deny",
-    "  bash: deny",
-    "  webfetch: deny",
-    "---",
-    "",
-  ].join("\n");
-  await writeFile(
-    join(dir, `${OPENCODE_AGENT_NAME}.md`),
-    frontmatter + SYSTEM_PROMPT + "\n",
-    "utf-8",
-  );
-}
+//
+// It runs the default agent rather than a custom one: opencode's built-in
+// free "opencode/*" models refuse (403) any session whose agent carries a
+// `deny` permission entry (verified against 1.18.32), which a restricted
+// live-edit agent necessarily would - so no custom agent means no hard
+// tool restrictions. Tool discipline for opencode is instruction-only, the
+// SYSTEM_PROMPT inlined into the first message of each session (see send()
+// below), a weaker guard than ClaudeStreamAdapter's --allowedTools but the
+// only one the free tier will serve.
 
 const EXIT_MARKER = Symbol("opencode-process-exit");
 
@@ -384,21 +347,21 @@ function isExitMarker(value: unknown): value is ExitMarker {
 }
 
 // `opencode run --format json`'s NDJSON stream isn't as fully documented
-// as Claude's --output-format stream-json, so this only recognizes the
-// couple of tool-progress shapes plausible from opencode's own SDK types
-// (a flat top-level "tool" event, and the SSE-style "message.part.updated"
-// event carrying a nested tool part) and silently ignores anything else. A
-// miss here only means a step doesn't show up in the "Working: ..." trail
-// - it can never affect the final result, which always comes from
-// `opencode export` instead (see exportResult() below).
+// as Claude's --output-format stream-json, but the event shapes the CLI
+// actually emits (verified against 1.18.32) are a flat top-level `tool`
+// event, the run command's `{ type: "tool_use", part: { type: "tool",
+// ... } }` records, and the SSE-style "message.part.updated" event (part
+// nested under `properties`). This recognizes all three and silently
+// ignores anything else. A miss here only means a step doesn't show up in
+// the "Working: ..." trail - it can never affect the final result, which
+// always comes from `opencode export` instead (see exportResult() below).
 function describeOpenCodeProgress(obj: Record<string, unknown>): string | null {
   const part =
     obj.type === "tool"
       ? obj
-      : obj.type === "message.part.updated"
-        ? ((obj.properties as Record<string, unknown> | undefined)?.part as
-            Record<string, unknown> | undefined)
-        : undefined;
+      : ((obj.part ??
+          (obj.properties as Record<string, unknown> | undefined)?.part) as
+          Record<string, unknown> | undefined);
   if (!part || part.type !== "tool") return null;
 
   const tool = typeof part.tool === "string" ? part.tool : "tool";
@@ -475,7 +438,6 @@ export class OpenCodeAdapter implements AgentAdapter {
   private readonly spawnFn: typeof spawn;
   private sessionId: string | null;
   private busy = false;
-  private agentConfigReady: Promise<void> | null = null;
   private readonly log: (message: string) => void;
   private readonly logError: (message: string) => void;
 
@@ -505,15 +467,15 @@ export class OpenCodeAdapter implements AgentAdapter {
     }
     this.busy = true;
     try {
-      if (!this.agentConfigReady) {
-        this.agentConfigReady = ensureOpenCodeAgentConfig(this.cwd);
-      }
-      await this.agentConfigReady;
-
-      const args = ["run", "--format", "json", "--agent", OPENCODE_AGENT_NAME];
+      const args = ["run", "--format", "json"];
       if (this.model) args.push("--model", this.model);
       if (this.sessionId) args.push("--session", this.sessionId);
-      args.push(prompt);
+      // No custom agent (the free tier refuses permission-scoped ones), so
+      // the SYSTEM_PROMPT rides along in the first message of a session
+      // instead. opencode persists every message server-side, so a resumed
+      // session already carries it and re-inlining every turn would stack
+      // copies into the conversation.
+      args.push(this.sessionId ? prompt : `${SYSTEM_PROMPT}\n\n${prompt}`);
 
       this.log(
         `spawning opencode (${this.sessionId ? `resuming session ${this.sessionId.slice(0, 8)}` : "new session"}${this.model ? `, model ${this.model}` : ""})`,
@@ -729,37 +691,6 @@ function readyIf(
   };
 }
 
-// opencode being installed isn't enough on its own: without at least one
-// configured provider/credential, every `opencode run` just fails, and
-// opencode's own free "opencode/*" models are blocked entirely for
-// headless use regardless (verified - see the OpenCodeAdapter comment
-// above). `opencode providers list` has no --format json, only a
-// human-readable "N credentials" summary, so this greps for that count
-// rather than parsing a richer structure that doesn't exist.
-export function checkOpenCodeHasProvider(
-  spawnFn: typeof spawn,
-): Promise<BackendReadiness> {
-  return runCliCapture(spawnFn, "opencode", ["providers", "list"]).then(
-    ({ output, spawnError }) => {
-      if (spawnError) {
-        return {
-          available: false,
-          reason: `failed to run \`opencode providers list\`: ${spawnError.message}`,
-        };
-      }
-      const match = output.match(/(\d+)\s+credentials?/i);
-      const count = match ? parseInt(match[1], 10) : 0;
-      return count > 0
-        ? { available: true }
-        : {
-            available: false,
-            reason:
-              "no opencode provider is configured (run `opencode providers login`)",
-          };
-    },
-  );
-}
-
 export const BACKEND_DEFINITIONS = [
   {
     id: "claude",
@@ -775,7 +706,9 @@ export const BACKEND_DEFINITIONS = [
     bin: "opencode",
     createAdapter: (opts: AgentAdapterOptions): AgentAdapter =>
       new OpenCodeAdapter(opts),
-    checkReady: readyIf("opencode", checkOpenCodeHasProvider),
+    // The free "opencode/*" tier answers a plain run (no custom agent, no
+    // deny permissions), so the CLI running is enough - no credential check.
+    checkReady: readyIf("opencode"),
   },
 ] as const satisfies readonly BackendDefinition[];
 
