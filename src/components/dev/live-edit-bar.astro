@@ -53,6 +53,12 @@
     </div>
 
     <div class="leb-input-row">
+      <select
+        class="leb-backend-select"
+        data-leb-backend-select
+        hidden
+        aria-label="Agent backend"
+      ></select>
       <textarea
         class="leb-comment"
         data-leb-comment
@@ -169,24 +175,40 @@
       "[data-leb-disabled]",
     )!;
     const bar = root.querySelector<HTMLElement>("[data-leb-bar]")!;
+    const backendSelect = root.querySelector<HTMLSelectElement>(
+      "[data-leb-backend-select]",
+    )!;
 
-    // Live Edit only works with the `claude` CLI (see
-    // src/integrations/live-edit/agent.ts), so a dev environment without it
-    // on PATH can't run this feature at all - checked once here rather than
-    // discovered on first use. When unavailable, show a disabled message in
-    // place of the bar instead of the usual enabled/disabled toggle.
-    let available = true;
+    // No hardcoded backend names here: BACKEND_DEFINITIONS (agent.ts) is
+    // the single place backends are registered, and GET /__live-edit/status
+    // reflects that list - this script only ever iterates status.backends'
+    // keys, never names "claude" or "opencode" directly, so a new backend
+    // shows up in the picker without any frontend change.
+    interface BackendStatus {
+      label: string;
+      available: boolean;
+      reason?: string;
+    }
+    interface StatusResponse {
+      available: boolean;
+      backend: string | null;
+      backends: Record<string, BackendStatus>;
+    }
+
+    // Checked once here rather than discovered on first use. When
+    // unavailable, show a disabled message in place of the bar instead of
+    // the usual enabled/disabled toggle; when more than one backend is
+    // installed, show a picker so the developer can choose which one runs
+    // the agent.
+    let status: StatusResponse | null = null;
     try {
       const res = await fetch("/__live-edit/status");
-      const body = (await res.json()) as {
-        available: boolean;
-        reason?: string;
-      };
-      available = body.available;
-      if (!available) {
-        disabledNotice.textContent = body.reason
-          ? `Live Edit is unavailable: ${body.reason}.`
-          : "Live Edit is unavailable.";
+      status = (await res.json()) as StatusResponse;
+      if (!status.available) {
+        const reasons = Object.values(status.backends)
+          .map((s) => `${s.label}: ${s.reason}`)
+          .join("; ");
+        disabledNotice.textContent = `Live Edit is unavailable (${reasons}).`;
       }
     } catch {
       // A failed status check doesn't necessarily mean live-edit is
@@ -194,11 +216,32 @@
       // treat it as available and let a real request surface any error.
     }
 
-    if (!available) {
+    if (status && !status.available) {
       root.hidden = false;
       disabledNotice.hidden = false;
       bar.hidden = true;
       return;
+    }
+
+    const availableBackends = status
+      ? Object.entries(status.backends).filter(([, s]) => s.available)
+      : [];
+    if (availableBackends.length > 1) {
+      for (const [id, s] of availableBackends) {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = s.label;
+        backendSelect.append(option);
+      }
+      backendSelect.hidden = false;
+      backendSelect.value = status!.backend ?? availableBackends[0][0];
+      backendSelect.addEventListener("change", () => {
+        void fetch("/__live-edit/backend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ backend: backendSelect.value }),
+        });
+      });
     }
 
     // Enabled by default; the dev toolbar's "Live Edit" icon
@@ -751,6 +794,18 @@
     display: flex;
     align-items: flex-end;
     gap: 6px;
+  }
+
+  .leb-backend-select {
+    flex: none;
+    align-self: center;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 6px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
   }
 
   .leb-comment {

@@ -7,9 +7,10 @@ import type { AstroIntegration, AstroIntegrationLogger } from "astro";
 import type { ViteDevServer } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import {
-  ClaudeStreamAdapter,
+  BACKEND_DEFINITIONS,
   type AgentAdapter,
   type AgentEvent,
+  type Backend,
 } from "./agent.ts";
 import {
   buildRequestMessage,
@@ -56,7 +57,14 @@ interface Job {
   message: string;
 }
 
-const SESSION_FILE = "live-edit-session";
+// The first entry in BACKEND_DEFINITIONS (agent.ts) is tried first when
+// nothing has been explicitly picked yet (see pickInitialBackend() below) -
+// that's currently "claude", simply because it's the backend this
+// integration originally shipped with, not a judgment about quality.
+function sessionFileName(backend: Backend): string {
+  return `live-edit-session-${backend}`;
+}
+const BACKEND_FILE = "live-edit-backend";
 
 // A plain pencil, for the dev toolbar's app icon (toolbar-app.ts).
 const PENCIL_ICON =
@@ -82,42 +90,53 @@ export default function liveEdit(): AstroIntegration {
   const queue: Job[] = [];
   let draining = false;
   let adapter: AgentAdapter | null = null;
-  // Live Edit only works with the `claude` CLI (agent.ts spawns it
-  // directly), so a dev environment without it on PATH can't run this
-  // feature at all. Checked once at server startup rather than per-request,
-  // and surfaced to the frontend via GET /__live-edit/status so the widgets
-  // can show a disabled message instead of silently failing on first use.
-  let claudeAvailable = true;
-  let claudeUnavailableReason: string | undefined;
-
-  function checkClaudeAvailable(): Promise<{
+  // Live Edit works with either the `claude` or `opencode` CLI (agent.ts
+  // spawns one directly, chosen by selectedBackend below), so a dev
+  // environment with neither on PATH can't run this feature at all.
+  // Checked once at server startup rather than per-request, and surfaced
+  // to the frontend via GET /__live-edit/status so the widgets can show a
+  // disabled message (or a backend picker, once more than one is
+  // available) instead of silently failing on first use.
+  interface AvailabilityStatus {
     available: boolean;
     reason?: string;
-  }> {
-    return new Promise((resolvePromise) => {
-      const child = spawn("claude", ["--version"], {
-        stdio: ["ignore", "ignore", "ignore"],
-      });
-      child.on("error", (err: NodeJS.ErrnoException) => {
-        resolvePromise({
-          available: false,
-          reason:
-            err.code === "ENOENT"
-              ? "the `claude` CLI is not installed or not on PATH"
-              : `failed to run \`claude\`: ${err.message}`,
-        });
-      });
-      child.on("exit", (code) => {
-        resolvePromise(
-          code === 0
-            ? { available: true }
-            : {
-                available: false,
-                reason: `\`claude --version\` exited with code ${code}`,
-              },
-        );
-      });
-    });
+  }
+  let backendAvailability: Record<Backend, AvailabilityStatus> =
+    Object.fromEntries(
+      BACKEND_DEFINITIONS.map((def) => [def.id, { available: true }]),
+    ) as Record<Backend, AvailabilityStatus>;
+  // null only when no backend is available.
+  let selectedBackend: Backend | null = null;
+
+  // Every backend's full readiness check (CLI present, plus whatever else
+  // it needs - see BACKEND_DEFINITIONS/readyIf() in agent.ts) lives on its
+  // definition, so this just runs each one; nothing here is backend-
+  // specific.
+  async function detectBackendAvailability(): Promise<
+    Record<Backend, AvailabilityStatus>
+  > {
+    const entries = await Promise.all(
+      BACKEND_DEFINITIONS.map(
+        async (def) => [def.id, await def.checkReady(spawn)] as const,
+      ),
+    );
+    return Object.fromEntries(entries) as Record<Backend, AvailabilityStatus>;
+  }
+
+  // Prefers a persisted developer choice (from a previous POST
+  // /__live-edit/backend) as long as that backend is still available;
+  // otherwise falls back to whichever backend is actually installed
+  // (matching "when claude isn't installed, opencode is used instead"),
+  // preferring BACKEND_DEFINITIONS' order when several are and nothing's
+  // been chosen yet. Returns null only when none is available.
+  function pickInitialBackend(persisted: Backend | undefined): Backend | null {
+    if (persisted && backendAvailability[persisted].available) {
+      return persisted;
+    }
+    const def = BACKEND_DEFINITIONS.find(
+      (d) => backendAvailability[d.id].available,
+    );
+    return def?.id ?? null;
   }
 
   function log(item: FeedbackItem, message: string): void {
@@ -125,22 +144,35 @@ export default function liveEdit(): AstroIntegration {
     logger?.info(`${item.id.slice(0, 8)} ${label}: ${message}`);
   }
 
+  // Each backend keeps its own adapter instance and session, so switching
+  // back and forth (via POST /__live-edit/backend) doesn't lose either
+  // conversation - only the currently-selected one is ever live, the other
+  // just sits idle until picked again.
   function getAdapter(initialSessionId?: string): AgentAdapter {
+    if (!selectedBackend) {
+      throw new Error("getAdapter() called with no backend available");
+    }
     if (!adapter) {
-      adapter = new ClaudeStreamAdapter({
+      const def = BACKEND_DEFINITIONS.find((d) => d.id === selectedBackend)!;
+      adapter = def.createAdapter({
         cwd: root,
         model: process.env.LIVE_EDIT_MODEL,
         initialSessionId,
-        log: (m) => logger?.info(m),
-        logError: (m) => logger?.error(m),
+        log: (m: string) => logger?.info(m),
+        logError: (m: string) => logger?.error(m),
       });
     }
     return adapter;
   }
 
-  async function loadPersistedSessionId(): Promise<string | undefined> {
+  async function loadPersistedSessionId(
+    backend: Backend,
+  ): Promise<string | undefined> {
     try {
-      const raw = await readFile(join(tmpDir, SESSION_FILE), "utf-8");
+      const raw = await readFile(
+        join(tmpDir, sessionFileName(backend)),
+        "utf-8",
+      );
       const id = raw.trim();
       return id.length > 0 ? id : undefined;
     } catch {
@@ -148,13 +180,33 @@ export default function liveEdit(): AstroIntegration {
     }
   }
 
-  async function persistSessionId(id: string): Promise<void> {
+  async function persistSessionId(backend: Backend, id: string): Promise<void> {
     try {
       await mkdir(tmpDir, { recursive: true });
-      await writeFile(join(tmpDir, SESSION_FILE), id, "utf-8");
+      await writeFile(join(tmpDir, sessionFileName(backend)), id, "utf-8");
     } catch {
       // Best-effort only: losing this just means the next dev-server start
       // begins a fresh session instead of resuming.
+    }
+  }
+
+  async function loadPersistedBackend(): Promise<Backend | undefined> {
+    try {
+      const raw = (await readFile(join(tmpDir, BACKEND_FILE), "utf-8")).trim();
+      return BACKEND_DEFINITIONS.some((d) => d.id === raw)
+        ? (raw as Backend)
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  async function persistBackend(backend: Backend): Promise<void> {
+    try {
+      await mkdir(tmpDir, { recursive: true });
+      await writeFile(join(tmpDir, BACKEND_FILE), backend, "utf-8");
+    } catch {
+      // Best-effort only.
     }
   }
 
@@ -211,7 +263,8 @@ export default function liveEdit(): AstroIntegration {
     try {
       for await (const evt of events) {
         if (evt.type === "session") {
-          void persistSessionId(evt.sessionId);
+          if (selectedBackend)
+            void persistSessionId(selectedBackend, evt.sessionId);
         } else if (evt.type === "progress") {
           item.progress.push(evt.label);
           touch(item);
@@ -452,28 +505,40 @@ export default function liveEdit(): AstroIntegration {
           return;
         }
 
-        const availability = await checkClaudeAvailable();
-        claudeAvailable = availability.available;
-        claudeUnavailableReason = availability.reason;
+        const [availability, persistedBackend] = await Promise.all([
+          detectBackendAvailability(),
+          loadPersistedBackend(),
+        ]);
+        backendAvailability = availability;
+        selectedBackend = pickInitialBackend(persistedBackend);
 
-        if (!claudeAvailable) {
-          logger.warn(`disabled: ${claudeUnavailableReason}`);
+        const availableCount = BACKEND_DEFINITIONS.filter(
+          (d) => backendAvailability[d.id].available,
+        ).length;
+
+        if (!selectedBackend) {
+          logger.warn(
+            `disabled: ${BACKEND_DEFINITIONS.map((d) => `${d.label}: ${backendAvailability[d.id].reason}`).join("; ")}`,
+          );
         } else {
           // Awaited before the server starts accepting requests, so the
           // very first turn already resumes the persisted session instead
           // of racing a fresh one into existence.
-          const persistedSessionId = await loadPersistedSessionId();
+          const persistedSessionId =
+            await loadPersistedSessionId(selectedBackend);
           if (persistedSessionId) getAdapter(persistedSessionId);
 
           const model = process.env.LIVE_EDIT_MODEL || "default";
           logger.info(
-            persistedSessionId
-              ? `ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
-              : `ready, will start a new session on first request (model: ${model})`,
+            `ready, backend: ${selectedBackend}${availableCount > 1 ? " (more than one installed, developer can switch from the web UI)" : ""}, ` +
+              (persistedSessionId
+                ? `resuming session ${persistedSessionId.slice(0, 8)}`
+                : "will start a new session on first request") +
+              ` (model: ${model})`,
           );
         }
         logger.info(
-          `routes: POST /__live-edit/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__live-edit/{events,notes,status}`,
+          `routes: POST /__live-edit/{request,apply/:id,discard/:id,refine/:id,reset,backend}, GET /__live-edit/{events,notes,status}`,
         );
 
         const closeAll = () => {
@@ -505,9 +570,49 @@ export default function liveEdit(): AstroIntegration {
         ): Promise<void> {
           if (url === "/__live-edit/status" && req.method === "GET") {
             return sendJson(res, 200, {
-              available: claudeAvailable,
-              reason: claudeUnavailableReason,
+              available: selectedBackend !== null,
+              backend: selectedBackend,
+              // Labeled here (not just id -> {available, reason}) so the
+              // web UI's backend picker can show BACKEND_DEFINITIONS'
+              // labels without hardcoding a name per backend itself.
+              backends: Object.fromEntries(
+                BACKEND_DEFINITIONS.map((d) => [
+                  d.id,
+                  { label: d.label, ...backendAvailability[d.id] },
+                ]),
+              ),
+              // Kept for older clients expecting a single top-level reason;
+              // new clients should read backends.<name>.reason instead.
+              reason:
+                selectedBackend === null
+                  ? BACKEND_DEFINITIONS.map(
+                      (d) => backendAvailability[d.id].reason,
+                    ).join("; ")
+                  : undefined,
             });
+          }
+
+          if (url === "/__live-edit/backend" && req.method === "POST") {
+            const body = await readJsonBody<{ backend?: string }>(req);
+            const backendId = body.backend;
+            const def = BACKEND_DEFINITIONS.find((d) => d.id === backendId);
+            if (!def) {
+              return sendJson(res, 400, { error: "invalid backend" });
+            }
+            const backend = def.id;
+            if (!backendAvailability[backend].available) {
+              return sendJson(res, 400, {
+                error: backendAvailability[backend].reason ?? "not available",
+              });
+            }
+            if (backend !== selectedBackend) {
+              adapter?.dispose();
+              adapter = null;
+              selectedBackend = backend;
+              await persistBackend(backend);
+              logger?.info(`switched backend to ${backend}`);
+            }
+            return sendJson(res, 200, { ok: true, backend: selectedBackend });
           }
 
           if (url === "/__live-edit/events" && req.method === "GET") {
@@ -537,10 +642,8 @@ export default function liveEdit(): AstroIntegration {
           }
 
           if (url === "/__live-edit/request" && req.method === "POST") {
-            if (!claudeAvailable) {
-              return sendJson(res, 503, {
-                error: claudeUnavailableReason ?? "live-edit is unavailable",
-              });
+            if (!selectedBackend) {
+              return sendJson(res, 503, { error: "live-edit is unavailable" });
             }
             const body = await readJsonBody<FeedbackRequest>(req);
             const item = buildItem(body);
@@ -570,10 +673,8 @@ export default function liveEdit(): AstroIntegration {
 
           const refineMatch = url.match(/^\/__live-edit\/refine\/([^/]+)$/);
           if (refineMatch && req.method === "POST") {
-            if (!claudeAvailable) {
-              return sendJson(res, 503, {
-                error: claudeUnavailableReason ?? "live-edit is unavailable",
-              });
+            if (!selectedBackend) {
+              return sendJson(res, 503, { error: "live-edit is unavailable" });
             }
             const item = items.get(refineMatch[1]);
             if (!item) return sendJson(res, 404, { error: "not found" });
