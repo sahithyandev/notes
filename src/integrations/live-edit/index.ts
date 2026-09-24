@@ -56,7 +56,7 @@ interface Job {
   message: string;
 }
 
-const SESSION_FILE = "edit-feedback-session";
+const SESSION_FILE = "live-edit-session";
 
 // A small in-process store + single-worker queue backing the dev-only
 // "select text, get an edit" feedback loop (plus a site-wide whole-note /
@@ -66,8 +66,8 @@ const SESSION_FILE = "edit-feedback-session";
 // proper AstroIntegration (not a raw Vite plugin) so `astro:server:setup`
 // gives us an AstroIntegrationLogger - the terminal output this produces
 // then matches the rest of `astro dev`'s output (timestamped, labeled
-// "edit-feedback"), the same as module-redirects and notes-style-validator.
-export default function editFeedback(): AstroIntegration {
+// "live-edit"), the same as module-redirects and notes-style-validator.
+export default function liveEdit(): AstroIntegration {
   let root = process.cwd();
   let docsRoot = join(root, "docs");
   let tmpDir = join(root, ".tmp");
@@ -88,7 +88,7 @@ export default function editFeedback(): AstroIntegration {
     if (!adapter) {
       adapter = new ClaudeStreamAdapter({
         cwd: root,
-        model: process.env.EDIT_FEEDBACK_MODEL,
+        model: process.env.LIVE_EDIT_MODEL,
         initialSessionId,
         log: (m) => logger?.info(m),
         logError: (m) => logger?.error(m),
@@ -378,7 +378,7 @@ export default function editFeedback(): AstroIntegration {
   }
 
   return {
-    name: "edit-feedback",
+    name: "live-edit",
     hooks: {
       "astro:config:setup": ({ config }) => {
         root = config.root.pathname.replace(/\/$/, "");
@@ -394,8 +394,8 @@ export default function editFeedback(): AstroIntegration {
       }) => {
         logger = serverLogger;
 
-        if (process.env.EDIT_FEEDBACK === "0") {
-          logger.info("disabled (EDIT_FEEDBACK=0)");
+        if (process.env.LIVE_EDIT === "0") {
+          logger.info("disabled (LIVE_EDIT=0)");
           return;
         }
 
@@ -405,14 +405,14 @@ export default function editFeedback(): AstroIntegration {
         const persistedSessionId = await loadPersistedSessionId();
         if (persistedSessionId) getAdapter(persistedSessionId);
 
-        const model = process.env.EDIT_FEEDBACK_MODEL || "default";
+        const model = process.env.LIVE_EDIT_MODEL || "default";
         logger.info(
           persistedSessionId
             ? `ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
             : `ready, will start a new session on first request (model: ${model})`,
         );
         logger.info(
-          `routes: POST /__edit-feedback/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__edit-feedback/{events,notes}`,
+          `routes: POST /__live-edit/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__live-edit/{events,notes}`,
         );
 
         const closeAll = () => {
@@ -426,7 +426,7 @@ export default function editFeedback(): AstroIntegration {
 
         server.middlewares.use((req, res, next) => {
           const url = req.url?.split("?")[0] ?? "";
-          if (!url.startsWith("/__edit-feedback/")) return next();
+          if (!url.startsWith("/__live-edit/")) return next();
 
           handleRoute(req, res, url).catch((err) => {
             if (!res.headersSent) {
@@ -442,7 +442,7 @@ export default function editFeedback(): AstroIntegration {
           res: ServerResponse,
           url: string,
         ): Promise<void> {
-          if (url === "/__edit-feedback/events" && req.method === "GET") {
+          if (url === "/__live-edit/events" && req.method === "GET") {
             res.writeHead(200, {
               "Content-Type": "text/event-stream",
               "Cache-Control": "no-cache",
@@ -459,7 +459,7 @@ export default function editFeedback(): AstroIntegration {
           // Backs the site-wide bar's file picker: every note's path, slug,
           // and title, read straight off disk (no Astro content-collection
           // boot needed here, same as scripts/check-notes-style.ts).
-          if (url === "/__edit-feedback/notes" && req.method === "GET") {
+          if (url === "/__live-edit/notes" && req.method === "GET") {
             const notes = scanFiles(docsRoot).map((f) => ({
               file: relative(root, f.file),
               slug: f.slug,
@@ -468,7 +468,7 @@ export default function editFeedback(): AstroIntegration {
             return sendJson(res, 200, { notes });
           }
 
-          if (url === "/__edit-feedback/request" && req.method === "POST") {
+          if (url === "/__live-edit/request" && req.method === "POST") {
             const body = await readJsonBody<FeedbackRequest>(req);
             const item = buildItem(body);
             if (!item)
@@ -480,14 +480,12 @@ export default function editFeedback(): AstroIntegration {
             return sendJson(res, 200, { id: item.id });
           }
 
-          const applyMatch = url.match(/^\/__edit-feedback\/apply\/([^/]+)$/);
+          const applyMatch = url.match(/^\/__live-edit\/apply\/([^/]+)$/);
           if (applyMatch && req.method === "POST") {
             return handleApply(req, res, applyMatch[1]);
           }
 
-          const discardMatch = url.match(
-            /^\/__edit-feedback\/discard\/([^/]+)$/,
-          );
+          const discardMatch = url.match(/^\/__live-edit\/discard\/([^/]+)$/);
           if (discardMatch && req.method === "POST") {
             const item = items.get(discardMatch[1]);
             if (!item) return sendJson(res, 404, { error: "not found" });
@@ -497,7 +495,7 @@ export default function editFeedback(): AstroIntegration {
             return sendJson(res, 200, { ok: true });
           }
 
-          const refineMatch = url.match(/^\/__edit-feedback\/refine\/([^/]+)$/);
+          const refineMatch = url.match(/^\/__live-edit\/refine\/([^/]+)$/);
           if (refineMatch && req.method === "POST") {
             const item = items.get(refineMatch[1]);
             if (!item) return sendJson(res, 404, { error: "not found" });
@@ -514,13 +512,13 @@ export default function editFeedback(): AstroIntegration {
             return sendJson(res, 200, { ok: true });
           }
 
-          if (url === "/__edit-feedback/reset" && req.method === "POST") {
+          if (url === "/__live-edit/reset" && req.method === "POST") {
             adapter?.reset();
             logger?.info("session reset");
             return sendJson(res, 200, { ok: true });
           }
 
-          return sendJson(res, 404, { error: "no such edit-feedback route" });
+          return sendJson(res, 404, { error: "no such live-edit route" });
         }
 
         function buildItem(body: FeedbackRequest): FeedbackItem | null {

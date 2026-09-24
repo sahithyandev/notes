@@ -112,9 +112,8 @@ export class ClaudeStreamAdapter implements AgentAdapter {
     this.model = opts.model;
     this.spawnFn = opts.spawnFn ?? spawn;
     this.sessionId = opts.initialSessionId ?? null;
-    this.log = opts.log ?? ((m) => console.log(`[edit-feedback] ${m}`));
-    this.logError =
-      opts.logError ?? ((m) => console.error(`[edit-feedback] ${m}`));
+    this.log = opts.log ?? ((m) => console.log(`[live-edit] ${m}`));
+    this.logError = opts.logError ?? ((m) => console.error(`[live-edit] ${m}`));
   }
 
   reset(): void {

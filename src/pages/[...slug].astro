@@ -21,7 +21,7 @@ import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
 import ImageZoom from "../components/note/image-zoom.astro";
-import EditFeedback from "../components/dev/edit-feedback.astro";
+import LiveEdit from "../components/dev/live-edit.astro";
 import {
   titleize,
   calculateReadTime,
@@ -217,7 +217,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     import "../scripts/image-zoom";
   </script>
   <ImageZoom />
-  {import.meta.env.DEV && <EditFeedback filePath={notesEntry.filePath ?? ""} />}
+  {import.meta.env.DEV && <LiveEdit filePath={notesEntry.filePath ?? ""} />}
 </Layout>
 
 <style>

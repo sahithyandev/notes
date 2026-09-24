@@ -1,37 +1,38 @@
 ---
 // Dev-only: select text in this note's <article> and attach a comment to
-// get a proposed edit back from src/integrations/edit-feedback/ (a
+// get a proposed edit back from src/integrations/live-edit/ (a
 // long-lived headless `claude` session). Only rendered under
 // import.meta.env.DEV by [...slug].astro, so none of this reaches a
 // production build.
 //
 // The proposal, and its Apply/Discard/Refine controls, render inline in the
-// article right after the selected text - not in the site-wide review
-// panel (that panel, in edit-feedback-bar.astro, is only for whole-note /
-// cross-note feedback, which has no single spot in the body to anchor to).
+// article right after the selected text - not in the dev toolbar's "Live
+// Edit" panel (src/integrations/live-edit/toolbar-app.ts), which only
+// covers whole-note/cross-note feedback, since that has no single spot in
+// a note's body to anchor to.
 interface Props {
   filePath: string;
 }
 const { filePath } = Astro.props;
 ---
 
-<div id="edit-feedback-selection" data-file-path={filePath}>
-  <button type="button" class="ef-select-btn" data-ef-select-btn hidden>
+<div id="live-edit-selection" data-file-path={filePath}>
+  <button type="button" class="le-select-btn" data-le-select-btn hidden>
     Suggest edit
   </button>
 
-  <div class="ef-popover" data-ef-popover hidden>
+  <div class="le-popover" data-le-popover hidden>
     <textarea
-      class="ef-comment"
-      data-ef-comment
+      class="le-comment"
+      data-le-comment
       placeholder="What should change? (⌘/Ctrl+Enter to send)"
       rows="3"
     ></textarea>
-    <div class="ef-popover-actions">
-      <button type="button" class="ef-btn ef-btn-ghost" data-ef-cancel>
+    <div class="le-popover-actions">
+      <button type="button" class="le-btn le-btn-ghost" data-le-cancel>
         Cancel
       </button>
-      <button type="button" class="ef-btn ef-btn-primary" data-ef-submit>
+      <button type="button" class="le-btn le-btn-primary" data-le-submit>
         Send
       </button>
     </div>
@@ -68,7 +69,7 @@ const { filePath } = Astro.props;
   }
 
   function init() {
-    const root = document.getElementById("edit-feedback-selection");
+    const root = document.getElementById("live-edit-selection");
     if (!root) return;
 
     const filePath = root.dataset.filePath ?? "";
@@ -76,15 +77,15 @@ const { filePath } = Astro.props;
     if (!article) return;
 
     const selectBtn = root.querySelector<HTMLButtonElement>(
-      "[data-ef-select-btn]",
+      "[data-le-select-btn]",
     )!;
-    const popover = root.querySelector<HTMLElement>("[data-ef-popover]")!;
+    const popover = root.querySelector<HTMLElement>("[data-le-popover]")!;
     const commentInput =
-      root.querySelector<HTMLTextAreaElement>("[data-ef-comment]")!;
+      root.querySelector<HTMLTextAreaElement>("[data-le-comment]")!;
     const submitBtn =
-      root.querySelector<HTMLButtonElement>("[data-ef-submit]")!;
+      root.querySelector<HTMLButtonElement>("[data-le-submit]")!;
     const cancelBtn =
-      root.querySelector<HTMLButtonElement>("[data-ef-cancel]")!;
+      root.querySelector<HTMLButtonElement>("[data-le-cancel]")!;
 
     let pendingSelection: PendingSelection | null = null;
 
@@ -250,14 +251,14 @@ const { filePath } = Astro.props;
           `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
         );
         if (!ok) return;
-        await fetch(`/__edit-feedback/apply/${item.id}`, {
+        await fetch(`/__live-edit/apply/${item.id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ confirmDelete: true }),
         });
         return;
       }
-      await fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+      await fetch(`/__live-edit/apply/${item.id}`, { method: "POST" });
     }
 
     function makeToolbar(
@@ -265,12 +266,12 @@ const { filePath } = Astro.props;
       opts: { canApply: boolean },
     ): HTMLElement {
       const bar = document.createElement("span");
-      bar.className = "ef-inline-toolbar";
+      bar.className = "le-inline-toolbar";
 
       if (opts.canApply) {
         const applyBtn = document.createElement("button");
         applyBtn.type = "button";
-        applyBtn.className = "ef-btn ef-btn-primary";
+        applyBtn.className = "le-btn le-btn-primary";
         applyBtn.textContent =
           (item.deletions?.length ?? 0) > 0 ? "Apply & Delete" : "Apply";
         applyBtn.onclick = () => void applyItem(item);
@@ -279,20 +280,20 @@ const { filePath } = Astro.props;
 
       const discardBtn = document.createElement("button");
       discardBtn.type = "button";
-      discardBtn.className = "ef-btn ef-btn-ghost";
+      discardBtn.className = "le-btn le-btn-ghost";
       discardBtn.textContent = "Discard";
       discardBtn.onclick = () =>
-        fetch(`/__edit-feedback/discard/${item.id}`, { method: "POST" });
+        fetch(`/__live-edit/discard/${item.id}`, { method: "POST" });
       bar.append(discardBtn);
 
       const refineBtn = document.createElement("button");
       refineBtn.type = "button";
-      refineBtn.className = "ef-btn ef-btn-ghost";
+      refineBtn.className = "le-btn le-btn-ghost";
       refineBtn.textContent = "Refine…";
       refineBtn.onclick = () => {
         const comment = window.prompt("Refine this suggestion:");
         if (!comment) return;
-        void fetch(`/__edit-feedback/refine/${item.id}`, {
+        void fetch(`/__live-edit/refine/${item.id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ comment }),
@@ -305,11 +306,11 @@ const { filePath } = Astro.props;
 
     function renderMarker(item: FeedbackItem, marker: HTMLElement): void {
       marker.innerHTML = "";
-      marker.className = `ef-marker ef-status-${item.status}`;
+      marker.className = `le-marker le-status-${item.status}`;
 
       if (item.status === "queued" || item.status === "running") {
         const badge = document.createElement("span");
-        badge.className = "ef-inline-badge";
+        badge.className = "le-inline-badge";
         badge.textContent = item.progress.at(-1)
           ? `Working: ${item.progress.at(-1)}`
           : "Suggesting edit…";
@@ -320,10 +321,10 @@ const { filePath } = Astro.props;
       if (item.status === "proposed") {
         if ((item.changes ?? []).length > 0) {
           const del = document.createElement("del");
-          del.className = "ef-inline-del";
+          del.className = "le-inline-del";
           del.textContent = pendingText(item);
           const ins = document.createElement("ins");
-          ins.className = "ef-inline-ins";
+          ins.className = "le-inline-ins";
           ins.textContent = (item.changes ?? [])
             .flatMap((c) => c.edits.map((e) => e.new))
             .join(" … ");
@@ -331,7 +332,7 @@ const { filePath } = Astro.props;
         }
         if ((item.deletions ?? []).length > 0) {
           const badge = document.createElement("span");
-          badge.className = "ef-inline-badge ef-inline-deletions";
+          badge.className = "le-inline-badge le-inline-deletions";
           badge.textContent = `🗑 Delete ${item.deletions!.length} file(s): ${item.deletions!.join(", ")}`;
           marker.append(badge);
         }
@@ -341,7 +342,7 @@ const { filePath } = Astro.props;
 
       if (item.status === "error") {
         const badge = document.createElement("span");
-        badge.className = "ef-inline-badge ef-inline-error";
+        badge.className = "le-inline-badge le-inline-error";
         badge.textContent = item.error
           ? `⚠ ${item.error.slice(0, 200)}`
           : "⚠ Error";
@@ -352,7 +353,7 @@ const { filePath } = Astro.props;
 
       if (item.status === "applied") {
         const badge = document.createElement("span");
-        badge.className = "ef-inline-badge";
+        badge.className = "le-inline-badge";
         badge.textContent = "✓ Applied — reloading…";
         marker.append(badge);
         return;
@@ -372,7 +373,7 @@ const { filePath } = Astro.props;
       return item.selection ?? "";
     }
 
-    document.addEventListener("ef-item", (e) => {
+    document.addEventListener("le-item", (e) => {
       const item = (e as CustomEvent<FeedbackItem>).detail;
       if (item.kind !== "selection" || item.files[0] !== filePath) return;
 
@@ -401,14 +402,14 @@ const { filePath } = Astro.props;
       window.getSelection()?.removeAllRanges();
 
       const marker = document.createElement("span");
-      marker.className = "ef-marker ef-status-queued";
+      marker.className = "le-marker le-status-queued";
       const badge = document.createElement("span");
-      badge.className = "ef-inline-badge";
+      badge.className = "le-inline-badge";
       badge.textContent = "Sending…";
       marker.append(badge);
       insertMarker(range, marker);
 
-      const res = await fetch("/__edit-feedback/request", {
+      const res = await fetch("/__live-edit/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -443,13 +444,13 @@ const { filePath } = Astro.props;
 </script>
 
 <style>
-  #edit-feedback-selection {
+  #live-edit-selection {
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     color: var(--text-primary);
   }
 
-  .ef-select-btn {
+  .le-select-btn {
     position: absolute;
     z-index: 60;
     border: 1px solid var(--border-strong);
@@ -463,11 +464,11 @@ const { filePath } = Astro.props;
     box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
   }
 
-  .ef-select-btn:hover {
+  .le-select-btn:hover {
     border-color: var(--sem, var(--border-strong));
   }
 
-  .ef-popover {
+  .le-popover {
     position: absolute;
     z-index: 61;
     width: min(320px, 90vw);
@@ -478,7 +479,7 @@ const { filePath } = Astro.props;
     box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
   }
 
-  .ef-comment {
+  .le-comment {
     width: 100%;
     box-sizing: border-box;
     resize: vertical;
@@ -491,14 +492,14 @@ const { filePath } = Astro.props;
     font-size: 0.8125rem;
   }
 
-  .ef-popover-actions {
+  .le-popover-actions {
     display: flex;
     justify-content: flex-end;
     gap: 6px;
     margin-top: 8px;
   }
 
-  .ef-btn {
+  .le-btn {
     border-radius: 6px;
     padding: 3px 10px;
     font-size: 0.75rem;
@@ -507,12 +508,12 @@ const { filePath } = Astro.props;
     border: 1px solid transparent;
   }
 
-  .ef-btn-primary {
+  .le-btn-primary {
     background: var(--sem, #2563eb);
     color: #fff;
   }
 
-  .ef-btn-ghost {
+  .le-btn-ghost {
     background: transparent;
     border-color: var(--border);
     color: var(--text-secondary);
@@ -523,7 +524,7 @@ const { filePath } = Astro.props;
   /* Inline, in the article body - not a corner popup. Global because the
      marker is inserted straight into <article>'s rendered content, outside
      this component's own scoped-style boundary. */
-  .ef-marker {
+  .le-marker {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
@@ -538,32 +539,32 @@ const { filePath } = Astro.props;
     border: 1px solid var(--border);
   }
 
-  .ef-marker.ef-status-proposed {
+  .le-marker.le-status-proposed {
     border-color: var(--sem, #2563eb);
   }
 
-  .ef-marker.ef-status-error {
+  .le-marker.le-status-error {
     border-color: #dc2626;
   }
 
-  .ef-marker.ef-status-applied {
+  .le-marker.le-status-applied {
     border-color: #16a34a;
   }
 
-  .ef-inline-badge {
+  .le-inline-badge {
     color: var(--text-secondary);
   }
 
-  .ef-inline-error {
+  .le-inline-error {
     color: #dc2626;
   }
 
-  .ef-inline-deletions {
+  .le-inline-deletions {
     color: #dc2626;
     font-weight: 600;
   }
 
-  .ef-inline-del {
+  .le-inline-del {
     color: #7f1d1d;
     background: #fecaca;
     text-decoration: line-through;
@@ -571,7 +572,7 @@ const { filePath } = Astro.props;
     border-radius: 4px;
   }
 
-  .ef-inline-ins {
+  .le-inline-ins {
     color: #14532d;
     background: #bbf7d0;
     text-decoration: none;
@@ -579,17 +580,17 @@ const { filePath } = Astro.props;
     border-radius: 4px;
   }
 
-  .ef-inline-toolbar {
+  .le-inline-toolbar {
     display: inline-flex;
     gap: 4px;
   }
 
   :root[data-theme="dark"] {
-    .ef-inline-del {
+    .le-inline-del {
       background: #7f1d1d;
       color: #fecaca;
     }
-    .ef-inline-ins {
+    .le-inline-ins {
       background: #14532d;
       color: #bbf7d0;
     }

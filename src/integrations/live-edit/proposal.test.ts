@@ -180,7 +180,7 @@ test("resolveDocPath rejects a path outside docs/", () => {
 });
 
 test("applyProposal writes every file when all edits are unambiguous", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
   const docsRoot = join(dir, "docs");
   await mkdir(docsRoot, { recursive: true });
   await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
@@ -198,7 +198,7 @@ test("applyProposal writes every file when all edits are unambiguous", async () 
 });
 
 test("applyProposal writes nothing when any file has a mismatch", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
   const docsRoot = join(dir, "docs");
   await mkdir(docsRoot, { recursive: true });
   await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
@@ -223,7 +223,7 @@ test("applyProposal writes nothing when any file has a mismatch", async () => {
 });
 
 test("applyProposal deletes files and can combine deletions with edits", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
   const docsRoot = join(dir, "docs");
   await mkdir(docsRoot, { recursive: true });
   await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
@@ -244,7 +244,7 @@ test("applyProposal deletes files and can combine deletions with edits", async (
 });
 
 test("applyProposal deletes nothing and edits nothing when a deletion target no longer exists", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
   const docsRoot = join(dir, "docs");
   await mkdir(docsRoot, { recursive: true });
   await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");

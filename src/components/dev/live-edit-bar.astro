@@ -3,111 +3,111 @@
 // this note") and cross-note merges ("fold this into that note"), plus the
 // review panel for every feedback item - both the ones this bar submits and
 // the selection-based ones submitted by the per-note
-// src/components/dev/edit-feedback.astro widget. Mounted once by
+// src/components/dev/live-edit.astro widget. Mounted once by
 // src/layouts/Layout.astro under import.meta.env.DEV, so it's present on
 // every page (note pages and otherwise) and none of it reaches a
 // production build.
 ---
 
-<div id="edit-feedback-bar">
-  <div class="efb-panel" data-efb-panel hidden>
-    <div class="efb-panel-header">
+<div id="live-edit-bar">
+  <div class="leb-panel" data-leb-panel hidden>
+    <div class="leb-panel-header">
       <span>Whole-note / merge feedback</span>
       <button
         type="button"
-        class="efb-icon-btn"
-        data-efb-panel-close
+        class="leb-icon-btn"
+        data-leb-panel-close
         aria-label="Close panel"
       >
         ×
       </button>
     </div>
-    <div class="efb-list" data-efb-list></div>
+    <div class="leb-list" data-leb-list></div>
   </div>
 
-  <div class="efb-bar">
-    <div class="efb-files" data-efb-files>
-      <button type="button" class="efb-add-file" data-efb-add-file>
+  <div class="leb-bar">
+    <div class="leb-files" data-leb-files>
+      <button type="button" class="leb-add-file" data-leb-add-file>
         + note
       </button>
     </div>
 
-    <div class="efb-picker" data-efb-picker hidden>
+    <div class="leb-picker" data-leb-picker hidden>
       <input
         type="text"
-        class="efb-picker-input"
-        data-efb-picker-input
+        class="leb-picker-input"
+        data-leb-picker-input
         placeholder="Search notes by title or slug…"
       />
-      <div class="efb-picker-results" data-efb-picker-results></div>
+      <div class="leb-picker-results" data-leb-picker-results></div>
     </div>
 
-    <div class="efb-input-row">
+    <div class="leb-input-row">
       <textarea
-        class="efb-comment"
-        data-efb-comment
+        class="leb-comment"
+        data-leb-comment
         placeholder="Feedback on the note(s) above… (⌘/Ctrl+Enter to send)"
         rows="1"
       ></textarea>
       <button
         type="button"
-        class="efb-icon-btn efb-panel-toggle"
-        data-efb-panel-toggle
+        class="leb-icon-btn leb-panel-toggle"
+        data-leb-panel-toggle
         aria-expanded="false"
         aria-label="Toggle edit feedback panel"
       >
         ✎
       </button>
-      <button type="button" class="ef-btn ef-btn-primary" data-efb-send>
+      <button type="button" class="le-btn le-btn-primary" data-leb-send>
         Send
       </button>
     </div>
   </div>
 
-  <template data-efb-chip-template>
-    <span class="efb-chip" data-efb-chip>
-      <span data-efb-chip-label></span>
-      <button type="button" data-efb-chip-remove aria-label="Remove note">
+  <template data-leb-chip-template>
+    <span class="leb-chip" data-leb-chip>
+      <span data-leb-chip-label></span>
+      <button type="button" data-leb-chip-remove aria-label="Remove note">
         ×
       </button>
     </span>
   </template>
 
-  <template data-efb-result-template>
-    <button type="button" class="efb-picker-result" data-efb-result>
-      <span class="efb-picker-result-title" data-efb-result-title></span>
-      <span class="efb-picker-result-slug" data-efb-result-slug></span>
+  <template data-leb-result-template>
+    <button type="button" class="leb-picker-result" data-leb-result>
+      <span class="leb-picker-result-title" data-leb-result-title></span>
+      <span class="leb-picker-result-slug" data-leb-result-slug></span>
     </button>
   </template>
 
-  <template data-efb-item-template>
-    <div class="ef-item">
-      <div class="ef-item-header">
-        <span class="ef-item-status" data-ef-status></span>
-        <span class="ef-item-files" data-ef-files></span>
+  <template data-leb-item-template>
+    <div class="le-item">
+      <div class="le-item-header">
+        <span class="le-item-status" data-le-status></span>
+        <span class="le-item-files" data-le-files></span>
       </div>
-      <div class="ef-item-comment" data-ef-comment-text></div>
-      <div class="ef-item-progress" data-ef-progress hidden></div>
-      <div class="ef-item-summary" data-ef-summary hidden></div>
-      <div class="ef-item-diff" data-ef-diff hidden></div>
-      <div class="ef-item-deletions" data-ef-deletions hidden></div>
-      <div class="ef-item-error" data-ef-error hidden></div>
-      <div class="ef-item-actions" data-ef-actions hidden>
-        <button type="button" class="ef-btn ef-btn-primary" data-ef-apply>
+      <div class="le-item-comment" data-le-comment-text></div>
+      <div class="le-item-progress" data-le-progress hidden></div>
+      <div class="le-item-summary" data-le-summary hidden></div>
+      <div class="le-item-diff" data-le-diff hidden></div>
+      <div class="le-item-deletions" data-le-deletions hidden></div>
+      <div class="le-item-error" data-le-error hidden></div>
+      <div class="le-item-actions" data-le-actions hidden>
+        <button type="button" class="le-btn le-btn-primary" data-le-apply>
           Apply
         </button>
-        <button type="button" class="ef-btn ef-btn-ghost" data-ef-discard>
+        <button type="button" class="le-btn le-btn-ghost" data-le-discard>
           Discard
         </button>
       </div>
-      <div class="ef-item-refine" data-ef-refine hidden>
+      <div class="le-item-refine" data-le-refine hidden>
         <textarea
-          class="ef-comment"
-          data-ef-refine-input
+          class="le-comment"
+          data-le-refine-input
           placeholder="Refine…"
           rows="2"
         ></textarea>
-        <button type="button" class="ef-btn ef-btn-ghost" data-ef-refine-btn>
+        <button type="button" class="le-btn le-btn-ghost" data-le-refine-btn>
           Send
         </button>
       </div>
@@ -147,43 +147,43 @@
   }
 
   function init() {
-    const root = document.getElementById("edit-feedback-bar");
+    const root = document.getElementById("live-edit-bar");
     if (!root) return;
 
-    const panel = root.querySelector<HTMLElement>("[data-efb-panel]")!;
+    const panel = root.querySelector<HTMLElement>("[data-leb-panel]")!;
     const panelClose = root.querySelector<HTMLButtonElement>(
-      "[data-efb-panel-close]",
+      "[data-leb-panel-close]",
     )!;
     const panelToggle = root.querySelector<HTMLButtonElement>(
-      "[data-efb-panel-toggle]",
+      "[data-leb-panel-toggle]",
     )!;
-    const list = root.querySelector<HTMLElement>("[data-efb-list]")!;
+    const list = root.querySelector<HTMLElement>("[data-leb-list]")!;
     const itemTemplate = root.querySelector<HTMLTemplateElement>(
-      "[data-efb-item-template]",
+      "[data-leb-item-template]",
     )!;
 
-    const filesEl = root.querySelector<HTMLElement>("[data-efb-files]")!;
+    const filesEl = root.querySelector<HTMLElement>("[data-leb-files]")!;
     const addFileBtn = root.querySelector<HTMLButtonElement>(
-      "[data-efb-add-file]",
+      "[data-leb-add-file]",
     )!;
     const chipTemplate = root.querySelector<HTMLTemplateElement>(
-      "[data-efb-chip-template]",
+      "[data-leb-chip-template]",
     )!;
 
-    const picker = root.querySelector<HTMLElement>("[data-efb-picker]")!;
+    const picker = root.querySelector<HTMLElement>("[data-leb-picker]")!;
     const pickerInput = root.querySelector<HTMLInputElement>(
-      "[data-efb-picker-input]",
+      "[data-leb-picker-input]",
     )!;
     const pickerResults = root.querySelector<HTMLElement>(
-      "[data-efb-picker-results]",
+      "[data-leb-picker-results]",
     )!;
     const resultTemplate = root.querySelector<HTMLTemplateElement>(
-      "[data-efb-result-template]",
+      "[data-leb-result-template]",
     )!;
 
     const commentInput =
-      root.querySelector<HTMLTextAreaElement>("[data-efb-comment]")!;
-    const sendBtn = root.querySelector<HTMLButtonElement>("[data-efb-send]")!;
+      root.querySelector<HTMLTextAreaElement>("[data-leb-comment]")!;
+    const sendBtn = root.querySelector<HTMLButtonElement>("[data-leb-send]")!;
 
     // --- panel open/close, persisted across page loads within a tab -----
 
@@ -191,14 +191,14 @@
       panel.hidden = !open;
       panelToggle.setAttribute("aria-expanded", String(open));
       try {
-        sessionStorage.setItem("ef-panel-open", open ? "1" : "0");
+        sessionStorage.setItem("le-panel-open", open ? "1" : "0");
       } catch {
         // ignore
       }
     }
 
     try {
-      if (sessionStorage.getItem("ef-panel-open") === "1") setPanelOpen(true);
+      if (sessionStorage.getItem("le-panel-open") === "1") setPanelOpen(true);
     } catch {
       // ignore
     }
@@ -213,7 +213,7 @@
 
     // Default to the note currently being viewed, if any: the per-note
     // widget's root carries the file path as a data attribute.
-    const currentNoteFile = document.getElementById("edit-feedback-selection")
+    const currentNoteFile = document.getElementById("live-edit-selection")
       ?.dataset.filePath;
     if (currentNoteFile) addFile(currentNoteFile);
 
@@ -223,10 +223,10 @@
       const chip = (
         chipTemplate.content.firstElementChild as HTMLElement
       ).cloneNode(true) as HTMLElement;
-      chip.querySelector("[data-efb-chip-label]")!.textContent = file
+      chip.querySelector("[data-leb-chip-label]")!.textContent = file
         .replace(/^docs\//, "")
         .replace(/\.mdx?$/, "");
-      chip.querySelector<HTMLButtonElement>("[data-efb-chip-remove]")!.onclick =
+      chip.querySelector<HTMLButtonElement>("[data-leb-chip-remove]")!.onclick =
         () => removeFile(file);
       chipEls.set(file, chip);
       filesEl.insertBefore(chip, addFileBtn);
@@ -240,13 +240,13 @@
       chipEls.delete(file);
     }
 
-    // --- note picker (searches /__edit-feedback/notes) ---------------
+    // --- note picker (searches /__live-edit/notes) ---------------
 
     let notesCache: NoteInfo[] | null = null;
 
     async function loadNotes(): Promise<NoteInfo[]> {
       if (notesCache) return notesCache;
-      const res = await fetch("/__edit-feedback/notes");
+      const res = await fetch("/__live-edit/notes");
       const body = (await res.json()) as { notes: NoteInfo[] };
       notesCache = body.notes;
       return notesCache;
@@ -268,9 +268,9 @@
         const el = (
           resultTemplate.content.firstElementChild as HTMLElement
         ).cloneNode(true) as HTMLElement;
-        el.querySelector("[data-efb-result-title]")!.textContent =
+        el.querySelector("[data-leb-result-title]")!.textContent =
           note.title || note.slug;
-        el.querySelector("[data-efb-result-slug]")!.textContent = note.slug;
+        el.querySelector("[data-leb-result-slug]")!.textContent = note.slug;
         el.addEventListener("click", () => {
           addFile(note.file);
           picker.hidden = true;
@@ -311,7 +311,7 @@
       commentInput.value = "";
       setPanelOpen(true);
 
-      await fetch("/__edit-feedback/request", {
+      await fetch("/__live-edit/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -344,14 +344,14 @@
           `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
         );
         if (!ok) return;
-        await fetch(`/__edit-feedback/apply/${item.id}`, {
+        await fetch(`/__live-edit/apply/${item.id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ confirmDelete: true }),
         });
         return;
       }
-      await fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+      await fetch(`/__live-edit/apply/${item.id}`, { method: "POST" });
     }
 
     const itemEls = new Map<string, HTMLElement>();
@@ -367,28 +367,28 @@
       }
 
       el.dataset.status = item.status;
-      el.querySelector("[data-ef-files]")!.textContent = item.files
+      el.querySelector("[data-le-files]")!.textContent = item.files
         .map((f) => f.replace(/^docs\//, "").replace(/\.mdx?$/, ""))
         .join(", ");
-      el.querySelector("[data-ef-comment-text]")!.textContent = item.comment;
-      el.querySelector("[data-ef-status]")!.textContent = statusLabel(item);
+      el.querySelector("[data-le-comment-text]")!.textContent = item.comment;
+      el.querySelector("[data-le-status]")!.textContent = statusLabel(item);
 
-      const progressEl = el.querySelector<HTMLElement>("[data-ef-progress]")!;
+      const progressEl = el.querySelector<HTMLElement>("[data-le-progress]")!;
       progressEl.textContent = item.progress.at(-1) ?? "";
       progressEl.hidden =
         item.status !== "running" || item.progress.length === 0;
 
-      const summaryEl = el.querySelector<HTMLElement>("[data-ef-summary]")!;
+      const summaryEl = el.querySelector<HTMLElement>("[data-le-summary]")!;
       summaryEl.textContent = item.summary ?? "";
       summaryEl.hidden = !item.summary;
 
-      const diffEl = el.querySelector<HTMLElement>("[data-ef-diff]")!;
+      const diffEl = el.querySelector<HTMLElement>("[data-le-diff]")!;
       diffEl.innerHTML = "";
       diffEl.hidden = !item.changes || item.changes.length === 0;
       for (const change of item.changes ?? []) {
         if ((item.changes?.length ?? 0) > 1) {
           const label = document.createElement("div");
-          label.className = "ef-edit-file";
+          label.className = "le-edit-file";
           label.textContent = change.file;
           diffEl.append(label);
         }
@@ -398,60 +398,60 @@
           const newEl = document.createElement("ins");
           newEl.textContent = edit.new;
           const wrap = document.createElement("div");
-          wrap.className = "ef-edit";
+          wrap.className = "le-edit";
           wrap.append(oldEl, newEl);
           diffEl.append(wrap);
         }
       }
 
-      const deletionsEl = el.querySelector<HTMLElement>("[data-ef-deletions]")!;
+      const deletionsEl = el.querySelector<HTMLElement>("[data-le-deletions]")!;
       deletionsEl.innerHTML = "";
       const deletions = item.deletions ?? [];
       deletionsEl.hidden = deletions.length === 0;
       if (deletions.length > 0) {
         const label = document.createElement("div");
-        label.className = "ef-deletions-label";
+        label.className = "le-deletions-label";
         label.textContent = `Delete ${deletions.length} file(s):`;
         deletionsEl.append(label);
         for (const file of deletions) {
           const row = document.createElement("div");
-          row.className = "ef-deletions-file";
+          row.className = "le-deletions-file";
           row.textContent = file;
           deletionsEl.append(row);
         }
       }
 
-      const errorEl = el.querySelector<HTMLElement>("[data-ef-error]")!;
+      const errorEl = el.querySelector<HTMLElement>("[data-le-error]")!;
       errorEl.textContent = item.error ?? "";
       errorEl.hidden = !item.error;
 
-      const actions = el.querySelector<HTMLElement>("[data-ef-actions]")!;
+      const actions = el.querySelector<HTMLElement>("[data-le-actions]")!;
       actions.hidden = item.status !== "proposed";
 
-      const refineForm = el.querySelector<HTMLElement>("[data-ef-refine]")!;
+      const refineForm = el.querySelector<HTMLElement>("[data-le-refine]")!;
       refineForm.hidden = !(
         item.status === "proposed" || item.status === "error"
       );
 
-      const applyBtn = el.querySelector<HTMLButtonElement>("[data-ef-apply]")!;
+      const applyBtn = el.querySelector<HTMLButtonElement>("[data-le-apply]")!;
       applyBtn.onclick = () => void applyItem(item);
 
       const discardBtn =
-        el.querySelector<HTMLButtonElement>("[data-ef-discard]")!;
+        el.querySelector<HTMLButtonElement>("[data-le-discard]")!;
       discardBtn.onclick = () =>
-        fetch(`/__edit-feedback/discard/${item.id}`, { method: "POST" });
+        fetch(`/__live-edit/discard/${item.id}`, { method: "POST" });
 
       const refineInput = el.querySelector<HTMLTextAreaElement>(
-        "[data-ef-refine-input]",
+        "[data-le-refine-input]",
       )!;
       const refineBtn = el.querySelector<HTMLButtonElement>(
-        "[data-ef-refine-btn]",
+        "[data-le-refine-btn]",
       )!;
       refineBtn.onclick = () => {
         const comment = refineInput.value.trim();
         if (!comment) return;
         refineInput.value = "";
-        void fetch(`/__edit-feedback/refine/${item.id}`, {
+        void fetch(`/__live-edit/refine/${item.id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ comment }),
@@ -478,16 +478,16 @@
 
     // This panel only covers "whole-note" items - a "selection" item
     // renders inline in the article by the per-note widget
-    // (edit-feedback.astro), which only has the live DOM Range needed to
-    // anchor it. Every item still gets dispatched as an "ef-item" DOM
+    // (live-edit.astro), which only has the live DOM Range needed to
+    // anchor it. Every item still gets dispatched as an "le-item" DOM
     // event, which is how that widget learns about updates to items it
     // submitted, without both components needing to share an EventSource.
     function handleItem(item: FeedbackItem): void {
-      document.dispatchEvent(new CustomEvent("ef-item", { detail: item }));
+      document.dispatchEvent(new CustomEvent("le-item", { detail: item }));
       if (item.kind === "whole-note") renderItem(item);
     }
 
-    const es = new EventSource("/__edit-feedback/events");
+    const es = new EventSource("/__live-edit/events");
     es.onmessage = (ev) => {
       const msg = JSON.parse(ev.data) as
         | { type: "snapshot"; items: FeedbackItem[] }
@@ -504,13 +504,13 @@
 </script>
 
 <style>
-  #edit-feedback-bar {
+  #live-edit-bar {
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     color: var(--text-primary);
   }
 
-  .ef-btn {
+  .le-btn {
     border-radius: 6px;
     padding: 5px 12px;
     font-size: 0.75rem;
@@ -519,18 +519,18 @@
     border: 1px solid transparent;
   }
 
-  .ef-btn-primary {
+  .le-btn-primary {
     background: var(--sem, #2563eb);
     color: #fff;
   }
 
-  .ef-btn-ghost {
+  .le-btn-ghost {
     background: transparent;
     border-color: var(--border);
     color: var(--text-secondary);
   }
 
-  .efb-icon-btn {
+  .leb-icon-btn {
     border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--surface);
@@ -545,7 +545,7 @@
 
   /* --- bottom bar ---------------------------------------------------- */
 
-  .efb-bar {
+  .leb-bar {
     position: fixed;
     left: 50%;
     bottom: 14px;
@@ -563,14 +563,14 @@
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 
-  .efb-files {
+  .leb-files {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
 
-  .efb-chip {
+  .leb-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -581,7 +581,7 @@
     font-size: 0.75rem;
   }
 
-  .efb-chip button {
+  .leb-chip button {
     border: none;
     background: transparent;
     color: var(--text-secondary);
@@ -592,7 +592,7 @@
     line-height: 1;
   }
 
-  .efb-add-file {
+  .leb-add-file {
     border: 1px dashed var(--border-strong);
     background: transparent;
     color: var(--text-secondary);
@@ -603,7 +603,7 @@
     cursor: pointer;
   }
 
-  .efb-picker {
+  .leb-picker {
     position: absolute;
     bottom: calc(100% + 6px);
     left: 0;
@@ -617,7 +617,7 @@
     box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
   }
 
-  .efb-picker-input {
+  .leb-picker-input {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid var(--border);
@@ -630,12 +630,12 @@
     margin-bottom: 6px;
   }
 
-  .efb-picker-results {
+  .leb-picker-results {
     display: flex;
     flex-direction: column;
   }
 
-  .efb-picker-result {
+  .leb-picker-result {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -649,22 +649,22 @@
     color: var(--text-primary);
   }
 
-  .efb-picker-result:hover {
+  .leb-picker-result:hover {
     background: var(--surface-2);
   }
 
-  .efb-picker-result-slug {
+  .leb-picker-result-slug {
     font-size: 0.6875rem;
     color: var(--text-secondary);
   }
 
-  .efb-input-row {
+  .leb-input-row {
     display: flex;
     align-items: flex-end;
     gap: 6px;
   }
 
-  .efb-comment {
+  .leb-comment {
     flex: 1;
     resize: vertical;
     border: 1px solid var(--border);
@@ -679,7 +679,7 @@
 
   /* --- panel ----------------------------------------------------------- */
 
-  .efb-panel {
+  .leb-panel {
     position: fixed;
     right: 12px;
     bottom: 90px;
@@ -695,7 +695,7 @@
     overflow: hidden;
   }
 
-  .efb-panel-header {
+  .leb-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -704,12 +704,12 @@
     border-bottom: 1px solid var(--border);
   }
 
-  .efb-panel-header .efb-icon-btn {
+  .leb-panel-header .leb-icon-btn {
     width: 24px;
     height: 24px;
   }
 
-  .efb-list {
+  .leb-list {
     overflow-y: auto;
     padding: 8px;
     display: flex;
@@ -717,29 +717,29 @@
     gap: 8px;
   }
 
-  .ef-item {
+  .le-item {
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 8px;
     background: var(--surface-2);
   }
 
-  .ef-item[data-status="error"] {
+  .le-item[data-status="error"] {
     border-color: #dc2626;
   }
 
-  .ef-item[data-status="applied"] {
+  .le-item[data-status="applied"] {
     border-color: #16a34a;
   }
 
-  .ef-item-header {
+  .le-item-header {
     display: flex;
     justify-content: space-between;
     gap: 8px;
     align-items: baseline;
   }
 
-  .ef-item-status {
+  .le-item-status {
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.4px;
@@ -747,30 +747,30 @@
     flex: none;
   }
 
-  .ef-item-files {
+  .le-item-files {
     font-size: 0.6875rem;
     color: var(--text-secondary);
     text-align: right;
     overflow-wrap: anywhere;
   }
 
-  .ef-item-comment {
+  .le-item-comment {
     margin-top: 4px;
     font-style: italic;
   }
 
-  .ef-item-progress {
+  .le-item-progress {
     margin-top: 4px;
     color: var(--text-secondary);
     font-size: 0.75rem;
   }
 
-  .ef-item-summary {
+  .le-item-summary {
     margin-top: 6px;
     font-weight: 600;
   }
 
-  .ef-item-diff {
+  .le-item-diff {
     margin-top: 6px;
     display: flex;
     flex-direction: column;
@@ -778,20 +778,20 @@
     font-size: 0.75rem;
   }
 
-  .ef-item-diff :global(.ef-edit-file) {
+  .le-item-diff :global(.le-edit-file) {
     font-weight: 600;
     font-size: 0.6875rem;
     color: var(--text-secondary);
     margin-top: 4px;
   }
 
-  .ef-item-diff :global(.ef-edit) {
+  .le-item-diff :global(.le-edit) {
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
 
-  .ef-item-diff :global(del) {
+  .le-item-diff :global(del) {
     background: #fecaca;
     color: #7f1d1d;
     text-decoration: line-through;
@@ -799,7 +799,7 @@
     border-radius: 4px;
   }
 
-  .ef-item-diff :global(ins) {
+  .le-item-diff :global(ins) {
     background: #bbf7d0;
     color: #14532d;
     text-decoration: none;
@@ -807,7 +807,7 @@
     border-radius: 4px;
   }
 
-  .ef-item-deletions {
+  .le-item-deletions {
     margin-top: 6px;
     border: 1px solid #dc2626;
     border-radius: 6px;
@@ -815,42 +815,42 @@
     font-size: 0.75rem;
   }
 
-  .ef-deletions-label {
+  .le-deletions-label {
     font-weight: 700;
     color: #dc2626;
     margin-bottom: 2px;
   }
 
-  .ef-deletions-file {
+  .le-deletions-file {
     color: var(--text-secondary);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
   }
 
-  .ef-item-error {
+  .le-item-error {
     margin-top: 6px;
     color: #dc2626;
     font-size: 0.75rem;
     white-space: pre-wrap;
   }
 
-  .ef-item-actions,
-  .ef-item-refine {
+  .le-item-actions,
+  .le-item-refine {
     margin-top: 8px;
     display: flex;
     gap: 6px;
   }
 
-  .ef-item-refine {
+  .le-item-refine {
     flex-direction: column;
   }
 
   :root[data-theme="dark"] {
-    .ef-item-diff :global(del) {
+    .le-item-diff :global(del) {
       background: #7f1d1d;
       color: #fecaca;
     }
-    .ef-item-diff :global(ins) {
+    .le-item-diff :global(ins) {
       background: #14532d;
       color: #bbf7d0;
     }
