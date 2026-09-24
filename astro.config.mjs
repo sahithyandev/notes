@@ -6,6 +6,7 @@ import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import moduleRedirects from "./src/integrations/module-redirects/index.ts";
 import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
+import devReloadLock from "./src/integrations/dev-reload-lock/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
@@ -129,7 +130,7 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [tailwindcss(), servePagefindDev()],
+    plugins: [tailwindcss(), servePagefindDev(), devReloadLock()],
     build: {
       // ponytail: lightningcss fails with Tailwind v4 CSS under Vite 8/rolldown; esbuild works fine
       cssMinify: "esbuild",

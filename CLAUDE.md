@@ -23,6 +23,14 @@ Run the metadata sync script whenever `.md` files are added or renamed:
 bun scripts/sync-note-metadata.ts <path/to/file.md> [...]   # add --dry-run to preview
 ```
 
+### Editing notes while `bun dev` is running
+
+Reloads during an edit burst are throttled by `src/integrations/dev-reload-lock/index.ts`, a Vite plugin registered in `astro.config.mjs`. It's agent-agnostic by default: every `full-reload`/HMR websocket message is held for a 1-second quiet period, and each new message during that window resets the timer, so a burst of edits from any tool, Claude Code, OpenCode, a different agent, or a human running a script across multiple notes, collapses into a single reload fired shortly after the burst ends. Nothing needs to call anything for this to work.
+
+On top of that, the plugin exposes `POST /__reload-lock/pause` and `POST /__reload-lock/resume` on the dev server (`localhost:4321`) as a latency optimization: pausing holds reloads indefinitely instead of on a timer, and resuming flushes immediately. `.claude/settings.json` wires these into Claude Code specifically (a `PreToolUse` hook on `Edit|Write|MultiEdit` pauses, a `Stop` hook resumes), so Claude Code's edit turns get an instant reload right after the turn ends rather than waiting out the debounce. Any other agent that doesn't call these endpoints still gets the debounced behavior for free.
+
+Regardless of the above, still make all edits to a given note in one pass (draft the full content, then a single `Write`/`Edit`) rather than several incremental `Edit` calls, since that's fewer filesystem writes and keeps intermediate diffs cleaner.
+
 ## Writing notes
 
 Use the `write-notes` skill whenever writing a new note or editing an existing one, so the content matches Sahithyan's style. For math-heavy or interactive learning content, use `math-teacher`.
