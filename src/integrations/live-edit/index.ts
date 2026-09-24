@@ -58,6 +58,10 @@ interface Job {
 
 const SESSION_FILE = "live-edit-session";
 
+// A plain pencil, for the dev toolbar's app icon (toolbar-app.ts).
+const PENCIL_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M3 21v-3.75L14.81 5.44a1.5 1.5 0 0 1 2.12 0l1.63 1.63a1.5 1.5 0 0 1 0 2.12L6.75 21H3Zm2-2h1l10.5-10.5-1-1L5 18v1Zm12.9-12.9 1-1-1.63-1.63-1 1 1.63 1.63Z"/></svg>';
+
 // A small in-process store + single-worker queue backing the dev-only
 // "select text, get an edit" feedback loop (plus a site-wide whole-note /
 // multi-note variant for merges). Turns run one at a time against one
@@ -380,10 +384,22 @@ export default function liveEdit(): AstroIntegration {
   return {
     name: "live-edit",
     hooks: {
-      "astro:config:setup": ({ config }) => {
+      "astro:config:setup": ({ config, addDevToolbarApp }) => {
         root = config.root.pathname.replace(/\/$/, "");
         docsRoot = join(root, "docs");
         tmpDir = join(root, ".tmp");
+
+        // The whole-note / merge review panel; a no-op outside `astro dev`.
+        // The per-note selection widget (src/components/dev/live-edit.astro)
+        // isn't a toolbar app - it needs the live DOM Range of a text
+        // selection to anchor its inline marker, which doesn't fit a
+        // toggled overlay panel.
+        addDevToolbarApp({
+          id: "live-edit:panel",
+          name: "Live Edit",
+          icon: PENCIL_ICON,
+          entrypoint: new URL("./toolbar-app.ts", import.meta.url),
+        });
       },
       "astro:server:setup": async ({
         server,
