@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { readdirSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { basename, extname, join, relative } from "node:path";
+import { basename, dirname, extname, join, relative } from "node:path";
 import { spawn } from "node:child_process";
 import type { AstroIntegration, AstroIntegrationLogger } from "astro";
 import type { ViteDevServer } from "vite";
@@ -43,6 +44,7 @@ export interface FeedbackItem {
   agentReply?: string;
   summary?: string;
   changes?: FileChange[];
+  deletions?: string[];
   error?: string;
   createdAt: number;
   updatedAt: number;
@@ -210,6 +212,7 @@ export default function editFeedback(): AstroIntegration {
       item.status = "proposed";
       item.summary = proposal.summary;
       item.changes = proposal.changes;
+      item.deletions = proposal.deletions;
       item.error = undefined;
       return true;
     } catch (err) {
@@ -231,7 +234,27 @@ export default function editFeedback(): AstroIntegration {
     return basename(file, extname(file));
   }
 
-  async function runStyleCheckFollowup(item: FeedbackItem): Promise<void> {
+  // After a deletion, a broken link pointing at the removed file(s) can be
+  // in *any* note, not just the ones this item touched, so that case scans
+  // the whole corpus (no --filter) instead of just item.files.
+  async function runStyleCheckFollowup(
+    item: FeedbackItem,
+    full: boolean,
+  ): Promise<void> {
+    if (full) {
+      const { code, output } = await runCheckNotesStyle(root);
+      if (code === 0) return;
+      log(
+        item,
+        "style check found violations after deletion, asking agent to fix",
+      );
+      enqueue({
+        itemId: item.id,
+        message: `Style check found violations across the site after your deletion was applied (most likely other notes still linking to what you removed). Find and fix them.\n\n${output.slice(0, 4000)}`,
+      });
+      return;
+    }
+
     const violatingOutputs: string[] = [];
     for (const file of item.files) {
       const { code, output } = await runCheckNotesStyle(
@@ -251,14 +274,15 @@ export default function editFeedback(): AstroIntegration {
 
   function runCheckNotesStyle(
     cwd: string,
-    filterArg: string,
+    filterArg?: string,
   ): Promise<{ code: number; output: string }> {
+    const args = ["run", "check-notes-style"];
+    if (filterArg) args.push("--", "--filter", filterArg);
     return new Promise((resolvePromise) => {
-      const child = spawn(
-        "bun",
-        ["run", "check-notes-style", "--", "--filter", filterArg],
-        { cwd, stdio: ["ignore", "pipe", "pipe"] },
-      );
+      const child = spawn("bun", args, {
+        cwd,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
       let output = "";
       child.stdout.on("data", (d) => (output += d.toString()));
       child.stderr.on("data", (d) => (output += d.toString()));
@@ -267,6 +291,77 @@ export default function editFeedback(): AstroIntegration {
         resolvePromise({ code: 1, output: String(err) }),
       );
     });
+  }
+
+  // Deleting a note leaves its siblings' prev/next/sidebar.order stale
+  // (they were numbered assuming the deleted file was still there), so this
+  // re-runs scripts/sync-note-metadata.ts for every directory a deletion
+  // touched. Shelled out to (like check-notes-style below), not imported
+  // directly: that script has a `if (require.main === module)` CLI entry
+  // point which, when imported as a module under Vite's SSR module runner
+  // (as opposed to run directly by Bun, which polyfills `require`), throws
+  // "require is not defined" and crashes the whole dev server on startup -
+  // caught by actually restarting the dev server after adding this, not
+  // just by tests or a type-check.
+  //
+  // Only one remaining sibling per directory is passed as an argument -
+  // sync-note-metadata.ts derives the full file list itself from that
+  // file's directory, and stamps a fresh lastUpdatedOn on every path
+  // actually passed as an argument. Passing just one (rather than every
+  // surviving file) limits that stamping to that one arbitrary file
+  // instead of the whole directory; it still isn't exactly right (that one
+  // file's content didn't change either, only its neighbors were removed),
+  // but matches what running the CLI by hand for the same purpose would
+  // do, and is a minor cosmetic inaccuracy, not a correctness issue.
+  async function resyncAfterDeletion(item: FeedbackItem): Promise<void> {
+    const dirs = new Set<string>();
+    for (const file of item.deletions ?? []) {
+      try {
+        dirs.add(dirname(resolveDocPath(docsRoot, file)));
+      } catch {
+        // Already validated by applyProposal before this ran; ignore.
+      }
+    }
+
+    const anchorFiles: string[] = [];
+    for (const dir of dirs) {
+      try {
+        const remaining = readdirSync(dir).find(
+          (name) => name.endsWith(".md") || name.endsWith(".mdx"),
+        );
+        if (remaining) anchorFiles.push(join(dir, remaining));
+      } catch {
+        // The directory may be gone if every note in it was deleted.
+      }
+    }
+    if (anchorFiles.length === 0) return;
+
+    const { code, output } = await new Promise<{
+      code: number;
+      output: string;
+    }>((resolvePromise) => {
+      const child = spawn(
+        "bun",
+        ["scripts/sync-note-metadata.ts", ...anchorFiles],
+        { cwd: root, stdio: ["ignore", "pipe", "pipe"] },
+      );
+      let out = "";
+      child.stdout.on("data", (d) => (out += d.toString()));
+      child.stderr.on("data", (d) => (out += d.toString()));
+      child.on("close", (c) => resolvePromise({ code: c ?? 1, output: out }));
+      child.on("error", (err) =>
+        resolvePromise({ code: 1, output: String(err) }),
+      );
+    });
+
+    if (code === 0) {
+      log(
+        item,
+        "renumbered the remaining notes in the affected director(y/ies)",
+      );
+    } else {
+      log(item, `renumbering after deletion failed: ${output.slice(0, 500)}`);
+    }
   }
 
   async function readJsonBody<T>(req: IncomingMessage): Promise<T> {
@@ -387,7 +482,7 @@ export default function editFeedback(): AstroIntegration {
 
           const applyMatch = url.match(/^\/__edit-feedback\/apply\/([^/]+)$/);
           if (applyMatch && req.method === "POST") {
-            return handleApply(res, applyMatch[1]);
+            return handleApply(req, res, applyMatch[1]);
           }
 
           const discardMatch = url.match(
@@ -466,20 +561,42 @@ export default function editFeedback(): AstroIntegration {
         }
 
         async function handleApply(
+          req: IncomingMessage,
           res: ServerResponse,
           id: string,
         ): Promise<void> {
           const item = items.get(id);
           if (!item) return sendJson(res, 404, { error: "not found" });
-          if (item.status !== "proposed" || !item.changes) {
+          const hasChanges = (item.changes?.length ?? 0) > 0;
+          const hasDeletions = (item.deletions?.length ?? 0) > 0;
+          if (item.status !== "proposed" || (!hasChanges && !hasDeletions)) {
             return sendJson(res, 400, {
               error: "item is not in a proposed state",
             });
           }
 
+          // Deleting files is the one destructive action this tool can
+          // propose, so it needs an explicit, separate confirmation from
+          // the click that reveals the proposal - the browser is expected
+          // to have already shown the exact file list and gotten a yes
+          // before sending this.
+          if (hasDeletions) {
+            const body = await readJsonBody<{ confirmDelete?: boolean }>(req);
+            if (!body.confirmDelete) {
+              return sendJson(res, 400, {
+                error: "confirmation required to delete files",
+                deletions: item.deletions,
+              });
+            }
+          }
+
           let result;
           try {
-            result = await applyProposal(docsRoot, item.changes);
+            result = await applyProposal(
+              docsRoot,
+              item.changes ?? [],
+              item.deletions ?? [],
+            );
           } catch (err) {
             if (err instanceof PathOutsideDocsError) {
               item.status = "error";
@@ -493,17 +610,20 @@ export default function editFeedback(): AstroIntegration {
           if (!result.ok) {
             if (item.mismatchRetried) {
               item.status = "error";
-              item.error = result.fileMismatches
-                .map(
-                  (fm) =>
-                    `${fm.file}: ${fm.mismatches.map((m) => `"${m.old}" found ${m.occurrences}x`).join("; ")}`,
-                )
-                .join(" | ");
+              const editMsgs = result.fileMismatches.map(
+                (fm) =>
+                  `${fm.file}: ${fm.mismatches.map((m) => `"${m.old}" found ${m.occurrences}x`).join("; ")}`,
+              );
+              const delMsgs = result.deletionMismatches.map(
+                (dm) => `${dm.file}: ${dm.reason}`,
+              );
+              item.error = [...editMsgs, ...delMsgs].join(" | ");
               touch(item);
               log(item, `apply failed (already retried once): ${item.error}`);
               return sendJson(res, 409, {
                 ok: false,
                 fileMismatches: result.fileMismatches,
+                deletionMismatches: result.deletionMismatches,
               });
             }
             item.mismatchRetried = true;
@@ -512,7 +632,10 @@ export default function editFeedback(): AstroIntegration {
             log(item, "apply mismatch, asking agent to re-propose");
             enqueue({
               itemId: item.id,
-              message: buildMismatchMessage(result.fileMismatches),
+              message: buildMismatchMessage(
+                result.fileMismatches,
+                result.deletionMismatches,
+              ),
             });
             return sendJson(res, 200, { ok: false, retried: true });
           }
@@ -520,10 +643,16 @@ export default function editFeedback(): AstroIntegration {
           item.status = "applied";
           item.error = undefined;
           touch(item);
-          log(item, "applied");
+          log(
+            item,
+            hasDeletions
+              ? `applied (deleted ${item.deletions!.length} file(s))`
+              : "applied",
+          );
           sendJson(res, 200, { ok: true });
 
-          void runStyleCheckFollowup(item);
+          if (hasDeletions) void resyncAfterDeletion(item);
+          void runStyleCheckFollowup(item, hasDeletions);
         }
       },
     },

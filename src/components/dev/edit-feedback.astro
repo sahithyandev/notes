@@ -56,6 +56,7 @@ const { filePath } = Astro.props;
     progress: string[];
     summary?: string;
     changes?: FileChange[];
+    deletions?: string[];
     error?: string;
   }
 
@@ -237,6 +238,28 @@ const { filePath } = Astro.props;
 
     const markers = new Map<string, HTMLElement>();
 
+    // Deleting files is the one destructive action a proposal can carry, so
+    // it gets a distinct confirmation - naming the exact files - on top of
+    // the click on Apply itself. The relay also refuses to delete without a
+    // matching confirmDelete flag in the request body, so this isn't just a
+    // client-side nicety.
+    async function applyItem(item: FeedbackItem): Promise<void> {
+      const deletions = item.deletions ?? [];
+      if (deletions.length > 0) {
+        const ok = window.confirm(
+          `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
+        );
+        if (!ok) return;
+        await fetch(`/__edit-feedback/apply/${item.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirmDelete: true }),
+        });
+        return;
+      }
+      await fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+    }
+
     function makeToolbar(
       item: FeedbackItem,
       opts: { canApply: boolean },
@@ -248,9 +271,9 @@ const { filePath } = Astro.props;
         const applyBtn = document.createElement("button");
         applyBtn.type = "button";
         applyBtn.className = "ef-btn ef-btn-primary";
-        applyBtn.textContent = "Apply";
-        applyBtn.onclick = () =>
-          fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+        applyBtn.textContent =
+          (item.deletions?.length ?? 0) > 0 ? "Apply & Delete" : "Apply";
+        applyBtn.onclick = () => void applyItem(item);
         bar.append(applyBtn);
       }
 
@@ -295,15 +318,23 @@ const { filePath } = Astro.props;
       }
 
       if (item.status === "proposed") {
-        const del = document.createElement("del");
-        del.className = "ef-inline-del";
-        del.textContent = pendingText(item);
-        const ins = document.createElement("ins");
-        ins.className = "ef-inline-ins";
-        ins.textContent = (item.changes ?? [])
-          .flatMap((c) => c.edits.map((e) => e.new))
-          .join(" … ");
-        marker.append(del, document.createTextNode(" → "), ins);
+        if ((item.changes ?? []).length > 0) {
+          const del = document.createElement("del");
+          del.className = "ef-inline-del";
+          del.textContent = pendingText(item);
+          const ins = document.createElement("ins");
+          ins.className = "ef-inline-ins";
+          ins.textContent = (item.changes ?? [])
+            .flatMap((c) => c.edits.map((e) => e.new))
+            .join(" … ");
+          marker.append(del, document.createTextNode(" → "), ins);
+        }
+        if ((item.deletions ?? []).length > 0) {
+          const badge = document.createElement("span");
+          badge.className = "ef-inline-badge ef-inline-deletions";
+          badge.textContent = `🗑 Delete ${item.deletions!.length} file(s): ${item.deletions!.join(", ")}`;
+          marker.append(badge);
+        }
         marker.append(makeToolbar(item, { canApply: true }));
         return;
       }
@@ -525,6 +556,11 @@ const { filePath } = Astro.props;
 
   .ef-inline-error {
     color: #dc2626;
+  }
+
+  .ef-inline-deletions {
+    color: #dc2626;
+    font-weight: 600;
   }
 
   .ef-inline-del {

@@ -42,26 +42,43 @@ any explanation, in this exact shape:
         { "old": "<exact text to find, copied verbatim from the file>", "new": "<replacement text>" }
       ]
     }
-  ]
+  ],
+  "deletions": ["docs/<path-to-note>.md"]
 }
 \`\`\`
 
 "changes" can list more than one file - use this when the feedback asks you
 to merge, move, or coordinate content across notes (each file gets its own
-entry with its own edits, all applied together).
+entry with its own edits, all applied together). Omit "changes" (or leave
+it empty) for a proposal that only deletes files.
 
-Rules for each entry's edits:
+"deletions" lists whole files to remove outright - e.g. "remove this note"
+or "delete this and the next N notes". Omit it (or leave it empty) unless
+the feedback actually asks to remove a note. This is the one destructive
+action available to you, so before proposing it: use Glob/Read to confirm
+exactly which files the request means (e.g. "this and the next 2" - read
+the directory listing and check filenames/sidebar order, don't guess from
+titles alone), and list every one of them explicitly. You do not need to
+also renumber the remaining notes in that directory or fix other notes'
+links to the deleted ones yourself - the relay re-numbers the directory
+after a deletion is applied, and re-checks the whole site for now-broken
+links, feeding any it finds back to you as a follow-up to fix.
+
+Rules for each "changes" entry's edits:
 - Each "old" string must appear in that file's current content, copied
   character-for-character from what you read (including surrounding
   whitespace/newlines) so it matches exactly once.
 - Prefer the smallest "old" span that still uniquely identifies the location
   and captures the full change.
+
+General rules:
 - If the requested change cannot be made, or needs clarification, explain why
   in prose and omit the JSON block entirely rather than proposing something
   wrong.
 - If you are told a previous proposal did not match the file(s) (a
-  "mismatch" follow-up), re-read the affected file(s) and send a corrected
-  JSON block.`;
+  "mismatch" follow-up - this covers both an edit whose "old" text no
+  longer matches and a deletion target that no longer exists), re-read the
+  affected file(s) and send a corrected JSON block.`;
 
 // Builds the one user-turn message sent to the agent for a fresh feedback
 // item. Refinement follow-ups (a comment on an existing item) and mismatch
@@ -113,17 +130,20 @@ export function buildMismatchMessage(
     file: string;
     mismatches: { old: string; occurrences: number }[];
   }[],
+  deletionMismatches: { file: string; reason: string }[] = [],
 ): string {
-  const details = fileMismatches
-    .map((fm) => {
-      const lines = fm.mismatches
-        .map(
-          (m) =>
-            `- "${m.old}" was found ${m.occurrences} time(s) (expected exactly 1)`,
-        )
-        .join("\n");
-      return `In ${fm.file}:\n${lines}`;
-    })
-    .join("\n\n");
+  const editDetails = fileMismatches.map((fm) => {
+    const lines = fm.mismatches
+      .map(
+        (m) =>
+          `- "${m.old}" was found ${m.occurrences} time(s) (expected exactly 1)`,
+      )
+      .join("\n");
+    return `In ${fm.file}:\n${lines}`;
+  });
+  const deletionDetails = deletionMismatches.map(
+    (dm) => `${dm.file}: ${dm.reason}`,
+  );
+  const details = [...editDetails, ...deletionDetails].join("\n\n");
   return `Your last proposal didn't apply. Re-read the affected file(s) - they may have changed - and send a corrected proposal:\n\n${details}`;
 }

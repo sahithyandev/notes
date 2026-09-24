@@ -94,6 +94,53 @@ test("throws when a change has no edits", () => {
   expect(() => parseProposal(reply)).toThrow(ProposalParseError);
 });
 
+test("parses a deletion-only proposal (no changes)", () => {
+  const reply = `\`\`\`json
+{
+  "summary": "Remove three notes",
+  "deletions": ["docs/a.mdx", "docs/b.mdx", "docs/c.mdx"]
+}
+\`\`\`
+`;
+  const proposal = parseProposal(reply);
+  expect(proposal.changes).toEqual([]);
+  expect(proposal.deletions).toEqual([
+    "docs/a.mdx",
+    "docs/b.mdx",
+    "docs/c.mdx",
+  ]);
+});
+
+test("parses a proposal with both changes and deletions", () => {
+  const reply = `\`\`\`json
+{
+  "summary": "Fold a into b, then remove a",
+  "changes": [{ "file": "docs/b.md", "edits": [{ "old": "x", "new": "x plus a" }] }],
+  "deletions": ["docs/a.md"]
+}
+\`\`\`
+`;
+  const proposal = parseProposal(reply);
+  expect(proposal.changes).toHaveLength(1);
+  expect(proposal.deletions).toEqual(["docs/a.md"]);
+});
+
+test("throws when deletions is not an array", () => {
+  const reply = '```json\n{"summary": "s", "deletions": "docs/a.md"}\n```';
+  expect(() => parseProposal(reply)).toThrow(ProposalParseError);
+});
+
+test("throws when a deletions entry is not a string", () => {
+  const reply = '```json\n{"summary": "s", "deletions": [42]}\n```';
+  expect(() => parseProposal(reply)).toThrow(ProposalParseError);
+});
+
+test("throws when changes and deletions are both empty", () => {
+  const reply =
+    '```json\n{"summary": "s", "changes": [], "deletions": []}\n```';
+  expect(() => parseProposal(reply)).toThrow(ProposalParseError);
+});
+
 test("checkEdits finds a unique match", () => {
   const content = "the quick brown fox jumps";
   const mismatches = checkEdits(content, [
@@ -171,6 +218,51 @@ test("applyProposal writes nothing when any file has a mismatch", async () => {
   // Neither file was written, even though a.md's edit was unambiguous.
   expect(await readFile(join(docsRoot, "a.md"), "utf-8")).toBe("hello world");
   expect(await readFile(join(docsRoot, "b.md"), "utf-8")).toBe("goodbye world");
+
+  await rm(dir, { recursive: true, force: true });
+});
+
+test("applyProposal deletes files and can combine deletions with edits", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const docsRoot = join(dir, "docs");
+  await mkdir(docsRoot, { recursive: true });
+  await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
+  await writeFile(join(docsRoot, "b.md"), "goodbye world", "utf-8");
+  await writeFile(join(docsRoot, "c.md"), "keep me", "utf-8");
+
+  const result = await applyProposal(
+    docsRoot,
+    [{ file: "docs/c.md", edits: [{ old: "keep", new: "kept" }] }],
+    ["docs/a.md", "docs/b.md"],
+  );
+  expect(result.ok).toBe(true);
+  await expect(readFile(join(docsRoot, "a.md"), "utf-8")).rejects.toThrow();
+  await expect(readFile(join(docsRoot, "b.md"), "utf-8")).rejects.toThrow();
+  expect(await readFile(join(docsRoot, "c.md"), "utf-8")).toBe("kept me");
+
+  await rm(dir, { recursive: true, force: true });
+});
+
+test("applyProposal deletes nothing and edits nothing when a deletion target no longer exists", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
+  const docsRoot = join(dir, "docs");
+  await mkdir(docsRoot, { recursive: true });
+  await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
+  await writeFile(join(docsRoot, "c.md"), "keep me", "utf-8");
+  // "b.md" was already removed by something else before Apply ran.
+
+  const result = await applyProposal(
+    docsRoot,
+    [{ file: "docs/c.md", edits: [{ old: "keep", new: "kept" }] }],
+    ["docs/a.md", "docs/b.md"],
+  );
+  expect(result.ok).toBe(false);
+  expect(result.deletionMismatches).toEqual([
+    { file: "docs/b.md", reason: "file no longer exists" },
+  ]);
+  // Nothing touched, even though a.md exists and c.md's edit was fine.
+  expect(await readFile(join(docsRoot, "a.md"), "utf-8")).toBe("hello world");
+  expect(await readFile(join(docsRoot, "c.md"), "utf-8")).toBe("keep me");
 
   await rm(dir, { recursive: true, force: true });
 });

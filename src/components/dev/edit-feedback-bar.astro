@@ -90,6 +90,7 @@
       <div class="ef-item-progress" data-ef-progress hidden></div>
       <div class="ef-item-summary" data-ef-summary hidden></div>
       <div class="ef-item-diff" data-ef-diff hidden></div>
+      <div class="ef-item-deletions" data-ef-deletions hidden></div>
       <div class="ef-item-error" data-ef-error hidden></div>
       <div class="ef-item-actions" data-ef-actions hidden>
         <button type="button" class="ef-btn ef-btn-primary" data-ef-apply>
@@ -133,6 +134,7 @@
     agentReply?: string;
     summary?: string;
     changes?: FileChange[];
+    deletions?: string[];
     error?: string;
     createdAt: number;
     updatedAt: number;
@@ -330,6 +332,28 @@
 
     // --- item rendering --------------------------------------------------
 
+    // Deleting files is the one destructive action a proposal can carry, so
+    // it gets a distinct confirmation - naming the exact files - on top of
+    // (not instead of) the click on Apply itself. The relay also refuses to
+    // delete without a matching confirmDelete flag in the request body, so
+    // this isn't just a client-side nicety.
+    async function applyItem(item: FeedbackItem): Promise<void> {
+      const deletions = item.deletions ?? [];
+      if (deletions.length > 0) {
+        const ok = window.confirm(
+          `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
+        );
+        if (!ok) return;
+        await fetch(`/__edit-feedback/apply/${item.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirmDelete: true }),
+        });
+        return;
+      }
+      await fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+    }
+
     const itemEls = new Map<string, HTMLElement>();
 
     function renderItem(item: FeedbackItem) {
@@ -380,6 +404,23 @@
         }
       }
 
+      const deletionsEl = el.querySelector<HTMLElement>("[data-ef-deletions]")!;
+      deletionsEl.innerHTML = "";
+      const deletions = item.deletions ?? [];
+      deletionsEl.hidden = deletions.length === 0;
+      if (deletions.length > 0) {
+        const label = document.createElement("div");
+        label.className = "ef-deletions-label";
+        label.textContent = `Delete ${deletions.length} file(s):`;
+        deletionsEl.append(label);
+        for (const file of deletions) {
+          const row = document.createElement("div");
+          row.className = "ef-deletions-file";
+          row.textContent = file;
+          deletionsEl.append(row);
+        }
+      }
+
       const errorEl = el.querySelector<HTMLElement>("[data-ef-error]")!;
       errorEl.textContent = item.error ?? "";
       errorEl.hidden = !item.error;
@@ -393,8 +434,7 @@
       );
 
       const applyBtn = el.querySelector<HTMLButtonElement>("[data-ef-apply]")!;
-      applyBtn.onclick = () =>
-        fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+      applyBtn.onclick = () => void applyItem(item);
 
       const discardBtn =
         el.querySelector<HTMLButtonElement>("[data-ef-discard]")!;
@@ -765,6 +805,26 @@
     text-decoration: none;
     padding: 2px 4px;
     border-radius: 4px;
+  }
+
+  .ef-item-deletions {
+    margin-top: 6px;
+    border: 1px solid #dc2626;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .ef-deletions-label {
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 2px;
+  }
+
+  .ef-deletions-file {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
   }
 
   .ef-item-error {

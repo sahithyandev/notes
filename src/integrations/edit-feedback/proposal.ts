@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { access, readFile, unlink, writeFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 
 export interface ProposedEdit {
@@ -14,6 +14,10 @@ export interface FileChange {
 export interface Proposal {
   summary: string;
   changes: FileChange[];
+  // Files to delete outright, e.g. removing a note (and its siblings) from
+  // the corpus - not expressible as an edit, since there's no "old" text to
+  // match against a file that shouldn't exist afterward.
+  deletions: string[];
 }
 
 export class ProposalParseError extends Error {}
@@ -23,7 +27,8 @@ export class ProposalParseError extends Error {}
 // exactly one such block; "last" guards against an example block earlier in
 // a longer explanation being picked up by mistake. A proposal can touch
 // several files at once (e.g. merging content between two notes), so it's a
-// list of per-file changes rather than a single file + edits pair.
+// list of per-file changes rather than a single file + edits pair, plus an
+// optional list of whole files to delete.
 export function parseProposal(text: string): Proposal {
   const matches = [...text.matchAll(/```json\s*\n([\s\S]*?)```/g)];
   if (matches.length === 0) {
@@ -48,11 +53,12 @@ export function parseProposal(text: string): Proposal {
   if (typeof obj.summary !== "string" || obj.summary.length === 0) {
     throw new ProposalParseError("Proposal.summary must be a non-empty string");
   }
-  if (!Array.isArray(obj.changes) || obj.changes.length === 0) {
-    throw new ProposalParseError("Proposal.changes must be a non-empty array");
-  }
 
-  const changes: FileChange[] = obj.changes.map((c, i) => {
+  const rawChanges = obj.changes ?? [];
+  if (!Array.isArray(rawChanges)) {
+    throw new ProposalParseError("Proposal.changes must be an array");
+  }
+  const changes: FileChange[] = rawChanges.map((c, i) => {
     if (typeof c !== "object" || c === null) {
       throw new ProposalParseError(`Proposal.changes[${i}] must be an object`);
     }
@@ -89,7 +95,26 @@ export function parseProposal(text: string): Proposal {
     return { file: change.file, edits };
   });
 
-  return { summary: obj.summary, changes };
+  const rawDeletions = obj.deletions ?? [];
+  if (!Array.isArray(rawDeletions)) {
+    throw new ProposalParseError("Proposal.deletions must be an array");
+  }
+  const deletions: string[] = rawDeletions.map((d, i) => {
+    if (typeof d !== "string" || d.length === 0) {
+      throw new ProposalParseError(
+        `Proposal.deletions[${i}] must be a non-empty string`,
+      );
+    }
+    return d;
+  });
+
+  if (changes.length === 0 && deletions.length === 0) {
+    throw new ProposalParseError(
+      "Proposal must have at least one entry in changes or deletions",
+    );
+  }
+
+  return { summary: obj.summary, changes, deletions };
 }
 
 export interface EditMismatch {
@@ -149,48 +174,74 @@ export interface FileMismatch {
   mismatches: EditMismatch[];
 }
 
+export interface DeletionMismatch {
+  file: string;
+  reason: string;
+}
+
 export interface ApplyResult {
   ok: boolean;
   fileMismatches: FileMismatch[];
+  deletionMismatches: DeletionMismatch[];
 }
 
-// Applies every file's edits in one pass, only if every edit in every file
-// is unambiguous - across the whole proposal, not just one file at a time,
-// so a cross-note merge either lands completely or not at all. Nothing is
-// written if any file has a mismatch; the mismatches are returned so the
-// caller can report them back to the agent for a corrected proposal.
+// Applies every file's edits and every requested deletion in one pass, only
+// if every edit is unambiguous and every file to delete still exists -
+// across the whole proposal, not just one entry at a time, so a multi-file
+// change (a cross-note merge, or removing a run of notes) either lands
+// completely or not at all. Nothing is written or deleted if anything
+// mismatches; the mismatches are returned so the caller can report them
+// back to the agent for a corrected proposal.
 export async function applyProposal(
   docsRoot: string,
   changes: FileChange[],
+  deletions: string[] = [],
 ): Promise<ApplyResult> {
-  const resolved = changes.map((c) => ({
+  const resolvedChanges = changes.map((c) => ({
     change: c,
     absPath: resolveDocPath(docsRoot, c.file),
   }));
+  const resolvedDeletions = deletions.map((file) => ({
+    file,
+    absPath: resolveDocPath(docsRoot, file),
+  }));
 
   const contents = await Promise.all(
-    resolved.map(({ absPath }) => readFile(absPath, "utf-8")),
+    resolvedChanges.map(({ absPath }) => readFile(absPath, "utf-8")),
   );
 
   const fileMismatches: FileMismatch[] = [];
-  for (let i = 0; i < resolved.length; i++) {
-    const mismatches = checkEdits(contents[i], resolved[i].change.edits);
+  for (let i = 0; i < resolvedChanges.length; i++) {
+    const mismatches = checkEdits(contents[i], resolvedChanges[i].change.edits);
     if (mismatches.length > 0) {
-      fileMismatches.push({ file: resolved[i].change.file, mismatches });
+      fileMismatches.push({ file: resolvedChanges[i].change.file, mismatches });
     }
   }
-  if (fileMismatches.length > 0) {
-    return { ok: false, fileMismatches };
+
+  const deletionMismatches: DeletionMismatch[] = [];
+  for (const { file, absPath } of resolvedDeletions) {
+    const exists = await access(absPath).then(
+      () => true,
+      () => false,
+    );
+    if (!exists) {
+      deletionMismatches.push({ file, reason: "file no longer exists" });
+    }
   }
 
-  await Promise.all(
-    resolved.map(({ change, absPath }, i) => {
+  if (fileMismatches.length > 0 || deletionMismatches.length > 0) {
+    return { ok: false, fileMismatches, deletionMismatches };
+  }
+
+  await Promise.all([
+    ...resolvedChanges.map(({ change, absPath }, i) => {
       let next = contents[i];
       for (const edit of change.edits) {
         next = next.replace(edit.old, edit.new);
       }
       return writeFile(absPath, next, "utf-8");
     }),
-  );
-  return { ok: true, fileMismatches: [] };
+    ...resolvedDeletions.map(({ absPath }) => unlink(absPath)),
+  ]);
+  return { ok: true, fileMismatches: [], deletionMismatches: [] };
 }

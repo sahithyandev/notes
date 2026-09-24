@@ -17,14 +17,19 @@ export interface AgentAdapter {
   dispose(): void;
 }
 
-const ALLOWED_TOOLS = [
-  "Read",
-  "Glob",
-  "Grep",
-  "Skill",
-  "Bash(bun run check-notes-style*)",
-];
-const DISALLOWED_TOOLS = ["Edit", "Write", "MultiEdit", "NotebookEdit"];
+// Bash is intentionally absent from ALLOWED_TOOLS and explicit in
+// DISALLOWED_TOOLS: verified (via a raw stream-json probe against the
+// `claude` CLI, 2.1.281) that a scoped pattern like
+// "Bash(bun run check-notes-style*)" in --allowedTools does NOT actually
+// restrict Bash to that command - it grants Bash access outright in
+// headless/print mode, with the pattern silently unenforced (permission
+// engine's per-command scoping is a settings.json/interactive-approval
+// feature, not something --allowedTools honors here). The relay itself
+// already runs check-notes-style as a follow-up after every apply
+// (index.ts's runStyleCheckFollowup), so the agent never actually needed
+// direct Bash access for that.
+const ALLOWED_TOOLS = ["Read", "Glob", "Grep", "Skill"];
+const DISALLOWED_TOOLS = ["Bash", "Edit", "Write", "MultiEdit", "NotebookEdit"];
 
 export interface ClaudeStreamAdapterOptions {
   cwd: string;
