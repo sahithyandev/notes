@@ -8,8 +8,9 @@ interface Props {
 const { semestersCount } = Astro.props;
 
 function numberToWords(num: number): string {
-  const ones = [
-    "",
+  if (num > 8) return num.toString();
+  return [
+    "Zero",
     "One",
     "Two",
     "Three",
@@ -18,10 +19,7 @@ function numberToWords(num: number): string {
     "Six",
     "Seven",
     "Eight",
-  ];
-  if (num === 0) return "Zero";
-  if (num <= 8) return ones[num];
-  return num.toString();
+  ][num];
 }
 
 const semestersCountLabel = numberToWords(semestersCount);
@@ -31,12 +29,15 @@ const semestersCountLabel = numberToWords(semestersCount);
 <section class="hero">
   <div class="hero-inner">
     <h1 class="hero-title">
-      <a href="https://sahithyan.dev" target="_blank">An engineering student</a
-      >'s personal notes.
+      <a href="https://sahithyan.dev" target="_blank">
+        An engineering student
+      </a>
+      's personal notes.
     </h1>
     <p class="hero-sub">
-      {semestersCountLabel} semesters into my Computer Science & Engineering degree.
-      A few friends have started chipping in too. Organized, searchable, and public.
+      {semestersCountLabel} semesters into my Computer Science & Engineering
+      degree. A few friends have started chipping in too. Organized, searchable,
+      and public.
     </p>
     <div class="hero-cta">
       <a href="#semesters" class="btn-primary">
