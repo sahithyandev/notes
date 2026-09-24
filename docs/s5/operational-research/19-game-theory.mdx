@@ -4,9 +4,9 @@ slug: s5/operational-research/game-theory
 sidebar:
   order: 19
 prev: true
-next: true
+next: false
 dateCreated: 2026-08-26T11:55:46.453Z
-lastUpdatedOn: 2026-09-23T13:05:19.562Z
+lastUpdatedOn: 2026-09-24T09:23:42.296Z
 ---
 
 Studies decision making between agents (players) whose outcomes depend on each other's choices, not just their own.
@@ -23,3 +23,58 @@ A game with exactly 2 players where one player's gain equals the other's loss; t
 ## Prisoner's Dilemma
 
 A 2-player, non-zero-sum game illustrating that individually rational choices can produce a jointly worse outcome than cooperation would.
+
+## Maximin Criterion
+
+The row player picks the strategy maximizing their guaranteed minimum payoff: $\max_i \min_j a_{ij}$.
+
+## Minimax Criterion
+
+The column player picks the strategy minimizing the row player's guaranteed maximum payoff: $\min_j \max_i a_{ij}$.
+
+## Saddle Point
+
+Exists when $\max_i \min_j a_{ij} = \min_j \max_i a_{ij}$. The corresponding entry is the game's value, and both players have an optimal pure strategy: neither benefits from deviating alone.
+
+If the maximin and minimax values differ, no saddle point exists, and pure strategies alone don't give an optimal solution.
+
+## Mixed Strategy Games
+
+When a game has no saddle point, players randomize over their strategies (a mixed strategy) instead of committing to one.
+
+- Mixed strategy  
+  A probability distribution over a player's pure strategies.
+
+## 2x2 Game Without a Saddle Point
+
+Solved algebraically: for optimal mixed strategy probabilities $p, 1-p$ (row) and $q, 1-q$ (column), the row player's expected payoff is equalized across the column player's 2 strategies, and vice versa. Solving the resulting linear equations gives $p$, $q$, and the game's value.
+
+## Dominance
+
+A strategy is dominated if another strategy gives the same player a payoff at least as good against every opposing strategy. Dominated strategies are removed before solving, reducing the payoff matrix.
+
+## 2xn and mx2 Games
+
+Solved graphically: plot each of the smaller player's strategies as a line over the opponent's mixing probability, take the upper envelope (row player) or lower envelope (column player), and read off the optimal point. Reduces the game to an equivalent 2x2 game at that point.
+
+## Game Theory as a Linear Program
+
+An $m \times n$ two-person zero-sum game is solved by formulating it as a pair of dual linear programs.
+
+### Row Player's LP
+
+$
+\text{maximize } v
+$
+
+Subject to $\sum_{i=1}^{m} p_i a_{ij} \ge v$ for every column $j$, $\sum_{i=1}^{m} p_i = 1$, $p_i \ge 0$.
+
+### Column Player's LP
+
+$
+\text{minimize } v
+$
+
+Subject to $\sum_{j=1}^{n} q_j a_{ij} \le v$ for every row $i$, $\sum_{j=1}^{n} q_j = 1$, $q_j \ge 0$.
+
+The 2 LPs are duals of each other. Solving either with the simplex algorithm gives the game's value $v$ and both players' optimal mixed strategies.
