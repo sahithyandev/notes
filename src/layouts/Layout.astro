@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
+import LiveEditBar from "../components/dev/live-edit-bar.astro";
 
 interface Author {
   name: string;
@@ -190,6 +191,7 @@ if (keywords && keywords.length > 0) {
   </head>
   <body>
     <slot />
+    {import.meta.env.DEV && <LiveEditBar />}
   </body>
 </html>
 

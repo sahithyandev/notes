@@ -40,6 +40,11 @@ const { filePath } = Astro.props;
 </div>
 
 <script>
+  import {
+    isEnabled,
+    onEnabledChange,
+  } from "../../integrations/live-edit/enabled-state.ts";
+
   interface FileChange {
     file: string;
     edits: { old: string; new: string }[];
@@ -171,8 +176,22 @@ const { filePath } = Astro.props;
       }
     }
 
+    // Enabled by default; the dev toolbar's "Live Edit" icon
+    // (toolbar-app.ts) is a pure on/off switch for this button, not how you
+    // reach it.
+    let enabled = isEnabled();
+    onEnabledChange((next) => {
+      enabled = next;
+      if (!enabled) {
+        clearShowTimer();
+        selectBtn.hidden = true;
+        popover.hidden = true;
+      }
+    });
+
     function scheduleShowButton(): void {
       clearShowTimer();
+      if (!enabled) return;
       showTimer = setTimeout(() => {
         showTimer = null;
         selectBtn.hidden = !captureSelection();

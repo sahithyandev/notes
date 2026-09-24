@@ -1,0 +1,877 @@
+---
+// Dev-only, site-wide: a floating bar for whole-note feedback ("tighten
+// this note") and cross-note merges ("fold this into that note"), plus the
+// review panel for every feedback item - both the ones this bar submits and
+// the selection-based ones submitted by the per-note
+// src/components/dev/live-edit.astro widget. Mounted once by
+// src/layouts/Layout.astro under import.meta.env.DEV, so it's present on
+// every page (note pages and otherwise) and none of it reaches a
+// production build.
+//
+// Deliberately detached from the toolbar: this is the actual UI, always
+// present in the page's own DOM (not inside the dev toolbar's app-canvas
+// ShadowRoot). The toolbar only carries an on/off switch for it
+// (src/integrations/live-edit/toolbar-app.ts) - enabled by default, per
+// enabled-state.ts.
+---
+
+<div id="live-edit-bar">
+  <div class="leb-panel" data-leb-panel hidden>
+    <div class="leb-panel-header">
+      <span>Whole-note / merge feedback</span>
+      <button
+        type="button"
+        class="leb-icon-btn"
+        data-leb-panel-close
+        aria-label="Close panel"
+      >
+        ×
+      </button>
+    </div>
+    <div class="leb-list" data-leb-list></div>
+  </div>
+
+  <div class="leb-bar">
+    <div class="leb-files" data-leb-files>
+      <button type="button" class="leb-add-file" data-leb-add-file>
+        + note
+      </button>
+    </div>
+
+    <div class="leb-picker" data-leb-picker hidden>
+      <input
+        type="text"
+        class="leb-picker-input"
+        data-leb-picker-input
+        placeholder="Search notes by title or slug…"
+      />
+      <div class="leb-picker-results" data-leb-picker-results></div>
+    </div>
+
+    <div class="leb-input-row">
+      <textarea
+        class="leb-comment"
+        data-leb-comment
+        placeholder="Feedback on the note(s) above… (⌘/Ctrl+Enter to send)"
+        rows="1"
+      ></textarea>
+      <button
+        type="button"
+        class="leb-icon-btn leb-panel-toggle"
+        data-leb-panel-toggle
+        aria-expanded="false"
+        aria-label="Toggle edit feedback panel"
+      >
+        ✎
+      </button>
+      <button type="button" class="le-btn le-btn-primary" data-leb-send>
+        Send
+      </button>
+    </div>
+  </div>
+
+  <template data-leb-chip-template>
+    <span class="leb-chip" data-leb-chip>
+      <span data-leb-chip-label></span>
+      <button type="button" data-leb-chip-remove aria-label="Remove note">
+        ×
+      </button>
+    </span>
+  </template>
+
+  <template data-leb-result-template>
+    <button type="button" class="leb-picker-result" data-leb-result>
+      <span class="leb-picker-result-title" data-leb-result-title></span>
+      <span class="leb-picker-result-slug" data-leb-result-slug></span>
+    </button>
+  </template>
+
+  <template data-leb-item-template>
+    <div class="le-item">
+      <div class="le-item-header">
+        <span class="le-item-status" data-le-status></span>
+        <span class="le-item-files" data-le-files></span>
+      </div>
+      <div class="le-item-comment" data-le-comment-text></div>
+      <div class="le-item-progress" data-le-progress hidden></div>
+      <div class="le-item-summary" data-le-summary hidden></div>
+      <div class="le-item-diff" data-le-diff hidden></div>
+      <div class="le-item-deletions" data-le-deletions hidden></div>
+      <div class="le-item-error" data-le-error hidden></div>
+      <div class="le-item-actions" data-le-actions hidden>
+        <button type="button" class="le-btn le-btn-primary" data-le-apply>
+          Apply
+        </button>
+        <button type="button" class="le-btn le-btn-ghost" data-le-discard>
+          Discard
+        </button>
+      </div>
+      <div class="le-item-refine" data-le-refine hidden>
+        <textarea
+          class="le-comment"
+          data-le-refine-input
+          placeholder="Refine…"
+          rows="2"
+        ></textarea>
+        <button type="button" class="le-btn le-btn-ghost" data-le-refine-btn>
+          Send
+        </button>
+      </div>
+    </div>
+  </template>
+</div>
+
+<script>
+  import {
+    isEnabled,
+    onEnabledChange,
+  } from "../../integrations/live-edit/enabled-state.ts";
+
+  interface FileChange {
+    file: string;
+    edits: { old: string; new: string }[];
+  }
+
+  interface FeedbackItem {
+    id: string;
+    kind: "selection" | "whole-note";
+    files: string[];
+    selection?: string;
+    heading?: string;
+    comment: string;
+    status:
+      "queued" | "running" | "proposed" | "error" | "applied" | "discarded";
+    progress: string[];
+    agentReply?: string;
+    summary?: string;
+    changes?: FileChange[];
+    deletions?: string[];
+    error?: string;
+    createdAt: number;
+    updatedAt: number;
+  }
+
+  interface NoteInfo {
+    file: string;
+    slug: string;
+    title: string;
+  }
+
+  function init() {
+    const root = document.getElementById("live-edit-bar");
+    if (!root) return;
+
+    // Enabled by default; the dev toolbar's "Live Edit" icon
+    // (toolbar-app.ts) is a pure on/off switch for this UI, not how you
+    // open it - toggling it just shows/hides this bar in place.
+    root.hidden = !isEnabled();
+    onEnabledChange((enabled) => {
+      root.hidden = !enabled;
+    });
+
+    const panel = root.querySelector<HTMLElement>("[data-leb-panel]")!;
+    const panelClose = root.querySelector<HTMLButtonElement>(
+      "[data-leb-panel-close]",
+    )!;
+    const panelToggle = root.querySelector<HTMLButtonElement>(
+      "[data-leb-panel-toggle]",
+    )!;
+    const list = root.querySelector<HTMLElement>("[data-leb-list]")!;
+    const itemTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-item-template]",
+    )!;
+
+    const filesEl = root.querySelector<HTMLElement>("[data-leb-files]")!;
+    const addFileBtn = root.querySelector<HTMLButtonElement>(
+      "[data-leb-add-file]",
+    )!;
+    const chipTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-chip-template]",
+    )!;
+
+    const picker = root.querySelector<HTMLElement>("[data-leb-picker]")!;
+    const pickerInput = root.querySelector<HTMLInputElement>(
+      "[data-leb-picker-input]",
+    )!;
+    const pickerResults = root.querySelector<HTMLElement>(
+      "[data-leb-picker-results]",
+    )!;
+    const resultTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-result-template]",
+    )!;
+
+    const commentInput =
+      root.querySelector<HTMLTextAreaElement>("[data-leb-comment]")!;
+    const sendBtn = root.querySelector<HTMLButtonElement>("[data-leb-send]")!;
+
+    // --- panel open/close, persisted across page loads within a tab -----
+
+    function setPanelOpen(open: boolean): void {
+      panel.hidden = !open;
+      panelToggle.setAttribute("aria-expanded", String(open));
+      try {
+        sessionStorage.setItem("le-panel-open", open ? "1" : "0");
+      } catch {
+        // ignore
+      }
+    }
+
+    try {
+      if (sessionStorage.getItem("le-panel-open") === "1") setPanelOpen(true);
+    } catch {
+      // ignore
+    }
+
+    panelToggle.addEventListener("click", () => setPanelOpen(panel.hidden));
+    panelClose.addEventListener("click", () => setPanelOpen(false));
+
+    // --- file chips -------------------------------------------------
+
+    const selectedFiles: string[] = [];
+    const chipEls = new Map<string, HTMLElement>();
+
+    // Default to the note currently being viewed, if any: the per-note
+    // widget's root carries the file path as a data attribute.
+    const currentNoteFile = document.getElementById("live-edit-selection")
+      ?.dataset.filePath;
+    if (currentNoteFile) addFile(currentNoteFile);
+
+    function addFile(file: string): void {
+      if (selectedFiles.includes(file)) return;
+      selectedFiles.push(file);
+      const chip = (
+        chipTemplate.content.firstElementChild as HTMLElement
+      ).cloneNode(true) as HTMLElement;
+      chip.querySelector("[data-leb-chip-label]")!.textContent = file
+        .replace(/^docs\//, "")
+        .replace(/\.mdx?$/, "");
+      chip.querySelector<HTMLButtonElement>("[data-leb-chip-remove]")!.onclick =
+        () => removeFile(file);
+      chipEls.set(file, chip);
+      filesEl.insertBefore(chip, addFileBtn);
+    }
+
+    function removeFile(file: string): void {
+      const idx = selectedFiles.indexOf(file);
+      if (idx === -1) return;
+      selectedFiles.splice(idx, 1);
+      chipEls.get(file)?.remove();
+      chipEls.delete(file);
+    }
+
+    // --- note picker (searches /__live-edit/notes) ---------------
+
+    let notesCache: NoteInfo[] | null = null;
+
+    async function loadNotes(): Promise<NoteInfo[]> {
+      if (notesCache) return notesCache;
+      const res = await fetch("/__live-edit/notes");
+      const body = (await res.json()) as { notes: NoteInfo[] };
+      notesCache = body.notes;
+      return notesCache;
+    }
+
+    function renderResults(notes: NoteInfo[], query: string): void {
+      pickerResults.innerHTML = "";
+      const q = query.trim().toLowerCase();
+      const matches = notes
+        .filter((n) => !selectedFiles.includes(n.file))
+        .filter(
+          (n) =>
+            q.length === 0 ||
+            n.title.toLowerCase().includes(q) ||
+            n.slug.toLowerCase().includes(q),
+        )
+        .slice(0, 20);
+      for (const note of matches) {
+        const el = (
+          resultTemplate.content.firstElementChild as HTMLElement
+        ).cloneNode(true) as HTMLElement;
+        el.querySelector("[data-leb-result-title]")!.textContent =
+          note.title || note.slug;
+        el.querySelector("[data-leb-result-slug]")!.textContent = note.slug;
+        el.addEventListener("click", () => {
+          addFile(note.file);
+          picker.hidden = true;
+          pickerInput.value = "";
+        });
+        pickerResults.append(el);
+      }
+    }
+
+    addFileBtn.addEventListener("click", async () => {
+      picker.hidden = !picker.hidden;
+      if (picker.hidden) return;
+      pickerInput.value = "";
+      pickerInput.focus();
+      renderResults(await loadNotes(), "");
+    });
+
+    pickerInput.addEventListener("input", async () => {
+      renderResults(await loadNotes(), pickerInput.value);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (
+        !picker.hidden &&
+        !picker.contains(e.target as Node) &&
+        e.target !== addFileBtn
+      ) {
+        picker.hidden = true;
+      }
+    });
+
+    // --- submit --------------------------------------------------------
+
+    async function submit() {
+      const comment = commentInput.value.trim();
+      if (!comment || selectedFiles.length === 0) return;
+
+      commentInput.value = "";
+      setPanelOpen(true);
+
+      await fetch("/__live-edit/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "whole-note",
+          files: [...selectedFiles],
+          comment,
+        }),
+      });
+    }
+
+    sendBtn.addEventListener("click", submit);
+    commentInput.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        void submit();
+      }
+    });
+
+    // --- item rendering --------------------------------------------------
+
+    // Deleting files is the one destructive action a proposal can carry, so
+    // it gets a distinct confirmation - naming the exact files - on top of
+    // (not instead of) the click on Apply itself. The relay also refuses to
+    // delete without a matching confirmDelete flag in the request body, so
+    // this isn't just a client-side nicety.
+    async function applyItem(item: FeedbackItem): Promise<void> {
+      const deletions = item.deletions ?? [];
+      if (deletions.length > 0) {
+        const ok = window.confirm(
+          `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
+        );
+        if (!ok) return;
+        await fetch(`/__live-edit/apply/${item.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirmDelete: true }),
+        });
+        return;
+      }
+      await fetch(`/__live-edit/apply/${item.id}`, { method: "POST" });
+    }
+
+    const itemEls = new Map<string, HTMLElement>();
+
+    function renderItem(item: FeedbackItem) {
+      let el = itemEls.get(item.id);
+      if (!el) {
+        el = (itemTemplate.content.firstElementChild as HTMLElement).cloneNode(
+          true,
+        ) as HTMLElement;
+        itemEls.set(item.id, el);
+        list.prepend(el);
+      }
+
+      el.dataset.status = item.status;
+      el.querySelector("[data-le-files]")!.textContent = item.files
+        .map((f) => f.replace(/^docs\//, "").replace(/\.mdx?$/, ""))
+        .join(", ");
+      el.querySelector("[data-le-comment-text]")!.textContent = item.comment;
+      el.querySelector("[data-le-status]")!.textContent = statusLabel(item);
+
+      const progressEl = el.querySelector<HTMLElement>("[data-le-progress]")!;
+      progressEl.textContent = item.progress.at(-1) ?? "";
+      progressEl.hidden =
+        item.status !== "running" || item.progress.length === 0;
+
+      const summaryEl = el.querySelector<HTMLElement>("[data-le-summary]")!;
+      summaryEl.textContent = item.summary ?? "";
+      summaryEl.hidden = !item.summary;
+
+      const diffEl = el.querySelector<HTMLElement>("[data-le-diff]")!;
+      diffEl.innerHTML = "";
+      diffEl.hidden = !item.changes || item.changes.length === 0;
+      for (const change of item.changes ?? []) {
+        if ((item.changes?.length ?? 0) > 1) {
+          const label = document.createElement("div");
+          label.className = "le-edit-file";
+          label.textContent = change.file;
+          diffEl.append(label);
+        }
+        for (const edit of change.edits) {
+          const oldEl = document.createElement("del");
+          oldEl.textContent = edit.old;
+          const newEl = document.createElement("ins");
+          newEl.textContent = edit.new;
+          const wrap = document.createElement("div");
+          wrap.className = "le-edit";
+          wrap.append(oldEl, newEl);
+          diffEl.append(wrap);
+        }
+      }
+
+      const deletionsEl = el.querySelector<HTMLElement>("[data-le-deletions]")!;
+      deletionsEl.innerHTML = "";
+      const deletions = item.deletions ?? [];
+      deletionsEl.hidden = deletions.length === 0;
+      if (deletions.length > 0) {
+        const label = document.createElement("div");
+        label.className = "le-deletions-label";
+        label.textContent = `Delete ${deletions.length} file(s):`;
+        deletionsEl.append(label);
+        for (const file of deletions) {
+          const row = document.createElement("div");
+          row.className = "le-deletions-file";
+          row.textContent = file;
+          deletionsEl.append(row);
+        }
+      }
+
+      const errorEl = el.querySelector<HTMLElement>("[data-le-error]")!;
+      errorEl.textContent = item.error ?? "";
+      errorEl.hidden = !item.error;
+
+      const actions = el.querySelector<HTMLElement>("[data-le-actions]")!;
+      actions.hidden = item.status !== "proposed";
+
+      const refineForm = el.querySelector<HTMLElement>("[data-le-refine]")!;
+      refineForm.hidden = !(
+        item.status === "proposed" || item.status === "error"
+      );
+
+      const applyBtn = el.querySelector<HTMLButtonElement>("[data-le-apply]")!;
+      applyBtn.onclick = () => void applyItem(item);
+
+      const discardBtn =
+        el.querySelector<HTMLButtonElement>("[data-le-discard]")!;
+      discardBtn.onclick = () =>
+        fetch(`/__live-edit/discard/${item.id}`, { method: "POST" });
+
+      const refineInput = el.querySelector<HTMLTextAreaElement>(
+        "[data-le-refine-input]",
+      )!;
+      const refineBtn = el.querySelector<HTMLButtonElement>(
+        "[data-le-refine-btn]",
+      )!;
+      refineBtn.onclick = () => {
+        const comment = refineInput.value.trim();
+        if (!comment) return;
+        refineInput.value = "";
+        void fetch(`/__live-edit/refine/${item.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment }),
+        });
+      };
+    }
+
+    function statusLabel(item: FeedbackItem): string {
+      switch (item.status) {
+        case "queued":
+          return "Queued";
+        case "running":
+          return "Working…";
+        case "proposed":
+          return "Proposed";
+        case "error":
+          return "Error";
+        case "applied":
+          return "Applied";
+        case "discarded":
+          return "Discarded";
+      }
+    }
+
+    // This panel only covers "whole-note" items - a "selection" item
+    // renders inline in the article by the per-note widget
+    // (live-edit.astro), which only has the live DOM Range needed to
+    // anchor it. Every item still gets dispatched as an "le-item" DOM
+    // event, which is how that widget learns about updates to items it
+    // submitted, without both components needing to share an EventSource.
+    function handleItem(item: FeedbackItem): void {
+      document.dispatchEvent(new CustomEvent("le-item", { detail: item }));
+      if (item.kind === "whole-note") renderItem(item);
+    }
+
+    const es = new EventSource("/__live-edit/events");
+    es.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data) as
+        | { type: "snapshot"; items: FeedbackItem[] }
+        | { type: "item"; item: FeedbackItem };
+      if (msg.type === "snapshot") {
+        for (const item of msg.items) handleItem(item);
+      } else {
+        handleItem(msg.item);
+      }
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+</script>
+
+<style>
+  #live-edit-bar {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+  }
+
+  .le-btn {
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .le-btn-primary {
+    background: var(--sem, #2563eb);
+    color: #fff;
+  }
+
+  .le-btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-secondary);
+  }
+
+  .leb-icon-btn {
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+  }
+
+  /* --- bottom bar ---------------------------------------------------- */
+
+  .leb-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 62;
+    width: min(560px, calc(100vw - 24px));
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .leb-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .leb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 4px 2px 10px;
+    font-size: 0.75rem;
+  }
+
+  .leb-chip button {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 1;
+  }
+
+  .leb-add-file {
+    border: 1px dashed var(--border-strong);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+  }
+
+  .leb-picker {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    width: min(360px, 90vw);
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  }
+
+  .leb-picker-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    margin-bottom: 6px;
+  }
+
+  .leb-picker-results {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leb-picker-result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  .leb-picker-result:hover {
+    background: var(--surface-2);
+  }
+
+  .leb-picker-result-slug {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+  }
+
+  .leb-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .leb-comment {
+    flex: 1;
+    resize: vertical;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    min-height: 30px;
+  }
+
+  /* --- panel ----------------------------------------------------------- */
+
+  .leb-panel {
+    position: fixed;
+    right: 12px;
+    bottom: 90px;
+    z-index: 61;
+    width: min(380px, calc(100vw - 24px));
+    max-height: min(65vh, 620px);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 10px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.25);
+    overflow: hidden;
+  }
+
+  .leb-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .leb-panel-header .leb-icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .leb-list {
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .le-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--surface-2);
+  }
+
+  .le-item[data-status="error"] {
+    border-color: #dc2626;
+  }
+
+  .le-item[data-status="applied"] {
+    border-color: #16a34a;
+  }
+
+  .le-item-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .le-item-status {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-secondary);
+    flex: none;
+  }
+
+  .le-item-files {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .le-item-comment {
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .le-item-progress {
+    margin-top: 4px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  .le-item-summary {
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  .le-item-diff {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.75rem;
+  }
+
+  .le-item-diff :global(.le-edit-file) {
+    font-weight: 600;
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .le-item-diff :global(.le-edit) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .le-item-diff :global(del) {
+    background: #fecaca;
+    color: #7f1d1d;
+    text-decoration: line-through;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .le-item-diff :global(ins) {
+    background: #bbf7d0;
+    color: #14532d;
+    text-decoration: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .le-item-deletions {
+    margin-top: 6px;
+    border: 1px solid #dc2626;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .le-deletions-label {
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 2px;
+  }
+
+  .le-deletions-file {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .le-item-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 0.75rem;
+    white-space: pre-wrap;
+  }
+
+  .le-item-actions,
+  .le-item-refine {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .le-item-refine {
+    flex-direction: column;
+  }
+
+  :root[data-theme="dark"] {
+    .le-item-diff :global(del) {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+    .le-item-diff :global(ins) {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+  }
+</style>
