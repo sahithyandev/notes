@@ -12,7 +12,7 @@
 <div id="edit-feedback-bar">
   <div class="efb-panel" data-efb-panel hidden>
     <div class="efb-panel-header">
-      <span>Edit feedback</span>
+      <span>Whole-note / merge feedback</span>
       <button
         type="button"
         class="efb-icon-btn"
@@ -203,12 +203,6 @@
 
     panelToggle.addEventListener("click", () => setPanelOpen(panel.hidden));
     panelClose.addEventListener("click", () => setPanelOpen(false));
-    // The per-note selection widget dispatches this after it submits a
-    // request, so the panel opens to show progress without the two
-    // components needing to know about each other beyond this event.
-    document.addEventListener("ef-panel-open-request", () =>
-      setPanelOpen(true),
-    );
 
     // --- file chips -------------------------------------------------
 
@@ -442,15 +436,26 @@
       }
     }
 
+    // This panel only covers "whole-note" items - a "selection" item
+    // renders inline in the article by the per-note widget
+    // (edit-feedback.astro), which only has the live DOM Range needed to
+    // anchor it. Every item still gets dispatched as an "ef-item" DOM
+    // event, which is how that widget learns about updates to items it
+    // submitted, without both components needing to share an EventSource.
+    function handleItem(item: FeedbackItem): void {
+      document.dispatchEvent(new CustomEvent("ef-item", { detail: item }));
+      if (item.kind === "whole-note") renderItem(item);
+    }
+
     const es = new EventSource("/__edit-feedback/events");
     es.onmessage = (ev) => {
       const msg = JSON.parse(ev.data) as
         | { type: "snapshot"; items: FeedbackItem[] }
         | { type: "item"; item: FeedbackItem };
       if (msg.type === "snapshot") {
-        for (const item of msg.items) renderItem(item);
+        for (const item of msg.items) handleItem(item);
       } else {
-        renderItem(msg.item);
+        handleItem(msg.item);
       }
     };
   }

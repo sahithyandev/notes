@@ -3,10 +3,12 @@
 // get a proposed edit back from src/integrations/edit-feedback/ (a
 // long-lived headless `claude` session). Only rendered under
 // import.meta.env.DEV by [...slug].astro, so none of this reaches a
-// production build. The review panel for what this submits lives in the
-// site-wide <EditFeedbackBar /> (src/components/dev/edit-feedback-bar.astro,
-// mounted by Layout.astro), not here - this component only captures the
-// selection and posts the request.
+// production build.
+//
+// The proposal, and its Apply/Discard/Refine controls, render inline in the
+// article right after the selected text - not in the site-wide review
+// panel (that panel, in edit-feedback-bar.astro, is only for whole-note /
+// cross-note feedback, which has no single spot in the body to anchor to).
 interface Props {
   filePath: string;
 }
@@ -37,10 +39,31 @@ const { filePath } = Astro.props;
 </div>
 
 <script>
+  interface FileChange {
+    file: string;
+    edits: { old: string; new: string }[];
+  }
+
+  interface FeedbackItem {
+    id: string;
+    kind: "selection" | "whole-note";
+    files: string[];
+    selection?: string;
+    heading?: string;
+    comment: string;
+    status:
+      "queued" | "running" | "proposed" | "error" | "applied" | "discarded";
+    progress: string[];
+    summary?: string;
+    changes?: FileChange[];
+    error?: string;
+  }
+
   interface PendingSelection {
     text: string;
     heading?: string;
     context?: string;
+    range: Range;
   }
 
   function init() {
@@ -109,8 +132,9 @@ const { filePath } = Astro.props;
     }
 
     // Reads the current selection and, if it's a non-empty selection inside
-    // the article, stashes it as pendingSelection and positions the button
-    // above it. Returns whether there was a usable selection.
+    // the article, stashes it (including the live Range, so the eventual
+    // proposal can be anchored right after it in the body) and positions
+    // the button above it. Returns whether there was a usable selection.
     function captureSelection(): boolean {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0) return false;
@@ -123,6 +147,7 @@ const { filePath } = Astro.props;
         text,
         heading: nearestHeading(range.startContainer),
         context: surroundingContext(range),
+        range: range.cloneRange(),
       };
       const rect = range.getBoundingClientRect();
       selectBtn.style.top = `${rect.top + window.scrollY - 36}px`;
@@ -183,28 +208,195 @@ const { filePath } = Astro.props;
       popover.hidden = true;
     });
 
+    // --- inline anchors: one marker element per submitted item, inserted
+    // right after the selected text, never modifying the selected text
+    // itself. Safer than wrapping the selection (which throws if the range
+    // partially crosses an element boundary) and keeps Apply/Discard/Refine
+    // exactly where the feedback was given, not in a corner popup. -------
+
+    function closestBlock(node: Node): Element | null {
+      let el: Element | null =
+        node instanceof Element ? node : node.parentElement;
+      while (el && !/^(P|LI|DIV|BLOCKQUOTE|H[1-6]|TD|TH)$/.test(el.tagName)) {
+        el = el.parentElement;
+      }
+      return el;
+    }
+
+    function insertMarker(range: Range, marker: HTMLElement): void {
+      try {
+        const r = range.cloneRange();
+        r.collapse(false);
+        r.insertNode(marker);
+        return;
+      } catch {
+        // Fall through to the block-level fallback below.
+      }
+      closestBlock(range.endContainer)?.after(marker);
+    }
+
+    const markers = new Map<string, HTMLElement>();
+
+    function makeToolbar(
+      item: FeedbackItem,
+      opts: { canApply: boolean },
+    ): HTMLElement {
+      const bar = document.createElement("span");
+      bar.className = "ef-inline-toolbar";
+
+      if (opts.canApply) {
+        const applyBtn = document.createElement("button");
+        applyBtn.type = "button";
+        applyBtn.className = "ef-btn ef-btn-primary";
+        applyBtn.textContent = "Apply";
+        applyBtn.onclick = () =>
+          fetch(`/__edit-feedback/apply/${item.id}`, { method: "POST" });
+        bar.append(applyBtn);
+      }
+
+      const discardBtn = document.createElement("button");
+      discardBtn.type = "button";
+      discardBtn.className = "ef-btn ef-btn-ghost";
+      discardBtn.textContent = "Discard";
+      discardBtn.onclick = () =>
+        fetch(`/__edit-feedback/discard/${item.id}`, { method: "POST" });
+      bar.append(discardBtn);
+
+      const refineBtn = document.createElement("button");
+      refineBtn.type = "button";
+      refineBtn.className = "ef-btn ef-btn-ghost";
+      refineBtn.textContent = "Refine…";
+      refineBtn.onclick = () => {
+        const comment = window.prompt("Refine this suggestion:");
+        if (!comment) return;
+        void fetch(`/__edit-feedback/refine/${item.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment }),
+        });
+      };
+      bar.append(refineBtn);
+
+      return bar;
+    }
+
+    function renderMarker(item: FeedbackItem, marker: HTMLElement): void {
+      marker.innerHTML = "";
+      marker.className = `ef-marker ef-status-${item.status}`;
+
+      if (item.status === "queued" || item.status === "running") {
+        const badge = document.createElement("span");
+        badge.className = "ef-inline-badge";
+        badge.textContent = item.progress.at(-1)
+          ? `Working: ${item.progress.at(-1)}`
+          : "Suggesting edit…";
+        marker.append(badge);
+        return;
+      }
+
+      if (item.status === "proposed") {
+        const del = document.createElement("del");
+        del.className = "ef-inline-del";
+        del.textContent = pendingText(item);
+        const ins = document.createElement("ins");
+        ins.className = "ef-inline-ins";
+        ins.textContent = (item.changes ?? [])
+          .flatMap((c) => c.edits.map((e) => e.new))
+          .join(" … ");
+        marker.append(del, document.createTextNode(" → "), ins);
+        marker.append(makeToolbar(item, { canApply: true }));
+        return;
+      }
+
+      if (item.status === "error") {
+        const badge = document.createElement("span");
+        badge.className = "ef-inline-badge ef-inline-error";
+        badge.textContent = item.error
+          ? `⚠ ${item.error.slice(0, 200)}`
+          : "⚠ Error";
+        marker.append(badge);
+        marker.append(makeToolbar(item, { canApply: false }));
+        return;
+      }
+
+      if (item.status === "applied") {
+        const badge = document.createElement("span");
+        badge.className = "ef-inline-badge";
+        badge.textContent = "✓ Applied — reloading…";
+        marker.append(badge);
+        return;
+      }
+
+      // discarded: leave the marker empty (about to be removed below).
+    }
+
+    function pendingText(item: FeedbackItem): string {
+      // The proposal's own "old" text if there's exactly one edit (most
+      // selection-based proposals), otherwise fall back to what was
+      // actually selected.
+      const changes = item.changes ?? [];
+      if (changes.length === 1 && changes[0].edits.length === 1) {
+        return changes[0].edits[0].old;
+      }
+      return item.selection ?? "";
+    }
+
+    document.addEventListener("ef-item", (e) => {
+      const item = (e as CustomEvent<FeedbackItem>).detail;
+      if (item.kind !== "selection" || item.files[0] !== filePath) return;
+
+      if (item.status === "discarded") {
+        markers.get(item.id)?.remove();
+        markers.delete(item.id);
+        return;
+      }
+
+      const marker = markers.get(item.id);
+      if (marker) renderMarker(item, marker);
+      // An item with no tracked marker here either belongs to a different
+      // page load (this component only anchors items it itself submitted,
+      // since only it has the live Range) or hasn't been created yet by
+      // this page's own submitFeedback() below - nothing to render for it.
+    });
+
     async function submitFeedback() {
       if (!pendingSelection) return;
       const comment = commentInput.value.trim();
       if (!comment) return;
 
       popover.hidden = true;
+      const { range, text, heading, context } = pendingSelection;
+      pendingSelection = null;
+      window.getSelection()?.removeAllRanges();
 
-      await fetch("/__edit-feedback/request", {
+      const marker = document.createElement("span");
+      marker.className = "ef-marker ef-status-queued";
+      const badge = document.createElement("span");
+      badge.className = "ef-inline-badge";
+      badge.textContent = "Sending…";
+      marker.append(badge);
+      insertMarker(range, marker);
+
+      const res = await fetch("/__edit-feedback/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kind: "selection",
           filePath,
-          selection: pendingSelection.text,
-          heading: pendingSelection.heading,
-          context: pendingSelection.context,
+          selection: text,
+          heading,
+          context,
           comment,
         }),
       });
-      pendingSelection = null;
-      window.getSelection()?.removeAllRanges();
-      document.dispatchEvent(new CustomEvent("ef-panel-open-request"));
+      const body = (await res.json().catch(() => null)) as {
+        id?: string;
+      } | null;
+      if (!body?.id) {
+        marker.remove();
+        return;
+      }
+      markers.set(body.id, marker);
     }
 
     submitBtn.addEventListener("click", submitFeedback);
@@ -277,7 +469,7 @@ const { filePath } = Astro.props;
 
   .ef-btn {
     border-radius: 6px;
-    padding: 5px 12px;
+    padding: 3px 10px;
     font-size: 0.75rem;
     font-family: var(--font-ui);
     cursor: pointer;
@@ -293,5 +485,77 @@ const { filePath } = Astro.props;
     background: transparent;
     border-color: var(--border);
     color: var(--text-secondary);
+  }
+</style>
+
+<style is:global>
+  /* Inline, in the article body - not a corner popup. Global because the
+     marker is inserted straight into <article>'s rendered content, outside
+     this component's own scoped-style boundary. */
+  .ef-marker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    vertical-align: middle;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+
+  .ef-marker.ef-status-proposed {
+    border-color: var(--sem, #2563eb);
+  }
+
+  .ef-marker.ef-status-error {
+    border-color: #dc2626;
+  }
+
+  .ef-marker.ef-status-applied {
+    border-color: #16a34a;
+  }
+
+  .ef-inline-badge {
+    color: var(--text-secondary);
+  }
+
+  .ef-inline-error {
+    color: #dc2626;
+  }
+
+  .ef-inline-del {
+    color: #7f1d1d;
+    background: #fecaca;
+    text-decoration: line-through;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .ef-inline-ins {
+    color: #14532d;
+    background: #bbf7d0;
+    text-decoration: none;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .ef-inline-toolbar {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  :root[data-theme="dark"] {
+    .ef-inline-del {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+    .ef-inline-ins {
+      background: #14532d;
+      color: #bbf7d0;
+    }
   }
 </style>

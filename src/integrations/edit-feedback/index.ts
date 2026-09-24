@@ -71,6 +71,16 @@ export default function editFeedback(): Plugin {
   let draining = false;
   let adapter: AgentAdapter | null = null;
 
+  // So progress is visible in the terminal running `bun dev`, not just in
+  // the browser - console.log rather than Vite's own logger, since that
+  // logger's methods aren't available until configureServer runs but items
+  // can be created and progress on them logged from helpers called before
+  // that (and it's simpler to have one code path either way).
+  function log(item: FeedbackItem, message: string): void {
+    const label = item.files.join(", ");
+    console.log(`[edit-feedback] ${item.id.slice(0, 8)} ${label}: ${message}`);
+  }
+
   function getAdapter(initialSessionId?: string): AgentAdapter {
     if (!adapter) {
       adapter = new ClaudeStreamAdapter({
@@ -137,6 +147,7 @@ export default function editFeedback(): Plugin {
     item.status = "running";
     item.progress = [];
     touch(item);
+    log(item, `running: ${job.message.split("\n")[0].slice(0, 120)}`);
 
     const agent = getAdapter();
 
@@ -147,6 +158,7 @@ export default function editFeedback(): Plugin {
       item.status = "error";
       item.error = err instanceof Error ? err.message : String(err);
       touch(item);
+      log(item, `error: ${item.error}`);
       return;
     }
 
@@ -157,17 +169,26 @@ export default function editFeedback(): Plugin {
         } else if (evt.type === "progress") {
           item.progress.push(evt.label);
           touch(item);
+          log(item, evt.label);
         } else if (evt.type === "process-error") {
           item.status = "error";
           item.error = evt.message;
           touch(item);
+          log(item, `error: ${evt.message}`);
         } else if (evt.type === "result") {
           item.agentReply = evt.text;
           if (evt.isError) {
             item.status = "error";
             item.error = evt.text;
+            log(item, `error: ${evt.text.slice(0, 200)}`);
           } else {
-            handleResultText(item, evt.text);
+            const proposed = handleResultText(item, evt.text);
+            log(
+              item,
+              proposed
+                ? `proposed: ${item.summary}`
+                : `no edit proposed: ${(item.error ?? "").slice(0, 200)}`,
+            );
           }
           touch(item);
         }
@@ -176,16 +197,18 @@ export default function editFeedback(): Plugin {
       item.status = "error";
       item.error = err instanceof Error ? err.message : String(err);
       touch(item);
+      log(item, `error: ${item.error}`);
     }
   }
 
-  function handleResultText(item: FeedbackItem, text: string): void {
+  function handleResultText(item: FeedbackItem, text: string): boolean {
     try {
       const proposal = parseProposal(text);
       item.status = "proposed";
       item.summary = proposal.summary;
       item.changes = proposal.changes;
       item.error = undefined;
+      return true;
     } catch (err) {
       item.status = "error";
       item.error =
@@ -194,6 +217,7 @@ export default function editFeedback(): Plugin {
           : err instanceof Error
             ? err.message
             : String(err);
+      return false;
     }
   }
 
@@ -215,6 +239,7 @@ export default function editFeedback(): Plugin {
     }
     if (violatingOutputs.length === 0) return;
 
+    log(item, "style check found violations, asking agent to fix");
     enqueue({
       itemId: item.id,
       message: `Style check found violations in the file(s) after your edit was applied. Re-read the affected file(s) and propose a corrected fix.\n\n${violatingOutputs.join("\n\n").slice(0, 4000)}`,
@@ -331,6 +356,7 @@ export default function editFeedback(): Plugin {
             return sendJson(res, 400, { error: "missing required fields" });
           items.set(item.id, item);
           broadcast(item);
+          log(item, `queued (${item.kind}): ${item.comment.slice(0, 120)}`);
           enqueue({ itemId: item.id, message: buildRequestMessage(body) });
           return sendJson(res, 200, { id: item.id });
         }
@@ -346,6 +372,7 @@ export default function editFeedback(): Plugin {
           if (!item) return sendJson(res, 404, { error: "not found" });
           item.status = "discarded";
           touch(item);
+          log(item, "discarded");
           return sendJson(res, 200, { ok: true });
         }
 
@@ -358,6 +385,7 @@ export default function editFeedback(): Plugin {
             return sendJson(res, 400, { error: "missing comment" });
           item.status = "queued";
           touch(item);
+          log(item, `refine: ${body.comment.slice(0, 120)}`);
           enqueue({
             itemId: item.id,
             message: buildRefineMessage(body.comment),
@@ -367,6 +395,7 @@ export default function editFeedback(): Plugin {
 
         if (url === "/__edit-feedback/reset" && req.method === "POST") {
           adapter?.reset();
+          console.log("[edit-feedback] session reset");
           return sendJson(res, 200, { ok: true });
         }
 
@@ -445,6 +474,7 @@ export default function editFeedback(): Plugin {
               )
               .join(" | ");
             touch(item);
+            log(item, `apply failed (already retried once): ${item.error}`);
             return sendJson(res, 409, {
               ok: false,
               fileMismatches: result.fileMismatches,
@@ -453,6 +483,7 @@ export default function editFeedback(): Plugin {
           item.mismatchRetried = true;
           item.status = "queued";
           touch(item);
+          log(item, "apply mismatch, asking agent to re-propose");
           enqueue({
             itemId: item.id,
             message: buildMismatchMessage(result.fileMismatches),
@@ -463,6 +494,7 @@ export default function editFeedback(): Plugin {
         item.status = "applied";
         item.error = undefined;
         touch(item);
+        log(item, "applied");
         sendJson(res, 200, { ok: true });
 
         void runStyleCheckFollowup(item);
