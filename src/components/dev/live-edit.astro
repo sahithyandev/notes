@@ -1,43 +1,24 @@
 ---
-// Dev-only: select text in this note's <article> and attach a comment to
-// get a proposed edit back from src/integrations/live-edit/ (a
-// long-lived headless `claude` session). Only rendered under
+// Dev-only: select text in this note's <article> and it's automatically
+// attached as context to the floating input in
+// src/components/dev/live-edit-bar.astro - no explicit "suggest edit"
+// button, no popup of its own. Once a selection settles, this dispatches
+// an "le-attach-selection" DOM event that the bar listens for, and this
+// widget only handles what needs the live DOM Range it captured: the
+// eventual proposal (and its Apply/Discard/Refine controls) still render
+// inline in the article right after the selected text, not in the dev
+// toolbar's "Live Edit" panel (src/integrations/live-edit/toolbar-app.ts),
+// which only covers whole-note/cross-note feedback since that has no
+// single spot in a note's body to anchor to. Only rendered under
 // import.meta.env.DEV by [...slug].astro, so none of this reaches a
 // production build.
-//
-// The proposal, and its Apply/Discard/Refine controls, render inline in the
-// article right after the selected text - not in the dev toolbar's "Live
-// Edit" panel (src/integrations/live-edit/toolbar-app.ts), which only
-// covers whole-note/cross-note feedback, since that has no single spot in
-// a note's body to anchor to.
 interface Props {
   filePath: string;
 }
 const { filePath } = Astro.props;
 ---
 
-<div id="live-edit-selection" data-file-path={filePath}>
-  <button type="button" class="le-select-btn" data-le-select-btn hidden>
-    Suggest edit
-  </button>
-
-  <div class="le-popover" data-le-popover hidden>
-    <textarea
-      class="le-comment"
-      data-le-comment
-      placeholder="What should change? (⌘/Ctrl+Enter to send)"
-      rows="3"
-    ></textarea>
-    <div class="le-popover-actions">
-      <button type="button" class="le-btn le-btn-ghost" data-le-cancel>
-        Cancel
-      </button>
-      <button type="button" class="le-btn le-btn-primary" data-le-submit>
-        Send
-      </button>
-    </div>
-  </div>
-</div>
+<div id="live-edit-selection" data-file-path={filePath}></div>
 
 <script>
   import {
@@ -81,10 +62,10 @@ const { filePath } = Astro.props;
     const article = document.querySelector("article");
     if (!article) return;
 
-    // Live Edit only works with the `claude` CLI (see
-    // src/integrations/live-edit/agent.ts); when it's not on PATH, this
-    // widget stays fully inert - no "Suggest edit" button ever appears,
-    // regardless of the enabled-state toggle. The site-wide bar
+    // Live Edit only works with a `claude` or `opencode` backend (see
+    // src/integrations/live-edit/agent.ts); when neither is available,
+    // this widget stays fully inert - selecting text never attaches
+    // anything, regardless of the enabled-state toggle. The site-wide bar
     // (live-edit-bar.astro) is what shows the disabled message.
     try {
       const res = await fetch("/__live-edit/status");
@@ -96,18 +77,11 @@ const { filePath } = Astro.props;
       // any error.
     }
 
-    const selectBtn = root.querySelector<HTMLButtonElement>(
-      "[data-le-select-btn]",
-    )!;
-    const popover = root.querySelector<HTMLElement>("[data-le-popover]")!;
-    const commentInput =
-      root.querySelector<HTMLTextAreaElement>("[data-le-comment]")!;
-    const submitBtn =
-      root.querySelector<HTMLButtonElement>("[data-le-submit]")!;
-    const cancelBtn =
-      root.querySelector<HTMLButtonElement>("[data-le-cancel]")!;
-
-    let pendingSelection: PendingSelection | null = null;
+    // The selection currently attached (handed off via "le-attach-selection"
+    // and shown as a chip in the bar, waiting on its Send). Kept around
+    // locally because only this widget has the live Range needed to anchor
+    // a marker once the bar actually submits it.
+    let attachedSelection: PendingSelection | null = null;
 
     function nearestHeading(node: Node | null): string | undefined {
       let el: Element | null =
@@ -154,94 +128,91 @@ const { filePath } = Astro.props;
     }
 
     // Reads the current selection and, if it's a non-empty selection inside
-    // the article, stashes it (including the live Range, so the eventual
-    // proposal can be anchored right after it in the body) and positions
-    // the button above it. Returns whether there was a usable selection.
-    function captureSelection(): boolean {
+    // the article, attaches it (dispatching "le-attach-selection" for the
+    // bar to show as a chip) and keeps the live Range locally so the
+    // eventual proposal can be anchored right after it in the body.
+    // Attaching again (a new selection replacing an already-attached one)
+    // just overwrites - both here and in the bar's own chip - matching
+    // "only one selection can be in context at a time".
+    function captureAndAttach(): void {
       const sel = window.getSelection();
-      if (!sel || sel.isCollapsed || sel.rangeCount === 0) return false;
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
       const range = sel.getRangeAt(0);
-      if (!article!.contains(range.commonAncestorContainer)) return false;
+      if (!article!.contains(range.commonAncestorContainer)) return;
       const text = serializeRange(range);
-      if (!text) return false;
+      if (!text) return;
 
-      pendingSelection = {
+      attachedSelection = {
         text,
         heading: nearestHeading(range.startContainer),
         context: surroundingContext(range),
         range: range.cloneRange(),
       };
-      const rect = range.getBoundingClientRect();
-      selectBtn.style.top = `${rect.top + window.scrollY - 36}px`;
-      selectBtn.style.left = `${rect.left + window.scrollX}px`;
-      return true;
+      document.dispatchEvent(
+        new CustomEvent("le-attach-selection", {
+          detail: {
+            filePath,
+            text: attachedSelection.text,
+            heading: attachedSelection.heading,
+            context: attachedSelection.context,
+          },
+        }),
+      );
     }
 
-    // The button only appears once the selection has settled (mouseup/
+    // Attaching only happens once the selection has settled (mouseup/
     // touchend/keyup, not on every intermediate selectionchange fired while
     // dragging), and only after a short delay so a quick click-and-release
-    // that immediately collapses the selection again doesn't flash it.
-    const SHOW_DELAY_MS = 200;
-    let showTimer: ReturnType<typeof setTimeout> | null = null;
+    // that immediately collapses the selection again doesn't attach
+    // anything. Clearing the selection afterward (e.g. clicking into the
+    // bar's textarea to type the comment) does NOT detach it - once
+    // attached, it stays in context until sent or removed via the bar's
+    // chip (see "le-selection-detached" below).
+    const ATTACH_DELAY_MS = 200;
+    let attachTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function clearShowTimer(): void {
-      if (showTimer !== null) {
-        clearTimeout(showTimer);
-        showTimer = null;
+    function clearAttachTimer(): void {
+      if (attachTimer !== null) {
+        clearTimeout(attachTimer);
+        attachTimer = null;
       }
     }
 
     // Enabled by default; the dev toolbar's "Live Edit" icon
-    // (toolbar-app.ts) is a pure on/off switch for this button, not how you
-    // reach it.
+    // (toolbar-app.ts) is a pure on/off switch for this behavior.
     let enabled = isEnabled();
     onEnabledChange((next) => {
       enabled = next;
-      if (!enabled) {
-        clearShowTimer();
-        selectBtn.hidden = true;
-        popover.hidden = true;
-      }
+      if (!enabled) clearAttachTimer();
     });
 
-    function scheduleShowButton(): void {
-      clearShowTimer();
+    function scheduleAttach(): void {
+      clearAttachTimer();
       if (!enabled) return;
-      showTimer = setTimeout(() => {
-        showTimer = null;
-        selectBtn.hidden = !captureSelection();
-      }, SHOW_DELAY_MS);
+      attachTimer = setTimeout(() => {
+        attachTimer = null;
+        captureAndAttach();
+      }, ATTACH_DELAY_MS);
     }
 
     document.addEventListener("selectionchange", () => {
-      // Covers both an active drag (selection still changing) and the
-      // selection being cleared: hide immediately and cancel any pending
-      // show so a stale button can't flash in mid-drag.
-      clearShowTimer();
-      selectBtn.hidden = true;
+      // Covers an active drag (selection still changing): cancel any
+      // pending attach so a fast, since-superseded selection can't sneak
+      // in after the drag has already moved on.
+      clearAttachTimer();
     });
 
-    document.addEventListener("mouseup", scheduleShowButton);
-    document.addEventListener("touchend", scheduleShowButton);
+    document.addEventListener("mouseup", scheduleAttach);
+    document.addEventListener("touchend", scheduleAttach);
     document.addEventListener("keyup", (e) => {
       // Keyboard selection (Shift+Arrow/Home/End) ends on keyup of the
       // shift combo, with no mouseup to hook into.
-      if (e.key === "Shift" || e.shiftKey) scheduleShowButton();
+      if (e.key === "Shift" || e.shiftKey) scheduleAttach();
     });
 
-    selectBtn.addEventListener("click", () => {
-      if (!pendingSelection) return;
-      const rect = selectBtn.getBoundingClientRect();
-      popover.style.top = `${rect.bottom + window.scrollY + 6}px`;
-      popover.style.left = `${rect.left + window.scrollX}px`;
-      popover.hidden = false;
-      selectBtn.hidden = true;
-      commentInput.value = "";
-      commentInput.focus();
-    });
-
-    cancelBtn.addEventListener("click", () => {
-      popover.hidden = true;
+    // The bar's chip-remove (×) button on a selection it hasn't sent yet.
+    document.addEventListener("le-selection-detached", () => {
+      attachedSelection = null;
     });
 
     // --- inline anchors: one marker element per submitted item, inserted
@@ -421,19 +392,24 @@ const { filePath } = Astro.props;
       if (marker) renderMarker(item, marker);
       // An item with no tracked marker here either belongs to a different
       // page load (this component only anchors items it itself submitted,
-      // since only it has the live Range) or hasn't been created yet by
-      // this page's own submitFeedback() below - nothing to render for it.
+      // since only it has the live Range) or hasn't been created yet by the
+      // "le-selection-submitted" handler below - nothing to render for it.
     });
 
-    async function submitFeedback() {
-      if (!pendingSelection) return;
-      const comment = commentInput.value.trim();
-      if (!comment) return;
+    // The bar (live-edit-bar.astro) owns the actual request now - this
+    // just reacts once it's sent one, inserting the marker at the Range
+    // only this widget has. A null id means the request failed; nothing to
+    // anchor in that case, matching the previous popup flow's behavior.
+    document.addEventListener("le-selection-submitted", (e) => {
+      const { filePath: submittedFile, id } = (
+        e as CustomEvent<{ filePath: string; id: string | null }>
+      ).detail;
+      if (submittedFile !== filePath || !attachedSelection) return;
 
-      popover.hidden = true;
-      const { range, text, heading, context } = pendingSelection;
-      pendingSelection = null;
+      const { range } = attachedSelection;
+      attachedSelection = null;
       window.getSelection()?.removeAllRanges();
+      if (!id) return;
 
       const marker = document.createElement("span");
       marker.className = "le-marker le-status-queued";
@@ -442,35 +418,7 @@ const { filePath } = Astro.props;
       badge.textContent = "Sending…";
       marker.append(badge);
       insertMarker(range, marker);
-
-      const res = await fetch("/__live-edit/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "selection",
-          filePath,
-          selection: text,
-          heading,
-          context,
-          comment,
-        }),
-      });
-      const body = (await res.json().catch(() => null)) as {
-        id?: string;
-      } | null;
-      if (!body?.id) {
-        marker.remove();
-        return;
-      }
-      markers.set(body.id, marker);
-    }
-
-    submitBtn.addEventListener("click", submitFeedback);
-    commentInput.addEventListener("keydown", (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        e.preventDefault();
-        void submitFeedback();
-      }
+      markers.set(id, marker);
     });
   }
 
@@ -482,55 +430,6 @@ const { filePath } = Astro.props;
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     color: var(--text-primary);
-  }
-
-  .le-select-btn {
-    position: absolute;
-    z-index: 60;
-    border: 1px solid var(--border-strong);
-    background: var(--surface);
-    color: var(--text-primary);
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    font-family: var(--font-ui);
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
-  }
-
-  .le-select-btn:hover {
-    border-color: var(--sem, var(--border-strong));
-  }
-
-  .le-popover {
-    position: absolute;
-    z-index: 61;
-    width: min(320px, 90vw);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
-  }
-
-  .le-comment {
-    width: 100%;
-    box-sizing: border-box;
-    resize: vertical;
-    border: 1px solid var(--border);
-    background: var(--surface-2);
-    color: var(--text-primary);
-    border-radius: 6px;
-    padding: 8px;
-    font-family: var(--font-ui);
-    font-size: 0.8125rem;
-  }
-
-  .le-popover-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-top: 8px;
   }
 
   .le-btn {

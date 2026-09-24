@@ -325,9 +325,10 @@
       const chip = (
         chipTemplate.content.firstElementChild as HTMLElement
       ).cloneNode(true) as HTMLElement;
-      chip.querySelector("[data-leb-chip-label]")!.textContent = file
-        .replace(/^docs\//, "")
-        .replace(/\.mdx?$/, "");
+      chip.querySelector("[data-leb-chip-label]")!.textContent =
+        file === currentNoteFile
+          ? "Current file"
+          : file.replace(/^docs\//, "").replace(/\.mdx?$/, "");
       chip.querySelector<HTMLButtonElement>("[data-leb-chip-remove]")!.onclick =
         () => removeFile(file);
       chipEls.set(file, chip);
@@ -341,6 +342,70 @@
       chipEls.get(file)?.remove();
       chipEls.delete(file);
     }
+
+    // --- attached selection ----------------------------------------------
+    //
+    // Selecting text in a note (live-edit.astro) shares this bar's input
+    // instead of opening its own popup: once a selection settles, that
+    // widget dispatches "le-attach-selection" with the captured text, and
+    // this shows it as a chip in the same row as file chips so the input
+    // makes clear the selection is included as context - no explicit
+    // "suggest edit" button, it's automatic. live-edit.astro keeps the
+    // actual DOM Range (only it has the article to anchor a marker in), so
+    // this only ever carries the text/heading/context needed for the
+    // request body, and reports back what happened via
+    // "le-selection-submitted"/relies on "le-selection-detached" to hear
+    // about a cancel.
+    interface PendingSelection {
+      filePath: string;
+      text: string;
+      heading?: string;
+      context?: string;
+    }
+    let pendingSelection: PendingSelection | null = null;
+    let selectionChipEl: HTMLElement | null = null;
+    const DEFAULT_PLACEHOLDER = commentInput.placeholder;
+
+    function renderSelectionChip(): void {
+      if (!pendingSelection) {
+        selectionChipEl?.remove();
+        selectionChipEl = null;
+        commentInput.placeholder = DEFAULT_PLACEHOLDER;
+        return;
+      }
+      if (!selectionChipEl) {
+        selectionChipEl = (
+          chipTemplate.content.firstElementChild as HTMLElement
+        ).cloneNode(true) as HTMLElement;
+        selectionChipEl.classList.add("leb-chip-selection");
+        selectionChipEl.querySelector<HTMLButtonElement>(
+          "[data-leb-chip-remove]",
+        )!.onclick = () => detachSelection();
+        filesEl.insertBefore(selectionChipEl, addFileBtn);
+      }
+      const text = pendingSelection.text.trim();
+      const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
+      selectionChipEl.querySelector("[data-leb-chip-label]")!.textContent =
+        `Selection: “${preview}”`;
+      commentInput.placeholder =
+        "What should change about the selected text? (⌘/Ctrl+Enter to send)";
+    }
+
+    // User-initiated cancel (the chip's × button) - distinct from a send,
+    // which clears pendingSelection itself and tells live-edit.astro via
+    // "le-selection-submitted" instead, so it can insert its marker rather
+    // than just dropping the selection.
+    function detachSelection(): void {
+      pendingSelection = null;
+      renderSelectionChip();
+      document.dispatchEvent(new CustomEvent("le-selection-detached"));
+    }
+
+    document.addEventListener("le-attach-selection", (e) => {
+      pendingSelection = (e as CustomEvent<PendingSelection>).detail;
+      renderSelectionChip();
+      commentInput.focus();
+    });
 
     // --- note picker (searches /__live-edit/notes) ---------------
 
@@ -408,8 +473,44 @@
 
     async function submit() {
       const comment = commentInput.value.trim();
-      if (!comment || selectedFiles.length === 0) return;
+      if (!comment) return;
 
+      // A pending selection takes priority: it's what the input's
+      // placeholder and chip are currently telling the developer this
+      // comment is about. Submits as a "selection" item, which renders
+      // inline in the article via live-edit.astro rather than in this
+      // bar's own panel - "le-selection-submitted" is how that widget
+      // learns the id to track (or that the request failed).
+      if (pendingSelection) {
+        const { filePath, text, heading, context } = pendingSelection;
+        commentInput.value = "";
+        pendingSelection = null;
+        renderSelectionChip();
+
+        const res = await fetch("/__live-edit/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "selection",
+            filePath,
+            selection: text,
+            heading,
+            context,
+            comment,
+          }),
+        });
+        const body = (await res.json().catch(() => null)) as {
+          id?: string;
+        } | null;
+        document.dispatchEvent(
+          new CustomEvent("le-selection-submitted", {
+            detail: { filePath, id: body?.id ?? null },
+          }),
+        );
+        return;
+      }
+
+      if (selectedFiles.length === 0) return;
       commentInput.value = "";
       setPanelOpen(true);
 
@@ -711,6 +812,16 @@
     border-radius: 999px;
     padding: 2px 4px 2px 10px;
     font-size: 0.75rem;
+  }
+
+  /* Marks the chip added when text is selected in a note (live-edit.astro)
+     as included context, distinct from the plain file chips - violet
+     rather than the site's blue accent (--sem/--accent), which is already
+     used for primary actions elsewhere in this bar. */
+  .leb-chip-selection {
+    border-color: var(--dia-key);
+    color: var(--dia-key);
+    background: color-mix(in oklab, var(--dia-key) 14%, var(--surface-2));
   }
 
   .leb-chip button {
