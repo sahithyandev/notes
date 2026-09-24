@@ -73,13 +73,28 @@ const { filePath } = Astro.props;
     range: Range;
   }
 
-  function init() {
+  async function init() {
     const root = document.getElementById("live-edit-selection");
     if (!root) return;
 
     const filePath = root.dataset.filePath ?? "";
     const article = document.querySelector("article");
     if (!article) return;
+
+    // Live Edit only works with the `claude` CLI (see
+    // src/integrations/live-edit/agent.ts); when it's not on PATH, this
+    // widget stays fully inert - no "Suggest edit" button ever appears,
+    // regardless of the enabled-state toggle. The site-wide bar
+    // (live-edit-bar.astro) is what shows the disabled message.
+    try {
+      const res = await fetch("/__live-edit/status");
+      const body = (await res.json()) as { available: boolean };
+      if (!body.available) return;
+    } catch {
+      // A failed status check doesn't necessarily mean live-edit is
+      // unavailable; treat it as available and let a real request surface
+      // any error.
+    }
 
     const selectBtn = root.querySelector<HTMLButtonElement>(
       "[data-le-select-btn]",

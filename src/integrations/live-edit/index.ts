@@ -82,6 +82,43 @@ export default function liveEdit(): AstroIntegration {
   const queue: Job[] = [];
   let draining = false;
   let adapter: AgentAdapter | null = null;
+  // Live Edit only works with the `claude` CLI (agent.ts spawns it
+  // directly), so a dev environment without it on PATH can't run this
+  // feature at all. Checked once at server startup rather than per-request,
+  // and surfaced to the frontend via GET /__live-edit/status so the widgets
+  // can show a disabled message instead of silently failing on first use.
+  let claudeAvailable = true;
+  let claudeUnavailableReason: string | undefined;
+
+  function checkClaudeAvailable(): Promise<{
+    available: boolean;
+    reason?: string;
+  }> {
+    return new Promise((resolvePromise) => {
+      const child = spawn("claude", ["--version"], {
+        stdio: ["ignore", "ignore", "ignore"],
+      });
+      child.on("error", (err: NodeJS.ErrnoException) => {
+        resolvePromise({
+          available: false,
+          reason:
+            err.code === "ENOENT"
+              ? "the `claude` CLI is not installed or not on PATH"
+              : `failed to run \`claude\`: ${err.message}`,
+        });
+      });
+      child.on("exit", (code) => {
+        resolvePromise(
+          code === 0
+            ? { available: true }
+            : {
+                available: false,
+                reason: `\`claude --version\` exited with code ${code}`,
+              },
+        );
+      });
+    });
+  }
 
   function log(item: FeedbackItem, message: string): void {
     const label = item.files.join(", ");
@@ -415,20 +452,28 @@ export default function liveEdit(): AstroIntegration {
           return;
         }
 
-        // Awaited before the server starts accepting requests, so the very
-        // first turn already resumes the persisted session instead of
-        // racing a fresh one into existence.
-        const persistedSessionId = await loadPersistedSessionId();
-        if (persistedSessionId) getAdapter(persistedSessionId);
+        const availability = await checkClaudeAvailable();
+        claudeAvailable = availability.available;
+        claudeUnavailableReason = availability.reason;
 
-        const model = process.env.LIVE_EDIT_MODEL || "default";
+        if (!claudeAvailable) {
+          logger.warn(`disabled: ${claudeUnavailableReason}`);
+        } else {
+          // Awaited before the server starts accepting requests, so the
+          // very first turn already resumes the persisted session instead
+          // of racing a fresh one into existence.
+          const persistedSessionId = await loadPersistedSessionId();
+          if (persistedSessionId) getAdapter(persistedSessionId);
+
+          const model = process.env.LIVE_EDIT_MODEL || "default";
+          logger.info(
+            persistedSessionId
+              ? `ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
+              : `ready, will start a new session on first request (model: ${model})`,
+          );
+        }
         logger.info(
-          persistedSessionId
-            ? `ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
-            : `ready, will start a new session on first request (model: ${model})`,
-        );
-        logger.info(
-          `routes: POST /__live-edit/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__live-edit/{events,notes}`,
+          `routes: POST /__live-edit/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__live-edit/{events,notes,status}`,
         );
 
         const closeAll = () => {
@@ -458,6 +503,13 @@ export default function liveEdit(): AstroIntegration {
           res: ServerResponse,
           url: string,
         ): Promise<void> {
+          if (url === "/__live-edit/status" && req.method === "GET") {
+            return sendJson(res, 200, {
+              available: claudeAvailable,
+              reason: claudeUnavailableReason,
+            });
+          }
+
           if (url === "/__live-edit/events" && req.method === "GET") {
             res.writeHead(200, {
               "Content-Type": "text/event-stream",
@@ -485,6 +537,11 @@ export default function liveEdit(): AstroIntegration {
           }
 
           if (url === "/__live-edit/request" && req.method === "POST") {
+            if (!claudeAvailable) {
+              return sendJson(res, 503, {
+                error: claudeUnavailableReason ?? "live-edit is unavailable",
+              });
+            }
             const body = await readJsonBody<FeedbackRequest>(req);
             const item = buildItem(body);
             if (!item)
@@ -513,6 +570,11 @@ export default function liveEdit(): AstroIntegration {
 
           const refineMatch = url.match(/^\/__live-edit\/refine\/([^/]+)$/);
           if (refineMatch && req.method === "POST") {
+            if (!claudeAvailable) {
+              return sendJson(res, 503, {
+                error: claudeUnavailableReason ?? "live-edit is unavailable",
+              });
+            }
             const item = items.get(refineMatch[1]);
             if (!item) return sendJson(res, 404, { error: "not found" });
             const body = await readJsonBody<{ comment: string }>(req);

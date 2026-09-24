@@ -31,7 +31,11 @@
     <div class="leb-list" data-leb-list></div>
   </div>
 
-  <div class="leb-bar">
+  <div class="leb-disabled" data-leb-disabled hidden>
+    Live Edit is unavailable.
+  </div>
+
+  <div class="leb-bar" data-leb-bar>
     <div class="leb-files" data-leb-files>
       <button type="button" class="leb-add-file" data-leb-add-file>
         + note
@@ -157,9 +161,45 @@
     title: string;
   }
 
-  function init() {
+  async function init() {
     const root = document.getElementById("live-edit-bar");
     if (!root) return;
+
+    const disabledNotice = root.querySelector<HTMLElement>(
+      "[data-leb-disabled]",
+    )!;
+    const bar = root.querySelector<HTMLElement>("[data-leb-bar]")!;
+
+    // Live Edit only works with the `claude` CLI (see
+    // src/integrations/live-edit/agent.ts), so a dev environment without it
+    // on PATH can't run this feature at all - checked once here rather than
+    // discovered on first use. When unavailable, show a disabled message in
+    // place of the bar instead of the usual enabled/disabled toggle.
+    let available = true;
+    try {
+      const res = await fetch("/__live-edit/status");
+      const body = (await res.json()) as {
+        available: boolean;
+        reason?: string;
+      };
+      available = body.available;
+      if (!available) {
+        disabledNotice.textContent = body.reason
+          ? `Live Edit is unavailable: ${body.reason}.`
+          : "Live Edit is unavailable.";
+      }
+    } catch {
+      // A failed status check doesn't necessarily mean live-edit is
+      // unavailable (the dev server itself could just be slow to come up);
+      // treat it as available and let a real request surface any error.
+    }
+
+    if (!available) {
+      root.hidden = false;
+      disabledNotice.hidden = false;
+      bar.hidden = true;
+      return;
+    }
 
     // Enabled by default; the dev toolbar's "Live Edit" icon
     // (toolbar-app.ts) is a pure on/off switch for this UI, not how you
@@ -527,6 +567,14 @@
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     color: var(--text-primary);
+
+    /* Astro's dev toolbar docks a full-width, pointer-events:auto hit area */
+    /* at the bottom of the viewport (a hover band above its pill, the pill */
+    /* itself, a band below it, about 98px total) at a z-index far above */
+    /* anything on the page, regardless of its own placement setting. */
+    /* Bottom-docked UI inside that band has its clicks/hovers swallowed by */
+    /* the toolbar instead, so this clears it with margin. */
+    --le-toolbar-clearance: 110px;
   }
 
   .le-btn {
@@ -562,15 +610,37 @@
     flex: none;
   }
 
+  /* --- disabled notice ------------------------------------------------- */
+
+  .leb-disabled {
+    position: fixed;
+    left: 50%;
+    bottom: var(--le-toolbar-clearance, 110px);
+    transform: translateX(-50%);
+    z-index: 62;
+    width: min(560px, calc(100vw - 24px));
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .leb-disabled code {
+    font-family: var(--font-mono);
+  }
+
   /* --- bottom bar ---------------------------------------------------- */
 
   .leb-bar {
     position: fixed;
     left: 50%;
-    bottom: 14px;
+    bottom: var(--le-toolbar-clearance, 110px);
     transform: translateX(-50%);
     z-index: 62;
-    width: min(560px, calc(100vw - 24px));
+    width: min(640px, calc(100vw - 24px));
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -701,7 +771,7 @@
   .leb-panel {
     position: fixed;
     right: 12px;
-    bottom: 90px;
+    bottom: calc(var(--le-toolbar-clearance, 110px) + 76px);
     z-index: 61;
     width: min(380px, calc(100vw - 24px));
     max-height: min(65vh, 620px);
