@@ -1,0 +1,305 @@
+---
+// Dev-only widget: select text in an <article>, attach a comment, and get a
+// proposed edit back from src/integrations/edit-feedback/ (a long-lived
+// headless `claude` session). Only rendered under import.meta.env.DEV by
+// [...slug].astro, so none of this reaches a production build.
+interface Props {
+  slug: string;
+  filePath: string;
+}
+const { slug, filePath } = Astro.props;
+---
+
+<div id="edit-feedback" data-slug={slug} data-file-path={filePath}>
+  <button type="button" class="ef-select-btn" data-ef-select-btn hidden>
+    Suggest edit
+  </button>
+
+  <div class="ef-popover" data-ef-popover hidden>
+    <textarea
+      class="ef-comment"
+      data-ef-comment
+      placeholder="What should change? (⌘/Ctrl+Enter to send)"
+      rows="3"
+    ></textarea>
+    <div class="ef-popover-actions">
+      <button type="button" class="ef-btn ef-btn-ghost" data-ef-cancel>
+        Cancel
+      </button>
+      <button type="button" class="ef-btn ef-btn-primary" data-ef-submit>
+        Send
+      </button>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="ef-panel-toggle"
+    data-ef-panel-toggle
+    aria-expanded="false"
+    aria-label="Toggle edit feedback panel"
+  >
+    ✎
+  </button>
+
+  <div class="ef-panel" data-ef-panel hidden>
+    <div class="ef-panel-header">Edit feedback</div>
+    <div class="ef-list" data-ef-list></div>
+  </div>
+
+  <template data-ef-item-template>
+    <div class="ef-item">
+      <div class="ef-item-header">
+        <span class="ef-item-status" data-ef-status></span>
+      </div>
+      <div class="ef-item-comment" data-ef-comment-text></div>
+      <div class="ef-item-progress" data-ef-progress hidden></div>
+      <div class="ef-item-summary" data-ef-summary hidden></div>
+      <div class="ef-item-diff" data-ef-diff hidden></div>
+      <div class="ef-item-error" data-ef-error hidden></div>
+      <div class="ef-item-actions" data-ef-actions hidden>
+        <button type="button" class="ef-btn ef-btn-primary" data-ef-apply>
+          Apply
+        </button>
+        <button type="button" class="ef-btn ef-btn-ghost" data-ef-discard>
+          Discard
+        </button>
+      </div>
+      <div class="ef-item-refine" data-ef-refine hidden>
+        <textarea
+          class="ef-comment"
+          data-ef-refine-input
+          placeholder="Refine…"
+          rows="2"
+        ></textarea>
+        <button type="button" class="ef-btn ef-btn-ghost" data-ef-refine-btn>
+          Send
+        </button>
+      </div>
+    </div>
+  </template>
+</div>
+
+<script>
+  import "../../scripts/edit-feedback";
+</script>
+
+<style>
+  #edit-feedback {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+  }
+
+  .ef-select-btn {
+    position: absolute;
+    z-index: 60;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  }
+
+  .ef-select-btn:hover {
+    border-color: var(--sem, var(--border-strong));
+  }
+
+  .ef-popover {
+    position: absolute;
+    z-index: 61;
+    width: min(320px, 90vw);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  }
+
+  .ef-comment {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 8px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+  }
+
+  .ef-popover-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .ef-btn {
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .ef-btn-primary {
+    background: var(--sem, #2563eb);
+    color: #fff;
+  }
+
+  .ef-btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-secondary);
+  }
+
+  .ef-panel-toggle {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 62;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .ef-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 70px;
+    z-index: 62;
+    width: min(360px, calc(100vw - 32px));
+    max-height: min(70vh, 640px);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 10px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.25);
+    overflow: hidden;
+  }
+
+  .ef-panel-header {
+    padding: 10px 12px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ef-list {
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ef-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--surface-2);
+  }
+
+  .ef-item[data-status="error"] {
+    border-color: #dc2626;
+  }
+
+  .ef-item[data-status="applied"] {
+    border-color: #16a34a;
+  }
+
+  .ef-item-status {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-secondary);
+  }
+
+  .ef-item-comment {
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .ef-item-progress {
+    margin-top: 4px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  .ef-item-summary {
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  .ef-item-diff {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.75rem;
+  }
+
+  .ef-item-diff :global(.ef-edit) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .ef-item-diff :global(del) {
+    background: #fecaca;
+    color: #7f1d1d;
+    text-decoration: line-through;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .ef-item-diff :global(ins) {
+    background: #bbf7d0;
+    color: #14532d;
+    text-decoration: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .ef-item-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 0.75rem;
+    white-space: pre-wrap;
+  }
+
+  .ef-item-actions,
+  .ef-item-refine {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .ef-item-refine {
+    flex-direction: column;
+  }
+
+  :root[data-theme="dark"] {
+    .ef-item-diff :global(del) {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+    .ef-item-diff :global(ins) {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+  }
+</style>

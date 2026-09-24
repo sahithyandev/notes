@@ -25,11 +25,26 @@ bun scripts/sync-note-metadata.ts <path/to/file.md> [...]   # add --dry-run to p
 
 ### Editing notes while `bun dev` is running
 
-Reloads during an edit burst are throttled by `src/integrations/dev-reload-lock/index.ts`, a Vite plugin registered in `astro.config.mjs`. It's agent-agnostic by default: every `full-reload`/HMR websocket message is held for a 1-second quiet period, and each new message during that window resets the timer, so a burst of edits from any tool, Claude Code, OpenCode, a different agent, or a human running a script across multiple notes, collapses into a single reload fired shortly after the burst ends. Nothing needs to call anything for this to work.
+Reloads during an edit burst are throttled by `src/integrations/dev-reload-lock/index.ts`, a Vite plugin registered in `astro.config.mjs`. It's agent-agnostic by default: every `full-reload`/HMR websocket message is held for a 500ms quiet period (`DEBOUNCE_MS`), and each new message during that window resets the timer, so a burst of edits from any tool, Claude Code, OpenCode, a different agent, or a human running a script across multiple notes, collapses into a single reload fired shortly after the burst ends. Nothing needs to call anything for this to work.
 
 On top of that, the plugin exposes `POST /__reload-lock/pause` and `POST /__reload-lock/resume` on the dev server (`localhost:4321`) as a latency optimization: pausing holds reloads indefinitely instead of on a timer, and resuming flushes immediately. `.claude/settings.json` wires these into Claude Code specifically (a `PreToolUse` hook on `Edit|Write|MultiEdit` pauses, a `Stop` hook resumes), so Claude Code's edit turns get an instant reload right after the turn ends rather than waiting out the debounce. Any other agent that doesn't call these endpoints still gets the debounced behavior for free.
 
 Regardless of the above, still make all edits to a given note in one pass (draft the full content, then a single `Write`/`Edit`) rather than several incremental `Edit` calls, since that's fewer filesystem writes and keeps intermediate diffs cleaner.
+
+### Edit feedback (dev only)
+
+`src/integrations/edit-feedback/` is a dev-only Vite plugin that lets you select text on a rendered note in the browser, attach a comment, and get a proposed edit back without leaving the browser. It's rendered by `src/components/dev/edit-feedback.astro` under `import.meta.env.DEV` (nothing ships in a production build) and wired into `astro.config.mjs`'s `vite.plugins` next to `devReloadLock()`.
+
+It runs one long-lived `claude -p --input-format stream-json --output-format stream-json` process (`agent.ts`), fed one user message per feedback request over its stdin, so the conversation and prompt cache carry across requests instead of being rebuilt each time. The agent can only `Read`/`Glob`/`Grep`/`Skill` plus run `bun run check-notes-style`; it never gets `Edit`/`Write`. Every reply ends with a fenced ` ```json ` proposal block (`{ file, summary, edits: [{ old, new }] }`), which `proposal.ts` parses and validates (each `old` must match the file's current content exactly once) before the relay applies it, only once you click Apply in the browser panel.
+
+Routes on the dev server (`localhost:4321`):
+
+- `POST /__edit-feedback/request` - submit a new feedback item.
+- `POST /__edit-feedback/apply/:id`, `POST /__edit-feedback/discard/:id`, `POST /__edit-feedback/refine/:id` - act on an item.
+- `POST /__edit-feedback/reset` - drop the current agent session and start a new one.
+- `GET /__edit-feedback/events` - SSE stream of item state.
+
+The session id is persisted to `.tmp/edit-feedback-session` (gitignored) so a dev-server restart resumes the same conversation instead of starting cold. `EDIT_FEEDBACK_MODEL` overrides the model; `EDIT_FEEDBACK=0` disables the plugin entirely.
 
 ## Writing notes
 

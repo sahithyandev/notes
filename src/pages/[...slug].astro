@@ -21,6 +21,7 @@ import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
 import ImageZoom from "../components/note/image-zoom.astro";
+import EditFeedback from "../components/dev/edit-feedback.astro";
 import {
   titleize,
   calculateReadTime,
@@ -59,8 +60,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(notesEntry);
 // headings (see remarkKatexMhchem in astro.config.mjs); use the real
 // rendered heading markup instead, so the TOC shows properly typeset math.
 const headingHtml = remarkPluginFrontmatter?.headingHtml as
-  | string[]
-  | undefined;
+  string[] | undefined;
 const cleanHeadings = headings.map((heading, i) => ({
   ...heading,
   html: headingHtml?.[i] ?? heading.text,
@@ -126,19 +126,17 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     >
       <MenuIcon />
     </button>
-    {
-      tocHeadings.length > 0 && (
-        <button
-          slot="nav-end"
-          class="nav-drawer-btn"
-          id="open-toc"
-          type="button"
-          aria-label="Open table of contents"
-        >
-          <TocIcon />
-        </button>
-      )
-    }
+    {tocHeadings.length > 0 && (
+      <button
+        slot="nav-end"
+        class="nav-drawer-btn"
+        id="open-toc"
+        type="button"
+        aria-label="Open table of contents"
+      >
+        <TocIcon />
+      </button>
+    )}
   </Nav>
   <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
   <main
@@ -150,18 +148,14 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
     <section>
       <Breadcrumb slug={slug} title={notesEntry.data.title} />
-      <h1 class="note-title">
-        {notesEntry.data.title}
-      </h1>
+      <h1 class="note-title">{notesEntry.data.title}</h1>
 
-      {
-        wip && (
-          <p class="wip-banner" role="note">
-            <span class="wip-dot" aria-hidden="true" />
-            Work in progress. This note is still being written and incomplete.
-          </p>
-        )
-      }
+      {wip && (
+        <p class="wip-banner" role="note">
+          <span class="wip-dot" aria-hidden="true" />
+          Work in progress. This note is still being written and incomplete.
+        </p>
+      )}
 
       <div class="note-meta">
         <AiLinks slug={slug} topic={topic} sectionLabel={sectionLabel} />
@@ -222,8 +216,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   <script>
     import "../scripts/image-zoom";
   </script>
-
   <ImageZoom />
+  {import.meta.env.DEV && (
+    <EditFeedback slug={slug} filePath={notesEntry.filePath ?? ""} />
+  )}
 </Layout>
 
 <style>
