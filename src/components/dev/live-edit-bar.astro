@@ -660,6 +660,27 @@
           body: JSON.stringify({ comment }),
         });
       };
+
+      // Applying is the end of an item's life in this panel - leaving it
+      // sitting there with a stale diff is just clutter, so it's cleared
+      // out rather than lingering until the eventual file-change reload
+      // (which may be debounced, or may not touch the page you're on if
+      // the applied note isn't the one currently open). The delay is only
+      // so the "Applied" confirmation itself is still visible for a beat.
+      if (item.status === "applied") scheduleItemRemoval(item.id);
+    }
+
+    const APPLIED_REMOVE_DELAY_MS = 1500;
+    const removalScheduled = new Set<string>();
+
+    function scheduleItemRemoval(id: string): void {
+      if (removalScheduled.has(id)) return;
+      removalScheduled.add(id);
+      setTimeout(() => {
+        itemEls.get(id)?.remove();
+        itemEls.delete(id);
+        removalScheduled.delete(id);
+      }, APPLIED_REMOVE_DELAY_MS);
     }
 
     function statusLabel(item: FeedbackItem): string {

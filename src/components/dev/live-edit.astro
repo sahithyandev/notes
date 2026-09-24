@@ -243,6 +243,7 @@ const { filePath } = Astro.props;
     }
 
     const markers = new Map<string, HTMLElement>();
+    const APPLIED_REMOVE_DELAY_MS = 1500;
 
     // Deleting files is the one destructive action a proposal can carry, so
     // it gets a distinct confirmation - naming the exact files - on top of
@@ -394,6 +395,19 @@ const { filePath } = Astro.props;
       // page load (this component only anchors items it itself submitted,
       // since only it has the live Range) or hasn't been created yet by the
       // "le-selection-submitted" handler below - nothing to render for it.
+
+      // Applying is the end of this marker's life - leaving "✓ Applied"
+      // sitting inline forever is just clutter, so it's cleared out rather
+      // than relying solely on the eventual file-change reload (which may
+      // be debounced, or may never fire if something else keeps it from
+      // completing). The delay is only so the confirmation itself is still
+      // visible for a beat.
+      if (item.status === "applied" && marker) {
+        setTimeout(() => {
+          marker.remove();
+          markers.delete(item.id);
+        }, APPLIED_REMOVE_DELAY_MS);
+      }
     });
 
     // The bar (live-edit-bar.astro) owns the actual request now - this
