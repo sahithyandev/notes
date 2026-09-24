@@ -288,13 +288,26 @@ export default function editFeedback(): Plugin {
       tmpDir = join(root, ".tmp");
     },
     async configureServer(server: ViteDevServer) {
-      if (process.env.EDIT_FEEDBACK === "0") return;
+      if (process.env.EDIT_FEEDBACK === "0") {
+        console.log("[edit-feedback] disabled (EDIT_FEEDBACK=0)");
+        return;
+      }
 
       // Awaited before the server starts accepting requests, so the very
       // first turn already resumes the persisted session instead of racing
       // a fresh one into existence.
       const persistedSessionId = await loadPersistedSessionId();
       if (persistedSessionId) getAdapter(persistedSessionId);
+
+      const model = process.env.EDIT_FEEDBACK_MODEL || "default";
+      console.log(
+        persistedSessionId
+          ? `[edit-feedback] ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
+          : `[edit-feedback] ready, will start a new session on first request (model: ${model})`,
+      );
+      console.log(
+        `[edit-feedback] routes: POST /__edit-feedback/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__edit-feedback/{events,notes}`,
+      );
 
       const closeAll = () => {
         for (const res of clients) res.end();

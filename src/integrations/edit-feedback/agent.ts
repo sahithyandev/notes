@@ -138,12 +138,18 @@ export class ClaudeStreamAdapter implements AgentAdapter {
     args.push("--append-system-prompt", SYSTEM_PROMPT);
     if (this.model) args.push("--model", this.model);
 
+    let resuming = false;
     if (this.sessionId) {
+      resuming = true;
       args.push("--resume", this.sessionId);
     } else {
       this.sessionId = randomUUID();
       args.push("--session-id", this.sessionId);
     }
+
+    console.log(
+      `[edit-feedback] spawning claude (${resuming ? "resuming" : "new"} session ${this.sessionId.slice(0, 8)}${this.model ? `, model ${this.model}` : ""})`,
+    );
 
     const child = this.spawnFn("claude", args, {
       cwd: this.cwd,
@@ -168,14 +174,24 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       this.queue.push(obj);
     });
 
-    child.stderr.on("data", () => {
-      // stderr is intentionally not surfaced per-line; a non-zero exit is
-      // reported through the "exit" handler below instead.
+    child.stderr.on("data", (data) => {
+      if (this.child !== child) return;
+      // Surfaced to the terminal so a setup problem (claude not on PATH,
+      // an auth error, a bad flag) is visible immediately rather than only
+      // as a generic "process exited unexpectedly" on the next turn.
+      for (const line of data.toString().split("\n")) {
+        if (line.trim()) console.error(`[edit-feedback:claude] ${line}`);
+      }
     });
 
     child.on("exit", (code) => {
       if (this.child !== child) return;
       this.child = null;
+      if (code !== 0) {
+        console.error(
+          `[edit-feedback] claude process exited with code ${code}`,
+        );
+      }
       this.queue.failAll(
         new Error(`claude process exited unexpectedly (code ${code})`),
       );
