@@ -1,9 +1,5 @@
 import { test, expect } from "bun:test";
-import {
-  buildRequestMessage,
-  buildRefineMessage,
-  buildMismatchMessage,
-} from "./prompt.ts";
+import { buildRequestMessage, buildMismatchMessage } from "./prompt.ts";
 
 test("buildRequestMessage includes all provided selection fields", () => {
   const msg = buildRequestMessage({
@@ -54,12 +50,6 @@ test("buildRequestMessage flags a multi-file whole-note request", () => {
   expect(msg).toContain("merging");
 });
 
-test("buildRefineMessage wraps the comment", () => {
-  expect(buildRefineMessage("also fix the typo")).toContain(
-    "also fix the typo",
-  );
-});
-
 test("buildMismatchMessage lists every mismatch grouped by file", () => {
   const msg = buildMismatchMessage([
     { file: "docs/a.md", mismatches: [{ old: "a", occurrences: 0 }] },
@@ -69,13 +59,4 @@ test("buildMismatchMessage lists every mismatch grouped by file", () => {
   expect(msg).toContain('"a" was found 0 time(s)');
   expect(msg).toContain("docs/b.md");
   expect(msg).toContain('"b" was found 2 time(s)');
-});
-
-test("buildMismatchMessage also lists deletion mismatches", () => {
-  const msg = buildMismatchMessage(
-    [],
-    [{ file: "docs/c.md", reason: "file no longer exists" }],
-  );
-  expect(msg).toContain("docs/c.md");
-  expect(msg).toContain("file no longer exists");
 });

@@ -4,13 +4,11 @@
 // src/components/dev/live-edit-bar.astro - no explicit "suggest edit"
 // button, no popup of its own. Once a selection settles, this dispatches
 // an "le-attach-selection" DOM event that the bar listens for, and this
-// widget only handles what needs the live DOM Range it captured: the
-// eventual proposal (and its Apply/Discard/Refine controls) still render
-// inline in the article right after the selected text, not in the dev
-// toolbar's "Live Edit" panel (src/integrations/live-edit/toolbar-app.ts),
-// which only covers whole-note/cross-note feedback since that has no
-// single spot in a note's body to anchor to. Only rendered under
-// import.meta.env.DEV by [...slug].astro, so none of this reaches a
+// widget only handles what needs the live DOM Range it captured: a
+// lightweight preview of the eventual proposal's "after" text, anchored
+// right after the selected text. Apply/Discard/Refine live in the bar's
+// status strip, not here - this widget is preview-only. Only rendered
+// under import.meta.env.DEV by [...slug].astro, so none of this reaches a
 // production build.
 interface Props {
   filePath: string;
@@ -218,8 +216,10 @@ const { filePath } = Astro.props;
     // --- inline anchors: one marker element per submitted item, inserted
     // right after the selected text, never modifying the selected text
     // itself. Safer than wrapping the selection (which throws if the range
-    // partially crosses an element boundary) and keeps Apply/Discard/Refine
-    // exactly where the feedback was given, not in a corner popup. -------
+    // partially crosses an element boundary) and keeps the preview of a
+    // proposed change exactly where the feedback was given, not in a
+    // corner popup - though the actual controls to act on it live in
+    // live-edit-bar.astro's status strip now, not here. -------
 
     function closestBlock(node: Node): Element | null {
       let el: Element | null =
@@ -245,115 +245,51 @@ const { filePath } = Astro.props;
     const markers = new Map<string, HTMLElement>();
     const APPLIED_REMOVE_DELAY_MS = 1500;
 
-    // Deleting files is the one destructive action a proposal can carry, so
-    // it gets a distinct confirmation - naming the exact files - on top of
-    // the click on Apply itself. The relay also refuses to delete without a
-    // matching confirmDelete flag in the request body, so this isn't just a
-    // client-side nicety.
-    async function applyItem(item: FeedbackItem): Promise<void> {
-      const deletions = item.deletions ?? [];
-      if (deletions.length > 0) {
-        const ok = window.confirm(
-          `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
-        );
-        if (!ok) return;
-        await fetch(`/__live-edit/apply/${item.id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ confirmDelete: true }),
-        });
-        return;
-      }
-      await fetch(`/__live-edit/apply/${item.id}`, { method: "POST" });
-    }
-
-    function makeToolbar(
-      item: FeedbackItem,
-      opts: { canApply: boolean },
-    ): HTMLElement {
-      const bar = document.createElement("span");
-      bar.className = "le-inline-toolbar";
-
-      if (opts.canApply) {
-        const applyBtn = document.createElement("button");
-        applyBtn.type = "button";
-        applyBtn.className = "le-btn le-btn-primary";
-        applyBtn.textContent =
-          (item.deletions?.length ?? 0) > 0 ? "Apply & Delete" : "Apply";
-        applyBtn.onclick = () => void applyItem(item);
-        bar.append(applyBtn);
-      }
-
-      const discardBtn = document.createElement("button");
-      discardBtn.type = "button";
-      discardBtn.className = "le-btn le-btn-ghost";
-      discardBtn.textContent = "Discard";
-      discardBtn.onclick = () =>
-        fetch(`/__live-edit/discard/${item.id}`, { method: "POST" });
-      bar.append(discardBtn);
-
-      const refineBtn = document.createElement("button");
-      refineBtn.type = "button";
-      refineBtn.className = "le-btn le-btn-ghost";
-      refineBtn.textContent = "Refine…";
-      refineBtn.onclick = () => {
-        const comment = window.prompt("Refine this suggestion:");
-        if (!comment) return;
-        void fetch(`/__live-edit/refine/${item.id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment }),
-        });
-      };
-      bar.append(refineBtn);
-
-      return bar;
-    }
-
+    // This widget only previews - Apply/Discard/Refine, and the progress
+    // shown while queued/running, live entirely in live-edit-bar.astro's
+    // status strip (docked above the floating input) now. Here, a marker
+    // is just a quiet pointer to *where* a proposed change would land:
+    // the "after" text, styled as new/pending rather than boxed as a
+    // before/after diff - the "before" is already right there on the
+    // page.
     function renderMarker(item: FeedbackItem, marker: HTMLElement): void {
       marker.innerHTML = "";
-      marker.className = `le-marker le-status-${item.status}`;
+      // Re-renders happen on every status change, so the block/inline
+      // variant (set once at creation, see the "le-item" listener below)
+      // has to survive resetting the rest of the class list each time.
+      const isBlock = marker.classList.contains("le-marker-block");
+      marker.className = `le-marker le-status-${item.status}${isBlock ? " le-marker-block" : ""}`;
 
       if (item.status === "queued" || item.status === "running") {
-        const badge = document.createElement("span");
-        badge.className = "le-inline-badge";
-        badge.textContent = item.progress.at(-1)
-          ? `Working: ${item.progress.at(-1)}`
-          : "Suggesting edit…";
-        marker.append(badge);
+        marker.hidden = true;
         return;
       }
+      marker.hidden = false;
 
       if (item.status === "proposed") {
-        if ((item.changes ?? []).length > 0) {
-          const del = document.createElement("del");
-          del.className = "le-inline-del";
-          del.textContent = pendingText(item);
-          const ins = document.createElement("ins");
-          ins.className = "le-inline-ins";
-          ins.textContent = (item.changes ?? [])
-            .flatMap((c) => c.edits.map((e) => e.new))
-            .join(" … ");
-          marker.append(del, document.createTextNode(" → "), ins);
+        const changes = item.changes ?? [];
+        for (const change of changes) {
+          for (const edit of change.edits) {
+            const after = document.createElement("div");
+            after.className = "le-inline-after";
+            after.textContent = edit.new;
+            marker.append(after);
+          }
         }
         if ((item.deletions ?? []).length > 0) {
           const badge = document.createElement("span");
           badge.className = "le-inline-badge le-inline-deletions";
-          badge.textContent = `🗑 Delete ${item.deletions!.length} file(s): ${item.deletions!.join(", ")}`;
+          badge.textContent = `🗑 Proposes deleting ${item.deletions!.length} file(s)`;
           marker.append(badge);
         }
-        marker.append(makeToolbar(item, { canApply: true }));
         return;
       }
 
       if (item.status === "error") {
         const badge = document.createElement("span");
         badge.className = "le-inline-badge le-inline-error";
-        badge.textContent = item.error
-          ? `⚠ ${item.error.slice(0, 200)}`
-          : "⚠ Error";
+        badge.textContent = "⚠ Couldn't propose an edit here";
         marker.append(badge);
-        marker.append(makeToolbar(item, { canApply: false }));
         return;
       }
 
@@ -368,20 +304,24 @@ const { filePath } = Astro.props;
       // discarded: leave the marker empty (about to be removed below).
     }
 
-    function pendingText(item: FeedbackItem): string {
-      // The proposal's own "old" text if there's exactly one edit (most
-      // selection-based proposals), otherwise fall back to what was
-      // actually selected.
-      const changes = item.changes ?? [];
-      if (changes.length === 1 && changes[0].edits.length === 1) {
-        return changes[0].edits[0].old;
-      }
-      return item.selection ?? "";
+    // A "whole-note" item is one this component didn't submit itself (the
+    // bar does, via live-edit-bar.astro) - it only picks up ones about
+    // exactly this note (not a merge across several), rendering them at
+    // the top of the article instead of the bar's side panel, which is
+    // what live-edit-bar.astro's own rendersInArticle() skips them for.
+    function isWholeNoteAboutThisFile(item: FeedbackItem): boolean {
+      return (
+        item.kind === "whole-note" &&
+        item.files.length === 1 &&
+        item.files[0] === filePath
+      );
     }
 
     document.addEventListener("le-item", (e) => {
       const item = (e as CustomEvent<FeedbackItem>).detail;
-      if (item.kind !== "selection" || item.files[0] !== filePath) return;
+      const isSelectionOfMine =
+        item.kind === "selection" && item.files[0] === filePath;
+      if (!isSelectionOfMine && !isWholeNoteAboutThisFile(item)) return;
 
       if (item.status === "discarded") {
         markers.get(item.id)?.remove();
@@ -389,12 +329,25 @@ const { filePath } = Astro.props;
         return;
       }
 
-      const marker = markers.get(item.id);
+      let marker = markers.get(item.id);
+      if (!marker && isWholeNoteAboutThisFile(item)) {
+        // First time seeing this one - unlike a selection item (whose
+        // marker is created synchronously on submit, see
+        // "le-selection-submitted" below), a whole-note item's first
+        // sighting here is via this same broadcast, so it's created
+        // lazily right here instead. There's no specific text to anchor
+        // to, so it goes at the top of the article as its own block,
+        // rather than inline mid-paragraph.
+        marker = document.createElement("div");
+        marker.className = "le-marker le-marker-block le-status-queued";
+        article!.prepend(marker);
+        markers.set(item.id, marker);
+      }
       if (marker) renderMarker(item, marker);
-      // An item with no tracked marker here either belongs to a different
-      // page load (this component only anchors items it itself submitted,
-      // since only it has the live Range) or hasn't been created yet by the
-      // "le-selection-submitted" handler below - nothing to render for it.
+      // An item with no tracked marker at this point belongs to a
+      // different page load (this component only anchors selection items
+      // it itself submitted, since only it has the live Range) - nothing
+      // to render for it.
 
       // Applying is the end of this marker's life - leaving "✓ Applied"
       // sitting inline forever is just clutter, so it's cleared out rather
@@ -403,8 +356,9 @@ const { filePath } = Astro.props;
       // completing). The delay is only so the confirmation itself is still
       // visible for a beat.
       if (item.status === "applied" && marker) {
+        const appliedMarker = marker;
         setTimeout(() => {
-          marker.remove();
+          appliedMarker.remove();
           markers.delete(item.id);
         }, APPLIED_REMOVE_DELAY_MS);
       }
@@ -425,12 +379,12 @@ const { filePath } = Astro.props;
       window.getSelection()?.removeAllRanges();
       if (!id) return;
 
+      // Starts hidden - progress lives in the bar's status strip now, not
+      // here, so there's nothing to show inline until the first "le-item"
+      // update carries a proposed/error/applied result.
       const marker = document.createElement("span");
       marker.className = "le-marker le-status-queued";
-      const badge = document.createElement("span");
-      badge.className = "le-inline-badge";
-      badge.textContent = "Sending…";
-      marker.append(badge);
+      marker.hidden = true;
       insertMarker(range, marker);
       markers.set(id, marker);
     });
@@ -445,57 +399,32 @@ const { filePath } = Astro.props;
     font-size: 0.8125rem;
     color: var(--text-primary);
   }
-
-  .le-btn {
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 0.75rem;
-    font-family: var(--font-ui);
-    cursor: pointer;
-    border: 1px solid transparent;
-  }
-
-  .le-btn-primary {
-    background: var(--sem, #2563eb);
-    color: #fff;
-  }
-
-  .le-btn-ghost {
-    background: transparent;
-    border-color: var(--border);
-    color: var(--text-secondary);
-  }
 </style>
 
 <style is:global>
   /* Inline, in the article body - not a corner popup. Global because the
      marker is inserted straight into <article>'s rendered content, outside
      this component's own scoped-style boundary. */
+  /* No box, no border, no background - just text in the article's own
+     flow. The color of the text itself (green for a proposed "after",
+     red for an error, see .le-inline-* below) is what marks it as live-
+     edit content, not a container around it. */
   .le-marker {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
     margin-left: 6px;
-    padding: 2px 8px;
-    border-radius: 6px;
     font-family: var(--font-ui);
     font-size: 0.75rem;
     vertical-align: middle;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
   }
 
-  .le-marker.le-status-proposed {
-    border-color: var(--sem, #2563eb);
-  }
-
-  .le-marker.le-status-error {
-    border-color: #dc2626;
-  }
-
-  .le-marker.le-status-applied {
-    border-color: #16a34a;
+  /* A "whole-note" item (no specific selection to anchor to) - its own
+     paragraph at the top of the article rather than a pill mid-sentence. */
+  .le-marker-block {
+    display: block;
+    margin: 0 0 20px;
   }
 
   .le-inline-badge {
@@ -511,35 +440,19 @@ const { filePath } = Astro.props;
     font-weight: 600;
   }
 
-  .le-inline-del {
-    color: #7f1d1d;
-    background: #fecaca;
-    text-decoration: line-through;
-    padding: 1px 4px;
-    border-radius: 4px;
-  }
-
-  .le-inline-ins {
-    color: #14532d;
-    background: #bbf7d0;
-    text-decoration: none;
-    padding: 1px 4px;
-    border-radius: 4px;
-  }
-
-  .le-inline-toolbar {
-    display: inline-flex;
-    gap: 4px;
+  /* Just the proposed "after" text, colored to read as new/pending - no
+     boxed background, no before/after pair (the "before" is already right
+     there in the article). Block so several edits on one item stack
+     rather than running together. */
+  .le-inline-after {
+    display: block;
+    color: #15803d;
+    white-space: pre-wrap;
   }
 
   :root[data-theme="dark"] {
-    .le-inline-del {
-      background: #7f1d1d;
-      color: #fecaca;
-    }
-    .le-inline-ins {
-      background: #14532d;
-      color: #bbf7d0;
+    .le-inline-after {
+      color: #4ade80;
     }
   }
 </style>

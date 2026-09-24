@@ -16,67 +16,47 @@
 ---
 
 <div id="live-edit-bar">
-  <div class="leb-panel" data-leb-panel hidden>
-    <div class="leb-panel-header">
-      <span>Whole-note / merge feedback</span>
-      <button
-        type="button"
-        class="leb-icon-btn"
-        data-leb-panel-close
-        aria-label="Close panel"
-      >
-        ×
-      </button>
-    </div>
-    <div class="leb-list" data-leb-list></div>
-  </div>
-
   <div class="leb-disabled" data-leb-disabled hidden>
     Live Edit is unavailable.
   </div>
 
-  <div class="leb-bar" data-leb-bar>
-    <div class="leb-files" data-leb-files>
-      <button type="button" class="leb-add-file" data-leb-add-file>
-        + note
-      </button>
-    </div>
+  <div class="leb-dock" data-leb-dock>
+    <div class="leb-status" data-leb-status hidden></div>
 
-    <div class="leb-picker" data-leb-picker hidden>
-      <input
-        type="text"
-        class="leb-picker-input"
-        data-leb-picker-input
-        placeholder="Search notes by title or slug…"
-      />
-      <div class="leb-picker-results" data-leb-picker-results></div>
-    </div>
+    <div class="leb-bar" data-leb-bar>
+      <div class="leb-files" data-leb-files>
+        <button type="button" class="leb-add-file" data-leb-add-file>
+          + note
+        </button>
+      </div>
 
-    <div class="leb-input-row">
-      <select
-        class="leb-backend-select"
-        data-leb-backend-select
-        hidden
-        aria-label="Agent backend"
-      ></select>
-      <textarea
-        class="leb-comment"
-        data-leb-comment
-        placeholder="Feedback on the note(s) above… (⌘/Ctrl+Enter to send)"
-        rows="1"
-      ></textarea>
-      <button
-        type="button"
-        class="leb-icon-btn leb-panel-toggle"
-        data-leb-panel-toggle
-        aria-expanded="false"
-        aria-label="Toggle edit feedback panel"
-      >
-        ✎
-      </button>
-      <button type="button" class="le-btn le-btn-primary" data-leb-send>
-        Send
-      </button>
+      <div class="leb-picker" data-leb-picker hidden>
+        <input
+          type="text"
+          class="leb-picker-input"
+          data-leb-picker-input
+          placeholder="Search notes by title or slug…"
+        />
+        <div class="leb-picker-results" data-leb-picker-results></div>
+      </div>
+
+      <div class="leb-input-row">
+        <select
+          class="leb-backend-select"
+          data-leb-backend-select
+          hidden
+          aria-label="Agent backend"
+        ></select>
+        <textarea
+          class="leb-comment"
+          data-leb-comment
+          placeholder="Feedback on the note(s) above… (⌘/Ctrl+Enter to send)"
+          rows="1"
+        ></textarea>
+        <button type="button" class="le-btn le-btn-primary" data-leb-send>
+          Send
+        </button>
+      </div>
     </div>
   </div>
 
@@ -102,31 +82,7 @@
         <span class="le-item-status" data-le-status></span>
         <span class="le-item-files" data-le-files></span>
       </div>
-      <div class="le-item-comment" data-le-comment-text></div>
-      <div class="le-item-progress" data-le-progress hidden></div>
-      <div class="le-item-summary" data-le-summary hidden></div>
-      <div class="le-item-diff" data-le-diff hidden></div>
-      <div class="le-item-deletions" data-le-deletions hidden></div>
       <div class="le-item-error" data-le-error hidden></div>
-      <div class="le-item-actions" data-le-actions hidden>
-        <button type="button" class="le-btn le-btn-primary" data-le-apply>
-          Apply
-        </button>
-        <button type="button" class="le-btn le-btn-ghost" data-le-discard>
-          Discard
-        </button>
-      </div>
-      <div class="le-item-refine" data-le-refine hidden>
-        <textarea
-          class="le-comment"
-          data-le-refine-input
-          placeholder="Refine…"
-          rows="2"
-        ></textarea>
-        <button type="button" class="le-btn le-btn-ghost" data-le-refine-btn>
-          Send
-        </button>
-      </div>
     </div>
   </template>
 </div>
@@ -137,11 +93,8 @@
     onEnabledChange,
   } from "../../integrations/live-edit/enabled-state.ts";
 
-  interface FileChange {
-    file: string;
-    edits: { old: string; new: string }[];
-  }
-
+  // Edits apply automatically (see index.ts's applyChanges()) - no
+  // "proposed" state to review, no "discarded" to reject out of.
   interface FeedbackItem {
     id: string;
     kind: "selection" | "whole-note";
@@ -149,13 +102,8 @@
     selection?: string;
     heading?: string;
     comment: string;
-    status:
-      "queued" | "running" | "proposed" | "error" | "applied" | "discarded";
+    status: "queued" | "running" | "error" | "applied";
     progress: string[];
-    agentReply?: string;
-    summary?: string;
-    changes?: FileChange[];
-    deletions?: string[];
     error?: string;
     createdAt: number;
     updatedAt: number;
@@ -252,14 +200,7 @@
       root.hidden = !enabled;
     });
 
-    const panel = root.querySelector<HTMLElement>("[data-leb-panel]")!;
-    const panelClose = root.querySelector<HTMLButtonElement>(
-      "[data-leb-panel-close]",
-    )!;
-    const panelToggle = root.querySelector<HTMLButtonElement>(
-      "[data-leb-panel-toggle]",
-    )!;
-    const list = root.querySelector<HTMLElement>("[data-leb-list]")!;
+    const statusList = root.querySelector<HTMLElement>("[data-leb-status]")!;
     const itemTemplate = root.querySelector<HTMLTemplateElement>(
       "[data-leb-item-template]",
     )!;
@@ -286,27 +227,6 @@
     const commentInput =
       root.querySelector<HTMLTextAreaElement>("[data-leb-comment]")!;
     const sendBtn = root.querySelector<HTMLButtonElement>("[data-leb-send]")!;
-
-    // --- panel open/close, persisted across page loads within a tab -----
-
-    function setPanelOpen(open: boolean): void {
-      panel.hidden = !open;
-      panelToggle.setAttribute("aria-expanded", String(open));
-      try {
-        sessionStorage.setItem("le-panel-open", open ? "1" : "0");
-      } catch {
-        // ignore
-      }
-    }
-
-    try {
-      if (sessionStorage.getItem("le-panel-open") === "1") setPanelOpen(true);
-    } catch {
-      // ignore
-    }
-
-    panelToggle.addEventListener("click", () => setPanelOpen(panel.hidden));
-    panelClose.addEventListener("click", () => setPanelOpen(false));
 
     // --- file chips -------------------------------------------------
 
@@ -477,10 +397,11 @@
 
       // A pending selection takes priority: it's what the input's
       // placeholder and chip are currently telling the developer this
-      // comment is about. Submits as a "selection" item, which renders
-      // inline in the article via live-edit.astro rather than in this
-      // bar's own panel - "le-selection-submitted" is how that widget
-      // learns the id to track (or that the request failed).
+      // comment is about. Submits as a "selection" item; its Apply/
+      // Discard/Refine still show up in this bar's status strip like any
+      // other item, but "le-selection-submitted" is also how
+      // live-edit.astro learns the id so it can anchor a lightweight
+      // preview at the actual selection (or that the request failed).
       if (pendingSelection) {
         const { filePath, text, heading, context } = pendingSelection;
         commentInput.value = "";
@@ -512,7 +433,6 @@
 
       if (selectedFiles.length === 0) return;
       commentInput.value = "";
-      setPanelOpen(true);
 
       await fetch("/__live-edit/request", {
         method: "POST",
@@ -534,28 +454,14 @@
     });
 
     // --- item rendering --------------------------------------------------
-
-    // Deleting files is the one destructive action a proposal can carry, so
-    // it gets a distinct confirmation - naming the exact files - on top of
-    // (not instead of) the click on Apply itself. The relay also refuses to
-    // delete without a matching confirmDelete flag in the request body, so
-    // this isn't just a client-side nicety.
-    async function applyItem(item: FeedbackItem): Promise<void> {
-      const deletions = item.deletions ?? [];
-      if (deletions.length > 0) {
-        const ok = window.confirm(
-          `Delete ${deletions.length} file(s)?\n\n${deletions.join("\n")}\n\nThis removes them from disk (recoverable via git, but not from this widget).`,
-        );
-        if (!ok) return;
-        await fetch(`/__live-edit/apply/${item.id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ confirmDelete: true }),
-        });
-        return;
-      }
-      await fetch(`/__live-edit/apply/${item.id}`, { method: "POST" });
-    }
+    //
+    // Edits apply automatically - there's nothing to approve, so this
+    // strip is a status readout, not a review UI: file + progress while
+    // it runs, then either "Applied" (briefly, then removed) or an error
+    // (left up, since there's nothing left to auto-retry and it's worth
+    // noticing). The actual change, once applied, shows inline in the
+    // article by live-edit.astro, right where it landed - not duplicated
+    // here.
 
     const itemEls = new Map<string, HTMLElement>();
 
@@ -566,121 +472,42 @@
           true,
         ) as HTMLElement;
         itemEls.set(item.id, el);
-        list.prepend(el);
+        statusList.prepend(el);
+        statusList.hidden = false;
       }
 
       el.dataset.status = item.status;
-      el.querySelector("[data-le-files]")!.textContent = item.files
-        .map((f) => f.replace(/^docs\//, "").replace(/\.mdx?$/, ""))
+      const filesLabel = item.files
+        .map((f) =>
+          f === currentNoteFile
+            ? "current file"
+            : f.replace(/^docs\//, "").replace(/\.mdx?$/, ""),
+        )
         .join(", ");
-      el.querySelector("[data-le-comment-text]")!.textContent = item.comment;
+      el.querySelector("[data-le-files]")!.textContent = filesLabel;
       el.querySelector("[data-le-status]")!.textContent = statusLabel(item);
-
-      const progressEl = el.querySelector<HTMLElement>("[data-le-progress]")!;
-      progressEl.textContent = item.progress.at(-1) ?? "";
-      progressEl.hidden =
-        item.status !== "running" || item.progress.length === 0;
-
-      const summaryEl = el.querySelector<HTMLElement>("[data-le-summary]")!;
-      summaryEl.textContent = item.summary ?? "";
-      summaryEl.hidden = !item.summary;
-
-      const diffEl = el.querySelector<HTMLElement>("[data-le-diff]")!;
-      diffEl.innerHTML = "";
-      diffEl.hidden = !item.changes || item.changes.length === 0;
-      for (const change of item.changes ?? []) {
-        if ((item.changes?.length ?? 0) > 1) {
-          const label = document.createElement("div");
-          label.className = "le-edit-file";
-          label.textContent = change.file;
-          diffEl.append(label);
-        }
-        for (const edit of change.edits) {
-          const oldEl = document.createElement("del");
-          oldEl.textContent = edit.old;
-          const newEl = document.createElement("ins");
-          newEl.textContent = edit.new;
-          const wrap = document.createElement("div");
-          wrap.className = "le-edit";
-          wrap.append(oldEl, newEl);
-          diffEl.append(wrap);
-        }
-      }
-
-      const deletionsEl = el.querySelector<HTMLElement>("[data-le-deletions]")!;
-      deletionsEl.innerHTML = "";
-      const deletions = item.deletions ?? [];
-      deletionsEl.hidden = deletions.length === 0;
-      if (deletions.length > 0) {
-        const label = document.createElement("div");
-        label.className = "le-deletions-label";
-        label.textContent = `Delete ${deletions.length} file(s):`;
-        deletionsEl.append(label);
-        for (const file of deletions) {
-          const row = document.createElement("div");
-          row.className = "le-deletions-file";
-          row.textContent = file;
-          deletionsEl.append(row);
-        }
-      }
 
       const errorEl = el.querySelector<HTMLElement>("[data-le-error]")!;
       errorEl.textContent = item.error ?? "";
       errorEl.hidden = !item.error;
 
-      const actions = el.querySelector<HTMLElement>("[data-le-actions]")!;
-      actions.hidden = item.status !== "proposed";
-
-      const refineForm = el.querySelector<HTMLElement>("[data-le-refine]")!;
-      refineForm.hidden = !(
-        item.status === "proposed" || item.status === "error"
-      );
-
-      const applyBtn = el.querySelector<HTMLButtonElement>("[data-le-apply]")!;
-      applyBtn.onclick = () => void applyItem(item);
-
-      const discardBtn =
-        el.querySelector<HTMLButtonElement>("[data-le-discard]")!;
-      discardBtn.onclick = () =>
-        fetch(`/__live-edit/discard/${item.id}`, { method: "POST" });
-
-      const refineInput = el.querySelector<HTMLTextAreaElement>(
-        "[data-le-refine-input]",
-      )!;
-      const refineBtn = el.querySelector<HTMLButtonElement>(
-        "[data-le-refine-btn]",
-      )!;
-      refineBtn.onclick = () => {
-        const comment = refineInput.value.trim();
-        if (!comment) return;
-        refineInput.value = "";
-        void fetch(`/__live-edit/refine/${item.id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment }),
-        });
-      };
-
-      // Applying is the end of an item's life in this panel - leaving it
-      // sitting there with a stale diff is just clutter, so it's cleared
-      // out rather than lingering until the eventual file-change reload
-      // (which may be debounced, or may not touch the page you're on if
-      // the applied note isn't the one currently open). The delay is only
-      // so the "Applied" confirmation itself is still visible for a beat.
       if (item.status === "applied") scheduleItemRemoval(item.id);
     }
 
     const APPLIED_REMOVE_DELAY_MS = 1500;
     const removalScheduled = new Set<string>();
 
+    function removeItemEl(id: string): void {
+      itemEls.get(id)?.remove();
+      itemEls.delete(id);
+      removalScheduled.delete(id);
+      statusList.hidden = itemEls.size === 0;
+    }
+
     function scheduleItemRemoval(id: string): void {
       if (removalScheduled.has(id)) return;
       removalScheduled.add(id);
-      setTimeout(() => {
-        itemEls.get(id)?.remove();
-        itemEls.delete(id);
-        removalScheduled.delete(id);
-      }, APPLIED_REMOVE_DELAY_MS);
+      setTimeout(() => removeItemEl(id), APPLIED_REMOVE_DELAY_MS);
     }
 
     function statusLabel(item: FeedbackItem): string {
@@ -688,27 +515,34 @@
         case "queued":
           return "Queued";
         case "running":
-          return "Working…";
-        case "proposed":
-          return "Proposed";
+          return item.progress.at(-1)
+            ? `Working: ${item.progress.at(-1)}`
+            : "Working…";
         case "error":
           return "Error";
         case "applied":
           return "Applied";
-        case "discarded":
-          return "Discarded";
       }
     }
 
-    // This panel only covers "whole-note" items - a "selection" item
-    // renders inline in the article by the per-note widget
-    // (live-edit.astro), which only has the live DOM Range needed to
-    // anchor it. Every item still gets dispatched as an "le-item" DOM
-    // event, which is how that widget learns about updates to items it
-    // submitted, without both components needing to share an EventSource.
+    // Every item - selection or whole-note - gets a row here with its
+    // Apply/Discard/Refine controls, docked right above the input instead
+    // of scattered wherever the item happens to be about. A "selection"
+    // item is *also* dispatched as "le-item" for the per-note widget
+    // (live-edit.astro), which reacts by anchoring a lightweight (button-
+    // free) preview at the actual selection, since only it has the live
+    // DOM Range needed to do that; a "whole-note" item about the note
+    // currently open gets the same treatment there. Neither of those is a
+    // substitute for the row here - it's the only place an item ever gets
+    // Apply/Discard/Refine, and the only preview at all for an item about
+    // a note that isn't the one you're looking at right now.
     function handleItem(item: FeedbackItem): void {
       document.dispatchEvent(new CustomEvent("le-item", { detail: item }));
-      if (item.kind === "whole-note") renderItem(item);
+      if (item.status === "discarded") {
+        removeItemEl(item.id);
+        return;
+      }
+      renderItem(item);
     }
 
     const es = new EventSource("/__live-edit/events");
@@ -762,19 +596,6 @@
     color: var(--text-secondary);
   }
 
-  .leb-icon-btn {
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-primary);
-    width: 30px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    flex: none;
-  }
-
   /* --- disabled notice ------------------------------------------------- */
 
   .leb-disabled {
@@ -797,15 +618,47 @@
     font-family: var(--font-mono);
   }
 
-  /* --- bottom bar ---------------------------------------------------- */
+  /* --- bottom bar + its status strip ----------------------------------- */
 
-  .leb-bar {
+  /* The fixed-positioned element: the status strip (queued/running
+     progress, or a proposed/error item's preview + Apply/Discard/Refine)
+     and the input bar stack as flex children here, so the strip sits
+     directly above the bar with zero gap between them regardless of
+     either one's height - not two independently-positioned elements
+     nudged into place with a magic offset. */
+  .leb-dock {
     position: fixed;
     left: 50%;
     bottom: var(--le-toolbar-clearance, 110px);
     transform: translateX(-50%);
     z-index: 62;
     width: min(640px, calc(100vw - 24px));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leb-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-height: 40vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+  }
+
+  /* Squares off the bar's top edge so it reads as one continuous shape
+     with the strip above it, instead of two separately-rounded boxes with
+     a border where they meet. */
+  .leb-dock:has(.leb-status:not([hidden])) .leb-bar {
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .leb-bar {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -955,49 +808,14 @@
 
   /* --- panel ----------------------------------------------------------- */
 
-  .leb-panel {
-    position: fixed;
-    right: 12px;
-    bottom: calc(var(--le-toolbar-clearance, 110px) + 76px);
-    z-index: 61;
-    width: min(380px, calc(100vw - 24px));
-    max-height: min(65vh, 620px);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    border-radius: 10px;
-    box-shadow: 0 10px 32px rgb(0 0 0 / 0.25);
-    overflow: hidden;
-  }
-
-  .leb-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    font-weight: 700;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .leb-panel-header .leb-icon-btn {
-    width: 24px;
-    height: 24px;
-  }
-
-  .leb-list {
-    overflow-y: auto;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
   .le-item {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 10px;
     background: var(--surface-2);
+  }
+
+  .le-item:first-child {
+    border-radius: 12px 12px 0 0;
   }
 
   .le-item[data-status="error"] {
@@ -1028,59 +846,6 @@
     color: var(--text-secondary);
     text-align: right;
     overflow-wrap: anywhere;
-  }
-
-  .le-item-comment {
-    margin-top: 4px;
-    font-style: italic;
-  }
-
-  .le-item-progress {
-    margin-top: 4px;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-  }
-
-  .le-item-summary {
-    margin-top: 6px;
-    font-weight: 600;
-  }
-
-  .le-item-diff {
-    margin-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 0.75rem;
-  }
-
-  .le-item-diff :global(.le-edit-file) {
-    font-weight: 600;
-    font-size: 0.6875rem;
-    color: var(--text-secondary);
-    margin-top: 4px;
-  }
-
-  .le-item-diff :global(.le-edit) {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .le-item-diff :global(del) {
-    background: #fecaca;
-    color: #7f1d1d;
-    text-decoration: line-through;
-    padding: 2px 4px;
-    border-radius: 4px;
-  }
-
-  .le-item-diff :global(ins) {
-    background: #bbf7d0;
-    color: #14532d;
-    text-decoration: none;
-    padding: 2px 4px;
-    border-radius: 4px;
   }
 
   .le-item-deletions {
@@ -1119,16 +884,5 @@
 
   .le-item-refine {
     flex-direction: column;
-  }
-
-  :root[data-theme="dark"] {
-    .le-item-diff :global(del) {
-      background: #7f1d1d;
-      color: #fecaca;
-    }
-    .le-item-diff :global(ins) {
-      background: #14532d;
-      color: #bbf7d0;
-    }
   }
 </style>
