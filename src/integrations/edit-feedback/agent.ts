@@ -33,6 +33,14 @@ export interface ClaudeStreamAdapterOptions {
   // A previously-persisted session id to resume instead of starting fresh
   // (e.g. after a dev-server restart).
   initialSessionId?: string;
+  // Routed through index.ts to the Astro integration logger, so this
+  // module's output (spawn events, the claude child's stderr, a bad exit
+  // code) is timestamped and labeled the same as the rest of `astro dev`'s
+  // terminal output, not a differently-formatted bare console.log. Defaults
+  // to console.log/console.error for direct use outside that context (e.g.
+  // this module's own tests).
+  log?: (message: string) => void;
+  logError?: (message: string) => void;
 }
 
 type Waiter = {
@@ -91,12 +99,17 @@ export class ClaudeStreamAdapter implements AgentAdapter {
   private sessionId: string | null = null;
   private busy = false;
   private queue = new LineQueue();
+  private readonly log: (message: string) => void;
+  private readonly logError: (message: string) => void;
 
   constructor(opts: ClaudeStreamAdapterOptions) {
     this.cwd = opts.cwd;
     this.model = opts.model;
     this.spawnFn = opts.spawnFn ?? spawn;
     this.sessionId = opts.initialSessionId ?? null;
+    this.log = opts.log ?? ((m) => console.log(`[edit-feedback] ${m}`));
+    this.logError =
+      opts.logError ?? ((m) => console.error(`[edit-feedback] ${m}`));
   }
 
   reset(): void {
@@ -147,8 +160,8 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       args.push("--session-id", this.sessionId);
     }
 
-    console.log(
-      `[edit-feedback] spawning claude (${resuming ? "resuming" : "new"} session ${this.sessionId.slice(0, 8)}${this.model ? `, model ${this.model}` : ""})`,
+    this.log(
+      `spawning claude (${resuming ? "resuming" : "new"} session ${this.sessionId.slice(0, 8)}${this.model ? `, model ${this.model}` : ""})`,
     );
 
     const child = this.spawnFn("claude", args, {
@@ -180,7 +193,7 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       // an auth error, a bad flag) is visible immediately rather than only
       // as a generic "process exited unexpectedly" on the next turn.
       for (const line of data.toString().split("\n")) {
-        if (line.trim()) console.error(`[edit-feedback:claude] ${line}`);
+        if (line.trim()) this.logError(`claude: ${line}`);
       }
     });
 
@@ -188,9 +201,7 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       if (this.child !== child) return;
       this.child = null;
       if (code !== 0) {
-        console.error(
-          `[edit-feedback] claude process exited with code ${code}`,
-        );
+        this.logError(`claude process exited with code ${code}`);
       }
       this.queue.failAll(
         new Error(`claude process exited unexpectedly (code ${code})`),

@@ -117,6 +117,7 @@ export default defineConfig({
       optimize: false,
     }),
     notesStyleValidator(),
+    editFeedback(),
   ],
   markdown: {
     processor: unified({
@@ -131,12 +132,7 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [
-      tailwindcss(),
-      servePagefindDev(),
-      devReloadLock(),
-      editFeedback(),
-    ],
+    plugins: [tailwindcss(), servePagefindDev(), devReloadLock()],
     build: {
       // ponytail: lightningcss fails with Tailwind v4 CSS under Vite 8/rolldown; esbuild works fine
       cssMinify: "esbuild",

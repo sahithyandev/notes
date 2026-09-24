@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, extname, join, relative } from "node:path";
 import { spawn } from "node:child_process";
-import type { Plugin, ViteDevServer } from "vite";
+import type { AstroIntegration, AstroIntegrationLogger } from "astro";
+import type { ViteDevServer } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import {
   ClaudeStreamAdapter,
@@ -59,11 +60,16 @@ const SESSION_FILE = "edit-feedback-session";
 // "select text, get an edit" feedback loop (plus a site-wide whole-note /
 // multi-note variant for merges). Turns run one at a time against one
 // long-lived `claude -p --input-format stream-json` process (agent.ts), so
-// prompt cache and conversation context are shared across requests.
-export default function editFeedback(): Plugin {
+// prompt cache and conversation context are shared across requests. A
+// proper AstroIntegration (not a raw Vite plugin) so `astro:server:setup`
+// gives us an AstroIntegrationLogger - the terminal output this produces
+// then matches the rest of `astro dev`'s output (timestamped, labeled
+// "edit-feedback"), the same as module-redirects and notes-style-validator.
+export default function editFeedback(): AstroIntegration {
   let root = process.cwd();
   let docsRoot = join(root, "docs");
   let tmpDir = join(root, ".tmp");
+  let logger: AstroIntegrationLogger | null = null;
 
   const items = new Map<string, FeedbackItem>();
   const clients = new Set<ServerResponse>();
@@ -71,14 +77,9 @@ export default function editFeedback(): Plugin {
   let draining = false;
   let adapter: AgentAdapter | null = null;
 
-  // So progress is visible in the terminal running `bun dev`, not just in
-  // the browser - console.log rather than Vite's own logger, since that
-  // logger's methods aren't available until configureServer runs but items
-  // can be created and progress on them logged from helpers called before
-  // that (and it's simpler to have one code path either way).
   function log(item: FeedbackItem, message: string): void {
     const label = item.files.join(", ");
-    console.log(`[edit-feedback] ${item.id.slice(0, 8)} ${label}: ${message}`);
+    logger?.info(`${item.id.slice(0, 8)} ${label}: ${message}`);
   }
 
   function getAdapter(initialSessionId?: string): AgentAdapter {
@@ -87,6 +88,8 @@ export default function editFeedback(): Plugin {
         cwd: root,
         model: process.env.EDIT_FEEDBACK_MODEL,
         initialSessionId,
+        log: (m) => logger?.info(m),
+        logError: (m) => logger?.error(m),
       });
     }
     return adapter;
@@ -281,237 +284,248 @@ export default function editFeedback(): Plugin {
 
   return {
     name: "edit-feedback",
-    apply: "serve",
-    configResolved(config) {
-      root = config.root;
-      docsRoot = join(root, "docs");
-      tmpDir = join(root, ".tmp");
-    },
-    async configureServer(server: ViteDevServer) {
-      if (process.env.EDIT_FEEDBACK === "0") {
-        console.log("[edit-feedback] disabled (EDIT_FEEDBACK=0)");
-        return;
-      }
+    hooks: {
+      "astro:config:setup": ({ config }) => {
+        root = config.root.pathname.replace(/\/$/, "");
+        docsRoot = join(root, "docs");
+        tmpDir = join(root, ".tmp");
+      },
+      "astro:server:setup": async ({
+        server,
+        logger: serverLogger,
+      }: {
+        server: ViteDevServer;
+        logger: AstroIntegrationLogger;
+      }) => {
+        logger = serverLogger;
 
-      // Awaited before the server starts accepting requests, so the very
-      // first turn already resumes the persisted session instead of racing
-      // a fresh one into existence.
-      const persistedSessionId = await loadPersistedSessionId();
-      if (persistedSessionId) getAdapter(persistedSessionId);
-
-      const model = process.env.EDIT_FEEDBACK_MODEL || "default";
-      console.log(
-        persistedSessionId
-          ? `[edit-feedback] ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
-          : `[edit-feedback] ready, will start a new session on first request (model: ${model})`,
-      );
-      console.log(
-        `[edit-feedback] routes: POST /__edit-feedback/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__edit-feedback/{events,notes}`,
-      );
-
-      const closeAll = () => {
-        for (const res of clients) res.end();
-        clients.clear();
-        adapter?.dispose();
-        adapter = null;
-      };
-      server.httpServer?.on("close", closeAll);
-      process.on("exit", closeAll);
-
-      server.middlewares.use((req, res, next) => {
-        const url = req.url?.split("?")[0] ?? "";
-        if (!url.startsWith("/__edit-feedback/")) return next();
-
-        handleRoute(req, res, url).catch((err) => {
-          if (!res.headersSent) {
-            sendJson(res, 500, {
-              error: err instanceof Error ? err.message : String(err),
-            });
-          }
-        });
-      });
-
-      async function handleRoute(
-        req: IncomingMessage,
-        res: ServerResponse,
-        url: string,
-      ): Promise<void> {
-        if (url === "/__edit-feedback/events" && req.method === "GET") {
-          res.writeHead(200, {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
-          });
-          res.write(
-            `data: ${JSON.stringify({ type: "snapshot", items: [...items.values()] })}\n\n`,
-          );
-          clients.add(res);
-          req.on("close", () => clients.delete(res));
+        if (process.env.EDIT_FEEDBACK === "0") {
+          logger.info("disabled (EDIT_FEEDBACK=0)");
           return;
         }
 
-        // Backs the site-wide bar's file picker: every note's path, slug,
-        // and title, read straight off disk (no Astro content-collection
-        // boot needed here, same as scripts/check-notes-style.ts).
-        if (url === "/__edit-feedback/notes" && req.method === "GET") {
-          const notes = scanFiles(docsRoot).map((f) => ({
-            file: relative(root, f.file),
-            slug: f.slug,
-            title: f.title,
-          }));
-          return sendJson(res, 200, { notes });
-        }
+        // Awaited before the server starts accepting requests, so the very
+        // first turn already resumes the persisted session instead of
+        // racing a fresh one into existence.
+        const persistedSessionId = await loadPersistedSessionId();
+        if (persistedSessionId) getAdapter(persistedSessionId);
 
-        if (url === "/__edit-feedback/request" && req.method === "POST") {
-          const body = await readJsonBody<FeedbackRequest>(req);
-          const item = buildItem(body);
-          if (!item)
-            return sendJson(res, 400, { error: "missing required fields" });
-          items.set(item.id, item);
-          broadcast(item);
-          log(item, `queued (${item.kind}): ${item.comment.slice(0, 120)}`);
-          enqueue({ itemId: item.id, message: buildRequestMessage(body) });
-          return sendJson(res, 200, { id: item.id });
-        }
+        const model = process.env.EDIT_FEEDBACK_MODEL || "default";
+        logger.info(
+          persistedSessionId
+            ? `ready, resuming session ${persistedSessionId.slice(0, 8)} (model: ${model})`
+            : `ready, will start a new session on first request (model: ${model})`,
+        );
+        logger.info(
+          `routes: POST /__edit-feedback/{request,apply/:id,discard/:id,refine/:id,reset}, GET /__edit-feedback/{events,notes}`,
+        );
 
-        const applyMatch = url.match(/^\/__edit-feedback\/apply\/([^/]+)$/);
-        if (applyMatch && req.method === "POST") {
-          return handleApply(res, applyMatch[1]);
-        }
+        const closeAll = () => {
+          for (const res of clients) res.end();
+          clients.clear();
+          adapter?.dispose();
+          adapter = null;
+        };
+        server.httpServer?.on("close", closeAll);
+        process.on("exit", closeAll);
 
-        const discardMatch = url.match(/^\/__edit-feedback\/discard\/([^/]+)$/);
-        if (discardMatch && req.method === "POST") {
-          const item = items.get(discardMatch[1]);
-          if (!item) return sendJson(res, 404, { error: "not found" });
-          item.status = "discarded";
-          touch(item);
-          log(item, "discarded");
-          return sendJson(res, 200, { ok: true });
-        }
+        server.middlewares.use((req, res, next) => {
+          const url = req.url?.split("?")[0] ?? "";
+          if (!url.startsWith("/__edit-feedback/")) return next();
 
-        const refineMatch = url.match(/^\/__edit-feedback\/refine\/([^/]+)$/);
-        if (refineMatch && req.method === "POST") {
-          const item = items.get(refineMatch[1]);
-          if (!item) return sendJson(res, 404, { error: "not found" });
-          const body = await readJsonBody<{ comment: string }>(req);
-          if (!body.comment)
-            return sendJson(res, 400, { error: "missing comment" });
-          item.status = "queued";
-          touch(item);
-          log(item, `refine: ${body.comment.slice(0, 120)}`);
-          enqueue({
-            itemId: item.id,
-            message: buildRefineMessage(body.comment),
+          handleRoute(req, res, url).catch((err) => {
+            if (!res.headersSent) {
+              sendJson(res, 500, {
+                error: err instanceof Error ? err.message : String(err),
+              });
+            }
           });
-          return sendJson(res, 200, { ok: true });
-        }
+        });
 
-        if (url === "/__edit-feedback/reset" && req.method === "POST") {
-          adapter?.reset();
-          console.log("[edit-feedback] session reset");
-          return sendJson(res, 200, { ok: true });
-        }
-
-        return sendJson(res, 404, { error: "no such edit-feedback route" });
-      }
-
-      function buildItem(body: FeedbackRequest): FeedbackItem | null {
-        if (!body || !body.comment) return null;
-
-        if (body.kind === "selection") {
-          if (!body.filePath || !body.selection) return null;
-          return {
-            id: randomUUID(),
-            kind: "selection",
-            files: [body.filePath],
-            selection: body.selection,
-            heading: body.heading,
-            comment: body.comment,
-            status: "queued",
-            progress: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          };
-        }
-
-        if (body.kind === "whole-note") {
-          if (!Array.isArray(body.files) || body.files.length === 0)
-            return null;
-          return {
-            id: randomUUID(),
-            kind: "whole-note",
-            files: body.files,
-            comment: body.comment,
-            status: "queued",
-            progress: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          };
-        }
-
-        return null;
-      }
-
-      async function handleApply(
-        res: ServerResponse,
-        id: string,
-      ): Promise<void> {
-        const item = items.get(id);
-        if (!item) return sendJson(res, 404, { error: "not found" });
-        if (item.status !== "proposed" || !item.changes) {
-          return sendJson(res, 400, {
-            error: "item is not in a proposed state",
-          });
-        }
-
-        let result;
-        try {
-          result = await applyProposal(docsRoot, item.changes);
-        } catch (err) {
-          if (err instanceof PathOutsideDocsError) {
-            item.status = "error";
-            item.error = err.message;
-            touch(item);
-            return sendJson(res, 400, { error: err.message });
+        async function handleRoute(
+          req: IncomingMessage,
+          res: ServerResponse,
+          url: string,
+        ): Promise<void> {
+          if (url === "/__edit-feedback/events" && req.method === "GET") {
+            res.writeHead(200, {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            });
+            res.write(
+              `data: ${JSON.stringify({ type: "snapshot", items: [...items.values()] })}\n\n`,
+            );
+            clients.add(res);
+            req.on("close", () => clients.delete(res));
+            return;
           }
-          throw err;
+
+          // Backs the site-wide bar's file picker: every note's path, slug,
+          // and title, read straight off disk (no Astro content-collection
+          // boot needed here, same as scripts/check-notes-style.ts).
+          if (url === "/__edit-feedback/notes" && req.method === "GET") {
+            const notes = scanFiles(docsRoot).map((f) => ({
+              file: relative(root, f.file),
+              slug: f.slug,
+              title: f.title,
+            }));
+            return sendJson(res, 200, { notes });
+          }
+
+          if (url === "/__edit-feedback/request" && req.method === "POST") {
+            const body = await readJsonBody<FeedbackRequest>(req);
+            const item = buildItem(body);
+            if (!item)
+              return sendJson(res, 400, { error: "missing required fields" });
+            items.set(item.id, item);
+            broadcast(item);
+            log(item, `queued (${item.kind}): ${item.comment.slice(0, 120)}`);
+            enqueue({ itemId: item.id, message: buildRequestMessage(body) });
+            return sendJson(res, 200, { id: item.id });
+          }
+
+          const applyMatch = url.match(/^\/__edit-feedback\/apply\/([^/]+)$/);
+          if (applyMatch && req.method === "POST") {
+            return handleApply(res, applyMatch[1]);
+          }
+
+          const discardMatch = url.match(
+            /^\/__edit-feedback\/discard\/([^/]+)$/,
+          );
+          if (discardMatch && req.method === "POST") {
+            const item = items.get(discardMatch[1]);
+            if (!item) return sendJson(res, 404, { error: "not found" });
+            item.status = "discarded";
+            touch(item);
+            log(item, "discarded");
+            return sendJson(res, 200, { ok: true });
+          }
+
+          const refineMatch = url.match(/^\/__edit-feedback\/refine\/([^/]+)$/);
+          if (refineMatch && req.method === "POST") {
+            const item = items.get(refineMatch[1]);
+            if (!item) return sendJson(res, 404, { error: "not found" });
+            const body = await readJsonBody<{ comment: string }>(req);
+            if (!body.comment)
+              return sendJson(res, 400, { error: "missing comment" });
+            item.status = "queued";
+            touch(item);
+            log(item, `refine: ${body.comment.slice(0, 120)}`);
+            enqueue({
+              itemId: item.id,
+              message: buildRefineMessage(body.comment),
+            });
+            return sendJson(res, 200, { ok: true });
+          }
+
+          if (url === "/__edit-feedback/reset" && req.method === "POST") {
+            adapter?.reset();
+            logger?.info("session reset");
+            return sendJson(res, 200, { ok: true });
+          }
+
+          return sendJson(res, 404, { error: "no such edit-feedback route" });
         }
 
-        if (!result.ok) {
-          if (item.mismatchRetried) {
-            item.status = "error";
-            item.error = result.fileMismatches
-              .map(
-                (fm) =>
-                  `${fm.file}: ${fm.mismatches.map((m) => `"${m.old}" found ${m.occurrences}x`).join("; ")}`,
-              )
-              .join(" | ");
-            touch(item);
-            log(item, `apply failed (already retried once): ${item.error}`);
-            return sendJson(res, 409, {
-              ok: false,
-              fileMismatches: result.fileMismatches,
+        function buildItem(body: FeedbackRequest): FeedbackItem | null {
+          if (!body || !body.comment) return null;
+
+          if (body.kind === "selection") {
+            if (!body.filePath || !body.selection) return null;
+            return {
+              id: randomUUID(),
+              kind: "selection",
+              files: [body.filePath],
+              selection: body.selection,
+              heading: body.heading,
+              comment: body.comment,
+              status: "queued",
+              progress: [],
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            };
+          }
+
+          if (body.kind === "whole-note") {
+            if (!Array.isArray(body.files) || body.files.length === 0)
+              return null;
+            return {
+              id: randomUUID(),
+              kind: "whole-note",
+              files: body.files,
+              comment: body.comment,
+              status: "queued",
+              progress: [],
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            };
+          }
+
+          return null;
+        }
+
+        async function handleApply(
+          res: ServerResponse,
+          id: string,
+        ): Promise<void> {
+          const item = items.get(id);
+          if (!item) return sendJson(res, 404, { error: "not found" });
+          if (item.status !== "proposed" || !item.changes) {
+            return sendJson(res, 400, {
+              error: "item is not in a proposed state",
             });
           }
-          item.mismatchRetried = true;
-          item.status = "queued";
+
+          let result;
+          try {
+            result = await applyProposal(docsRoot, item.changes);
+          } catch (err) {
+            if (err instanceof PathOutsideDocsError) {
+              item.status = "error";
+              item.error = err.message;
+              touch(item);
+              return sendJson(res, 400, { error: err.message });
+            }
+            throw err;
+          }
+
+          if (!result.ok) {
+            if (item.mismatchRetried) {
+              item.status = "error";
+              item.error = result.fileMismatches
+                .map(
+                  (fm) =>
+                    `${fm.file}: ${fm.mismatches.map((m) => `"${m.old}" found ${m.occurrences}x`).join("; ")}`,
+                )
+                .join(" | ");
+              touch(item);
+              log(item, `apply failed (already retried once): ${item.error}`);
+              return sendJson(res, 409, {
+                ok: false,
+                fileMismatches: result.fileMismatches,
+              });
+            }
+            item.mismatchRetried = true;
+            item.status = "queued";
+            touch(item);
+            log(item, "apply mismatch, asking agent to re-propose");
+            enqueue({
+              itemId: item.id,
+              message: buildMismatchMessage(result.fileMismatches),
+            });
+            return sendJson(res, 200, { ok: false, retried: true });
+          }
+
+          item.status = "applied";
+          item.error = undefined;
           touch(item);
-          log(item, "apply mismatch, asking agent to re-propose");
-          enqueue({
-            itemId: item.id,
-            message: buildMismatchMessage(result.fileMismatches),
-          });
-          return sendJson(res, 200, { ok: false, retried: true });
+          log(item, "applied");
+          sendJson(res, 200, { ok: true });
+
+          void runStyleCheckFollowup(item);
         }
-
-        item.status = "applied";
-        item.error = undefined;
-        touch(item);
-        log(item, "applied");
-        sendJson(res, 200, { ok: true });
-
-        void runStyleCheckFollowup(item);
-      }
+      },
     },
   };
 }
