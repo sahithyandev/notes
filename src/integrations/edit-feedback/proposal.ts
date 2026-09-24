@@ -6,10 +6,14 @@ export interface ProposedEdit {
   new: string;
 }
 
-export interface Proposal {
+export interface FileChange {
   file: string;
-  summary: string;
   edits: ProposedEdit[];
+}
+
+export interface Proposal {
+  summary: string;
+  changes: FileChange[];
 }
 
 export class ProposalParseError extends Error {}
@@ -17,7 +21,9 @@ export class ProposalParseError extends Error {}
 // Finds the last ```json fenced block in the agent's reply and validates its
 // shape. The agent is instructed (see prompt.ts) to end every reply with
 // exactly one such block; "last" guards against an example block earlier in
-// a longer explanation being picked up by mistake.
+// a longer explanation being picked up by mistake. A proposal can touch
+// several files at once (e.g. merging content between two notes), so it's a
+// list of per-file changes rather than a single file + edits pair.
 export function parseProposal(text: string): Proposal {
   const matches = [...text.matchAll(/```json\s*\n([\s\S]*?)```/g)];
   if (matches.length === 0) {
@@ -39,33 +45,51 @@ export function parseProposal(text: string): Proposal {
   }
   const obj = parsed as Record<string, unknown>;
 
-  if (typeof obj.file !== "string" || obj.file.length === 0) {
-    throw new ProposalParseError("Proposal.file must be a non-empty string");
-  }
   if (typeof obj.summary !== "string" || obj.summary.length === 0) {
     throw new ProposalParseError("Proposal.summary must be a non-empty string");
   }
-  if (!Array.isArray(obj.edits) || obj.edits.length === 0) {
-    throw new ProposalParseError("Proposal.edits must be a non-empty array");
+  if (!Array.isArray(obj.changes) || obj.changes.length === 0) {
+    throw new ProposalParseError("Proposal.changes must be a non-empty array");
   }
 
-  const edits: ProposedEdit[] = obj.edits.map((e, i) => {
-    if (typeof e !== "object" || e === null) {
-      throw new ProposalParseError(`Proposal.edits[${i}] must be an object`);
+  const changes: FileChange[] = obj.changes.map((c, i) => {
+    if (typeof c !== "object" || c === null) {
+      throw new ProposalParseError(`Proposal.changes[${i}] must be an object`);
     }
-    const edit = e as Record<string, unknown>;
-    if (typeof edit.old !== "string" || edit.old.length === 0) {
+    const change = c as Record<string, unknown>;
+    if (typeof change.file !== "string" || change.file.length === 0) {
       throw new ProposalParseError(
-        `Proposal.edits[${i}].old must be a non-empty string`,
+        `Proposal.changes[${i}].file must be a non-empty string`,
       );
     }
-    if (typeof edit.new !== "string") {
-      throw new ProposalParseError(`Proposal.edits[${i}].new must be a string`);
+    if (!Array.isArray(change.edits) || change.edits.length === 0) {
+      throw new ProposalParseError(
+        `Proposal.changes[${i}].edits must be a non-empty array`,
+      );
     }
-    return { old: edit.old, new: edit.new };
+    const edits: ProposedEdit[] = change.edits.map((e, j) => {
+      if (typeof e !== "object" || e === null) {
+        throw new ProposalParseError(
+          `Proposal.changes[${i}].edits[${j}] must be an object`,
+        );
+      }
+      const edit = e as Record<string, unknown>;
+      if (typeof edit.old !== "string" || edit.old.length === 0) {
+        throw new ProposalParseError(
+          `Proposal.changes[${i}].edits[${j}].old must be a non-empty string`,
+        );
+      }
+      if (typeof edit.new !== "string") {
+        throw new ProposalParseError(
+          `Proposal.changes[${i}].edits[${j}].new must be a string`,
+        );
+      }
+      return { old: edit.old, new: edit.new };
+    });
+    return { file: change.file, edits };
   });
 
-  return { file: obj.file, summary: obj.summary, edits };
+  return { summary: obj.summary, changes };
 }
 
 export interface EditMismatch {
@@ -120,28 +144,53 @@ export function resolveDocPath(docsRoot: string, file: string): string {
   return resolved;
 }
 
-export interface ApplyResult {
-  ok: boolean;
+export interface FileMismatch {
+  file: string;
   mismatches: EditMismatch[];
 }
 
-// Applies all edits in one pass only if every one of them is unambiguous;
-// otherwise nothing is written and the mismatches are returned so the caller
-// can report them back to the agent for a corrected proposal.
-export async function applyEdits(
-  absPath: string,
-  edits: ProposedEdit[],
+export interface ApplyResult {
+  ok: boolean;
+  fileMismatches: FileMismatch[];
+}
+
+// Applies every file's edits in one pass, only if every edit in every file
+// is unambiguous - across the whole proposal, not just one file at a time,
+// so a cross-note merge either lands completely or not at all. Nothing is
+// written if any file has a mismatch; the mismatches are returned so the
+// caller can report them back to the agent for a corrected proposal.
+export async function applyProposal(
+  docsRoot: string,
+  changes: FileChange[],
 ): Promise<ApplyResult> {
-  const content = await readFile(absPath, "utf-8");
-  const mismatches = checkEdits(content, edits);
-  if (mismatches.length > 0) {
-    return { ok: false, mismatches };
+  const resolved = changes.map((c) => ({
+    change: c,
+    absPath: resolveDocPath(docsRoot, c.file),
+  }));
+
+  const contents = await Promise.all(
+    resolved.map(({ absPath }) => readFile(absPath, "utf-8")),
+  );
+
+  const fileMismatches: FileMismatch[] = [];
+  for (let i = 0; i < resolved.length; i++) {
+    const mismatches = checkEdits(contents[i], resolved[i].change.edits);
+    if (mismatches.length > 0) {
+      fileMismatches.push({ file: resolved[i].change.file, mismatches });
+    }
+  }
+  if (fileMismatches.length > 0) {
+    return { ok: false, fileMismatches };
   }
 
-  let next = content;
-  for (const edit of edits) {
-    next = next.replace(edit.old, edit.new);
-  }
-  await writeFile(absPath, next, "utf-8");
-  return { ok: true, mismatches: [] };
+  await Promise.all(
+    resolved.map(({ change, absPath }, i) => {
+      let next = contents[i];
+      for (const edit of change.edits) {
+        next = next.replace(edit.old, edit.new);
+      }
+      return writeFile(absPath, next, "utf-8");
+    }),
+  );
+  return { ok: true, fileMismatches: [] };
 }

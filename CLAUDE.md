@@ -33,18 +33,24 @@ Regardless of the above, still make all edits to a given note in one pass (draft
 
 ### Edit feedback (dev only)
 
-`src/integrations/edit-feedback/` is a dev-only Vite plugin that lets you select text on a rendered note in the browser, attach a comment, and get a proposed edit back without leaving the browser. It's rendered by `src/components/dev/edit-feedback.astro` under `import.meta.env.DEV` (nothing ships in a production build) and wired into `astro.config.mjs`'s `vite.plugins` next to `devReloadLock()`.
+`src/integrations/edit-feedback/` is a dev-only Vite plugin that lets you attach feedback to notes in the browser and get a proposed edit back, without leaving the browser. Nothing ships in a production build. Two widgets feed it:
 
-It runs one long-lived `claude -p --input-format stream-json --output-format stream-json` process (`agent.ts`), fed one user message per feedback request over its stdin, so the conversation and prompt cache carry across requests instead of being rebuilt each time. The agent can only `Read`/`Glob`/`Grep`/`Skill` plus run `bun run check-notes-style`; it never gets `Edit`/`Write`. Every reply ends with a fenced ` ```json ` proposal block (`{ file, summary, edits: [{ old, new }] }`), which `proposal.ts` parses and validates (each `old` must match the file's current content exactly once) before the relay applies it, only once you click Apply in the browser panel.
+- `src/components/dev/edit-feedback.astro` - per-note, rendered by `[...slug].astro` under `import.meta.env.DEV`. Select text in the article to get a "Suggest edit" button (it only appears once the selection settles on mouseup/touchend/keyup, not while dragging, and after a short delay to avoid flashing), which opens a popover for a comment. Submits a `kind: "selection"` request.
+- `src/components/dev/edit-feedback-bar.astro` - site-wide, rendered by `Layout.astro` (present on every page, note or not). A floating bar at the bottom for whole-note feedback ("tighten this note") or a cross-note merge ("fold this into that note"): pick one or more notes via the `+ note` file picker (backed by `GET /__edit-feedback/notes`, defaulting to the current note if you're on one), write a comment, send. Submits a `kind: "whole-note"` request with a `files` array. This component also owns the review panel (Apply/Discard/Refine, opened automatically when either widget submits), since items can span notes and aren't scoped to one page.
+
+Both wired into `astro.config.mjs` (`editFeedback()` in `vite.plugins`, next to `devReloadLock()`) and `Layout.astro`/`[...slug].astro` respectively.
+
+It runs one long-lived `claude -p --input-format stream-json --output-format stream-json` process (`agent.ts`), fed one user message per feedback request over its stdin, so the conversation and prompt cache carry across requests instead of being rebuilt each time. The agent can only `Read`/`Glob`/`Grep`/`Skill` plus run `bun run check-notes-style`; it never gets `Edit`/`Write`. Every reply ends with a fenced ` ```json ` proposal block, `{ summary, changes: [{ file, edits: [{ old, new }] }] }` - `changes` can list more than one file for a merge - which `proposal.ts` parses and validates (each `old` must match its file's current content exactly once, across every file in the proposal) before the relay applies it, only once you click Apply in the browser panel; a proposal with any mismatched file writes nothing.
 
 Routes on the dev server (`localhost:4321`):
 
-- `POST /__edit-feedback/request` - submit a new feedback item.
+- `GET /__edit-feedback/notes` - every note's path/slug/title, for the bar's file picker.
+- `POST /__edit-feedback/request` - submit a new feedback item (`kind: "selection"` or `"whole-note"`).
 - `POST /__edit-feedback/apply/:id`, `POST /__edit-feedback/discard/:id`, `POST /__edit-feedback/refine/:id` - act on an item.
 - `POST /__edit-feedback/reset` - drop the current agent session and start a new one.
 - `GET /__edit-feedback/events` - SSE stream of item state.
 
-The session id is persisted to `.tmp/edit-feedback-session` (gitignored) so a dev-server restart resumes the same conversation instead of starting cold. `EDIT_FEEDBACK_MODEL` overrides the model; `EDIT_FEEDBACK=0` disables the plugin entirely.
+The session id is persisted to `.tmp/edit-feedback-session` (gitignored) so a dev-server restart resumes the same conversation instead of starting cold. **Resuming keeps the session's original system prompt** even though `agent.ts` passes the current `SYSTEM_PROMPT` on every spawn - a `claude` CLI behavior, not a bug here - so if you change `SYSTEM_PROMPT` (e.g. the proposal JSON contract) and want the running dev session to pick it up, `POST /__edit-feedback/reset` (or delete `.tmp/edit-feedback-session` before starting `bun dev`) instead of just restarting the server. `EDIT_FEEDBACK_MODEL` overrides the model; `EDIT_FEEDBACK=0` disables the plugin entirely.
 
 ## Writing notes
 

@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { mkdtemp, writeFile, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -8,41 +8,64 @@ import {
   checkEdits,
   resolveDocPath,
   PathOutsideDocsError,
-  applyEdits,
+  applyProposal,
 } from "./proposal.ts";
 
-test("parses a well-formed proposal block", () => {
+test("parses a well-formed single-file proposal", () => {
   const reply = `Here's my suggestion.
 
 \`\`\`json
 {
-  "file": "docs/s1/foo.md",
   "summary": "Shorten the sentence",
-  "edits": [{ "old": "the quick brown fox", "new": "the fox" }]
+  "changes": [
+    {
+      "file": "docs/s1/foo.md",
+      "edits": [{ "old": "the quick brown fox", "new": "the fox" }]
+    }
+  ]
 }
 \`\`\`
 `;
   const proposal = parseProposal(reply);
-  expect(proposal.file).toBe("docs/s1/foo.md");
   expect(proposal.summary).toBe("Shorten the sentence");
-  expect(proposal.edits).toEqual([
-    { old: "the quick brown fox", new: "the fox" },
+  expect(proposal.changes).toEqual([
+    {
+      file: "docs/s1/foo.md",
+      edits: [{ old: "the quick brown fox", new: "the fox" }],
+    },
   ]);
+});
+
+test("parses a proposal that touches several files", () => {
+  const reply = `\`\`\`json
+{
+  "summary": "Merge the intro into the overview note",
+  "changes": [
+    { "file": "docs/a.md", "edits": [{ "old": "x", "new": "" }] },
+    { "file": "docs/b.md", "edits": [{ "old": "y", "new": "x plus y" }] }
+  ]
+}
+\`\`\`
+`;
+  const proposal = parseProposal(reply);
+  expect(proposal.changes).toHaveLength(2);
+  expect(proposal.changes[0].file).toBe("docs/a.md");
+  expect(proposal.changes[1].file).toBe("docs/b.md");
 });
 
 test("uses the last json block when several are present", () => {
   const reply = `An example:
 \`\`\`json
-{"file": "example.md", "summary": "example", "edits": [{"old": "x", "new": "y"}]}
+{"summary": "example", "changes": [{"file": "example.md", "edits": [{"old": "x", "new": "y"}]}]}
 \`\`\`
 
 My actual proposal:
 \`\`\`json
-{"file": "docs/real.md", "summary": "real", "edits": [{"old": "a", "new": "b"}]}
+{"summary": "real", "changes": [{"file": "docs/real.md", "edits": [{"old": "a", "new": "b"}]}]}
 \`\`\`
 `;
   const proposal = parseProposal(reply);
-  expect(proposal.file).toBe("docs/real.md");
+  expect(proposal.changes[0].file).toBe("docs/real.md");
 });
 
 test("throws when no json block is present", () => {
@@ -54,13 +77,20 @@ test("throws on invalid json", () => {
   expect(() => parseProposal(reply)).toThrow(ProposalParseError);
 });
 
-test("throws when required fields are missing", () => {
-  const reply = '```json\n{"file": "a.md"}\n```';
+test("throws when summary is missing", () => {
+  const reply =
+    '```json\n{"changes": [{"file": "a.md", "edits": [{"old": "x", "new": "y"}]}]}\n```';
   expect(() => parseProposal(reply)).toThrow(ProposalParseError);
 });
 
-test("throws when edits is empty", () => {
-  const reply = '```json\n{"file": "a.md", "summary": "s", "edits": []}\n```';
+test("throws when changes is empty", () => {
+  const reply = '```json\n{"summary": "s", "changes": []}\n```';
+  expect(() => parseProposal(reply)).toThrow(ProposalParseError);
+});
+
+test("throws when a change has no edits", () => {
+  const reply =
+    '```json\n{"summary": "s", "changes": [{"file": "a.md", "edits": []}]}\n```';
   expect(() => parseProposal(reply)).toThrow(ProposalParseError);
 });
 
@@ -102,31 +132,45 @@ test("resolveDocPath rejects a path outside docs/", () => {
   );
 });
 
-test("applyEdits writes the file when all edits are unambiguous", async () => {
+test("applyProposal writes every file when all edits are unambiguous", async () => {
   const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
-  const file = join(dir, "note.md");
-  await writeFile(file, "the quick brown fox jumps", "utf-8");
+  const docsRoot = join(dir, "docs");
+  await mkdir(docsRoot, { recursive: true });
+  await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
+  await writeFile(join(docsRoot, "b.md"), "goodbye world", "utf-8");
 
-  const result = await applyEdits(file, [
-    { old: "quick brown fox", new: "fox" },
+  const result = await applyProposal(docsRoot, [
+    { file: "docs/a.md", edits: [{ old: "hello", new: "hi" }] },
+    { file: "docs/b.md", edits: [{ old: "goodbye", new: "bye" }] },
   ]);
   expect(result.ok).toBe(true);
-  expect(await readFile(file, "utf-8")).toBe("the fox jumps");
+  expect(await readFile(join(docsRoot, "a.md"), "utf-8")).toBe("hi world");
+  expect(await readFile(join(docsRoot, "b.md"), "utf-8")).toBe("bye world");
 
   await rm(dir, { recursive: true, force: true });
 });
 
-test("applyEdits writes nothing when a mismatch exists", async () => {
+test("applyProposal writes nothing when any file has a mismatch", async () => {
   const dir = await mkdtemp(join(tmpdir(), "edit-feedback-"));
-  const file = join(dir, "note.md");
-  await writeFile(file, "the quick brown fox jumps", "utf-8");
+  const docsRoot = join(dir, "docs");
+  await mkdir(docsRoot, { recursive: true });
+  await writeFile(join(docsRoot, "a.md"), "hello world", "utf-8");
+  await writeFile(join(docsRoot, "b.md"), "goodbye world", "utf-8");
 
-  const result = await applyEdits(file, [{ old: "slow turtle", new: "fox" }]);
-  expect(result.ok).toBe(false);
-  expect(result.mismatches).toEqual([
-    { index: 0, old: "slow turtle", occurrences: 0 },
+  const result = await applyProposal(docsRoot, [
+    { file: "docs/a.md", edits: [{ old: "hello", new: "hi" }] },
+    { file: "docs/b.md", edits: [{ old: "nonexistent", new: "bye" }] },
   ]);
-  expect(await readFile(file, "utf-8")).toBe("the quick brown fox jumps");
+  expect(result.ok).toBe(false);
+  expect(result.fileMismatches).toEqual([
+    {
+      file: "docs/b.md",
+      mismatches: [{ index: 0, old: "nonexistent", occurrences: 0 }],
+    },
+  ]);
+  // Neither file was written, even though a.md's edit was unambiguous.
+  expect(await readFile(join(docsRoot, "a.md"), "utf-8")).toBe("hello world");
+  expect(await readFile(join(docsRoot, "b.md"), "utf-8")).toBe("goodbye world");
 
   await rm(dir, { recursive: true, force: true });
 });

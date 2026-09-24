@@ -1,16 +1,19 @@
 ---
-// Dev-only widget: select text in an <article>, attach a comment, and get a
-// proposed edit back from src/integrations/edit-feedback/ (a long-lived
-// headless `claude` session). Only rendered under import.meta.env.DEV by
-// [...slug].astro, so none of this reaches a production build.
+// Dev-only: select text in this note's <article> and attach a comment to
+// get a proposed edit back from src/integrations/edit-feedback/ (a
+// long-lived headless `claude` session). Only rendered under
+// import.meta.env.DEV by [...slug].astro, so none of this reaches a
+// production build. The review panel for what this submits lives in the
+// site-wide <EditFeedbackBar /> (src/components/dev/edit-feedback-bar.astro,
+// mounted by Layout.astro), not here - this component only captures the
+// selection and posts the request.
 interface Props {
-  slug: string;
   filePath: string;
 }
-const { slug, filePath } = Astro.props;
+const { filePath } = Astro.props;
 ---
 
-<div id="edit-feedback" data-slug={slug} data-file-path={filePath}>
+<div id="edit-feedback-selection" data-file-path={filePath}>
   <button type="button" class="ef-select-btn" data-ef-select-btn hidden>
     Suggest edit
   </button>
@@ -31,61 +34,193 @@ const { slug, filePath } = Astro.props;
       </button>
     </div>
   </div>
-
-  <button
-    type="button"
-    class="ef-panel-toggle"
-    data-ef-panel-toggle
-    aria-expanded="false"
-    aria-label="Toggle edit feedback panel"
-  >
-    ✎
-  </button>
-
-  <div class="ef-panel" data-ef-panel hidden>
-    <div class="ef-panel-header">Edit feedback</div>
-    <div class="ef-list" data-ef-list></div>
-  </div>
-
-  <template data-ef-item-template>
-    <div class="ef-item">
-      <div class="ef-item-header">
-        <span class="ef-item-status" data-ef-status></span>
-      </div>
-      <div class="ef-item-comment" data-ef-comment-text></div>
-      <div class="ef-item-progress" data-ef-progress hidden></div>
-      <div class="ef-item-summary" data-ef-summary hidden></div>
-      <div class="ef-item-diff" data-ef-diff hidden></div>
-      <div class="ef-item-error" data-ef-error hidden></div>
-      <div class="ef-item-actions" data-ef-actions hidden>
-        <button type="button" class="ef-btn ef-btn-primary" data-ef-apply>
-          Apply
-        </button>
-        <button type="button" class="ef-btn ef-btn-ghost" data-ef-discard>
-          Discard
-        </button>
-      </div>
-      <div class="ef-item-refine" data-ef-refine hidden>
-        <textarea
-          class="ef-comment"
-          data-ef-refine-input
-          placeholder="Refine…"
-          rows="2"
-        ></textarea>
-        <button type="button" class="ef-btn ef-btn-ghost" data-ef-refine-btn>
-          Send
-        </button>
-      </div>
-    </div>
-  </template>
 </div>
 
 <script>
-  import "../../scripts/edit-feedback";
+  interface PendingSelection {
+    text: string;
+    heading?: string;
+    context?: string;
+  }
+
+  function init() {
+    const root = document.getElementById("edit-feedback-selection");
+    if (!root) return;
+
+    const filePath = root.dataset.filePath ?? "";
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const selectBtn = root.querySelector<HTMLButtonElement>(
+      "[data-ef-select-btn]",
+    )!;
+    const popover = root.querySelector<HTMLElement>("[data-ef-popover]")!;
+    const commentInput =
+      root.querySelector<HTMLTextAreaElement>("[data-ef-comment]")!;
+    const submitBtn =
+      root.querySelector<HTMLButtonElement>("[data-ef-submit]")!;
+    const cancelBtn =
+      root.querySelector<HTMLButtonElement>("[data-ef-cancel]")!;
+
+    let pendingSelection: PendingSelection | null = null;
+
+    function nearestHeading(node: Node | null): string | undefined {
+      let el: Element | null =
+        node instanceof Element ? node : (node?.parentElement ?? null);
+      while (el && el !== article) {
+        let sib: Element | null = el;
+        while (sib) {
+          if (/^H[2-4]$/.test(sib.tagName)) return sib.textContent?.trim();
+          sib = sib.previousElementSibling;
+        }
+        el = el.parentElement;
+      }
+      return undefined;
+    }
+
+    // Katex renders each formula as MathML + a raw-TeX <annotation>; swap
+    // the rendered glyphs for "$tex$" so the captured selection reads as
+    // Markdown source, not KaTeX's visual output.
+    function serializeRange(range: Range): string {
+      const clone = range.cloneContents();
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(clone);
+      wrapper.querySelectorAll(".katex").forEach((katex) => {
+        const tex = katex.querySelector(
+          'annotation[encoding="application/x-tex"]',
+        )?.textContent;
+        const displayMode = katex.closest(".katex-display") !== null;
+        const delim = displayMode ? "$$" : "$";
+        katex.replaceWith(
+          document.createTextNode(`${delim}${tex ?? ""}${delim}`),
+        );
+      });
+      return wrapper.textContent?.trim() ?? "";
+    }
+
+    function surroundingContext(range: Range): string {
+      const full = article!.textContent ?? "";
+      const before =
+        range.startContainer.textContent?.slice(0, range.startOffset) ?? "";
+      const idx = full.indexOf(before.slice(-40));
+      if (idx === -1) return "";
+      const start = Math.max(0, idx - 100);
+      return full.slice(start, idx + 140);
+    }
+
+    // Reads the current selection and, if it's a non-empty selection inside
+    // the article, stashes it as pendingSelection and positions the button
+    // above it. Returns whether there was a usable selection.
+    function captureSelection(): boolean {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) return false;
+      const range = sel.getRangeAt(0);
+      if (!article!.contains(range.commonAncestorContainer)) return false;
+      const text = serializeRange(range);
+      if (!text) return false;
+
+      pendingSelection = {
+        text,
+        heading: nearestHeading(range.startContainer),
+        context: surroundingContext(range),
+      };
+      const rect = range.getBoundingClientRect();
+      selectBtn.style.top = `${rect.top + window.scrollY - 36}px`;
+      selectBtn.style.left = `${rect.left + window.scrollX}px`;
+      return true;
+    }
+
+    // The button only appears once the selection has settled (mouseup/
+    // touchend/keyup, not on every intermediate selectionchange fired while
+    // dragging), and only after a short delay so a quick click-and-release
+    // that immediately collapses the selection again doesn't flash it.
+    const SHOW_DELAY_MS = 200;
+    let showTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function clearShowTimer(): void {
+      if (showTimer !== null) {
+        clearTimeout(showTimer);
+        showTimer = null;
+      }
+    }
+
+    function scheduleShowButton(): void {
+      clearShowTimer();
+      showTimer = setTimeout(() => {
+        showTimer = null;
+        selectBtn.hidden = !captureSelection();
+      }, SHOW_DELAY_MS);
+    }
+
+    document.addEventListener("selectionchange", () => {
+      // Covers both an active drag (selection still changing) and the
+      // selection being cleared: hide immediately and cancel any pending
+      // show so a stale button can't flash in mid-drag.
+      clearShowTimer();
+      selectBtn.hidden = true;
+    });
+
+    document.addEventListener("mouseup", scheduleShowButton);
+    document.addEventListener("touchend", scheduleShowButton);
+    document.addEventListener("keyup", (e) => {
+      // Keyboard selection (Shift+Arrow/Home/End) ends on keyup of the
+      // shift combo, with no mouseup to hook into.
+      if (e.key === "Shift" || e.shiftKey) scheduleShowButton();
+    });
+
+    selectBtn.addEventListener("click", () => {
+      if (!pendingSelection) return;
+      const rect = selectBtn.getBoundingClientRect();
+      popover.style.top = `${rect.bottom + window.scrollY + 6}px`;
+      popover.style.left = `${rect.left + window.scrollX}px`;
+      popover.hidden = false;
+      selectBtn.hidden = true;
+      commentInput.value = "";
+      commentInput.focus();
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      popover.hidden = true;
+    });
+
+    async function submitFeedback() {
+      if (!pendingSelection) return;
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+
+      popover.hidden = true;
+
+      await fetch("/__edit-feedback/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "selection",
+          filePath,
+          selection: pendingSelection.text,
+          heading: pendingSelection.heading,
+          context: pendingSelection.context,
+          comment,
+        }),
+      });
+      pendingSelection = null;
+      window.getSelection()?.removeAllRanges();
+      document.dispatchEvent(new CustomEvent("ef-panel-open-request"));
+    }
+
+    submitBtn.addEventListener("click", submitFeedback);
+    commentInput.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        void submitFeedback();
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
 </script>
 
 <style>
-  #edit-feedback {
+  #edit-feedback-selection {
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     color: var(--text-primary);
@@ -158,148 +293,5 @@ const { slug, filePath } = Astro.props;
     background: transparent;
     border-color: var(--border);
     color: var(--text-secondary);
-  }
-
-  .ef-panel-toggle {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    z-index: 62;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--border-strong);
-    background: var(--surface);
-    color: var(--text-primary);
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  .ef-panel {
-    position: fixed;
-    right: 20px;
-    bottom: 70px;
-    z-index: 62;
-    width: min(360px, calc(100vw - 32px));
-    max-height: min(70vh, 640px);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    border-radius: 10px;
-    box-shadow: 0 10px 32px rgb(0 0 0 / 0.25);
-    overflow: hidden;
-  }
-
-  .ef-panel-header {
-    padding: 10px 12px;
-    font-weight: 700;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .ef-list {
-    overflow-y: auto;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .ef-item {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px;
-    background: var(--surface-2);
-  }
-
-  .ef-item[data-status="error"] {
-    border-color: #dc2626;
-  }
-
-  .ef-item[data-status="applied"] {
-    border-color: #16a34a;
-  }
-
-  .ef-item-status {
-    font-size: 0.6875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    color: var(--text-secondary);
-  }
-
-  .ef-item-comment {
-    margin-top: 4px;
-    font-style: italic;
-  }
-
-  .ef-item-progress {
-    margin-top: 4px;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-  }
-
-  .ef-item-summary {
-    margin-top: 6px;
-    font-weight: 600;
-  }
-
-  .ef-item-diff {
-    margin-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 0.75rem;
-  }
-
-  .ef-item-diff :global(.ef-edit) {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .ef-item-diff :global(del) {
-    background: #fecaca;
-    color: #7f1d1d;
-    text-decoration: line-through;
-    padding: 2px 4px;
-    border-radius: 4px;
-  }
-
-  .ef-item-diff :global(ins) {
-    background: #bbf7d0;
-    color: #14532d;
-    text-decoration: none;
-    padding: 2px 4px;
-    border-radius: 4px;
-  }
-
-  .ef-item-error {
-    margin-top: 6px;
-    color: #dc2626;
-    font-size: 0.75rem;
-    white-space: pre-wrap;
-  }
-
-  .ef-item-actions,
-  .ef-item-refine {
-    margin-top: 8px;
-    display: flex;
-    gap: 6px;
-  }
-
-  .ef-item-refine {
-    flex-direction: column;
-  }
-
-  :root[data-theme="dark"] {
-    .ef-item-diff :global(del) {
-      background: #7f1d1d;
-      color: #fecaca;
-    }
-    .ef-item-diff :global(ins) {
-      background: #14532d;
-      color: #bbf7d0;
-    }
   }
 </style>

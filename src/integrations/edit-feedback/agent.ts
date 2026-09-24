@@ -113,6 +113,12 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       this.child.kill();
     }
     this.child = null;
+    // Fail any turn waiting on this child synchronously, rather than
+    // relying on its (async, possibly delayed) "exit" event: that event's
+    // handler is guarded against firing for a child this method has
+    // already superseded (see ensureChild()), so it alone can't be counted
+    // on to unblock a turn reset()/dispose() interrupts mid-flight.
+    this.queue.failAll(new Error("claude process was reset"));
   }
 
   private ensureChild(): ChildProcessWithoutNullStreams {
@@ -146,6 +152,12 @@ export class ClaudeStreamAdapter implements AgentAdapter {
 
     const rl = readline.createInterface({ input: child.stdout });
     rl.on("line", (line) => {
+      // Guards against a stale event from a child that reset()/a respawn
+      // has already superseded: without this, a delayed line or exit from
+      // the old process (e.g. its kill() signal still in flight when a new
+      // turn spawns a replacement) would land on `this.queue`, which is
+      // shared across respawns, and corrupt the new child's turn.
+      if (this.child !== child) return;
       if (!line.trim()) return;
       let obj: unknown;
       try {
@@ -162,6 +174,7 @@ export class ClaudeStreamAdapter implements AgentAdapter {
     });
 
     child.on("exit", (code) => {
+      if (this.child !== child) return;
       this.child = null;
       this.queue.failAll(
         new Error(`claude process exited unexpectedly (code ${code})`),

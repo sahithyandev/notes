@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, extname, join, relative } from "node:path";
 import { spawn } from "node:child_process";
 import type { Plugin, ViteDevServer } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -18,28 +18,30 @@ import {
 import {
   parseProposal,
   ProposalParseError,
-  applyEdits,
+  applyProposal,
   resolveDocPath,
   PathOutsideDocsError,
-  type ProposedEdit,
+  type FileChange,
 } from "./proposal.ts";
+import { scanFiles } from "../notes-style-validator/scan.ts";
 
 export type ItemStatus =
   "queued" | "running" | "proposed" | "error" | "applied" | "discarded";
 
 export interface FeedbackItem {
   id: string;
-  slug: string;
-  filePath: string;
-  selection: string;
+  kind: "selection" | "whole-note";
+  // Target file(s), relative to the repo root (e.g. "docs/s1/foo.md").
+  // One entry for a selection-based item; one or more for a whole-note item.
+  files: string[];
+  selection?: string;
   heading?: string;
   comment: string;
   status: ItemStatus;
   progress: string[];
   agentReply?: string;
   summary?: string;
-  proposedFile?: string;
-  edits?: ProposedEdit[];
+  changes?: FileChange[];
   error?: string;
   createdAt: number;
   updatedAt: number;
@@ -54,9 +56,10 @@ interface Job {
 const SESSION_FILE = "edit-feedback-session";
 
 // A small in-process store + single-worker queue backing the dev-only
-// "select text, get an edit" feedback loop. Turns run one at a time against
-// one long-lived `claude -p --input-format stream-json` process (agent.ts),
-// so prompt cache and conversation context are shared across requests.
+// "select text, get an edit" feedback loop (plus a site-wide whole-note /
+// multi-note variant for merges). Turns run one at a time against one
+// long-lived `claude -p --input-format stream-json` process (agent.ts), so
+// prompt cache and conversation context are shared across requests.
 export default function editFeedback(): Plugin {
   let root = process.cwd();
   let docsRoot = join(root, "docs");
@@ -181,8 +184,7 @@ export default function editFeedback(): Plugin {
       const proposal = parseProposal(text);
       item.status = "proposed";
       item.summary = proposal.summary;
-      item.proposedFile = proposal.file;
-      item.edits = proposal.edits;
+      item.changes = proposal.changes;
       item.error = undefined;
     } catch (err) {
       item.status = "error";
@@ -195,14 +197,27 @@ export default function editFeedback(): Plugin {
     }
   }
 
+  // Filter arg check-notes-style accepts: a note's filename (with or
+  // without its numeric prefix), matched case-insensitively anywhere in the
+  // path. See scripts/check-notes-style.ts and filter.ts.
+  function filterArgFor(file: string): string {
+    return basename(file, extname(file));
+  }
+
   async function runStyleCheckFollowup(item: FeedbackItem): Promise<void> {
-    const filterArg = item.slug.split("/").pop() ?? item.slug;
-    const { code, output } = await runCheckNotesStyle(root, filterArg);
-    if (code === 0) return;
+    const violatingOutputs: string[] = [];
+    for (const file of item.files) {
+      const { code, output } = await runCheckNotesStyle(
+        root,
+        filterArgFor(file),
+      );
+      if (code !== 0) violatingOutputs.push(`# ${file}\n${output}`);
+    }
+    if (violatingOutputs.length === 0) return;
 
     enqueue({
       itemId: item.id,
-      message: `Style check found violations in the file after your edit was applied. Re-read the file and propose a corrected fix.\n\n${output.slice(0, 4000)}`,
+      message: `Style check found violations in the file(s) after your edit was applied. Re-read the affected file(s) and propose a corrected fix.\n\n${violatingOutputs.join("\n\n").slice(0, 4000)}`,
     });
   }
 
@@ -297,28 +312,23 @@ export default function editFeedback(): Plugin {
           return;
         }
 
+        // Backs the site-wide bar's file picker: every note's path, slug,
+        // and title, read straight off disk (no Astro content-collection
+        // boot needed here, same as scripts/check-notes-style.ts).
+        if (url === "/__edit-feedback/notes" && req.method === "GET") {
+          const notes = scanFiles(docsRoot).map((f) => ({
+            file: relative(root, f.file),
+            slug: f.slug,
+            title: f.title,
+          }));
+          return sendJson(res, 200, { notes });
+        }
+
         if (url === "/__edit-feedback/request" && req.method === "POST") {
           const body = await readJsonBody<FeedbackRequest>(req);
-          if (
-            !body.filePath ||
-            !body.slug ||
-            !body.selection ||
-            !body.comment
-          ) {
+          const item = buildItem(body);
+          if (!item)
             return sendJson(res, 400, { error: "missing required fields" });
-          }
-          const item: FeedbackItem = {
-            id: randomUUID(),
-            slug: body.slug,
-            filePath: body.filePath,
-            selection: body.selection,
-            heading: body.heading,
-            comment: body.comment,
-            status: "queued",
-            progress: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          };
           items.set(item.id, item);
           broadcast(item);
           enqueue({ itemId: item.id, message: buildRequestMessage(body) });
@@ -363,21 +373,58 @@ export default function editFeedback(): Plugin {
         return sendJson(res, 404, { error: "no such edit-feedback route" });
       }
 
+      function buildItem(body: FeedbackRequest): FeedbackItem | null {
+        if (!body || !body.comment) return null;
+
+        if (body.kind === "selection") {
+          if (!body.filePath || !body.selection) return null;
+          return {
+            id: randomUUID(),
+            kind: "selection",
+            files: [body.filePath],
+            selection: body.selection,
+            heading: body.heading,
+            comment: body.comment,
+            status: "queued",
+            progress: [],
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+        }
+
+        if (body.kind === "whole-note") {
+          if (!Array.isArray(body.files) || body.files.length === 0)
+            return null;
+          return {
+            id: randomUUID(),
+            kind: "whole-note",
+            files: body.files,
+            comment: body.comment,
+            status: "queued",
+            progress: [],
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+        }
+
+        return null;
+      }
+
       async function handleApply(
         res: ServerResponse,
         id: string,
       ): Promise<void> {
         const item = items.get(id);
         if (!item) return sendJson(res, 404, { error: "not found" });
-        if (item.status !== "proposed" || !item.proposedFile || !item.edits) {
+        if (item.status !== "proposed" || !item.changes) {
           return sendJson(res, 400, {
             error: "item is not in a proposed state",
           });
         }
 
-        let absPath: string;
+        let result;
         try {
-          absPath = resolveDocPath(docsRoot, item.proposedFile);
+          result = await applyProposal(docsRoot, item.changes);
         } catch (err) {
           if (err instanceof PathOutsideDocsError) {
             item.status = "error";
@@ -388,17 +435,19 @@ export default function editFeedback(): Plugin {
           throw err;
         }
 
-        const result = await applyEdits(absPath, item.edits);
         if (!result.ok) {
           if (item.mismatchRetried) {
             item.status = "error";
-            item.error = `Proposal no longer matches the file: ${result.mismatches
-              .map((m) => `"${m.old}" found ${m.occurrences}x`)
-              .join("; ")}`;
+            item.error = result.fileMismatches
+              .map(
+                (fm) =>
+                  `${fm.file}: ${fm.mismatches.map((m) => `"${m.old}" found ${m.occurrences}x`).join("; ")}`,
+              )
+              .join(" | ");
             touch(item);
             return sendJson(res, 409, {
               ok: false,
-              mismatches: result.mismatches,
+              fileMismatches: result.fileMismatches,
             });
           }
           item.mismatchRetried = true;
@@ -406,7 +455,7 @@ export default function editFeedback(): Plugin {
           touch(item);
           enqueue({
             itemId: item.id,
-            message: buildMismatchMessage(result.mismatches),
+            message: buildMismatchMessage(result.fileMismatches),
           });
           return sendJson(res, 200, { ok: false, retried: true });
         }

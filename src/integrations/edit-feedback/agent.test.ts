@@ -25,6 +25,26 @@ function makeFakeChild() {
   return { child, stdout, writes };
 }
 
+// Like makeFakeChild(), but kill() doesn't auto-emit "exit" - the test
+// fires it manually, to simulate the OS's exit notification arriving late
+// (after the adapter has already moved on to a new child).
+function makeFakeChildManualExit() {
+  const stdout = new PassThrough();
+  const stderr = new PassThrough();
+  const writes: string[] = [];
+  const emitter = new EventEmitter();
+  const child = Object.assign(emitter, {
+    stdout,
+    stderr,
+    stdin: { write: (data: string) => writes.push(data) },
+    killed: false,
+    kill: () => {
+      child.killed = true;
+    },
+  });
+  return { child, stdout, writes };
+}
+
 function line(obj: unknown): string {
   return JSON.stringify(obj) + "\n";
 }
@@ -167,6 +187,40 @@ test("reset() drops the session so the next send starts fresh", async () => {
 
   expect(spawnCalls[1]).toContain("--session-id");
   expect(spawnCalls[1]).not.toContain("--resume");
+
+  adapter.dispose();
+});
+
+test("a stale exit from a reset() child doesn't corrupt the next turn", async () => {
+  const childA = makeFakeChildManualExit();
+  const childB = makeFakeChild();
+  const children = [childA, childB];
+  let spawnIdx = 0;
+  const spawnFn = (() => children[spawnIdx++].child) as any;
+
+  const adapter = new ClaudeStreamAdapter({ cwd: "/repo", spawnFn });
+
+  const first = collect(adapter.send("first"));
+  childA.stdout.write(line({ type: "result", result: "ok1", is_error: false }));
+  await first;
+
+  // reset() kills child A, but (per makeFakeChildManualExit) its "exit"
+  // event hasn't fired yet - mirrors the real ChildProcess.kill()/"exit"
+  // gap that let a stale event clobber a newer child's state.
+  adapter.reset();
+
+  const second = collect(adapter.send("second"));
+
+  // Child A's delayed exit arrives while the second turn (on child B) is
+  // already in flight. It must not be mistaken for child B dying.
+  (childA.child as any).emit("exit", null);
+
+  childB.stdout.write(line({ type: "result", result: "ok2", is_error: false }));
+  const events = await second;
+
+  expect(events.some((e) => e.type === "process-error")).toBe(false);
+  const result = events.find((e) => e.type === "result");
+  expect(result).toEqual({ type: "result", text: "ok2", isError: false });
 
   adapter.dispose();
 });
