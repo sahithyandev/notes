@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { PassThrough } from "node:stream";
 import {
   ClaudeStreamAdapter,
+  LineQueue,
   OpenCodeAdapter,
   type AgentEvent,
 } from "./agent.ts";
@@ -110,6 +111,163 @@ test("send() yields session then result for a simple turn", async () => {
     isError: false,
     costUsd: 0.01,
   });
+
+  adapter.dispose();
+});
+
+test("LineQueue.drainStale() clears and returns whatever was buffered", async () => {
+  // The claude CLI can keep emitting lines after a turn's own "result" -
+  // observed directly: the Skill tool (in ALLOWED_TOOLS) can dispatch a
+  // background subagent whose belated completion arrives once the main
+  // reply has already ended the turn, landing here with nothing waiting to
+  // consume it. Without draining it before the next turn writes a new
+  // prompt, the next send() would hand this stale line out first, as if it
+  // were the reply to the brand new prompt.
+  const queue = new LineQueue();
+  expect(queue.drainStale()).toEqual([]);
+
+  queue.push({ type: "assistant", text: "stray" });
+  queue.push({ type: "result", result: "stray result" });
+  expect(queue.drainStale()).toEqual([
+    { type: "assistant", text: "stray" },
+    { type: "result", result: "stray result" },
+  ]);
+
+  // Draining empties it - a second call has nothing left to return.
+  expect(queue.drainStale()).toEqual([]);
+
+  // A pending waiter (a send() awaiting the *next* real line) is untouched:
+  // drainStale() only ever clears what's already buffered, never cancels an
+  // in-flight wait.
+  const pending = queue.next();
+  expect(queue.drainStale()).toEqual([]);
+  queue.push({ type: "result", result: "real" });
+  expect(await pending).toEqual({ type: "result", result: "real" });
+});
+
+test("send() discards a stale line left over from the previous turn before starting the next one", async () => {
+  const { child, stdout } = makeFakeChild();
+  const adapter = new ClaudeStreamAdapter({
+    cwd: "/repo",
+    spawnFn: (() => child) as any,
+  });
+
+  const first = collect(adapter.send("first"));
+  stdout.write(line({ type: "result", result: "ok1", is_error: false }));
+  await first;
+
+  // Arrives late, after the first turn already returned - nothing is
+  // waiting on the queue at this point, so it just sits buffered until
+  // something calls next() (or, before this fix, until the next send()'s
+  // own loop wrongly picked it up as that turn's reply). setImmediate
+  // (not just a microtask) gives the real stream/readline pipeline a full
+  // event-loop turn to actually deliver it.
+  stdout.write(
+    line({
+      type: "assistant",
+      message: {
+        content: [{ type: "text", text: "stray background agent notice" }],
+      },
+    }),
+  );
+  await new Promise((resolve) => setImmediate(resolve));
+
+  const second = collect(adapter.send("second"));
+  // Real IPC can't deliver a reply before the request that provoked it was
+  // actually sent - give send() a full turn to run past its own
+  // drainStale() and reach child.stdin.write() before simulating the CLI's
+  // response, or this write could race ahead of drainStale() and get
+  // swept up as if it were itself the stale leftover.
+  await new Promise((resolve) => setImmediate(resolve));
+  stdout.write(line({ type: "result", result: "ok2", is_error: false }));
+  const events = await second;
+
+  const result = events.find((e) => e.type === "result");
+  expect(result).toEqual({
+    type: "result",
+    text: "ok2",
+    isError: false,
+    costUsd: undefined,
+  });
+
+  adapter.dispose();
+});
+
+test("send() shortens an absolute file_path to a cwd-relative one in progress labels", async () => {
+  // Real Claude tool calls always give an absolute file_path (unlike the
+  // shorthand relative path used above) - a raw absolute path overflows
+  // live-edit-bar.astro's fixed-width status strip, so this must come back
+  // shortened, not passed through as-is.
+  const { child, stdout } = makeFakeChild();
+  const adapter = new ClaudeStreamAdapter({
+    cwd: "/repo",
+    spawnFn: (() => child) as any,
+  });
+
+  const eventsPromise = collect(adapter.send("hello"));
+
+  stdout.write(
+    line({ type: "system", subtype: "init", session_id: "abc-123" }),
+  );
+  stdout.write(
+    line({
+      type: "assistant",
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "Read",
+            input: { file_path: "/repo/docs/s1/x.md" },
+          },
+        ],
+      },
+    }),
+  );
+  stdout.write(line({ type: "result", result: "done", is_error: false }));
+
+  const events = await eventsPromise;
+  expect(
+    events.some(
+      (e) => e.type === "progress" && e.label === "Read: docs/s1/x.md",
+    ),
+  ).toBe(true);
+
+  adapter.dispose();
+});
+
+test("send() caps an overly long progress label", async () => {
+  const { child, stdout } = makeFakeChild();
+  const adapter = new ClaudeStreamAdapter({
+    cwd: "/repo",
+    spawnFn: (() => child) as any,
+  });
+
+  const eventsPromise = collect(adapter.send("hello"));
+
+  stdout.write(
+    line({ type: "system", subtype: "init", session_id: "abc-123" }),
+  );
+  stdout.write(
+    line({
+      type: "assistant",
+      message: {
+        content: [
+          {
+            type: "tool_use",
+            name: "Bash",
+            input: { command: "x".repeat(200) },
+          },
+        ],
+      },
+    }),
+  );
+  stdout.write(line({ type: "result", result: "done", is_error: false }));
+
+  const events = await eventsPromise;
+  const progress = events.find((e) => e.type === "progress");
+  expect(progress?.type).toBe("progress");
+  expect((progress as { label: string }).label.length).toBeLessThanOrEqual(70);
+  expect((progress as { label: string }).label.endsWith("…")).toBe(true);
 
   adapter.dispose();
 });

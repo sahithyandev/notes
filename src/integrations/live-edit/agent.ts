@@ -5,7 +5,7 @@ import {
 } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { isAbsolute, relative, resolve } from "node:path";
 import readline from "node:readline";
 import { SYSTEM_PROMPT } from "./prompt.ts";
 
@@ -66,7 +66,7 @@ type Waiter = {
 // (e.g. several NDJSON lines arriving in one stdout chunk, faster than the
 // consumer processes each yielded event), and nextLine() can wait before
 // anything has arrived. Neither side drops data.
-class LineQueue {
+export class LineQueue {
   private buffered: unknown[] = [];
   private waiter: Waiter | null = null;
 
@@ -86,6 +86,24 @@ class LineQueue {
       this.waiter = null;
       w.reject(err);
     }
+  }
+
+  // Discards anything sitting in the buffer, returning it so the caller can
+  // log it. A turn's send() always returns as soon as it sees its own
+  // "result" line, but the underlying claude CLI can keep emitting lines
+  // after that - observed directly: the Skill tool (in ALLOWED_TOOLS) can
+  // itself dispatch a background subagent, whose belated completion arrives
+  // as its own line(s) once the main reply's turn has already ended. With
+  // nothing waiting at that point, those land here and would otherwise sit
+  // until the *next* send() call, whose next() would hand them out first -
+  // stale content (including a stray "result") getting mistaken for the
+  // reply to a brand new prompt. Call this before writing a new prompt so
+  // every turn starts from a clean buffer.
+  drainStale(): unknown[] {
+    if (this.buffered.length === 0) return [];
+    const stale = this.buffered;
+    this.buffered = [];
+    return stale;
   }
 
   next(): Promise<unknown> {
@@ -233,9 +251,25 @@ export class ClaudeStreamAdapter implements AgentAdapter {
     }
     this.busy = true;
     try {
+      // Only a child that's already running could possibly have a stale
+      // trailing line sitting in the queue (see drainStale()'s comment) - a
+      // freshly-spawned one hasn't been sent anything yet, so anything
+      // already queued for it is that child's own first real output, not
+      // leftovers, and draining here would discard it out from under this
+      // very turn.
+      const isExistingChild = this.child !== null;
       const child = this.ensureChild();
       if (this.sessionId) {
         yield { type: "session", sessionId: this.sessionId };
+      }
+
+      if (isExistingChild) {
+        const stale = this.queue.drainStale();
+        if (stale.length > 0) {
+          this.log(
+            `discarding ${stale.length} stale line(s) left over from the previous turn (likely a background subagent finishing late)`,
+          );
+        }
       }
 
       child.stdin.write(
@@ -256,7 +290,7 @@ export class ClaudeStreamAdapter implements AgentAdapter {
           };
           return;
         }
-        const event = mapLine(line);
+        const event = mapLine(line, this.cwd);
         if (event) yield event;
         if (event?.type === "result") return;
       }
@@ -266,7 +300,7 @@ export class ClaudeStreamAdapter implements AgentAdapter {
   }
 }
 
-function mapLine(line: unknown): AgentEvent | null {
+function mapLine(line: unknown, cwd: string): AgentEvent | null {
   if (typeof line !== "object" || line === null) return null;
   const obj = line as Record<string, unknown>;
 
@@ -285,7 +319,7 @@ function mapLine(line: unknown): AgentEvent | null {
       for (const block of content) {
         const b = block as Record<string, unknown>;
         if (b.type === "tool_use") {
-          return { type: "progress", label: describeToolUse(b) };
+          return { type: "progress", label: describeToolUse(b, cwd) };
         }
       }
     }
@@ -305,15 +339,34 @@ function mapLine(line: unknown): AgentEvent | null {
   return null;
 }
 
-function describeToolUse(block: Record<string, unknown>): string {
+// The progress label this returns is rendered inline in live-edit-bar.astro's
+// fixed-position status strip (.le-item-status), with no width constraint of
+// its own - a raw absolute path or a long bash command/grep pattern blows
+// out that layout (observed directly: a real Claude turn's "Read: /Users/...
+// /some-note.mdx" overflowed the whole dock). Shortening file_path to be
+// relative to the project root fixes the common case; the length cap is a
+// backstop for whatever's still too long after that (long commands/patterns
+// have no such shortening available).
+const PROGRESS_LABEL_MAX_LEN = 70;
+
+function describeToolUse(block: Record<string, unknown>, cwd: string): string {
   const name = typeof block.name === "string" ? block.name : "tool";
   const input = block.input as Record<string, unknown> | undefined;
+  const filePath = typeof input?.file_path === "string" ? input.file_path : "";
   const target =
-    (typeof input?.file_path === "string" && input.file_path) ||
+    // Claude's own tool calls always give an absolute file_path; path.relative
+    // treats a non-absolute `to` as relative to process.cwd() instead of
+    // `cwd`, so only shorten it when it's actually absolute - anything else
+    // is passed through as-is rather than mis-resolved.
+    (filePath && (isAbsolute(filePath) ? relative(cwd, filePath) : filePath)) ||
     (typeof input?.pattern === "string" && input.pattern) ||
     (typeof input?.command === "string" && input.command) ||
     "";
-  return target ? `${name}: ${target}` : name;
+  if (!target) return name;
+  const label = `${name}: ${target}`;
+  return label.length > PROGRESS_LABEL_MAX_LEN
+    ? `${label.slice(0, PROGRESS_LABEL_MAX_LEN - 1)}…`
+    : label;
 }
 
 // --- OpenCode backend -------------------------------------------------
