@@ -36,6 +36,7 @@ export { default as ProductionFunctionDiagram } from "./production-function-diag
 export { default as TPAPMPDiagram } from "./tp-ap-mp-diagram.astro";
 export { default as StagesOfProductionDiagram } from "./stages-of-production-diagram.astro";
 export { default as OptimalInputDiagram } from "./optimal-input-diagram.astro";
+export { default as OverheadDistributionTable } from "./overhead-distribution-table.astro";
 export { default as IsoquantDiagram } from "./isoquant-diagram.astro";
 export { default as ConvexIsoquantDiagram } from "./convex-isoquant-diagram.astro";
 export { default as PerfectSubstitutesDiagram } from "./perfect-substitutes-diagram.astro";

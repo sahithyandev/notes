@@ -1,0 +1,133 @@
+---
+import { tex } from "../../utils/tex";
+
+interface Row {
+  label: string;
+  values: (number | null)[];
+  total?: boolean;
+}
+
+interface Props {
+  departments: string[];
+  rows: Row[];
+  caption?: string;
+}
+
+const { departments, rows, caption } = Astro.props;
+
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const inlineTex = (label: string) =>
+  label
+    .split(/(\$[^$]+\$)/g)
+    .map((part) =>
+      part.startsWith("$") && part.endsWith("$")
+        ? tex(part.slice(1, -1))
+        : escapeHtml(part),
+    )
+    .join("");
+
+const isNegative = (row: Row, ci: number) => {
+  const v = row.values[ci];
+  return v !== null && v < 0;
+};
+const format = (v: number | null, negative: boolean) => {
+  if (v === null) return "";
+  return negative ? `(${v * -1})` : `${v}`;
+};
+---
+
+<figure class="overhead-dist">
+  <table class="tableau">
+    <colgroup>
+      <col class="c-label" />
+      {departments.map(() => (
+        <col class="c-data" />
+      ))}
+    </colgroup>
+    <thead>
+      <tr>
+        <th></th>
+        {departments.map((d) => (
+          <th class="num" set:html={tex(d)} />
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((row) => (
+        <tr class:list={{ total: row.total }}>
+          <th set:html={inlineTex(row.label)} />
+          {row.values.map((v, ci) => (
+            <td class:list={["num", { negative: isNegative(row, ci) }]}>
+              {format(v, isNegative(row, ci))}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .overhead-dist {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  table.tableau {
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  col.c-label {
+    width: 11rem;
+  }
+  col.c-data {
+    width: 5.5rem;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  thead th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  tbody th {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: left;
+  }
+
+  td.num {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  td.num.negative {
+    color: var(--loop-minus);
+  }
+
+  tr.total th,
+  tr.total td {
+    border-top: 2px solid var(--border-strong);
+    font-weight: 700;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+</style>
