@@ -239,6 +239,33 @@
       ?.dataset.filePath;
     if (currentNoteFile) addFile(currentNoteFile);
 
+    // A content edit reloads the page (see dev-reload-lock), which would
+    // otherwise wipe an in-progress draft the developer was typing here -
+    // round-trip the comment text and any extra files through
+    // sessionStorage across that reload. Restored after the file/selection
+    // wiring above so it can layer on top of the current-note default.
+    const DRAFT_KEY = "sn-live-edit-draft";
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        sessionStorage.removeItem(DRAFT_KEY);
+        const draft = JSON.parse(saved) as { comment: string; files: string[] };
+        commentInput.value = draft.comment;
+        for (const file of draft.files) addFile(file);
+      }
+    } catch {}
+
+    window.addEventListener("pagehide", () => {
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+      try {
+        sessionStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({ comment: commentInput.value, files: selectedFiles }),
+        );
+      } catch {}
+    });
+
     function addFile(file: string): void {
       if (selectedFiles.includes(file)) return;
       selectedFiles.push(file);
@@ -833,12 +860,22 @@
     align-items: baseline;
   }
 
+  /* A progress label can carry an arbitrarily long path/command (see
+     describeToolUse() in agent.ts, which caps it, but this is the backstop
+     for whatever still doesn't fit) - flex:1 + min-width:0 lets it actually
+     shrink inside the flex row instead of forcing the row to overflow, and
+     the three overflow properties turn "doesn't fit" into an ellipsis
+     rather than a layout blowout. */
   .le-item-status {
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     color: var(--text-secondary);
-    flex: none;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .le-item-files {

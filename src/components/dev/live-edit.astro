@@ -294,10 +294,12 @@ const { filePath } = Astro.props;
       }
 
       if (item.status === "applied") {
-        const badge = document.createElement("span");
-        badge.className = "le-inline-badge";
-        badge.textContent = "✓ Applied — reloading…";
-        marker.append(badge);
+        // The bar's status strip already shows "Applied" (briefly) for
+        // this item, and a reload is moments away anyway (see
+        // dev-reload-lock) - showing it again here, inline in the article
+        // content itself, is pure repetition right before that content
+        // gets replaced. Hide rather than announce it.
+        marker.hidden = true;
         return;
       }
 
