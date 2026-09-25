@@ -4,6 +4,8 @@ import {
   type ChildProcessWithoutNullStreams,
 } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import readline from "node:readline";
 import { SYSTEM_PROMPT } from "./prompt.ts";
 
@@ -595,6 +597,175 @@ export class OpenCodeAdapter implements AgentAdapter {
   }
 }
 
+// --- Debug backend -------------------------------------------------------
+//
+// Not a real agent - it never spawns a CLI or calls an LLM. It exists so
+// the whole real request/queue/apply/UI pipeline (live-edit-bar.astro's
+// status strip, live-edit.astro's inline marker, the style-check follow-up)
+// can be exercised by hand from the actual UI, without spending a real
+// agent turn on every manual test. Select "Debug" from the backend picker
+// (shown automatically once this is registered below, alongside Claude
+// Code/opencode) and drive it with magic words in the feedback comment:
+//
+//   "debug error"    -> ends in "error" (no proposal block in the reply)
+//   "debug mismatch" -> ends in "error" via the apply-mismatch retry path
+//                        (the proposed "old" text never matches the file)
+//   anything else     -> ends in "applied": appends a debug marker comment
+//                        at the end of the target file
+//
+// buildRequestMessage() (prompt.ts) always lists the target file(s) as
+// either "File: <path>" (a selection request) or "- <path>" lines (a
+// whole-note request); buildMismatchMessage()/the style-check follow-up
+// (index.ts) instead say "In <file>:" or "# <file>". extractFiles() tries
+// each shape in turn (most specific first) rather than one loose "- " match
+// - a bare "- " match alone also catches buildMismatchMessage()'s own
+// `- "<old>" was found N time(s)` detail lines, which happen to start the
+// same way and would get misread as a file path.
+function extractFiles(prompt: string): string[] {
+  const single = prompt.match(/^File: (.+)$/m);
+  if (single) return [single[1].trim()];
+
+  const inLines = [...prompt.matchAll(/^In (.+):$/gm)].map((m) => m[1].trim());
+  if (inLines.length > 0) return inLines;
+
+  const hashLines = [...prompt.matchAll(/^# (.+)$/gm)].map((m) => m[1].trim());
+  if (hashLines.length > 0) return hashLines;
+
+  return [...prompt.matchAll(/^- (.+)$/gm)].map((m) => m[1].trim());
+}
+
+function extractComment(prompt: string): string {
+  const idx = prompt.indexOf("Feedback:");
+  return idx === -1 ? prompt : prompt.slice(idx + "Feedback:".length).trim();
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
+}
+
+// Deliberately never matches any real file content, so proposing it as an
+// "old" string always fails proposal.ts's exactly-once check.
+const FORCE_MISMATCH_MARKER = "__debug_force_mismatch__";
+
+function buildProposalReply(
+  summary: string,
+  file: string,
+  old: string,
+  next: string,
+): string {
+  const proposal = {
+    summary,
+    changes: [{ file, edits: [{ old, new: next }] }],
+  };
+  return `${summary}\n\n\`\`\`json\n${JSON.stringify(proposal, null, 2)}\n\`\`\`\n`;
+}
+
+export class DebugAdapter implements AgentAdapter {
+  private readonly cwd: string;
+  private sessionId: string;
+
+  constructor(opts: AgentAdapterOptions) {
+    this.cwd = opts.cwd;
+    this.sessionId = opts.initialSessionId ?? randomUUID();
+  }
+
+  reset(): void {
+    this.sessionId = randomUUID();
+  }
+
+  dispose(): void {
+    // No process, nothing to kill.
+  }
+
+  async *send(prompt: string): AsyncIterable<AgentEvent> {
+    yield { type: "session", sessionId: this.sessionId };
+
+    await delay(400);
+    yield { type: "progress", label: "Reading file..." };
+    await delay(400);
+    yield { type: "progress", label: "Drafting edit..." };
+    await delay(400);
+
+    const comment = extractComment(prompt).toLowerCase();
+    const files = extractFiles(prompt);
+    const file = files[0];
+
+    if (comment.includes("debug error")) {
+      yield {
+        type: "result",
+        text: 'Debug backend: forced error (no proposal block, matching a real "I\'m not confident" reply).',
+        isError: false,
+      };
+      return;
+    }
+
+    if (!file) {
+      yield {
+        type: "result",
+        text: "Debug backend: couldn't find a target file in the request.",
+        isError: true,
+      };
+      return;
+    }
+
+    // buildMismatchMessage() (prompt.ts, called from index.ts's
+    // applyChanges()) quotes the failed "old" text back in its retry
+    // prompt - `- "<old>" was found N time(s)` - rather than repeating the
+    // original comment, so a plain comment.includes("debug mismatch")
+    // check would only see the trigger on the first turn and silently
+    // succeed via the default branch on the retry, never reaching
+    // index.ts's real "already retried once -> permanent error" path.
+    // Checking for the marker itself in the whole prompt (not just the
+    // comment) means the retry turn recognizes its own quoted-back old
+    // text and keeps forcing a mismatch, exactly like a real repeatedly-
+    // wrong proposal would.
+    if (
+      comment.includes("debug mismatch") ||
+      prompt.includes(FORCE_MISMATCH_MARKER)
+    ) {
+      yield {
+        type: "result",
+        text: buildProposalReply(
+          "Debug: forced apply mismatch.",
+          file,
+          FORCE_MISMATCH_MARKER,
+          "replacement text that will never get written",
+        ),
+        isError: false,
+      };
+      return;
+    }
+
+    let content: string;
+    try {
+      content = await readFile(resolve(this.cwd, file), "utf-8");
+      if (!content) throw new Error("file is empty");
+    } catch (err) {
+      yield {
+        type: "result",
+        text: `Debug backend: couldn't read ${file}: ${err instanceof Error ? err.message : String(err)}`,
+        isError: true,
+      };
+      return;
+    }
+
+    // Anchors on the whole file content, not just a line from it: a line
+    // like a frontmatter "---" can occur more than once, which would fail
+    // proposal.ts's exactly-once check. The full content is trivially
+    // unique against itself.
+    yield {
+      type: "result",
+      text: buildProposalReply(
+        `Debug: appended a marker line at the end of ${file}.`,
+        file,
+        content,
+        `${content}\n[debug edit ${new Date().toISOString()}]\n`,
+      ),
+      isError: false,
+    };
+  }
+}
+
 // --- Backend registry ---------------------------------------------------
 //
 // The single place that lists every backend live-edit can drive: its CLI
@@ -709,6 +880,17 @@ export const BACKEND_DEFINITIONS = [
     // The free "opencode/*" tier answers a plain run (no custom agent, no
     // deny permissions), so the CLI running is enough - no credential check.
     checkReady: readyIf("opencode"),
+  },
+  {
+    id: "debug",
+    label: "Debug",
+    bin: "",
+    createAdapter: (opts: AgentAdapterOptions): AgentAdapter =>
+      new DebugAdapter(opts),
+    // No CLI, nothing to spawn - always available, so it always shows up
+    // in the backend picker alongside Claude Code/opencode for manually
+    // testing the UI without spending a real agent turn.
+    checkReady: async () => ({ available: true }),
   },
 ] as const satisfies readonly BackendDefinition[];
 
