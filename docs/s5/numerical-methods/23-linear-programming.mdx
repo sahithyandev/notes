@@ -1,0 +1,64 @@
+---
+title: Linear Programming
+dateCreated: 2026-09-23T08:07:54.155Z
+lastUpdatedOn: 2026-09-25T06:53:41.416Z
+slug: s5/numerical-methods/linear-programming
+sidebar:
+  order: 23
+prev: true
+next: true
+---
+
+Linear programming is [constrained optimization](/s5/numerical-methods/constrained-optimization) where the objective function and every constraint are linear.
+
+## Standard Form
+
+Objective function
+
+$$
+z = f(x) = a_1 x_1 + a_2 x_2 + \cdots + a_n x_n
+$$
+
+Constraints
+
+$$
+a_{i1} x_1 + a_{i2} x_2 + \cdots + a_{in} x_n \leq b_i
+$$
+
+or with $\geq$ in place of $\leq$.
+
+## Graphical Solution
+
+For 2 design variables, the problem can be solved graphically
+
+- Plot each constraint as a boundary line
+- Shade the feasible region satisfying all constraints
+- Move the objective function line, $z$ constant, across the feasible region
+- The optimum occurs at a vertex of the feasible region
+
+## Worked Example
+
+A factory produces heaters of types $S$ and $L$, sold wholesale at \$40 and \$88 respectively. Machine $M_1$ needs 2 minutes per $S$ heater and 8 minutes per $L$ heater. Machine $M_2$ needs 5 minutes per $S$ heater and 2 minutes per $L$ heater. Both machines run 60 minutes per hour. Find the hourly production rates $x_1$ ($S$) and $x_2$ ($L$) maximizing hourly revenue.
+
+Objective function
+
+$$
+z = f(x) = 40x_1 + 88x_2
+$$
+
+Constraints
+
+$$
+\begin{aligned}
+2x_1 + 8x_2 &\leq 60 \\
+5x_1 + 2x_2 &\leq 60 \\
+x_1 &\geq 0 \\
+x_2 &\geq 0
+\end{aligned}
+$$
+
+The optimum occurs at the vertex $(x_1, x_2) = (10, 5)$, the intersection of the 2 machine-time constraints.
+
+$$
+z_{\max} = 40(10) + 88(5) = 840
+$$

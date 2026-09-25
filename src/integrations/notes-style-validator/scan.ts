@@ -35,6 +35,9 @@ export interface ScannedFile {
   lineIsCode: boolean[];
   title: string;
   titleLine: number;
+  /** Frontmatter `sidebar.label`, if set. Empty string when absent. */
+  sidebarLabel: string;
+  sidebarLabelLine: number;
   headings: ScannedHeading[];
   /** Frontmatter slug (public URL path, no leading slash). */
   slug: string;
@@ -73,6 +76,18 @@ function titleLineOf(raw: string): number {
     if (i === 0 && lines[i].trim() !== "---") return 1;
     if (/^title:\s*/.test(lines[i])) return i + 1;
     if (i > 0 && lines[i].trim() === "---") break;
+  }
+  return 1;
+}
+
+// Line number of the nested `sidebar.label` frontmatter field (1-based).
+// `sidebar:` fields are indented (e.g. "  order: 1\n  label: Foo"), so this
+// looks for an indented `label:` key rather than a top-level one.
+function sidebarLabelLineOf(raw: string): number {
+  const lines = raw.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (i > 0 && lines[i].trim() === "---") break;
+    if (/^\s+label:\s*/.test(lines[i])) return i + 1;
   }
   return 1;
 }
@@ -269,7 +284,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
     const { lines, maskedLines, lineIsCode } = maskFile(raw);
 
     // Frontmatter is never prose: mask it so YAML colons/dashes can't trip
-    // the prose rules (label-description, em-dash, collapsed-label).
+    // the prose rules (label-description, dash, collapsed-label).
     const fmLines = frontmatterLineCount(raw);
     for (let i = 0; i < fmLines && i < lines.length; i++) {
       lineIsCode[i] = true;
@@ -287,6 +302,9 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       lineIsCode,
       title: typeof data.title === "string" ? data.title : "",
       titleLine: titleLineOf(raw),
+      sidebarLabel:
+        typeof data.sidebar?.label === "string" ? data.sidebar.label : "",
+      sidebarLabelLine: sidebarLabelLineOf(raw),
       headings: extractHeadings(content, fmLines),
       slug: typeof data.slug === "string" ? data.slug : "",
       headingSlugs: extractHeadingSlugs(content),

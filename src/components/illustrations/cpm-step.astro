@@ -1,0 +1,16 @@
+---
+import type { ComponentProps } from "astro/types";
+import CpmTable from "./cpm-table.astro";
+import StepNote from "./primitives/step-note.astro";
+
+type Props = Omit<ComponentProps<typeof CpmTable>, "dataSource"> & {
+  label: string;
+};
+
+const { label, ...table } = Astro.props;
+---
+
+<div class="step" data-label={label}>
+  <CpmTable dataSource {...table} />
+  <StepNote><slot /></StepNote>
+</div>

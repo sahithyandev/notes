@@ -1,0 +1,26 @@
+---
+title: Project Crashing
+slug: s5/operational-research/project-crashing
+sidebar:
+  order: 18
+prev: true
+next: true
+dateCreated: 2026-08-26T11:55:39.175Z
+lastUpdatedOn: 2026-09-25T06:53:41.709Z
+---
+
+Reduces a project's duration by shortening (crashing) critical activities, trading extra cost for time saved.
+
+- Normal time / normal cost  
+  An activity's duration and cost under regular execution.
+- Crash time / crash cost  
+  The minimum achievable duration and its (higher) cost.
+- Cost slope  
+  $\dfrac{\text{crash cost} - \text{normal cost}}{\text{normal time} - \text{crash time}}$. The cost of shortening the activity by 1 time unit.
+
+## Crashing Steps
+
+- Find the critical path(s) at normal duration.
+- Crash the critical activity with the lowest cost slope, by 1 time unit at a time.
+- Recompute the critical path after every crash: a non-critical path can become critical, requiring simultaneous crashing on multiple paths.
+- Stop when every activity is at crash time, or when the marginal cost of crashing further exceeds the benefit (e.g. the cost of the delay it avoids).

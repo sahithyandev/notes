@@ -1,0 +1,118 @@
+---
+title: Steepest Ascent Method
+dateCreated: 2026-09-23T08:07:54.117Z
+lastUpdatedOn: 2026-09-25T06:53:41.408Z
+slug: s5/numerical-methods/steepest-ascent-method
+sidebar:
+  order: 21
+prev: true
+next: true
+---
+
+The steepest ascent method finds a local maximum of $f(x, y)$ by repeatedly moving in the direction of the gradient.
+
+## Gradient
+
+The gradient of $f(x,y)$ is
+
+$$
+\nabla f(x, y) = \frac{\partial f}{\partial x}\vec{i} + \frac{\partial f}{\partial y}\vec{j}
+$$
+
+$f(x,y)$ increases fastest in the direction of $\nabla f$ and decreases fastest in the opposite direction.
+
+## Procedure
+
+Given a starting point $(x_0, y_0)$
+
+- Evaluate the gradient $\nabla f(x_i, y_i)$
+- Search along the gradient direction for the $h_i$ that maximizes
+
+$$
+g(h_i) = f\left(x_i + h_i \frac{\partial f}{\partial x}(x_i,y_i),\ y_i + h_i \frac{\partial f}{\partial y}(x_i,y_i)\right)
+$$
+
+- Set $g'(h_i) = 0$ and solve for $h_i$
+- Update
+
+$$
+x_{i+1} = x_i + h_i \frac{\partial f}{\partial x}(x_i,y_i), \quad y_{i+1} = y_i + h_i \frac{\partial f}{\partial y}(x_i,y_i)
+$$
+
+- Repeat until convergence
+
+<Note>
+
+Finding the minimum of $f(x,y)$ follows the same steps applied to $-f(x,y)$. This variant is the steepest descent method.
+
+</Note>
+
+## Worked Example
+
+Maximize
+
+$$
+f(x,y) = 2xy + 2x - x^2 - 2y^2
+$$
+
+with initial guess $x_0 = -1$, $y_0 = 1$. The partial derivatives are
+
+$$
+\frac{\partial f}{\partial x} = 2y + 2 - 2x, \quad \frac{\partial f}{\partial y} = 2x - 4y
+$$
+
+Iteration 1
+
+$$
+\left.\frac{\partial f}{\partial x}\right|_{(-1,1)} = 6, \quad \left.\frac{\partial f}{\partial y}\right|_{(-1,1)} = -6
+$$
+
+$$
+g(h_0) = f(-1 + 6h_0,\ 1 - 6h_0) = -180h_0^2 + 72h_0 - 7
+$$
+
+$$
+g'(h_0) = -360h_0 + 72 = 0 \implies h_0 = 0.2
+$$
+
+$$
+x_1 = -1 + 6(0.2) = 0.2, \quad y_1 = 1 - 6(0.2) = -0.2
+$$
+
+Iteration 2
+
+$$
+\left.\frac{\partial f}{\partial x}\right|_{(0.2,-0.2)} = 1.2, \quad \left.\frac{\partial f}{\partial y}\right|_{(0.2,-0.2)} = 1.2
+$$
+
+$$
+g(h_1) = f(0.2 + 1.2h_1,\ -0.2 + 1.2h_1) = -1.44h_1^2 + 2.88h_1 + 0.2
+$$
+
+$$
+g'(h_1) = -2.88h_1 + 2.88 = 0 \implies h_1 = 1
+$$
+
+$$
+x_2 = 0.2 + 1.2(1) = 1.4, \quad y_2 = -0.2 + 1.2(1) = 1
+$$
+
+Iteration 3
+
+$$
+\left.\frac{\partial f}{\partial x}\right|_{(1.4,1)} = 1.2, \quad \left.\frac{\partial f}{\partial y}\right|_{(1.4,1)} = -1.2
+$$
+
+$$
+g(h_2) = f(1.4 + 1.2h_2,\ 1 - 1.2h_2) = -7.2h_2^2 + 2.88h_2 + 1.64
+$$
+
+$$
+g'(h_2) = -14.4h_2 + 2.88 = 0 \implies h_2 = 0.2
+$$
+
+$$
+x_3 = 1.4 + 1.2(0.2) = 1.64, \quad y_3 = 1 - 1.2(0.2) = 0.76
+$$
+
+The iterations continue toward the maximum at $(2, 1)$, where $f(2,1) = 2$.

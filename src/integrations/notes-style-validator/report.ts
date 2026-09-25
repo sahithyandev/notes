@@ -5,12 +5,17 @@ export interface SimpleLogger {
 
 export type RuleId =
   | "title-case"
-  | "em-dash"
+  | "title-parens"
+  | "title-dash"
+  | "dash"
+  | "math-delimiters"
   | "adjacent-note"
   | "label-description"
   | "collapsed-label"
   | "prereq-scope"
-  | "broken-link";
+  | "broken-link"
+  | "filename"
+  | "title-heading-duplicate";
 
 export interface Violation {
   rule: RuleId;

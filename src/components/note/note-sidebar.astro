@@ -1,0 +1,309 @@
+---
+import type { SidebarData } from "../../lib/sidebar";
+import { getSemesterInfo } from "../../lib/sidebar";
+import { isElective } from "../../utils/values";
+import ChevronDown from "../icons/chevron-down.astro";
+import ModulesList from "./modules-list.astro";
+import ModuleTree from "./module-tree.astro";
+
+interface Props {
+  sidebarData: SidebarData;
+  slug: string;
+  slugParts: string[];
+}
+
+const { sidebarData, slug, slugParts } = Astro.props;
+---
+
+<aside class="sidebar">
+  <div class="sb-sem-wrap">
+    <button
+      class="sb-sem"
+      id="sem-switcher-btn"
+      type="button"
+      aria-haspopup="listbox"
+      aria-expanded="false"
+    >
+      <div class="sb-sem-pip"></div>
+      <div class="sb-sem-info">
+        <span class="sb-sem-name">{getSemesterInfo(slugParts).label}</span>
+      </div>
+      <ChevronDown class="sb-sem-chev" />
+    </button>
+    <div class="sb-sem-menu" id="sem-switcher-menu" hidden role="listbox">
+      {
+        sidebarData.semesters.map((s) => (
+          <a
+            href={`/${s.firstSlug}`}
+            class={`sb-sem-opt ${s.number === Number(sidebarData.currentSemester.slice(1)) ? "active" : ""}`}
+            style={`--opt-sem: var(--s${s.number}); --opt-sem-bg: var(--s${s.number}-bg); --opt-sem-border: var(--s${s.number}-border);`}
+            role="option"
+          >
+            <span class="sb-sem-opt-pip" />
+            <span>{s.label}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <ModulesList
+    modules={Object.entries(
+      sidebarData.grouped[sidebarData.currentSemester] || {},
+    ).map(([module, notes]) => ({
+      module,
+      href: `/${sidebarData.currentSemester}/${module}`,
+      count: notes.length,
+      active: module === sidebarData.currentModule,
+      elective: isElective(`${sidebarData.currentSemester}/${module}`),
+    }))}
+  />
+
+  <ModuleTree
+    currentModule={sidebarData.currentModule}
+    direct={sidebarData.currentModuleTree.direct}
+    topics={sidebarData.currentModuleTree.topics}
+    currentSlug={slug}
+  />
+
+  <div class="sb-rule"></div>
+  <a href="/license" class="sb-item sb-license-link"> License </a>
+</aside>
+
+<script>
+  const semBtn = document.getElementById("sem-switcher-btn");
+  const semMenu = document.getElementById("sem-switcher-menu");
+  if (semBtn && semMenu) {
+    const close = () => {
+      semMenu.hidden = true;
+      semBtn.setAttribute("aria-expanded", "false");
+    };
+    const open = () => {
+      semMenu.hidden = false;
+      semBtn.setAttribute("aria-expanded", "true");
+    };
+    semBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      semMenu.hidden ? open() : close();
+    });
+    document.addEventListener("click", (e) => {
+      if (semMenu.hidden) return;
+      const target = e.target as Node;
+      if (!semMenu.contains(target) && !semBtn.contains(target)) close();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !semMenu.hidden) {
+        close();
+        semBtn.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    overflow-y: auto;
+    background: var(--surface);
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 2px;
+  }
+
+  .sb-sem-wrap {
+    position: relative;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sb-sem {
+    width: 100%;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--sem-bg);
+    border: 0;
+    border-bottom: 1px solid var(--sem-border);
+    color: var(--sem);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: filter 0.1s;
+  }
+
+  .sb-sem:hover {
+    filter: brightness(0.97);
+  }
+
+  :global([data-theme="dark"]) .sb-sem:hover {
+    filter: brightness(1.25);
+  }
+
+  .sb-sem .sb-sem-name {
+    color: var(--sem);
+  }
+
+  .sb-sem :global(.sb-sem-chev) {
+    color: var(--sem);
+    opacity: 0.7;
+  }
+
+  .sb-sem[aria-expanded="true"] :global(.sb-sem-chev) {
+    transform: rotate(180deg);
+  }
+
+  .sb-sem-menu {
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    z-index: 10;
+    margin-top: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .sb-sem-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 4px;
+    transition:
+      background 0.1s,
+      color 0.1s;
+  }
+
+  .sb-sem-opt:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  .sb-sem-opt.active {
+    color: var(--opt-sem);
+  }
+
+  .sb-sem-opt-pip,
+  .sb-sem-pip {
+    width: var(--pip-size);
+    height: var(--pip-size);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .sb-sem-opt-pip {
+    background: var(--opt-sem);
+  }
+
+  .sb-sem-pip {
+    background: var(--sem);
+  }
+
+  .sb-sem-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .sb-sem-name {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  .sb-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 16px;
+    font-size: 0.78125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    transition:
+      background 0.1s,
+      color 0.1s,
+      border-color 0.1s;
+    line-height: 1.35;
+  }
+
+  .sb-item:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  .sb-item.active {
+    background: var(--sem-dim);
+    color: var(--sem);
+    border-left-color: var(--sem);
+    font-weight: 700;
+  }
+
+  .sb-item-sub {
+    padding-left: 28px;
+    font-size: 0.75rem;
+  }
+
+  .sb-item-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--text-muted);
+  }
+
+  .sb-rule {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+  }
+
+  @media (max-width: 48rem) {
+    .sb-item {
+      padding: 10px 16px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      height: calc(100dvh - var(--nav-h));
+      width: min(300px, 85vw);
+      z-index: 50;
+      transform: translateX(-100%);
+      box-shadow: 2px 0 18px rgba(0, 0, 0, 0.18);
+    }
+
+    :global(html.drawers-ready) .sidebar {
+      transition: transform 0.22s ease;
+    }
+
+    :global(html.sidebar-open) .sidebar {
+      transform: translateX(0);
+    }
+  }
+</style>

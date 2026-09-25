@@ -1,0 +1,132 @@
+---
+import { titleize } from "../../utils/index";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+export interface Props {
+  slug: string;
+  title?: string;
+}
+
+const { slug, title } = Astro.props;
+
+function generateBreadcrumb(
+  slug: string,
+  pageTitle?: string,
+): BreadcrumbItem[] {
+  const parts = slug.split("/");
+  const breadcrumb: BreadcrumbItem[] = [];
+
+  parts.forEach((part, index) => {
+    let label = part;
+    let href: string | undefined;
+
+    // Handle semester
+    if (index === 0 && part.startsWith("s")) {
+      const semesterNum = part.substring(1);
+      label = `Semester ${semesterNum}`;
+      href = `/${part}`;
+    }
+    // Handle module names (convert kebab-case to title case)
+    else if (index === 1) {
+      label = titleize(part);
+      href = `/${parts.slice(0, index + 1).join("/")}`;
+    }
+    // Handle subdirectories
+    else if (index > 1 && index < parts.length - 1) {
+      label = titleize(part);
+      href = `/${parts.slice(0, index + 1).join("/")}`;
+    }
+    // Handle the final note (current page)
+    else if (index === parts.length - 1) {
+      label = pageTitle ?? titleize(part);
+      if (label.startsWith("Introduction to ")) {
+        label = "Introduction";
+      }
+      // No href for current page
+    }
+
+    breadcrumb.push({ label, href });
+  });
+
+  return breadcrumb;
+}
+
+const breadcrumbItems = generateBreadcrumb(slug, title);
+---
+
+<div class="breadcrumb" aria-label="Breadcrumb">
+  {
+    breadcrumbItems.map((item, index) => (
+      <>
+        {index > 0 && (
+          <span
+            class={`breadcrumb-sep${index === breadcrumbItems.length - 1 ? " last" : ""}`}
+          >
+            /
+          </span>
+        )}
+        {item.href ? (
+          <a href={item.href} class="breadcrumb-link">
+            {item.label}
+          </a>
+        ) : (
+          <span class="breadcrumb-current">{item.label}</span>
+        )}
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.12s ease;
+    font-weight: 500;
+  }
+
+  .breadcrumb-link:hover {
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .breadcrumb-sep {
+    color: var(--text-muted);
+    opacity: 0.5;
+    font-weight: 400;
+  }
+
+  /* Responsive */
+  @media (max-width: 48rem) {
+    .breadcrumb {
+      font-size: 12px;
+      gap: 6px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .breadcrumb-current,
+    .breadcrumb-sep.last {
+      display: none;
+    }
+  }
+</style>

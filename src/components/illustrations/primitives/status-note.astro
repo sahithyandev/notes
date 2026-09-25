@@ -1,0 +1,35 @@
+---
+// The pass/fail message box under a sensitivity slider. Normalises the
+// three ad-hoc state attribute names the sliders used to write
+// (data-optimal / data-feasible / data-satisfied) onto one data-state.
+interface Props {
+  ok: boolean;
+}
+
+const { ok } = Astro.props;
+---
+
+<div class="status" data-status data-state={ok ? "ok" : "bad"}>
+  <slot />
+</div>
+
+<style>
+  .status {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .status[data-state="ok"] {
+    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
+    border-color: var(--s3-border);
+  }
+
+  .status[data-state="bad"] {
+    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
+    border-color: var(--s4-border);
+  }
+</style>

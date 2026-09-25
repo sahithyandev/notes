@@ -1,0 +1,255 @@
+---
+interface Props {
+  slug: string;
+  initialUp?: number;
+  initialDown?: number;
+}
+const { slug, initialUp = 0, initialDown = 0 } = Astro.props;
+---
+
+<div class="note-feedback" data-slug={slug} aria-label="Was this note helpful?">
+  <span class="note-feedback-label">Was this helpful?</span>
+  <div class="note-feedback-btns">
+    <button
+      class="note-feedback-btn"
+      data-vote="1"
+      aria-label="Yes, this note was helpful"
+      aria-pressed="false"
+    >
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"
+        ></path>
+        <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+      </svg>
+      <span class="note-feedback-btn-label">Yes</span>
+      <span class="note-feedback-count" data-count="up">{initialUp}</span>
+    </button>
+
+    <button
+      class="note-feedback-btn"
+      data-vote="-1"
+      aria-label="No, this note was not helpful"
+      aria-pressed="false"
+    >
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"
+        ></path>
+        <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"
+        ></path>
+      </svg>
+      <span class="note-feedback-btn-label">No</span>
+      <span class="note-feedback-count" data-count="down">{initialDown}</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const container = document.querySelector<HTMLElement>(".note-feedback");
+    if (!container) return;
+
+    const slug = container.dataset.slug ?? "";
+    const storageKey = `sn-vote-${slug}`;
+    const btns =
+      container.querySelectorAll<HTMLButtonElement>(".note-feedback-btn");
+    const upCountEl =
+      container.querySelector<HTMLElement>('[data-count="up"]')!;
+    const downCountEl = container.querySelector<HTMLElement>(
+      '[data-count="down"]',
+    )!;
+
+    let inflight = false;
+    let voted = false;
+
+    function markActive(vote: number | null) {
+      btns.forEach((btn) => {
+        const v = Number(btn.dataset.vote);
+        const active = vote !== null && v === vote;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-pressed", String(active));
+      });
+    }
+
+    function setCounts(up: number, down: number) {
+      upCountEl.textContent = String(up);
+      downCountEl.textContent = String(down);
+    }
+
+    // Restore prior vote highlight from localStorage
+    const stored = localStorage.getItem(storageKey);
+    if (stored === "1" || stored === "-1") {
+      markActive(Number(stored));
+    }
+
+    // Fetch live counts on load (static build bakes in stale zeros)
+    fetch(`/api/votes?slug=${encodeURIComponent(slug)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        // A click may have already landed (and its own POST response
+        // applied) while this was in flight; don't clobber it.
+        if (!voted && data && typeof data.up === "number") {
+          setCounts(data.up, data.down);
+        }
+      })
+      .catch(() => {});
+
+    btns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (inflight) return;
+        voted = true;
+        const vote = Number(btn.dataset.vote) as 1 | -1;
+        const prevVote = localStorage.getItem(storageKey);
+        const isUndo = prevVote === String(vote);
+        const sentVote: 0 | 1 | -1 = isUndo ? 0 : vote;
+
+        // Optimistic UI
+        let up = Number(upCountEl.textContent) || 0;
+        let down = Number(downCountEl.textContent) || 0;
+        // Remove effect of previous vote
+        if (prevVote === "1") up = Math.max(0, up - 1);
+        if (prevVote === "-1") down = Math.max(0, down - 1);
+        // Apply new vote
+        if (sentVote === 1) up++;
+        if (sentVote === -1) down++;
+        setCounts(up, down);
+
+        if (isUndo) {
+          localStorage.removeItem(storageKey);
+          markActive(null);
+        } else {
+          localStorage.setItem(storageKey, String(vote));
+          markActive(vote);
+        }
+
+        inflight = true;
+        fetch("/api/votes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, vote: sentVote }),
+        })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data) => {
+            if (data && typeof data.up === "number") {
+              setCounts(data.up, data.down);
+              window.stonks?.event("vote", "/" + slug, { vote: sentVote });
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            inflight = false;
+          });
+      });
+    });
+  })();
+</script>
+
+<style>
+  .note-feedback {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 24px;
+    font-family: var(--font-ui);
+    flex-wrap: wrap;
+  }
+
+  .note-feedback-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .note-feedback-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .note-feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition:
+      background 0.12s ease,
+      border-color 0.12s ease,
+      color 0.12s ease,
+      transform 0.1s ease;
+  }
+
+  .note-feedback-btn:hover {
+    color: var(--sem);
+    background: var(--sem-bg);
+    border-color: var(--sem-border);
+  }
+
+  .note-feedback-btn:active {
+    transform: scale(0.95);
+  }
+
+  .note-feedback-btn.is-active {
+    color: var(--sem);
+    background: var(--sem-bg);
+    border-color: var(--sem-border);
+  }
+
+  .note-feedback-btn.is-active svg {
+    fill: currentColor;
+    opacity: 1;
+  }
+
+  .note-feedback-btn svg {
+    flex-shrink: 0;
+    opacity: 0.75;
+  }
+
+  .note-feedback-btn-label {
+    line-height: 1;
+  }
+
+  .note-feedback-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    line-height: 1;
+    min-width: 1ch;
+    text-align: center;
+  }
+
+  .note-feedback-btn.is-active .note-feedback-count {
+    color: currentColor;
+    opacity: 0.75;
+  }
+</style>

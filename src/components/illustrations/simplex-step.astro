@@ -1,5 +1,7 @@
 ---
-import katex from "katex";
+import "../../styles/tableau.css";
+import { tex } from "../../utils/tex";
+import StepNote from "./primitives/step-note.astro";
 
 interface Row {
   basic: string;
@@ -14,12 +16,10 @@ interface Props {
   rows: Row[];
   entering?: number;
   leaving?: number;
+  ratioRow?: string[];
 }
 
-const { label, columns, rows, entering, leaving } = Astro.props;
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
+const { label, columns, rows, entering, leaving, ratioRow } = Astro.props;
 
 const colCount = columns.length;
 ---
@@ -29,7 +29,7 @@ const colCount = columns.length;
     /* Hidden data source. The walkthrough clones one live table and copies
       only the cells that actually change between steps. */
   }
-  <table class="tableau" aria-hidden="true">
+  <table class="tableau" data-stage aria-hidden="true">
     <colgroup>
       <col class="c-basic" />
       {columns.map(() => <col class="c-data" />)}
@@ -73,23 +73,30 @@ const colCount = columns.length;
           </tr>
         ))
       }
+      {
+        ratioRow && (
+          <tr class="ratio-row">
+            <td class="basic ratio-label">Ratio</td>
+            {ratioRow.map((v) => (
+              <td class="num ratio-cell" set:html={v ? tex(v) : ""} />
+            ))}
+            <td class="num rhs" />
+            <td class="num" />
+          </tr>
+        )
+      }
     </tbody>
   </table>
 
-  <div class="step-note"><slot /></div>
+  <StepNote><slot /></StepNote>
 </div>
 
 <style>
+  /* Fixed layout: data columns share the leftover space equally, so widths
+     stay put as cells swap between steps. Below min-width the parent .scroll
+     scrolls horizontally. */
   table.tableau {
-    border-collapse: collapse;
-    /* Fixed layout: data columns share the leftover space equally, so widths
-       stay put as cells swap between steps. Below min-width the parent .scroll
-       scrolls horizontally. */
-    table-layout: fixed;
-    width: 100%;
     min-width: 34rem;
-    font-size: 0.9rem;
-    font-family: var(--font-ui);
   }
   .tableau col.c-basic {
     width: 3rem;
@@ -101,34 +108,17 @@ const colCount = columns.length;
     width: 5rem;
   }
 
-  .tableau th,
-  .tableau td {
-    padding: 6px 8px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .tableau thead tr {
-    border-bottom: 2px solid var(--border-strong);
-  }
-  .tableau tbody tr:last-child td {
-    border-bottom: none;
-  }
-  .tableau th.basic,
-  .tableau td.basic {
-    text-align: left;
-    color: var(--text-secondary);
-  }
-  .tableau td.num,
-  .tableau th.num {
-    font-variant-numeric: tabular-nums;
-  }
-  .tableau .rhs {
-    border-left: 2px solid var(--border-strong);
-  }
   .tableau td.ratio {
     color: var(--text-secondary);
     font-size: 0.8rem;
+  }
+  .tableau tr.ratio-row td {
+    border-top: 2px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+  .tableau td.ratio-label {
+    font-style: italic;
   }
 
   /* Only background and text color change, with a plain fade. */
@@ -161,19 +151,5 @@ const colCount = columns.length;
     .tableau td {
       transition: none;
     }
-  }
-
-  .step-note {
-    margin: 12px 0 0;
-    min-height: 2.8em;
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: var(--text-secondary);
-  }
-  .step-note :global(p) {
-    margin: 0;
-  }
-  .step-note :global(.katex) {
-    font-size: 1em;
   }
 </style>

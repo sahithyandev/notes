@@ -1,7 +1,7 @@
 ---
 title: Overhead Reapportionment
 dateCreated: 2026-08-18T07:03:53.000Z
-lastUpdatedOn: 2026-08-20T06:37:25.384Z
+lastUpdatedOn: 2026-09-25T06:53:40.309Z
 slug: >-
   s5/business-economics-and-financial-accounting/management-accounting/overhead-reapportionment
 sidebar:
@@ -46,3 +46,113 @@ Sets up the overhead reapportionment process as a set of equations, letting $A$ 
 #### Repeated Distribution Method
 
 Each service department's total cost is repeatedly reallocated among other departments, based on a given percentage basis, until the cost of each service department becomes negligible.
+
+## Worked Examples
+
+Consider production departments $P_1$ and $P_2$, and service departments $S_1$ and $S_2$, with overheads before reapportionment: $P_1 = 10000$, $P_2 = 8000$, $S_1 = 4000$, $S_2 = 2000$.
+
+### Direct Method
+
+$S_1$ serves $P_1$ 60% and $P_2$ 40%. $S_2$ serves $P_1$ 50% and $P_2$ 50%.
+
+$
+\begin{aligned}
+S_1 \to P_1 &= 0.60 \times 4000 = 2400 \\
+S_1 \to P_2 &= 0.40 \times 4000 = 1600 \\
+S_2 \to P_1 &= 0.50 \times 2000 = 1000 \\
+S_2 \to P_2 &= 0.50 \times 2000 = 1000
+\end{aligned}
+$
+
+$
+\begin{aligned}
+P_1 &= 10000 + 2400 + 1000 = 13400 \\
+P_2 &= 8000 + 1600 + 1000 = 10600
+\end{aligned}
+$
+
+### Step Down Method
+
+$S_1$ is apportioned first, serving $S_2$ 10%, $P_1$ 60%, $P_2$ 30%.
+
+$
+\begin{aligned}
+S_1 \to S_2 &= 0.10 \times 4000 = 400 \\
+S_1 \to P_1 &= 0.60 \times 4000 = 2400 \\
+S_1 \to P_2 &= 0.30 \times 4000 = 1200
+\end{aligned}
+$
+
+$S_2
+s cost then includes what it received from $S_1$, and is apportioned to $P_1$ and $P_2$ only, without going back to $S_1$. $S_2
+s total becomes $2000 + 400 = 2400$, split $P_1$ 50%, $P_2$ 50%.
+
+$
+\begin{aligned}
+S_2 \to P_1 &= 0.50 \times 2400 = 1200 \\
+S_2 \to P_2 &= 0.50 \times 2400 = 1200
+\end{aligned}
+$
+
+$
+\begin{aligned}
+P_1 &= 10000 + 2400 + 1200 = 13600 \\
+P_2 &= 8000 + 1200 + 1200 = 10400
+\end{aligned}
+$
+
+### Reciprocal Method
+
+Uses $S_1$ serving $S_2$ 10%, $P_1$ 60%, $P_2$ 30%, and $S_2$ serving $S_1$ 20%, $P_1$ 40%, $P_2$ 40%.
+
+#### Simultaneous Equation Method
+
+$
+\begin{aligned}
+S_1 &= 4000 + 0.20 S_2 \\
+S_2 &= 2000 + 0.10 S_1
+\end{aligned}
+$
+
+Substitute $S_2$ into $S_1$ and solve.
+
+$
+S_1 = 4000 + 0.20(2000 + 0.10 S_1) = 4400 + 0.02 S_1
+$
+
+$
+0.98 S_1 = 4400 \implies S_1 = 4489.80
+$
+
+$
+S_2 = 2000 + 0.10 \times 4489.80 = 2448.98
+$
+
+$
+\begin{aligned}
+P_1 &= 10000 + 0.60(4489.80) + 0.40(2448.98) = 13673.47 \\
+P_2 &= 8000 + 0.30(4489.80) + 0.40(2448.98) = 10326.53
+\end{aligned}
+$
+
+#### Repeated Distribution Method
+
+Uses the same percentages as the Simultaneous Equation Method.
+
+- Round 1  
+  Distribute $S_1 = 4000$: $S_2$ gains $400$, $P_1$ gains $2400$, $P_2$ gains $1200$.
+  Distribute $S_2 = 2400$: $S_1$ gains $480$, $P_1$ gains $960$, $P_2$ gains $960$.
+- Round 2  
+  Distribute $S_1 = 480$: $S_2$ gains $48$, $P_1$ gains $288$, $P_2$ gains $144$.
+  Distribute $S_2 = 48$: $S_1$ gains $9.6$, $P_1$ gains $19.2$, $P_2$ gains $19.2$.
+- Round 3  
+  $S_1 = 9.6$ is negligible, so distribution stops.
+
+$
+\begin{aligned}
+P_1 &\approx 10000 + 2400 + 960 + 288 + 19.2 = 13667.2 \\
+P_2 &\approx 8000 + 1200 + 960 + 144 + 19.2 = 10323.2
+\end{aligned}
+$
+
+Further rounds converge these towards the Simultaneous Equation Method's result.

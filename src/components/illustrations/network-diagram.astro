@@ -1,0 +1,159 @@
+---
+// Static node-and-arrow project network diagram: events as circles, activities
+// as labeled directed arrows between them (dashed for a dummy activity).
+interface Node {
+  id: string;
+  x: number;
+  y: number;
+}
+
+interface Edge {
+  from: string;
+  to: string;
+  label: string;
+  dashed?: boolean;
+}
+
+interface Props {
+  nodes: Node[];
+  edges: Edge[];
+  width?: number;
+  height?: number;
+}
+
+const { nodes, edges, width = 560, height = 300 } = Astro.props;
+
+const uid = "net-" + Math.random().toString(36).slice(2, 9);
+
+const R = 18;
+
+const byId = new Map(nodes.map((n) => [n.id, n]));
+
+const arrows = edges.map((edge) => {
+  const from = byId.get(edge.from)!;
+  const to = byId.get(edge.to)!;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dist = Math.hypot(dx, dy) || 1;
+  const ux = dx / dist;
+  const uy = dy / dist;
+  const x1 = from.x + ux * R;
+  const y1 = from.y + uy * R;
+  const x2 = to.x - ux * R;
+  const y2 = to.y - uy * R;
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+  // Offset the label off the line, on its perpendicular side.
+  const nx = -uy;
+  const ny = ux;
+  const labelX = midX + nx * 12;
+  const labelY = midY + ny * 12;
+  return { ...edge, x1, y1, x2, y2, labelX, labelY };
+});
+---
+
+<figure class="network" id={uid}>
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    width="100%"
+    role="img"
+    aria-label="Project network diagram"
+  >
+    <defs>
+      <marker
+        id={`${uid}-arrow`}
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"></path>
+      </marker>
+    </defs>
+
+    {
+      arrows.map((a) => (
+        <g class="edge">
+          <line
+            x1={a.x1}
+            y1={a.y1}
+            x2={a.x2}
+            y2={a.y2}
+            class:list={["shaft", { dummy: a.dashed }]}
+            marker-end={`url(#${uid}-arrow)`}
+          />
+          <text
+            x={a.labelX}
+            y={a.labelY}
+            class="edge-label"
+            text-anchor="middle"
+          >
+            {a.label}
+          </text>
+        </g>
+      ))
+    }
+
+    {
+      nodes.map((n) => (
+        <g class="node">
+          <circle cx={n.x} cy={n.y} r={R} />
+          <text
+            x={n.x}
+            y={n.y}
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            {n.id}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+</figure>
+
+<style>
+  .network {
+    max-width: 560px;
+    margin: 20px auto;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .shaft {
+    stroke: var(--text-secondary);
+    stroke-width: 1.5;
+  }
+
+  .shaft.dummy {
+    stroke-dasharray: 5 4;
+  }
+
+  .arrowhead {
+    fill: var(--text-secondary);
+  }
+
+  .edge-label {
+    fill: var(--text-secondary);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+
+  .node circle {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+
+  .node text {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+  }
+</style>

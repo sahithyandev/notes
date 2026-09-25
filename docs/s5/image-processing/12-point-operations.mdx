@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-09-13T14:55:24.500Z
+lastUpdatedOn: 2026-09-25T06:53:41.219Z
 slug: s5/image-processing/point-operations
 sidebar:
   order: 12
@@ -11,9 +11,9 @@ next: true
 
 Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
 
-Homogeneous **iff** the operation is independent of pixel location
+Homogeneous **iff** the operation is independent of pixel location.
 
-## Lookup Tables
+## Lookup Table
 
 A lookup table (LUT) maps the current pixel value to an index, returning a new value from the table.
 
@@ -52,12 +52,19 @@ Defines the accumulated probability of pixels with intensity level $\le k$.
 
 ### Brightness and Contrast
 
-Brightness and contrast are the position and the width of the same histogram.
+Brightness and contrast are the position and the width of the same histogram. Both are described as point operations mapping input intensity $r$ to output intensity $s$.
 
 - Brightness  
   Mean intensity. A shift $s = r + c$ slides the histogram along the intensity axis, keeping its shape and width.
 - Contrast  
   Spread of intensities. Histogram width, the gap between the darkest and brightest points, measures it. A gain $s = a r$ stretches the histogram wider.
+
+Here:
+
+- $r$: input intensity
+- $s$: output intensity
+- $c$: shift constant, added to move brightness
+- $a$: gain constant, multiplied to change contrast
 
 Shifting the histogram changes brightness only. Every pair of pixels keeps the same intensity gap, so contrast is unaffected.
 
@@ -94,7 +101,7 @@ Common transformations applied to each pixel, typically implemented as a LUT map
 
 ## Histogram Matching
 
-Histogram matching adjusts a test image so its grey level distribution follows a given reference distribution. Also called histogram specification.
+Aka. histogram specification. The process of adjusting a test image so its grey level distribution follows a given reference distribution.
 
 The reference is supplied as a 256-element array holding the reference CDF, one value per grey level.
 

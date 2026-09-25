@@ -1,0 +1,189 @@
+---
+import { tex } from "../../utils/tex";
+
+interface Props {
+  agents: string[];
+  tasks: string[];
+  costs: number[][];
+  coveredRows?: number[];
+  coveredCols?: number[];
+  assigned?: [number, number][];
+  total?: string;
+  dataSource?: boolean;
+}
+
+const {
+  agents,
+  tasks,
+  costs,
+  coveredRows = [],
+  coveredCols = [],
+  assigned = [],
+  total,
+  dataSource = false,
+} = Astro.props;
+
+const isRowCovered = (ri: number) => coveredRows.includes(ri);
+const isColCovered = (ci: number) => coveredCols.includes(ci);
+const isAssigned = (ri: number, ci: number) =>
+  assigned.some(([ar, ac]) => ar === ri && ac === ci);
+---
+
+<figure class="assignment" data-stage={dataSource ? "" : undefined}>
+  <table class="tableau" aria-hidden={dataSource ? "true" : undefined}>
+    <colgroup>
+      <col class="c-label" />
+      {tasks.map(() => <col class="c-data" />)}
+    </colgroup>
+    <thead>
+      <tr>
+        <th></th>
+        {
+          tasks.map((t, ci) => (
+            <th class:list={["num", { "col-covered": isColCovered(ci) }]}>
+              {t}
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        agents.map((a, ri) => (
+          <tr>
+            <th class:list={{ "row-covered": isRowCovered(ri) }}>{a}</th>
+            {tasks.map((_, ci) => (
+              <td
+                class:list={[
+                  "cell",
+                  {
+                    zero: costs[ri][ci] === 0,
+                    assigned: isAssigned(ri, ci),
+                    "row-covered": isRowCovered(ri),
+                    "col-covered": isColCovered(ci),
+                  },
+                ]}
+              >
+                {costs[ri][ci]}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  {total && <figcaption set:html={tex(total)} />}
+</figure>
+
+<style>
+  .assignment {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  table {
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  col.c-label {
+    width: 4.5rem;
+  }
+  col.c-data {
+    width: 4rem;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+    position: relative;
+    /* Own stacking context so the covering line (z-index: -1 below) tucks
+       behind this cell's text without slipping under other cells. */
+    z-index: 0;
+  }
+
+  th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  th.row-covered,
+  th.col-covered {
+    color: var(--accent);
+  }
+
+  /* A covering line is drawn as 1 pseudo-element per data cell it crosses,
+     at the cell's mid-height (row line) or mid-width (col line). Adjacent
+     cells are flush (border-collapse), so the segments join into 1
+     continuous line across the inner matrix, stopping at the row/column
+     headers so it never crosses their text. */
+  td.cell.row-covered::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 0;
+    border-top: 1px dotted var(--text-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  td.cell.col-covered::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    border-left: 1px dotted var(--text-muted);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  td.cell {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  td.cell.changed:not(.assigned) {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  td.cell.zero {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  td.cell.assigned {
+    background: var(--dia-pt);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 4px;
+    outline: 2px solid var(--dia-pt);
+    outline-offset: -2px;
+  }
+
+  figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    td.cell {
+      transition: none;
+    }
+  }
+</style>

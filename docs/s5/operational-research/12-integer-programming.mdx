@@ -6,7 +6,7 @@ sidebar:
 prev: true
 next: true
 dateCreated: 2026-08-26T11:54:28.601Z
-lastUpdatedOn: 2026-09-13T14:55:24.615Z
+lastUpdatedOn: 2026-09-25T06:53:41.584Z
 ---
 
 An integer programming problem (IPP) is a linear program with the added restriction that some or all decision variables must be integers.
@@ -106,10 +106,37 @@ The $x_1$ row has $b_1 = 1.5$, so $f_1 = 0.5$. Its coefficients split as $f_{1,s
 
 Gomory constraint: $0.5s_2 \ge 0.5$, i.e. $s_2 \ge 1$.
 
-Add $-0.5s_2 + G = -0.5$ to the tableau and resolve with dual simplex:
+<Walkthrough variant="simplex">
+  <SimplexStep
+    label="Cut added"
+    entering={3}
+    leaving={3}
+    columns={["x_1", "x_2", "s_1", "s_2", "G"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "2", "0.5", "0"], rhs: "13.5" },
+      { basic: "x_1", cells: ["1", "0", "1", "-0.5", "0"], rhs: "1.5" },
+      { basic: "x_2", cells: ["0", "1", "0", "0.5", "0"], rhs: "3.5" },
+      { basic: "G", cells: ["0", "0", "0", "-0.5", "1"], rhs: "-0.5" },
+    ]}
+  >
+    $-0.5s_2 + G = -0.5$ added as a new row. The tableau is still optimal
+    ($z$ row non-negative) but infeasible ($b = -0.5$), so $G$ leaves. Its
+    only negative entry is under $s_2$, so $s_2$ enters. Pivot on $-0.5$.
+  </SimplexStep>
 
-- $G$'s row leaves ($b = -0.5$).
-- $s_2$ enters, its only negative coefficient.
-- Pivoting on $s_2$ gives $x_1 = 2$, $x_2 = 3$, $s_2 = 1$, all integral.
+  <SimplexStep
+    label="Final tableau"
+    columns={["x_1", "x_2", "s_1", "s_2", "G"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "2", "0", "1"], rhs: "13" },
+      { basic: "x_1", cells: ["1", "0", "1", "0", "-1"], rhs: "2" },
+      { basic: "x_2", cells: ["0", "1", "0", "0", "1"], rhs: "3" },
+      { basic: "s_2", cells: ["0", "0", "0", "1", "-2"], rhs: "1" },
+    ]}
+  >
+    Every RHS is $\ge 0$ and $x_1$, $x_2$, $s_2$ are all integral. Optimal at
+    $x_1 = 2$, $x_2 = 3$, $Z = 13$.
+  </SimplexStep>
+</Walkthrough>
 
 Optimal solution: $x_1 = 2$, $x_2 = 3$, $Z = 13$. Matches branch and bound.

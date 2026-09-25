@@ -1,5 +1,9 @@
 ---
-import katex from "katex";
+import "../../styles/tableau.css";
+import { tex } from "../../utils/tex";
+import Panel from "./primitives/panel.astro";
+import SliderControl from "./primitives/slider-control.astro";
+import StatusNote from "./primitives/status-note.astro";
 
 interface Props {
   slack: "s_1" | "s_2" | "s_3";
@@ -9,9 +13,6 @@ interface Props {
 }
 
 const { slack, baseB, deltaMin, deltaMax } = Astro.props;
-
-const tex = (v: string) =>
-  katex.renderToString(v, { throwOnError: false, strict: false });
 
 const columns = ["x_1", "x_2", "s_1", "s_2", "s_3"];
 const rows = [
@@ -31,7 +32,7 @@ const mult = MULT[slack];
 const bIndex = slack.split("_")[1];
 ---
 
-<div class="rhs-slider">
+<Panel class="rhs-slider">
   <table class="tableau">
     <thead>
       <tr>
@@ -62,43 +63,22 @@ const bIndex = slack.split("_")[1];
     </tbody>
   </table>
 
-  <div class="control">
-    <label for={`rhs-delta-${slack}`}>
-      &Delta;, change to <span set:html={tex(`b_${bIndex}`)} />, currently{" "}
-      {baseB}
-    </label>
-    <input
-      id={`rhs-delta-${slack}`}
-      type="range"
-      min={deltaMin}
-      max={deltaMax}
-      step="0.01"
-      value="0"
-    />
-    <output for={`rhs-delta-${slack}`} data-delta>0</output>
-  </div>
+  <SliderControl
+    id={`rhs-delta-${slack}`}
+    min={deltaMin}
+    max={deltaMax}
+    step={0.01}
+    value={0}
+  >
+    &Delta;, change to <span set:html={tex(`b_${bIndex}`)} />, currently{" "}
+    {baseB}
+  </SliderControl>
 
-  <div class="status" data-status data-feasible="true">
-    Feasible. Basis stays optimal.
-  </div>
-</div>
+  <StatusNote ok={true}>Feasible. Basis stays optimal.</StatusNote>
+</Panel>
 
 <script>
-  const SUBSCRIPT: Record<string, string> = {
-    "1": "₁",
-    "2": "₂",
-    "3": "₃",
-  };
-
-  const label = (name: string) => {
-    const [base, idx] = name.split("_");
-    return `${base}${SUBSCRIPT[idx] ?? idx}`;
-  };
-
-  const fmt = (n: number) => {
-    const rounded = Math.round(n * 100) / 100;
-    return Object.is(rounded, -0) ? "0" : String(rounded);
-  };
+  import { fmt, label } from "./lib/format";
 
   document.querySelectorAll<HTMLDivElement>(".rhs-slider").forEach((widget) => {
     const slider = widget.querySelector<HTMLInputElement>(
@@ -131,7 +111,7 @@ const bIndex = slack.split("_")[1];
       });
 
       const feasible = infeasible === null;
-      status.dataset.feasible = String(feasible);
+      status.dataset.state = feasible ? "ok" : "bad";
       status.textContent = feasible
         ? "Feasible. Basis stays optimal."
         : `Infeasible. ${label(infeasible!.name)} = ${fmt(
@@ -145,98 +125,14 @@ const bIndex = slack.split("_")[1];
 </script>
 
 <style>
-  .rhs-slider {
-    margin: 24px 0;
+  :global(.panel.rhs-slider) {
     padding: 16px 18px 18px;
-    border: 1px solid var(--border);
     border-radius: 10px;
-    background: var(--surface);
   }
 
-  table.tableau {
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-    font-size: 0.9rem;
-    font-family: var(--font-ui);
-  }
-
-  .tableau th,
-  .tableau td {
-    padding: 6px 8px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .tableau thead tr {
-    border-bottom: 2px solid var(--border-strong);
-  }
-  .tableau tbody tr:last-child td {
-    border-bottom: none;
-  }
-  .tableau th.basic,
-  .tableau td.basic {
-    text-align: left;
-    color: var(--text-secondary);
-  }
-  .tableau td.num,
-  .tableau th.num {
-    font-variant-numeric: tabular-nums;
-  }
-  .tableau .rhs {
-    border-left: 2px solid var(--border-strong);
-  }
   .tableau td.changed {
     color: var(--accent);
     font-weight: 600;
     transition: color 0.15s ease;
-  }
-
-  .control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .control label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-
-  .control input[type="range"] {
-    flex: 1 1 160px;
-    accent-color: var(--s5);
-  }
-
-  .control output {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--s5);
-    min-width: 4ch;
-    text-align: right;
-  }
-
-  .status {
-    margin-top: 12px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 12.5px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-  }
-
-  .status[data-feasible="true"] {
-    background: color-mix(in oklab, var(--s3) 12%, var(--surface));
-    border-color: var(--s3-border);
-  }
-
-  .status[data-feasible="false"] {
-    background: color-mix(in oklab, var(--s4) 12%, var(--surface));
-    border-color: var(--s4-border);
   }
 </style>

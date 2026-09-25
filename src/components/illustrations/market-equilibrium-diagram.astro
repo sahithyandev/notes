@@ -1,0 +1,136 @@
+---
+// Static market equilibrium diagram: demand and supply curves
+// intersecting at the equilibrium point, with dashed guides to the
+// price and quantity axes.
+---
+
+<figure id="market-equilibrium-diagram">
+  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Market Equilibrium</title>
+
+    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
+    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
+    <text class="axis-label" x="50" y="14" text-anchor="middle">Price</text>
+    <text class="axis-label" x="390" y="315" text-anchor="end">Quantity</text>
+
+    <path
+      class="curve demand"
+      d="M 100 40 C 150 90, 190 130, 220 150 C 260 180, 320 220, 370 260"
+    ></path>
+    <path
+      class="curve supply"
+      d="M 90 270 C 140 220, 180 180, 220 150 C 260 120, 310 80, 350 40"></path>
+
+    <line class="guide" x1="220" y1="150" x2="50" y2="150"></line>
+    <line class="guide" x1="220" y1="150" x2="220" y2="290"></line>
+
+    <circle class="pt" cx="220" cy="150" r="5"></circle>
+
+    <text class="axis-tick" x="42" y="154" text-anchor="end">P&#8337;</text>
+    <text class="axis-tick" x="220" y="305" text-anchor="middle">Q&#8337;</text>
+
+    <text class="curve-label demand" x="105" y="30">D</text>
+    <text class="curve-label supply" x="355" y="40">S</text>
+    <text class="pt-label" x="222" y="140">E</text>
+  </svg>
+  <figcaption>
+    <span class="pt">E</span> the equilibrium point, where
+    <span class="demand">D</span> and <span class="supply">S</span> intersect, at
+    price <span class="pt">P&#8337;</span> and quantity
+    <span class="pt">Q&#8337;</span>.
+  </figcaption>
+</figure>
+
+<style>
+  #market-equilibrium-diagram {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  #market-equilibrium-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #market-equilibrium-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #market-equilibrium-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #market-equilibrium-diagram .axis-tick {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  #market-equilibrium-diagram .curve {
+    fill: none;
+    stroke-width: 2.5;
+  }
+
+  #market-equilibrium-diagram .curve.demand {
+    stroke: var(--s5);
+  }
+
+  #market-equilibrium-diagram .curve.supply {
+    stroke: var(--dia-ct);
+  }
+
+  #market-equilibrium-diagram .guide {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  #market-equilibrium-diagram .pt {
+    fill: var(--dia-pt);
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+
+  #market-equilibrium-diagram .curve-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #market-equilibrium-diagram .curve-label.demand {
+    fill: var(--s5);
+  }
+
+  #market-equilibrium-diagram .curve-label.supply {
+    fill: var(--dia-ct);
+  }
+
+  #market-equilibrium-diagram .pt-label {
+    fill: var(--dia-pt);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #market-equilibrium-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #market-equilibrium-diagram figcaption span {
+    font-weight: 600;
+  }
+
+  #market-equilibrium-diagram figcaption .demand {
+    color: var(--s5);
+  }
+
+  #market-equilibrium-diagram figcaption .supply {
+    color: var(--dia-ct);
+  }
+
+  #market-equilibrium-diagram figcaption .pt {
+    color: var(--dia-pt);
+  }
+</style>

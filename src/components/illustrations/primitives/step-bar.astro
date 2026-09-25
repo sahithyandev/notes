@@ -1,0 +1,47 @@
+---
+// Label + "n / total" counter row at the top of a walkthrough. Filled in by
+// the shared controller (lib/walkthrough.ts) via the data- hooks below.
+// `total` is an optional server-rendered starting value for the ones that
+// know their step count up front and never overwrite it client-side (the
+// flow/sequence diagrams); lib/walkthrough.ts always overwrites it anyway.
+interface Props {
+  total?: number;
+}
+
+const { total } = Astro.props;
+---
+
+<div class="bar">
+  <span class="label" data-label></span>
+  <span class="count"
+    ><span data-current>1</span> / <span data-total>{total}</span></span
+  >
+</div>
+
+<style>
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    min-height: 1.2em;
+  }
+  .label {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .count {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Astro scopes ancestor compounds too, so ":not(.ready) .bar" written
+     plainly here would need the walkthrough root to carry this component's
+     own cid, which it never will. :global() on the ancestor compound keeps
+     .bar scoped to this component while still matching the walkthrough's
+     .ready toggle. */
+  :global(.walkthrough:not(.ready)) .bar {
+    visibility: hidden;
+  }
+</style>

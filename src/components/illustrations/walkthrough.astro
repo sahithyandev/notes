@@ -1,0 +1,109 @@
+---
+// The generic step carousel: one persistent [data-stage] table/figure that
+// the shared controller (lib/walkthrough.ts) clones and updates cell by
+// cell, replacing simplex-walkthrough / transportation-walkthrough /
+// assignment-walkthrough. `variant` picks a legend preset (see
+// lib/legend-presets.ts); pass `legend` directly for a one-off.
+import Panel from "./primitives/panel.astro";
+import StepBar from "./primitives/step-bar.astro";
+import Legend from "./primitives/legend.astro";
+import StepNav from "./primitives/step-nav.astro";
+import type { Chip } from "./primitives/legend.astro";
+import {
+  WALKTHROUGH_PRESETS,
+  type WalkthroughVariant,
+} from "./lib/legend-presets";
+
+interface Props {
+  variant?: WalkthroughVariant;
+  legend?: Chip[];
+}
+
+const { variant, legend } = Astro.props;
+const chips = legend ?? (variant ? WALKTHROUGH_PRESETS[variant].legend : []);
+---
+
+<Panel
+  class="walkthrough"
+  data-walkthrough
+  tabindex="0"
+  aria-roledescription="carousel"
+>
+  <StepBar />
+  <Legend items={chips} />
+
+  <div class="scroll" data-live></div>
+
+  <div class="stack"><slot /></div>
+
+  <StepNav />
+</Panel>
+
+<style>
+  .scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  /* The hidden data tables inside each step; only notes stay visible. */
+  .stack :global(.step [data-stage]) {
+    display: none;
+  }
+
+  /* Notes share one grid cell so the box does not resize between steps. */
+  .stack {
+    display: grid;
+    margin-top: 2px;
+  }
+  .stack > :global(.step) {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+  }
+  .stack > :global(.step.active) {
+    opacity: 1;
+    visibility: visible;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stack > :global(.step) {
+      transition: none;
+    }
+  }
+</style>
+
+<noscript>
+  <style>
+    /* This block is passed through unscoped, so every rule keeps the
+       .walkthrough prefix explicitly. */
+    .walkthrough [data-live] {
+      display: none;
+    }
+    .walkthrough .stack {
+      display: block;
+    }
+    .walkthrough .stack > .step {
+      opacity: 1;
+      visibility: visible;
+      margin-top: 16px;
+    }
+    .walkthrough .stack .step [data-stage] {
+      display: revert;
+    }
+    .walkthrough .stack .step [data-stage] table {
+      display: revert;
+    }
+    .walkthrough .foot {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { initWalkthrough } from "./lib/walkthrough";
+
+  document
+    .querySelectorAll<HTMLElement>("[data-walkthrough]")
+    .forEach((el) => initWalkthrough(el));
+</script>

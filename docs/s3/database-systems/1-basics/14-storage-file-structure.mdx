@@ -6,7 +6,7 @@ slug: s3/database-systems/basics/storage-file-structure
 prev: true
 next: true
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-09-13T14:55:23.301Z
+lastUpdatedOn: 2026-09-25T06:53:38.125Z
 ---
 
 Explains how data is stored and managed at the physical level in a DBMS. It introduces the types of storage media, performance measures, disk organization, and techniques for efficient data access.
@@ -106,11 +106,9 @@ from disk. If the block is already in the buffer, buffer manager returns its add
 
 Most operating systems replace the block using Least Recently Used (LRU) strategy. But in RDBMSs, LRU other strategies are also used:
 
-- Pinned block – memory block that is not allowed to be written
-  back to disk.
-- Toss-immediate strategy – frees the space occupied by a block
-  as soon as the final tuple of that block has been processed
-- Most recently used (MRU) strategy – system must pin the
-  block currently being processed. After the final tuple of that block
-  has been processed, the block is unpinned, and it becomes the
-  most recently used block.
+- Pinned block  
+  A memory block that is not allowed to be written back to disk.
+- Toss-immediate strategy  
+  Frees the space occupied by a block as soon as the final tuple of that block has been processed.
+- Most recently used (MRU) strategy  
+  The system must pin the block currently being processed. After the final tuple of that block has been processed, the block is unpinned, and it becomes the most recently used block.

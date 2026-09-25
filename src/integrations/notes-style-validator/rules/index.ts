@@ -1,12 +1,18 @@
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
 import { checkTitleCaseRule } from "./title-case.ts";
-import { checkEmDash } from "./em-dash.ts";
+import { checkTitleParens } from "./title-parens.ts";
+import { checkTitleDash } from "./title-dash.ts";
+import { checkTitleLength } from "./title-length.ts";
+import { checkDash } from "./dash.ts";
+import { checkMathDelimiters } from "./math-delimiters.ts";
 import { checkAdjacentNote } from "./adjacent-note.ts";
 import { checkLabelDescription } from "./label-description.ts";
 import { checkCollapsedLabel } from "./collapsed-label.ts";
 import { checkPrereqScope } from "./prereq-scope.ts";
 import { checkBrokenLinks } from "./broken-link.ts";
+import { checkFilename } from "./filename.ts";
+import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 
 export { checkBrokenLinks };
 
@@ -15,11 +21,17 @@ export { checkBrokenLinks };
 // what a valid target even is, so it's handled separately (see validate.ts).
 const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleCaseRule,
-  checkEmDash,
+  checkTitleParens,
+  checkTitleDash,
+  checkTitleLength,
+  checkDash,
+  checkMathDelimiters,
   checkAdjacentNote,
   checkLabelDescription,
   checkCollapsedLabel,
   checkPrereqScope,
+  checkFilename,
+  checkTitleHeadingDuplicate,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {

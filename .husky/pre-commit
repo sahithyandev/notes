@@ -1,1 +1,5 @@
 bunx lint-staged
+
+if git diff --cached --name-only --diff-filter=ACMR | grep -qE '^docs/.*\.mdx?$'; then
+  bun run check-notes-style
+fi

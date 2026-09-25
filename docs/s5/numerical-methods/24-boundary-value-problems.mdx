@@ -1,0 +1,36 @@
+---
+title: Boundary Value Problems
+dateCreated: 2026-09-23T08:09:15.054Z
+lastUpdatedOn: 2026-09-25T06:53:41.420Z
+slug: s5/numerical-methods/boundary-value-problems
+sidebar:
+  order: 24
+prev: true
+next: true
+---
+
+A boundary value problem (BVP) is a differential equation with conditions specified at 2 distinct points, called boundary conditions.
+
+## Standard Form
+
+$$
+y'' = f(x, y, y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+## Existence and Uniqueness
+
+The BVP has a unique solution on $[a,b]$ **iff**
+
+- $f$, $f_y$, and $f_{y'}$ are continuous on $D = \{(x,y,y') \mid a \leq x \leq b,\ y, y' \in \mathbb{R}\}$
+- $f_y(x,y,y') > 0$ for all $(x,y,y') \in D$
+- a constant $M > 0$ exists with $|f_{y'}(x,y,y')| \leq M$ for all $(x,y,y') \in D$
+
+Examples:
+
+- $y'' + e^{-xy} + \sin(y') = 0$, $0 \leq x \leq 1$, $y(0) = y(1) = 0$ has a unique solution, since $f_y = xe^{-xy} > 0$ for all $x,y$ and $|f_{y'}| = |\cos(y')| \leq 1$ for all $y'$.
+
+<Note>
+
+A linear BVP is solved by the [linear shooting method](/s5/numerical-methods/linear-shooting-method) or a [finite-difference method](/s5/numerical-methods/finite-difference-linear-bvp). A nonlinear BVP is solved by the [nonlinear shooting method](/s5/numerical-methods/nonlinear-shooting-method) or a [finite-difference method](/s5/numerical-methods/finite-difference-nonlinear-bvp).
+
+</Note>

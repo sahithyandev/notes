@@ -1,0 +1,16 @@
+---
+import type { ComponentProps } from "astro/types";
+import TransportationTable from "./transportation-table.astro";
+import StepNote from "./primitives/step-note.astro";
+
+type Props = Omit<ComponentProps<typeof TransportationTable>, "dataSource"> & {
+  label: string;
+};
+
+const { label, ...table } = Astro.props;
+---
+
+<div class="step" data-label={label}>
+  <TransportationTable dataSource {...table} />
+  <StepNote><slot /></StepNote>
+</div>

@@ -1,6 +1,19 @@
-import { defineCollection } from "astro:content";
-import { glob } from "astro/loaders";
+import { defineCollection, reference } from "astro:content";
+import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
+
+const authors = defineCollection({
+  loader: file("src/data/authors.json"),
+  schema: z.object({
+    slug: z.string(),
+    name: z.string(),
+    url: z.string().url().optional(),
+    color: z
+      .string()
+      .regex(/^#[0-9a-f]{6}$/i, "color must be a 6-digit hex code"),
+    github_id: z.string().optional(),
+  }),
+});
 
 const notes = defineCollection({
   loader: glob({ base: `./docs`, pattern: "**/*.{md,mdx}" }),
@@ -19,7 +32,10 @@ const notes = defineCollection({
     lastUpdatedOn: z.date().optional(),
     keywords: z.optional(z.array(z.string())),
     prereqs: z.optional(z.array(z.string())),
+    authors: z
+      .array(reference("authors"))
+      .default([{ collection: "authors", id: "sahithyan" }]),
   }),
 });
 
-export const collections = { notes };
+export const collections = { notes, authors };

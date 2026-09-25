@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Blocks commits whose message contains AI-assistant attribution trailers.
+msg_file="$1"
+
+pattern='Co-Authored-By:.*(claude|anthropic|openai|chatgpt|copilot|gemini|gpt-[0-9]|codex)|Generated (with|by).*(Claude|ChatGPT|Copilot|Gemini|Codex)|🤖 Generated with'
+
+if grep -Eqi "$pattern" "$msg_file"; then
+  echo "Commit rejected: message contains AI assistant attribution." >&2
+  echo "Remove any 'Co-Authored-By' / 'Generated with' lines referencing an AI tool." >&2
+  exit 1
+fi

@@ -1,0 +1,160 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { calculateReadTime } from "../../utils";
+
+type Author = CollectionEntry<"authors">;
+
+interface Props {
+  authors: Author[];
+  lastUpdatedOn?: Date;
+  wordCount: number;
+}
+
+const { authors, lastUpdatedOn, wordCount } = Astro.props;
+const readTime = calculateReadTime(wordCount);
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+function githubProfileUrl(githubId: string) {
+  return `https://github.com/${githubId}.png?size=64`;
+}
+
+const formattedDate = lastUpdatedOn
+  ? new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(lastUpdatedOn)
+  : null;
+
+const readTimeLabel = `${readTime} min read`;
+const wordCountLabel = `${wordCount} words`;
+---
+
+{
+  authors.length > 0 && (
+    <div class="note-authors" aria-label="Note authors">
+      <span class="note-authors-label">Written by</span>
+
+      <ul class="note-authors-list">
+        {authors.map((author) => (
+          <li
+            class="note-authors-item"
+            style={`--author-color: ${author.data.color}`}
+          >
+            <div class="note-authors-avatar" aria-hidden="true">
+              {author.data.github_id ? (
+                <img
+                  src={githubProfileUrl(author.data.github_id)}
+                  alt={author.data.name}
+                />
+              ) : (
+                initials(author.data.name)
+              )}
+            </div>
+            {author.data.url ? (
+              <a
+                class="note-authors-link"
+                href={author.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {author.data.name}
+              </a>
+            ) : (
+              <span class="note-authors-name">{author.data.name}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      <span class="note-authors-meta">
+        {formattedDate && <span>{formattedDate}</span>}
+        {formattedDate && <span aria-hidden="true"> · </span>}
+        <span title={wordCountLabel}>{readTimeLabel}</span>
+      </span>
+    </div>
+  )
+}
+
+<style>
+  .note-authors {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-ui);
+  }
+
+  .note-authors-label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .note-authors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .note-authors-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    --author-bg: color-mix(in oklab, var(--author-color) 13%, var(--surface));
+    --author-border: color-mix(
+      in oklab,
+      var(--author-color) 32%,
+      var(--surface)
+    );
+  }
+
+  .note-authors-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--author-bg);
+    color: var(--author-color);
+    border: 1px solid var(--author-border);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .note-authors-name,
+  .note-authors-link {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .note-authors-link:hover {
+    color: var(--author-color);
+    text-decoration: underline;
+  }
+
+  .note-authors-meta {
+    display: block;
+    margin-top: 12px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+</style>

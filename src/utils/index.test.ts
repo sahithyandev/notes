@@ -1,5 +1,10 @@
 import { test, expect } from "bun:test";
-import { titleize, calculateReadTime, generateDescription } from "./index";
+import {
+  titleize,
+  calculateReadTime,
+  generateDescription,
+  calculateWordCount,
+} from "./index";
 
 test("titleize expands a whole-string abbreviation", () => {
   expect(titleize("iot")).toBe("Internet of Things"); // special-cased, not just uppercased
@@ -16,11 +21,36 @@ test("titleize keeps minor words lowercase except in first position", () => {
   expect(titleize("of-mice-and-men")).toBe("Of Mice and Men"); // "of" capitalized only because it's first
 });
 
+test("calculateWordCount counts words in a string", () => {
+  expect(calculateWordCount("")).toBe(0);
+  expect(calculateWordCount("Hello world")).toBe(2);
+});
+
+test("calculateWordCount ignores import/export lines and JSX/expression syntax", () => {
+  const content = `import Note from "../components/note.astro";
+
+Hello world.
+
+<Note type="tip" title="Careful">
+  This is a clarification.
+</Note>
+
+<TransportationTable data={someData} />
+
+export const foo = 1;`;
+  // "Hello world." (2) + "This is a clarification." (4) = 6
+  expect(calculateWordCount(content)).toBe(6);
+});
+
+test("calculateWordCount strips heading markers but keeps heading text", () => {
+  const content = "## Section Title\n\n### Subsection\n\nBody text.";
+  // "Section Title" (2) + "Subsection" (1) + "Body text." (2) = 5
+  expect(calculateWordCount(content)).toBe(5);
+});
+
 test("calculateReadTime rounds up to the nearest minute", () => {
-  const words200 = Array(200).fill("word").join(" ");
-  const words201 = Array(201).fill("word").join(" ");
-  expect(calculateReadTime(words200)).toBe(1);
-  expect(calculateReadTime(words201)).toBe(2);
+  expect(calculateReadTime(200)).toBe(1);
+  expect(calculateReadTime(201)).toBe(2);
 });
 
 test("generateDescription only looks at the first paragraph", () => {

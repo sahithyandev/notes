@@ -7,7 +7,7 @@ slug: s2/program-construction/design-patterns/behavioral
 prev: true
 next: false
 dateCreated: 2026-04-22T07:07:02.601Z
-lastUpdatedOn: 2026-09-13T14:55:22.877Z
+lastUpdatedOn: 2026-09-25T06:53:36.808Z
 ---
 
 Deals with how different kinds of objects interact with each other.
@@ -174,15 +174,12 @@ Benefits:
 
 Drawbacks:
 
-- Overhead for simple operations – For very simple operations, the Command
-  pattern introduces unnecessary complexity by creating multiple command
-  objects.
-- Difficult to implement with complex systems – In systems where commands can
-  have many different types of parameters, the number of command objects may
-  grow significantly, making the system harder to manage.
-- Harder to maintain – As new commands are added, the invoker (client) and
-  command interface may need modifications, leading to possible changes in other
-  parts of the system.
+- Overhead for simple operations  
+  For very simple operations, the Command pattern introduces unnecessary complexity by creating multiple command objects.
+- Difficult to implement with complex systems  
+  In systems where commands can have many different types of parameters, the number of command objects may grow significantly, making the system harder to manage.
+- Harder to maintain  
+  As new commands are added, the invoker (client) and command interface may need modifications, leading to possible changes in other parts of the system.
 
 ## Interpreter Pattern
 
@@ -909,10 +906,9 @@ class EvalVisitor implements ExprVisitor {
 
 Drawbacks:
 
-- Open/closed principle is broken – Every time a new file type is added (e.g.,
-  VideoFile), the visitor interface must be modified, which affects all concrete
-  visitors.
-- Increased complexity – More interfaces and classes make the system harder to
-  understand for beginners.
-- Not ideal for frequently changing structures – If the object structure (i.e.,
-  file types) changes frequently, modifying all visitors becomes cumbersome.
+- Open/closed principle is broken  
+  Every time a new file type is added (e.g., VideoFile), the visitor interface must be modified, which affects all concrete visitors.
+- Increased complexity  
+  More interfaces and classes make the system harder to understand for beginners.
+- Not ideal for frequently changing structures  
+  If the object structure (i.e., file types) changes frequently, modifying all visitors becomes cumbersome.

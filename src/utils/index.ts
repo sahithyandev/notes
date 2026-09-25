@@ -37,9 +37,23 @@ const ABBREVIATIONS: Record<string, string> = {
   dns: "DNS",
 };
 
-export function calculateReadTime(content: string): number {
-  const words = content.trim().split(/\s+/).length;
-  return Math.ceil(words / 200);
+export function stripMdxSyntax(content: string): string {
+  return content
+    .replace(/^import .*$/gm, "")
+    .replace(/^export .*$/gm, "")
+    .replace(/\{[^}]*\}/g, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/^#{1,6}\s+/gm, "");
+}
+
+export function calculateWordCount(content: string): number {
+  if (!content) return 0;
+  const words = stripMdxSyntax(content).trim().split(/\s+/).filter(Boolean);
+  return words.length;
+}
+
+export function calculateReadTime(wordCount: number): number {
+  return Math.ceil(wordCount / 200);
 }
 
 export function generateDescription(content: string): string {

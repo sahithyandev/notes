@@ -1,0 +1,52 @@
+---
+title: Nonlinear Finite-Difference Method
+dateCreated: 2026-09-23T08:09:15.160Z
+lastUpdatedOn: 2026-09-25T06:53:41.436Z
+slug: s5/numerical-methods/finite-difference-nonlinear-bvp
+sidebar:
+  order: 28
+prev: true
+next: false
+---
+
+The finite-difference method for a nonlinear [BVP](/s5/numerical-methods/boundary-value-problems) replaces derivatives with centered difference formulas and solves the resulting nonlinear system with Newton's method.
+
+## Standard Form
+
+$$
+y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+A unique solution exists **iff**
+
+- $f$, $f_y$, $f_{y'}$ are continuous for $x \in [a,b]$ and $y, y' \in (-\infty, \infty)$
+- $f_y(x,y,y') \geq \delta$ for some $\delta > 0$
+- a constant $k$ exists with $k = \max\big(|f_y(x,y,y')|,\ |f_{y'}(x,y,y')|\big)$
+
+## Difference Equation
+
+Using the [centered difference formulas](/s5/numerical-methods/finite-difference-linear-bvp) at mesh points $x_0, \ldots, x_{N+1}$ on $[a,b]$, $y(x_i) \approx w_i$ satisfies
+
+$$
+w_0 = \alpha, \quad w_{N+1} = \beta
+$$
+
+$$
+-\frac{w_{i+1} - 2w_i + w_{i-1}}{h^2} + f\left(x_i, w_i, \frac{w_{i+1}-w_{i-1}}{2h}\right) = 0
+$$
+
+for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
+
+## Nonlinear System
+
+$$
+\begin{aligned}
+2w_1 - w_2 + h^2 f\left(x_1, w_1, \frac{w_2 - \alpha}{2h}\right) - \alpha &= 0 \\
+-w_1 + 2w_2 - w_3 + h^2 f\left(x_2, w_2, \frac{w_3 - w_1}{2h}\right) &= 0 \\
+&\ \ \vdots \\
+-w_{N-2} + 2w_{N-1} - w_N + h^2 f\left(x_{N-1}, w_{N-1}, \frac{w_N - w_{N-2}}{2h}\right) &= 0 \\
+-w_{N-1} + 2w_N + h^2 f\left(x_N, w_N, \frac{\beta - w_{N-1}}{2h}\right) - \beta &= 0
+\end{aligned}
+$$
+
+This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).

@@ -1,0 +1,114 @@
+---
+// Static demand curve diagram: downward-sloping curve on price/quantity
+// axes, with a dashed curve shifted left (decrease) and right (increase)
+// to illustrate a shift of the entire curve.
+---
+
+<figure id="demand-curve-diagram">
+  <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Demand Curve</title>
+
+    <line class="axis" x1="50" y1="20" x2="50" y2="290"></line>
+    <line class="axis" x1="50" y1="290" x2="390" y2="290"></line>
+    <text class="axis-label" x="50" y="14" text-anchor="middle">Price</text>
+    <text class="axis-label" x="390" y="315" text-anchor="end"
+      >Quantity Demanded</text
+    >
+
+    <path class="curve shift-left" d="M 90 40 C 110 130, 90 220, 60 270"></path>
+    <path class="curve shift-right" d="M 230 40 C 250 130, 230 220, 200 270"
+    ></path>
+    <path class="curve main" d="M 160 40 C 180 130, 160 220, 130 270"></path>
+
+    <text class="curve-label main" x="180" y="55">D</text>
+    <text class="curve-label shift-left" x="110" y="55">D&#8321;</text>
+    <text class="curve-label shift-right" x="250" y="55">D&#8322;</text>
+  </svg>
+  <figcaption>
+    <span class="main">D</span> the original demand curve.
+    <span class="shift-left">D&#8321;</span> a decrease in demand, curve shifts left.
+    <span class="shift-right">D&#8322;</span> an increase in demand, curve shifts
+    right.
+  </figcaption>
+</figure>
+
+<style>
+  #demand-curve-diagram {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  #demand-curve-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #demand-curve-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #demand-curve-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #demand-curve-diagram .curve {
+    fill: none;
+    stroke-width: 2.5;
+  }
+
+  #demand-curve-diagram .curve.main {
+    stroke: var(--s5);
+  }
+
+  #demand-curve-diagram .curve.shift-left {
+    stroke: var(--dia-ct);
+    stroke-dasharray: 6 5;
+  }
+
+  #demand-curve-diagram .curve.shift-right {
+    stroke: var(--dia-pt);
+    stroke-dasharray: 6 5;
+  }
+
+  #demand-curve-diagram .curve-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #demand-curve-diagram .curve-label.main {
+    fill: var(--s5);
+  }
+
+  #demand-curve-diagram .curve-label.shift-left {
+    fill: var(--dia-ct);
+  }
+
+  #demand-curve-diagram .curve-label.shift-right {
+    fill: var(--dia-pt);
+  }
+
+  #demand-curve-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #demand-curve-diagram figcaption span {
+    font-weight: 600;
+  }
+
+  #demand-curve-diagram figcaption .main {
+    color: var(--s5);
+  }
+
+  #demand-curve-diagram figcaption .shift-left {
+    color: var(--dia-ct);
+  }
+
+  #demand-curve-diagram figcaption .shift-right {
+    color: var(--dia-pt);
+  }
+</style>

@@ -1,0 +1,397 @@
+---
+import { tex } from "../../utils/tex";
+
+interface Props {
+  rows: string[];
+  cols: string[];
+  costs: number[][];
+  supply: number[];
+  demand: number[];
+  allocations?: (number | null)[][];
+  highlight?: [number, number][];
+  loop?: { row: number; col: number; sign: "+" | "-" }[];
+  rowPenalties?: (number | null)[];
+  colPenalties?: (number | null)[];
+  selectedPenalty?: { axis: "row" | "col"; index: number };
+  total?: string;
+  dataSource?: boolean;
+}
+
+const {
+  rows,
+  cols,
+  costs,
+  supply,
+  demand,
+  allocations,
+  highlight = [],
+  loop = [],
+  rowPenalties,
+  colPenalties,
+  selectedPenalty,
+  total,
+  dataSource = false,
+} = Astro.props;
+
+const hasAllocations = allocations !== undefined;
+const hasPenalties = rowPenalties !== undefined || colPenalties !== undefined;
+const isHighlighted = (ri: number, ci: number) =>
+  highlight.some(([hr, hc]) => hr === ri && hc === ci);
+const loopSign = (ri: number, ci: number) =>
+  loop.find((l) => l.row === ri && l.col === ci)?.sign;
+const loopBounds = loop.length
+  ? {
+      minRow: Math.min(...loop.map((l) => l.row)),
+      maxRow: Math.max(...loop.map((l) => l.row)),
+      minCol: Math.min(...loop.map((l) => l.col)),
+      maxCol: Math.max(...loop.map((l) => l.col)),
+    }
+  : null;
+const loopEdgeClasses = (ri: number, ci: number) => {
+  if (!loopBounds) return {};
+  const { minRow, maxRow, minCol, maxCol } = loopBounds;
+  if (ri < minRow || ri > maxRow || ci < minCol || ci > maxCol) return {};
+  return {
+    "loop-edge-top": ri === minRow,
+    "loop-edge-bottom": ri === maxRow,
+    "loop-edge-left": ci === minCol,
+    "loop-edge-right": ci === maxCol,
+  };
+};
+const isRowExhausted = (ri: number) => hasAllocations && supply[ri] === 0;
+const isColExhausted = (ci: number) => hasAllocations && demand[ci] === 0;
+const isSelectedRow = (ri: number) =>
+  selectedPenalty?.axis === "row" && selectedPenalty.index === ri;
+const isSelectedCol = (ci: number) =>
+  selectedPenalty?.axis === "col" && selectedPenalty.index === ci;
+---
+
+<figure class="transport" data-stage={dataSource ? "" : undefined}>
+  <table class="tableau" aria-hidden={dataSource ? "true" : undefined}>
+    <colgroup>
+      <col class="c-label" />
+      {cols.map(() => <col class="c-data" />)}
+      <col class="c-margin" />
+      {hasPenalties && <col class="c-margin" />}
+    </colgroup>
+    <thead>
+      <tr>
+        <th></th>
+        {
+          cols.map((c, ci) => (
+            <th
+              class:list={["num", { exhausted: isColExhausted(ci) }]}
+              set:html={tex(c)}
+            />
+          ))
+        }
+        <th class="num margin supply">Supply</th>
+        {hasPenalties && <th class="num margin penalty">Penalty</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r, ri) => (
+          <tr>
+            <th
+              class:list={{ exhausted: isRowExhausted(ri) }}
+              set:html={tex(r)}
+            />
+            {cols.map((_, ci) => {
+              const alloc = allocations?.[ri]?.[ci];
+              const occupied = alloc !== undefined && alloc !== null;
+              const sign = loopSign(ri, ci);
+              return (
+                <td
+                  class:list={[
+                    "cell",
+                    {
+                      plain: !hasAllocations,
+                      occupied,
+                      zero: alloc === 0,
+                      current: isHighlighted(ri, ci),
+                      exhausted:
+                        !occupied && (isRowExhausted(ri) || isColExhausted(ci)),
+                    },
+                    loopEdgeClasses(ri, ci),
+                  ]}
+                >
+                  <span class="cost">{costs[ri][ci]}</span>
+                  {occupied && <span class="alloc">{alloc}</span>}
+                  {sign && (
+                    <span
+                      class:list={["sign", sign === "+" ? "plus" : "minus"]}
+                    >
+                      {sign}
+                    </span>
+                  )}
+                </td>
+              );
+            })}
+            <td
+              class:list={[
+                "num",
+                "margin",
+                "supply",
+                { exhausted: isRowExhausted(ri) },
+              ]}
+            >
+              {supply[ri]}
+            </td>
+            {hasPenalties && (
+              <td
+                class:list={[
+                  "num",
+                  "margin",
+                  "penalty",
+                  {
+                    selected: isSelectedRow(ri),
+                    exhausted: isRowExhausted(ri),
+                  },
+                ]}
+              >
+                {rowPenalties?.[ri] ?? "–"}
+              </td>
+            )}
+          </tr>
+        ))
+      }
+      <tr class="totals">
+        <th>Demand</th>
+        {
+          demand.map((d, ci) => (
+            <td
+              class:list={[
+                "num",
+                "margin",
+                "demand",
+                { exhausted: isColExhausted(ci) },
+              ]}
+            >
+              {d}
+            </td>
+          ))
+        }
+        <td class="margin supply"></td>
+        {hasPenalties && <td class="margin penalty" />}
+      </tr>
+      {
+        hasPenalties && (
+          <tr class="totals">
+            <th>Penalty</th>
+            {cols.map((_, ci) => (
+              <td
+                class:list={[
+                  "num",
+                  "margin",
+                  "demand",
+                  {
+                    selected: isSelectedCol(ci),
+                    exhausted: isColExhausted(ci),
+                  },
+                ]}
+              >
+                {colPenalties?.[ci] ?? "–"}
+              </td>
+            ))}
+            <td class="margin supply" />
+            <td class="margin penalty" />
+          </tr>
+        )
+      }
+    </tbody>
+  </table>
+  {total && <figcaption set:html={tex(total)} />}
+</figure>
+
+<style>
+  .transport {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  table {
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  col.c-label {
+    width: 3.2rem;
+  }
+  col.c-data {
+    width: 4rem;
+  }
+  col.c-margin {
+    width: 4rem;
+  }
+
+  th,
+  td {
+    padding: 4px 6px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  th.margin,
+  td.margin {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th.supply,
+  td.supply {
+    border-left: 2px solid var(--border-strong);
+  }
+
+  th.penalty,
+  td.penalty {
+    border-left: 2px solid var(--border-strong);
+  }
+
+  tr.totals th,
+  tr.totals td {
+    border-top: 2px solid var(--border-strong);
+  }
+
+  td.cell {
+    position: relative;
+    height: 3rem;
+    vertical-align: bottom;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  td.cell.plain {
+    height: auto;
+    vertical-align: middle;
+  }
+
+  td.cell .cost {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  td.cell.plain .cost {
+    position: static;
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  td.cell .alloc {
+    display: block;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent);
+    padding-bottom: 2px;
+  }
+
+  td.cell.occupied {
+    background: var(--accent-subtle);
+  }
+
+  td.cell.zero .alloc {
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  td.cell.current {
+    background: var(--accent-dim);
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  td.cell.changed .alloc {
+    color: var(--accent);
+  }
+
+  td.cell.loop-edge-top {
+    border-top: 3px solid var(--accent);
+  }
+
+  td.cell.loop-edge-bottom {
+    border-bottom: 3px solid var(--accent);
+  }
+
+  td.cell.loop-edge-left {
+    border-left: 3px solid var(--accent);
+  }
+
+  td.cell.loop-edge-right {
+    border-right: 3px solid var(--accent);
+  }
+
+  td.cell .sign {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    line-height: 1;
+    color: #fff;
+  }
+
+  td.cell.plain .sign {
+    top: 3px;
+  }
+
+  .sign.plus {
+    background: var(--loop-plus);
+  }
+
+  .sign.minus {
+    background: var(--loop-minus);
+  }
+
+  td.margin.selected {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  td.margin.changed {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  th.exhausted,
+  td.margin.exhausted,
+  td.cell.exhausted {
+    opacity: 0.4;
+  }
+
+  th.exhausted {
+    text-decoration: line-through;
+    text-decoration-color: var(--text-muted);
+  }
+
+  td.cell.exhausted .cost {
+    color: var(--text-muted);
+  }
+
+  figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+</style>

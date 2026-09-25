@@ -1,0 +1,134 @@
+---
+interface Cell {
+  text?: string;
+  type?: "label" | "input" | "formula" | "limit";
+}
+type CellInput = string | Cell | null | undefined;
+
+interface Props {
+  rows: CellInput[][];
+  caption?: string;
+}
+
+const { rows, caption } = Astro.props;
+
+const numCols = Math.max(...rows.map((row) => row.length));
+const colLetters = Array.from({ length: numCols }, (_, i) =>
+  String.fromCharCode(65 + i),
+);
+
+const normalize = (cell: CellInput): Cell =>
+  cell == null ? {} : typeof cell === "string" ? { text: cell } : cell;
+---
+
+<figure class="excel">
+  <div class="sheet-wrap">
+    <table class="sheet">
+      <thead>
+        <tr>
+          <th class="corner"></th>
+          {colLetters.map((letter) => <th class="colhead">{letter}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row, ri) => (
+            <tr>
+              <th class="rowhead">{ri + 1}</th>
+              {colLetters.map((_, ci) => {
+                const cell = normalize(row[ci]);
+                return <td class:list={["cell", cell.type]}>{cell.text}</td>;
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .excel {
+    margin: 20px 0;
+  }
+
+  .sheet-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  table.sheet {
+    margin: 0;
+    width: auto;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--border);
+    height: 2rem;
+    padding: 0 10px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  thead th {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+
+  th.corner {
+    background: var(--surface-2);
+  }
+
+  th.rowhead {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  td.cell {
+    background: var(--surface);
+    color: var(--text-primary);
+    text-align: left;
+  }
+
+  td.cell.label {
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  td.cell.input {
+    font-variant-numeric: tabular-nums;
+    color: var(--excel-input);
+  }
+
+  td.cell.formula {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    background: var(--accent-dim);
+  }
+
+  td.cell.limit {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+  }
+
+  figcaption {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+</style>
