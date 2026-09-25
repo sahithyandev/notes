@@ -1,0 +1,89 @@
+---
+title: Gomory's Cutting Plane Method
+slug: s5/operational-research/cutting-plane-method
+sidebar:
+  order: 15
+prev: true
+next: true
+dateCreated: 2026-09-25T19:04:34.017Z
+lastUpdatedOn: 2026-09-25T19:32:18.425Z
+---
+
+Solves a pure IPP by adding constraints (cuts) to the LP relaxation's optimal tableau that exclude the fractional solution without excluding any feasible integer solution.
+
+### Fractional Cut
+
+For a basic variable $x_i$ with a fractional value in the optimal tableau's row:
+
+$$
+x_i + \sum_j a_{ij} x_j = b_i
+$$
+
+Split each coefficient into integer and fractional parts, $a_{ij} = \lfloor a_{ij} \rfloor + f_{ij}$ and $b_i = \lfloor b_i \rfloor + f_i$ (with $0 \le f_{ij}, f_i < 1$). The Gomory constraint is:
+
+$$
+\sum_j f_{ij} x_j \ge f_i
+$$
+
+### Steps
+
+- Solve the LP relaxation with simplex.
+- If every basic variable is integral, stop. The solution is optimal for the IPP.
+- Otherwise, pick a row with a fractional basic variable and derive its Gomory constraint.
+- Add the constraint (as a new row with a surplus variable) to the tableau and resolve with the dual simplex method, since the new RHS is negative.
+- Repeat until every basic variable is integral.
+
+## Worked Example
+
+Same LP as the [branch and bound worked example](/s5/operational-research/branch-and-bound#worked-example): maximize $Z = 2x_1 + 3x_2$ subject to $x_1 + x_2 \le 5$, $2x_2 \le 7$, $x_1, x_2 \ge 0$ and integer, with LP relaxation optimum $x_1 = 1.5$, $x_2 = 3.5$, $Z = 13.5$.
+
+Standard form: $x_1 + x_2 + s_1 = 5$, $x_2 + 0.5s_2 = 3.5$.
+
+Optimal tableau rows, basis $x_1, x_2$:
+
+$$
+x_1 + s_1 - 0.5s_2 = 1.5
+$$
+
+$$
+x_2 + 0.5s_2 = 3.5
+$$
+
+The $x_1$ row has $b_1 = 1.5$, so $f_1 = 0.5$. Its coefficients split as $f_{1,s_1} = 0$ (since $1$ is already an integer) and $f_{1,s_2} = 0.5$ (since $-0.5 = \lfloor -0.5 \rfloor + 0.5$).
+
+Gomory constraint: $0.5s_2 \ge 0.5$, i.e. $s_2 \ge 1$.
+
+<Walkthrough variant="simplex">
+  <SimplexStep
+    label="Cut added"
+    entering={3}
+    leaving={3}
+    columns={["x_1", "x_2", "s_1", "s_2", "G"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "2", "0.5", "0"], rhs: "13.5" },
+      { basic: "x_1", cells: ["1", "0", "1", "-0.5", "0"], rhs: "1.5" },
+      { basic: "x_2", cells: ["0", "1", "0", "0.5", "0"], rhs: "3.5" },
+      { basic: "G", cells: ["0", "0", "0", "-0.5", "1"], rhs: "-0.5" },
+    ]}
+  >
+    $-0.5s_2 + G = -0.5$ added as a new row. The tableau is still optimal
+    ($z$ row non-negative) but infeasible ($b = -0.5$), so $G$ leaves. Its
+    only negative entry is under $s_2$, so $s_2$ enters. Pivot on $-0.5$.
+  </SimplexStep>
+
+  <SimplexStep
+    label="Final tableau"
+    columns={["x_1", "x_2", "s_1", "s_2", "G"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "2", "0", "1"], rhs: "13" },
+      { basic: "x_1", cells: ["1", "0", "1", "0", "-1"], rhs: "2" },
+      { basic: "x_2", cells: ["0", "1", "0", "0", "1"], rhs: "3" },
+      { basic: "s_2", cells: ["0", "0", "0", "1", "-2"], rhs: "1" },
+    ]}
+  >
+    Every RHS is $\ge 0$ and $x_1$, $x_2$, $s_2$ are all integral. Optimal at
+    $x_1 = 2$, $x_2 = 3$, $Z = 13$.
+  </SimplexStep>
+</Walkthrough>
+
+Optimal solution: $x_1 = 2$, $x_2 = 3$, $Z = 13$. Matches branch and bound.

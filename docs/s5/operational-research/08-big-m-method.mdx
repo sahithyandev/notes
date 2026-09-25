@@ -1,0 +1,207 @@
+---
+title: Big-M Method
+slug: s5/operational-research/big-m-method
+sidebar:
+  order: 8
+prev: true
+next: true
+dateCreated: 2026-09-25T19:07:09.267Z
+lastUpdatedOn: 2026-09-25T19:32:18.382Z
+---
+
+When the starting basis needs artificial variables, the Big-M method solves the LP in a single simplex run by penalizing artificial variables in the objective.
+
+- Assign each artificial variable a coefficient $-M$ in the objective (maximization), where $M$ is an arbitrarily large positive constant.
+- Run the simplex algorithm normally. The penalty drives artificial variables out of the basis as the objective improves.
+
+## Reading the Result
+
+- Optimal solution  
+  All artificial variables are 0 in the optimal tableau.
+- Infeasible problem  
+  At least one artificial variable remains positive (basic with a non-zero value) in the optimal tableau.
+- Unbounded problem  
+  Detected by the usual minimum ratio test, same as without artificial variables.
+
+## Worked Example
+
+$$
+\begin{aligned}
+\text{minimize} \quad & z = 4x_1 + x_2 \\
+\text{subject to} \quad & 3x_1 + x_2 = 3 \\
+& 4x_1 + 3x_2 \ge 6 \\
+& x_1 + 2x_2 \le 4 \\
+& x_1, x_2 \ge 0
+\end{aligned}
+\tag{1}
+$$
+
+Standard form adds a surplus $s_2$ to the $\ge$ constraint, a slack $s_3$ to the $\le$ constraint, and artificials $a_1, a_2$ to the equality and $\ge$ rows:
+
+$$
+\begin{aligned}
+3x_1 + x_2 + a_1 &= 3 \\
+4x_1 + 3x_2 - s_2 + a_2 &= 6 \\
+x_1 + 2x_2 + s_3 &= 4
+\end{aligned}
+\tag{2}
+$$
+
+The tableau convention maximizes and stops when all objective row coefficients are $\ge 0$. Minimizing $z$ means maximizing $-z$, so the objective is $\max\ -z - M a_1 - M a_2$. The natural starting basis is $(a_1, a_2, s_3) = (3, 6, 4)$, read straight off $(2)$.
+
+<Walkthrough variant="simplex">
+  <SimplexStep
+    label="Setup: raw objective row"
+    columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+    rows={[
+      { basic: "z", cells: ["4", "1", "0", "0", "M", "M"], rhs: "0" },
+      { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+      { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+      { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+    ]}
+  >
+    Basis $(a_1, a_2, s_3) = (3, 6, 4)$. But $a_1, a_2$ are basic with a
+    nonzero coefficient $M$ in the objective row, so it isn't canonical yet:
+    subtract $M \times (a_1 \text{ row})$ and $M \times (a_2 \text{ row})$
+    from the objective row to zero them out.
+  </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    { basic: "z", cells: ["4 - 7M", "1 - 4M", "M", "0", "0", "0"], rhs: "-9M" },
+    { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+    { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+    { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+  ]}
+>
+  Objective row after eliminating $a_1, a_2$. Its RHS is the value of the
+  maximand $-z$; negate it for $z$. For large $M$ the coefficients $4 - 7M$ and
+  $1 - 4M$ are both negative, so not optimal.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 1"
+  entering={0}
+  leaving={1}
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    {
+      basic: "z",
+      cells: ["4 - 7M", "1 - 4M", "M", "0", "0", "0"],
+      rhs: "-9M",
+      ratio: "",
+    },
+    {
+      basic: "a_1",
+      cells: ["3", "1", "0", "0", "1", "0"],
+      rhs: "3",
+      ratio: "3/3 = 1",
+    },
+    {
+      basic: "a_2",
+      cells: ["4", "3", "-1", "0", "0", "1"],
+      rhs: "6",
+      ratio: "6/4 = 1.5",
+    },
+    {
+      basic: "s_3",
+      cells: ["1", "2", "0", "1", "0", "0"],
+      rhs: "4",
+      ratio: "4/1 = 4",
+    },
+  ]}
+>
+  Most negative coefficient is $4 - 7M$, so $x_1$ enters. Minimum ratio is $1$
+  in row $a_1$, so $a_1$ leaves. Pivot element is $3$.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 2"
+  entering={1}
+  leaving={2}
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    {
+      basic: "z",
+      cells: ["0", "(-1 - 5M)/3", "M", "0", "(7M - 4)/3", "0"],
+      rhs: "-2M - 4",
+      ratio: "",
+    },
+    {
+      basic: "x_1",
+      cells: ["1", "1/3", "0", "0", "1/3", "0"],
+      rhs: "1",
+      ratio: "1 / (1/3) = 3",
+    },
+    {
+      basic: "a_2",
+      cells: ["0", "5/3", "-1", "0", "-4/3", "1"],
+      rhs: "2",
+      ratio: "2 / (5/3) = 1.2",
+    },
+    {
+      basic: "s_3",
+      cells: ["0", "5/3", "0", "1", "-1/3", "0"],
+      rhs: "3",
+      ratio: "3 / (5/3) = 1.8",
+    },
+  ]}
+>
+  Coefficient $(-1 - 5M)/3$ is the most negative, so $x_2$ enters. Minimum ratio
+  is $1.2$ in row $a_2$, so $a_2$ leaves. Pivot element is $5/3$.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 3"
+  entering={2}
+  leaving={3}
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    {
+      basic: "z",
+      cells: ["0", "0", "-1/5", "0", "M - 8/5", "1/5 + M"],
+      rhs: "-18/5",
+      ratio: "",
+    },
+    {
+      basic: "x_1",
+      cells: ["1", "0", "1/5", "0", "3/5", "-1/5"],
+      rhs: "3/5",
+      ratio: "(3/5) / (1/5) = 3",
+    },
+    {
+      basic: "x_2",
+      cells: ["0", "1", "-3/5", "0", "-4/5", "3/5"],
+      rhs: "6/5",
+      ratio: "skip (-3/5)",
+    },
+    {
+      basic: "s_3",
+      cells: ["0", "0", "1", "1", "1", "-1"],
+      rhs: "1",
+      ratio: "1/1 = 1",
+    },
+  ]}
+>
+  Both artificials are non-basic. Only $-1/5$ (column $s_2$) is negative, so
+  $s_2$ enters. Minimum ratio is $1$ in row $s_3$, so $s_3$ leaves. Pivot
+  element is $1$.
+</SimplexStep>
+
+  <SimplexStep
+    label="Final tableau"
+    columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "0", "1/5", "M - 7/5", "M"], rhs: "-17/5" },
+      { basic: "x_1", cells: ["1", "0", "0", "-1/5", "2/5", "0"], rhs: "2/5" },
+      { basic: "x_2", cells: ["0", "1", "0", "3/5", "-1/5", "0"], rhs: "9/5" },
+      { basic: "s_2", cells: ["0", "0", "1", "1", "1", "-1"], rhs: "1" },
+    ]}
+  >
+    All objective coefficients are non-negative and no artificial is basic.
+    Optimal at $x_1 = 2/5$, $x_2 = 9/5$, maximand $-z = -17/5$, so
+    $z = 17/5 = 3.4$.
+  </SimplexStep>
+</Walkthrough>
