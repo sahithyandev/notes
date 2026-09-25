@@ -1,0 +1,61 @@
+---
+title: OpenFlow
+slug: s5/advanced-networking/openflow
+dateCreated: 2026-09-25T05:53:42.847Z
+lastUpdatedOn: 2026-09-25T06:35:39.167Z
+sidebar:
+  order: 12
+prev: true
+next: false
+---
+
+**OpenFlow** is a southbound protocol for controlling a switch's match-action tables.
+
+[SDN](/s5/advanced-networking/introduction-to-sdn) defines the architecture. OpenFlow provides 1 possible controller-to-switch interface.
+
+## Flow-Based Forwarding
+
+A flow is a set of packets identified by shared packet-header fields or ingress information.
+
+- Matching can combine addresses, transport ports, protocol, VLAN, and ingress port.
+- A rule can represent an individual connection or an aggregate of connections.
+- Forwarding can depend on more than the destination IP prefix.
+- Available match fields and actions depend on the device and interface.
+
+## Flow Entries
+
+- Match fields select packets belonging to a flow.
+- Priority resolves overlapping matches.
+- Instructions and actions determine packet processing.
+- Counters record traffic handled by an entry.
+- Timeouts can remove stale entries.
+
+## Core Messages
+
+- `FLOW-MOD`  
+  Adds, modifies, or removes flow entries.
+- `PACKET-IN`  
+  Reports a packet to the controller when configured processing requires it.
+- `PACKET-OUT`  
+  Requests the switch to process a packet using specified actions.
+
+## Reactive and Proactive Installation
+
+| Property             | Reactive Installation                            | Proactive Installation                                |
+| -------------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| Trigger              | Traffic arrival causes rule installation.        | Rules are installed before traffic arrives.           |
+| Initial packet delay | Controller interaction adds delay.               | Existing rules avoid a setup round trip.              |
+| Controller load      | New flows generate control work.                 | Routine traffic requires less controller interaction. |
+| Table use            | Rules are allocated as traffic appears.          | Rules may occupy space before they are used.          |
+| Main concern         | Bursts of new flows can overload the controller. | Rule coverage and table capacity require planning.    |
+
+A hybrid design installs base connectivity proactively and handles exceptions reactively.
+
+## Programmable Data Planes
+
+P4 is a language for describing packet parsing, match-action tables, and supported actions in a programmable data plane.
+
+- OpenFlow operates within the match fields and actions exposed by its specification and implementation.
+- P4 allows the pipeline itself to be described programmatically.
+- P4Runtime controls entries in the resulting pipeline.
+- Target hardware still limits supported operations and resources.

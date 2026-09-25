@@ -1,27 +1,28 @@
 ---
 title: Real-Time Protocols
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-25T05:56:45.317Z
+lastUpdatedOn: 2026-09-25T06:35:38.962Z
 slug: s5/advanced-networking/real-time-protocols
 sidebar:
-  order: 4
+  order: 7
   label: "RTP, RTCP, and SIP"
 prev: true
 next: true
+prereqs:
+  - s4/computer-networks/udp
 ---
 
 Real-time multimedia applications rely on RTP, RTCP, and SIP for transport, feedback, and signalling.
 
-<Note>
-  - SIP - establishes/manages the session - RTP - carries real-time media - RTCP
-  - provides control/feedback about RTP
-</Note>
+- SIP - establishes/manages the session
+- RTP - carries real-time media
+- RTCP - provides control/feedback about RTP
 
 ## Real-Time Transport Protocol (RTP)
 
 RTP standardizes the packet structure for delivering real-time data such as audio and video over network transport.
 
-- RTP runs in end systems and is encapsulated directly inside [UDP](/s4/computer-networks/udp) segments.
+- RTP runs in end systems and is encapsulated directly inside UDP segments.
 - It extends UDP by adding payload identification, sequence numbers, and sampling timestamps.
 
 ```

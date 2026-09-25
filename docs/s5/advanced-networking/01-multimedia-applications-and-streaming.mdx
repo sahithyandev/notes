@@ -1,18 +1,19 @@
 ---
 title: Multimedia Applications and Video Streaming
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-14T21:59:35.558Z
+lastUpdatedOn: 2026-09-25T06:35:38.552Z
 slug: s5/advanced-networking/multimedia-applications-and-streaming
 sidebar:
   order: 1
   label: Multimedia Applications and Streaming
 prev: false
 next: true
+prereqs:
+  - s3/data-communication-and-networking/multimedia
+  - s3/data-communication-and-networking/analog-to-digital
 ---
 
 Multimedia networking focuses on transmitting audio, video, and interactive data over packet-switched IP networks while coping with variable network delay, throughput fluctuations, and packet loss.
-
-For foundational definitions of discrete vs. continuous media and captured vs. synthesized media, see [Multimedia](/s3/data-communication-and-networking/multimedia). For basic analog-to-digital conversion and Pulse Code Modulation (PCM), see [Analog to Digital Encoding](/s3/data-communication-and-networking/analog-to-digital).
 
 ## Multimedia Encoding
 
@@ -20,7 +21,7 @@ Digitisation - conversion of an analogue signal into digital samples.
 
 Coding - representation of digitised media for storage or transmission.
 
-Compression removes spatial and temporal redundancy. See [Multimedia Encodings](/s5/advanced-networking/multimedia-encodings) for codec design, audio coding, video coding, and MPEG.
+Compression removes spatial and temporal redundancy. Codec design is covered in [Multimedia Encodings](/s5/advanced-networking/multimedia-encodings). [Audio Coding](/s5/advanced-networking/audio-coding), [Video Coding](/s5/advanced-networking/video-coding), and [MPEG](/s5/advanced-networking/mpeg) cover media-specific methods and standards.
 
 ## Application Categories
 
@@ -136,3 +137,35 @@ The choice of initial playout delay $t_p$ is a key trade-off:
 - Basis for modern Dynamic Adaptive Streaming over HTTP (DASH), where video is chunked into small segments encoded at multiple bitrates, allowing the client to adaptively switch quality based on current TCP throughput.
 - Advantages  
   Easily passes through firewalls and middleboxes; leverages existing web infrastructure (CDNs, web caches).
+
+## Worked Example
+
+### Adaptive Streaming over a Variable Link
+
+Adapted from December 2021, Question 2, December 2022, Question 2, November 2023, Question 2, and November 2024, Question 2.3.
+
+Assume a stored video has aligned 2-second segments at 1, 2, and 4 Mbps. Segment boundaries support switching between representations. Ignore audio and transport overhead in the following sizes.
+
+| Representation | Data per Segment | Download Time over a 3 Mbps Link |
+| -------------- | ---------------- | -------------------------------- |
+| 1 Mbps         | 2 Mbit.          | Approximately 0.67 seconds.      |
+| 2 Mbps         | 4 Mbit.          | Approximately 1.33 seconds.      |
+| 4 Mbps         | 8 Mbit.          | Approximately 2.67 seconds.      |
+
+1. The server publishes a manifest listing representations and segment URLs.
+2. The client fetches the manifest and estimates throughput from completed downloads.
+3. At an estimated 3 Mbps, the client selects the 2 Mbps representation to leave a capacity margin.
+4. Each 2-second segment arrives in approximately 1.33 seconds. Downloads can replenish the playout buffer faster than playback consumes it.
+5. Throughput falls to 1.5 Mbps. A 2 Mbps segment now takes approximately 2.67 seconds, so continued requests at this quality drain the buffer.
+6. The client requests subsequent segments at 1 Mbps. Each takes approximately 1.33 seconds at the new throughput.
+7. The client increases quality only after throughput and buffer occupancy remain sufficient.
+
+The buffer absorbs temporary deficits. Selecting a sustainable representation prevents a persistent deficit from exhausting it.
+
+For live delivery:
+
+- The encoder produces new segments continuously.
+- The manifest advertises newly available segments.
+- Shorter segments allow earlier delivery and faster quality changes, with more request and packaging overhead.
+- Larger buffers reduce stalls but increase delay behind the live source.
+- Interactive conversation requires a tighter latency budget than watching a live broadcast.

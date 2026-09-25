@@ -1,0 +1,88 @@
+---
+title: Audio Coding
+prereqs:
+  - s3/data-communication-and-networking/analog-to-digital
+dateCreated: 2026-09-25T06:10:54.663Z
+lastUpdatedOn: 2026-09-25T06:35:38.801Z
+slug: s5/advanced-networking/audio-coding
+sidebar:
+  order: 3
+prev: true
+next: true
+---
+
+Audio codecs exploit the expected signal type.
+
+- Speech
+- Music
+- Fax and modem signals
+
+Speech codecs can perform poorly on music.
+
+## Sampling
+
+The Nyquist condition requires a sampling frequency greater than twice the highest input frequency for ideal reconstruction of a band-limited signal.
+
+$$f_s > 2f_{\max}$$
+
+- $f_s$: sampling frequency
+- $f_{\max}$: highest input frequency
+
+## Pulse Code Modulation
+
+Pulse code modulation (PCM) samples and quantises the waveform directly.
+
+G.711 telephony uses 8,000 samples per second with 8 bits per sample.
+
+$$8{,}000 \times 8 = 64{,}000\ \text{bps} = 64\ \text{kbps}$$
+
+- $\mu$-law  
+  Maps 14-bit samples to 8 bits. Used in North America and Japan.
+- A-law  
+  Maps 13-bit samples to 8 bits. Used in Europe.
+
+## Differential PCM
+
+Differential pulse code modulation (DPCM) encodes the difference between an actual sample and its predicted value.
+
+$$e_n = x_n - \hat{x}_n$$
+
+- $e_n$: prediction error
+- $x_n$: actual sample
+- $\hat{x}_n$: predicted sample
+
+Encoder and decoder use the same predictor.
+
+**Adaptive DPCM (ADPCM)** adapts prediction and quantisation to changing waveform characteristics.
+
+G.721 uses 4-bit differences at 8,000 samples per second, producing 32 kbps.
+
+## Linear Predictive Coding
+
+Linear predictive coding (LPC) models speech using an excitation source and a vocal-tract filter.
+
+- Excitation source  
+  Periodic excitation for voiced speech or noise-like excitation for unvoiced speech.
+- Vocal-tract filter  
+  Shapes the excitation through acoustic resonance.
+- Formants  
+  Resonance peaks in the speech frequency spectrum.
+
+Encoding analyses short speech segments of approximately 20 ms.
+
+- Estimate linear-prediction coefficients describing the filter.
+- Separate the filter contribution from the residual excitation.
+- Determine whether excitation is voiced or unvoiced.
+- Estimate pitch for voiced speech.
+
+The decoder reconstructs speech by passing the reconstructed excitation through the synthesis filter.
+
+## Code-Excited Linear Prediction
+
+Code-excited linear prediction (CELP) uses codebook entries to represent the excitation of a linear-prediction speech model.
+
+The encoder sends references to a shared excitation codebook alongside filter parameters.
+
+Examples:
+
+- Speex

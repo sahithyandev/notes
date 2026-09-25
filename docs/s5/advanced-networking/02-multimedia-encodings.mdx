@@ -1,257 +1,70 @@
 ---
 title: Multimedia Encodings
 dateCreated: 2026-09-05T21:01:18.369Z
-lastUpdatedOn: 2026-09-16T05:32:53.522Z
+lastUpdatedOn: 2026-09-25T06:35:38.783Z
 slug: s5/advanced-networking/multimedia-encodings
 sidebar:
   order: 2
 prev: true
 next: true
+prereqs:
+  - s3/data-communication-and-networking/encoding-decoding
 ---
 
-Converting huge amounts of audio/video data into a smaller digital representation while maintaining acceptable quality.
-Encoding is covered in [Data Communication and Networking](/s3/data-communication-and-networking/encoding-decoding) module.
+**Encoding** converts a physical signal into a digital bit stream for transmission or storage. A **codec** performs encoding and decoding.
 
-**Encoding** - conversion of a physical signal into a digital bit stream.
+## Encoding Process
 
-**Codec** - encoder and decoder pair for a media representation.
+### Digitisation
 
-## Digitisation, Coding, and Containers
+Digitisation converts an analogue signal into digital samples.
 
-Digitisation - converting the analogue signal into digital samples.
+| Media  | Digitisation Parameters                                     |
+| :----- | :---------------------------------------------------------- |
+| Audio  | Sampling rate and quantisation bits per sample.             |
+| Images | Picture dimensions, pixel depth, and colour representation. |
+| Video  | Image parameters, frame rate, and interlacing.              |
 
-Audio parameters:
+### Coding
 
-- Sampling rate.
-- Quantisation bits per sample.
+Coding represents digitised media in a form suitable for transmission or storage.
 
-Video parameters:
+- Exploits media characteristics to reduce the data rate.
+- Balances reconstruction quality against data rate.
 
-- Picture dimensions.
-- Frame rate.
-- Interlacing.
-- Pixel depth and colour representation.
+## Multimedia Formats and Codecs
 
-Coding - representing/compressing the digital samples efficiently. Codec objectives conflict:
+A container defines how media streams and their parameters are stored in a file or stream. A codec defines how an individual media stream is encoded.
+
+A container can hold audio, video, text, slides, or whiteboard streams.
+
+| Category     | Examples                                                     |
+| :----------- | :----------------------------------------------------------- |
+| Containers   | AVI, ASF, FLV, MPEG program streams.                         |
+| Audio codecs | G.711, GSM-EFR, G.729, MP3.                                  |
+| Video codecs | H.261, MPEG-1 Video, MPEG-2 Video, MPEG-4 Part 2, H.264/AVC. |
+
+### Codec Requirements
 
 - Low data rate.
 - High reconstruction quality.
-- Low coding delay.
-- Low complexity and power use.
-- Packet-loss resilience.
-- Higher compression usually comes at the cost of quality, processing complexity, or delay.
-
-Container - file or stream structure holding one or more media streams.
-
-- Streams  
-  Audio, video, text, slides, or whiteboard data.
-- Examples  
-  AVI, ASF, WMV, FLV, MPEG.
-- A container is not a codec.
-
-## Codec Classes
-
-Lossless codec - reconstructs the original bit stream exactly.
-
-- Uses  
-  Fax, presentation files, medical images.
-
-Lossy codec - discards selected information.
-
-- Uses  
-  Audio and video.
-
-Constant bit rate (CBR) - fixed output rate. Suitable for fixed-rate channels and streaming.
-
-Variable bit rate (VBR) - output rate varies with content complexity. Suitable for packet-switched networks and stored media.
-
-## Audio Coding
-
-### Sampling
-
-$$f_s > 2f_{max}$$
-
-The Nyquist condition permits reconstruction of a band-limited signal.
-
-Audio codec design depends on signal type:
-
-- Speech.
-- Music.
-- Fax and modem signals.
-
-A speech codec performs poorly on music.
-
-### Pulse Code Modulation
-
-Pulse Code Modulation (PCM) - sample and quantise the waveform directly.
-
-G.711 telephony uses $8{,}000$ samples/second and $8$ bits/sample:
-
-$$8{,}000 \times 8 = 64\ \text{kbps}$$
-
-Companding variants:
-
-- $\mu$-law - maps 14-bit samples to 8 bits. Used in North America and Japan.
-- A-law - maps 13-bit samples to 8 bits. Used in Europe.
-
-### Differential PCM
-
-Differential Pulse Code Modulation (DPCM) - transmit prediction error rather than each sample.
-
-$$e_n = x_n - \hat{x}_n$$
-
-$x_n$ is the actual sample. $\hat{x}_n$ is the predicted sample. Encoder and decoder use the same predictor.
-
-**Adaptive DPCM (ADPCM)** - predictor and quantiser adapt to waveform changes.
-
-- G.721 uses eight preceding samples.
-- Four-bit errors produce a $32\ \text{kbps}$ stream.
-
-### Linear Predictive Coding
-
-Linear Predictive Coding (LPC) - speech source-filter model.
-
-- Source  
-  Voiced buzz or unvoiced noise.
-- Filter  
-  Vocal-tract resonance.
-- Formants  
-  Resonance peaks in the frequency spectrum.
-
-LPC operates on approximately $20\ \text{ms}$ of speech.
-
-- Determine voiced or unvoiced excitation.
-- Determine pitch for voiced speech.
-- Encode linear-prediction coefficients.
-
-Code-Excited Linear Prediction (CELP) - transmit a reference into a shared excitation codebook.
-
-- Speex uses CELP.
-
-### MPEG Audio
-
-| Standard             | Properties                                                                    |
-| :------------------- | :---------------------------------------------------------------------------- |
-| MPEG-1 Layer 3 (MP3) | $16$ bits/sample; $32$, $44.1$, or $48\ \text{kHz}$; $32$–$320\ \text{kbps}$. |
-| MPEG-2 audio         | More than two channels; lower sampling frequencies.                           |
-| AAC                  | $8$–$96\ \text{kHz}$; higher coding efficiency than MP3.                      |
-
-AAC at $96\ \text{kbps}$ exceeds MP3 quality at $128\ \text{kbps}$.
-
-## Video Characterisation
-
-Luminance - pixel intensity component.
-
-Chrominance - pixel colour component.
-
-Video properties:
-
-- Frame rate - frames per second.
-- Frame dimensions - pixel width and height.
-- Pixel depth - bits per pixel.
-- Colour model - RGB or YUV.
-
-Common frame rates:
-
-- Motion perception  
-  Approximately $12\ \text{fps}$.
-- Cinema  
-  $24\ \text{fps}$.
-- PAL television  
-  $25\ \text{fps}$.
-
-Raw $768 \times 576$ video, $24$ bits/pixel, at $25\ \text{fps}$ requires:
-
-$$768 \times 576 \times 24 \times 25 = 265{,}420{,}800\ \text{bps}$$
-
-## Compression Methods
-
-### General-Purpose Methods
-
-Run-length encoding (RLE) - replace a repeated-symbol run with its symbol and length.
-
-- Effective for long uniform runs.
-- Suitable for graphics and cartoons.
-
-Relative encoding - encode the difference from the preceding value.
-
-Huffman coding - variable-length code. Frequent symbols receive shorter codes.
-
-Arithmetic coding - encodes a symbol sequence as one interval value.
-
-- More efficient than Huffman coding for arbitrary probabilities.
-- More complex.
-
-### Intraframe Compression
-
-Intraframe compression - compression within one frame. Exploits spatial redundancy.
-
-- Subsampling - retain fewer pixels or replace regions with average values.
-- Coarse quantisation - use fewer bits per pixel.
-- Vector quantisation - replace each input block with its nearest codebook pattern.
-- Transform coding - transform spatial samples into frequency coefficients.
-
-Discrete cosine transform (DCT) coding uses $8 \times 8$ blocks. Quantisation, run-length coding, and entropy coding reduce the coefficient representation.
-
-### Interframe Compression
-
-Interframe compression - compression across a frame sequence. Exploits temporal redundancy.
-
-- Frame subsampling - transmit only selected frames.
-- Difference coding - transmit changed pixels.
-- Block difference coding - transmit significantly changed blocks.
-- Block motion compensation - transmit motion vectors and residual differences.
-
-Motion compensation searches a reference frame for a match to each current block. The displacement is the motion vector.
-
-## MPEG Video
-
-MPEG - Moving Picture Experts Group standards for audio and video coding.
-
-| Standard       | Scope                                                                     |
-| :------------- | :------------------------------------------------------------------------ |
-| MPEG-1         | VCD; target $1.5\ \text{Mbps}$ at $352 \times 240$; progressive pictures. |
-| MPEG-2         | DVD and digital television; profile and level variants.                   |
-| MPEG-3         | HDTV proposal; abandoned because MPEG-2 was sufficient.                   |
-| MPEG-4         | Audio-visual objects, 3D content, low bit rates, and DRM.                 |
-| MPEG-4 Part 10 | H.264 / AVC.                                                              |
-
-### Spatial and Temporal Processing
-
-MPEG spatial processing:
-
-1. Convert RGB to YUV.
-2. Split the frame into $8 \times 8$ blocks.
-3. Apply two-dimensional DCT.
-4. Quantise DCT coefficients.
-5. Apply run-length and entropy coding.
-
-MPEG temporal processing uses $16 \times 16$ macroblocks. Motion vectors reference previous or future frames. The encoder sends residual error when prediction differs from the current block.
-
-### Frame Types
-
-| Frame   | Coding method                                      | Relative size                  |
-| :------ | :------------------------------------------------- | :----------------------------- |
-| I-frame | Intra-coded. No frame reference.                   | Largest.                       |
-| P-frame | References a preceding I- or P-frame.              | About one-third of an I-frame. |
-| B-frame | References preceding and following I- or P-frames. | About one-sixth of an I-frame. |
-
-Group of Pictures (GOP) - consecutive frames decodable from their contained references.
-
-- Usually 12 or 15 frames.
-- Random access begins at an I-frame.
-- Transmission order differs from display order when B-frames exist.
-
-If no close motion match exists, encode the macroblock as an I-block. Scene changes also require a new intra-coded reference. Excessive predictive frames propagate error and increase decoding delay.
-
-## MPEG Systems
-
-Program Stream (PS) - container for reliable media such as disks.
-
-Transport Stream (TS) - container for lossy network or broadcast links.
-
-### Audio-Video Synchronisation
-
-Presentation timestamp - time at which a decoded sample or frame is presented.
-
-MPEG-2 uses a $90\ \text{kHz}$ clock. Program Clock Reference (PCR) timestamps let the receiver align its clock. A phase-locked loop (PLL) synchronises receiver timing to the sender.
+- Low encoding and decoding delay.
+- Low computational complexity and power consumption.
+- Robustness to repeated encoding and decoding through different codecs.
+- Resilience to packet loss.
+
+Codec selection depends on the application, existing infrastructure, standards, patent constraints, and user expectations.
+
+### Codec Types
+
+| Classification | Type                    | Property                                               |
+| :------------- | :---------------------- | :----------------------------------------------------- |
+| Reconstruction | Lossless                | Reconstructs the original input exactly.               |
+| Reconstruction | Lossy                   | Discards selected information to reduce the data rate. |
+| Output rate    | Constant bit rate (CBR) | Maintains a fixed target output rate.                  |
+| Output rate    | Variable bit rate (VBR) | Varies the output rate with content complexity.        |
+
+- Lossless coding suits fax, presentation data, and medical images requiring exact reconstruction.
+- Lossy coding suits audio and video when some distortion is acceptable.
+- CBR suits fixed-rate channels.
+- VBR suits packet-switched networks and stored media.

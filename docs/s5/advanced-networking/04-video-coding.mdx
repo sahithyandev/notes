@@ -1,0 +1,172 @@
+---
+title: Video Coding
+dateCreated: 2026-09-25T06:10:54.663Z
+lastUpdatedOn: 2026-09-25T06:35:38.823Z
+slug: s5/advanced-networking/video-coding
+sidebar:
+  order: 4
+prev: true
+next: true
+---
+
+Video coding represents digital video in a compressed form for storage or transmission.
+
+## Video Processing Stages
+
+1. Digitise the source video.
+2. Process colour, contrast, and brightness as required.
+3. Encode and compress the resulting video.
+
+Initial compression during capture reduces data volume but affects final quality.
+
+## Video Characteristics
+
+| Property              | Description                                                   |
+| :-------------------- | :------------------------------------------------------------ |
+| Frame rate            | Number of frames displayed per second.                        |
+| Frame dimensions      | Image width and height in pixels.                             |
+| Pixel depth           | Number of bits used to represent each pixel.                  |
+| Luminance             | Component representing pixel intensity.                       |
+| Chrominance           | Components representing colour information.                   |
+| Colour representation | Component values such as RGB or luminance/chrominance values. |
+
+Frame rates used in the lecture:
+
+- Cinema  
+  24 frames per second.
+- PAL television  
+  25 frames per second.
+
+## Uncompressed Video Rate
+
+The lecture's 768 × 576 video uses 24 bits per pixel at 25 frames per second.
+
+$$768 \times 576 \times 24 \times 25 = 265{,}420{,}800\ \text{bps}$$
+
+Approximately 265.4 Mbps before transmission overhead.
+
+## Compression Trade-Offs
+
+Redundancy is repeated or predictable information that can be represented more compactly.
+
+- Reducing dimensions removes spatial detail.
+- Reducing frame rate removes temporal detail.
+- Lossy coding can discard information less noticeable to human perception.
+- Strong compression can produce blockiness or other visible distortion.
+- Rapid motion reduces similarity between consecutive frames.
+
+## General-Purpose Compression
+
+General-purpose lossless methods exploit repeated values or unequal symbol probabilities.
+
+### Run-Length Encoding
+
+Run-length encoding (RLE) replaces consecutive occurrences of a symbol with the symbol and its run length.
+
+- Effective for long runs of identical values.
+- Suits uniform image regions, graphics, and cartoons.
+
+Examples:
+
+- `111110000003355` becomes `(1, 5), (0, 6), (3, 2), (5, 2)`.
+
+### Relative Encoding
+
+Relative encoding stores an initial value followed by differences between consecutive values.
+
+Small differences can require fewer bits than the original values.
+
+### Huffman Coding
+
+Huffman coding assigns variable-length prefix codes to symbols according to their frequencies.
+
+- Frequent symbols receive shorter codes.
+- Effective when a small number of symbols dominate.
+
+### Arithmetic Coding
+
+Arithmetic coding represents a symbol sequence by progressively narrowing an interval according to symbol probabilities.
+
+- Can encode a sequence more efficiently than symbol-by-symbol Huffman coding.
+- Requires more complex processing.
+
+## Intraframe Compression
+
+Intraframe compression exploits spatial redundancy within an individual image or video frame.
+
+### Subsampling
+
+Spatial subsampling reduces the number of pixels used to represent an image.
+
+- Pixel selection  
+  Retains a subset of the original pixels.
+- Averaging  
+  Represents a region using an average pixel value.
+
+Averaging generally gives better quality than direct pixel selection.
+
+### Coarse Quantisation
+
+Coarse quantisation reduces the number of possible values used to represent each pixel.
+
+Preserves the number of pixels but reduces their precision.
+
+### Vector Quantisation
+
+Vector quantisation represents a block of input values using a reference to a similar pattern in a shared codebook.
+
+Example adapted from November 2023, Question 4.3.
+
+- The input block is `(10, 10, 10, 10)`.
+- The closest codebook entry is `(12, 12, 12, 12)`.
+- Decoding its index reconstructs every sample with an error of `+2`.
+- Repeating the input block repeats the same distortion.
+
+Repetition alone does not cause a large error. A poorly matched codebook can produce persistent distortion even for highly repetitive input.
+
+### Transform Coding
+
+Transform coding represents image blocks using coefficients in a transform domain.
+
+DCT coding uses 8 × 8 blocks, followed by quantisation, run-length coding, and entropy coding.
+
+## Interframe Compression
+
+Interframe compression exploits temporal redundancy across a sequence of video frames.
+
+### Frame Subsampling
+
+Frame subsampling transmits selected frames and reduces the effective frame rate.
+
+### Difference Coding
+
+Difference coding compares a frame with its predecessor and updates changed pixels.
+
+### Block-Based Difference Coding
+
+Block-based difference coding compares non-overlapping blocks with their counterparts in a reference frame.
+
+Only significantly changed blocks are updated.
+
+### Block-Based Motion Compensation
+
+Motion compensation predicts a current block using a similar region in a reference frame.
+
+- Motion vector  
+  Specifies the displacement to the reference region.
+- Residual  
+  Represents the difference between the predicted block and the current block.
+
+## Encoding Selection Examples
+
+The choice depends on motion, repeated information, and the detail the application must preserve. These techniques can be combined within a codec.
+
+| Scenario                                             | Suitable Approach                                                                                 | Reason and Limitation                                                                                                                    |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| CCTV used for machine-learning detection             | Preserve spatial and temporal detail. Use lossless coding when exact reconstruction is required.  | Aggressive subsampling can remove small objects or brief events. Validate any lossy setting against detection accuracy.                  |
+| Fixed camera recording sunrise and sunset            | Relative or difference coding.                                                                    | Gradual changes produce small differences. Frame subsampling also suits a time-lapse recording when intermediate events are unnecessary. |
+| Action movie                                         | Block-based motion compensation with residual coding.                                             | Moving objects can be predicted from nearby frames. Scene cuts and unpredictable motion require more intra coding.                       |
+| Board game filmed from above                         | Block-based difference coding.                                                                    | Most of the board remains unchanged. Update blocks containing moved pieces or hands.                                                     |
+| Sleeping baby monitor                                | Difference coding while retaining the required frame rate and detail.                             | Small movements matter. Aggressive spatial or frame subsampling could hide an event the monitor must detect.                             |
+| Fixed camera aimed at a cricket pitch                | Block-based difference coding for unchanged regions, with motion compensation for moving regions. | The background changes little. The ball and players still require sufficient detail and frequent updates.                                |
+| Black-and-white graphics with 96% plain-black frames | Run-length coding for uniform regions, combined with temporal prediction for repeated frames.     | Relative coding alone still produces many differences to represent. Runs and repeated frames need compact representations.               |

@@ -1,10 +1,10 @@
 ---
 title: Implementing Quality of Service
 dateCreated: 2026-09-01T19:24:36.012Z
-lastUpdatedOn: 2026-09-25T05:56:45.536Z
+lastUpdatedOn: 2026-09-25T06:35:39.046Z
 slug: s5/advanced-networking/intserv-rsvp-diffserv
 sidebar:
-  order: 6
+  order: 9
   label: "IntServ, RSVP, DiffServ"
 prev: true
 next: true
@@ -233,3 +233,46 @@ During network congestion, core routers drop packets with higher drop precedence
 | Guarantees Offered  | Hard delay and loss bounds           | Relative service distinctions            |
 | Scalability         | Poor in large core networks          | Excellent in large core networks         |
 | Primary Deployment  | Enterprise and campus networks       | ISP backbones and multi-service networks |
+
+## Worked Example
+
+### Prioritised Voice and Web Traffic
+
+Adapted from December 2021, Question 2.3, December 2022, Question 1.4, and November 2024, Questions 4.1–4.2.
+
+An organisation permits an approved VoIP application and web browsing. Voice needs low delay. Web traffic must retain some capacity.
+
+Assume managed endpoints and a known set of authorised services and voice media flows.
+
+```text
+Managed endpoints
+        |
+        v
+Edge firewall and classifier
+        |
+        v
+Meter and mark admitted traffic
+        |
+        v
+Core queues selected by DSCP
+        |
+        v
+Destination
+```
+
+1. The edge firewall admits the authorised voice and web flows. It rejects other traffic under the organisation's access policy.
+2. The classifier identifies approved voice sessions using configured service information and signalling-derived media flows. It does not treat every UDP packet as voice.
+3. A token-bucket meter checks voice traffic against its allowed rate and burst size.
+4. The edge marks conforming voice packets for EF treatment. It marks web traffic as best effort. Untrusted endpoint markings are validated or replaced.
+5. Excess voice traffic is dropped or remarked according to policy. A priority class must not grow without a bound.
+6. Core routers select queues from DSCP. A bounded priority service gives voice low delay while leaving capacity for web traffic.
+7. Admission control rejects additional calls when the voice allocation cannot meet their requirements.
+
+The DSCP occupies 6 bits of the existing IPv4 differentiated-services field or IPv6 Traffic Class field. No additional IP header is required.
+
+<Note>
+  A port number identifies a transport endpoint, not a verified application.
+  Encrypted traffic and shared ports can defeat port-only classification. Strict
+  application restrictions also require trusted endpoint controls or an
+  application-aware gateway.
+</Note>
