@@ -15,7 +15,8 @@ export type RuleId =
   | "prereq-scope"
   | "broken-link"
   | "filename"
-  | "title-heading-duplicate";
+  | "title-heading-duplicate"
+  | "duplicate-heading";
 
 export interface Violation {
   rule: RuleId;
