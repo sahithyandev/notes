@@ -1,0 +1,190 @@
+---
+title: Point Operations
+dateCreated: 2026-08-18T07:18:35.588Z
+lastUpdatedOn: 2026-09-25T19:32:18.236Z
+slug: s5/image-processing/point-operations
+sidebar:
+  order: 14
+prev: true
+next: true
+---
+
+Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
+
+Homogeneous **iff** the operation is independent of pixel location.
+
+## Lookup Table
+
+A lookup table (LUT) maps the current pixel value to an index, returning a new value from the table.
+
+- Enables on the fly processing, especially on hardware platforms
+- Changing table content changes the operation without changing any code
+
+Examples:
+
+- Pseudo colouring, e.g. mapping thermal image temperature to RGB
+- Compensating for non-linearity in sensor elements
+
+## Grey Level Histogram
+
+The grey level histogram shows the frequency of occurrence of each intensity level in an image, regardless of pixel position. Its shape describes overall brightness and contrast.
+
+Normalized histogram:
+
+$$
+P(k) = \frac{N(k)}{n}
+$$
+
+Here:
+
+- $N(k)$: number of pixels with intensity $k$
+- $n$: total number of pixels
+
+Defines the probability of intensity level $k$ in the image.
+
+Accumulated histogram:
+
+$$
+A(k) = \sum_{j \le k} P(j)
+$$
+
+Defines the accumulated probability of pixels with intensity level $\le k$.
+
+### Brightness and Contrast
+
+Brightness and contrast are the position and the width of the same histogram. Both are described as point operations mapping input intensity $r$ to output intensity $s$.
+
+- Brightness  
+  Mean intensity. A shift $s = r + c$ slides the histogram along the intensity axis, keeping its shape and width.
+- Contrast  
+  Spread of intensities. Histogram width, the gap between the darkest and brightest points, measures it. A gain $s = a r$ stretches the histogram wider.
+
+Here:
+
+- $r$: input intensity
+- $s$: output intensity
+- $c$: shift constant, added to move brightness
+- $a$: gain constant, multiplied to change contrast
+
+Shifting the histogram changes brightness only. Every pair of pixels keeps the same intensity gap, so contrast is unaffected.
+
+<Note>
+
+Auto-focus algorithms maximize the standard deviation of pixel intensities, a contrast measure insensitive to outliers. Sharp focus gives large jumps between neighbouring pixels and a wide spread. Blur averages each pixel toward its neighbours, narrowing the spread. Mean intensity barely changes, since blur redistributes light rather than adding or removing it.
+
+</Note>
+
+## Point Processing Functions
+
+Common transformations applied to each pixel, typically implemented as a LUT mapping input intensity $r$ to output intensity $s$.
+
+- Identity  
+  $s = r$.
+- Digital negative  
+  Inverts intensity: $s = (L-1) - r$, where $L$ is the number of grey levels.
+- Square root  
+  Compresses bright values and expands dark ones.
+- Contrast stretching  
+  Piecewise linear expansion of a chosen intensity range.
+- Normalizing  
+  Rescales intensities to use the full available range.
+- Clipping  
+  Forces values outside a chosen range to the range boundary.
+- Intensity level slicing  
+  Highlights a chosen intensity band, suppressing all others.
+- Bit slicing  
+  Extracts one bit-plane of the pixel value.
+- Range stretching or compression  
+  Maps a chosen input range onto a different output range.
+- Histogram equalization  
+  Redistributes intensities to make the histogram more uniform.
+
+## Histogram Matching
+
+Aka. histogram specification. The process of adjusting a test image so its grey level distribution follows a given reference distribution.
+
+The reference is supplied as a 256-element array holding the reference CDF, one value per grey level.
+
+Procedure:
+
+- Compute the test image histogram, then its CDF $C_t$
+- For each test level $g$, find the reference level $r$ whose CDF value $C_r(r)$ is closest to $C_t(g)$
+- Store $g \mapsto r$ in a 256-entry LUT
+- Apply the LUT to every pixel
+
+$$
+\text{LUT}(g) = \arg\min_{r} \, \lvert C_r(r) - C_t(g) \rvert
+$$
+
+Here:
+
+- $C_t(g)$: accumulated probability of test level $\le g$
+- $C_r(r)$: accumulated probability of reference level $\le r$
+
+Histogram equalization is the special case where the reference CDF is linear. Matching 2 levels through equal CDF values preserves their relative ordering.
+
+For a colour image, each channel is matched independently against the reference channel.
+
+<Note>
+
+A good reference image gives a smooth reference CDF. A test level can only map to reference levels that the reference image actually contains, so gaps in the reference histogram appear as gaps in the output.
+
+</Note>
+
+```python
+def cdf(pixels):
+    # count how many pixels have each intensity
+    hist = [0] * 256
+    for v in pixels:
+        hist[v] += 1
+    # accumulate the counts and divide by the total to get the CDF
+    total = len(pixels)
+    running, out = 0, [0.0] * 256
+    for i, c in enumerate(hist):
+        running += c
+        out[i] = running / total
+    return out
+
+def match(test_pixels, ref_cdf):
+    ct = cdf(test_pixels)
+    # build the LUT: for each test level g, pick the reference
+    # level r whose CDF value is closest to the test CDF value
+    lut = [0] * 256
+    for g in range(256):
+        best_r = 0
+        best_diff = abs(ref_cdf[0] - ct[g])
+        for r in range(1, 256):
+            diff = abs(ref_cdf[r] - ct[g])
+            if diff < best_diff:
+                best_diff = diff
+                best_r = r
+        lut[g] = best_r
+    # remap every pixel through the LUT
+    out = []
+    for v in test_pixels:
+        out.append(lut[v])
+    return out
+```
+
+For a colour image, match each channel against that channel's reference CDF.
+
+## Worked Example
+
+Match a 4-pixel test image to a reference CDF over 4 grey levels $\{0, 1, 2, 3\}$.
+
+Test pixels: $0, 1, 1, 3$.
+
+Test histogram: $[1, 2, 0, 1]$, total $4$.
+
+Test CDF $C_t$: $[0.25, 0.75, 0.75, 1.0]$.
+
+Reference CDF $C_r$: $[0.1, 0.2, 0.7, 1.0]$.
+
+Mapping:
+
+- $g = 0$, $C_t = 0.25$: closest is $C_r(1) = 0.2$, so $0 \mapsto 1$
+- $g = 1$, $C_t = 0.75$: closest is $C_r(2) = 0.7$, so $1 \mapsto 2$
+- $g = 2$, $C_t = 0.75$: $2 \mapsto 2$
+- $g = 3$, $C_t = 1.0$: $C_r(3) = 1.0$, so $3 \mapsto 3$
+
+Output pixels: $1, 2, 2, 3$.

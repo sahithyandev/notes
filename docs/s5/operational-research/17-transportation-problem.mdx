@@ -1,0 +1,818 @@
+---
+title: Transportation Problem
+slug: s5/operational-research/transportation-problem
+sidebar:
+  order: 17
+prev: true
+next: true
+dateCreated: 2026-08-26T11:54:50.043Z
+lastUpdatedOn: 2026-09-25T19:32:18.438Z
+---
+
+Minimizes the cost of shipping a single commodity from $m$ supply points to $n$ demand points, given a per-unit shipping cost $c_{ij}$ for every supply-demand pair.
+
+$$
+\text{minimize } z = \sum_{i=1}^{m} \sum_{j=1}^{n} c_{ij} x_{ij}
+$$
+
+Subject to:
+
+- $\sum_{j=1}^{n} x_{ij} \le a_i$ for every supply point $i$ (supply capacity)
+- $\sum_{i=1}^{m} x_{ij} \ge b_j$ for every demand point $j$ (demand requirement)
+- $x_{ij} \ge 0$
+
+## Variations
+
+### Balanced
+
+Total supply equals total demand: $\sum_i a_i = \sum_j b_j$. Every constraint becomes an equality.
+
+A feasible solution exists **iff** the problem is balanced.
+
+A balanced transportation problem with $m$ supply and $n$ demand points has $m + n - 1$ basic variables in any basic feasible solution (BFS), the most positive allocations a BFS can have.
+
+Balance makes the last of the $m + n$ supply/demand equality constraints redundant, since it follows from the rest once totals match, leaving $m + n - 1$ independent constraints. A [basic solution](/s5/operational-research/solutions-of-lp#basic-solution) has exactly 1 basic variable per independent constraint.
+
+### Unbalanced
+
+Total supply and demand differ. Add a dummy supply point (if demand exceeds supply) or a dummy demand point (if supply exceeds demand) with 0 shipping cost, absorbing the excess, to rebalance it.
+
+### Maximization
+
+Convert to an equivalent minimization problem by negating every cost $c_{ij}$ (or subtracting each from the largest cost in the matrix), then solve as usual.
+
+### Restricted
+
+A route is prohibited (e.g. no road between a supply and demand point). Assign it a very large cost $M$, which drives $x_{ij}$ to 0 in any optimal solution.
+
+## Transportation Table
+
+A transportation table lays out a transportation problem as a grid: one row per supply point, one column per demand point.
+
+Conventions:
+
+- Cell $(i,j)$ carries the shipping cost $c_{ij}$ and the allocation $x_{ij}$.
+- The rightmost column holds each row's supply $a_i$.
+- The bottom row holds each column's demand $b_j$.
+- A cell is occupied when $x_{ij} > 0$, unoccupied otherwise.
+
+Example, unsolved (only the costs, supply, and demand are known):
+
+<TransportationTable
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3"]}
+  costs={[
+    [4, 6, 8],
+    [3, 5, 2],
+    [3, 9, 6],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20]}
+/>
+
+Total supply is $115$, total demand is $75$: unbalanced.
+
+### Loop
+
+A closed path of occupied cells (plus a chosen unoccupied cell) that alternates horizontal and vertical moves, turning only at occupied cells, and returns to the unoccupied cell. Exactly one such loop exists for a given unoccupied cell in a non-degenerate BFS.
+
+## Solving Transportation Method
+
+To construct an initial BFS, there are 2 methods. Only 1 is needed to proceed to the stepping stone method.
+
+### Least Cost Method
+
+Step:
+
+- Allocate as much as possible to the cell with the lowest cost in the matrix.  
+  A tie in the lowest cost is broken by choosing the cell allowing the larger allocation.
+- Cross out the exhausted row or column.
+- Repeat on the remaining cells until fully allocated.
+
+### Vogel's Approximation Method
+
+Penalty is the difference between the lowest and second-lowest cost in it.
+
+Steps:
+
+- For every remaining row and column, compute the penalty.
+- Select the row or column with the largest penalty.  
+  A tie is broken by choosing the row or column whose lowest-cost cell allows the larger allocation. If still tied, choose the one with the lower cost in that cell. If that also ties, choose the lowest-indexed row or column.
+- Allocate as much as possible to its lowest-cost cell in the chosen row or column.
+- Cross out the exhausted row or column and recompute penalties.
+- Repeat until fully allocated.
+
+Generally gives a BFS closer to optimal than the least cost method.
+
+### Stepping Stone Method
+
+Improves an initial BFS to optimality.
+
+- For every unoccupied cell, trace its loop.
+- Alternate $+$ and $-$ signs around the loop, starting with $+$ at the unoccupied cell.
+- Sum the costs around the loop with their signs. This is the cell's improvement index.
+- If every improvement index is $\ge 0$, the solution is optimal. Stop.
+- Otherwise, the cell with the most negative improvement index enters the basis.
+- Shift the minimum allocation among $-$ cells in its loop, adding it at $+$ cells and subtracting it at $-$ cells.
+- The $-$ cell with the minimum allocation leaves the basis (becomes 0/unoccupied).
+
+Repeat until every improvement index is $\ge 0$.
+
+<Note>
+
+Occurs when an unoccupied cell has an improvement index of 0 at optimality. Any allocation along its loop gives another solution with the same optimal cost.
+
+</Note>
+
+## Degenerate BFS
+
+A BFS is degenerate **iff** it has fewer than $m+n-1$ positive allocations.
+
+A non-degenerate BFS has exactly $m+n-1$ positive allocations. Every unoccupied cell then has exactly 1 loop back to the occupied cells, which the stepping stone method needs to compute improvement indices.
+
+Causes:
+
+- Initial allocation  
+  1 allocation exhausts its row and column together. Example: supply $(10,10)$, demand $(10,10)$. Allocating $10$ to $(1,1)$ empties row $1$ and column $1$ at once, leaving only 1 more allocation instead of the expected $m+n-1=3$.
+- Pivot tie  
+  A pivot's loop has 2 or more $-$ cells tied at the minimum allocation. Only 1 leaves the basis. The rest drop to $0$ too.
+
+Fix: allocate $0$ to an unoccupied cell that doesn't close a loop with the occupied cells. This restores the count to $m+n-1$, and the cell counts as occupied in loops despite shipping nothing.
+
+A dummy row or column's allocation is a real basic variable, not a placeholder: it counts toward $m+n-1$ and takes part in loops like any other occupied cell.
+
+## Worked Example
+
+Solving the table from [Transportation Table](#transportation-table). Total supply is $115$, total demand is $75$: unbalanced. Add a dummy demand point $D_4$ with demand $40$ and cost $0$ to balance it.
+
+<TransportationTable
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+/>
+
+Least cost method proceeds as follows:
+
+<Walkthrough variant="transportation">
+  <TransportationStep
+    label="Step 1"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[20, 30, 25]}
+    demand={[30, 25, 20, 0]}
+    allocations={[
+      [null, null, null, null],
+      [null, null, null, 40],
+      [null, null, null, null],
+    ]}
+    highlight={[[1, 3]]}
+  >
+    Lowest cost is 0, tied across the whole dummy column $D_4$. $O_2 D_4$
+    allows the largest allocation ($\min(70,40)=40$, against $O_1$'s 20 and
+    $O_3$'s 25). Allocate 40. $D_4$ exhausted.
+  </TransportationStep>
+
+<TransportationStep
+  label="Step 2"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 10, 25]}
+  demand={[30, 25, 0, 0]}
+  allocations={[
+    [null, null, null, null],
+    [null, null, 20, 40],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 2]]}
+>
+  Lowest remaining cost is 2 at $O_2 D_3$. Allocate $\min(30,20) = 20$. $D_3$
+  exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Step 3"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 10, 0]}
+  demand={[5, 25, 0, 0]}
+  allocations={[
+    [null, null, null, null],
+    [null, null, 20, 40],
+    [25, null, null, null],
+  ]}
+  highlight={[[2, 0]]}
+>
+  Lowest remaining cost is 3, tied between $O_2 D_1$ and $O_3 D_1$. $O_3 D_1$
+  allows the larger allocation ($\min(25,30)=25$ against $\min(10,30)=10$).
+  Allocate 25. $O_3$ exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Step 4"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 5, 0]}
+  demand={[0, 25, 0, 0]}
+  allocations={[
+    [null, null, null, null],
+    [5, null, 20, 40],
+    [25, null, null, null],
+  ]}
+  highlight={[[1, 0]]}
+>
+  Lowest remaining cost is 3 at $O_2 D_1$. Allocate $\min(10,5) = 5$. $D_1$
+  exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Step 5"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 0, 0]}
+  demand={[0, 20, 0, 0]}
+  allocations={[
+    [null, null, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  highlight={[[1, 1]]}
+>
+  Lowest remaining cost is 5 at $O_2 D_2$. Allocate $\min(5,25) = 5$. $O_2$
+  exhausted.
+</TransportationStep>
+
+  <TransportationStep
+    label="Final"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[0, 0, 0]}
+    demand={[0, 0, 0, 0]}
+    allocations={[
+      [null, 20, null, null],
+      [5, 5, 20, 40],
+      [25, null, null, null],
+    ]}
+    highlight={[[0, 1]]}
+    total="z = 275"
+  >
+    Only $O_1 D_2$ remains. Allocate the remaining 20. 6 basic variables
+    equals $m+n-1$, non-degenerate.
+  </TransportationStep>
+</Walkthrough>
+
+Vogel's approximation method proceeds as follows:
+
+<Walkthrough variant="transportation">
+  <TransportationStep
+    label="Round 1: Penalties"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[20, 70, 25]}
+    demand={[30, 25, 20, 40]}
+    allocations={[
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+    ]}
+    highlight={[[0, 3]]}
+    rowPenalties={[4, 2, 3]}
+    colPenalties={[0, 1, 4, 0]}
+    selectedPenalty={{ axis: "row", index: 0 }}
+  >
+    Row penalties are $O_1 = 4$, $O_2 = 2$, $O_3 = 3$. Column penalties are
+    $D_1 = 0$, $D_2 = 1$, $D_3 = 4$, $D_4 = 0$. $O_1$ and $D_3$ tie at 4.
+    $O_1$'s lowest-cost cell ($O_1 D_4$, cost 0) allows $\min(20,40)=20$;
+    $D_3$'s ($O_2 D_3$, cost 2) also allows $\min(70,20)=20$, so the lower
+    cost wins: $O_1$.
+  </TransportationStep>
+
+<TransportationStep
+  label="Round 1: Allocate"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 70, 25]}
+  demand={[30, 25, 20, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, null, null, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[0, 3]]}
+  rowPenalties={[null, null, null]}
+  colPenalties={[null, null, null, null]}
+>
+  Allocate 20 to $O_1 D_4$. $O_1$ exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 2: Penalties"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 70, 25]}
+  demand={[30, 25, 20, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, null, null, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 1]]}
+  rowPenalties={[null, 2, 3]}
+  colPenalties={[0, 4, 4, 0]}
+  selectedPenalty={{ axis: "col", index: 1 }}
+>
+  Row penalties are $O_2 = 2$, $O_3 = 3$. Column penalties are $D_1 = 0$, $D_2 =
+  4$, $D_3 = 4$, $D_4 = 0$. $D_2$ and $D_3$ tie at 4. $D_2$'s lowest-cost cell
+  ($O_2 D_2$) allows $\min(70,25)=25$, more than $D_3$'s $\min(70,20)=20$.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 2: Allocate"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 45, 25]}
+  demand={[30, 0, 20, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, 25, null, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 1]]}
+  rowPenalties={[null, null, null]}
+  colPenalties={[null, null, null, null]}
+>
+  Allocate 25 to $O_2 D_2$. $D_2$ exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 3: Penalties"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 45, 25]}
+  demand={[30, 0, 20, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, 25, null, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 2]]}
+  rowPenalties={[null, 2, 3]}
+  colPenalties={[0, null, 4, 0]}
+  selectedPenalty={{ axis: "col", index: 2 }}
+>
+  Row penalties are $O_2 = 2$, $O_3 = 3$. Column penalties are $D_1 = 0$, $D_3 =
+  4$, $D_4 = 0$. Largest is $D_3$ (4), whose lowest cost is $O_2 D_3$ (2).
+</TransportationStep>
+
+<TransportationStep
+  label="Round 3: Allocate"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 25, 25]}
+  demand={[30, 0, 0, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, 25, 20, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 2]]}
+  rowPenalties={[null, null, null]}
+  colPenalties={[null, null, null, null]}
+>
+  Allocate 20 to $O_2 D_3$. $D_3$ exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 4: Penalties"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 25, 25]}
+  demand={[30, 0, 0, 20]}
+  allocations={[
+    [null, null, null, 20],
+    [null, 25, 20, null],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 3]]}
+  rowPenalties={[null, 3, 3]}
+  colPenalties={[0, null, null, 0]}
+  selectedPenalty={{ axis: "row", index: 1 }}
+>
+  Row penalties are $O_2 = 3$, $O_3 = 3$. Column penalties are $D_1 = 0$, $D_4 =
+  0$. $O_2$ and $O_3$ tie at 3, and both offer $\min(25,20)=20$ at cost 0 in
+  $D_4$: tied on every rule, so the lowest-indexed row wins, $O_2$.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 4: Allocate"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 5, 25]}
+  demand={[30, 0, 0, 0]}
+  allocations={[
+    [null, null, null, 20],
+    [null, 25, 20, 20],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 3]]}
+  rowPenalties={[null, null, null]}
+  colPenalties={[null, null, null, null]}
+>
+  Allocate 20 to $O_2 D_4$. $D_4$ exhausted.
+</TransportationStep>
+
+<TransportationStep
+  label="Round 5"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[0, 0, 25]}
+  demand={[25, 0, 0, 0]}
+  allocations={[
+    [null, null, null, 20],
+    [5, 25, 20, 20],
+    [null, null, null, null],
+  ]}
+  highlight={[[1, 0]]}
+  rowPenalties={[null, null, null]}
+  colPenalties={[null, null, null, null]}
+>
+  Only $D_1$ remains, so no penalty is needed. Allocate $O_2 D_1 = 5$. $O_2$
+  exhausted.
+</TransportationStep>
+
+  <TransportationStep
+    label="Final"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[0, 0, 0]}
+    demand={[0, 0, 0, 0]}
+    allocations={[
+      [null, null, null, 20],
+      [5, 25, 20, 20],
+      [25, null, null, null],
+    ]}
+    highlight={[[2, 0]]}
+    rowPenalties={[null, null, null]}
+    colPenalties={[null, null, null, null]}
+    total="z = 255"
+  >
+    Allocate $O_3 D_1 = 25$. 6 basic variables equals $m+n-1$,
+    non-degenerate.
+  </TransportationStep>
+</Walkthrough>
+
+Applying the stepping stone method to the least cost method's BFS above (occupied cells $O_1 D_2$, $O_2 D_1$, $O_2 D_2$, $O_2 D_3$, $O_2 D_4$, $O_3 D_1$). Each step below traces the loop for one unoccupied cell, with $+$ and $-$ marking the alternating signs around it.
+
+<Walkthrough variant="transportation">
+  <TransportationStep
+    label="BFS"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[20, 70, 25]}
+    demand={[30, 25, 20, 40]}
+    allocations={[
+      [null, 20, null, null],
+      [5, 5, 20, 40],
+      [25, null, null, null],
+    ]}
+    total="z = 275"
+  >
+    Starting from the least cost method's BFS. Trace the loop of every
+    unoccupied cell to find its improvement index.
+  </TransportationStep>
+
+<TransportationStep
+  label="O1 D1"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 0, col: 0, sign: "+" },
+    { row: 1, col: 0, sign: "-" },
+    { row: 1, col: 1, sign: "+" },
+    { row: 0, col: 1, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_1 D_1(+), O_2 D_1(-), O_2 D_2(+), O_1 D_2(-)$. Improvement index $4 -
+  3 + 5 - 6 = 0$.
+</TransportationStep>
+
+<TransportationStep
+  label="O1 D3"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 0, col: 2, sign: "+" },
+    { row: 0, col: 1, sign: "-" },
+    { row: 1, col: 1, sign: "+" },
+    { row: 1, col: 2, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_1 D_3(+), O_1 D_2(-), O_2 D_2(+), O_2 D_3(-)$. Improvement index $8 -
+  6 + 5 - 2 = 5$.
+</TransportationStep>
+
+<TransportationStep
+  label="O1 D4"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 0, col: 3, sign: "+" },
+    { row: 0, col: 1, sign: "-" },
+    { row: 1, col: 1, sign: "+" },
+    { row: 1, col: 3, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_1 D_4(+), O_1 D_2(-), O_2 D_2(+), O_2 D_4(-)$. Improvement index $0 -
+  6 + 5 - 0 = -1$: the most negative so far.
+</TransportationStep>
+
+<TransportationStep
+  label="O3 D2"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 2, col: 1, sign: "+" },
+    { row: 2, col: 0, sign: "-" },
+    { row: 1, col: 0, sign: "+" },
+    { row: 1, col: 1, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_3 D_2(+), O_3 D_1(-), O_2 D_1(+), O_2 D_2(-)$. Improvement index $9 -
+  3 + 3 - 5 = 4$.
+</TransportationStep>
+
+<TransportationStep
+  label="O3 D3"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 2, col: 2, sign: "+" },
+    { row: 2, col: 0, sign: "-" },
+    { row: 1, col: 0, sign: "+" },
+    { row: 1, col: 2, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_3 D_3(+), O_3 D_1(-), O_2 D_1(+), O_2 D_3(-)$. Improvement index $6 -
+  3 + 3 - 2 = 4$.
+</TransportationStep>
+
+<TransportationStep
+  label="O3 D4"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 2, col: 3, sign: "+" },
+    { row: 2, col: 0, sign: "-" },
+    { row: 1, col: 0, sign: "+" },
+    { row: 1, col: 3, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  Loop $O_3 D_4(+), O_3 D_1(-), O_2 D_1(+), O_2 D_4(-)$. Improvement index $0 -
+  3 + 3 - 0 = 0$. Every unoccupied cell is checked: $O_1 D_4$'s $-1$ is the most
+  negative, so it enters the basis.
+</TransportationStep>
+
+<TransportationStep
+  label="Pivot"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, 20, null, null],
+    [5, 5, 20, 40],
+    [25, null, null, null],
+  ]}
+  loop={[
+    { row: 0, col: 3, sign: "+" },
+    { row: 0, col: 1, sign: "-" },
+    { row: 1, col: 1, sign: "+" },
+    { row: 1, col: 3, sign: "-" },
+  ]}
+  total="z = 275"
+>
+  The minimum allocation among the loop's $-$ cells is 20, at $O_1 D_2$. Shift
+  20 around the loop: add 20 at the $+$ cells, subtract 20 at the $-$ cells.
+</TransportationStep>
+
+<TransportationStep
+  label="New BFS"
+  rows={["O_1", "O_2", "O_3"]}
+  cols={["D_1", "D_2", "D_3", "D_4"]}
+  costs={[
+    [4, 6, 8, 0],
+    [3, 5, 2, 0],
+    [3, 9, 6, 0],
+  ]}
+  supply={[20, 70, 25]}
+  demand={[30, 25, 20, 40]}
+  allocations={[
+    [null, null, null, 20],
+    [5, 25, 20, 20],
+    [25, null, null, null],
+  ]}
+  total="z = 255"
+>
+  $O_1 D_2$ leaves the basis (0/unoccupied), $O_1 D_4$ enters at 20. New cost $z
+  = 275 - 20 = 255$.
+</TransportationStep>
+
+  <TransportationStep
+    label="Final"
+    rows={["O_1", "O_2", "O_3"]}
+    cols={["D_1", "D_2", "D_3", "D_4"]}
+    costs={[
+      [4, 6, 8, 0],
+      [3, 5, 2, 0],
+      [3, 9, 6, 0],
+    ]}
+    supply={[20, 70, 25]}
+    demand={[30, 25, 20, 40]}
+    allocations={[
+      [null, null, null, 20],
+      [5, 25, 20, 20],
+      [25, null, null, null],
+    ]}
+    total="z = 255"
+  >
+    Recomputing: $O_1 D_1 = 1$, $O_1 D_2 = 1$, $O_1 D_3 = 6$, $O_3 D_2 = 4$,
+    $O_3 D_3 = 4$, $O_3 D_4 = 0$. Every improvement index is $\ge 0$:
+    optimal at $z = 255$. $O_3 D_4 = 0$ gives an alternate optimal
+    solution.
+  </TransportationStep>
+</Walkthrough>
+
+This matches Vogel's approximation method's result exactly, both in allocations and cost: VAM reached the optimum directly, while the least cost method needed 1 stepping stone iteration to get there.

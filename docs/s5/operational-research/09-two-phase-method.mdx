@@ -1,0 +1,230 @@
+---
+title: Two-Phase Method
+slug: s5/operational-research/two-phase-method
+sidebar:
+  order: 9
+prev: true
+next: true
+dateCreated: 2026-09-25T19:07:36.280Z
+lastUpdatedOn: 2026-09-25T19:32:18.390Z
+---
+
+When the starting basis needs artificial variables, the two-phase method uses 2 separate simplex runs, avoiding the arbitrary constant $M$ of the [Big-M method](/s5/operational-research/big-m-method).
+
+## Phase 1
+
+- Replace the original objective with minimizing the sum of all artificial variables. This is the same regardless of whether the original problem maximizes or minimizes; the original objective's direction plays no role in phase 1.
+- Run the simplex algorithm.
+- If the minimum is 0, a basic feasible solution to the original problem was found; proceed to phase 2.
+- If the minimum is positive, the original problem is infeasible. Stop.
+
+## Phase 2
+
+- Drop the artificial variables and restore the original objective. The original direction only matters here: convert a minimization to $\max\ {-z}$ to fit the tableau convention, or use a maximization objective as is.
+- Use the phase 1 optimal basis as the starting basic feasible solution: keep the same basic variables and the same rows (with the artificial columns dropped) from the phase 1 final tableau, and only replace the objective row with the restored objective, priced out against those same rows.
+- Run the simplex algorithm to optimize the original objective.
+
+Unbounded and alternate/infinite optimal solutions are detected in phase 2 the same way as in the ordinary simplex algorithm.
+
+## Worked Example
+
+Same LP as the [Big-M worked example](/s5/operational-research/big-m-method#worked-example): minimize $z = 4x_1 + x_2$ subject to $3x_1 + x_2 = 3$, $4x_1 + 3x_2 \ge 6$, $x_1 + 2x_2 \le 4$, $x_1, x_2 \ge 0$. Standard form adds a surplus $s_2$, a slack $s_3$, and artificials $a_1, a_2$: $3x_1 + x_2 + a_1 = 3$, $4x_1 + 3x_2 - s_2 + a_2 = 6$, $x_1 + 2x_2 + s_3 = 4$.
+
+### Phase 1 Tableau
+
+Objective becomes $\min\ a_1 + a_2$, i.e. $\max\ w$ with $w = -a_1 - a_2$. The natural starting basis is again $(a_1, a_2, s_3) = (3, 6, 4)$.
+
+<Walkthrough variant="simplex">
+  <SimplexStep
+    label="Setup: raw objective row"
+    columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+    rows={[
+      { basic: "w", cells: ["0", "0", "0", "0", "1", "1"], rhs: "0" },
+      { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+      { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+      { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+    ]}
+  >
+    Basis $(a_1, a_2, s_3) = (3, 6, 4)$. But $a_1, a_2$ are basic with
+    coefficient $1$ in the $w$ row, so it isn't canonical yet: subtract the
+    $a_1$ row and the $a_2$ row from the $w$ row to zero them out.
+  </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    { basic: "w", cells: ["-7", "-4", "1", "0", "0", "0"], rhs: "-9" },
+    { basic: "a_1", cells: ["3", "1", "0", "0", "1", "0"], rhs: "3" },
+    { basic: "a_2", cells: ["4", "3", "-1", "0", "0", "1"], rhs: "6" },
+    { basic: "s_3", cells: ["1", "2", "0", "1", "0", "0"], rhs: "4" },
+  ]}
+>
+  $w$ row after eliminating $a_1, a_2$: $w = -9$. Coefficients $-7$ and $-4$ are
+  negative, so not optimal.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 1"
+  entering={0}
+  leaving={1}
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    {
+      basic: "w",
+      cells: ["-7", "-4", "1", "0", "0", "0"],
+      rhs: "-9",
+      ratio: "",
+    },
+    {
+      basic: "a_1",
+      cells: ["3", "1", "0", "0", "1", "0"],
+      rhs: "3",
+      ratio: "3/3 = 1",
+    },
+    {
+      basic: "a_2",
+      cells: ["4", "3", "-1", "0", "0", "1"],
+      rhs: "6",
+      ratio: "6/4 = 1.5",
+    },
+    {
+      basic: "s_3",
+      cells: ["1", "2", "0", "1", "0", "0"],
+      rhs: "4",
+      ratio: "4/1 = 4",
+    },
+  ]}
+>
+  Most negative is $-7$, so $x_1$ enters. Minimum ratio is $1$ in row $a_1$, so
+  $a_1$ leaves. Pivot element is $3$.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 2"
+  entering={1}
+  leaving={2}
+  columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+  rows={[
+    {
+      basic: "w",
+      cells: ["0", "-5/3", "1", "0", "7/3", "0"],
+      rhs: "-2",
+      ratio: "",
+    },
+    {
+      basic: "x_1",
+      cells: ["1", "1/3", "0", "0", "1/3", "0"],
+      rhs: "1",
+      ratio: "1 / (1/3) = 3",
+    },
+    {
+      basic: "a_2",
+      cells: ["0", "5/3", "-1", "0", "-4/3", "1"],
+      rhs: "2",
+      ratio: "2 / (5/3) = 1.2",
+    },
+    {
+      basic: "s_3",
+      cells: ["0", "5/3", "0", "1", "-1/3", "0"],
+      rhs: "3",
+      ratio: "3 / (5/3) = 1.8",
+    },
+  ]}
+>
+  Coefficient $-5/3$ is negative, so $x_2$ enters. Minimum ratio is $1.2$ in row
+  $a_2$, so $a_2$ leaves. Pivot element is $5/3$.
+</SimplexStep>
+
+  <SimplexStep
+    label="Phase 1 optimal"
+    columns={["x_1", "x_2", "s_2", "s_3", "a_1", "a_2"]}
+    rows={[
+      { basic: "w", cells: ["0", "0", "0", "0", "1", "1"], rhs: "0" },
+      { basic: "x_1", cells: ["1", "0", "1/5", "0", "3/5", "-1/5"], rhs: "3/5" },
+      { basic: "x_2", cells: ["0", "1", "-3/5", "0", "-4/5", "3/5"], rhs: "6/5" },
+      { basic: "s_3", cells: ["0", "0", "1", "1", "1", "-1"], rhs: "1" },
+    ]}
+  >
+    $w = 0$ and all coefficients are non-negative. Both artificials are
+    non-basic, so $(x_1, x_2, s_3) = (3/5, 6/5, 1)$ is a basic feasible solution
+    of the original problem.
+  </SimplexStep>
+</Walkthrough>
+
+### Phase 2 Tableau
+
+Drop columns $a_1, a_2$. Restore $\max\ -z$ with $-z = -4x_1 - x_2$. Carry over the phase 1 final basis $(x_1, x_2, s_3) = (3/5, 6/5, 1)$, columns $x_1, x_2, s_2, s_3$ only.
+
+<Walkthrough variant="simplex">
+  <SimplexStep
+    label="Setup: raw objective row"
+    columns={["x_1", "x_2", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["4", "1", "0", "0"], rhs: "0" },
+      { basic: "x_1", cells: ["1", "0", "1/5", "0"], rhs: "3/5" },
+      { basic: "x_2", cells: ["0", "1", "-3/5", "0"], rhs: "6/5" },
+      { basic: "s_3", cells: ["0", "0", "1", "1"], rhs: "1" },
+    ]}
+  >
+    Basis $(x_1, x_2, s_3) = (3/5, 6/5, 1)$, carried over from the phase 1
+    final tableau. But $x_1, x_2$ are basic with nonzero coefficients $4$ and
+    $1$ in the objective row, so it isn't canonical yet: subtract
+    $4 \times (x_1 \text{ row})$ and $1 \times (x_2 \text{ row})$ to zero
+    them out.
+  </SimplexStep>
+
+<SimplexStep
+  label="Initial tableau"
+  columns={["x_1", "x_2", "s_2", "s_3"]}
+  rows={[
+    { basic: "z", cells: ["0", "0", "-1/5", "0"], rhs: "-18/5" },
+    { basic: "x_1", cells: ["1", "0", "1/5", "0"], rhs: "3/5" },
+    { basic: "x_2", cells: ["0", "1", "-3/5", "0"], rhs: "6/5" },
+    { basic: "s_3", cells: ["0", "0", "1", "1"], rhs: "1" },
+  ]}
+>
+  Objective row after eliminating $x_1, x_2$. Coefficient $-1/5$ in column $s_2$
+  is negative, so not optimal.
+</SimplexStep>
+
+<SimplexStep
+  label="Iteration 1"
+  entering={2}
+  leaving={3}
+  columns={["x_1", "x_2", "s_2", "s_3"]}
+  rows={[
+    { basic: "z", cells: ["0", "0", "-1/5", "0"], rhs: "-18/5", ratio: "" },
+    {
+      basic: "x_1",
+      cells: ["1", "0", "1/5", "0"],
+      rhs: "3/5",
+      ratio: "(3/5) / (1/5) = 3",
+    },
+    {
+      basic: "x_2",
+      cells: ["0", "1", "-3/5", "0"],
+      rhs: "6/5",
+      ratio: "skip (-3/5)",
+    },
+    { basic: "s_3", cells: ["0", "0", "1", "1"], rhs: "1", ratio: "1/1 = 1" },
+  ]}
+>
+  $s_2$ enters. Minimum ratio is $1$ in row $s_3$, so $s_3$ leaves. Pivot
+  element is $1$.
+</SimplexStep>
+
+  <SimplexStep
+    label="Final tableau"
+    columns={["x_1", "x_2", "s_2", "s_3"]}
+    rows={[
+      { basic: "z", cells: ["0", "0", "0", "1/5"], rhs: "-17/5" },
+      { basic: "x_1", cells: ["1", "0", "0", "-1/5"], rhs: "2/5" },
+      { basic: "x_2", cells: ["0", "1", "0", "3/5"], rhs: "9/5" },
+      { basic: "s_2", cells: ["0", "0", "1", "1"], rhs: "1" },
+    ]}
+  >
+    All objective coefficients are non-negative. Optimal at $x_1 = 2/5$,
+    $x_2 = 9/5$, so $z = 17/5 = 3.4$, matching the Big-M result.
+  </SimplexStep>
+</Walkthrough>

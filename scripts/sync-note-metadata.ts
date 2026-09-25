@@ -3,6 +3,60 @@ import { lstat, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 import { format, resolveConfig } from "prettier";
+import { GitAdapter } from "./lib/git";
+
+// Fields the script itself derives on every run (ordering, slug, dates).
+// A pure recompute of these on an otherwise-untouched sibling file must not
+// count as a "real" change, or lastUpdatedOn gets stamped fresh for files
+// nobody edited.
+const AUTO_MANAGED_FIELDS = [
+  "dateCreated",
+  "lastUpdatedOn",
+  "slug",
+  "prev",
+  "next",
+];
+
+function stripAutoManaged(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const stripped = { ...data };
+  for (const field of AUTO_MANAGED_FIELDS) delete stripped[field];
+  if (stripped.sidebar && typeof stripped.sidebar === "object") {
+    const sidebar = { ...(stripped.sidebar as Record<string, unknown>) };
+    delete sidebar.order;
+    stripped.sidebar = sidebar;
+  }
+  return stripped;
+}
+
+const git = new GitAdapter();
+
+// A file only earns a fresh lastUpdatedOn if its actual content (body or any
+// non-auto-managed frontmatter field) differs from what's committed at HEAD.
+// This is the signal that survives however the caller invoked the script:
+// one file, a hand-picked list, or an entire directory pulled in to fix
+// ordering after a rename/add/delete.
+//
+// candidatePaths tries the file's path before AND after any renumberFiles
+// rename: a pure reorder (a sibling inserted/removed, this file just shifts
+// numbers) moves the file locally before it's ever committed at the new
+// path, so looking up only the new path would find nothing and wrongly read
+// as "new file, must be a real change."
+function hasRealChange(
+  candidatePaths: string[],
+  current: matter.GrayMatterFile<string>,
+): boolean {
+  const headRaw = git.readAtHead(candidatePaths);
+  if (headRaw === undefined) return true; // untracked/new file, or no git root
+
+  const head = matter(headRaw);
+  if (current.content !== head.content) return true;
+  return (
+    JSON.stringify(stripAutoManaged(current.data)) !==
+    JSON.stringify(stripAutoManaged(head.data))
+  );
+}
 
 const PATTERN_TITLE_PREFIX = /(\d+)-/;
 
@@ -73,17 +127,8 @@ async function renumberFiles(
 export async function syncNoteMetadata(
   mdFilePaths: string[],
   dryRun: boolean = false,
-  explicitFiles: Set<string> = new Set(),
 ) {
-  // Every file in a touched note's directory gets pulled in below (for
-  // prev/next/order, which depend on the whole directory's listing), but
-  // only files actually passed in should get a fresh lastUpdatedOn — an
-  // empty set means "no filter", i.e. every path passed in is explicit,
-  // which keeps direct CLI usage (`sync-note-metadata.ts <file>`) and old
-  // callers stamping everything they're given.
-  const isExplicit = mdFilePaths.map(
-    (p) => explicitFiles.size === 0 || explicitFiles.has(p),
-  );
+  const originalPaths = [...mdFilePaths];
   mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
@@ -127,12 +172,16 @@ export async function syncNoteMetadata(
 
     // dateCreated is set once and kept; lastUpdatedOn is stamped fresh only
     // for files actually changed (per CLAUDE.md, "lastUpdatedOn frontmatter
-    // is set on commit"). Sibling files pulled in just to recompute
+    // is set on commit"), judged against HEAD rather than against how the
+    // caller invoked the script. Sibling files pulled in just to recompute
     // prev/next/order keep their existing lastUpdatedOn.
     file.data = {
       ...currentFrontMatter,
       dateCreated: toDate(currentFrontMatter.dateCreated) ?? stat.birthtime,
-      lastUpdatedOn: isExplicit[i]
+      lastUpdatedOn: hasRealChange(
+        [dryRun ? filePath : newFilePath, originalPaths[i]],
+        file,
+      )
         ? new Date()
         : (toDate(currentFrontMatter.lastUpdatedOn) ?? new Date()),
     };
@@ -213,7 +262,6 @@ export async function syncNoteMetadata(
 if (require.main === module) {
   const directories: Array<string> = [];
   const filePaths: Array<string> = [];
-  const explicitFiles = new Set<string>();
 
   // Check for --dry-run flag
   const dryRun = process.argv.includes("--dry-run");
@@ -222,7 +270,6 @@ if (require.main === module) {
     : process.argv.slice(2);
 
   for (const changedFile of argsToProcess) {
-    explicitFiles.add(changedFile);
     const changedDirectory = dirname(changedFile);
     if (directories.includes(changedDirectory)) {
       continue;
@@ -239,5 +286,5 @@ if (require.main === module) {
     console.log("=== DRY RUN MODE - No files will be modified ===");
   }
 
-  syncNoteMetadata(filePaths, dryRun, explicitFiles);
+  syncNoteMetadata(filePaths, dryRun);
 }

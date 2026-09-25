@@ -88,7 +88,7 @@ async function insertPage(args: string[]) {
     await writeFile(newFileLocation, lines.join("\n"));
     const allFiles = (await readdir(directory)).map((f) => join(directory, f));
     allFiles.sort();
-    await syncNoteMetadata(allFiles, false, new Set([newFileLocation]));
+    await syncNoteMetadata(allFiles, false);
   }
 }
 

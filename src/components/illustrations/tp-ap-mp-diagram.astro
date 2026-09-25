@@ -1,0 +1,123 @@
+<figure id="tp-ap-mp-diagram">
+  <svg
+    viewBox="0 0 460 340"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby="tp-ap-mp-title"
+  >
+    <title id="tp-ap-mp-title">
+      Total Product, Average Product and Marginal Product
+    </title>
+
+    <!-- Axes -->
+    <line class="axis" x1="55" y1="25" x2="55" y2="280"></line>
+
+    <line class="axis" x1="55" y1="280" x2="420" y2="280"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="55" y="18" text-anchor="middle"> Product </text>
+
+    <text class="axis-label" x="420" y="310" text-anchor="end"> Labour </text>
+
+    <!-- Total Product -->
+    <path
+      class="tp"
+      d="M 70 255
+         C 115 240, 155 205, 195 155
+         C 235 105, 270 65, 305 55
+         C 340 48, 370 48, 395 48"
+    ></path>
+
+    <!-- Average Product -->
+    <path
+      class="ap"
+      d="M 70 250
+         C 115 220, 160 165, 205 125
+         C 245 95, 285 92, 320 105
+         C 350 118, 375 145, 395 175"
+    ></path>
+
+    <!-- Marginal Product -->
+    <path
+      class="mp"
+      d="M 70 235
+         C 110 175, 145 115, 185 85
+         C 215 65, 240 70, 260 95
+         C 285 125, 310 170, 335 210
+         C 355 235, 375 250, 395 258"
+    ></path>
+  </svg>
+
+  <figcaption>
+    <strong>TP</strong> = Total Product,
+    <strong>AP</strong> = Average Product, and
+    <strong>MP</strong> = Marginal Product. The diagram shows their relationship as
+    labour increases.
+  </figcaption>
+</figure>
+
+<style>
+  #tp-ap-mp-diagram {
+    max-width: 460px;
+    margin: 24px auto;
+  }
+
+  #tp-ap-mp-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #tp-ap-mp-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  #tp-ap-mp-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #tp-ap-mp-diagram .tp,
+  #tp-ap-mp-diagram .ap,
+  #tp-ap-mp-diagram .mp {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+
+  #tp-ap-mp-diagram .tp {
+    stroke: var(--s5);
+  }
+
+  #tp-ap-mp-diagram .ap {
+    stroke: var(--dia-ct);
+  }
+
+  #tp-ap-mp-diagram .mp {
+    stroke: var(--dia-pt);
+  }
+
+  #tp-ap-mp-diagram figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  #tp-ap-mp-diagram figcaption strong {
+    font-weight: 600;
+  }
+
+  #tp-ap-mp-diagram figcaption strong:nth-child(1) {
+    color: var(--s5);
+  }
+
+  #tp-ap-mp-diagram figcaption strong:nth-child(2) {
+    color: var(--dia-ct);
+  }
+
+  #tp-ap-mp-diagram figcaption strong:nth-child(3) {
+    color: var(--dia-pt);
+  }
+</style>

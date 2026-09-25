@@ -1,0 +1,55 @@
+---
+title: Transshipment Problem
+sidebar:
+  order: 18
+dateCreated: 2026-09-23T12:25:30.894Z
+lastUpdatedOn: 2026-09-25T19:32:18.471Z
+slug: s5/operational-research/transshipment-problem
+prev: true
+next: true
+---
+
+An extension of the [transportation problem](/s5/operational-research/transportation-problem) where a shipment may pass through an intermediate node before reaching its final destination.
+
+A transshipment problem is solved by converting it into an equivalent transportation problem with a buffer supply and demand added at every node.
+
+### Transshipment Point
+
+A node that a shipment may pass through on its way to a final destination.
+
+May be a source or destination handling passthrough shipments, or a dedicated warehouse.
+
+## Conversion
+
+Let $m$ be the number of pure sources with supply $a_i$, $n$ be the number of pure destinations with demand $b_j$, $p$ be the number of dedicated warehouses with no supply or demand of their own, and $c_{ij}$ be the shipping cost between any 2 nodes. The problem must be balanced, $\sum_i a_i = \sum_j b_j$.
+
+### Buffer Quantity
+
+Sum of all pure source supplies. $T = \sum_i a_i$.
+
+$T$ is added to both supply and demand of each node to calculate the buffer supply and demand.
+
+Adding both buffer supply and buffer demand to the same node lets it hold up to $T$ units in transit without a net shipment, which is what makes it act as a transshipment point.
+
+## Solution
+
+Build an augmented transportation table over all $N=m+n+p$ nodes, treating every node as both a supply row and a demand column.
+
+- Each pure source $i$ gets supply $a_i + T$ (its own supply plus buffer supply) and demand $T$ (buffer demand only).
+- Each pure destination $j$ gets supply $T$ (buffer supply only) and demand $b_j + T$ (its own demand plus buffer demand).
+- Each dedicated warehouse gets supply $T$ and demand $T$ (buffer supply and buffer demand only, no supply or demand of its own).
+
+Let $x_{ij}$ be the quantity shipped from node $i$ to node $j$, over all $N$ nodes on both sides.
+
+$$
+\text{minimize } z = \sum_{i=1}^{N} \sum_{j=1}^{N} c_{ij} x_{ij}
+$$
+
+Subject to:
+
+- $\sum_{j=1}^{N} x_{ij} = (\text{supply of } i)$ for every node $i$
+- $\sum_{i=1}^{N} x_{ij} = (\text{demand of } j)$ for every node $j$
+- $x_{ij} \ge 0$
+- $c_{ii} = 0$ for every node $i$, since a node shipping to itself carries no real transfer
+
+Solving the augmented table gives $x_{ii} = T - (\text{actual through-flow at } i)$ on the diagonal. Discard the diagonal values. The remaining $x_{ij}$, $i \ne j$, are the actual shipment quantities in the original network.

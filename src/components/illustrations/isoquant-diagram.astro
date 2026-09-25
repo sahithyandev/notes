@@ -1,0 +1,129 @@
+<figure id="isoquant-diagram">
+  <svg viewBox="0 0 620 430" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Isoquant Map</title>
+
+    <!-- Axes -->
+    <line class="axis" x1="75" y1="35" x2="75" y2="355"></line>
+    <line class="axis" x1="75" y1="355" x2="565" y2="355"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="75" y="22" text-anchor="middle">
+      Capital (K)
+    </text>
+
+    <text class="axis-label" x="565" y="385" text-anchor="end">
+      Labour (L)
+    </text>
+
+    <!-- Lowest isoquant -->
+    <path
+      class="isoquant isoquant-low"
+      d="M 135 100 C 185 125, 215 175, 245 225 C 270 265, 290 300, 315 330"
+    ></path>
+
+    <!-- Middle isoquant -->
+    <path
+      class="isoquant isoquant-middle"
+      d="M 220 75 C 275 105, 315 160, 350 215 C 380 260, 410 305, 445 335"
+    ></path>
+
+    <!-- Highest isoquant -->
+    <path
+      class="isoquant isoquant-high"
+      d="M 315 55 C 370 85, 420 135, 455 190 C 490 245, 520 295, 550 330"
+    ></path>
+
+    <!-- Labels -->
+    <text class="curve-label low" x="285" y="315"> Q₁ </text>
+
+    <text class="curve-label middle" x="415" y="295"> Q₂ </text>
+
+    <text class="curve-label high" x="510" y="270"> Q₃ </text>
+
+    <!-- Direction -->
+    <text class="output-label" x="445" y="75"> Higher output </text>
+
+    <text class="output-arrow" x="470" y="95"> ↑ </text>
+  </svg>
+
+  <figcaption>
+    Each isoquant represents a different level of output. Isoquants farther from
+    the origin represent higher output levels.
+  </figcaption>
+</figure>
+
+<style>
+  #isoquant-diagram {
+    max-width: 620px;
+    margin: 28px auto;
+  }
+
+  #isoquant-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #isoquant-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+  }
+
+  #isoquant-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  #isoquant-diagram .isoquant {
+    fill: none;
+    stroke-width: 3;
+  }
+
+  #isoquant-diagram .isoquant-low {
+    stroke: var(--dia-ct);
+  }
+
+  #isoquant-diagram .isoquant-middle {
+    stroke: var(--s5);
+  }
+
+  #isoquant-diagram .isoquant-high {
+    stroke: var(--dia-pt);
+  }
+
+  #isoquant-diagram .curve-label {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #isoquant-diagram .curve-label.low {
+    fill: var(--dia-ct);
+  }
+
+  #isoquant-diagram .curve-label.middle {
+    fill: var(--s5);
+  }
+
+  #isoquant-diagram .curve-label.high {
+    fill: var(--dia-pt);
+  }
+
+  #isoquant-diagram .output-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #isoquant-diagram .output-arrow {
+    fill: var(--text-primary);
+    font-size: 22px;
+  }
+
+  #isoquant-diagram figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+</style>

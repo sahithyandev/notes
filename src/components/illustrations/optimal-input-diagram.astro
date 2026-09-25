@@ -1,0 +1,193 @@
+---
+/*
+ * Optimal Input Diagram
+ *
+ * MRP = Marginal Revenue Product
+ * MRC = Marginal Resource Cost
+ *
+ * The optimal input level occurs where:
+ *
+ * MRP = MRC
+ */
+---
+
+<figure id="optimal-input-diagram">
+  <svg
+    viewBox="0 0 620 420"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby="optimal-title optimal-description"
+  >
+    <title id="optimal-title">Optimal Use of Labour</title>
+
+    <desc id="optimal-description">
+      MRP and MRC curves showing the optimal quantity of labour where marginal
+      revenue product equals marginal resource cost.
+    </desc>
+
+    <!-- Axes -->
+    <line class="axis" x1="75" y1="35" x2="75" y2="340"></line>
+
+    <line class="axis" x1="75" y1="340" x2="560" y2="340"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="75" y="22" text-anchor="middle">
+      Revenue / Cost
+    </text>
+
+    <text class="axis-label" x="560" y="370" text-anchor="end">
+      Labour (L)
+    </text>
+
+    <!-- MRP downward curve -->
+    <path
+      class="mrp-curve"
+      d="
+        M 100 70
+        C 170 95, 230 135, 290 180
+        C 350 225, 410 275, 500 320
+      "
+    ></path>
+
+    <!-- MRC horizontal line -->
+    <line class="mrc-line" x1="90" y1="205" x2="540" y2="205"></line>
+
+    <!-- Optimal point -->
+    <circle class="optimal-point" cx="320" cy="205" r="6"></circle>
+
+    <!-- Vertical guide -->
+    <line class="optimal-guide" x1="320" y1="205" x2="320" y2="340"></line>
+
+    <!-- MRP label -->
+    <text class="mrp-label" x="390" y="255"> MRP </text>
+
+    <!-- MRC label -->
+    <text class="mrc-label" x="475" y="195"> MRC </text>
+
+    <!-- Optimal point label -->
+    <text class="optimal-label" x="320" y="185" text-anchor="middle">
+      MRP = MRC
+    </text>
+
+    <!-- Optimal labour level -->
+    <text class="optimal-label" x="320" y="360" text-anchor="middle"> L* </text>
+
+    <text class="optimal-description" x="320" y="390" text-anchor="middle">
+      Optimal level of labour
+    </text>
+
+    <!-- Left region -->
+    <text class="region-label" x="180" y="120" text-anchor="middle">
+      MRP &gt; MRC
+    </text>
+
+    <text class="region-description" x="180" y="138" text-anchor="middle">
+      Increase labour
+    </text>
+
+    <!-- Right region -->
+    <text class="region-label" x="450" y="300" text-anchor="middle">
+      MRP &lt; MRC
+    </text>
+
+    <text class="region-description" x="450" y="318" text-anchor="middle">
+      Decrease labour
+    </text>
+  </svg>
+
+  <figcaption>
+    The firm's optimal use of labour occurs where
+    <strong>MRP = MRC</strong>.
+  </figcaption>
+</figure>
+
+<style>
+  #optimal-input-diagram {
+    max-width: 620px;
+    margin: 28px auto;
+  }
+
+  #optimal-input-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #optimal-input-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+  }
+
+  #optimal-input-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  #optimal-input-diagram .mrp-curve {
+    fill: none;
+    stroke: var(--s5);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  #optimal-input-diagram .mrc-line {
+    stroke: var(--dia-pt);
+    stroke-width: 3;
+  }
+
+  #optimal-input-diagram .optimal-guide {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 5 5;
+  }
+
+  #optimal-input-diagram .optimal-point {
+    fill: var(--text-primary);
+  }
+
+  #optimal-input-diagram .mrp-label {
+    fill: var(--s5);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #optimal-input-diagram .mrc-label {
+    fill: var(--dia-pt);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #optimal-input-diagram .optimal-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #optimal-input-diagram .optimal-description {
+    fill: var(--text-secondary);
+    font-size: 11px;
+  }
+
+  #optimal-input-diagram .region-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #optimal-input-diagram .region-description {
+    fill: var(--text-secondary);
+    font-size: 11px;
+  }
+
+  #optimal-input-diagram figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #optimal-input-diagram figcaption strong {
+    color: var(--text-primary);
+  }
+</style>

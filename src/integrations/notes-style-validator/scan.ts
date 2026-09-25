@@ -128,7 +128,7 @@ function extractHeadings(
 }
 
 // GitHub-style heading slugger matching @astrojs/markdown-remark behavior.
-function slugifyHeading(text: string): string {
+export function slugifyHeading(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")

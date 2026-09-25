@@ -1,0 +1,28 @@
+---
+title: Integer Programming
+slug: s5/operational-research/integer-programming
+sidebar:
+  order: 13
+prev: true
+next: true
+dateCreated: 2026-09-25T19:09:16.333Z
+lastUpdatedOn: 2026-09-25T19:32:18.419Z
+---
+
+An integer programming problem (IPP) is a linear program with the added restriction that some or all decision variables must be integers.
+
+- Pure integer programming  
+  Every decision variable must be an integer.
+- Mixed integer linear programming (MILP)  
+  Only some decision variables must be integers.
+- Binary (0-1) integer programming  
+  Every decision variable is restricted to $\{0, 1\}$.
+
+## Solving an IPP
+
+The LP relaxation (dropping the integer restriction) is solved first, since it gives an upper bound (maximization) on the IPP's optimal value. If the relaxation's optimal solution happens to be integral, it's also optimal for the IPP.
+
+Rounding the LP relaxation's solution to the nearest integer doesn't reliably give a feasible or optimal IPP solution. Dedicated methods are needed:
+
+- [Branch and bound](/s5/operational-research/branch-and-bound)
+- [Gomory's cutting plane method](/s5/operational-research/cutting-plane-method)

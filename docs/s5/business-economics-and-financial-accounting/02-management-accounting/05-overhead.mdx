@@ -1,0 +1,237 @@
+---
+title: Overhead
+dateCreated: 2026-08-18T07:03:53.000Z
+lastUpdatedOn: 2026-09-25T20:27:58.901Z
+slug: s5/business-economics-and-financial-accounting/management-accounting/overhead
+sidebar:
+  order: 5
+prev: true
+next: true
+---
+
+Total cost of indirect materials, indirect labour, and indirect expenses.
+
+Production overhead cost is allocated to each unit of production through allocation, apportionment, and absorption.
+
+## Allocation
+
+The allotment of all the items of cost to cost centres or cost units. An expense directly identifiable with a specific cost centre is allocated to that centre.
+
+Examples:
+
+- Indirect materials issued to a specific department.
+- Wages of a supervisor working solely in one department.
+- Depreciation of a machine used only by one department.
+- Power cost metered separately for a department.
+
+## Apportionment
+
+The allotment of proportions of items of cost to cost centres or cost units, based on an equitable basis.
+
+### Basis of Apportionment
+
+- Floor area occupied  
+  Rent, rates and taxes, lighting and heating, insurance and depreciation of building, air conditioning.
+- Capital value  
+  Insurance and depreciation on plant and machinery, maintenance of plant and machinery.
+- Number of employees  
+  Welfare expenses, time-keeping, payroll office, canteen, recreation, supervision, medical expenses.
+- Machine hours  
+  Repairs and maintenance of plant and machinery, power.
+- Value or weight of materials  
+  Store keeping expenses.
+- Truck mileage or tonnage or number of packages  
+  Transport service expenses.
+
+### Worked Example
+
+Consider production departments $P_1$ and $P_2$, with 3 overhead items to apportion.
+
+| Item                      | Amount | Basis               | $P_1$          | $P_2$          |
+| ------------------------- | ------ | ------------------- | -------------- | -------------- |
+| Rent                      | $6000$ | Floor area          | $600$ sq. ft   | $400$ sq. ft   |
+| Depreciation of machinery | $4000$ | Capital value       | $30000$        | $20000$        |
+| Canteen expenses          | $2000$ | Number of employees | $30$ employees | $20$ employees |
+
+Each item is apportioned in the ratio of its basis.
+
+Rent is apportioned in the ratio $600:400$.
+
+$$
+P_1 = 6000 \times \frac{600}{1000} = 3600, \qquad P_2 = 6000 \times \frac{400}{1000} = 2400
+$$
+
+Depreciation of machinery is apportioned in the ratio $30000:20000$.
+
+$$
+P_1 = 4000 \times \frac{30000}{50000} = 2400, \qquad P_2 = 4000 \times \frac{20000}{50000} = 1600
+$$
+
+Canteen expenses are apportioned in the ratio $30:20$.
+
+$$
+P_1 = 2000 \times \frac{30}{50} = 1200, \qquad P_2 = 2000 \times \frac{20}{50} = 800
+$$
+
+<OverheadDistributionTable
+  departments={["P_1", "P_2"]}
+  rows={[
+    { label: "Rent (600:400)", values: [3600, 2400] },
+    { label: "Depreciation (30000:20000)", values: [2400, 1600] },
+    { label: "Canteen (30:20)", values: [1200, 800] },
+    { label: "Total apportioned overhead", values: [7200, 4800], total: true },
+  ]}
+/>
+
+## Reapportionment
+
+Service department costs are reapportioned to operating departments , since service departments do not carry out production directly.
+
+There are different methods for reapportioning overhead costs from service departments to production departments.
+
+For all the examples in this note, consider production departments $P_1$ and $P_2$, and service departments $S_1$ and $S_2$, with overheads before reapportionment: $P_1 = 10000$, $P_2 = 8000$, $S_1 = 4000$, $S_2 = 2000$.
+
+### Direct Method
+
+Costs of service departments are apportioned directly to production departments, without considering any service from one service department to another. Proper apportionment cannot be done, so production departments may be overcharged or undercharged.
+
+Good when service departments do not provide service to other service departments.
+
+Consider $S_1$ serves $P_1$ 60% and $P_2$ 40%. $S_2$ serves $P_1$ 50% and $P_2$ 50%.
+
+<OverheadDistributionTable
+  departments={["S_1", "S_2", "P_1", "P_2"]}
+  rows={[
+    { label: "Before reapportionment", values: [4000, 2000, 10000, 8000] },
+    {
+      label: "$S_1$ distributed",
+      values: [-4000, null, 2400, 1600],
+    },
+    {
+      label: "$S_2$ distributed",
+      values: [null, -2000, 1000, 1000],
+    },
+    {
+      label: "After reapportionment",
+      values: [0, 0, 13400, 10600],
+      total: true,
+    },
+  ]}
+/>
+
+### Step Down Method
+
+Best used where some service cost centres provide services to other service cost centres, but these services are not reciprocated.
+
+$S_1$ is apportioned first, serving $S_2$ 10%, $P_1$ 60%, $P_2$ 30%. $S_2$'s cost then includes what it received from $S_1$, and is apportioned to $P_1$ and $P_2$ only, without going back to $S_1$, split $P_1$ 50%, $P_2$ 50%.
+
+<OverheadDistributionTable
+  departments={["S_1", "S_2", "P_1", "P_2"]}
+  rows={[
+    { label: "Before reapportionment", values: [4000, 2000, 10000, 8000] },
+    {
+      label: "$S_1$ distributed",
+      values: [-4000, 400, 2400, 1200],
+    },
+    {
+      label: "$S_2$ distributed",
+      values: [null, -2400, 1200, 1200],
+    },
+    {
+      label: "After reapportionment",
+      values: [0, 0, 13600, 10400],
+      total: true,
+    },
+  ]}
+/>
+
+### Reciprocal Method
+
+Used where service departments provide services to each other reciprocally.
+
+Consider $S_1$ serving $S_2$ 10%, $P_1$ 60%, $P_2$ 30%, and $S_2$ serving $S_1$ 20%, $P_1$ 40%, $P_2$ 40%.
+
+#### Simultaneous Equation Method
+
+Sets up the overhead reapportionment process as a set of equations, letting $A$ be the total overhead apportioned to department $A$, $B$ the total overhead apportioned to department $B$, and so on.
+
+$$
+\begin{aligned}
+S_1 &= 4000 + 0.20 S_2 \\
+S_2 &= 2000 + 0.10 S_1
+\end{aligned}
+$$
+
+Solving the above equations results in $S_1 = 4489.80$ and $S_2 = 2448.98$.
+
+<OverheadDistributionTable
+  departments={["S_1", "S_2", "P_1", "P_2"]}
+  rows={[
+    { label: "Original overhead", values: [null, null, 10000, 8000] },
+    { label: "Solved total", values: [4489.8, 2448.98, null, null] },
+    {
+      label: "From $S_1$ (60/30)",
+      values: [-4489.8, null, 2693.88, 1346.94],
+    },
+    {
+      label: "From $S_2$ (40/40)",
+      values: [null, -2448.98, 979.59, 979.59],
+    },
+    {
+      label: "After reapportionment",
+      values: [null, null, 13673.47, 10326.53],
+      total: true,
+    },
+  ]}
+/>
+
+#### Repeated Distribution Method
+
+Each service department's total cost is repeatedly reallocated among other departments, based on a given percentage basis, until the cost of each service department becomes negligible.
+
+Uses the same percentages as the Simultaneous Equation Method.
+
+<OverheadDistributionTable
+  departments={["S_1", "S_2", "P_1", "P_2"]}
+  rows={[
+    { label: "Opening balance", values: [4000, 2000, 10000, 8000] },
+    {
+      label: "$S_1$ distributed (10/60/30)",
+      values: [-4000, 400, 2400, 1200],
+    },
+    {
+      label: "$S_2$ distributed (20/40/40)",
+      values: [480, -2400, 960, 960],
+    },
+    {
+      label: "$S_1$ distributed (10/60/30)",
+      values: [-480, 48, 288, 144],
+    },
+    {
+      label: "$S_2$ distributed (20/40/40)",
+      values: [9.6, -48, 19.2, 19.2],
+    },
+    {
+      label: "$S_1$ = 9.6, negligible, stop",
+      values: [null, null, null, null],
+    },
+    {
+      label: "Total",
+      values: [null, null, 13667.2, 10323.2],
+      total: true,
+    },
+  ]}
+/>
+
+Further rounds converge these towards the Simultaneous Equation Method's result.
+
+### Basis of Reapportionment
+
+- Purchase department  
+  Number of purchase orders, or value of materials purchased for each production department.
+- Stores  
+  Value or quantity of materials issued, or number of materials requisitions.
+- Internal transport  
+  Weight and distance.
+- Inspection  
+  Inspection hours devoted to each department.
