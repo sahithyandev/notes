@@ -197,6 +197,26 @@ test("applyProposal writes every file when all edits are unambiguous", async () 
   await rm(dir, { recursive: true, force: true });
 });
 
+test("applyProposal writes a replacement containing $$ literally", async () => {
+  // String.prototype.replace() treats a string replacement specially ($$
+  // collapses to a literal $), which would otherwise corrupt any proposed
+  // block-math edit - see the comment in applyProposal().
+  const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
+  const docsRoot = join(dir, "docs");
+  await mkdir(docsRoot, { recursive: true });
+  await writeFile(join(docsRoot, "a.md"), "before\n\nafter", "utf-8");
+
+  const result = await applyProposal(docsRoot, [
+    { file: "docs/a.md", edits: [{ old: "before", new: "$$x = 1$$" }] },
+  ]);
+  expect(result.ok).toBe(true);
+  expect(await readFile(join(docsRoot, "a.md"), "utf-8")).toBe(
+    "$$x = 1$$\n\nafter",
+  );
+
+  await rm(dir, { recursive: true, force: true });
+});
+
 test("applyProposal writes nothing when any file has a mismatch", async () => {
   const dir = await mkdtemp(join(tmpdir(), "live-edit-"));
   const docsRoot = join(dir, "docs");

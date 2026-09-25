@@ -237,7 +237,13 @@ export async function applyProposal(
     ...resolvedChanges.map(({ change, absPath }, i) => {
       let next = contents[i];
       for (const edit of change.edits) {
-        next = next.replace(edit.old, edit.new);
+        // A function replacer, not the string itself: String.replace()
+        // treats a string replacement specially ($$ collapses to a literal
+        // $, $&/$n substitute the match/a capture group), which silently
+        // corrupts any proposed edit whose `new` text contains "$$" - block
+        // math delimiters, all over this site's notes. A function's return
+        // value is inserted verbatim, with none of that.
+        next = next.replace(edit.old, () => edit.new);
       }
       return writeFile(absPath, next, "utf-8");
     }),
