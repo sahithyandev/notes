@@ -218,6 +218,9 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   </script>
   <ImageZoom />
   {import.meta.env.DEV && <LiveEdit filePath={notesEntry.filePath ?? ""} />}
+  {import.meta.env.DEV && <script>
+    import "../scripts/live-update";
+  </script>}
 </Layout>
 
 <style>
