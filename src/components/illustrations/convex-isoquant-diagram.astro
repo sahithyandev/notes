@@ -1,0 +1,124 @@
+<figure id="convex-isoquant-diagram">
+  <svg viewBox="0 0 620 430" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Convex Isoquant</title>
+
+    <!-- Axes -->
+    <line class="axis" x1="75" y1="35" x2="75" y2="355"></line>
+    <line class="axis" x1="75" y1="355" x2="565" y2="355"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="75" y="22" text-anchor="middle">
+      Capital (K)
+    </text>
+
+    <text class="axis-label" x="565" y="385" text-anchor="end">
+      Labour (L)
+    </text>
+
+    <!-- Convex isoquant -->
+    <path
+      class="isoquant"
+      d="
+        M 145 85
+        C 165 120, 185 155, 225 190
+        C 270 230, 330 265, 405 295
+        C 455 315, 505 330, 545 340
+      "
+    ></path>
+
+    <!-- Tangent 1 -->
+    <line class="tangent tangent-one" x1="155" y1="100" x2="275" y2="235"
+    ></line>
+
+    <!-- Tangent 2 -->
+    <line class="tangent tangent-two" x1="335" y1="265" x2="475" y2="325"
+    ></line>
+
+    <!-- Points -->
+    <circle class="point" cx="205" cy="175" r="5"></circle>
+    <circle class="point" cx="405" cy="295" r="5"></circle>
+
+    <!-- Point labels -->
+    <text class="point-label" x="185" y="165"> A </text>
+
+    <text class="point-label" x="415" y="290"> B </text>
+
+    <!-- Isoquant label -->
+    <text class="curve-label" x="350" y="225"> Q₁ </text>
+
+    <!-- MRTS labels -->
+    <text class="mrt-label" x="125" y="125"> Steeper </text>
+
+    <text class="mrt-label" x="450" y="310"> Flatter </text>
+  </svg>
+
+  <figcaption>
+    A convex isoquant reflects diminishing MRTS: as more labour replaces
+    capital, the amount of capital that can be given up for an additional unit
+    of labour decreases.
+  </figcaption>
+</figure>
+
+<style>
+  #convex-isoquant-diagram {
+    max-width: 620px;
+    margin: 28px auto;
+  }
+
+  #convex-isoquant-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #convex-isoquant-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+  }
+
+  #convex-isoquant-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  #convex-isoquant-diagram .isoquant {
+    fill: none;
+    stroke: var(--s5);
+    stroke-width: 3;
+  }
+
+  #convex-isoquant-diagram .tangent {
+    stroke: var(--text-muted);
+    stroke-width: 1.4;
+    stroke-dasharray: 5 5;
+  }
+
+  #convex-isoquant-diagram .point {
+    fill: var(--text-primary);
+  }
+
+  #convex-isoquant-diagram .point-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #convex-isoquant-diagram .curve-label {
+    fill: var(--s5);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #convex-isoquant-diagram .mrt-label {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  #convex-isoquant-diagram figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+</style>

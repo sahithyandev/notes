@@ -1,0 +1,163 @@
+<figure id="cost-minimization-diagram">
+  <svg viewBox="0 0 650 450" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>Cost Minimization</title>
+
+    <!-- Axes -->
+    <line class="axis" x1="75" y1="35" x2="75" y2="370"></line>
+    <line class="axis" x1="75" y1="370" x2="590" y2="370"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="75" y="22" text-anchor="middle">
+      Capital (K)
+    </text>
+
+    <text class="axis-label" x="590" y="400" text-anchor="end">
+      Labour (L)
+    </text>
+
+    <!-- Isoquant -->
+    <path
+      class="isoquant"
+      d="
+        M 145 95
+        C 175 135, 205 175, 250 215
+        C 300 260, 365 300, 440 325
+        C 490 342, 540 352, 575 357
+      "
+    ></path>
+
+    <!-- Lower-cost isocost -->
+    <line class="isocost-min" x1="135" y1="325" x2="440" y2="100"></line>
+
+    <!-- Higher-cost isocost -->
+    <line class="isocost-high" x1="210" y1="360" x2="585" y2="85"></line>
+
+    <!-- Tangency point -->
+    <circle class="tangency-point" cx="335" cy="250" r="7"></circle>
+
+    <!-- Dashed guides -->
+    <line class="guide" x1="335" y1="250" x2="335" y2="370"></line>
+
+    <line class="guide" x1="75" y1="250" x2="335" y2="250"></line>
+
+    <!-- Labels -->
+    <text class="isoquant-label" x="410" y="310"> Q₁ </text>
+
+    <text class="isocost-label" x="235" y="285"> Isocost </text>
+
+    <text class="high-cost-label" x="455" y="165"> Higher cost </text>
+
+    <text class="point-label" x="345" y="240"> E </text>
+
+    <text class="minimum-label" x="350" y="275">
+      Cost-minimizing combination
+    </text>
+
+    <!-- Tangency condition -->
+    <text class="condition-label" x="355" y="65"> Tangency </text>
+
+    <text class="formula-label" x="355" y="85"> MRTS = Pₗ / Pₖ </text>
+  </svg>
+
+  <figcaption>
+    The firm minimizes the cost of producing Q₁ where the isoquant is tangent to
+    the lowest attainable isocost line.
+  </figcaption>
+</figure>
+
+<style>
+  #cost-minimization-diagram {
+    max-width: 650px;
+    margin: 28px auto;
+  }
+
+  #cost-minimization-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #cost-minimization-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+  }
+
+  #cost-minimization-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  #cost-minimization-diagram .isoquant {
+    fill: none;
+    stroke: var(--s5);
+    stroke-width: 3;
+  }
+
+  #cost-minimization-diagram .isocost-min {
+    stroke: var(--dia-pt);
+    stroke-width: 2.8;
+  }
+
+  #cost-minimization-diagram .isocost-high {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+    stroke-dasharray: 7 5;
+  }
+
+  #cost-minimization-diagram .guide {
+    stroke: var(--text-muted);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 5;
+  }
+
+  #cost-minimization-diagram .tangency-point {
+    fill: var(--text-primary);
+  }
+
+  #cost-minimization-diagram .isoquant-label {
+    fill: var(--s5);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #cost-minimization-diagram .isocost-label {
+    fill: var(--dia-pt);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #cost-minimization-diagram .high-cost-label {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  #cost-minimization-diagram .point-label {
+    fill: var(--text-primary);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #cost-minimization-diagram .minimum-label {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  #cost-minimization-diagram .condition-label {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  #cost-minimization-diagram .formula-label {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  #cost-minimization-diagram figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+</style>

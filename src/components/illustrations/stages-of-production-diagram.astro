@@ -1,0 +1,191 @@
+---
+/*
+ * Stages of Production Diagram
+ *
+ * Stage 1: MP > AP
+ * Stage 2: 0 < MP < AP
+ * Stage 3: MP < 0
+ */
+---
+
+<figure id="stages-of-production-diagram">
+  <svg
+    viewBox="0 0 620 420"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby="stages-title stages-description"
+  >
+    <title id="stages-title">Stages of Production</title>
+
+    <desc id="stages-description">
+      Diagram showing three stages of production based on the relationship
+      between marginal product and average product.
+    </desc>
+
+    <!-- Axes -->
+    <line class="axis" x1="70" y1="35" x2="70" y2="350"></line>
+    <line class="axis" x1="70" y1="350" x2="570" y2="350"></line>
+
+    <!-- Axis labels -->
+    <text class="axis-label" x="70" y="22" text-anchor="middle"> Product </text>
+
+    <text class="axis-label" x="570" y="380" text-anchor="end">
+      Variable Input
+    </text>
+
+    <!-- Stage boundary lines -->
+    <line class="boundary" x1="235" y1="55" x2="235" y2="350"></line>
+    <line class="boundary" x1="415" y1="55" x2="415" y2="350"></line>
+
+    <!-- Stage 1 -->
+    <text class="stage-label" x="150" y="75" text-anchor="middle">
+      Stage 1
+    </text>
+
+    <text class="stage-description" x="150" y="94" text-anchor="middle">
+      MP &gt; AP
+    </text>
+
+    <!-- Stage 2 -->
+    <text class="stage-label" x="325" y="75" text-anchor="middle">
+      Stage 2
+    </text>
+
+    <text class="stage-description" x="325" y="94" text-anchor="middle">
+      0 &lt; MP &lt; AP
+    </text>
+
+    <!-- Stage 3 -->
+    <text class="stage-label" x="492" y="75" text-anchor="middle">
+      Stage 3
+    </text>
+
+    <text class="stage-description" x="492" y="94" text-anchor="middle">
+      MP &lt; 0
+    </text>
+
+    <!-- AP curve -->
+    <path
+      class="ap-curve"
+      d="
+        M 80 285
+        C 125 230, 170 150, 235 125
+        C 285 105, 340 120, 415 170
+        C 470 205, 520 245, 560 275
+      "
+    ></path>
+
+    <!-- MP curve -->
+    <path
+      class="mp-curve"
+      d="
+        M 80 310
+        C 120 175, 165 95, 210 115
+        C 250 135, 285 190, 330 230
+        C 370 265, 405 305, 440 325
+        C 485 345, 525 355, 560 360
+      "
+    ></path>
+
+    <!-- Zero line -->
+    <line class="zero-line" x1="70" y1="325" x2="570" y2="325"></line>
+
+    <!-- Curve labels -->
+    <text class="ap-label" x="205" y="110"> AP </text>
+
+    <text class="mp-label" x="175" y="92"> MP </text>
+  </svg>
+
+  <figcaption>
+    The three stages of production are determined by the relationship between <strong
+      >MP</strong
+    > and <strong>AP</strong>. Stage 2 is the economically relevant stage
+    because MP is positive but below AP.
+  </figcaption>
+</figure>
+
+<style>
+  #stages-of-production-diagram {
+    max-width: 620px;
+    margin: 28px auto;
+  }
+
+  #stages-of-production-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #stages-of-production-diagram .axis {
+    stroke: var(--text-muted);
+    stroke-width: 1.8;
+  }
+
+  #stages-of-production-diagram .boundary {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 5 5;
+    opacity: 0.7;
+  }
+
+  #stages-of-production-diagram .zero-line {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    opacity: 0.6;
+  }
+
+  #stages-of-production-diagram .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  #stages-of-production-diagram .stage-label {
+    fill: var(--text-primary);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #stages-of-production-diagram .stage-description {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  #stages-of-production-diagram .ap-curve {
+    fill: none;
+    stroke: var(--s5);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  #stages-of-production-diagram .mp-curve {
+    fill: none;
+    stroke: var(--dia-pt);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  #stages-of-production-diagram .ap-label {
+    fill: var(--s5);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #stages-of-production-diagram .mp-label {
+    fill: var(--dia-pt);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #stages-of-production-diagram figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  #stages-of-production-diagram figcaption strong {
+    color: var(--text-primary);
+  }
+</style>
