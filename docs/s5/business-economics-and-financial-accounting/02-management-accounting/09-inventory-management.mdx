@@ -1,7 +1,7 @@
 ---
 title: Inventory Management
 dateCreated: 2026-08-31T07:54:07.767Z
-lastUpdatedOn: 2026-09-25T20:56:41.275Z
+lastUpdatedOn: 2026-09-25T23:41:17.894Z
 slug: >-
   s5/business-economics-and-financial-accounting/management-accounting/inventory-management
 sidebar:
@@ -26,57 +26,31 @@ An inventory system is the set of policies and controls that monitor inventory l
 
 ## Inventory Costs
 
-- Ordering costs ($C_o$)  
-  Cost incurred to place an order.
-- Setup costs  
-  Cost of arranging specific equipment setups (production change).
-- Holding costs ($C_h$)  
-  Cost of storage, handling, insurance, and similar, per unit per year.
-- Shortage costs  
-  Cost of lost sales, emergency procurement, and similar.
+### Ordering Costs
 
-## Stock Levels
+Cost incurred to place an order. Denoted as $C_o$.
 
-Objectives: avoid holding unnecessary stock (which raises holding cost and loses profit), and avoid stock outs (which interrupt production).
+### Setup Costs
 
-Average lead time is the average time from placing an order to receiving it.
+Cost of arranging specific equipment setups (production change).
 
-- Re-order level  
-  Level at which the storekeeper initiates a purchase requisition. Fixed between the maximum and minimum stock levels.
+### Holding Costs
 
-  $$
-  \text{Re-order level} = \text{Maximum consumption per unit time} \times \text{Maximum lead time}
-  $$
+Cost of storage, handling, insurance, and similar, per unit per year. Denoted as $C_h$.
 
-  Or:
+### Shortage Costs
 
-  $$
-  \text{Re-order level} = \text{Minimum stock level} + (\text{Average consumption per unit time} \times \text{Average lead time})
-  $$
-
-- Maximum stock level  
-  Level above which stock should not rise, so that capital is not blocked unnecessarily in stores.
-
-  $$
-  \text{MSL} = \text{Re-order level} + \text{Re-order quantity (EOQ)} - (\text{Minimum consumption per unit time} \times \text{Minimum lead time})
-  $$
-
-- Minimum stock level  
-  Safety or buffer stock. Stock should not fall below this level.
-
-  $$
-  \text{Minimum stock level} = \text{Re-order level} - (\text{Average consumption per unit time} \times \text{Average lead time})
-  $$
+Cost of lost sales, emergency procurement, and similar.
 
 ## Economic Order Quantity
 
 The most favorable quantity to order each time fresh supplies are required.
 
 $$
-\text{EOQ} = \sqrt{\frac{2 D C_o}{C_h}}
+Q = \sqrt{\frac{2 D C_o}{C_h}}
 $$
 
-Where $D$ is annual demand, $C_o$ is cost of ordering per order, and $C_h$ is annual cost of holding per unit.
+Here: $Q$ is the economic order quantity, $D$ is annual demand, $C_o$ is cost of ordering per order, and $C_h$ is annual cost of holding per unit.
 
 Assumptions:
 
@@ -85,6 +59,44 @@ Assumptions:
 - Lead time is constant.
 - Cost of materials remains constant.
 - Holding and ordering cost per unit remain constant during the year.
+
+## Stock Levels
+
+Threshold quantities of inventory that trigger and bound replenishment decisions such as when to place an order, and how much stock is too little or too much to hold.
+
+Objectives: avoid holding unnecessary stock (which raises holding cost and loses profit), and avoid stock outs (which interrupt production).
+
+### Lead Time
+
+Time between placing an order and receiving it. Lead time varies, so the re-order and stock-level formulas below use its maximum ($t_{\text{max}}$), average ($t_{\text{avg}}$), or minimum value ($t_{\text{min}}$).
+
+### Consumption Rate
+
+Quantity of stock used per unit time. It varies, so the re-order and stock-level formulas below use its maximum ($c_{\text{max}}$), average ($c_{\text{avg}}$), or minimum value ($c_{\text{min}}$).
+
+### Re-Order Level
+
+Level at which the storekeeper initiates a purchase requisition. Fixed between the maximum and minimum stock levels. $R$ is the re-order level.
+
+$$
+R = c_{\text{max}} \times t_{\text{max}}
+$$
+
+### Maximum Stock Level
+
+Level above which stock should not rise, so that capital is not blocked unnecessarily in stores. $M$ is the maximum stock level.
+
+$$
+M = R + Q - (c_{\text{min}} \times t_{\text{min}})
+$$
+
+### Minimum Stock Level
+
+Safety or buffer stock. Stock should not fall below this level. $S$ is the minimum stock level.
+
+$$
+S = R - (c_{\text{avg}} \times t_{\text{avg}})
+$$
 
 ## ABC Analysis
 
