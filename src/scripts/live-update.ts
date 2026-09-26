@@ -57,14 +57,25 @@ async function reExecuteScripts(root: ParentNode): Promise<void> {
 
 let tocCleanup: (() => void) | null = null;
 
-async function applyContentUpdate(): Promise<void> {
+// Live Edit auto-applies edits with no review pause, so a single feedback
+// item can trigger several content changes in quick succession - each one
+// calling applyContentUpdate() again before the previous call's fetch has
+// resolved. Without a guard, a slow response for change N could land (and
+// patch the DOM) after change N+1 already applied, silently reverting the
+// page to stale content. Each call is tagged with an incrementing id at the
+// start; if a newer call has already started (or finished) by the time an
+// older one's fetch resolves, the older one bails before touching the DOM
+// instead of clobbering what's already there.
+let latestUpdateId = 0;
+
+export async function applyContentUpdate(): Promise<void> {
+  const updateId = ++latestUpdateId;
   const res = await fetch(location.pathname + location.search);
   if (!res.ok)
     throw new Error(`fetch ${location.pathname} failed: ${res.status}`);
-  const nextDoc = new DOMParser().parseFromString(
-    await res.text(),
-    "text/html",
-  );
+  const html = await res.text();
+  if (updateId !== latestUpdateId) return;
+  const nextDoc = new DOMParser().parseFromString(html, "text/html");
 
   const oldArticle = document.querySelector("article");
   const newArticle = nextDoc.querySelector("article");
@@ -115,6 +126,21 @@ async function applyContentUpdate(): Promise<void> {
   }
 }
 
+// Extracted out of init()'s hot.on() callback so it can be exercised
+// directly in tests without needing a real import.meta.hot.
+export function handleContentChangedEvent(): void {
+  applyContentUpdate().catch((err) => {
+    // Whatever went wrong (network error, the page's shape not matching
+    // what this script expects, ...), a real reload is always correct -
+    // never leave the page showing stale content just to avoid one.
+    console.error(
+      "[live-update] optimistic update failed, falling back to a full reload:",
+      err,
+    );
+    location.reload();
+  });
+}
+
 function init(): void {
   if (!import.meta.hot) return;
   const filePath = document.getElementById("live-edit-selection")?.dataset
@@ -123,16 +149,7 @@ function init(): void {
 
   import.meta.hot.on(CONTENT_CHANGED_EVENT, (data: ContentChangedData) => {
     if (!data.files.includes(filePath)) return;
-    applyContentUpdate().catch((err) => {
-      // Whatever went wrong (network error, the page's shape not matching
-      // what this script expects, ...), a real reload is always correct -
-      // never leave the page showing stale content just to avoid one.
-      console.error(
-        "[live-update] optimistic update failed, falling back to a full reload:",
-        err,
-      );
-      location.reload();
-    });
+    handleContentChangedEvent();
   });
 }
 
