@@ -403,7 +403,16 @@ export default function liveEdit(
       );
       if (code !== 0) violatingOutputs.push(`# ${file}\n${output}`);
     }
-    if (violatingOutputs.length === 0) return;
+    if (violatingOutputs.length === 0) {
+      // Fully settled: nothing more will happen to this item, and a
+      // currently-open bar has already shown its brief "Applied" and
+      // auto-removed the row itself (see APPLIED_REMOVE_DELAY_MS in
+      // live-edit-bar.astro). Dropping it here means a *later* page load's
+      // fresh EventSource snapshot (see the "snapshot" branch below) won't
+      // resurrect an already-dismissed item's row.
+      items.delete(item.id);
+      return;
+    }
 
     log(item, "style check found violations, asking agent to fix");
     enqueue({

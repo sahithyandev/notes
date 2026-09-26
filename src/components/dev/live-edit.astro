@@ -59,8 +59,17 @@ const { filePath } = Astro.props;
     if (!root) return;
 
     const filePath = root.dataset.filePath ?? "";
-    const article = document.querySelector("article");
-    if (!article) return;
+    if (!document.querySelector("article")) return;
+
+    // Re-queried on every use rather than cached once: a live-edit apply
+    // triggers live-update.ts's applyContentUpdate(), which replaces the
+    // whole <article> element with a freshly-fetched one (see
+    // live-update.ts). A cached reference would keep pointing at the
+    // now-detached old element, so contains()-checks against it would
+    // silently fail forever after the first apply.
+    function getArticle(): Element | null {
+      return document.querySelector("article");
+    }
 
     // Live Edit only works with a `claude` or `opencode` backend (see
     // src/integrations/live-edit/agent.ts); when neither is available,
@@ -84,6 +93,7 @@ const { filePath } = Astro.props;
     let attachedSelection: PendingSelection | null = null;
 
     function nearestHeading(node: Node | null): string | undefined {
+      const article = getArticle();
       let el: Element | null =
         node instanceof Element ? node : (node?.parentElement ?? null);
       while (el && el !== article) {
@@ -118,7 +128,7 @@ const { filePath } = Astro.props;
     }
 
     function surroundingContext(range: Range): string {
-      const full = article!.textContent ?? "";
+      const full = getArticle()?.textContent ?? "";
       const before =
         range.startContainer.textContent?.slice(0, range.startOffset) ?? "";
       const idx = full.indexOf(before.slice(-40));
@@ -138,7 +148,8 @@ const { filePath } = Astro.props;
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
       const range = sel.getRangeAt(0);
-      if (!article!.contains(range.commonAncestorContainer)) return;
+      const article = getArticle();
+      if (!article || !article.contains(range.commonAncestorContainer)) return;
       const text = serializeRange(range);
       if (!text) return;
 
@@ -345,7 +356,7 @@ const { filePath } = Astro.props;
         // rather than inline mid-paragraph.
         marker = document.createElement("div");
         marker.className = "le-marker le-marker-block le-status-queued";
-        article!.prepend(marker);
+        getArticle()?.prepend(marker);
         markers.set(item.id, marker);
       }
       if (marker) renderMarker(item, marker);
