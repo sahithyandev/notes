@@ -1,0 +1,474 @@
+---
+// Dev-only: select text in this note's <article> and it's automatically
+// attached as context to the floating input in
+// src/components/dev/live-edit-bar.astro - no explicit "suggest edit"
+// button, no popup of its own. Once a selection settles, this dispatches
+// an "le-attach-selection" DOM event that the bar listens for, and this
+// widget only handles what needs the live DOM Range it captured: a
+// lightweight preview of the eventual proposal's "after" text, anchored
+// right after the selected text. The status readout (queued/running/
+// applied/error - there's no review step, so no controls to act on) lives
+// in the bar's status strip, not here - this widget is preview-only. Only
+// rendered
+// under import.meta.env.DEV by [...slug].astro, so none of this reaches a
+// production build.
+interface Props {
+  filePath: string;
+}
+const { filePath } = Astro.props;
+---
+
+<div id="live-edit-selection" data-file-path={filePath}></div>
+
+<script>
+  import {
+    isEnabled,
+    onEnabledChange,
+  } from "../../integrations/live-edit/enabled-state.ts";
+
+  interface FileChange {
+    file: string;
+    edits: { old: string; new: string }[];
+  }
+
+  interface FeedbackItem {
+    id: string;
+    kind: "selection" | "whole-note";
+    files: string[];
+    selection?: string;
+    heading?: string;
+    comment: string;
+    status:
+      "queued" | "running" | "proposed" | "error" | "applied" | "discarded";
+    progress: string[];
+    summary?: string;
+    changes?: FileChange[];
+    deletions?: string[];
+    error?: string;
+  }
+
+  interface PendingSelection {
+    text: string;
+    heading?: string;
+    context?: string;
+    range: Range;
+  }
+
+  async function init() {
+    const root = document.getElementById("live-edit-selection");
+    if (!root) return;
+
+    const filePath = root.dataset.filePath ?? "";
+    if (!document.querySelector("article")) return;
+
+    // Re-queried on every use rather than cached once: a live-edit apply
+    // triggers live-update.ts's applyContentUpdate(), which replaces the
+    // whole <article> element with a freshly-fetched one (see
+    // live-update.ts). A cached reference would keep pointing at the
+    // now-detached old element, so contains()-checks against it would
+    // silently fail forever after the first apply.
+    function getArticle(): Element | null {
+      return document.querySelector("article");
+    }
+
+    // Live Edit only works with a `claude` or `opencode` backend (see
+    // src/integrations/live-edit/agent.ts); when neither is available,
+    // this widget stays fully inert - selecting text never attaches
+    // anything, regardless of the enabled-state toggle. The site-wide bar
+    // (live-edit-bar.astro) is what shows the disabled message.
+    try {
+      const res = await fetch("/__live-edit/status");
+      const body = (await res.json()) as { available: boolean };
+      if (!body.available) return;
+    } catch {
+      // A failed status check doesn't necessarily mean live-edit is
+      // unavailable; treat it as available and let a real request surface
+      // any error.
+    }
+
+    // The selection currently attached (handed off via "le-attach-selection"
+    // and shown as a chip in the bar, waiting on its Send). Kept around
+    // locally because only this widget has the live Range needed to anchor
+    // a marker once the bar actually submits it.
+    let attachedSelection: PendingSelection | null = null;
+
+    function nearestHeading(node: Node | null): string | undefined {
+      const article = getArticle();
+      let el: Element | null =
+        node instanceof Element ? node : (node?.parentElement ?? null);
+      while (el && el !== article) {
+        let sib: Element | null = el;
+        while (sib) {
+          if (/^H[2-4]$/.test(sib.tagName)) return sib.textContent?.trim();
+          sib = sib.previousElementSibling;
+        }
+        el = el.parentElement;
+      }
+      return undefined;
+    }
+
+    // Katex renders each formula as MathML + a raw-TeX <annotation>; swap
+    // the rendered glyphs for "$tex$" so the captured selection reads as
+    // Markdown source, not KaTeX's visual output.
+    function serializeRange(range: Range): string {
+      const clone = range.cloneContents();
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(clone);
+      wrapper.querySelectorAll(".katex").forEach((katex) => {
+        const tex = katex.querySelector(
+          'annotation[encoding="application/x-tex"]',
+        )?.textContent;
+        const displayMode = katex.closest(".katex-display") !== null;
+        const delim = displayMode ? "$$" : "$";
+        katex.replaceWith(
+          document.createTextNode(`${delim}${tex ?? ""}${delim}`),
+        );
+      });
+      return wrapper.textContent?.trim() ?? "";
+    }
+
+    function surroundingContext(range: Range): string {
+      const full = getArticle()?.textContent ?? "";
+      const before =
+        range.startContainer.textContent?.slice(0, range.startOffset) ?? "";
+      const idx = full.indexOf(before.slice(-40));
+      if (idx === -1) return "";
+      const start = Math.max(0, idx - 100);
+      return full.slice(start, idx + 140);
+    }
+
+    // Reads the current selection and, if it's a non-empty selection inside
+    // the article, attaches it (dispatching "le-attach-selection" for the
+    // bar to show as a chip) and keeps the live Range locally so the
+    // eventual proposal can be anchored right after it in the body.
+    // Attaching again (a new selection replacing an already-attached one)
+    // just overwrites - both here and in the bar's own chip - matching
+    // "only one selection can be in context at a time".
+    function captureAndAttach(): void {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+      const range = sel.getRangeAt(0);
+      const article = getArticle();
+      if (!article || !article.contains(range.commonAncestorContainer)) return;
+      const text = serializeRange(range);
+      if (!text) return;
+
+      attachedSelection = {
+        text,
+        heading: nearestHeading(range.startContainer),
+        context: surroundingContext(range),
+        range: range.cloneRange(),
+      };
+      document.dispatchEvent(
+        new CustomEvent("le-attach-selection", {
+          detail: {
+            filePath,
+            text: attachedSelection.text,
+            heading: attachedSelection.heading,
+            context: attachedSelection.context,
+          },
+        }),
+      );
+    }
+
+    // Attaching only happens once the selection has settled (mouseup/
+    // touchend/keyup, not on every intermediate selectionchange fired while
+    // dragging), and only after a short delay so a quick click-and-release
+    // that immediately collapses the selection again doesn't attach
+    // anything. Clearing the selection afterward (e.g. clicking into the
+    // bar's textarea to type the comment) does NOT detach it - once
+    // attached, it stays in context until sent or removed via the bar's
+    // chip (see "le-selection-detached" below).
+    const ATTACH_DELAY_MS = 200;
+    let attachTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function clearAttachTimer(): void {
+      if (attachTimer !== null) {
+        clearTimeout(attachTimer);
+        attachTimer = null;
+      }
+    }
+
+    // Enabled by default; the dev toolbar's "Live Edit" icon
+    // (toolbar-app.ts) is a pure on/off switch for this behavior.
+    let enabled = isEnabled();
+    onEnabledChange((next) => {
+      enabled = next;
+      if (!enabled) clearAttachTimer();
+    });
+
+    function scheduleAttach(): void {
+      clearAttachTimer();
+      if (!enabled) return;
+      attachTimer = setTimeout(() => {
+        attachTimer = null;
+        captureAndAttach();
+      }, ATTACH_DELAY_MS);
+    }
+
+    document.addEventListener("selectionchange", () => {
+      // Covers an active drag (selection still changing): cancel any
+      // pending attach so a fast, since-superseded selection can't sneak
+      // in after the drag has already moved on.
+      clearAttachTimer();
+    });
+
+    document.addEventListener("mouseup", scheduleAttach);
+    document.addEventListener("touchend", scheduleAttach);
+    document.addEventListener("keyup", (e) => {
+      // Keyboard selection (Shift+Arrow/Home/End) ends on keyup of the
+      // shift combo, with no mouseup to hook into.
+      if (e.key === "Shift" || e.shiftKey) scheduleAttach();
+    });
+
+    // The bar's chip-remove (×) button on a selection it hasn't sent yet.
+    document.addEventListener("le-selection-detached", () => {
+      attachedSelection = null;
+    });
+
+    // --- inline anchors: one marker element per submitted item, inserted
+    // right after the selected text, never modifying the selected text
+    // itself. Safer than wrapping the selection (which throws if the range
+    // partially crosses an element boundary) and keeps the preview of a
+    // proposed change exactly where the feedback was given, not in a
+    // corner popup - the status readout for it (there's no review step, so
+    // nothing to act on) lives in live-edit-bar.astro's status strip now,
+    // not here. -------
+
+    function closestBlock(node: Node): Element | null {
+      let el: Element | null =
+        node instanceof Element ? node : node.parentElement;
+      while (el && !/^(P|LI|DIV|BLOCKQUOTE|H[1-6]|TD|TH)$/.test(el.tagName)) {
+        el = el.parentElement;
+      }
+      return el;
+    }
+
+    function insertMarker(range: Range, marker: HTMLElement): void {
+      try {
+        const r = range.cloneRange();
+        r.collapse(false);
+        r.insertNode(marker);
+        return;
+      } catch {
+        // Fall through to the block-level fallback below.
+      }
+      closestBlock(range.endContainer)?.after(marker);
+    }
+
+    const markers = new Map<string, HTMLElement>();
+    const APPLIED_REMOVE_DELAY_MS = 1500;
+
+    // This widget only previews - the status readout, and the progress
+    // shown while queued/running, live entirely in live-edit-bar.astro's
+    // status strip (docked above the floating input) now. Here, a marker
+    // is just a quiet pointer to *where* a proposed change would land:
+    // the "after" text, styled as new/pending rather than boxed as a
+    // before/after diff - the "before" is already right there on the
+    // page.
+    function renderMarker(item: FeedbackItem, marker: HTMLElement): void {
+      marker.innerHTML = "";
+      // Re-renders happen on every status change, so the block/inline
+      // variant (set once at creation, see the "le-item" listener below)
+      // has to survive resetting the rest of the class list each time.
+      const isBlock = marker.classList.contains("le-marker-block");
+      marker.className = `le-marker le-status-${item.status}${isBlock ? " le-marker-block" : ""}`;
+
+      if (item.status === "queued" || item.status === "running") {
+        marker.hidden = true;
+        return;
+      }
+      marker.hidden = false;
+
+      if (item.status === "proposed") {
+        const changes = item.changes ?? [];
+        for (const change of changes) {
+          for (const edit of change.edits) {
+            const after = document.createElement("div");
+            after.className = "le-inline-after";
+            after.textContent = edit.new;
+            marker.append(after);
+          }
+        }
+        if ((item.deletions ?? []).length > 0) {
+          const badge = document.createElement("span");
+          badge.className = "le-inline-badge le-inline-deletions";
+          badge.textContent = `🗑 Proposes deleting ${item.deletions!.length} file(s)`;
+          marker.append(badge);
+        }
+        return;
+      }
+
+      if (item.status === "error") {
+        const badge = document.createElement("span");
+        badge.className = "le-inline-badge le-inline-error";
+        badge.textContent = "⚠ Couldn't propose an edit here";
+        marker.append(badge);
+        return;
+      }
+
+      if (item.status === "applied") {
+        // The bar's status strip already shows "Applied" (briefly) for
+        // this item, and a reload is moments away anyway (see
+        // dev-reload-lock) - showing it again here, inline in the article
+        // content itself, is pure repetition right before that content
+        // gets replaced. Hide rather than announce it.
+        marker.hidden = true;
+        return;
+      }
+
+      // discarded: leave the marker empty (about to be removed below).
+    }
+
+    // A "whole-note" item is one this component didn't submit itself (the
+    // bar does, via live-edit-bar.astro) - it only picks up ones about
+    // exactly this note (not a merge across several), rendering them at
+    // the top of the article instead of the bar's side panel, which is
+    // what live-edit-bar.astro's own rendersInArticle() skips them for.
+    function isWholeNoteAboutThisFile(item: FeedbackItem): boolean {
+      return (
+        item.kind === "whole-note" &&
+        item.files.length === 1 &&
+        item.files[0] === filePath
+      );
+    }
+
+    document.addEventListener("le-item", (e) => {
+      const item = (e as CustomEvent<FeedbackItem>).detail;
+      const isSelectionOfMine =
+        item.kind === "selection" && item.files[0] === filePath;
+      if (!isSelectionOfMine && !isWholeNoteAboutThisFile(item)) return;
+
+      if (item.status === "discarded") {
+        markers.get(item.id)?.remove();
+        markers.delete(item.id);
+        return;
+      }
+
+      let marker = markers.get(item.id);
+      if (!marker && isWholeNoteAboutThisFile(item)) {
+        // First time seeing this one - unlike a selection item (whose
+        // marker is created synchronously on submit, see
+        // "le-selection-submitted" below), a whole-note item's first
+        // sighting here is via this same broadcast, so it's created
+        // lazily right here instead. There's no specific text to anchor
+        // to, so it goes at the top of the article as its own block,
+        // rather than inline mid-paragraph.
+        marker = document.createElement("div");
+        marker.className = "le-marker le-marker-block le-status-queued";
+        getArticle()?.prepend(marker);
+        markers.set(item.id, marker);
+      }
+      if (marker) renderMarker(item, marker);
+      // An item with no tracked marker at this point belongs to a
+      // different page load (this component only anchors selection items
+      // it itself submitted, since only it has the live Range) - nothing
+      // to render for it.
+
+      // Applying is the end of this marker's life - leaving "✓ Applied"
+      // sitting inline forever is just clutter, so it's cleared out rather
+      // than relying solely on the eventual file-change reload (which may
+      // be debounced, or may never fire if something else keeps it from
+      // completing). The delay is only so the confirmation itself is still
+      // visible for a beat.
+      if (item.status === "applied" && marker) {
+        const appliedMarker = marker;
+        setTimeout(() => {
+          appliedMarker.remove();
+          markers.delete(item.id);
+        }, APPLIED_REMOVE_DELAY_MS);
+      }
+    });
+
+    // The bar (live-edit-bar.astro) owns the actual request now - this
+    // just reacts once it's sent one, inserting the marker at the Range
+    // only this widget has. A null id means the request failed; nothing to
+    // anchor in that case, matching the previous popup flow's behavior.
+    document.addEventListener("le-selection-submitted", (e) => {
+      const { filePath: submittedFile, id } = (
+        e as CustomEvent<{ filePath: string; id: string | null }>
+      ).detail;
+      if (submittedFile !== filePath || !attachedSelection) return;
+
+      const { range } = attachedSelection;
+      attachedSelection = null;
+      window.getSelection()?.removeAllRanges();
+      if (!id) return;
+
+      // Starts hidden - progress lives in the bar's status strip now, not
+      // here, so there's nothing to show inline until the first "le-item"
+      // update carries a proposed/error/applied result.
+      const marker = document.createElement("span");
+      marker.className = "le-marker le-status-queued";
+      marker.hidden = true;
+      insertMarker(range, marker);
+      markers.set(id, marker);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+</script>
+
+<style>
+  #live-edit-selection {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+  }
+</style>
+
+<style is:global>
+  /* Inline, in the article body - not a corner popup. Global because the
+     marker is inserted straight into <article>'s rendered content, outside
+     this component's own scoped-style boundary. */
+  /* No box, no border, no background - just text in the article's own
+     flow. The color of the text itself (green for a proposed "after",
+     red for an error, see .le-inline-* below) is what marks it as live-
+     edit content, not a container around it. */
+  .le-marker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    vertical-align: middle;
+  }
+
+  /* A "whole-note" item (no specific selection to anchor to) - its own
+     paragraph at the top of the article rather than a pill mid-sentence. */
+  .le-marker-block {
+    display: block;
+    margin: 0 0 20px;
+  }
+
+  .le-inline-badge {
+    color: var(--text-secondary);
+  }
+
+  .le-inline-error {
+    color: #dc2626;
+  }
+
+  .le-inline-deletions {
+    color: #dc2626;
+    font-weight: 600;
+  }
+
+  /* Just the proposed "after" text, colored to read as new/pending - no
+     boxed background, no before/after pair (the "before" is already right
+     there in the article). Block so several edits on one item stack
+     rather than running together. */
+  .le-inline-after {
+    display: block;
+    color: #15803d;
+    white-space: pre-wrap;
+  }
+
+  :root[data-theme="dark"] {
+    .le-inline-after {
+      color: #4ade80;
+    }
+  }
+</style>

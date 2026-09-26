@@ -25,6 +25,17 @@ bun install
 
 `bun dev` runs a `notes-style-validator` pass on `docs/` as you edit (see below), and the dev server coalesces rapid successive file changes into a single browser reload instead of one per file, so editing several notes in quick succession (by hand, a script, or an AI coding agent) doesn't cause a reload storm.
 
+### Live Edit
+
+While `bun dev` is running, you can leave feedback on a note right from the browser and get a proposed edit back, without switching to an editor:
+
+- Select text in a note's article to attach it as context to the floating bar at the bottom - shown there as a chip, with your comment sent alongside it. The proposal renders inline after the selection.
+- Use the same floating bar without a selection for whole-note feedback ("tighten this section") or a cross-note merge/restructure, picking one or more notes.
+
+Every proposal ends in a review step: nothing touches disk until you click Apply, and deleting a note requires an extra confirmation naming the exact file(s). Toggle the feature on/off from the "Live Edit" icon in Astro's dev toolbar.
+
+It's driven by a headless [Claude Code](https://claude.com/claude-code) or [opencode](https://opencode.ai) session (whichever you have installed and authenticated; if both are, a picker in the bar lets you choose). With neither available, the UI shows a disabled message instead. It never ships to production - see `src/integrations/live-edit/` and the "Live edit (dev only)" section of `CLAUDE.md` for how it works.
+
 ## Testing
 
 Unit tests use `bun:test` and live next to the code they cover as `*.test.ts`.

@@ -1,0 +1,915 @@
+---
+// Dev-only, site-wide: a floating bar for whole-note feedback ("tighten
+// this note") and cross-note merges ("fold this into that note"), plus the
+// review panel for every feedback item - both the ones this bar submits and
+// the selection-based ones submitted by the per-note
+// src/components/dev/live-edit.astro widget. Mounted once by
+// src/layouts/Layout.astro under import.meta.env.DEV, so it's present on
+// every page (note pages and otherwise) and none of it reaches a
+// production build.
+//
+// Deliberately detached from the toolbar: this is the actual UI, always
+// present in the page's own DOM (not inside the dev toolbar's app-canvas
+// ShadowRoot). The toolbar only carries an on/off switch for it
+// (src/integrations/live-edit/toolbar-app.ts) - enabled by default, per
+// enabled-state.ts.
+---
+
+<div id="live-edit-bar">
+  <div class="leb-disabled" data-leb-disabled hidden>
+    Live Edit is unavailable.
+  </div>
+
+  <div class="leb-dock" data-leb-dock>
+    <div class="leb-status" data-leb-status hidden></div>
+
+    <div class="leb-bar" data-leb-bar>
+      <div class="leb-files" data-leb-files>
+        <button type="button" class="leb-add-file" data-leb-add-file>
+          + note
+        </button>
+      </div>
+
+      <div class="leb-picker" data-leb-picker hidden>
+        <input
+          type="text"
+          class="leb-picker-input"
+          data-leb-picker-input
+          placeholder="Search notes by title or slug…"
+        />
+        <div class="leb-picker-results" data-leb-picker-results></div>
+      </div>
+
+      <div class="leb-input-row">
+        <select
+          class="leb-backend-select"
+          data-leb-backend-select
+          hidden
+          aria-label="Agent backend"
+        ></select>
+        <textarea
+          class="leb-comment"
+          data-leb-comment
+          placeholder="Feedback on the note(s) above… (⌘/Ctrl+Enter to send)"
+          rows="1"
+        ></textarea>
+        <button type="button" class="le-btn le-btn-primary" data-leb-send>
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <template data-leb-chip-template>
+    <span class="leb-chip" data-leb-chip>
+      <span data-leb-chip-label></span>
+      <button type="button" data-leb-chip-remove aria-label="Remove note">
+        ×
+      </button>
+    </span>
+  </template>
+
+  <template data-leb-result-template>
+    <button type="button" class="leb-picker-result" data-leb-result>
+      <span class="leb-picker-result-title" data-leb-result-title></span>
+      <span class="leb-picker-result-slug" data-leb-result-slug></span>
+    </button>
+  </template>
+
+  <template data-leb-item-template>
+    <div class="le-item">
+      <div class="le-item-header">
+        <span class="le-item-status" data-le-status></span>
+        <span class="le-item-files" data-le-files></span>
+      </div>
+      <div class="le-item-error" data-le-error hidden></div>
+    </div>
+  </template>
+</div>
+
+<script>
+  import {
+    isEnabled,
+    onEnabledChange,
+  } from "../../integrations/live-edit/enabled-state.ts";
+
+  // Edits apply automatically (see index.ts's applyChanges()) - no
+  // "proposed" state to review, no "discarded" to reject out of.
+  interface FeedbackItem {
+    id: string;
+    kind: "selection" | "whole-note";
+    files: string[];
+    selection?: string;
+    heading?: string;
+    comment: string;
+    status: "queued" | "running" | "error" | "applied";
+    progress: string[];
+    error?: string;
+    createdAt: number;
+    updatedAt: number;
+  }
+
+  interface NoteInfo {
+    file: string;
+    slug: string;
+    title: string;
+  }
+
+  async function init() {
+    const root = document.getElementById("live-edit-bar");
+    if (!root) return;
+
+    const disabledNotice = root.querySelector<HTMLElement>(
+      "[data-leb-disabled]",
+    )!;
+    const bar = root.querySelector<HTMLElement>("[data-leb-bar]")!;
+    const backendSelect = root.querySelector<HTMLSelectElement>(
+      "[data-leb-backend-select]",
+    )!;
+
+    // No hardcoded backend names here: BACKEND_DEFINITIONS (agent.ts) is
+    // the single place backends are registered, and GET /__live-edit/status
+    // reflects that list - this script only ever iterates status.backends'
+    // keys, never names "claude" or "opencode" directly, so a new backend
+    // shows up in the picker without any frontend change.
+    interface BackendStatus {
+      label: string;
+      available: boolean;
+      reason?: string;
+    }
+    interface StatusResponse {
+      available: boolean;
+      backend: string | null;
+      backends: Record<string, BackendStatus>;
+    }
+
+    // Checked once here rather than discovered on first use. When
+    // unavailable, show a disabled message in place of the bar instead of
+    // the usual enabled/disabled toggle; when more than one backend is
+    // installed, show a picker so the developer can choose which one runs
+    // the agent.
+    let status: StatusResponse | null = null;
+    try {
+      const res = await fetch("/__live-edit/status");
+      status = (await res.json()) as StatusResponse;
+      if (!status.available) {
+        const reasons = Object.values(status.backends)
+          .map((s) => `${s.label}: ${s.reason}`)
+          .join("; ");
+        disabledNotice.textContent = `Live Edit is unavailable (${reasons}).`;
+      }
+    } catch {
+      // A failed status check doesn't necessarily mean live-edit is
+      // unavailable (the dev server itself could just be slow to come up);
+      // treat it as available and let a real request surface any error.
+    }
+
+    if (status && !status.available) {
+      root.hidden = false;
+      disabledNotice.hidden = false;
+      bar.hidden = true;
+      return;
+    }
+
+    const availableBackends = status
+      ? Object.entries(status.backends).filter(([, s]) => s.available)
+      : [];
+    if (availableBackends.length > 1) {
+      for (const [id, s] of availableBackends) {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = s.label;
+        backendSelect.append(option);
+      }
+      backendSelect.hidden = false;
+      backendSelect.value = status!.backend ?? availableBackends[0][0];
+      backendSelect.addEventListener("change", () => {
+        void fetch("/__live-edit/backend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ backend: backendSelect.value }),
+        });
+      });
+    }
+
+    // Enabled by default; the dev toolbar's "Live Edit" icon
+    // (toolbar-app.ts) is a pure on/off switch for this UI, not how you
+    // open it - toggling it just shows/hides this bar in place.
+    root.hidden = !isEnabled();
+    onEnabledChange((enabled) => {
+      root.hidden = !enabled;
+    });
+
+    const statusList = root.querySelector<HTMLElement>("[data-leb-status]")!;
+    const itemTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-item-template]",
+    )!;
+
+    const filesEl = root.querySelector<HTMLElement>("[data-leb-files]")!;
+    const addFileBtn = root.querySelector<HTMLButtonElement>(
+      "[data-leb-add-file]",
+    )!;
+    const chipTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-chip-template]",
+    )!;
+
+    const picker = root.querySelector<HTMLElement>("[data-leb-picker]")!;
+    const pickerInput = root.querySelector<HTMLInputElement>(
+      "[data-leb-picker-input]",
+    )!;
+    const pickerResults = root.querySelector<HTMLElement>(
+      "[data-leb-picker-results]",
+    )!;
+    const resultTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-leb-result-template]",
+    )!;
+
+    const commentInput =
+      root.querySelector<HTMLTextAreaElement>("[data-leb-comment]")!;
+    const sendBtn = root.querySelector<HTMLButtonElement>("[data-leb-send]")!;
+
+    // --- file chips -------------------------------------------------
+
+    const selectedFiles: string[] = [];
+    const chipEls = new Map<string, HTMLElement>();
+
+    // Default to the note currently being viewed, if any: the per-note
+    // widget's root carries the file path as a data attribute.
+    const currentNoteFile = document.getElementById("live-edit-selection")
+      ?.dataset.filePath;
+    if (currentNoteFile) addFile(currentNoteFile);
+
+    // A content edit reloads the page (see dev-reload-lock), which would
+    // otherwise wipe an in-progress draft the developer was typing here -
+    // round-trip the comment text and any extra files through
+    // sessionStorage across that reload. Restored after the file/selection
+    // wiring above so it can layer on top of the current-note default.
+    const DRAFT_KEY = "sn-live-edit-draft";
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        sessionStorage.removeItem(DRAFT_KEY);
+        const draft = JSON.parse(saved) as { comment: string; files: string[] };
+        commentInput.value = draft.comment;
+        for (const file of draft.files) addFile(file);
+      }
+    } catch {}
+
+    window.addEventListener("pagehide", () => {
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+      try {
+        sessionStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({ comment: commentInput.value, files: selectedFiles }),
+        );
+      } catch {}
+    });
+
+    function addFile(file: string): void {
+      if (selectedFiles.includes(file)) return;
+      selectedFiles.push(file);
+      const chip = (
+        chipTemplate.content.firstElementChild as HTMLElement
+      ).cloneNode(true) as HTMLElement;
+      chip.querySelector("[data-leb-chip-label]")!.textContent =
+        file === currentNoteFile
+          ? "Current file"
+          : file.replace(/^docs\//, "").replace(/\.mdx?$/, "");
+      chip.querySelector<HTMLButtonElement>("[data-leb-chip-remove]")!.onclick =
+        () => removeFile(file);
+      chipEls.set(file, chip);
+      filesEl.insertBefore(chip, addFileBtn);
+    }
+
+    function removeFile(file: string): void {
+      const idx = selectedFiles.indexOf(file);
+      if (idx === -1) return;
+      selectedFiles.splice(idx, 1);
+      chipEls.get(file)?.remove();
+      chipEls.delete(file);
+    }
+
+    // --- attached selection ----------------------------------------------
+    //
+    // Selecting text in a note (live-edit.astro) shares this bar's input
+    // instead of opening its own popup: once a selection settles, that
+    // widget dispatches "le-attach-selection" with the captured text, and
+    // this shows it as a chip in the same row as file chips so the input
+    // makes clear the selection is included as context - no explicit
+    // "suggest edit" button, it's automatic. live-edit.astro keeps the
+    // actual DOM Range (only it has the article to anchor a marker in), so
+    // this only ever carries the text/heading/context needed for the
+    // request body, and reports back what happened via
+    // "le-selection-submitted"/relies on "le-selection-detached" to hear
+    // about a cancel.
+    interface PendingSelection {
+      filePath: string;
+      text: string;
+      heading?: string;
+      context?: string;
+    }
+    let pendingSelection: PendingSelection | null = null;
+    let selectionChipEl: HTMLElement | null = null;
+    const DEFAULT_PLACEHOLDER = commentInput.placeholder;
+
+    function renderSelectionChip(): void {
+      if (!pendingSelection) {
+        selectionChipEl?.remove();
+        selectionChipEl = null;
+        commentInput.placeholder = DEFAULT_PLACEHOLDER;
+        return;
+      }
+      if (!selectionChipEl) {
+        selectionChipEl = (
+          chipTemplate.content.firstElementChild as HTMLElement
+        ).cloneNode(true) as HTMLElement;
+        selectionChipEl.classList.add("leb-chip-selection");
+        selectionChipEl.querySelector<HTMLButtonElement>(
+          "[data-leb-chip-remove]",
+        )!.onclick = () => detachSelection();
+        filesEl.insertBefore(selectionChipEl, addFileBtn);
+      }
+      const text = pendingSelection.text.trim();
+      const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
+      selectionChipEl.querySelector("[data-leb-chip-label]")!.textContent =
+        `Selection: “${preview}”`;
+      commentInput.placeholder =
+        "What should change about the selected text? (⌘/Ctrl+Enter to send)";
+    }
+
+    // User-initiated cancel (the chip's × button) - distinct from a send,
+    // which clears pendingSelection itself and tells live-edit.astro via
+    // "le-selection-submitted" instead, so it can insert its marker rather
+    // than just dropping the selection.
+    function detachSelection(): void {
+      pendingSelection = null;
+      renderSelectionChip();
+      document.dispatchEvent(new CustomEvent("le-selection-detached"));
+    }
+
+    document.addEventListener("le-attach-selection", (e) => {
+      pendingSelection = (e as CustomEvent<PendingSelection>).detail;
+      renderSelectionChip();
+      commentInput.focus();
+    });
+
+    // --- note picker (searches /__live-edit/notes) ---------------
+
+    let notesCache: NoteInfo[] | null = null;
+
+    async function loadNotes(): Promise<NoteInfo[]> {
+      if (notesCache) return notesCache;
+      const res = await fetch("/__live-edit/notes");
+      const body = (await res.json()) as { notes: NoteInfo[] };
+      notesCache = body.notes;
+      return notesCache;
+    }
+
+    function renderResults(notes: NoteInfo[], query: string): void {
+      pickerResults.innerHTML = "";
+      const q = query.trim().toLowerCase();
+      const matches = notes
+        .filter((n) => !selectedFiles.includes(n.file))
+        .filter(
+          (n) =>
+            q.length === 0 ||
+            n.title.toLowerCase().includes(q) ||
+            n.slug.toLowerCase().includes(q),
+        )
+        .slice(0, 20);
+      for (const note of matches) {
+        const el = (
+          resultTemplate.content.firstElementChild as HTMLElement
+        ).cloneNode(true) as HTMLElement;
+        el.querySelector("[data-leb-result-title]")!.textContent =
+          note.title || note.slug;
+        el.querySelector("[data-leb-result-slug]")!.textContent = note.slug;
+        el.addEventListener("click", () => {
+          addFile(note.file);
+          picker.hidden = true;
+          pickerInput.value = "";
+        });
+        pickerResults.append(el);
+      }
+    }
+
+    addFileBtn.addEventListener("click", async () => {
+      picker.hidden = !picker.hidden;
+      if (picker.hidden) return;
+      pickerInput.value = "";
+      pickerInput.focus();
+      renderResults(await loadNotes(), "");
+    });
+
+    pickerInput.addEventListener("input", async () => {
+      renderResults(await loadNotes(), pickerInput.value);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (
+        !picker.hidden &&
+        !picker.contains(e.target as Node) &&
+        e.target !== addFileBtn
+      ) {
+        picker.hidden = true;
+      }
+    });
+
+    // --- submit --------------------------------------------------------
+
+    async function submit() {
+      const comment = commentInput.value.trim();
+      if (!comment) return;
+
+      // A pending selection takes priority: it's what the input's
+      // placeholder and chip are currently telling the developer this
+      // comment is about. Submits as a "selection" item; its status still
+      // shows up in this bar's status strip like any other item, but
+      // "le-selection-submitted" is also how
+      // live-edit.astro learns the id so it can anchor a lightweight
+      // preview at the actual selection (or that the request failed).
+      if (pendingSelection) {
+        const { filePath, text, heading, context } = pendingSelection;
+        commentInput.value = "";
+        pendingSelection = null;
+        renderSelectionChip();
+
+        const res = await fetch("/__live-edit/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "selection",
+            filePath,
+            selection: text,
+            heading,
+            context,
+            comment,
+          }),
+        });
+        const body = (await res.json().catch(() => null)) as {
+          id?: string;
+        } | null;
+        document.dispatchEvent(
+          new CustomEvent("le-selection-submitted", {
+            detail: { filePath, id: body?.id ?? null },
+          }),
+        );
+        return;
+      }
+
+      if (selectedFiles.length === 0) return;
+      commentInput.value = "";
+
+      await fetch("/__live-edit/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "whole-note",
+          files: [...selectedFiles],
+          comment,
+        }),
+      });
+    }
+
+    sendBtn.addEventListener("click", submit);
+    commentInput.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        void submit();
+      }
+    });
+
+    // --- item rendering --------------------------------------------------
+    //
+    // Edits apply automatically - there's nothing to approve, so this
+    // strip is a status readout, not a review UI: file + progress while
+    // it runs, then either "Applied" (briefly, then removed) or an error
+    // (left up, since there's nothing left to auto-retry and it's worth
+    // noticing). The actual change, once applied, shows inline in the
+    // article by live-edit.astro, right where it landed - not duplicated
+    // here.
+
+    const itemEls = new Map<string, HTMLElement>();
+
+    function renderItem(item: FeedbackItem) {
+      let el = itemEls.get(item.id);
+      if (!el) {
+        el = (itemTemplate.content.firstElementChild as HTMLElement).cloneNode(
+          true,
+        ) as HTMLElement;
+        itemEls.set(item.id, el);
+        statusList.prepend(el);
+        statusList.hidden = false;
+      }
+
+      el.dataset.status = item.status;
+      const filesLabel = item.files
+        .map((f) =>
+          f === currentNoteFile
+            ? "current file"
+            : f.replace(/^docs\//, "").replace(/\.mdx?$/, ""),
+        )
+        .join(", ");
+      el.querySelector("[data-le-files]")!.textContent = filesLabel;
+      el.querySelector("[data-le-status]")!.textContent = statusLabel(item);
+
+      const errorEl = el.querySelector<HTMLElement>("[data-le-error]")!;
+      errorEl.textContent = item.error ?? "";
+      errorEl.hidden = !item.error;
+
+      if (item.status === "applied") scheduleItemRemoval(item.id);
+    }
+
+    const APPLIED_REMOVE_DELAY_MS = 1500;
+    const removalScheduled = new Set<string>();
+
+    function removeItemEl(id: string): void {
+      itemEls.get(id)?.remove();
+      itemEls.delete(id);
+      removalScheduled.delete(id);
+      statusList.hidden = itemEls.size === 0;
+    }
+
+    function scheduleItemRemoval(id: string): void {
+      if (removalScheduled.has(id)) return;
+      removalScheduled.add(id);
+      setTimeout(() => removeItemEl(id), APPLIED_REMOVE_DELAY_MS);
+    }
+
+    function statusLabel(item: FeedbackItem): string {
+      switch (item.status) {
+        case "queued":
+          return "Queued";
+        case "running":
+          return item.progress.at(-1)
+            ? `Working: ${item.progress.at(-1)}`
+            : "Working…";
+        case "error":
+          return "Error";
+        case "applied":
+          return "Applied";
+      }
+    }
+
+    // Every item - selection or whole-note - gets a row here with its
+    // status readout, docked right above the input instead of scattered
+    // wherever the item happens to be about. A "selection" item is *also*
+    // dispatched as "le-item" for the per-note widget (live-edit.astro),
+    // which reacts by anchoring a lightweight (button-free) preview at the
+    // actual selection, since only it has the live DOM Range needed to do
+    // that; a "whole-note" item about the note currently open gets the
+    // same treatment there. Neither of those is a substitute for the row
+    // here - it's the only place an item's status is always shown, and the
+    // only preview at all for an item about a note that isn't the one
+    // you're looking at right now.
+    function handleItem(item: FeedbackItem): void {
+      document.dispatchEvent(new CustomEvent("le-item", { detail: item }));
+      if (item.status === "discarded") {
+        removeItemEl(item.id);
+        return;
+      }
+      renderItem(item);
+    }
+
+    const es = new EventSource("/__live-edit/events");
+    es.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data) as
+        | { type: "snapshot"; items: FeedbackItem[] }
+        | { type: "item"; item: FeedbackItem };
+      if (msg.type === "snapshot") {
+        for (const item of msg.items) handleItem(item);
+      } else {
+        handleItem(msg.item);
+      }
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+</script>
+
+<style>
+  #live-edit-bar {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+
+    /* Astro's dev toolbar docks a full-width, pointer-events:auto hit area */
+    /* at the bottom of the viewport (a hover band above its pill, the pill */
+    /* itself, a band below it, about 98px total) at a z-index far above */
+    /* anything on the page, regardless of its own placement setting. */
+    /* Bottom-docked UI inside that band has its clicks/hovers swallowed by */
+    /* the toolbar instead, so this clears it with margin. */
+    --le-toolbar-clearance: 110px;
+  }
+
+  .le-btn {
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .le-btn-primary {
+    background: var(--sem, #2563eb);
+    color: #fff;
+  }
+
+  .le-btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-secondary);
+  }
+
+  /* --- disabled notice ------------------------------------------------- */
+
+  .leb-disabled {
+    position: fixed;
+    left: 50%;
+    bottom: var(--le-toolbar-clearance, 110px);
+    transform: translateX(-50%);
+    z-index: 62;
+    width: min(560px, calc(100vw - 24px));
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .leb-disabled code {
+    font-family: var(--font-mono);
+  }
+
+  /* --- bottom bar + its status strip ----------------------------------- */
+
+  /* The fixed-positioned element: the status strip (queued/running
+     progress, or an applied/error item's final status - there's no review
+     step, so no controls to act on) and the input bar stack as flex
+     children here, so the strip sits
+     directly above the bar with zero gap between them regardless of
+     either one's height - not two independently-positioned elements
+     nudged into place with a magic offset. */
+  .leb-dock {
+    position: fixed;
+    left: 50%;
+    bottom: var(--le-toolbar-clearance, 110px);
+    transform: translateX(-50%);
+    z-index: 62;
+    width: min(640px, calc(100vw - 24px));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leb-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-height: 40vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+  }
+
+  /* Squares off the bar's top edge so it reads as one continuous shape
+     with the strip above it, instead of two separately-rounded boxes with
+     a border where they meet. */
+  .leb-dock:has(.leb-status:not([hidden])) .leb-bar {
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .leb-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .leb-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .leb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 4px 2px 10px;
+    font-size: 0.75rem;
+  }
+
+  /* Marks the chip added when text is selected in a note (live-edit.astro)
+     as included context, distinct from the plain file chips - violet
+     rather than the site's blue accent (--sem/--accent), which is already
+     used for primary actions elsewhere in this bar. */
+  .leb-chip-selection {
+    border-color: var(--dia-key);
+    color: var(--dia-key);
+    background: color-mix(in oklab, var(--dia-key) 14%, var(--surface-2));
+  }
+
+  .leb-chip button {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 1;
+  }
+
+  .leb-add-file {
+    border: 1px dashed var(--border-strong);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
+  }
+
+  .leb-picker {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    width: min(360px, 90vw);
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  }
+
+  .leb-picker-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    margin-bottom: 6px;
+  }
+
+  .leb-picker-results {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leb-picker-result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  .leb-picker-result:hover {
+    background: var(--surface-2);
+  }
+
+  .leb-picker-result-slug {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+  }
+
+  .leb-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .leb-backend-select {
+    flex: none;
+    align-self: center;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 5px 6px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+  }
+
+  .leb-comment {
+    flex: 1;
+    resize: vertical;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    min-height: 30px;
+  }
+
+  /* --- panel ----------------------------------------------------------- */
+
+  .le-item {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 10px;
+    background: var(--surface-2);
+  }
+
+  .le-item:first-child {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .le-item[data-status="error"] {
+    border-color: #dc2626;
+  }
+
+  .le-item[data-status="applied"] {
+    border-color: #16a34a;
+  }
+
+  .le-item-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  /* A progress label can carry an arbitrarily long path/command (see
+     describeToolUse() in agent.ts, which caps it, but this is the backstop
+     for whatever still doesn't fit) - flex:1 + min-width:0 lets it actually
+     shrink inside the flex row instead of forcing the row to overflow, and
+     the three overflow properties turn "doesn't fit" into an ellipsis
+     rather than a layout blowout. */
+  .le-item-status {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .le-item-files {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .le-item-deletions {
+    margin-top: 6px;
+    border: 1px solid #dc2626;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .le-deletions-label {
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 2px;
+  }
+
+  .le-deletions-file {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .le-item-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 0.75rem;
+    white-space: pre-wrap;
+  }
+</style>

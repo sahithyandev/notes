@@ -7,6 +7,7 @@ import vercel from "@astrojs/vercel";
 import moduleRedirects from "./src/integrations/module-redirects/index.ts";
 import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
 import devReloadLock from "./src/integrations/dev-reload-lock/index.ts";
+import liveEdit from "./src/integrations/live-edit/index.ts";
 import remarkGfm from "remark-gfm";
 import katex from "katex";
 import { visit } from "unist-util-visit";
@@ -116,6 +117,7 @@ export default defineConfig({
       optimize: false,
     }),
     notesStyleValidator(),
+    liveEdit(),
   ],
   markdown: {
     processor: unified({
