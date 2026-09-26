@@ -77,7 +77,15 @@ const PENCIL_ICON =
 // gives us an AstroIntegrationLogger - the terminal output this produces
 // then matches the rest of `astro dev`'s output (timestamped, labeled
 // "live-edit"), the same as module-redirects and notes-style-validator.
-export default function liveEdit(): AstroIntegration {
+// spawnFn defaults to the real node:child_process spawn; overridable so
+// tests can drive the whole integration (backend availability checks, the
+// agent's own child process, the style-check follow-up) against fakes
+// instead of real `claude`/`opencode`/`bun` processes, mirroring
+// AgentAdapterOptions.spawnFn in agent.ts.
+export default function liveEdit(
+  opts: { spawnFn?: typeof spawn } = {},
+): AstroIntegration {
+  const spawnFn = opts.spawnFn ?? spawn;
   let root = process.cwd();
   let docsRoot = join(root, "docs");
   let tmpDir = join(root, ".tmp");
@@ -115,7 +123,7 @@ export default function liveEdit(): AstroIntegration {
   > {
     const entries = await Promise.all(
       BACKEND_DEFINITIONS.map(
-        async (def) => [def.id, await def.checkReady(spawn)] as const,
+        async (def) => [def.id, await def.checkReady(spawnFn)] as const,
       ),
     );
     return Object.fromEntries(entries) as Record<Backend, AvailabilityStatus>;
@@ -156,6 +164,7 @@ export default function liveEdit(): AstroIntegration {
         cwd: root,
         model: process.env.LIVE_EDIT_MODEL,
         initialSessionId,
+        spawnFn,
         log: (m: string) => logger?.info(m),
         logError: (m: string) => logger?.error(m),
       });
@@ -410,7 +419,7 @@ export default function liveEdit(): AstroIntegration {
     const args = ["run", "check-notes-style"];
     if (filterArg) args.push("--", "--filter", filterArg);
     return new Promise((resolvePromise) => {
-      const child = spawn("bun", args, {
+      const child = spawnFn("bun", args, {
         cwd,
         stdio: ["ignore", "pipe", "pipe"],
       });
@@ -576,7 +585,19 @@ export default function liveEdit(): AstroIntegration {
               adapter = null;
               selectedBackend = backend;
               await persistBackend(backend);
-              logger?.info(`switched backend to ${backend}`);
+              // Mirrors the astro:server:setup startup path: without this,
+              // switching back to a backend used earlier in this same dev
+              // session (or a previous one) would start a brand-new
+              // conversation instead of resuming the one CLAUDE.md promises
+              // is preserved per backend.
+              const persistedSessionId = await loadPersistedSessionId(backend);
+              if (persistedSessionId) getAdapter(persistedSessionId);
+              logger?.info(
+                `switched backend to ${backend}` +
+                  (persistedSessionId
+                    ? `, resuming session ${persistedSessionId.slice(0, 8)}`
+                    : ""),
+              );
             }
             return sendJson(res, 200, { ok: true, backend: selectedBackend });
           }
