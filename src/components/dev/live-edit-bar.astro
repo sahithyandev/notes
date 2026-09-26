@@ -424,9 +424,9 @@
 
       // A pending selection takes priority: it's what the input's
       // placeholder and chip are currently telling the developer this
-      // comment is about. Submits as a "selection" item; its Apply/
-      // Discard/Refine still show up in this bar's status strip like any
-      // other item, but "le-selection-submitted" is also how
+      // comment is about. Submits as a "selection" item; its status still
+      // shows up in this bar's status strip like any other item, but
+      // "le-selection-submitted" is also how
       // live-edit.astro learns the id so it can anchor a lightweight
       // preview at the actual selection (or that the request failed).
       if (pendingSelection) {
@@ -553,16 +553,16 @@
     }
 
     // Every item - selection or whole-note - gets a row here with its
-    // Apply/Discard/Refine controls, docked right above the input instead
-    // of scattered wherever the item happens to be about. A "selection"
-    // item is *also* dispatched as "le-item" for the per-note widget
-    // (live-edit.astro), which reacts by anchoring a lightweight (button-
-    // free) preview at the actual selection, since only it has the live
-    // DOM Range needed to do that; a "whole-note" item about the note
-    // currently open gets the same treatment there. Neither of those is a
-    // substitute for the row here - it's the only place an item ever gets
-    // Apply/Discard/Refine, and the only preview at all for an item about
-    // a note that isn't the one you're looking at right now.
+    // status readout, docked right above the input instead of scattered
+    // wherever the item happens to be about. A "selection" item is *also*
+    // dispatched as "le-item" for the per-note widget (live-edit.astro),
+    // which reacts by anchoring a lightweight (button-free) preview at the
+    // actual selection, since only it has the live DOM Range needed to do
+    // that; a "whole-note" item about the note currently open gets the
+    // same treatment there. Neither of those is a substitute for the row
+    // here - it's the only place an item's status is always shown, and the
+    // only preview at all for an item about a note that isn't the one
+    // you're looking at right now.
     function handleItem(item: FeedbackItem): void {
       document.dispatchEvent(new CustomEvent("le-item", { detail: item }));
       if (item.status === "discarded") {
@@ -648,8 +648,9 @@
   /* --- bottom bar + its status strip ----------------------------------- */
 
   /* The fixed-positioned element: the status strip (queued/running
-     progress, or a proposed/error item's preview + Apply/Discard/Refine)
-     and the input bar stack as flex children here, so the strip sits
+     progress, or an applied/error item's final status - there's no review
+     step, so no controls to act on) and the input bar stack as flex
+     children here, so the strip sits
      directly above the bar with zero gap between them regardless of
      either one's height - not two independently-positioned elements
      nudged into place with a magic offset. */
@@ -910,16 +911,5 @@
     color: #dc2626;
     font-size: 0.75rem;
     white-space: pre-wrap;
-  }
-
-  .le-item-actions,
-  .le-item-refine {
-    margin-top: 8px;
-    display: flex;
-    gap: 6px;
-  }
-
-  .le-item-refine {
-    flex-direction: column;
   }
 </style>
