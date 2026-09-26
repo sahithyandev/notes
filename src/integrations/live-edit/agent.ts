@@ -239,6 +239,20 @@ export class ClaudeStreamAdapter implements AgentAdapter {
       );
     });
 
+    // Without this, a spawn failure (claude removed from PATH, EACCES, ...)
+    // emits an unhandled "error" event - Node's default behavior for that is
+    // to throw, crashing the whole `astro dev` process rather than just
+    // failing this one turn. OpenCodeAdapter already handles this on both of
+    // its spawns; this backend's long-lived child was missing the same.
+    child.on("error", (err) => {
+      if (this.child !== child) return;
+      this.child = null;
+      this.logError(`claude process failed to start: ${err.message}`);
+      this.queue.failAll(
+        new Error(`claude process failed to start: ${err.message}`),
+      );
+    });
+
     this.child = child;
     return child;
   }

@@ -326,6 +326,35 @@ test("send() reports a process-error when the child dies mid-turn", async () => 
   adapter.dispose();
 });
 
+test("send() reports a process-error instead of crashing when the child fails to spawn", async () => {
+  // Before the fix, this child had no "error" listener at all - Node's
+  // default behavior for an unhandled "error" event on an EventEmitter is to
+  // throw, which would take down the whole `astro dev` process rather than
+  // just failing this turn. Without the fix this test crashes instead of
+  // reaching its assertions.
+  const { child } = makeFakeChild();
+  const adapter = new ClaudeStreamAdapter({
+    cwd: "/repo",
+    spawnFn: (() => child) as any,
+  });
+
+  const eventsPromise = collect(adapter.send("hello"));
+  await Promise.resolve();
+  await Promise.resolve();
+  (child as any).emit("error", new Error("spawn claude ENOENT"));
+
+  const events = await eventsPromise;
+  expect(events).toEqual([
+    { type: "session", sessionId: expect.any(String) } as any,
+    {
+      type: "process-error",
+      message: "claude process failed to start: spawn claude ENOENT",
+    },
+  ]);
+
+  adapter.dispose();
+});
+
 test("reset() drops the session so the next send starts fresh", async () => {
   const spawnCalls: string[][] = [];
   const children = [makeFakeChild(), makeFakeChild()];
