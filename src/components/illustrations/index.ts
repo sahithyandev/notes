@@ -4,6 +4,7 @@
 export { default as AssignmentStep } from "./assignment-step.astro";
 export { default as AssignmentTable } from "./assignment-table.astro";
 export { default as BranchAndBoundTree } from "./branch-and-bound-tree.astro";
+export { default as BreakevenChart } from "./breakeven-chart.astro";
 export { default as ComplexLogExplorer } from "./complex-log-explorer.astro";
 export { default as CpmStep } from "./cpm-step.astro";
 export { default as CpmTable } from "./cpm-table.astro";

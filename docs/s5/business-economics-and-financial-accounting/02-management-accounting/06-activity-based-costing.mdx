@@ -1,7 +1,7 @@
 ---
 title: Activity Based Costing
 dateCreated: 2026-08-18T07:03:53.000Z
-lastUpdatedOn: 2026-09-25T20:56:41.236Z
+lastUpdatedOn: 2026-09-26T07:09:37.927Z
 slug: >-
   s5/business-economics-and-financial-accounting/management-accounting/activity-based-costing
 sidebar:
@@ -10,16 +10,23 @@ prev: true
 next: true
 ---
 
-Activity-based costing, ABC, is a costing method that assigns overhead costs to related products and services. Recognizes the relationship between indirect costs and overhead activities, assigning indirect costs to products less arbitrarily than traditional costing methods.
+Aka. ABC. A costing method that assigns overhead costs to related products and services. Recognizes the relationship between indirect costs and overhead activities, assigning indirect costs to products less arbitrarily than traditional costing methods.
 
-## Concepts
+## Activity
 
-- Activities  
-  Aggregation of many different tasks, events, or units of work that cause the consumption of resources.
-- Activity cost pool  
-  The overhead cost attributed to a distinct type of activity.
-- Cost drivers  
-  Any factor which causes a change in the cost of an activity.
+Aggregation of many different tasks, events, or units of work that cause the consumption of resources. Each activity forms its own cost centre, so ABC works with many more cost centres than traditional costing methods, which pool overhead into a small number of departmental cost centres.
+
+Examples: machine setups, production scheduling, material handling, inspection, purchasing, dispatch.
+
+### Activity Cost Pool
+
+The overhead cost attributed to a distinct type of activity.
+
+Examples: setup cost pool, production scheduling cost pool, material handling cost pool, inspection cost pool, dispatch cost pool.
+
+## Cost Drivers
+
+Any factor which causes a change in the cost of an activity.
 
 Examples:
 
@@ -37,15 +44,6 @@ Examples:
 - Compute the overhead rate for each pool.
 - Assign overhead costs to products using the overhead rates.
 
-## Absorption Costing vs ABC
-
-- Cost centres  
-  Absorption uses a small number of cost centres. ABC uses a greater number of activity cost centres.
-- Cost drivers  
-  Absorption uses a small number of cost drivers. ABC uses a greater number of cost drivers.
-- Allocation  
-  Absorption allocates overhead to cost centres, then service department cost again to production. ABC assigns cost to major activities and applies cost drivers.
-
 ## Benefits
 
 - Easily identify the root causes of poor financial performance.
@@ -59,5 +57,42 @@ Examples:
 
 An extension of ABC from a product costing system to a management function that focuses on reducing costs and improving processes and decision making.
 
-- Value-added activities.
-- Non-value-added activities.
+### Value-Added Activities
+
+Activities that increase the value of the product or service to the customer, and which the customer would be willing to pay for. Removing one reduces the product's value.
+
+Examples: assembly, painting, packaging.
+
+### Non-Value-Added Activities
+
+Activities that do not increase the value of the product or service to the customer. Can be eliminated without affecting the product's value.
+
+Examples: storage, inspection, material movement, waiting time.
+
+## Worked Example
+
+Consider products $X$ and $Y$, with 2 cost pools.
+
+| Cost Pool        | Cost Driver     | Pool Cost | Total Driver Volume | $X$  | $Y$   |
+| ---------------- | --------------- | --------- | ------------------- | ---- | ----- |
+| Set up costs     | Production runs | $20000$   | $100$               | $60$ | $40$  |
+| Inspection costs | Inspections     | $15000$   | $150$               | $50$ | $100$ |
+
+The cost driver rate for each pool is the pool cost divided by the total driver volume.
+
+$$
+\begin{array}{rccl}
+\text{Set up Rate} & = & \dfrac{20000}{100} & = 200 \text{ per production run} \\[1em]
+\text{Inspection Rate} & = & \dfrac{15000}{150} & = 100 \text{ per inspection}
+\end{array}
+$$
+
+Overhead assigned to each product is the sum of each cost driver rate multiplied by that product's usage of the driver.
+
+$$
+\text{Overhead (X)} = (200 \times 60) + (100 \times 50) = 17000
+$$
+
+$$
+\text{Overhead (Y)} = (200 \times 40) + (100 \times 100) = 18000
+$$

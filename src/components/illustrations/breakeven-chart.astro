@@ -1,0 +1,223 @@
+---
+// Static breakeven chart: fixed cost, total cost, and sales revenue lines
+// against output, with the breakeven point, loss/profit regions, and the
+// margin of safety between breakeven and budgeted sales.
+---
+
+<figure id="breakeven-chart">
+  <svg
+    viewBox="0 0 620 430"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby="breakeven-chart-title breakeven-chart-desc"
+  >
+    <title id="breakeven-chart-title">Breakeven Chart</title>
+    <desc id="breakeven-chart-desc">
+      Fixed cost, total cost, and sales revenue plotted against output. The
+      total cost and sales revenue lines cross at the breakeven point. Below
+      breakeven output there is a loss, above it there is a profit. The margin
+      of safety spans from breakeven output to budgeted sales.
+    </desc>
+
+    <!-- Loss region: total cost above sales revenue -->
+    <path class="region loss" d="M 70 300 L 280 205 L 70 360 Z"></path>
+
+    <!-- Profit region: sales revenue above total cost -->
+    <path class="region profit" d="M 280 205 L 490 50 L 490 110 Z"></path>
+
+    <!-- Axes -->
+    <line class="axis" x1="70" y1="360" x2="70" y2="45"></line>
+    <line class="axis" x1="70" y1="360" x2="490" y2="360"></line>
+    <text class="axis-label" x="70" y="30" text-anchor="middle">
+      Cost / Revenue
+    </text>
+    <text class="axis-label" x="490" y="392" text-anchor="end">
+      Output (Units)
+    </text>
+    <text class="origin" x="55" y="378">
+      0
+    </text>
+
+    <!-- Fixed cost -->
+    <line class="fixed-cost-line" x1="70" y1="300" x2="490" y2="300"></line>
+    <text class="line-label fixed-cost" x="360" y="294">
+      Fixed Cost
+    </text>
+
+    <!-- Total cost -->
+    <line class="total-cost-line" x1="70" y1="300" x2="490" y2="110"></line>
+    <text class="line-label total-cost" x="498" y="115">
+      Total Cost
+    </text>
+
+    <!-- Sales revenue -->
+    <line class="revenue-line" x1="70" y1="360" x2="490" y2="50"></line>
+    <text class="line-label revenue" x="498" y="48">
+      Sales Revenue
+    </text>
+
+    <!-- Breakeven point -->
+    <line class="guide" x1="280" y1="205" x2="280" y2="360"></line>
+    <line class="guide" x1="70" y1="205" x2="280" y2="205"></line>
+    <circle class="point breakeven" cx="280" cy="205" r="6"></circle>
+    <text class="point-label" x="260" y="192" text-anchor="end">
+      BEP
+    </text>
+
+    <!-- Budgeted sales point -->
+    <line class="guide" x1="420" y1="102" x2="420" y2="360"></line>
+    <circle class="point budgeted" cx="420" cy="102" r="6"></circle>
+    <text class="point-label" x="420" y="132" text-anchor="middle">
+      Budgeted Sales
+    </text>
+
+    <!-- Margin of safety -->
+    <line class="mos-line" x1="280" y1="345" x2="420" y2="345"></line>
+    <text class="mos-label" x="350" y="335" text-anchor="middle">
+      Margin of Safety
+    </text>
+  </svg>
+
+  <figcaption>
+    <span class="loss">Loss</span> below the breakeven point, where total cost
+    exceeds sales revenue. <span class="profit">Profit</span> above it. The
+    <span class="mos">margin of safety</span> is the output between the
+    breakeven point and budgeted sales.
+  </figcaption>
+</figure>
+
+<style>
+  #breakeven-chart {
+    max-width: 560px;
+    margin: 24px auto;
+  }
+
+  #breakeven-chart svg {
+    width: 100%;
+    height: auto;
+  }
+
+  #breakeven-chart .region {
+    stroke: none;
+  }
+
+  #breakeven-chart .region.loss {
+    fill: var(--dia-ct);
+    opacity: 0.12;
+  }
+
+  #breakeven-chart .region.profit {
+    fill: var(--dia-pt);
+    opacity: 0.12;
+  }
+
+  #breakeven-chart .axis {
+    stroke: var(--text-muted);
+    stroke-width: 2;
+  }
+
+  #breakeven-chart .axis-label {
+    fill: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  #breakeven-chart .origin {
+    fill: var(--text-muted);
+    font-size: 13px;
+  }
+
+  #breakeven-chart .fixed-cost-line {
+    stroke: var(--dia-ct);
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+  }
+
+  #breakeven-chart .total-cost-line {
+    stroke: var(--dia-pt);
+    stroke-width: 2.5;
+  }
+
+  #breakeven-chart .revenue-line {
+    stroke: var(--s5);
+    stroke-width: 2.5;
+  }
+
+  #breakeven-chart .line-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  #breakeven-chart .line-label.fixed-cost {
+    fill: var(--dia-ct);
+  }
+
+  #breakeven-chart .line-label.total-cost {
+    fill: var(--dia-pt);
+  }
+
+  #breakeven-chart .line-label.revenue {
+    fill: var(--s5);
+  }
+
+  #breakeven-chart .guide {
+    stroke: var(--text-muted);
+    stroke-width: 1.2;
+    stroke-dasharray: 5 5;
+    opacity: 0.7;
+  }
+
+  #breakeven-chart .point {
+    stroke: var(--surface);
+    stroke-width: 2;
+  }
+
+  #breakeven-chart .point.breakeven {
+    fill: var(--dia-key);
+  }
+
+  #breakeven-chart .point.budgeted {
+    fill: var(--dia-key);
+  }
+
+  #breakeven-chart .point-label {
+    fill: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  #breakeven-chart .mos-line {
+    stroke: var(--dia-key);
+    stroke-width: 1.5;
+  }
+
+  #breakeven-chart .mos-label {
+    fill: var(--dia-key);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  #breakeven-chart figcaption {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  #breakeven-chart figcaption span {
+    font-weight: 600;
+  }
+
+  #breakeven-chart figcaption .loss {
+    color: var(--dia-ct);
+  }
+
+  #breakeven-chart figcaption .profit {
+    color: var(--dia-pt);
+  }
+
+  #breakeven-chart figcaption .mos {
+    color: var(--dia-key);
+  }
+</style>
