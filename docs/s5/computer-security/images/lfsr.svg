@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image lfsr" viewBox="0 0 560 300" width="560" height="300" role="img" aria-label="A 4-stage linear feedback shift register. Stages shift left to right. Stage 1 and stage 4 are tapped, XORed together, and fed back into stage 1. The bit leaving stage 4 is the output.">
+  <style>
+    .lfsr text { fill: currentColor; font: 500 17px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .lfsr .cap { fill: currentColor; opacity: 0.6; font-size: 14px; }
+    .lfsr .sub { opacity: 0.65; font-size: 15px; font-weight: 400; }
+    .lfsr .stage { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .lfsr .w { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .lfsr .t-in { fill: var(--dia-pt, #1f7a4d); }
+    .lfsr .w-in { stroke: var(--dia-pt, #1f7a4d); }
+    .lfsr .t-out { fill: var(--dia-ct, #b3541e); }
+    .lfsr .w-out { stroke: var(--dia-ct, #b3541e); }
+    .lfsr .t-tap { fill: var(--dia-key, #6d4bb6); }
+    .lfsr .w-tap { stroke: var(--dia-key, #6d4bb6); }
+  </style>
+  <defs>
+    <marker id="ah-lfsr" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <text x="70" y="18" class="cap">shift</text>
+  <path class="w" d="M70 28 H430" marker-end="url(#ah-lfsr)" />
+
+  <rect class="stage" x="70" y="56" width="56" height="50" rx="2" />
+  <rect class="stage" x="160" y="56" width="56" height="50" rx="2" />
+  <rect class="stage" x="250" y="56" width="56" height="50" rx="2" />
+  <rect class="stage" x="340" y="56" width="56" height="50" rx="2" />
+
+  <text x="98" y="81" text-anchor="middle" class="sub">1</text>
+  <text x="188" y="81" text-anchor="middle" class="sub">2</text>
+  <text x="278" y="81" text-anchor="middle" class="sub">3</text>
+  <text x="368" y="81" text-anchor="middle" class="sub">4</text>
+
+  <path class="w w-out" d="M396 81 H460" marker-end="url(#ah-lfsr)" />
+  <text x="472" y="81" class="t-out">output</text>
+
+  <path class="w w-tap" d="M98 106 V190 H233 V214" marker-end="url(#ah-lfsr)" />
+  <text x="106" y="172" class="t-tap sub">c₁</text>
+
+  <path class="w w-tap" d="M368 106 V270 H233 V246" marker-end="url(#ah-lfsr)" />
+  <text x="376" y="230" class="t-tap sub">c₄</text>
+
+  <circle class="stage" cx="233" cy="230" r="16" />
+  <path class="w" d="M223 230 h20M233 220 v20" />
+
+  <path class="w w-in" d="M217 230 H20 V81 H70" marker-end="url(#ah-lfsr)" />
+  <text x="30" y="172" class="t-in sub">new bit</text>
+</svg>
