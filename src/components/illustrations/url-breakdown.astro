@@ -1,0 +1,127 @@
+---
+// Splits an absolute URL into scheme / host / path / query segments and
+// colour-codes them against a legend, so the structure reads at a glance
+// instead of as one undifferentiated string.
+import Panel from "./primitives/panel.astro";
+import Legend from "./primitives/legend.astro";
+
+interface Props {
+  url: string;
+}
+
+const { url } = Astro.props;
+
+type SegmentKind =
+  "scheme" | "host" | "path" | "param-name" | "param-value" | "connector";
+
+interface Segment {
+  text: string;
+  kind: SegmentKind;
+}
+
+function parse(raw: string): Segment[] {
+  const match = raw.match(
+    /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/([^/?#]+)([^?#]*)(?:\?([^#]*))?/,
+  );
+  if (!match) return [{ text: raw, kind: "path" }];
+
+  const [, scheme, host, path, query] = match;
+  const segments: Segment[] = [
+    { text: scheme, kind: "scheme" },
+    { text: "://", kind: "connector" },
+    { text: host, kind: "host" },
+  ];
+  if (path) segments.push({ text: path, kind: "path" });
+
+  if (query) {
+    segments.push({ text: "?", kind: "connector" });
+    const params = query.split("&");
+    params.forEach((param, i) => {
+      const eq = param.indexOf("=");
+      if (eq === -1) {
+        segments.push({ text: param, kind: "param-name" });
+      } else {
+        segments.push({ text: param.slice(0, eq), kind: "param-name" });
+        segments.push({ text: "=", kind: "connector" });
+        segments.push({ text: param.slice(eq + 1), kind: "param-value" });
+      }
+      if (i < params.length - 1)
+        segments.push({ text: "&", kind: "connector" });
+    });
+  }
+
+  return segments;
+}
+
+const segments = parse(url);
+
+const LEGEND: { label: string; kind: SegmentKind; color: string }[] = [
+  { label: "Host", kind: "host", color: "var(--dia-pt)" },
+  { label: "Path", kind: "path", color: "var(--dia-ct)" },
+  { label: "Parameter name", kind: "param-name", color: "var(--dia-key)" },
+  { label: "Parameter value", kind: "param-value", color: "var(--dia-out)" },
+];
+const presentKinds = new Set(segments.map((s) => s.kind));
+const legendItems = LEGEND.filter((l) => presentKinds.has(l.kind)).map((l) => ({
+  label: l.label,
+  kind: "swatch" as const,
+  fill: l.color,
+}));
+---
+
+<Panel class="url-breakdown">
+  <p class="url">
+    {segments.map((s) => (
+      <span class:list={["seg", s.kind]}>{s.text}</span>
+    ))}
+  </p>
+  <Legend items={legendItems} />
+</Panel>
+
+<style>
+  .url-breakdown .url {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+  .seg {
+    border-radius: 3px;
+    padding: 0 1px;
+    transition:
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .seg.scheme,
+  .seg.connector {
+    color: var(--text-muted);
+  }
+  .seg.host {
+    color: var(--dia-pt);
+    font-weight: 700;
+  }
+  .seg.path {
+    color: var(--dia-ct);
+    font-weight: 700;
+  }
+  .seg.param-name {
+    color: var(--dia-key);
+    font-weight: 700;
+  }
+  .seg.param-value {
+    color: var(--dia-out);
+    font-weight: 700;
+  }
+  .seg.scheme:hover,
+  .seg.host:hover,
+  .seg.path:hover,
+  .seg.param-name:hover,
+  .seg.param-value:hover {
+    background: color-mix(in srgb, currentColor 16%, transparent);
+    box-shadow: 0 0 0 1px currentColor;
+  }
+  .url-breakdown :global(.legend) {
+    margin: 0;
+  }
+</style>

@@ -31,6 +31,7 @@ export { default as SupplyCurveDiagram } from "./supply-curve-diagram.astro";
 export { default as TransportationStep } from "./transportation-step.astro";
 export { default as TransportationTable } from "./transportation-table.astro";
 export { default as TreePropertiesProofs } from "./tree-properties-proofs.astro";
+export { default as UrlBreakdown } from "./url-breakdown.astro";
 export { default as Walkthrough } from "./walkthrough.astro";
 export { default as WalksVennDiagram } from "./walks-venn-diagram.astro";
 export { default as ProductionFunctionDiagram } from "./production-function-diagram.astro";
