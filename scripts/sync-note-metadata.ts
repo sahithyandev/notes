@@ -31,6 +31,52 @@ function stripAutoManaged(
   return stripped;
 }
 
+// Key order carries no meaning, so two objects that differ only in field
+// order must compare equal. Without this, reordering frontmatter to match
+// FRONTMATTER_FIELD_ORDER would look like a "real" content change and stamp
+// a fresh lastUpdatedOn on every file the reorder touches.
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value !== null && typeof value === "object" && !(value instanceof Date)) {
+    const record = value as Record<string, unknown>;
+    return Object.fromEntries(
+      Object.keys(record)
+        .sort()
+        .map((key) => [key, canonicalize(record[key])]),
+    );
+  }
+  return value;
+}
+
+// The order notes should read in. Fields not listed here keep their
+// existing relative position, inserted right before dateCreated/lastUpdatedOn
+// (which always sort last since they're the least relevant to a human
+// skimming the frontmatter).
+const FRONTMATTER_FIELD_ORDER = [
+  "title",
+  "sidebar",
+  "keywords",
+  "prereqs",
+  "authors",
+];
+
+function reorderFrontmatter(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const ordered: Record<string, unknown> = {};
+  for (const field of FRONTMATTER_FIELD_ORDER) {
+    if (field in data) ordered[field] = data[field];
+  }
+  for (const key of Object.keys(data)) {
+    if (!(key in ordered) && key !== "dateCreated" && key !== "lastUpdatedOn") {
+      ordered[key] = data[key];
+    }
+  }
+  if ("dateCreated" in data) ordered.dateCreated = data.dateCreated;
+  if ("lastUpdatedOn" in data) ordered.lastUpdatedOn = data.lastUpdatedOn;
+  return ordered;
+}
+
 const git = new GitAdapter();
 
 // A file only earns a fresh lastUpdatedOn if its actual content (body or any
@@ -54,8 +100,8 @@ function hasRealChange(
   const head = matter(headRaw);
   if (current.content !== head.content) return true;
   return (
-    JSON.stringify(stripAutoManaged(current.data)) !==
-    JSON.stringify(stripAutoManaged(head.data))
+    JSON.stringify(canonicalize(stripAutoManaged(current.data))) !==
+    JSON.stringify(canonicalize(stripAutoManaged(head.data)))
   );
 }
 
@@ -187,7 +233,7 @@ export async function syncNoteMetadata(
     // is set on commit"), judged against HEAD rather than against how the
     // caller invoked the script. Sibling files pulled in just to recompute
     // prev/next/order keep their existing lastUpdatedOn.
-    file.data = {
+    file.data = reorderFrontmatter({
       ...currentFrontMatter,
       dateCreated: toDate(currentFrontMatter.dateCreated) ?? stat.birthtime,
       lastUpdatedOn: hasRealChange(
@@ -196,7 +242,7 @@ export async function syncNoteMetadata(
       )
         ? new Date()
         : (toDate(currentFrontMatter.lastUpdatedOn) ?? new Date()),
-    };
+    });
 
     // slug and sidebar.order are derived from the file path at read time
     // (see src/utils/note-path.ts) rather than written here; this is just
