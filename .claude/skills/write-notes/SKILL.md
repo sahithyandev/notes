@@ -171,7 +171,7 @@ Do not split merely because the content is long — depth under one concept belo
 
 ### Frontmatter
 
-Required: `title`, `slug`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`.  
+Required: `title`, `slug`, `sidebar.order`, `dateCreated`, `lastUpdatedOn`.  
 Add `prereqs` (list of slugs) when the note assumes knowledge from a specific prior note.
 
 ---

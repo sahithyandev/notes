@@ -35,8 +35,8 @@ const git = new GitAdapter();
 // A file only earns a fresh lastUpdatedOn if its actual content (body or any
 // non-auto-managed frontmatter field) differs from what's committed at HEAD.
 // This is the signal that survives however the caller invoked the script:
-// one file, a hand-picked list, or an entire directory pulled in to fix
-// ordering after a rename/add/delete.
+// one file, a hand-picked list, or an entire directory pulled in to recompute
+// order after a rename/add/delete.
 //
 // candidatePaths tries the file's path before AND after any renumberFiles
 // rename: a pure reorder (a sibling inserted/removed, this file just shifts
@@ -170,6 +170,10 @@ export async function syncNoteMetadata(
       return undefined;
     };
 
+    // prev/next are no longer computed; drop any leftover value
+    delete currentFrontMatter.prev;
+    delete currentFrontMatter.next;
+
     // dateCreated is set once and kept; lastUpdatedOn is stamped fresh only
     // for files actually changed (per CLAUDE.md, "lastUpdatedOn frontmatter
     // is set on commit"), judged against HEAD rather than against how the
@@ -224,29 +228,9 @@ export async function syncNoteMetadata(
       console.log(filePath, "isn't named correctly.");
     }
     console.log(`${i} ${section} ${file.data.slug}`);
-    if (file.data.sidebar.order === 1) {
-      file.data.prev = false;
-      console.log(">>> prev false");
-    } else {
-      file.data.prev = true;
-      console.log(">>> prev true");
-    }
-    const nextFile = mdFilePaths
-      .slice(i + 1)
-      .find(
-        (p) =>
-          dirname(p) === dirname(filePath) &&
-          !p.includes("/summary/") &&
-          !p.includes("/images/") &&
-          (p.endsWith(".md") || p.endsWith(".mdx")) &&
-          PATTERN_TITLE_PREFIX.test(basename(p)),
-      );
-    file.data.next = nextFile !== undefined;
-    console.log(`>>> next ${file.data.next}`);
 
     if (dryRun) {
       console.log(`[DRY RUN] New slug: ${file.data.slug}`);
-      console.log(`[DRY RUN] Prev: ${file.data.prev}, Next: ${file.data.next}`);
     } else {
       const updatedFileContent = matter.stringify(file.content, file.data);
       const config = await resolveConfig(newFilePath);

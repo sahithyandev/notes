@@ -26,6 +26,8 @@ const notes = defineCollection({
         order: z.optional(z.number()),
       }),
     ),
+    // Kept optional (rather than removed) so notes still carrying the field
+    // from before sync-note-metadata.ts stopped writing it still validate.
     prev: z.boolean().optional(),
     next: z.boolean().optional(),
     dateCreated: z.date().optional(),

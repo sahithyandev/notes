@@ -148,13 +148,12 @@ URLs come from the `slug` frontmatter field, not the file path. `sync-note-metad
 
 - `docs/s2/theory-of-electricity/01-introduction.md` becomes slug `s2/theory-of-electricity/introduction`.
 - The prefix becomes `sidebar.order`.
-- `prev` and `next` are set from position within the directory.
 
 `images/` and `summary/` subdirectories are skipped.
 
-Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `prev`, `next`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
+Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
-Do not put notes from the same module in `prereqs`. The `prev` / sidebar-order link already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. Enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
+Do not put notes from the same module in `prereqs`. The sidebar order / prev-next navigation already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. Enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
 
 ## Routing
 
