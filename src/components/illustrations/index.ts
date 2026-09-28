@@ -16,6 +16,7 @@ export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.as
 export { default as MarketEquilibriumDiagram } from "./market-equilibrium-diagram.astro";
 export { default as NetworkDiagram } from "./network-diagram.astro";
 export { default as Packet } from "./packet.astro";
+export { default as PermissionBreakdown } from "./permission-breakdown.astro";
 export { default as PermutationTable } from "./permutation-table.astro";
 export { default as PpfDiagram } from "./ppf-diagram.astro";
 export { default as ProcessStateDiagram } from "./process-state-diagram.astro";

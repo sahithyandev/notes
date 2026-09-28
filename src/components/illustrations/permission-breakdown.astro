@@ -1,0 +1,715 @@
+---
+// Interactive `ls -l` permission builder. The bits string itself is the
+// input surface: click the type character to cycle file types, click any
+// r/w/x letter to toggle it. The equivalent `chmod` numeric mode, its
+// derivation, and a plain-English explanation all update live alongside.
+import Panel from "./primitives/panel.astro";
+
+interface Props {
+  bits?: string;
+}
+
+const { bits = "-rw-rw-r--" } = Astro.props;
+
+const TYPES = ["-", "d", "l", "c", "b", "p", "s"] as const;
+
+const TYPE_MEANINGS: Record<string, string> = {
+  "-": "Regular file",
+  d: "Directory",
+  l: "Symbolic link",
+  c: "Character device",
+  b: "Block device",
+  p: "Named pipe",
+  s: "Socket",
+};
+
+const SCOPES = ["user", "group", "other"] as const;
+type Scope = (typeof SCOPES)[number];
+
+const initialType = bits[0] ?? "-";
+const initialTriads: Record<Scope, string> = {
+  user: bits.slice(1, 4) || "rw-",
+  group: bits.slice(4, 7) || "rw-",
+  other: bits.slice(7, 10) || "r--",
+};
+
+function triadDerivation(triad: string): string {
+  const parts: string[] = [];
+  let sum = 0;
+  if (triad[0] === "r") {
+    parts.push("4 (read)");
+    sum += 4;
+  }
+  if (triad[1] === "w") {
+    parts.push("2 (write)");
+    sum += 2;
+  }
+  if (triad[2] === "x") {
+    parts.push("1 (execute)");
+    sum += 1;
+  }
+  if (parts.length === 0) return "0 (no permissions)";
+  return `${parts.join(" + ")} = ${sum}`;
+}
+
+function triadDigit(triad: string): string {
+  let sum = 0;
+  if (triad[0] === "r") sum += 4;
+  if (triad[1] === "w") sum += 2;
+  if (triad[2] === "x") sum += 1;
+  return String(sum);
+}
+
+const PRESETS = [
+  { mode: "600", hint: "private key" },
+  { mode: "644", hint: "config file" },
+  { mode: "640", hint: "shared log" },
+  { mode: "755", hint: "executable" },
+  { mode: "777", hint: "wide open" },
+] as const;
+---
+
+<Panel class="permission-builder">
+  <div class="perm-row">
+    <button
+      type="button"
+      class="seg type"
+      data-role="type"
+      aria-label={`File type, currently ${TYPE_MEANINGS[initialType]}. Click to cycle.`}
+    >
+      {initialType}
+    </button>
+    {SCOPES.map((scope) => (
+      <span class:list={["triad", scope]} data-scope={scope}>
+        {(["r", "w", "x"] as const).map((bit, i) => {
+          const on = initialTriads[scope][i] !== "-";
+          const verb = bit === "r" ? "read" : bit === "w" ? "write" : "execute";
+          return (
+            <button
+              type="button"
+              class="seg bit"
+              data-role="bit"
+              data-scope={scope}
+              data-bit={bit}
+              data-on={on ? "true" : "false"}
+              aria-label={`${scope} ${verb}, currently ${on ? "on" : "off"}. Click to toggle.`}
+            >
+              {bit}
+            </button>
+          );
+        })}
+      </span>
+    ))}
+  </div>
+
+  <div class="perm-caption">
+    <span class="cap-spacer" aria-hidden="true" />
+    {SCOPES.map((scope) => (
+      <span class:list={["cap", scope]}>{scope}</span>
+    ))}
+  </div>
+
+  <div class="presets">
+    <span class="presets-label">Try</span>
+    {PRESETS.map((p) => (
+      <button type="button" class="preset" data-preset={p.mode}>
+        {p.mode}
+        <span class="preset-hint">{p.hint}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="specials">
+    <span class="presets-label">Special bits</span>
+    <button
+      type="button"
+      class="special-toggle"
+      data-special="setuid"
+      aria-pressed="false"
+    >
+      SetUID
+    </button>
+    <button
+      type="button"
+      class="special-toggle"
+      data-special="setgid"
+      aria-pressed="false"
+    >
+      SetGID
+    </button>
+    <button
+      type="button"
+      class="special-toggle"
+      data-special="sticky"
+      aria-pressed="false"
+    >
+      Sticky bit
+    </button>
+  </div>
+
+  <p class="chmod-cmd">
+    <code>
+      chmod{" "}
+      <span class="digit special" data-digit="special" hidden>
+        0
+      </span>
+      <span class="digit user" data-digit="user">
+        {triadDigit(initialTriads.user)}
+      </span>
+      <span class="digit group" data-digit="group">
+        {triadDigit(initialTriads.group)}
+      </span>
+      <span class="digit other" data-digit="other">
+        {triadDigit(initialTriads.other)}
+      </span>{" "}
+      file
+    </code>
+  </p>
+
+  <ul class="derivation">
+    <li class="deriv-row special" data-deriv-row="special" hidden>
+      <span class="deriv-label">Special</span>
+      <span class="deriv-text" data-deriv="special" />
+    </li>
+    {SCOPES.map((scope) => (
+      <li class:list={["deriv-row", scope]}>
+        <span class="deriv-label">{scope}</span>
+        <span class="deriv-text" data-deriv={scope}>
+          {triadDerivation(initialTriads[scope])}
+        </span>
+      </li>
+    ))}
+  </ul>
+
+  <p class="explanation" data-explanation></p>
+  <p class="live" aria-live="polite"></p>
+</Panel>
+
+<style>
+  .permission-builder {
+    /* Absolute width shared by every button and label column below, so
+         nothing drifts when it's computed in an "em" relative to a different
+         local font-size (the bug this fixes: .seg's 1.5em at font-size:1.3rem
+         is not the same length as a caption's 1.5em at font-size:0.6rem). */
+    --seg-w: 1.95rem;
+  }
+
+  .perm-row {
+    display: flex;
+    align-items: stretch;
+    gap: 3px;
+    font-family: var(--font-mono);
+  }
+
+  .seg {
+    appearance: none;
+    border: none;
+    border-radius: 4px;
+    background: var(--surface-2);
+    font: inherit;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1;
+    width: var(--seg-w);
+    padding: 0.35em 0;
+    cursor: pointer;
+    transition:
+      transform 0.12s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .seg:hover {
+    box-shadow: 0 0 0 1.5px currentColor;
+  }
+  .seg:active {
+    transform: scale(0.88);
+  }
+  .seg.pulse {
+    animation: pulse 0.28s ease;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.18);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .seg.type {
+    color: var(--dia-key);
+  }
+  .triad {
+    display: inline-flex;
+    gap: 1px;
+    margin-left: 2px;
+  }
+  .triad.user .seg {
+    color: var(--dia-pt);
+  }
+  .triad.group .seg {
+    color: var(--dia-ct);
+  }
+  .triad.other .seg {
+    color: var(--dia-out);
+  }
+  .seg.bit[data-on="false"] {
+    opacity: 0.35;
+  }
+
+  .perm-caption {
+    display: flex;
+    gap: 3px;
+    margin: 4px 0 14px;
+  }
+  .cap-spacer {
+    width: var(--seg-w);
+    flex: none;
+  }
+  .cap {
+    flex: none;
+    width: calc(3 * var(--seg-w) + 2px);
+    margin-left: 2px;
+    text-align: center;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .presets-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-right: 2px;
+  }
+  .preset {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    appearance: none;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .preset:hover {
+    border-color: var(--sem, var(--accent));
+    background: var(--sem-bg, var(--surface));
+  }
+  .preset-hint {
+    font-family: var(--font-ui);
+    font-weight: 400;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .specials {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .special-toggle {
+    appearance: none;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .special-toggle:hover {
+    border-color: var(--dia-key);
+  }
+  .special-toggle[aria-pressed="true"] {
+    border-color: var(--dia-key);
+    background: color-mix(in srgb, var(--dia-key) 16%, transparent);
+    color: var(--dia-key);
+  }
+
+  .permission-builder button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .chmod-cmd {
+    margin: 0 0 8px;
+    font-size: 0.92rem;
+  }
+  .chmod-cmd code {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .digit {
+    font-weight: 800;
+  }
+  .digit.user {
+    color: var(--dia-pt);
+  }
+  .digit.group {
+    color: var(--dia-ct);
+  }
+  .digit.other {
+    color: var(--dia-out);
+  }
+  .digit.special {
+    color: var(--dia-key);
+  }
+
+  .derivation {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .deriv-row {
+    display: flex;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+  }
+  .deriv-label {
+    flex: none;
+    width: 3.6em;
+    text-transform: capitalize;
+    font-weight: 700;
+  }
+  .deriv-row.user .deriv-label {
+    color: var(--dia-pt);
+  }
+  .deriv-row.group .deriv-label {
+    color: var(--dia-ct);
+  }
+  .deriv-row.other .deriv-label {
+    color: var(--dia-out);
+  }
+  .deriv-row.special .deriv-label {
+    color: var(--dia-key);
+  }
+
+  .explanation {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  .explanation :global(code) {
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+  }
+
+  .live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  type Scope = "user" | "group" | "other";
+
+  const TYPES = ["-", "d", "l", "c", "b", "p", "s"];
+
+  const TYPE_MEANINGS: Record<string, string> = {
+    "-": "regular file",
+    d: "directory",
+    l: "symbolic link",
+    c: "character device",
+    b: "block device",
+    p: "named pipe",
+    s: "socket",
+  };
+
+  function describeTriad(triad: string): string {
+    const words: string[] = [];
+    if (triad[0] === "r") words.push("read");
+    if (triad[1] === "w") words.push("write");
+    if (triad[2] === "x") words.push("execute");
+    if (words.length === 0) return "do nothing";
+    if (words.length === 1) return words[0];
+    if (words.length === 2) return `${words[0]} and ${words[1]}`;
+    return `${words[0]}, ${words[1]}, and ${words[2]}`;
+  }
+
+  function triadDerivation(triad: string): string {
+    const parts: string[] = [];
+    let sum = 0;
+    if (triad[0] === "r") {
+      parts.push("4 (read)");
+      sum += 4;
+    }
+    if (triad[1] === "w") {
+      parts.push("2 (write)");
+      sum += 2;
+    }
+    if (triad[2] === "x") {
+      parts.push("1 (execute)");
+      sum += 1;
+    }
+    if (parts.length === 0) return "0 (no permissions)";
+    return `${parts.join(" + ")} = ${sum}`;
+  }
+
+  function triadDigit(triad: string): string {
+    let sum = 0;
+    if (triad[0] === "r") sum += 4;
+    if (triad[1] === "w") sum += 2;
+    if (triad[2] === "x") sum += 1;
+    return String(sum);
+  }
+
+  function octalDigitToTriad(digit: string): string {
+    const n = Number(digit) || 0;
+    return (n & 4 ? "r" : "-") + (n & 2 ? "w" : "-") + (n & 1 ? "x" : "-");
+  }
+
+  type SpecialBits = { setuid: boolean; setgid: boolean; sticky: boolean };
+
+  // The execute character in a triad is overloaded to also carry a special
+  // bit: lowercase when the underlying execute permission is on, uppercase
+  // when it's off (s/S for setuid or setgid, t/T for the sticky bit).
+  function execChar(scope: Scope, on: boolean, special: SpecialBits): string {
+    if (scope === "user" && special.setuid) return on ? "s" : "S";
+    if (scope === "group" && special.setgid) return on ? "s" : "S";
+    if (scope === "other" && special.sticky) return on ? "t" : "T";
+    return "x";
+  }
+
+  function specialDigit(special: SpecialBits): number {
+    return (
+      (special.setuid ? 4 : 0) +
+      (special.setgid ? 2 : 0) +
+      (special.sticky ? 1 : 0)
+    );
+  }
+
+  function specialDerivation(special: SpecialBits): string {
+    const parts: string[] = [];
+    if (special.setuid) parts.push("4 (setuid)");
+    if (special.setgid) parts.push("2 (setgid)");
+    if (special.sticky) parts.push("1 (sticky)");
+    return `${parts.join(" + ")} = ${specialDigit(special)}`;
+  }
+
+  function pulse(el: HTMLElement) {
+    el.classList.remove("pulse");
+    // Force reflow so the animation replays on rapid repeat clicks.
+    void el.offsetWidth;
+    el.classList.add("pulse");
+  }
+
+  function initBuilder(root: HTMLElement) {
+    const typeBtn =
+      root.querySelector<HTMLButtonElement>('[data-role="type"]')!;
+    const bitBtns = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-role="bit"]'),
+    );
+    const digitEls: Record<Scope | "special", HTMLElement> = {
+      user: root.querySelector<HTMLElement>('[data-digit="user"]')!,
+      group: root.querySelector<HTMLElement>('[data-digit="group"]')!,
+      other: root.querySelector<HTMLElement>('[data-digit="other"]')!,
+      special: root.querySelector<HTMLElement>('[data-digit="special"]')!,
+    };
+    const derivEls: Record<Scope | "special", HTMLElement> = {
+      user: root.querySelector<HTMLElement>('[data-deriv="user"]')!,
+      group: root.querySelector<HTMLElement>('[data-deriv="group"]')!,
+      other: root.querySelector<HTMLElement>('[data-deriv="other"]')!,
+      special: root.querySelector<HTMLElement>('[data-deriv="special"]')!,
+    };
+    const specialDerivRow = root.querySelector<HTMLElement>(
+      '[data-deriv-row="special"]',
+    )!;
+    const explanation = root.querySelector<HTMLElement>("[data-explanation]")!;
+    const live = root.querySelector<HTMLElement>(".live")!;
+    const presets = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-preset]"),
+    );
+    const specialToggles = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-special]"),
+    );
+
+    const special: SpecialBits = {
+      setuid: false,
+      setgid: false,
+      sticky: false,
+    };
+
+    const bitsOf = (scope: Scope) =>
+      bitBtns.filter((b) => b.dataset.scope === scope);
+
+    function triadBits(scope: Scope): string {
+      return bitsOf(scope)
+        .map((b) => (b.dataset.on === "true" ? (b.dataset.bit ?? "") : "-"))
+        .join("");
+    }
+
+    function setTriad(scope: Scope, triad: string) {
+      bitsOf(scope).forEach((b, i) => {
+        const on = triad[i] !== "-";
+        b.dataset.on = on ? "true" : "false";
+      });
+    }
+
+    function render() {
+      const type = typeBtn.textContent?.trim() || "-";
+      const user = triadBits("user");
+      const group = triadBits("group");
+      const other = triadBits("other");
+      const typeLabel = TYPE_MEANINGS[type] ?? "file";
+
+      // The execute button's displayed letter, not just its on/off state,
+      // depends on the special bits, so it's redrawn every render.
+      (["user", "group", "other"] as const).forEach((scope) => {
+        const triad = { user, group, other }[scope];
+        const btn = bitsOf(scope).find((b) => b.dataset.bit === "x")!;
+        const on = triad[2] !== "-";
+        btn.textContent = execChar(scope, on, special);
+        digitEls[scope].textContent = triadDigit(triad);
+        derivEls[scope].textContent = triadDerivation(triad);
+      });
+
+      const sDigit = specialDigit(special);
+      specialDerivRow.hidden = sDigit === 0;
+      digitEls.special.hidden = sDigit === 0;
+      if (sDigit > 0) {
+        digitEls.special.textContent = String(sDigit);
+        derivEls.special.textContent = specialDerivation(special);
+      }
+
+      // The display string mirrors `ls -l`: execute positions already carry
+      // the special-bit letters (s/S/t/T) via execChar above.
+      const displayUser = `${user.slice(0, 2)}${execChar("user", user[2] !== "-", special)}`;
+      const displayGroup = `${group.slice(0, 2)}${execChar("group", group[2] !== "-", special)}`;
+      const displayOther = `${other.slice(0, 2)}${execChar("other", other[2] !== "-", special)}`;
+      const combined = `${type}${displayUser}${displayGroup}${displayOther}`;
+      const mode =
+        (sDigit > 0 ? String(sDigit) : "") +
+        triadDigit(user) +
+        triadDigit(group) +
+        triadDigit(other);
+
+      const specialNames = (
+        [
+          [special.setuid, "setuid"],
+          [special.setgid, "setgid"],
+          [special.sticky, "sticky"],
+        ] as const
+      )
+        .filter(([on]) => on)
+        .map(([, name]) => name);
+      const specialClause =
+        specialNames.length > 0
+          ? ` The ${specialNames.join(", ")} bit${specialNames.length > 1 ? "s are" : " is"} also set.`
+          : "";
+
+      const sentence =
+        `${combined} is a ${typeLabel}, set with chmod ${mode}. ` +
+        `The owner can ${describeTriad(user)}. ` +
+        `The group can ${describeTriad(group)}. ` +
+        `Others can ${describeTriad(other)}.` +
+        specialClause;
+
+      explanation.innerHTML =
+        `<code>${combined}</code> is a ${typeLabel}, set with <code>chmod ${mode}</code>. ` +
+        `The owner can ${describeTriad(user)}. ` +
+        `The group can ${describeTriad(group)}. ` +
+        `Others can ${describeTriad(other)}.` +
+        specialClause;
+      live.textContent = sentence;
+    }
+
+    typeBtn.addEventListener("click", () => {
+      const current = typeBtn.textContent?.trim() || "-";
+      const next = TYPES[(TYPES.indexOf(current) + 1) % TYPES.length];
+      typeBtn.textContent = next;
+      typeBtn.setAttribute(
+        "aria-label",
+        `File type, currently ${TYPE_MEANINGS[next]}. Click to cycle.`,
+      );
+      pulse(typeBtn);
+      render();
+    });
+
+    bitBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const on = btn.dataset.on !== "true";
+        btn.dataset.on = on ? "true" : "false";
+        const scope = btn.dataset.scope;
+        const verb =
+          btn.dataset.bit === "r"
+            ? "read"
+            : btn.dataset.bit === "w"
+              ? "write"
+              : "execute";
+        btn.setAttribute(
+          "aria-label",
+          `${scope} ${verb}, currently ${on ? "on" : "off"}. Click to toggle.`,
+        );
+        pulse(btn);
+        render();
+      });
+    });
+
+    presets.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const mode = btn.dataset.preset ?? "644";
+        const [u, g, o] = mode.split("");
+        setTriad("user", octalDigitToTriad(u));
+        setTriad("group", octalDigitToTriad(g));
+        setTriad("other", octalDigitToTriad(o));
+        bitBtns.forEach((b) => pulse(b));
+        render();
+      });
+    });
+
+    specialToggles.forEach((btn) => {
+      const key = btn.dataset.special as keyof SpecialBits;
+      btn.addEventListener("click", () => {
+        special[key] = !special[key];
+        btn.setAttribute("aria-pressed", special[key] ? "true" : "false");
+        pulse(btn);
+        render();
+      });
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>(".permission-builder")
+    .forEach((el) => initBuilder(el));
+</script>

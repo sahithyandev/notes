@@ -1,7 +1,7 @@
 ---
 title: Unix Process Management
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.015Z
+lastUpdatedOn: 2026-09-28T14:28:29.720Z
 ---
 
 Unix identifies each [process](/s5/secure-app-dev/process-abstraction) by a PID, an integer unique among running processes. Additional OS context tracked per process includes the parent PID, process accounting (CPU time used), open files, working directory, signal handlers, and umask.
@@ -17,19 +17,22 @@ int fork(void);
 
 - Data in the child is a copy of the parent's, not shared.
 - The child differs from the parent only in its PID, its PPID, and the return value of `fork()`.
-- In parent, return value is the child's PID.
-- In child, return value is 0.
-- The return value on error is negative.
-
-<Note>
+- Return value of `fork()` is 0 in child, positive in parent, negative on error.
 
 Both parent and child continue executing the instructions after `fork()`. Since each has an independent memory copy, modifying a variable in one process does not affect the other's copy.
 
-</Note>
-
 ## Executing a New Program with Exec
 
-`fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family.
+`fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family, a group of 6 related system calls, not a single function, sharing a naming convention.
+
+- `l`  
+  Arguments passed as a list, e.g. `execl()`.
+- `v`  
+  Arguments passed as a vector (array), e.g. `execv()`.
+- `p`  
+  Searches the `PATH` environment variable for the executable, e.g. `execlp()`.
+- `e`  
+  Takes an explicit `envp` array instead of inheriting the caller's environment, e.g. `execle()`.
 
 ```c
 #include <unistd.h>
@@ -72,11 +75,7 @@ void exit(int status);
 
 `_exit()` (the system call) performs immediate termination: closes all open file descriptors, reparents any children to `init`, and sends `SIGCHLD` to the parent. It does not flush C stdio buffers.
 
-<Note>
-
-Returning from `main()` implicitly calls `exit()`. Most programs never call `exit()` explicitly.
-
-</Note>
+Returning from `main()` implicitly calls `exit()`.
 
 ## Parent-Child Synchronization
 
@@ -100,24 +99,18 @@ Variants:
 
 ## Process States in Unix
 
-Unix refines the [generic 5-state model](/s5/secure-app-dev/process-abstraction) with additional states.
+Unix refines the [generic process state model](/s3/operating-systems/process#process-states) with 1 additional state.
 
-- Running  
-  Process is executing.
-- Sleeping (Blocked)  
-  Process waiting for a resource, e.g. I/O.
 - Stopped  
   Process suspended by a `SIGSTOP` signal, resumed by `SIGCONT`.
-- Zombie  
-  Process has terminated via `_exit()` but its process table entry has not been cleaned up by a `wait()` call.
 
 <Note>
 
-Zombies exist because some process accounting information, PID and exit status, cannot be released until the parent retrieves it via `wait()`. A zombie cannot be killed, it is already dead.
+A zombie cannot be killed, it is already dead. Its process table entry is retained solely until the parent retrieves its exit status via `wait()`.
 
 </Note>
 
-Zombie process arises in 2 cases:
+Zombie arises in 2 cases:
 
 - Parent terminates before the child  
   `init` becomes the child's pseudo parent and calls `wait()` on its behalf.

@@ -1,12 +1,14 @@
 ---
 title: Linux Discretionary Access Control
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.025Z
+lastUpdatedOn: 2026-09-28T14:28:29.738Z
 ---
 
 Linux's traditional security model grants a process running with root privileges unrestricted access, while other accounts can do much less. This is Discretionary Access Control (DAC), and attackers therefore target root privileges.
 
 In Linux, most system resources, including memory, device drivers, and named pipes, are represented as files, so file system security is central to the model.
+
+The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only root may load or unload kernel modules.
 
 ## Users and Groups
 
@@ -17,23 +19,17 @@ In Linux, most system resources, including memory, device drivers, and named pip
 
 Users and groups are managed with `useradd`, `usermod`, `userdel`, and the equivalent `group*` commands.
 
-<Note>
-
-Users and groups are not files themselves, they are entries in these configuration files.
-
-</Note>
-
 ## File Permissions
 
 Every file has 2 owners, a user and a group, plus a third permission set for all other users. Each of the 3 sets carries read, write, and execute permissions, in the order user, group, other:
 
-```
--rw-rw-r--  1  maestro  user  35414  Mar 25 01:38  baton.txt
-```
-
 Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read contributes 4, write 2, execute 1, summed per set (user, group, other).
 
+<PermissionBreakdown bits="-rw-rw-r--" />
+
 ### Directory Permissions
+
+Same permissions are applied to the directory.
 
 - Read  
   List the directory's contents.
@@ -44,7 +40,9 @@ Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read c
 
 ### Sticky Bit
 
-Originally used to lock a file in memory, now applied to directories to restrict deletion: if set, a user must own a file to delete it, even with write permission on the directory. Set with `chmod +t`, shown as a `t` or `T` flag in the listing. Applies only to that directory, not to child directories.
+Originally used to lock a file in memory, now applied to directories to restrict deletion: if set, a user must own a file to delete it, even with write permission on the directory. Set with `chmod +t`. Applies only to that directory, not to child directories.
+
+The sticky bit has no character position of its own. It overloads the other-execute position in the listing: `t` if that execute bit is also set, `T` if not.
 
 ### SetUID and SetGID
 
@@ -53,6 +51,12 @@ Originally used to lock a file in memory, now applied to directories to restrict
 - SetGID  
   The program runs as a member of the group that owns it, regardless of who executes it.
 
+SetUID and SetGID are permission bits on the executable file, like the sticky bit, not functions the program calls. The kernel applies them during `exec()`: it sets the process's effective UID or GID from the file's owner or group before any of the program's own code runs.
+
+Like the sticky bit, neither has a character position of its own. SetUID overloads the user-execute position, SetGID the group-execute position: `s` if the underlying execute bit is also set, `S` if not.
+
+A running process may separately call the `setuid()` or `setgid()` system calls to change its own UID or GID. A setuid root program typically calls `setuid()` itself once its privileged work is done, permanently dropping back to an unprivileged UID for the remainder of execution.
+
 <Note>
 
 SetUID and SetGID are dangerous when set on a file owned by root or another privileged account, and should only be used on executable binaries, not shell scripts.
@@ -60,15 +64,6 @@ SetUID and SetGID are dangerous when set on a file owned by root or another priv
 </Note>
 
 SetUID has no effect on directories. SetGID on a directory causes any file created inside to inherit the directory's group, useful when users share files across a common group without manually changing ownership.
-
-## Kernel vs User Space
-
-- Kernel space  
-  Memory used by the Linux kernel and its loadable modules, e.g. device drivers.
-- User space  
-  Memory used by all other processes.
-
-Since the kernel enforces Linux's DAC, isolating kernel space from user space is security-critical: kernel space is never swapped to disk, and only root may load or unload kernel modules.
 
 ## setuid Root Vulnerabilities
 

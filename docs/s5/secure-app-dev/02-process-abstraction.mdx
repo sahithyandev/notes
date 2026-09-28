@@ -1,71 +1,33 @@
 ---
 title: Process Abstraction
+prereqs:
+  - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.007Z
+lastUpdatedOn: 2026-09-28T14:28:29.697Z
 ---
 
-A process is a dynamic abstraction describing the state required to describe a running program. It tracks 3 contexts.
+A process is a dynamic abstraction describing the state required to describe a running program, distinct from the [program](/s3/operating-systems/process#program) it instantiates. Its state splits into 3 contexts, each a distinct target when reasoning about exploits.
 
 - Memory context  
-  Code, data, dynamically allocated memory.
+  Code, data, dynamically allocated memory. Corrupted by memory safety violations.
 - Hardware context  
-  Registers, program counter, stack pointer.
+  Registers, program counter, stack pointer. Corrupting these hijacks control flow.
 - OS context  
-  Process ID, process state, resources used.
+  Process ID, process state, resources used. Governs what the process is authorized to access.
 
 <Note>
 
-A process is distinct from the program it runs. The same program can have many process instances, each with its own state.
+Process states, transitions, and the full context breakdown are covered under [process states](/s3/operating-systems/process#process-states) and [process context](/s3/operating-systems/process#context).
 
 </Note>
 
-## Process State
+## Process Control Block
 
-Process state describes what a process is currently doing. The set of states and their transitions form a process model.
+The Process Control Block (PCB) stores all 3 contexts for a single process. The kernel maintains 1 PCB per process, conceptually organized as a single process table.
 
-A 2-state model (Ready, Running) is insufficient to describe real systems, so a generic 5-state model is used.
-
-- New  
-  Process created, may still be under initialization, not yet ready.
-- Ready  
-  Process waiting to run.
-- Running  
-  Process being executed on the CPU.
-- Blocked  
-  Process waiting for an event, cannot execute until the event occurs.
-- Terminated  
-  Process finished execution, may require OS cleanup.
-
-### State Transitions
-
-- Create  
-  nil to New, a new process is created.
-- Admit  
-  New to Ready, process is ready to be scheduled.
-- Switch  
-  Ready to Running, process selected to run by the scheduler.
-- Switch  
-  Running to Ready, process releases the CPU voluntarily or is preempted.
-- Event wait  
-  Running to Blocked, process requests an event, resource, or service not yet available, e.g. a system call waiting for I/O.
-- Event occurs  
-  Blocked to Ready, the awaited event occurs and the process can continue.
-
-<Note>
-
-With 1 CPU, at most 1 process is in the Running state at any time. With $m$ CPUs, up to $m$ processes are Running concurrently. Different processes may sit in different states simultaneously, and more than 1 process can occupy the Ready or Blocked queues.
-
-</Note>
-
-## Process Control Block and Process Table
-
-The Process Control Block (PCB), aka. a Process Table Entry, is the entire execution context stored by the kernel for a single process. The kernel maintains one PCB per process, conceptually organized as a single process table.
-
-Interesting design issues:
+Design issues:
 
 - Scalability  
-  How many concurrent processes can the table support.
+  How many concurrent processes the table can support.
 - Efficiency  
   Access must be efficient with minimum space wastage.
-
-The PCB stores the OS context (PID, process state), the hardware context (PC, stack pointer, frame pointer, general purpose registers), and memory region information pointing to the process's text, data, heap, and stack.

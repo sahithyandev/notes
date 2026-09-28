@@ -3,7 +3,7 @@ title: Secure Software Development Framework
 prereqs:
   - s5/computer-security/confidentiality-integrity-availability#access-control
 dateCreated: 2026-09-03T07:41:50.444Z
-lastUpdatedOn: 2026-09-28T05:07:15.095Z
+lastUpdatedOn: 2026-09-28T14:28:29.823Z
 ---
 
 NIST Special Publication 800-218, the Secure Software Development Framework (SSDF). It defines outcomes to aim for, not tools to run, so it fits Agile, Waterfall, or DevSecOps. 42 tasks grouped into 19 practices under 4 pillars.
@@ -14,27 +14,69 @@ Put people, rules, and tooling in place before coding starts.
 
 ### Train and Vet Staff
 
-Every new developer takes secure coding training. Anyone touching sensitive code gets a clearance check. Security policies are distributed and quiz-validated.
+- Role-based training  
+  Every developer completes secure coding training scoped to what their role touches, before they get commit access to production code.
+- Refresher cycles  
+  Training repeats on a schedule, not once at hiring, since threats and languages in use change.
+- Personnel vetting  
+  Anyone with access to sensitive code or systems passes a background or clearance check matched to that access level.
+- Policy acknowledgment  
+  Security policies are distributed to staff and comprehension is checked with a quiz or signed acknowledgment, not just a broadcast email.
 
 ### Control the Toolchain
 
-Build-system scanners are kept fed with fresh vulnerability data. Libraries come from a curated, pre-vetted list. Unapproved third-party tools are blocked.
+- Approved toolchain  
+  Compilers, build systems, test frameworks, and CI runners are drawn from an approved list, each with a documented, security-reviewed configuration.
+- Fed vulnerability data  
+  Build-system scanners pull fresh CVE feeds so a newly disclosed flaw in a dependency is caught on the next build, not the next audit.
+- Curated library list  
+  Third-party libraries come from a pre-vetted registry. A developer cannot pull an arbitrary package into the build.
+- Blocked unapproved tools  
+  Tooling outside the approved list is blocked at the network or package-manager level, not just discouraged by policy.
 
 ### Define Security Goals
 
-A ban list names bug classes that must never reach production. Remediation deadlines are set per severity, for example critical within 7 days. Security tests have a pass mark.
+- Bug ban list  
+  Names classes of vulnerability, for example SQL injection or hardcoded credentials, that must never reach production regardless of severity elsewhere.
+- Severity-based deadlines  
+  Each severity tier has a fix-time rule, for example critical within 7 days, high within 30.
+- Security test pass mark  
+  A minimum score or zero-critical-finding bar on security testing gates release, applied the same way a functional test suite does.
 
 ### Lock Down the Environment
 
-Developer accounts use MFA and access logging. Build servers sit on an isolated network. Dev and deployment environments are separate. Access is role-based, backed by a formal [access control model](/s5/computer-security/confidentiality-integrity-availability#access-control).
+- MFA and logging  
+  Developer accounts require multi-factor authentication, and every access to source or build systems is logged.
+- Isolated build servers  
+  Build servers sit on a network segment separate from general corporate traffic, reducing the blast radius of an unrelated compromise.
+- Separated environments  
+  Development and deployment environments are distinct systems, so a mistake or compromise in one does not directly reach the other.
+- Role-based access  
+  Access to each environment follows a formal [access control model](/s5/computer-security/confidentiality-integrity-availability#access-control), not ad hoc sharing of credentials.
 
 ### Track Progress with Metrics
 
-Training completion and quiz scores. Share of repos with active scanners. Count of unapproved libraries. Releases shipped with known flaws. On-time critical-fix rate. MFA adoption.
+- Training coverage  
+  Share of staff completing training and their quiz scores.
+- Scanner coverage  
+  Share of repositories with an active vulnerability scanner attached.
+- Unapproved library count  
+  Number of dependencies found outside the curated list.
+- Known-flaw releases  
+  Count of releases shipped with a known, unremediated vulnerability.
+- Fix-time compliance  
+  Share of critical fixes landed within their deadline.
+- MFA adoption  
+  Share of developer accounts with multi-factor authentication enabled.
 
 ### Enforce a CI/CD Security Gate
 
-The gate must fail hard with exit code 1, so a committed API key or vulnerable library stops the build. Run cheap code checks before expensive dependency builds.
+- Hard fail  
+  The gate exits with a non-zero status on any violation, so a committed API key or a vulnerable library stops the build outright rather than logging a warning.
+- Cheap checks first  
+  Fast checks such as secret scanning and linting run before slow ones such as full dependency builds, so a doomed build fails early.
+- No bypass path  
+  The gate cannot be skipped by a developer under deadline pressure. An override, if one exists, requires a second approver.
 
 ## Protect the Software (PS)
 
@@ -42,19 +84,43 @@ Stop code and released artifacts from being tampered with or leaked, at rest and
 
 ### Protect All Forms of Code
 
-Source lives in version control with least-privilege access and mandatory review before merge. Sign commits where feasible so authorship is verifiable.
+- Version-controlled source  
+  All source lives in version control, never on a developer's local disk alone.
+- Least-privilege access  
+  Read and write access to a repository is scoped to the people who need it, not the whole organization.
+- Mandatory review  
+  A change merges only after review by someone other than its author.
+- Signed commits  
+  Commits are cryptographically signed where feasible, so authorship of a change is verifiable after the fact.
 
 ### Verify Integrity on Release
 
-Publish a cryptographic hash and signature for every release. Consumers then check that the download matches the build.
+- Published hash  
+  Every release ships with a cryptographic hash of its artifact.
+- Published signature  
+  Every release ships with a signature from the publishing organization's key.
+- Consumer verification  
+  A consumer recomputes the hash and checks the signature before trusting a downloaded artifact, catching tampering in transit or on a mirror.
 
 ### Archive Each Release
 
-Keep the exact source, build inputs, and settings for every shipped version. An old release can then be rebuilt and investigated after a vulnerability report.
+- Exact source snapshot  
+  The precise source tree used for each shipped version is retained, not just the latest `main` branch.
+- Build inputs and settings  
+  Build parameters, compiler flags, and dependency versions used for that release are retained alongside the source.
+- Rebuildability  
+  An archived release can be rebuilt and investigated after a vulnerability report, even if the live codebase has since moved on.
 
 ### Record Provenance
 
-List what went into each build: dependencies, build tools, parameters. This is usually a Software Bill of Materials (SBOM). Downstream users use it to assess exposure to a newly disclosed flaw.
+- Dependency list  
+  Every dependency pulled into a build, direct and transitive, is recorded.
+- Build tool and parameter list  
+  The tools and settings used to produce the artifact are recorded alongside the dependencies.
+- Software Bill of Materials  
+  This record is usually published as a Software Bill of Materials (SBOM), a standardized manifest of a build's contents.
+- Downstream exposure assessment  
+  A consumer checks a newly disclosed component flaw against the SBOM to know immediately whether they are exposed, without re-auditing the whole artifact.
 
 ## Produce Well-Secured Software (PW)
 
@@ -62,23 +128,50 @@ Design, write, and test so that few vulnerabilities exist at release, and those 
 
 ### Start with Security Requirements
 
-Model how the design could be attacked through data flows, trust boundaries, and abuse cases. Revise the architecture to remove or mitigate each threat.
+- Threat modeling  
+  Data flows, trust boundaries, and abuse cases are modeled before implementation starts, so an attack path is a design question rather than a post-hoc discovery.
+- Architecture revision  
+  Each identified threat is removed or mitigated by revising the architecture, not deferred to a later patch.
 
 ### Reuse Well-Secured Components
 
-Prefer vetted internal or third-party modules over rewriting auth, crypto, or parsing code. Track their versions and known flaws.
+- Prefer vetted modules  
+  Authentication, cryptography, and parsing use vetted internal or third-party components instead of custom implementations, since these are the areas most prone to subtle, exploitable mistakes.
+- Version and flaw tracking  
+  Reused components have their versions and known vulnerabilities tracked for the life of the product, not just at the time they were first adopted.
 
 ### Follow Secure Coding Practices
 
-Use safer languages and library functions, compiler warnings, and hardening flags. Follow the organization's coding standard. Keep humans away from error-prone tasks a tool can do.
+- Safer languages and functions  
+  Memory-safe languages and hardened library functions are preferred over ones known to be error-prone, where the choice is available.
+- Compiler warnings and hardening flags  
+  Builds enable compiler warnings and hardening flags such as stack protection, and treat new warnings as build failures.
+- Organizational coding standard  
+  Developers follow a documented coding standard rather than individual style, so review and tooling can assume a consistent baseline.
+- Tool over human for error-prone tasks  
+  A task with a known high human error rate, such as manual memory management or manual escaping, is handed to a tool wherever one exists.
 
 ### Review and Test Code
 
-Combine human review with static analysis, then dynamic analysis and fuzzing. Include negative tests for what must not happen. Fix root causes, not symptoms.
+- Human review  
+  A person reviews code for logic and security issues a tool would miss.
+- Static analysis  
+  Automated static analysis runs on every change to catch known-pattern flaws at low cost.
+- Dynamic analysis and fuzzing  
+  Running code is tested with dynamic analysis and fuzzing to catch flaws that only appear at execution time.
+- Negative testing  
+  Tests assert what must not happen, for example that an unauthenticated request is rejected, not only that the happy path succeeds.
+- Root cause fixes  
+  A finding is fixed at its underlying cause, not patched at the symptom that exposed it.
 
 ### Configure Defaults Securely
 
-Ship with least privilege, features off, and logging on, so a default install is safe.
+- Least privilege by default  
+  A default install runs with the minimum privilege it needs, not the maximum available.
+- Features off by default  
+  Optional features, especially ones that expand attack surface, ship disabled until explicitly enabled.
+- Logging on by default  
+  Security-relevant logging is enabled out of the box, since a default install is often never revisited.
 
 ## Respond to Vulnerabilities (RV)
 
@@ -86,12 +179,29 @@ Find and fix flaws that reach production, and feed the lessons back into develop
 
 ### Identify Vulnerabilities Continuously
 
-Run a disclosure programme with a known intake channel. Monitor advisories for used components. Keep scanning released software.
+- Disclosure programme  
+  A known, monitored intake channel exists for external reports, for example a security contact address or a bug bounty programme.
+- Advisory monitoring  
+  Security advisories for every component in use are monitored on an ongoing basis, not checked only at release time.
+- Continuous scanning  
+  Released software is rescanned periodically, since a component clean at release can gain a disclosed flaw later.
 
 ### Assess, Prioritise, and Remediate
 
-Confirm each report. Judge severity and exploitability. Patch within the fix-time rule for that severity. Disclose to affected users.
+- Confirmation  
+  Each report is reproduced and confirmed before work starts on it.
+- Severity and exploitability judgment  
+  Confirmed reports are ranked by severity and how easily they can be exploited in practice.
+- Deadline-bound patching  
+  Each report is patched within the fix-time rule set for its severity tier under Define Security Goals.
+- Disclosure to affected users  
+  Users affected by a confirmed vulnerability are notified, not just the ones who happen to check a changelog.
 
 ### Analyse Root Cause
 
-For each confirmed vulnerability, find the underlying cause. Check whether similar flaws exist elsewhere. Update requirements, design, tooling, or training so the class does not recur.
+- Underlying cause identification  
+  Each confirmed vulnerability is traced to its underlying cause, not just the line of code that manifested it.
+- Similar flaw search  
+  The codebase is checked for the same class of flaw elsewhere, since one instance rarely occurs in isolation.
+- Feedback into process  
+  Requirements, design guidance, tooling, or training are updated so the class of flaw does not recur, closing the loop back to Prepare the Organization.
