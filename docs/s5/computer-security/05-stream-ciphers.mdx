@@ -1,7 +1,7 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T03:47:59.461Z
+lastUpdatedOn: 2026-09-28T03:52:45.606Z
 slug: s5/computer-security/stream-ciphers
 sidebar:
   order: 5
@@ -84,15 +84,8 @@ To encrypt a message $m$ (of length $n$), a keystream $k$ (of length $n$) is gen
 
 Impractical as it requires a key as long as the message and never reused, but applications need a short key and reuse it across many messages.
 
-### Ron's Cipher (RC4)
+### RC4
 
-RC4, designed by Ron Rivest in 1987, is a byte-oriented keystream generator built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an [LFSR](/s5/computer-security/linear-feedback-shift-registers).
-
-- Key Scheduling Algorithm (KSA)  
-  Initialises $S$ to the identity permutation, then scrambles it by repeatedly swapping entries, using the secret key (1 to 256 bytes, reused cyclically) to bias each swap.
-- Pseudo-Random Generation Algorithm (PRGA)  
-  Produces 1 keystream byte per step: 2 indices into $S$ are advanced and their entries swapped, then the byte at the sum of the 2 swapped entries (mod 256) is output.
-
-Each output byte depends on the entire current permutation rather than a fixed linear recurrence, so RC4 has none of the structure the LFSR-based generators above rely on, at the cost of a much larger internal state ($256!$ possible permutations) than the key itself.
+[RC4](/s5/computer-security/rc4) is a widely deployed keystream generator built around a permutation of the 256 byte values, rather than an [LFSR](/s5/computer-security/linear-feedback-shift-registers).
 
 RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, but is now considered broken. The first output bytes are measurably biased toward certain values, letting an attacker who sees the same key reused across enough sessions recover plaintext without ever recovering the key, and RC4 has since been deprecated in the protocols that used it.

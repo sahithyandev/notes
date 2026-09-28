@@ -1,0 +1,69 @@
+---
+title: RC4
+dateCreated: 2026-09-28T00:00:00.000Z
+slug: s5/computer-security/rc4
+sidebar:
+  order: 7
+prev: true
+next: true
+lastUpdatedOn: 2026-09-28T03:52:45.641Z
+---
+
+RC4, designed by Ron Rivest in 1987, is a byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an [LFSR](/s5/computer-security/linear-feedback-shift-registers).
+
+$$
+S: \{0, \ldots, 255\} \to \{0, \ldots, 255\}
+$$
+
+Generating the keystream has 2 phases: the Key Scheduling Algorithm builds an initial permutation from the key, and the Pseudo-Random Generation Algorithm repeatedly mutates it to emit 1 output byte per step.
+
+## Key Scheduling Algorithm
+
+Initialises $S$ to the identity permutation, then scrambles it using the secret key $K$ (1 to 256 bytes), reused cyclically if shorter than 256 bytes.
+
+$$
+\begin{aligned}
+&S[i] = i, \quad i = 0, \ldots, 255 \\
+&j = 0 \\
+&\text{for } i = 0 \text{ to } 255: \\
+&\quad j = (j + S[i] + K[i \bmod \text{len}(K)]) \bmod 256 \\
+&\quad \text{swap } S[i] \text{ and } S[j]
+\end{aligned}
+$$
+
+- $i$: iterates once over every index in order.
+- $j$: a running value seeded by the key, deciding which entry $i$ is swapped with.
+
+After 256 swaps, every byte value has moved to a key-dependent position, and $S$ passes unchanged into the PRGA.
+
+## Pseudo-Random Generation Algorithm
+
+Produces the keystream 1 byte at a time, advancing $S$ further at every step.
+
+$$
+\begin{aligned}
+&i = 0, \quad j = 0 \\
+&\text{repeat:} \\
+&\quad i = (i + 1) \bmod 256 \\
+&\quad j = (j + S[i]) \bmod 256 \\
+&\quad \text{swap } S[i] \text{ and } S[j] \\
+&\quad k = S[(S[i] + S[j]) \bmod 256]
+\end{aligned}
+$$
+
+$k$ is the output byte, XORed with the corresponding plaintext byte exactly as in any other stream cipher.
+
+Each output byte depends on the entire current permutation rather than a fixed linear recurrence, so RC4 has none of the structure LFSR-based generators rely on, at the cost of a much larger internal state ($256!$ possible permutations) than the key itself.
+
+## Security Analysis
+
+RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, but every major use of it has since been broken or deprecated.
+
+- Key scheduling bias  
+  The KSA leaves a detectable statistical bias in the early PRGA output: the second keystream byte equals 0 with probability close to $2/256$ instead of the expected $1/256$, so the start of every keystream leaks information about the key.
+- Related-key weakness  
+  WEP prepends a 24-bit public IV to the long-term key for every packet. For certain weak IV values, the first KSA swaps leak 1 byte of the long-term key directly into the first PRGA output byte. The Fluhrer-Mantin-Shamir attack collects packets under enough weak IVs to recover the entire long-term key, breaking WEP outright.
+- Keystream bias  
+  Beyond the first bytes, the PRGA output is not perfectly uniform either. Digraph biases such as Mantin's ABSAB bias let an attacker who sees the same plaintext encrypted under many unrelated keys, as in a broadcast setting, recover it by majority vote across sessions, without recovering any key.
+
+Dropping the first 256 or more output bytes and never deriving a key by concatenating it with a public IV patches the specific attacks above, but does not restore RC4 to a currently recommended cipher. Modern protocols use [AES](/s5/computer-security/aes) or other authenticated stream ciphers instead.
