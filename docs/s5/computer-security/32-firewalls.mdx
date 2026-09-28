@@ -1,0 +1,84 @@
+---
+title: Firewalls
+slug: s5/computer-security/firewalls
+dateCreated: 2026-09-28T03:03:26.410Z
+lastUpdatedOn: 2026-09-28T03:20:31.154Z
+sidebar:
+  order: 32
+prev: true
+next: true
+---
+
+A firewall is a device that protects a private network from outside intrusions by examining every packet that passes through it against a set of rules. A firewall is not a virus guard.
+
+## Stance
+
+The stance dictates what a firewall does in the absence of a matching rule. The default stance blocks everything unless explicitly allowed.
+
+## Interfaces
+
+- External interface  
+  Connects to an untrusted network, typically the Internet.
+- Trusted interface  
+  Connects to the internal network, requiring maximum protection.
+- Optional interface  
+  Connects to a DMZ or another semi-trusted zone, hosting public web, mail, FTP, or DNS servers.
+
+## Security Policy
+
+A firewall's security policy specifies:
+
+- Which hosts send or receive which kinds of traffic.
+- Which communication links require authentication or encryption.
+- Which users are authorized to use which services through the firewall.
+- Which communication protocols and content types are allowed.
+- Which times of day users may browse the web.
+- Which categories of website users may visit.
+
+## Packet Filtering
+
+Packet filtering inspects a packet's header, filtering on IP address, port, protocol, or type of service, and treats incoming and outgoing packets separately.
+
+- Operates at the network and transport layers.
+- Cannot detect stateless attacks such as [denial of service](/s5/computer-security/network-attacks#denial-of-service), since it judges every packet independently.
+
+## Circuit Relay
+
+Circuit relay filters using information outside the packet header, such as the user or time of day, and tracks connection state dynamically instead of judging each packet in isolation.
+
+Combining packet filtering with circuit relay is more effective than either alone.
+
+## Security Proxy
+
+A security proxy intercepts each packet, strips its wrapping, inspects and processes the content, then re-wraps and forwards it, detecting forbidden content that packet filtering and circuit relay cannot see.
+
+- Blocks entire categories of attack rather than individual packets.
+- Conceals details of internal servers from the public Internet.
+- Adds processing delay to every packet.
+
+| Firewall type  | Lowest layer inspected |
+| -------------- | ---------------------- |
+| Packet filter  | Network                |
+| Circuit relay  | Transport              |
+| Security proxy | Application            |
+
+A lower layer means less information is available to the filter, but less processing overhead per packet.
+
+## Network Address Translation
+
+Network address translation (NAT) rewrites the addresses of packets crossing a network boundary, translating between an address on one network and an address on another. It is also called IP masquerading or port forwarding.
+
+- Hides the internal hosts of one network from the other.
+- Static NAT maps each internal address to a fixed external address.
+- Dynamic NAT maps an internal address to an external address chosen from a pool.
+- 1-to-1 NAT maps each internal address to exactly 1 dedicated external address.
+
+## Virtual Private Networks
+
+A virtual private network (VPN) gives 2 hosts an encrypted channel over a public network, using a protocol such as IPsec, L2TP, or PPTP.
+
+- Encrypts traffic end to end.
+- Encryption overhead trades bandwidth and processing power for confidentiality.
+- This overhead can noticeably reduce throughput on a high-speed connection.
+
+A VPN server needs to be dedicated to the task, since a server shared with other services cannot sustain the added processing load.

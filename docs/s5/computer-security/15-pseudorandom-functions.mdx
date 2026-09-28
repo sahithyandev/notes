@@ -1,0 +1,61 @@
+---
+title: Pseudorandom Functions
+slug: s5/computer-security/pseudorandom-functions
+dateCreated: 2026-09-28T03:02:07.502Z
+lastUpdatedOn: 2026-09-28T03:20:30.875Z
+sidebar:
+  order: 15
+prev: true
+next: true
+---
+
+A pseudorandom function (PRF) family is a set of efficiently computable functions $\{f_k : \{0,1\}^n \to \{0,1\}^n\}_{k \in \{0,1\}^n}$, indexed by a key $k$, that no efficient adversary can distinguish from a function chosen uniformly at random from all functions on $\{0,1\}^n$.
+
+## Security Game
+
+A distinguisher $D$ is given oracle access to a function $f$ and must output a single bit guessing whether $f$ was drawn as $f_k$ for a random key $k$, or as a uniformly random function $R$.
+
+$$
+\mathrm{Adv}_{\mathrm{PRF}}(D) = \left| \Pr[D^{f_k} = 1] - \Pr[D^{R} = 1] \right|
+$$
+
+A family is a secure PRF **iff** $\mathrm{Adv}_{\mathrm{PRF}}(D)$ is negligible for every probabilistic polynomial-time (PPT) $D$, over the random choice of $k$ or $R$.
+
+- The number of oracle queries $D$ may make is polynomial in $n$, since $D$ itself runs in polynomial time.
+- $D$ never sees $k$, only input-output pairs of the oracle it queries.
+
+## Pseudorandom Permutations
+
+A pseudorandom permutation (PRP) family restricts each $f_k$ to a bijection on $\{0,1\}^n$, indistinguishable from a permutation chosen uniformly at random from all permutations on $\{0,1\}^n$, rather than from all functions.
+
+[Block ciphers](/s5/computer-security/block-ciphers) are designed to be PRP families: $e_k$ plays the role of $f_k$, and $d_k = f_k^{-1}$ must also be efficiently computable, a requirement a general PRF has no need for.
+
+<Note>
+
+Every PRP family is also a PRF family, under a slightly larger advantage bound. A permutation never repeats an output, so a distinguisher can only exploit the missing collisions a random function would otherwise show, and that gap is negligible once $n$ is large enough.
+
+</Note>
+
+## Construction from a Pseudorandom Generator
+
+A pseudorandom generator (PRG) $G : \{0,1\}^n \to \{0,1\}^{2n}$ stretches a short seed into a longer pseudorandom string. Write $G_0(k)$ and $G_1(k)$ for the first and second $n$-bit halves of $G(k)$.
+
+The Goldreich-Goldwasser-Micali (GGM) construction builds a PRF from $G$. To evaluate $f_k(x)$ for an $n$-bit input $x = x_1 x_2 \cdots x_n$, walk a binary tree of depth $n$ rooted at $k$, taking the left half $G_0$ at each $0$ bit of $x$ and the right half $G_1$ at each $1$ bit.
+
+$$
+f_k(x_1 x_2 \cdots x_n) = G_{x_n}(\cdots G_{x_2}(G_{x_1}(k)) \cdots)
+$$
+
+- Every leaf of the tree corresponds to a distinct input $x$, reached by a distinct sequence of $n$ PRG calls.
+- A secure PRG makes each level indistinguishable from random, so the composed function is indistinguishable from random overall.
+
+This shows a PRF exists whenever a PRG does, and a PRG exists whenever a one-way function does.
+
+## Uses
+
+- Message authentication  
+  A MAC over a fixed-length message $m$ under key $k$ can be computed directly as $f_k(m)$.
+- Counter mode encryption  
+  CTR mode, in [block encryption schemes](/s5/computer-security/block-ciphers), uses $f_k$ evaluated at a counter as the keystream. Only the PRF property is needed, not the PRP's invertibility.
+- Key derivation  
+  A single master key $k$ produces many independent-looking sub-keys $f_k(1), f_k(2), \ldots$

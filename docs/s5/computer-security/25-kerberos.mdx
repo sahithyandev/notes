@@ -1,10 +1,10 @@
 ---
 title: Kerberos
 dateCreated: 2026-09-14T00:00:00.000Z
-lastUpdatedOn: 2026-09-16T05:43:00.827Z
+lastUpdatedOn: 2026-09-28T03:20:31.056Z
 slug: s5/computer-security/kerberos
 sidebar:
-  order: 24
+  order: 25
 prev: true
 next: true
 ---
@@ -39,8 +39,6 @@ It solves 2 problems the [2-party authentication protocols](/s5/computer-securit
 - SGT  
   Service Granting Ticket, proof that $C$ has authenticated to the TGS for $V$. Encrypted under $K_V$, so only the TGS and $V$ can read it, not $C$.
 
-Each workstation runs a client installed once by the sysadmin with root permission, regardless of how many Users later log in through it.
-
 ## Keys
 
 - $K_C$  
@@ -54,7 +52,7 @@ Each workstation runs a client installed once by the sysadmin with root permissi
 - $K_{C,V}$  
   Session key for $C$ and $V$, chosen fresh by the TGS for this request.
 
-$pwd$ itself is stored nowhere, not on any workstation and not at the KDC. Only $K_C$, derived from it, is stored at the KDC for verification. $C$ shares exactly 1 long-term secret with the AS ($K_C$) and 0 with the TGS or with any Service, since $K_{C,T}$ and $K_{C,V}$ are freshly generated session keys rather than long-term shared secrets. The AS and TGS share exactly 1 long-term key ($K_T$), and a Service shares exactly 1 long-term key with the TGS ($K_V$) but 0 with the AS.
+$C$ shares exactly 1 long-term secret with the AS ($K_C$) and 0 with the TGS or any Service, since $K_{C,T}$ and $K_{C,V}$ are freshly generated per session. The AS and TGS share 1 long-term key ($K_T$), and the TGS and $V$ share 1 ($K_V$), but the AS shares 0 with $V$.
 
 Because $K_C$ never changes across logins, an attacker who captures 1 $AS\_REP$ can mount an offline dictionary attack against $pwd$ at leisure, without further interaction with the AS. This is the main weakness of password-based Kerberos.
 
@@ -80,7 +78,7 @@ $$
 AS\_REP = [\text{Enc}_{K_C}(T, timestamp_{AS}, lifetime_{granted}, K_{C,T}), TGT]
 $$
 
-The client prompts the User for $pwd$, computes $K_C$, and decrypts the reply to recover $K_{C,T}$. It stores $K_{C,T}$ and the TGT in the User's credential cache. $K_C$ is recomputed every login and never persisted, so the client never needs to store the User's password.
+The client prompts the User for $pwd$, computes $K_C$, and decrypts the reply to recover $K_{C,T}$. It stores $K_{C,T}$ and the TGT in the User's credential cache.
 
 ### 3. Ticket Granting Server Request
 
@@ -132,4 +130,4 @@ $V$ decrypts the SGT with $K_V$ to recover $K_{C,V}$, then decrypts $Authenticat
 
 Steps 3 to 5 repeat for every Service $C$ wants to reach, each time presenting a fresh Authenticator but reusing the TGT until it expires. Only steps 1 to 2 need the User's password.
 
-Only $AS\_REQ$ travels fully in the clear. Every later message carries fields encrypted under whichever key its sender shares with the intended reader of that field, so confidentiality is per-field rather than per-channel: the AS creates the TGT under $K_T$ and the rest of $AS\_REP$ under $K_C$, $C$ creates each Authenticator under that step's session key ($K_{C,T}$ or $K_{C,V}$), and the TGS creates the SGT under $K_V$ and the rest of $TGS\_REP$ under $K_{C,T}$.
+Only $AS\_REQ$ travels fully in the clear. Confidentiality is per-field, not per-channel: each field is encrypted under whichever key its sender shares with the intended reader, e.g. the TGT under $K_T$, an Authenticator under that step's session key, and the SGT under $K_V$.

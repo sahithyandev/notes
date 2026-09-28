@@ -1,0 +1,44 @@
+---
+title: Server Protection
+slug: s5/computer-security/server-protection
+dateCreated: 2026-09-28T02:55:20.050Z
+lastUpdatedOn: 2026-09-28T03:20:31.168Z
+sidebar:
+  order: 33
+prev: true
+next: false
+---
+
+Server protection secures the machines that host data and applications, since compromise from inside a network is at least as common as attack from outside it.
+
+A user with legitimate access at the power-user level can:
+
+- Alter a web page to divert submitted data to another location.
+- Create a backdoor user account.
+- Delete log entries that would reveal the compromise.
+- Reconfigure the system.
+
+## ServerLock
+
+ServerLock protects a server's integrity by denying unauthorized changes, rather than trying to detect an attack after it happens.
+
+- Locks itself, critical OS files and configuration, the registry, and user-defined resources.
+- Denies write or delete access based on the resource being protected, not on the identity of the user requesting it, so even a system administrator cannot bypass it.
+- A locked resource must be explicitly unlocked before it can be changed.
+
+ServerLock sits between user space and kernel space, intercepting every system call, implemented as a device driver on Windows or a loadable kernel module on Solaris.
+
+It can guard:
+
+- Existing files or registry keys against change.
+- New files or registry keys against creation.
+- The IIS metabase, user accounts, system date and time, and the stack buffer.
+
+Custom rules extend it to other resources.
+
+## Centralized Antivirus Management
+
+A central console updates virus definitions once, then deploys them to every server.
+
+- Preserves bandwidth relative to each server fetching its own update.
+- Lets mail servers run specialized mail-scanning software distinct from general server antivirus.

@@ -1,0 +1,85 @@
+---
+title: Network Attacks
+slug: s5/computer-security/network-attacks
+dateCreated: 2026-09-28T03:03:26.380Z
+lastUpdatedOn: 2026-09-28T03:20:31.144Z
+sidebar:
+  order: 31
+prev: true
+next: true
+---
+
+## Denial of Service
+
+A denial of service (DoS) attack degrades performance or crashes a server, without granting the attacker access to it. [Buffer overflow](/s5/computer-security/buffer-overflow) and [CGI exploitation](#cgi-exploitation) are also used as DoS vectors.
+
+### Ping of Death
+
+Exploits bugs in the ICMP handling of some operating systems.
+
+- Sends an ICMP echo request larger than 64 KB.
+- The oversized packet crashes the host.
+
+An OS patch that rejects oversized ICMP packets closes the vulnerability.
+
+### SYN Flooding
+
+Exploits the TCP 3-way handshake.
+
+- The attacker sends SYN packets from unreachable source addresses.
+- Each SYN allocates a half-open connection on the server, which never completes.
+- Enough half-open connections exhaust the server's connection table.
+
+No general solution exists. Minimizing the number of allowed half-open connections, and shortening the connection timeout, both reduce exposure.
+
+### Ping Flood and Smurf Attacks
+
+- A ping flood sends a large number of ICMP echo requests to the host at once.
+- A smurf attack sends ICMP echo requests to a broadcast address with the victim's address forged as the source, via [IP spoofing](#ip-spoofing), so every host on the broadcast network replies to the victim.
+
+Configuring routers, NAT devices, or firewalls to rate-limit or block these packets mitigates both.
+
+## Network Reconnaissance
+
+Network reconnaissance probes a network for open ports and reachable hosts before an attack.
+
+### Address and Port Scanning
+
+Sequentially searches a range of IP addresses for open ports, then targets vulnerabilities in the programs listening on them, sometimes through a Trojan horse such as Back Orifice.
+
+Stateful packet filtering, which tracks connection state instead of judging each packet in isolation, blocks unsolicited probes.
+
+- TCP SYN scanning  
+  Sends a packet with the SYN flag set to a port, to begin a connection. A SYN-ACK reply indicates the port is open.
+- TCP FIN scanning  
+  Sends a packet with the FIN flag set to a port, without an open connection. An RST reply indicates the port is open.
+
+### IP Options
+
+The IP header's optional header field is meant for testing, e.g. specifying a source route for a packet.
+
+Authentication based on a packet's path can be bypassed if the sender controls that path through source routing.
+
+Blocking all packets carrying IP options removes the exposure.
+
+## IP Spoofing
+
+IP spoofing forges a packet's source address to impersonate a trusted host and bypass access controls at a server, router, or firewall.
+
+- An external packet carrying an internal source address can pass filters that treat internal addresses as trusted.
+
+Blocking packets with impossible source addresses at the router, NAT device, or firewall, filtering both incoming and outgoing traffic, prevents this.
+
+## CGI Exploitation
+
+A CGI (Common Gateway Interface) program that passes browser input directly to a shell without validation lets an attacker inject arbitrary commands.
+
+For example, appending a shell command to a parameter the CGI script forwards unchanged:
+
+```
+http://fake.name.com/cgi-bin/name.cgi?fqdn=%3Bcat%20/etc/passwd
+```
+
+This is an instance of [incomplete mediation](/s5/computer-security/incomplete-mediation): the input is never checked against what a legitimate hostname looks like.
+
+Filtering unwanted characters and commands from CGI input, and removing shell access from the CGI program's execution environment entirely, closes the vulnerability.
