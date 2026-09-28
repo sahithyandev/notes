@@ -1,0 +1,48 @@
+---
+title: Mandatory Access Control
+dateCreated: 2026-09-28T00:00:00.000Z
+lastUpdatedOn: 2026-09-28T15:03:30.725Z
+---
+
+Mandatory Access Control (MAC) imposes a global security policy on all users, on top of [Linux's native DAC model](/s5/secure-app-dev/linux-discretionary-access-control). Users cannot set controls weaker than the policy, and normal administration does not carry authority to change the policy itself.
+
+## SELinux
+
+SELinux is NSA's implementation of MAC for Linux. Linux DAC still applies first. If it permits an action, SELinux then evaluates the action against its own policy, following the principle that anything not expressly permitted is denied.
+
+Each subject (process) and object (not just files and directories) is governed by a security context:
+
+- User  
+  SELinux maintains its own user list, distinct from Linux users, labeling a subject's privileges or an object's owner.
+- Role  
+  Similar to a group, assumed by users. A user holds 1 role at a time and may only switch roles when authorized.
+- Domain (type)  
+  A sandbox combining subjects and objects permitted to interact with each other.
+
+This model is Type Enforcement (TE).
+
+Decisions in SELinux are of 2 kinds:
+
+- Access decisions  
+  A subject acts on an existing object, or creates a new object, within its expected domain.
+- Transition decisions  
+  A process is invoked in a different domain than its caller, or an object is created in a different type than its parent directory. Transitions must be explicitly authorized by policy.
+
+SELinux also implements:
+
+- Role Based Access Control (RBAC)  
+  Rules governing which roles a user may assume and when a role transition is allowed.
+- Multi Level Security (MLS)  
+  For classified data, enforced via file system labeling under a "no read up, no write down" rule.
+
+<Note>
+
+SELinux policies are complex, often hundreds of lines. RHEL ships a default "targeted" policy that only constrains selected network applications, leaving everything else to DAC.
+
+</Note>
+
+## AppArmor
+
+AppArmor is Novell's MAC implementation for SuSE Linux. It is enforced at the kernel level via Linux Security Modules.
+
+It restricts the behavior of selected applications in a granular, targeted way, so a compromised root application's access is contained. It has no data classification controls, making it a partial MAC implementation. Unprotected applications fall back to plain Linux DAC.

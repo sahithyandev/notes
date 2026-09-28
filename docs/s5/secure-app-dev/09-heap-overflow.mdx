@@ -1,10 +1,10 @@
 ---
 title: Heap Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.060Z
+lastUpdatedOn: 2026-09-28T15:03:30.783Z
 ---
 
-A heap overflow is a [buffer overflow](/s5/secure-app-dev/buffer-overflow-basics) where the overflowed buffer is a dynamic buffer, e.g. one allocated with `malloc`, on the heap.
+A heap overflow is a [buffer overflow](/s5/secure-app-dev/buffer-overflow-basics) where the overflowed buffer is a dynamic buffer, e.g. one allocated with `malloc`, on the heap. The heap typically sits above the program code, allocated for dynamic data structures.
 
 Adjacent to a heap buffer:
 
@@ -12,7 +12,9 @@ Adjacent to a heap buffer:
 - vtables of C++ objects
 - Internal data structures of the memory allocator
 
-As with a stack overflow, an attacker controlling the buffer input overwrites this adjacent data, changing control flow or manipulating program data.
+As with a stack overflow, an attacker controlling the buffer input overwrites this adjacent data, changing control flow or manipulating program data. There is no return address to hijack on the heap, so control transfer instead exploits function pointers stored nearby, or manipulates heap management data structures.
+
+Defended against by a [non-executable heap and randomized heap allocation](/s5/secure-app-dev/buffer-overflow-defenses).
 
 ## Allocator Metadata Corruption
 

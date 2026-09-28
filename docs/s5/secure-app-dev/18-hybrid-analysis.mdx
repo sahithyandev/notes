@@ -1,0 +1,38 @@
+---
+title: Hybrid Analysis
+dateCreated: 2026-09-28T00:00:00.000Z
+lastUpdatedOn: 2026-09-28T15:03:30.905Z
+---
+
+[Hybrid analysis](/s5/secure-app-dev/security-analysis#types-of-analysis) combines [static analysis](/s5/secure-app-dev/static-analysis) and [dynamic analysis](/s5/secure-app-dev/dynamic-analysis).
+
+## Coverage Measures
+
+- Statement coverage  
+  The percentage of statements executed by some test.
+- Branch coverage  
+  The percentage of branch outcomes taken.
+
+Both reveal untested paths but cannot warn about missing code.
+
+## Concolic Testing
+
+Concolic testing is concrete plus symbolic execution. It walks the program path by path instead of guessing inputs, getting past checks random fuzzing almost never hits, such as magic values, checksums, and parser keywords.
+
+1. Run the program on a real input.
+2. Track the branch conditions symbolically along the path taken, forming the path constraint.
+3. Negate one condition to target a new path, and pass the constraint set to an SMT solver.
+4. The solver returns a concrete input satisfying the new set.
+5. Run that input and repeat.
+
+The costs are expensive solver queries and path explosion.
+
+Examples:
+
+- SAGE
+- KLEE
+- fuzzgrind
+
+## Penetration Testing
+
+Penetration testing has testers act as adversaries and try to break in. Effectiveness depends on tester skill and realistic rules of engagement. Kali Linux bundles the common tools.

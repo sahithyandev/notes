@@ -1,7 +1,7 @@
 ---
 title: Integer Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.066Z
+lastUpdatedOn: 2026-09-28T15:03:30.796Z
 ---
 
 Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safety) violation. It leads to one when the overflowed value is used:
@@ -25,11 +25,10 @@ An $n$-bit unsigned integer can overflow in multiple cases, for $0 \leq a,b < 2^
 - Multiplication  
   $a \cdot b \geq 2^n$.
 
-<Note>
+Examples:
 
-Stagefright: `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended.
-
-</Note>
+- Stagefright  
+  `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended.
 
 ## Signed Overflow
 
@@ -46,11 +45,9 @@ An $n$-bit signed integer can overflow in multiple cases, for $-2^{n-1} \leq a,b
 - Division  
   $\frac{-2^{n-1}}{-1} = 2^{n-1}$, reducing to negation. Division by $0$ is also undefined.
 
-<Note>
+Examples:
 
-Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index.
-
-</Note>
+- Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index.
 
 ## Type Conversion
 
@@ -68,17 +65,17 @@ Converting a smaller type to a larger one uses:
 - Zero extension  
   High bits set to `0`, used when the source is unsigned.
 
-For an arithmetic operation between two operands, the compiler chooses a common type:
+For an arithmetic operation between 2 operands, the compiler chooses a common type:
 
 - Same type, same rank  
   No conversion.
 - Same type, different rank  
   Convert the smaller type to the larger.
-- Unsigned operand with rank $\geq$ the signed operand's rank  
+- Unsigned operand with rank at least the signed operand's rank  
   Convert both to unsigned.
-- Else if the signed type can represent every value of the unsigned type  
+- Signed type can represent every value of the unsigned type  
   Convert both to signed.
-- Else  
+- None of the above  
   Convert both to unsigned, using the signed operand's type as the unsigned width.
 
 <Note>

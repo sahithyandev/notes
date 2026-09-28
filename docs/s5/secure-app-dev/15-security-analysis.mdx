@@ -1,0 +1,78 @@
+---
+title: Security Analysis
+dateCreated: 2026-09-03T05:28:16.620Z
+lastUpdatedOn: 2026-09-28T15:03:30.864Z
+---
+
+Verification compares a system against its requirements and design. Analysis tools support it, and analysis can be manual, automated, or both. Relying only on manual techniques is usually too expensive.
+
+## Types of Analysis
+
+- [Static analysis](/s5/secure-app-dev/static-analysis)  
+  Verifies software without running it. Covers source code scanning, code inspection, and type checking.
+- [Dynamic analysis](/s5/secure-app-dev/dynamic-analysis)  
+  Runs the software on specific inputs and checks results against an oracle. Covers functional testing, web app scanners, and fuzz testing.
+- [Hybrid analysis](/s5/secure-app-dev/hybrid-analysis)  
+  Combines static and dynamic analysis.
+
+## Measurement Terminology
+
+Treat a defect-detection tool as a classifier. For each code location it either raises a report or stays silent, and that call is either right or wrong. This gives 4 outcomes.
+
+- True positive  
+  A report where a real defect exists. This is the intended result.
+- False positive  
+  A report where no defect exists. It costs developer time and erodes trust in the tool.
+- False negative  
+  Silence about a location with a real defect. This is the dangerous outcome, since the vulnerability ships unnoticed.
+- True negative  
+  Silence about defect-free code. It is correct but not directly observable, since you do not know which locations the tool cleared.
+
+Developers care most about false positives, which waste effort. Auditors care most about false negatives, which are missed defects.
+
+### Precision
+
+The fraction of real defects out of all locations the tool reported. Probability a given report is worth acting on. Developers want this high.
+
+$$
+\text{Precision} = \frac{TP}{TP + FP}
+$$
+
+### Recall
+
+Aka. sensitivity or true positive rate. The fraction of real defects out of all real defects present. Probability a defect will not be missed. Auditors want this high.
+
+$$
+\text{Recall} = \frac{TP}{TP + FN}
+$$
+
+### F1 Score
+
+The harmonic mean of precision and recall. It is low unless both inputs are high, so a tool cannot score well by sacrificing one for the other.
+
+$$
+\frac{1}{F_1} = \frac{1}{2} \times \left(\frac{1}{\text{Precision}} + \frac{1}{\text{Recall}}\right)
+$$
+
+$$
+F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+$$
+
+### ROC Curve
+
+Plots true positive rate against false positive rate as the reporting threshold varies. Catching more real defects also means more false alarms.
+
+Formal methods aside, automated tools do not understand system architecture, mission, or environment. Most have significant false positive or false negative rates. They work best as part of a process, not as the only mechanism.
+
+## Adopting Tools
+
+A tool is useless without understanding of the vulnerability types it reports and how to fix them. RealPlayer developers marked genuine Flawfinder findings as "ignore" instead of fixing them, and each became a CVE.
+
+Rollout steps:
+
+1. Define objectives.
+2. Create a soft gate that later becomes mandatory.
+3. Train on secure development first.
+4. Start with a small pilot and easily understood checks.
+5. Appoint a champion.
+6. Build on success.

@@ -1,0 +1,95 @@
+---
+title: OWASP Top 10
+dateCreated: 2026-09-03T07:42:03.136Z
+lastUpdatedOn: 2026-09-28T15:03:30.852Z
+---
+
+The OWASP Top 10 is a list of the most critical web application security risks, maintained by the Open Web Application Security Project. The categories below follow the classic list taught with WebGoat.
+
+## Cross-Site Scripting
+
+Cross-site scripting, aka. XSS, injects attacker-controlled script into a page served by a trusted application, so it runs in the victim's browser with that site's privileges. It can exfiltrate page data and cookies, hijack site behavior, and enable CSRF and session attacks.
+
+- Stored XSS  
+  The payload is persisted server-side, for example a comment, and served to every visitor.
+
+Prevention:
+
+- Escape all user input on output, so `<script>` renders as `&lt;script&gt;`.
+- Use a white-list filter, not a blacklist.
+- Do not reflect unsolicited input in confirmation or error pages.
+
+## Cross-Site Request Forgery
+
+Cross-site request forgery, aka. CSRF, forces a logged-in victim's browser to send a pre-authenticated request that performs an action the attacker chooses. The request carries the victim's cookies and IP through ambient authority, browsers attach cookies to a request automatically, so the server treats it as intentional.
+
+Examples:
+
+- An `<img>` tag on a forum pointing at `bank.com/transfer?to=attacker&amount=all`, triggered when the authenticated victim views the page.
+
+Prevention:
+
+- An unguessable anti-CSRF token per form.
+- A confirmation page before dangerous actions.
+- Accept only POST for sensitive actions.
+- `SameSite` cookies, so the browser does not attach them to cross-site requests.
+- Eliminate XSS, which defeats token protection.
+
+## Insecure Direct Object Reference
+
+Insecure direct object reference, aka. parameter tampering, exposes an internal object key, a file, record id, or path, as a URL or form parameter, so an attacker edits it to reach objects they are not authorized for.
+
+Prevention:
+
+- Validate all input server-side on every request.
+- Check authorization on every request, for example `... WHERE account_number = ? AND user_id = ?`.
+- Use an indirect reference map with hard-to-guess keys instead of exposing raw ids.
+
+## Injection Flaws
+
+An injection flaw concatenates untrusted input into an interpreted command, SQL, XPath, LDAP, an OS command, or JSON. SQL injection is the most common.
+
+Examples:
+
+- In `SELECT * FROM users WHERE login = '<input>' AND password = '<input>'`, the input `' OR '' = '';--` bypasses authentication.
+- Stacked queries can run `xp_cmdshell` to add OS accounts.
+
+Prevention:
+
+- Prepared statements (parameterized queries).
+- Strong typing and business-logic validation of input.
+- Least privilege for the database account, read-only where possible.
+- Escaping questionable characters.
+
+## Broken Authentication and Session Management
+
+Broken authentication and session management is credentials and session tokens not properly protected, letting attackers assume other identities.
+
+- Session fixation  
+  The attacker fixes or predicts a valid session key, often via phishing.
+- Session hijacking  
+  The attacker steals the victim's session id, often via XSS.
+
+Prevention:
+
+- Never store plaintext passwords, salt and hash them. bcrypt is the standard choice.
+- Revalidate authentication on every request.
+- Issue a new session token on privilege change.
+- Use secure random session keys, reasonable timeouts, and the framework's built-in session management.
+
+## Failure to Restrict URL Access
+
+Failure to restrict URL access protects sensitive functionality only by hiding its links, while the URL still works when requested directly. Caused by missing authentication, incorrect authorization, or unprotected admin areas with guessable URLs.
+
+Prevention:
+
+- Enforce authentication and authorization checks on the server for every request, not by omitting links.
+
+## Insecure Cryptographic Storage
+
+Insecure cryptographic storage protects data and credentials with weak or misused cryptography. MD5 is a prominent case: [MD5 collisions](/s5/computer-security/hash-functions) have been used to forge a root CA certificate trusted by all browsers.
+
+Prevention:
+
+- Use current standard algorithms, SHA-256, AES, RSA.
+- Drop MD5, SHA-1, and DES.

@@ -1,7 +1,7 @@
 ---
 title: Unix Process Management
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-28T14:28:29.720Z
+lastUpdatedOn: 2026-09-28T15:03:30.689Z
 ---
 
 Unix identifies each [process](/s5/secure-app-dev/process-abstraction) by a PID, an integer unique among running processes. Additional OS context tracked per process includes the parent PID, process accounting (CPU time used), open files, working directory, signal handlers, and umask.
@@ -21,9 +21,31 @@ int fork(void);
 
 Both parent and child continue executing the instructions after `fork()`. Since each has an independent memory copy, modifying a variable in one process does not affect the other's copy.
 
+## Implementing Fork
+
+Simplified steps:
+
+1. Create the address space of the child process.
+2. Allocate a new PID.
+3. Create kernel process data structures, e.g. a process table entry.
+4. Copy kernel environment from the parent, e.g. scheduling priority.
+5. Initialize child process context: PID, PPID, zero CPU time.
+6. Copy memory regions (program, data, stack) from the parent.
+7. Acquire shared resources: open files, current working directory.
+8. Initialize the hardware context by copying registers from the parent.
+9. Add the child to the scheduler's ready queue.
+
+<Note>
+
+Copying the full memory space (step 6) is expensive. Copy-on-write defers duplication until a memory page is actually written to, otherwise parent and child share the same physical page.
+
+</Note>
+
+Linux additionally provides `clone()`, a more general primitive than `fork()` that allows partial resource sharing between parent and child, used to implement threads.
+
 ## Executing a New Program with Exec
 
-`fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family, a group of 6 related system calls, not a single function, sharing a naming convention.
+`fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family, a group of 6 related system calls sharing a naming convention.
 
 - `l`  
   Arguments passed as a list, e.g. `execl()`.
@@ -39,8 +61,10 @@ Both parent and child continue executing the instructions after `fork()`. Since 
 int execl(const char *path, const char *arg0, ..., const char *argN, NULL);
 ```
 
-- `path`: location of the executable.
-- `arg0` through `argN`: command line arguments, terminated by `NULL`.
+- `path`  
+  Location of the executable.
+- `arg0` through `argN`  
+  Command line arguments, terminated by `NULL`.
 
 `execl()` replaces the current process image with a new one. Code and data are replaced, but the PID and other state such as open files are preserved.
 
@@ -50,9 +74,12 @@ Every Unix executable is invoked as if `main()` were called:
 int main(int argc, char *argv[], char *envp[])
 ```
 
-- `argc`: number of command line arguments, including the program name.
-- `argv`: NULL-terminated array of C strings, `argv[0]` is the program name.
-- `envp`: NULL-terminated array of `key=value` strings, the environment.
+- `argc`  
+  Number of command line arguments, including the program name.
+- `argv`  
+  NULL-terminated array of C strings, `argv[0]` is the program name.
+- `envp`  
+  NULL-terminated array of `key=value` strings, the environment.
 
 <Note>
 
@@ -67,13 +94,16 @@ int main(int argc, char *argv[], char *envp[])
 void exit(int status);
 ```
 
-- `status = 0`: normal termination.
-- `status != 0`: problematic execution, by convention.
-- `exit()` never returns.
+- `status = 0`  
+  Normal termination.
+- `status != 0`  
+  Problematic execution, by convention.
+
+`exit()` never returns.
 
 `exit()` (the C library function) flushes and closes open C stdio streams, calls registered exit handlers, then invokes `_exit()`.
 
-`_exit()` (the system call) performs immediate termination: closes all open file descriptors, reparents any children to `init`, and sends `SIGCHLD` to the parent. It does not flush C stdio buffers.
+`_exit()` (the system call) performs immediate termination: it closes all open file descriptors, reparents any children to `init`, and sends `SIGCHLD` to the parent. It does not flush C stdio buffers.
 
 Returning from `main()` implicitly calls `exit()`.
 
@@ -97,26 +127,6 @@ Variants:
 - `waitid()`  
   Wait for any child process to change status.
 
-## Process States in Unix
-
-Unix refines the [generic process state model](/s3/operating-systems/process#process-states) with 1 additional state.
-
-- Stopped  
-  Process suspended by a `SIGSTOP` signal, resumed by `SIGCONT`.
-
-<Note>
-
-A zombie cannot be killed, it is already dead. Its process table entry is retained solely until the parent retrieves its exit status via `wait()`.
-
-</Note>
-
-Zombie arises in 2 cases:
-
-- Parent terminates before the child  
-  `init` becomes the child's pseudo parent and calls `wait()` on its behalf.
-- Child terminates before the parent, and the parent never calls `wait()`  
-  The child remains a zombie, potentially filling the process table.
-
 ## Kill and Signals
 
 ```c
@@ -125,28 +135,29 @@ int kill(pid_t pid, int sig);
 
 Sends a signal to a process, the Unix analog of a hardware interrupt, routed through the kernel.
 
-- `SIGSTOP`: stop the process.
-- `SIGKILL`: kill the process.
-- `SIGCONT`: restart a stopped process.
+- `SIGSTOP`  
+  Stop the process.
+- `SIGKILL`  
+  Kill the process.
+- `SIGCONT`  
+  Restart a stopped process.
 
-## Implementing Fork
+## Process States in Unix
 
-Simplified steps:
+Unix refines the [generic process state model](/s3/operating-systems/process#process-states) with 1 additional state.
 
-1. Create the address space of the child process.
-2. Allocate a new PID.
-3. Create kernel process data structures, e.g. a process table entry.
-4. Copy kernel environment from the parent, e.g. scheduling priority.
-5. Initialize child process context: PID, PPID, zero CPU time.
-6. Copy memory regions (program, data, stack) from the parent.
-7. Acquire shared resources: open files, current working directory.
-8. Initialize the hardware context by copying registers from the parent.
-9. Add the child to the scheduler's ready queue.
+- Stopped  
+  Process suspended by a `SIGSTOP` signal, resumed by `SIGCONT`.
+
+Zombie arises in 2 cases:
+
+- Parent terminates before the child  
+  `init` becomes the child's pseudo parent and calls `wait()` on its behalf.
+- Child terminates before the parent, and the parent never calls `wait()`  
+  The child remains a zombie, potentially filling the process table.
 
 <Note>
 
-Copying the full memory space (step 6) is expensive. Copy-on-write defers duplication until a memory page is actually written to, otherwise parent and child share the same physical page.
+A zombie cannot be killed, it is already dead. Its process table entry is retained solely until the parent retrieves its exit status via `wait()`.
 
 </Note>
-
-Linux additionally provides `clone()`, a more general primitive than `fork()` that allows partial resource sharing between parent and child, used to implement threads.

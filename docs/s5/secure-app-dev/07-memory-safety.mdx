@@ -1,7 +1,7 @@
 ---
 title: Memory Safety
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.045Z
+lastUpdatedOn: 2026-09-28T15:03:30.753Z
 ---
 
 A program execution is memory safe **iff** none of the following occur:
@@ -18,18 +18,12 @@ A program execution is memory safe **iff** none of the following occur:
 - Invalid free
 - Unwanted aliasing
 
-<Note>
-
-Memory safe languages exist, e.g. Rust, Java, but most code is still written in C/C++, since C/C++ is supported nearly everywhere, low-level code such as operating systems cannot easily be implemented in memory safe languages, and memory safe languages are still not fully mature.
-
-</Note>
-
 ## Spatial and Temporal Violations
 
 A spatial violation is a memory access outside an object's bounds.
 
 - Buffer overflow
-- Out-of-bounds read
+- Out-of-bounds read, e.g. [Heartbleed](/s5/secure-app-dev/heap-overflow#heartbleed)
 - Null pointer dereference
 
 A temporal violation is a memory access referring to an invalid object.
@@ -39,3 +33,13 @@ A temporal violation is a memory access referring to an invalid object.
 - Use of uninitialized memory
 
 Overflows, covered in [buffer overflow basics](/s5/secure-app-dev/buffer-overflow-basics), [heap overflow](/s5/secure-app-dev/heap-overflow), and [integer overflow](/s5/secure-app-dev/integer-overflow), are the most common form of spatial violation.
+
+## Memory Safe Languages
+
+A memory safe language, e.g. Rust, Java, enforces memory safety at compile time or run time. Most code is still written in C/C++.
+
+- C/C++ is supported nearly everywhere.
+- Low-level code such as operating systems cannot easily be implemented in memory safe languages.
+- Memory safe languages are still not fully mature.
+
+Adopting a memory safe language costs runtime overhead and loses some direct, low-level memory access, e.g. hardware-specific instructions needed by device drivers. C and related languages allow direct memory access without bounds checks, hence their vulnerability and large legacy of unsafe code.

@@ -1,0 +1,78 @@
+---
+title: Static Analysis
+dateCreated: 2026-09-28T00:00:00.000Z
+lastUpdatedOn: 2026-09-28T15:03:30.875Z
+---
+
+[Static analysis](/s5/secure-app-dev/security-analysis#types-of-analysis) verifies software without running it.
+
+- Source code  
+  Gives more context through variable names and comments. It also allows fixing found problems and is hard to decompile.
+- Executables  
+  Needed when source is unavailable, or when the built artifact differs from source.
+
+## Human Analysis
+
+Human analysis is strong on context and intent. It is expensive and prone to boredom. Inspections use defined roles per IEEE 1028.
+
+## Type Checkers and Compiler Warnings
+
+Type checkers and compiler warnings are not security-specific but useful. Enable `-Wall -Wextra`, `use strict`, and fix every warning so new ones stand out.
+
+Examples:
+
+- `-Wimplicit-fallthrough` in Linux found real bugs in about 10% of the fall-through patches it prompted.
+
+## Unreachable Code Detection
+
+Dead code is not itself exploitable, but it can signal skipped input validation or authentication.
+
+Examples:
+
+- Apple's `goto fail; goto fail;` is the classic case.
+
+## Style Checkers and Quality Scanners
+
+Style checkers and quality scanners compare source to pre-canned rules. Neither targets security.
+
+Examples:
+
+- PMD for Java source.
+- SpotBugs for JVM bytecode.
+- FindSecurityBugs, a SpotBugs security plugin.
+
+## Security Defect Text Scanners
+
+Security defect text scanners are grep-like lexers that look for dangerous function calls. They are fast, cheap, and work on partial code, but have high false positive and false negative rates.
+
+Examples:
+
+- Flawfinder
+- RATS
+- ITS4
+
+## Security Defect Finders
+
+Security defect finders build an internal model and look for vulnerability patterns. Many aim to be sound.
+
+- Taint propagation  
+  Tracks untrusted input from sources to sinks and warns when it reaches a sink unsanitized. Especially useful for injection and buffer overflow.
+- Control flow analysis  
+  Follows execution paths to find dangerous sequences like double-free.
+- Property checkers  
+  Prove a narrow temporal safety property, for example always freeing allocated memory.
+
+Examples:
+
+- Coverity
+- Fortify
+- cppcheck
+- clang static analyzer
+
+## Software Composition Analysis
+
+Software Composition Analysis (SCA), aka. origin analysis, identifies embedded libraries and flags those with known vulnerabilities. It cross-references the NIST National Vulnerability Database. Prefer package-manager data for low false positives.
+
+## Secret Scanners
+
+Secret scanners look for accidentally committed passwords and private keys. They are built into GitHub and GitLab.

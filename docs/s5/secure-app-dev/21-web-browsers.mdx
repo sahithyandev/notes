@@ -1,0 +1,72 @@
+---
+title: Web Browsers
+dateCreated: 2026-09-03T05:28:58.273Z
+lastUpdatedOn: 2026-09-28T15:03:30.939Z
+---
+
+A browser is a large, complex, network-facing codebase written in memory-unsafe languages, with features added constantly.
+
+## Memory Unsafety
+
+A Microsoft study found roughly 70% of vulnerabilities fixed by security updates each year are memory safety issues. As of March 2019, all but about 5 of 130 public Critical Chrome bugs were memory corruption.
+
+Examples:
+
+- One Chrome RCE overrides `byteLength` on an `ArrayBuffer` getter to `0xFFFFFFFC`. The resulting `Uint32Array` reads and writes arbitrary memory.
+
+The Rule of 2: for a given task, pick at most 2 of these 3.
+
+- Untrusted input
+- Unsafe language
+- No sandbox
+
+If a task needs all 3, split the work.
+
+## Chrome Multi-Process Architecture
+
+Renderer processes have no direct disk, network, or device access. They run in a restricted sandbox, which limits damage from a renderer exploit. The split also gives parallelism across tabs and survives a single renderer crash. See the [Chrome worked example](/s5/computer-security/secure-system-design#worked-example-chrome) for the full multi-process architecture and threat model.
+
+Limitations:
+
+- Same-origin iframes with `document.domain` can force cross-origin pages into one process.
+- Memory pressure exhausts process budgets.
+- Every renderer can request cross-origin images and scripts, so it effectively sees many cookies.
+
+Auto-update shipped from the start, and it is now the delivery mechanism for the whole platform.
+
+## Site Isolation
+
+Site isolation puts content from one site in its own renderer process. The unit is a site, not a tab, and a site, not an origin. The browser process can then restrict each renderer to its own site's data.
+
+It defends against Spectre-style [speculative side channels](/s5/secure-app-dev/meltdown-and-spectre#spectre) from JavaScript, universal XSS (UXSS), and fully compromised renderers.
+
+Goals:
+
+- Stop a renderer receiving cross-site cookies, stored data, saved passwords, or another site's granted permissions.
+- Block cross-site pages in iframes per `X-Frame-Options`.
+- Keep cross-site DOM out of reach of UXSS bugs.
+
+Cross-Origin Read Blocking (CORB) blocks cross-site delivery of HTML, XML, and JSON responses. It works reliably when the response has a correct `Content-Type` and `X-Content-Type-Options: nosniff`. Without `nosniff`, Chrome sniffs the start of the file and protects it only if it can confirm the type, avoiding breaking mislabeled JavaScript files.
+
+## Secure Coding in JavaScript
+
+Use strict mode and a linter such as ESLint or StandardJS.
+
+- Abstract equality  
+  `==` treats `0`, `'0'`, and `false` as all mutually equal. Use `===` instead.
+- Duplicate declarations  
+  Duplicate function parameters and duplicate object keys are allowed by default. Strict mode or a linter catches them.
+- Prototype builtins  
+  Accessing `Object.prototype` builtins directly breaks when an object has its own `hasOwnProperty`. Use `Object.hasOwn` instead.
+- Automatic semicolon insertion  
+  Changes meaning across line breaks. A leading `;` before `(` or `[` disambiguates.
+- Octal literals  
+  A leading zero makes a number octal, so `010` is 8. Strict mode rejects it.
+- Implicit globals  
+  Assignment without `var`, `let`, or `const` creates a global. Strict mode makes it a ReferenceError.
+- Silent failures  
+  Assigning to non-writable globals or setting properties on primitives fails silently without strict mode.
+
+## Style and Testing Principles
+
+Source code is for humans, so readability is preferred over brevity, and clever one-liners that lean on obscure language features are avoided. Dangerous code should look dangerous so it stands out in review. Untested code is broken code, so tests are automated in CI. Explicit code is safer than magical code.

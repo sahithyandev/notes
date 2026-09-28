@@ -1,12 +1,12 @@
 ---
 title: Buffer Overflow Basics
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:15.052Z
+lastUpdatedOn: 2026-09-28T15:03:30.764Z
 ---
 
-A buffer overflow, aka. a buffer overrun, is a [spatial memory safety violation](/s5/secure-app-dev/memory-safety) where more input is placed into a buffer than its allocated capacity, overwriting other information. First widely exploited by the Morris Worm in 1988, it remains a major concern despite well-known prevention techniques.
+A buffer overflow, aka. a buffer overrun, is a [spatial memory safety violation](/s5/secure-app-dev/memory-safety) where more input is placed into a buffer than its allocated capacity, overwriting other information. It is a programming error: a process attempts to store data beyond a fixed-size buffer's limits, overwriting adjacent memory locations. Those locations may hold other program variables, parameters, or control flow data. The buffer itself may sit on the stack, in the heap, or in the process's data section.
 
-The overflow is a programming error: a process attempts to store data beyond a fixed-size buffer's limits, overwriting adjacent memory locations. Those locations may hold other program variables, parameters, or control flow data. The buffer itself may sit on the stack, in the heap, or in the process's data section.
+Buffer overflow was first widely exploited by the Morris Worm in 1988, and it remains a major concern despite well-known prevention techniques. See the [computer security note on buffer overflow](/s5/computer-security/buffer-overflow) for additional attack variants and famous exploits.
 
 ## Consequences
 
@@ -22,12 +22,6 @@ To exploit a buffer overflow, an attacker needs:
 
 Vulnerable programs are identified by source inspection, tracing execution under oversized input, or automated fuzzing.
 
-<Note>
-
-Modern high-level languages with strong typing are not vulnerable to buffer overflow, at the cost of runtime overhead and reduced direct memory access. C and related languages allow direct memory access without bounds checks, hence their vulnerability and large legacy of unsafe code.
-
-</Note>
-
 ## Stack Frame
 
 When one function calls another, it needs somewhere to save the return address, the parameters passed to the called function, and possibly saved register values. This region is the stack frame.
@@ -38,11 +32,17 @@ Aka. stack smashing, this overflow occurs when the overflowed buffer sits on the
 
 An unchecked call, e.g. `gets()`, copying attacker-controlled input into a fixed-size stack buffer can overwrite adjacent stack contents, including the saved frame pointer and the return address. Overwriting the return address redirects control flow to an address chosen by the attacker on function return.
 
-<Note>
+Common unsafe C standard library routines, none of which perform bounds checking against the destination buffer's size:
 
-Table of some common unsafe C standard library routines: `gets`, `sprintf`, `strcat`, `strcpy`, `vsprintf`. Each performs no bounds checking against the destination buffer's size.
+- `gets`
+- `sprintf`
+- `strcat`
+- `strcpy`
+- `vsprintf`
 
-</Note>
+## Global Data Overflow
+
+The overflowed buffer sits in the global data region, which may be located above program code. If a vulnerable buffer and a function pointer share a struct, or the buffer neighbors process management tables, the attack aims to overwrite the function pointer later invoked. Defended against by a [non-executable or randomized global data region, moving function pointers, and guard pages](/s5/secure-app-dev/buffer-overflow-defenses).
 
 ## Shellcode
 

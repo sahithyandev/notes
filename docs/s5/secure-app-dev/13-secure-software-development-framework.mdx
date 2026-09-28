@@ -1,14 +1,21 @@
 ---
 title: Secure Software Development Framework
+sidebar:
+  label: SSDF
 prereqs:
   - s5/computer-security/confidentiality-integrity-availability#access-control
 dateCreated: 2026-09-03T07:41:50.444Z
-lastUpdatedOn: 2026-09-28T14:28:29.823Z
+lastUpdatedOn: 2026-09-28T15:03:30.835Z
 ---
 
-NIST Special Publication 800-218, the Secure Software Development Framework (SSDF). It defines outcomes to aim for, not tools to run, so it fits Agile, Waterfall, or DevSecOps. 42 tasks grouped into 19 practices under 4 pillars.
+NIST Special Publication 800-218 defines the Secure Software Development Framework (SSDF). It defines outcomes to aim for, not tools to run, so it fits Agile, Waterfall, or DevSecOps. 42 tasks are grouped into 19 practices under 4 pillars.
 
-## Prepare the Organization (PO)
+- Prepare the Organization (PO)
+- Protect the Software (PS)
+- Produce Well-Secured Software (PW)
+- Respond to Vulnerabilities (RV)
+
+## Prepare the Organization
 
 Put people, rules, and tooling in place before coding starts.
 
@@ -17,22 +24,22 @@ Put people, rules, and tooling in place before coding starts.
 - Role-based training  
   Every developer completes secure coding training scoped to what their role touches, before they get commit access to production code.
 - Refresher cycles  
-  Training repeats on a schedule, not once at hiring, since threats and languages in use change.
+  Training repeats on a schedule, since threats and languages in use change.
 - Personnel vetting  
   Anyone with access to sensitive code or systems passes a background or clearance check matched to that access level.
 - Policy acknowledgment  
-  Security policies are distributed to staff and comprehension is checked with a quiz or signed acknowledgment, not just a broadcast email.
+  Security policies are distributed to staff and comprehension is checked with a quiz or signed acknowledgment.
 
 ### Control the Toolchain
 
 - Approved toolchain  
   Compilers, build systems, test frameworks, and CI runners are drawn from an approved list, each with a documented, security-reviewed configuration.
 - Fed vulnerability data  
-  Build-system scanners pull fresh CVE feeds so a newly disclosed flaw in a dependency is caught on the next build, not the next audit.
+  Build-system scanners pull fresh CVE feeds so a newly disclosed flaw in a dependency is caught on the next build.
 - Curated library list  
   Third-party libraries come from a pre-vetted registry. A developer cannot pull an arbitrary package into the build.
 - Blocked unapproved tools  
-  Tooling outside the approved list is blocked at the network or package-manager level, not just discouraged by policy.
+  Tooling outside the approved list is blocked at the network or package-manager level.
 
 ### Define Security Goals
 
@@ -52,7 +59,7 @@ Put people, rules, and tooling in place before coding starts.
 - Separated environments  
   Development and deployment environments are distinct systems, so a mistake or compromise in one does not directly reach the other.
 - Role-based access  
-  Access to each environment follows a formal [access control model](/s5/computer-security/confidentiality-integrity-availability#access-control), not ad hoc sharing of credentials.
+  Access to each environment follows a formal [access control model](/s5/computer-security/confidentiality-integrity-availability#access-control).
 
 ### Track Progress with Metrics
 
@@ -78,16 +85,16 @@ Put people, rules, and tooling in place before coding starts.
 - No bypass path  
   The gate cannot be skipped by a developer under deadline pressure. An override, if one exists, requires a second approver.
 
-## Protect the Software (PS)
+## Protect the Software
 
 Stop code and released artifacts from being tampered with or leaked, at rest and in transit.
 
 ### Protect All Forms of Code
 
 - Version-controlled source  
-  All source lives in version control, never on a developer's local disk alone.
+  All source lives in version control, not only on a developer's local disk.
 - Least-privilege access  
-  Read and write access to a repository is scoped to the people who need it, not the whole organization.
+  Read and write access to a repository is scoped to the people who need it.
 - Mandatory review  
   A change merges only after review by someone other than its author.
 - Signed commits  
@@ -118,11 +125,11 @@ Stop code and released artifacts from being tampered with or leaked, at rest and
 - Build tool and parameter list  
   The tools and settings used to produce the artifact are recorded alongside the dependencies.
 - Software Bill of Materials  
-  This record is usually published as a Software Bill of Materials (SBOM), a standardized manifest of a build's contents.
+  This record is usually published as a Software Bill of Materials (SBOM), a standardized manifest of a build's contents. [Software supply chain security](/s5/secure-app-dev/software-supply-chain-security) covers how this record is used to assess exposure to a disclosed flaw.
 - Downstream exposure assessment  
   A consumer checks a newly disclosed component flaw against the SBOM to know immediately whether they are exposed, without re-auditing the whole artifact.
 
-## Produce Well-Secured Software (PW)
+## Produce Well-Secured Software
 
 Design, write, and test so that few vulnerabilities exist at release, and those that do are found early.
 
@@ -131,14 +138,14 @@ Design, write, and test so that few vulnerabilities exist at release, and those 
 - Threat modeling  
   Data flows, trust boundaries, and abuse cases are modeled before implementation starts, so an attack path is a design question rather than a post-hoc discovery.
 - Architecture revision  
-  Each identified threat is removed or mitigated by revising the architecture, not deferred to a later patch.
+  Each identified threat is removed or mitigated by revising the architecture.
 
 ### Reuse Well-Secured Components
 
 - Prefer vetted modules  
   Authentication, cryptography, and parsing use vetted internal or third-party components instead of custom implementations, since these are the areas most prone to subtle, exploitable mistakes.
 - Version and flaw tracking  
-  Reused components have their versions and known vulnerabilities tracked for the life of the product, not just at the time they were first adopted.
+  Reused components have their versions and known vulnerabilities tracked for the life of the product.
 
 ### Follow Secure Coding Practices
 
@@ -160,20 +167,20 @@ Design, write, and test so that few vulnerabilities exist at release, and those 
 - Dynamic analysis and fuzzing  
   Running code is tested with dynamic analysis and fuzzing to catch flaws that only appear at execution time.
 - Negative testing  
-  Tests assert what must not happen, for example that an unauthenticated request is rejected, not only that the happy path succeeds.
+  Tests assert what must not happen, for example that an unauthenticated request is rejected.
 - Root cause fixes  
-  A finding is fixed at its underlying cause, not patched at the symptom that exposed it.
+  A finding is fixed at its underlying cause.
 
 ### Configure Defaults Securely
 
 - Least privilege by default  
-  A default install runs with the minimum privilege it needs, not the maximum available.
+  A default install runs with the minimum privilege it needs.
 - Features off by default  
   Optional features, especially ones that expand attack surface, ship disabled until explicitly enabled.
 - Logging on by default  
   Security-relevant logging is enabled out of the box, since a default install is often never revisited.
 
-## Respond to Vulnerabilities (RV)
+## Respond to Vulnerabilities
 
 Find and fix flaws that reach production, and feed the lessons back into development.
 
@@ -182,7 +189,7 @@ Find and fix flaws that reach production, and feed the lessons back into develop
 - Disclosure programme  
   A known, monitored intake channel exists for external reports, for example a security contact address or a bug bounty programme.
 - Advisory monitoring  
-  Security advisories for every component in use are monitored on an ongoing basis, not checked only at release time.
+  Security advisories for every component in use are monitored on an ongoing basis.
 - Continuous scanning  
   Released software is rescanned periodically, since a component clean at release can gain a disclosed flaw later.
 
@@ -195,12 +202,12 @@ Find and fix flaws that reach production, and feed the lessons back into develop
 - Deadline-bound patching  
   Each report is patched within the fix-time rule set for its severity tier under Define Security Goals.
 - Disclosure to affected users  
-  Users affected by a confirmed vulnerability are notified, not just the ones who happen to check a changelog.
+  Users affected by a confirmed vulnerability are notified.
 
 ### Analyse Root Cause
 
 - Underlying cause identification  
-  Each confirmed vulnerability is traced to its underlying cause, not just the line of code that manifested it.
+  Each confirmed vulnerability is traced to its underlying cause.
 - Similar flaw search  
   The codebase is checked for the same class of flaw elsewhere, since one instance rarely occurs in isolation.
 - Feedback into process  

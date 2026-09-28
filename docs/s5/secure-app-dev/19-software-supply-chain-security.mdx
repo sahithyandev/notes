@@ -1,0 +1,54 @@
+---
+title: Software Supply Chain Security
+dateCreated: 2026-09-28T00:00:00.000Z
+lastUpdatedOn: 2026-09-28T15:03:30.915Z
+---
+
+Software supply chain security defends the build and distribution process itself, not just the code it produces. Attackers target this process because it is trusted by every downstream consumer at once.
+
+## Risk Sources
+
+Risk comes from 3 sources.
+
+- Accidents
+- Undermaintained packages  
+  Critical infrastructure like OpenSSL and curl is maintained by a handful of people on tiny budgets.
+- Outright malice
+
+Adding dependencies got easy, packages got smaller, and far more individual maintainers are trusted, worsening the risk.
+
+Vulnerabilities are accidental and sometimes acceptable to ship. Malware is intentional and never acceptable.
+
+## Malicious Packages
+
+A malicious package is public for about 209 days on average before being reported. 56% run their payload on install through `preinstall` scripts, exfiltrating `process.env`, mining cryptocurrency, or stealing credentials.
+
+Examples:
+
+- `ua-parser-js`
+- `coa`
+- `rc`
+
+Software Composition Analysis (SCA) tools like Socket analyze dependency behavior to catch these.
+
+## Securing Project Infrastructure
+
+In the SolarWinds Orion attack, malicious code was signed and distributed through the compromised build pipeline.
+
+Controls:
+
+- Least privilege and MFA on all accounts.
+- Blocking direct pushes to main so review is enforced.
+- `git config fsckObjects true`.
+- Keeping CI/CD secrets out of test environments.
+
+## Supply Chain Levels for Software Artifacts
+
+Supply chain Levels for Software Artifacts (SLSA, "salsa") rates how hard a build's provenance is to fake. Provenance is a signed record of how an artifact was built, which source commit, which build system, which inputs. The build track has 3 levels.
+
+- L1  
+  The build produces a provenance record, but nothing stops someone editing or fabricating it. Catches honest mistakes, not attackers.
+- L2  
+  The build runs on a hosted build service that writes and signs the provenance itself. Faking it now needs a deliberate attack, and swapping the artifact after the build is detectable.
+- L3  
+  The build service is hardened and each build runs isolated. One build cannot tamper with another, and signing keys are out of reach of the build steps. Forging provenance means breaking the build platform itself.

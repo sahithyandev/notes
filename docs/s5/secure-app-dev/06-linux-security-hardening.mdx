@@ -1,0 +1,40 @@
+---
+title: Linux Security Hardening
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-09-28T15:03:30.738Z
+---
+
+Hardening [Linux's DAC model](/s5/secure-app-dev/linux-discretionary-access-control) requires mitigating risk at both the OS level and the application level.
+
+## OS Installation and Patch Management
+
+- Minimize installed software  
+  Unused applications are liable to be left in a default, un-hardened, unpatched state. Avoid running X Window, RPC services, R-services, inetd, SMTP daemons, telnet, unless required.
+- Initial configuration  
+  Set the root password, create a non-root user account, set a system security level, enable a host-based firewall, enable [SELinux](/s5/secure-app-dev/mandatory-access-control).
+- Patch management  
+  Installed applications must be configured securely and kept current with security patches. Automated update tools exist, e.g. `up2date`, `YaST`, `apt-get`. Automatic updates should not run on change-controlled systems without testing first.
+
+## Network Access Controls
+
+- TCP wrappers  
+  Checks a connecting host against `hosts.allow` and `hosts.deny` before permitting a connection, based on service, source IP, and username.
+- netfilter and iptables  
+  The Linux kernel's native firewall mechanism, with `iptables` as the user-space configuration front end. Typical personal firewall policy: allow specified inbound services, block all other inbound requests, allow all outbound requests.
+
+## Logging
+
+Linux logs via `syslogd` or `syslog-ng`, sorting messages by facility and severity and writing them to local or remote log files. `syslog-ng` is preferable for its flexible rules engine and support for encrypted TCP transport.
+
+Log files must be rotated and old copies deleted, typically with `logrotate` run by `cron`, balancing the number of log files against ease of locating information.
+
+## Application Security
+
+- Running as unprivileged user or group  
+  Every process runs as some user, and it is critical that user is not root, since a bug could otherwise compromise the entire system. If root privileges are briefly required, e.g. to bind a privileged port, a root parent should perform that step and hand off to an [unprivileged child](/s5/secure-app-dev/linux-discretionary-access-control#setuid-root-programs).
+- Running in a chroot jail  
+  Confines a process to a subset of the file system by remapping the virtual root. Directories outside the jail are not visible or reachable. Contains the effects of a compromised daemon, but is complex to configure.
+- Modularity  
+  A single large multipurpose process is harder to run unprivileged, harder to audit, and harder to disable selectively. Modular applications present a smaller attack surface.
+- Encryption  
+  Sending credentials or data over a network in clear text exposes them to eavesdropping, so network applications should support encryption, often via OpenSSL.
