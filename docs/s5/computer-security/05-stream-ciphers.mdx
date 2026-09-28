@@ -1,7 +1,7 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T03:17:45.430Z
+lastUpdatedOn: 2026-09-28T03:47:59.461Z
 slug: s5/computer-security/stream-ciphers
 sidebar:
   order: 5
@@ -43,62 +43,6 @@ A secure keystream generator must satisfy:
 - Unpredictability  
   Computationally infeasible to determine the full keystream from any part of it, of any length.
 
-### Linear Feedback Shift Registers
-
-A linear feedback shift register (LFSR) builds a keystream from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
-
-$$
-s_i = c_1 s_{i-1} \oplus c_2 s_{i-2} \oplus \cdots \oplus c_n s_{i-n}, \quad i \ge n
-$$
-
-- $c_1, \ldots, c_n \in \{0, 1\}$: the feedback taps, fixed for a given LFSR.
-- $s_0, \ldots, s_{n-1}$: the initial state, acting as the secret key or seed.
-
-Each step outputs 1 bit, usually $s_{i-n}$, then shifts the register and inserts the new feedback bit.
-
-import Lfsr from "./images/lfsr.svg";
-
-<Lfsr />
-
-The taps are written as a feedback polynomial over $\mathrm{GF}(2)$.
-
-$$
-p(x) = 1 + c_1 x + c_2 x^2 + \cdots + c_n x^n
-$$
-
-The output sequence has period $2^n - 1$, the maximum possible for an $n$-bit register, **iff** $p(x)$ is a primitive polynomial over $\mathrm{GF}(2)$.
-
-<Note>
-
-A non-primitive feedback polynomial still produces a periodic sequence, just with a period shorter than $2^n - 1$, and possibly a period that depends on the initial state.
-
-</Note>
-
-An LFSR alone fails the unpredictability requirement above.
-
-- The recurrence is linear, so $2n$ consecutive output bits give $n$ linear equations in the $n$ unknown taps $c_1, \ldots, c_n$.
-- Solving this system (the Berlekamp-Massey algorithm does so in $O(n^2)$) recovers every tap and the state at that point.
-- The attacker then computes every following output bit from the recurrence.
-
-Practical keystream generators instead combine several LFSRs through a nonlinear function, so no linear system captures the whole output.
-
-For example, take $n = 4$ with feedback polynomial $p(x) = 1 + x + x^4$, so $c_1 = 1, c_2 = 0, c_3 = 0, c_4 = 1$, and initial state $s_0 s_1 s_2 s_3 = 1000$.
-
-$$
-s_i = s_{i-1} \oplus s_{i-4}
-$$
-
-| $i$ | $s_{i-4} s_{i-3} s_{i-2} s_{i-1}$ | $s_i$ | Output  |
-| --- | --------------------------------- | ----- | ------- |
-| 4   | 1000                              | 1     | $s_0=1$ |
-| 5   | 0001                              | 1     | $s_1=0$ |
-| 6   | 0011                              | 0     | $s_2=0$ |
-| 7   | 0110                              | 1     | $s_3=0$ |
-| 8   | 1101                              | 1     | $s_4=1$ |
-| 9   | 1011                              | 0     | $s_5=1$ |
-
-Continuing the recurrence for 15 steps cycles through every nonzero state of the register once before repeating, giving the maximal period $2^4 - 1 = 15$, confirming $p(x) = 1 + x + x^4$ is primitive over $\mathrm{GF}(2)$.
-
 ## Malleability
 
 An encryption scheme is malleable **iff** an attacker can transform a ciphertext of an unknown message $m$ into a ciphertext of a related message $f(m)$, without knowing $m$ or the key.
@@ -139,3 +83,16 @@ Knowing one plaintext also recovers the keystream, $k = c_1 \oplus m_1$. Any fur
 To encrypt a message $m$ (of length $n$), a keystream $k$ (of length $n$) is generated that is random and never reused. The message bits are XORed with the keystream bits to produce the ciphertext.
 
 Impractical as it requires a key as long as the message and never reused, but applications need a short key and reuse it across many messages.
+
+### Ron's Cipher (RC4)
+
+RC4, designed by Ron Rivest in 1987, is a byte-oriented keystream generator built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an [LFSR](/s5/computer-security/linear-feedback-shift-registers).
+
+- Key Scheduling Algorithm (KSA)  
+  Initialises $S$ to the identity permutation, then scrambles it by repeatedly swapping entries, using the secret key (1 to 256 bytes, reused cyclically) to bias each swap.
+- Pseudo-Random Generation Algorithm (PRGA)  
+  Produces 1 keystream byte per step: 2 indices into $S$ are advanced and their entries swapped, then the byte at the sum of the 2 swapped entries (mod 256) is output.
+
+Each output byte depends on the entire current permutation rather than a fixed linear recurrence, so RC4 has none of the structure the LFSR-based generators above rely on, at the cost of a much larger internal state ($256!$ possible permutations) than the key itself.
+
+RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, but is now considered broken. The first output bytes are measurably biased toward certain values, letting an attacker who sees the same key reused across enough sessions recover plaintext without ever recovering the key, and RC4 has since been deprecated in the protocols that used it.

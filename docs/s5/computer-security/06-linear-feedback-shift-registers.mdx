@@ -1,0 +1,132 @@
+---
+title: Linear Feedback Shift Registers
+dateCreated: 2026-09-28T00:00:00.000Z
+slug: s5/computer-security/linear-feedback-shift-registers
+sidebar:
+  order: 6
+prev: true
+next: true
+lastUpdatedOn: 2026-09-28T03:47:59.477Z
+---
+
+A linear feedback shift register (LFSR) builds a [keystream](/s5/computer-security/stream-ciphers) from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
+
+$$
+s_i = c_1 s_{i-1} \oplus c_2 s_{i-2} \oplus \cdots \oplus c_n s_{i-n}, \quad i \ge n
+$$
+
+- $c_1, \ldots, c_n \in \{0, 1\}$: the feedback taps, fixed for a given LFSR.
+- $s_0, \ldots, s_{n-1}$: the initial state, acting as the secret key or seed.
+
+Each step outputs 1 bit, usually $s_{i-n}$, then shifts the register and inserts the new feedback bit.
+
+import Lfsr from "./images/lfsr.svg";
+
+<Lfsr />
+
+## Connection Polynomial
+
+The taps are written as a connection polynomial over $\mathrm{GF}(2)$, also called the feedback polynomial.
+
+$$
+p(x) = 1 + c_1 x + c_2 x^2 + \cdots + c_n x^n
+$$
+
+Each term $c_k x^k$ marks whether the tap $k$ steps back feeds into the recurrence, so $p(x)$ is a complete description of the LFSR's wiring, independent of the initial state.
+
+The output sequence has period $2^n - 1$, the maximum possible for an $n$-bit register, **iff** $p(x)$ is a primitive polynomial over $\mathrm{GF}(2)$.
+
+<Note>
+
+A non-primitive connection polynomial still produces a periodic sequence, just with a period shorter than $2^n - 1$, and possibly a period that depends on the initial state.
+
+</Note>
+
+## Characteristic Polynomial
+
+The recurrence itself corresponds to a characteristic polynomial, related to the connection polynomial by $x^n$ reversal.
+
+$$
+p^*(x) = x^n p(1/x) = x^n + c_1 x^{n-1} + c_2 x^{n-2} + \cdots + c_n
+$$
+
+$p^*(x)$ is primitive over $\mathrm{GF}(2)$ **iff** $p(x)$ is, so either polynomial can be used to check for maximal period. The characteristic polynomial is the one whose roots in the extension field $\mathrm{GF}(2^n)$ generate the output sequence, each output bit expressible as a trace function of a root raised to successive powers.
+
+## Combining LFSRs
+
+An LFSR alone fails the unpredictability requirement of a secure keystream generator, since its recurrence is linear. Practical generators instead combine several LFSRs of different lengths and connection polynomials through a nonlinear Boolean function $f$.
+
+$$
+k_i = f\left(s_i^{(1)}, s_i^{(2)}, \ldots, s_i^{(m)}\right)
+$$
+
+- $s_i^{(j)}$: the output bit of the $j$-th LFSR at step $i$.
+- $f$: a fixed nonlinear function of the $m$ component outputs.
+
+For example, the Geffe generator combines 3 LFSRs through $f(x_1, x_2, x_3) = x_1 x_2 \oplus (1 \oplus x_1) x_3$, using $x_1$ to select between $x_2$ and $x_3$.
+
+## Security
+
+A combining function $f$ must satisfy several properties for the resulting keystream to resist analysis.
+
+- Balance  
+  $f$ outputs 0 and 1 equally often across all input combinations, so the keystream carries no statistical bias.
+- High nonlinear order  
+  $f$ cannot be approximated by a linear or affine function of its inputs, since a close linear approximation reduces the combiner to a single large LFSR.
+- Correlation immunity  
+  $k_i$ is statistically independent of each individual $s_i^{(j)}$, so no component LFSR's output correlates with the combiner's output.
+
+A higher correlation immunity order generally forces a lower achievable nonlinear order, so the 2 properties trade off against each other rather than maximising independently. The Geffe generator above illustrates the failure mode: despite being nonlinear and balanced, its output agrees with $x_2$ on $75\%$ of inputs and with $x_3$ on $75\%$ of inputs, since $x_1$ only selects which of the two it copies.
+
+## Attacking
+
+### Berlekamp-Massey Algorithm
+
+Targets a single LFSR directly, exploiting the linearity of its recurrence.
+
+- $2n$ consecutive output bits give $n$ linear equations in the $n$ unknown taps $c_1, \ldots, c_n$.
+- Solving this system (the Berlekamp-Massey algorithm does so in $O(n^2)$) recovers every tap and the state at that point.
+- The attacker then computes every following output bit from the recurrence.
+
+### Correlation Attack
+
+Targets a combined generator whose combining function $f$ correlates with 1 of its component LFSRs, as in the Geffe example above.
+
+- The attacker guesses the connection polynomial of the correlated LFSR (public in most designs) and searches over its $2^n - 1$ possible initial states.
+- Each candidate state produces a candidate output sequence, compared against the keystream bit by bit.
+- The candidate whose sequence agrees with the keystream noticeably more than $50\%$ of the time is accepted as the recovered state.
+
+This reduces recovering an $m$-LFSR generator's full state from 1 search of size $2^{\sum n_j} - 1$ to $m$ separate searches of size $2^{n_j} - 1$ each, so correlation immunity directly defends against it.
+
+## A5/1
+
+A5/1 is the stream cipher GSM uses to encrypt the over-the-air voice and data channel between a phone and the base station, keyed by a 64-bit session key $K_c$.
+
+It combines 3 LFSRs of lengths 19, 22, and 23 bits, whose lengths sum to the 64-bit key, each initialised from $K_c$ and a public frame number. The keystream bit at each step is the XOR of the top bit of all 3 registers.
+
+Clocking a register means advancing it by 1 step: computing the feedback bit from its taps, shifting its contents, and inserting that bit. A standalone LFSR clocks unconditionally every step.
+
+Rather than a nonlinear combining function, A5/1 gets its nonlinearity from irregular clocking, where whether a register clocks on a given step is itself decided by the registers' own state. Each register has 1 designated clocking bit. At every step, the majority value among the 3 clocking bits is computed, and only the registers whose clocking bit matches the majority are clocked, so 2 or 3 registers advance each step but never just 1.
+
+Whether a given register advances depends on the other 2 registers' state, so the relationship between the key and the keystream is no longer linear, defeating a direct Berlekamp-Massey attack.
+
+A5/1 is still broken in practice. Its 64-bit state is small enough for a precomputed time-memory tradeoff attack to recover $K_c$ from a few seconds of captured traffic, and the majority clocking rule is itself biased enough to support a dedicated correlation attack.
+
+## Example
+
+Take $n = 4$ with connection polynomial $p(x) = 1 + x + x^4$, so $c_1 = 1, c_2 = 0, c_3 = 0, c_4 = 1$, and initial state $s_0 s_1 s_2 s_3 = 1000$.
+
+$$
+s_i = s_{i-1} \oplus s_{i-4}
+$$
+
+| $i$ | $s_{i-4} s_{i-3} s_{i-2} s_{i-1}$ | $s_i$ | Output  |
+| --- | --------------------------------- | ----- | ------- |
+| 4   | 1000                              | 1     | $s_0=1$ |
+| 5   | 0001                              | 1     | $s_1=0$ |
+| 6   | 0011                              | 0     | $s_2=0$ |
+| 7   | 0110                              | 1     | $s_3=0$ |
+| 8   | 1101                              | 1     | $s_4=1$ |
+| 9   | 1011                              | 0     | $s_5=1$ |
+
+Continuing the recurrence for 15 steps cycles through every nonzero state of the register once before repeating, giving the maximal period $2^4 - 1 = 15$, confirming $p(x) = 1 + x + x^4$ is primitive over $\mathrm{GF}(2)$.
