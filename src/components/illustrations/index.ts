@@ -18,6 +18,7 @@ export { default as NetworkDiagram } from "./network-diagram.astro";
 export { default as Packet } from "./packet.astro";
 export { default as PermutationTable } from "./permutation-table.astro";
 export { default as PpfDiagram } from "./ppf-diagram.astro";
+export { default as ProcessStateDiagram } from "./process-state-diagram.astro";
 export { default as RgbCmykConverter } from "./rgb-cmyk-converter.astro";
 export { default as RotationSchedule } from "./rotation-schedule.astro";
 export { default as SensitivityCostRowOp } from "./sensitivity-cost-row-op.astro";
