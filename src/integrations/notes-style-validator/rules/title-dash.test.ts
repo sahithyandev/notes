@@ -3,22 +3,18 @@ import { checkTitleDash } from "./title-dash.ts";
 import { scanOne } from "../test-helpers.ts";
 
 function note(frontmatterExtra: string, body = "Body text."): string {
-  return `---\ntitle: X\nslug: s1/mathematics/foo\n${frontmatterExtra}\n---\n\n${body}\n`;
+  return `---\ntitle: X\n${frontmatterExtra}\n---\n\n${body}\n`;
 }
 
 test("flags an em dash in the title", () => {
-  const f = scanOne(
-    `---\ntitle: Foo — Bar\nslug: s1/mathematics/foo\n---\n\nBody.\n`,
-  );
+  const f = scanOne(`---\ntitle: Foo — Bar\n---\n\nBody.\n`);
   const violations = checkTitleDash(f);
   expect(violations).toHaveLength(1);
   expect(violations[0].snippet).toBe("Foo — Bar");
 });
 
 test("flags an en dash in the title", () => {
-  const f = scanOne(
-    `---\ntitle: Foo – Bar\nslug: s1/mathematics/foo\n---\n\nBody.\n`,
-  );
+  const f = scanOne(`---\ntitle: Foo – Bar\n---\n\nBody.\n`);
   const violations = checkTitleDash(f);
   expect(violations).toHaveLength(1);
   expect(violations[0].snippet).toBe("Foo – Bar");
@@ -40,7 +36,7 @@ test("flags an en dash in sidebar.label", () => {
 
 test("flags both title and sidebar.label independently", () => {
   const f = scanOne(
-    `---\ntitle: A — B\nslug: s1/mathematics/foo\nsidebar:\n  order: 1\n  label: C – D\n---\n\nBody.\n`,
+    `---\ntitle: A — B\nsidebar:\n  order: 1\n  label: C – D\n---\n\nBody.\n`,
   );
   expect(checkTitleDash(f)).toHaveLength(2);
 });
@@ -51,9 +47,7 @@ test("does not flag a title or label without a dash", () => {
 });
 
 test("does not flag an unspaced en dash range in the title", () => {
-  const f = scanOne(
-    `---\ntitle: History 1978–2020\nslug: s1/mathematics/foo\n---\n\nBody.\n`,
-  );
+  const f = scanOne(`---\ntitle: History 1978–2020\n---\n\nBody.\n`);
   expect(checkTitleDash(f)).toHaveLength(0);
 });
 

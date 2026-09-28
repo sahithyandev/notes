@@ -165,13 +165,13 @@ One file = one core concept. Split into separate files when:
 
 - The sub-concept has its own properties or proof hints.
 - The sub-concept is a prerequisite for a different note.
-- The sub-concept warrants its own `sidebar.order` entry.
+- The sub-concept warrants its own numbered file (its own sidebar position).
 
 Do not split merely because the content is long — depth under one concept belongs in one file.
 
 ### Frontmatter
 
-Required: `title`, `slug`, `sidebar.order`, `dateCreated`, `lastUpdatedOn`.  
+Required: `title`, `dateCreated`, `lastUpdatedOn`. Do not write `slug` or `sidebar.order`, both are derived from the file path/filename automatically (see CLAUDE.md's "Slugs & file naming").  
 Add `prereqs` (list of slugs) when the note assumes knowledge from a specific prior note.
 
 ---

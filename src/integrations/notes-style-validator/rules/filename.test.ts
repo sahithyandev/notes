@@ -2,9 +2,7 @@ import { test, expect } from "bun:test";
 import { checkFilename } from "./filename.ts";
 import { withScannedFiles } from "../test-helpers.ts";
 
-const CONTENT = ["---", "title: X", "slug: s1/x", "---", "", "content"].join(
-  "\n",
-);
+const CONTENT = ["---", "title: X", "---", "", "content"].join("\n");
 
 test("flags a filename with uppercase letters", () => {
   withScannedFiles({ "05-Markets-and-Products.mdx": CONTENT }, ([f]) => {

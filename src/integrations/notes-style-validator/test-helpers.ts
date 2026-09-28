@@ -3,10 +3,17 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { scanFiles, type ScannedFile } from "./scan.ts";
 
-/** Scans a single in-memory note body via a throwaway temp file. Test-only. */
-export function scanOne(content: string): ScannedFile {
+/**
+ * Scans a single in-memory note body via a throwaway temp file. Test-only.
+ * `relPath` (relative to the temp docs root, may include subdirectories)
+ * defaults to "01-x.mdx"; pass one explicitly for rules that key off the
+ * derived slug (e.g. prereq-scope).
+ */
+export function scanOne(content: string, relPath = "01-x.mdx"): ScannedFile {
   const dir = mkdtempSync(join(tmpdir(), "nsv-"));
-  writeFileSync(join(dir, "01-x.mdx"), content);
+  const full = join(dir, relPath);
+  mkdirSync(dirname(full), { recursive: true });
+  writeFileSync(full, content);
   const [f] = scanFiles(dir);
   rmSync(dir, { recursive: true, force: true });
   return f;

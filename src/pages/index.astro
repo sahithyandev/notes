@@ -33,7 +33,7 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
   for (const note of notes) {
     // Extract semester and module from the slug
     // slug format: "theory-of-electricity/introduction"
-    const slugParts = note.data.slug.split("/");
+    const slugParts = note.id.split("/");
 
     let semesterNumber: number;
     let moduleSlug: string;
@@ -99,7 +99,7 @@ async function getRecentNotes(count: number = 4) {
 
   return notesWithDates.map((note) => {
     // Extract semester and module from slug
-    const slugParts = note.data.slug.split("/");
+    const slugParts = note.id.split("/");
 
     let semesterNumber: number;
     let moduleName: string;
@@ -138,7 +138,7 @@ async function getRecentNotes(count: number = 4) {
       module: formattedModuleName,
       preview,
       lastUpdatedIso,
-      slug: note.data.slug,
+      slug: note.id,
     };
   });
 }
@@ -157,55 +157,48 @@ const recentNotes = await getRecentNotes();
   <Hero semestersCount={semestersData.length} />
 
   <p class="gpa-band">
-    This website holds all my notes, and helped me achieve {CGPA} CGPA across 4 semesters.
+    This website holds all my notes, and helped me achieve {CGPA} CGPA across 4
+    semesters.
   </p>
 
   <section id="semesters">
     <h2 class="section-title">All Semesters</h2>
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
-    >
-      {
-        semestersData.map((semester) => (
-          <SemesterCard
-            href={`/s${semester.number}`}
-            number={semester.number}
-            subjects={semester.modules}
-            notesCount={semester.notesCount.toString()}
-          />
-        ))
-      }
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {semestersData.map((semester) => (
+        <SemesterCard
+          href={`/s${semester.number}`}
+          number={semester.number}
+          subjects={semester.modules}
+          notesCount={semester.notesCount.toString()}
+        />
+      ))}
     </div>
   </section>
 
   <section>
     <h2 class="section-title">Recent Notes</h2>
     <div id="recent">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
-      >
-        {
-          recentNotes.map((note) => (
-            <a href={`/${note.slug}`} class="note-card">
-              <div
-                class="note-card-bar"
-                style={`background:var(--s${note.semester})`}
-              />
-              <div class="note-card-inner">
-                <div class="note-card-sem">
-                  SEMESTER {note.semester} / {note.module.toUpperCase()}
-                </div>
-                <div class="note-card-title">{note.title}</div>
-                <div class="note-card-foot">
-                  <span class="note-card-meta" data-date={note.lastUpdatedIso}>
-                    {note.lastUpdatedIso}
-                  </span>
-                  <span class="note-card-cta">Read &rarr;</span>
-                </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {recentNotes.map((note) => (
+          <a href={`/${note.slug}`} class="note-card">
+            <div
+              class="note-card-bar"
+              style={`background:var(--s${note.semester})`}
+            />
+            <div class="note-card-inner">
+              <div class="note-card-sem">
+                SEMESTER {note.semester} / {note.module.toUpperCase()}
               </div>
-            </a>
-          ))
-        }
+              <div class="note-card-title">{note.title}</div>
+              <div class="note-card-foot">
+                <span class="note-card-meta" data-date={note.lastUpdatedIso}>
+                  {note.lastUpdatedIso}
+                </span>
+                <span class="note-card-cta">Read &rarr;</span>
+              </div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   </section>

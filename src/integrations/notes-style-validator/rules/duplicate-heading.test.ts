@@ -7,7 +7,6 @@ test("flags a heading repeated at the same level", () => {
     [
       "---",
       "title: Demand",
-      "slug: s1/demand",
       "---",
       "",
       "## Elasticity",
@@ -21,8 +20,8 @@ test("flags a heading repeated at the same level", () => {
   );
   const violations = checkDuplicateHeading(f);
   expect(violations).toHaveLength(1);
-  expect(violations[0].line).toBe(10);
-  expect(violations[0].text).toContain("line 6");
+  expect(violations[0].line).toBe(9);
+  expect(violations[0].text).toContain("line 5");
 });
 
 test("flags case-insensitively and ignores markdown formatting", () => {
@@ -30,7 +29,6 @@ test("flags case-insensitively and ignores markdown formatting", () => {
     [
       "---",
       "title: Demand",
-      "slug: s1/demand",
       "---",
       "",
       "## **Elasticity**",
@@ -50,7 +48,6 @@ test("flags the same text repeated at a different heading level", () => {
     [
       "---",
       "title: Demand",
-      "slug: s1/demand",
       "---",
       "",
       "## Elasticity",
@@ -68,7 +65,6 @@ test("does not flag distinct headings", () => {
     [
       "---",
       "title: Demand",
-      "slug: s1/demand",
       "---",
       "",
       "## Elasticity",

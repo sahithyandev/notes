@@ -77,7 +77,7 @@ const entries = await getCollection("notes");
 const pages: Record<
   string,
   {
-    data: (typeof entries)[number]["data"];
+    data: (typeof entries)[number]["data"] & { slug: string };
   }
 > = {};
 
@@ -93,12 +93,11 @@ pages["default.jpg"] = {
 const semesters = new Set<string>();
 
 for (const entry of entries) {
-  const { data } = entry;
-  const slug = data.slug;
-  if (!slug || slug.endsWith("summary")) {
+  const { data, id: slug } = entry;
+  if (slug.endsWith("summary")) {
     continue;
   }
-  pages[`${slug}.jpg`] = { data };
+  pages[`${slug}.jpg`] = { data: { ...data, slug } };
   semesters.add(slug.split("/")[0]);
 }
 

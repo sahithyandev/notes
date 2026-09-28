@@ -75,8 +75,6 @@ async function insertPage(args: string[]) {
   const lines = [
     "---",
     `title: ${hyphenCaseToTitleCase(title)}`,
-    "sidebar:",
-    `  order: ${n}`,
     `dateCreated: ${now}`,
     `lastUpdatedOn: ${now}`,
     "---",

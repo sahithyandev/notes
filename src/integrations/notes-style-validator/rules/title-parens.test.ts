@@ -3,7 +3,7 @@ import { checkTitleParens } from "./title-parens.ts";
 import { scanOne } from "../test-helpers.ts";
 
 function note(title: string, body = "Body text."): string {
-  return `---\ntitle: ${title}\nslug: s1/mathematics/foo\n---\n\n${body}\n`;
+  return `---\ntitle: ${title}\n---\n\n${body}\n`;
 }
 
 test("flags a title containing parentheses", () => {

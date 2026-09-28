@@ -5,10 +5,11 @@ import matter from "gray-matter";
 import { format, resolveConfig } from "prettier";
 import { GitAdapter } from "./lib/git";
 
-// Fields the script itself derives on every run (ordering, slug, dates).
-// A pure recompute of these on an otherwise-untouched sibling file must not
-// count as a "real" change, or lastUpdatedOn gets stamped fresh for files
-// nobody edited.
+// Fields the script itself manages on every run: dates it stamps, plus dead
+// fields (slug, sidebar.order, prev, next) it now deletes on sight rather
+// than write. A pure recompute/cleanup of these on an otherwise-untouched
+// sibling file must not count as a "real" change, or lastUpdatedOn gets
+// stamped fresh for files nobody edited.
 const AUTO_MANAGED_FIELDS = [
   "dateCreated",
   "lastUpdatedOn",
@@ -59,19 +60,6 @@ function hasRealChange(
 }
 
 const PATTERN_TITLE_PREFIX = /(\d+)-/;
-
-function safeParseInt(
-  value: string | undefined,
-  defaultValue: number | undefined = undefined,
-) {
-  if (typeof value === "undefined") return defaultValue;
-
-  const parsed = Number.parseInt(value);
-  if (Number.isNaN(parsed)) {
-    return defaultValue;
-  }
-  return parsed;
-}
 
 async function renumberFiles(
   filePaths: string[],
@@ -170,9 +158,29 @@ export async function syncNoteMetadata(
       return undefined;
     };
 
-    // prev/next are no longer computed; drop any leftover value
+    // prev/next, slug, and sidebar.order are no longer computed; drop any
+    // leftover value from before this script stopped writing them. This
+    // only cleans up files the script happens to touch for another reason
+    // (renumber, rename, real content change) - it does not proactively
+    // rewrite the whole corpus.
     delete currentFrontMatter.prev;
     delete currentFrontMatter.next;
+    delete currentFrontMatter.slug;
+    if (
+      currentFrontMatter.sidebar &&
+      typeof currentFrontMatter.sidebar === "object"
+    ) {
+      const sidebar = { ...currentFrontMatter.sidebar } as Record<
+        string,
+        unknown
+      >;
+      delete sidebar.order;
+      if (Object.keys(sidebar).length > 0) {
+        currentFrontMatter.sidebar = sidebar;
+      } else {
+        delete currentFrontMatter.sidebar;
+      }
+    }
 
     // dateCreated is set once and kept; lastUpdatedOn is stamped fresh only
     // for files actually changed (per CLAUDE.md, "lastUpdatedOn frontmatter
@@ -190,47 +198,22 @@ export async function syncNoteMetadata(
         : (toDate(currentFrontMatter.lastUpdatedOn) ?? new Date()),
     };
 
+    // slug and sidebar.order are derived from the file path at read time
+    // (see src/utils/note-path.ts) rather than written here; this is just
+    // for the log line below.
     const slugSection = relativeFromDocsDirectory.replace(".mdx", "");
-    const pathParts = slugSection.split("/");
+    const newSlug = slugSection
+      .split("/")
+      .map((part) => part.replace(PATTERN_TITLE_PREFIX, ""))
+      .join("/");
 
-    // Remove numeric prefix from all parts
-    const cleanedParts = pathParts.map((part) =>
-      part.replace(PATTERN_TITLE_PREFIX, ""),
-    );
-
-    // Reconstruct slug with semester at the beginning
-    const newSlug = cleanedParts.join("/");
-    file.data.slug = newSlug;
-
-    // const s = await lstat(filePath);
-    // const timeDelta = TIME_NOW - s.mtimeMs;
-    // let isInsideTimeDelta = false;
-    // if (timeDelta < TIME_DELTA) {
-    // 	isInsideTimeDelta = true;
-    // }
-    // if (isInsideTimeDelta) {
-    // 	file.data.sidebar.badge = "new";
-    // } else {
-    // 	file.data.sidebar.badge = undefined;
-    // }
-    if (!file.data.sidebar) {
-      file.data.sidebar = {};
-    }
-    // Derive sidebar.order from the filename only (not directory prefix).
-    const fileBaseName = basename(newFilePath);
-    const orderMatched = fileBaseName.match(PATTERN_TITLE_PREFIX);
-    if (orderMatched) {
-      const orderNumber = safeParseInt(orderMatched[1]);
-      if (orderNumber !== undefined) {
-        file.data.sidebar.order = orderNumber;
-      }
-    } else {
+    if (!basename(newFilePath).match(PATTERN_TITLE_PREFIX)) {
       console.log(filePath, "isn't named correctly.");
     }
-    console.log(`${i} ${section} ${file.data.slug}`);
+    console.log(`${i} ${section} ${newSlug}`);
 
     if (dryRun) {
-      console.log(`[DRY RUN] New slug: ${file.data.slug}`);
+      console.log(`[DRY RUN] New slug: ${newSlug}`);
     } else {
       const updatedFileContent = matter.stringify(file.content, file.data);
       const config = await resolveConfig(newFilePath);

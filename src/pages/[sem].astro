@@ -9,6 +9,7 @@ import TocRail from "../components/note/toc-rail.astro";
 import ModulesList from "../components/note/modules-list.astro";
 import RightSidebar from "../components/note/right-sidebar.astro";
 import type { ModuleItem } from "../utils/types";
+import { orderFromFilePath } from "../utils/note-path";
 
 export const prerender = true;
 
@@ -16,7 +17,7 @@ export async function getStaticPaths() {
   const notes = await getCollection("notes");
   const sems = new Set<string>();
   notes.forEach((note) => {
-    const parts = note.data.slug.split("/");
+    const parts = note.id.split("/");
     if (parts[0]?.match(/^s\d$/)) sems.add(parts[0]);
   });
   return [...sems].map((sem) => ({ params: { sem } }));
@@ -46,14 +47,14 @@ type NoteItem = {
 
 const grouped: Record<string, NoteItem[]> = {};
 allNotes.forEach((note) => {
-  const parts = note.data.slug.split("/");
+  const parts = note.id.split("/");
   if (parts[0] !== sem) return;
   const subject = parts[1];
   if (!grouped[subject]) grouped[subject] = [];
   grouped[subject].push({
-    slug: note.data.slug,
+    slug: note.id,
     label: note.data.sidebar?.label || note.data.title,
-    order: note.data.sidebar?.order ?? 999,
+    order: orderFromFilePath(note.filePath),
     moduleOrder: moduleOrderFromFilePath(note.filePath),
   });
 });
@@ -110,7 +111,7 @@ Object.entries(subjectTrees).forEach(([subject, { modules }]) => {
 
 const semesterNums = new Set<number>();
 allNotes.forEach((note) => {
-  const match = note.data.slug.split("/")[0].match(/^s(\d)$/);
+  const match = note.id.split("/")[0].match(/^s(\d)$/);
   if (match) semesterNums.add(parseInt(match[1]));
 });
 const semesters = [...semesterNums]
@@ -158,44 +159,41 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        ><line x1="3" y1="6" x2="21" y2="6"></line><line
-          x1="3"
-          y1="12"
-          x2="15"
-          y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg
       >
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="15" y2="12"></line>
+        <line x1="3" y1="18" x2="18" y2="18"></line>
+      </svg>
     </button>
-    {
-      tocHeadings.length > 0 && (
-        <button
-          slot="nav-end"
-          class="nav-drawer-btn"
-          id="open-toc"
-          type="button"
-          aria-label="Open table of contents"
+    {tocHeadings.length > 0 && (
+      <button
+        slot="nav-end"
+        class="nav-drawer-btn"
+        id="open-toc"
+        type="button"
+        aria-label="Open table of contents"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <>
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </>
-          </svg>
-        </button>
-      )
-    }
+          <>
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </>
+        </svg>
+      </button>
+    )}
   </Nav>
   <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
 
@@ -232,77 +230,77 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
           </svg>
         </button>
         <div class="sb-sem-menu" id="sem-switcher-menu" hidden role="listbox">
-          {
-            semesters.map((s) => (
-              <a
-                href={`/s${s.number}`}
-                class={`sb-sem-opt ${s.number === parseInt(semNum) ? "active" : ""}`}
-                style={`--opt-sem: var(--s${s.number}); --opt-sem-bg: var(--s${s.number}-bg); --opt-sem-border: var(--s${s.number}-border);`}
-                role="option"
-              >
-                <span class="sb-sem-opt-pip" />
-                <span>{s.label}</span>
-              </a>
-            ))
-          }
+          {semesters.map((s) => (
+            <a
+              href={`/s${s.number}`}
+              class={`sb-sem-opt ${s.number === parseInt(semNum) ? "active" : ""}`}
+              style={`--opt-sem: var(--s${s.number}); --opt-sem-bg: var(--s${s.number}-bg); --opt-sem-border: var(--s${s.number}-border);`}
+              role="option"
+            >
+              <span class="sb-sem-opt-pip" />
+              <span>{s.label}</span>
+            </a>
+          ))}
         </div>
       </div>
 
       <ModulesList modules={subjectsList} />
 
       <div class="sb-rule"></div>
-      <a href="/license" class="sb-item"> License </a>
+      <a href="/license" class="sb-item">
+        {" "}
+        License{" "}
+      </a>
     </aside>
 
     <section>
       <div class="sem-breadcrumb">
-        <a href="/" class="sem-breadcrumb-link">Home</a>
+        <a href="/" class="sem-breadcrumb-link">
+          Home
+        </a>
         <span class="sem-breadcrumb-sep">/</span>
         <span class="sem-breadcrumb-current">Semester {semNum}</span>
       </div>
 
       <h1 class="sem-title">Semester {semNum}</h1>
       <p class="sem-subtitle">
-        {Object.keys(subjectTrees).length} subject{
-          Object.keys(subjectTrees).length !== 1 ? "s" : ""
-        },
-        {allNotes.filter((n) => n.data.slug.startsWith(`${sem}/`)).length} notes
+        {Object.keys(subjectTrees).length} subject
+        {Object.keys(subjectTrees).length !== 1 ? "s" : ""},
+        {allNotes.filter((n) => n.id.startsWith(`${sem}/`)).length} notes
       </p>
 
       <article data-pagefind-body>
-        {
-          Object.entries(subjectTrees).map(([subject, { direct, modules }]) => (
-            <>
-              <h2 id={subject}>
-                {titleize(subject)}
-                {isElective(`${sem}/${subject}`) && (
-                  <span class="elective-badge">Elective</span>
-                )}
-              </h2>
-              {direct.length > 0 && (
+        {Object.entries(subjectTrees).map(([subject, { direct, modules }]) => (
+          <>
+            <h2 id={subject}>
+              {titleize(subject)}
+              {isElective(`${sem}/${subject}`) && (
+                <span class="elective-badge">Elective</span>
+              )}
+            </h2>
+            {direct.length > 0 && (
+              <div class="note-grid">
+                {direct.map((note) => (
+                  <NoteCard href={`/${note.slug}`} order={note.order}>
+                    {note.label}
+                  </NoteCard>
+                ))}
+              </div>
+            )}
+            {Object.entries(modules).map(([mod, notes]) => (
+              <>
+                <h3 id={`${subject}-${mod}`}>{titleize(mod)}</h3>
                 <div class="note-grid">
-                  {direct.map((note) => (
+                  {notes.map((note) => (
                     <NoteCard href={`/${note.slug}`} order={note.order}>
                       {note.label}
                     </NoteCard>
                   ))}
                 </div>
-              )}
-              {Object.entries(modules).map(([mod, notes]) => (
-                <>
-                  <h3 id={`${subject}-${mod}`}>{titleize(mod)}</h3>
-                  <div class="note-grid">
-                    {notes.map((note) => (
-                      <NoteCard href={`/${note.slug}`} order={note.order}>
-                        {note.label}
-                      </NoteCard>
-                    ))}
-                  </div>
-                </>
-              ))}
-            </>
-          ))
-        }
+              </>
+            ))}
+          </>
+        ))}
       </article>
     </section>
 
@@ -340,7 +338,6 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
       });
     }
   </script>
-
   <script>
     const openSidebarBtn = document.getElementById("open-sidebar");
     const openTocBtn = document.getElementById("open-toc");

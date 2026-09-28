@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import { titleize } from "../utils";
+import { orderFromFilePath } from "../utils/note-path";
 
 export interface SidebarNote {
   slug: string;
@@ -54,15 +55,15 @@ export async function getSidebarData(
   > = {};
 
   allNotes.forEach((note) => {
-    const parts = note.data.slug.split("/");
+    const parts = note.id.split("/");
     const sem = parts[0];
     const mod = parts[1];
-    const order = note.data.sidebar?.order ?? 999;
+    const order = orderFromFilePath(note.filePath);
 
     if (!grouped[sem]) grouped[sem] = {};
     if (!grouped[sem][mod]) grouped[sem][mod] = [];
     grouped[sem][mod].push({
-      slug: note.data.slug,
+      slug: note.id,
       title: note.data.title,
       label: note.data.sidebar?.label || note.data.title,
       order,
@@ -75,7 +76,7 @@ export async function getSidebarData(
       const moduleKey = mod ?? "general";
       if (!semesterMap[n]) semesterMap[n] = {};
       if (!semesterMap[n][moduleKey]) semesterMap[n][moduleKey] = [];
-      semesterMap[n][moduleKey].push({ slug: note.data.slug, order });
+      semesterMap[n][moduleKey].push({ slug: note.id, order });
     }
   });
 

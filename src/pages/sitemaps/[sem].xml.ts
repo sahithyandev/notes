@@ -9,7 +9,7 @@ export async function GET({ params }: { params: { sem: string } }) {
 
   // Filter notes for this semester
   const semesterNotes = notes.filter((note) => {
-    const parts = note.data.slug.split("/");
+    const parts = note.id.split("/");
     return parts[0] === sem;
   });
 
@@ -25,10 +25,10 @@ export async function GET({ params }: { params: { sem: string } }) {
   </url>
   ${semesterNotes
     .map((note) => {
-      const wip = isWip(note.data.slug);
+      const wip = isWip(note.id);
       return `
   <url>
-    <loc>${SITE_HOST_URL}/${note.data.slug}</loc>
+    <loc>${SITE_HOST_URL}/${note.id}</loc>
     <lastmod>${note.data.lastUpdatedOn ? formatDate(note.data.lastUpdatedOn) : new Date().toISOString()}</lastmod>
     <changefreq>${wip ? "daily" : "weekly"}</changefreq>
     <priority>${wip ? "0.4" : "0.7"}</priority>
@@ -50,7 +50,7 @@ export async function getStaticPaths() {
   const semesters = new Set<string>();
 
   for (const note of notes) {
-    const parts = note.data.slug.split("/");
+    const parts = note.id.split("/");
     if (parts[0].match(/^s\d$/)) {
       semesters.add(parts[0]);
     }

@@ -7,7 +7,7 @@ export async function GET() {
 
   // Group notes by semester and find most recent date for each
   for (const note of notes) {
-    const parts = note.data.slug.split("/");
+    const parts = note.id.split("/");
     if (parts[0].match(/^s\d$/)) {
       const sem = parts[0];
       const noteDate = note.data.lastUpdatedOn || new Date();

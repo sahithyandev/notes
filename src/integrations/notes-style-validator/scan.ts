@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import matter from "gray-matter";
 import { maskFile, maskWholeLine } from "./mask.ts";
+import { slugFromDocsPath } from "../../utils/note-path.ts";
 
 export interface ScannedHeading {
   level: number;
@@ -39,7 +40,7 @@ export interface ScannedFile {
   sidebarLabel: string;
   sidebarLabelLine: number;
   headings: ScannedHeading[];
-  /** Frontmatter slug (public URL path, no leading slash). */
+  /** Public URL path (no leading slash), derived from the file's path under docsRoot. */
   slug: string;
   /** GitHub-style anchor slugs for every heading (h1-h6), for in-page/cross-note anchor checks. */
   headingSlugs: Set<string>;
@@ -306,7 +307,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
         typeof data.sidebar?.label === "string" ? data.sidebar.label : "",
       sidebarLabelLine: sidebarLabelLineOf(raw),
       headings: extractHeadings(content, fmLines),
-      slug: typeof data.slug === "string" ? data.slug : "",
+      slug: slugFromDocsPath(relative(docsRoot, file)),
       headingSlugs: extractHeadingSlugs(content),
       prereqs: prereqLinesOf(raw, prereqs),
       links: extractLinks(content, fmLines),

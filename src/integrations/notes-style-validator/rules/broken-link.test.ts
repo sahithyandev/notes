@@ -5,7 +5,7 @@ import { withScannedFiles } from "../test-helpers.ts";
 test("flags a doc link to a slug that doesn't exist", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [b](/s1/mod/nonexistent).\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [b](/s1/mod/nonexistent).\n`,
     },
     (files) => {
       const violations = findBrokenLinks(files);
@@ -18,8 +18,8 @@ test("flags a doc link to a slug that doesn't exist", () => {
 test("does not flag a doc link to a slug that exists", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [b](/s1/mod/b).\n`,
-      "02-b.mdx": `---\ntitle: B\nslug: s1/mod/b\n---\n\nBody.\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [b](/s1/mod/b).\n`,
+      "s1/mod/02-b.mdx": `---\ntitle: B\n---\n\nBody.\n`,
     },
     (files) => {
       expect(findBrokenLinks(files)).toHaveLength(0);
@@ -30,7 +30,7 @@ test("does not flag a doc link to a slug that exists", () => {
 test("respects extraValidUrls for redirected slugs", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [old](/s1/old-module).\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [old](/s1/old-module).\n`,
     },
     (files) => {
       expect(findBrokenLinks(files, ["/s1/old-module"])).toHaveLength(0);
@@ -41,7 +41,7 @@ test("respects extraValidUrls for redirected slugs", () => {
 test("flags a broken in-page anchor within the same file", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\n## Real Heading\n\nSee [x](#missing-heading).\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\n## Real Heading\n\nSee [x](#missing-heading).\n`,
     },
     (files) => {
       const violations = findBrokenLinks(files);
@@ -54,7 +54,7 @@ test("flags a broken in-page anchor within the same file", () => {
 test("does not flag an in-page anchor that matches a real heading", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\n## Real Heading\n\nSee [x](#real-heading).\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\n## Real Heading\n\nSee [x](#real-heading).\n`,
     },
     (files) => {
       expect(findBrokenLinks(files)).toHaveLength(0);
@@ -65,8 +65,8 @@ test("does not flag an in-page anchor that matches a real heading", () => {
 test("flags a broken anchor on a link to another (valid) note", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [b](/s1/mod/b#missing).\n`,
-      "02-b.mdx": `---\ntitle: B\nslug: s1/mod/b\n---\n\n## Existing\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [b](/s1/mod/b#missing).\n`,
+      "s1/mod/02-b.mdx": `---\ntitle: B\n---\n\n## Existing\n`,
     },
     (files) => {
       const violations = findBrokenLinks(files);
@@ -79,7 +79,7 @@ test("flags a broken anchor on a link to another (valid) note", () => {
 test("skips external links entirely", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [ext](https://example.com/nonexistent).\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [ext](https://example.com/nonexistent).\n`,
     },
     (files) => {
       expect(findBrokenLinks(files)).toHaveLength(0);
@@ -90,7 +90,7 @@ test("skips external links entirely", () => {
 test("flags a relative image link that doesn't exist on disk", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\n![alt](./images/missing.png)\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\n![alt](./images/missing.png)\n`,
     },
     (files) => {
       const violations = findBrokenLinks(files);
@@ -103,8 +103,8 @@ test("flags a relative image link that doesn't exist on disk", () => {
 test("does not flag a relative image link that exists on disk", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\n![alt](./images/real.png)\n`,
-      "images/real.png": "not actually a png, just needs to exist",
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\n![alt](./images/real.png)\n`,
+      "s1/mod/images/real.png": "not actually a png, just needs to exist",
     },
     (files) => {
       expect(findBrokenLinks(files)).toHaveLength(0);
@@ -115,8 +115,8 @@ test("does not flag a relative image link that exists on disk", () => {
 test("suggests a close match for a near-miss slug", () => {
   withScannedFiles(
     {
-      "01-a.mdx": `---\ntitle: A\nslug: s1/mod/a\n---\n\nSee [b](/s1/mod/bb).\n`,
-      "02-b.mdx": `---\ntitle: B\nslug: s1/mod/b\n---\n\nBody.\n`,
+      "s1/mod/01-a.mdx": `---\ntitle: A\n---\n\nSee [b](/s1/mod/bb).\n`,
+      "s1/mod/02-b.mdx": `---\ntitle: B\n---\n\nBody.\n`,
     },
     (files) => {
       const violations = findBrokenLinks(files);

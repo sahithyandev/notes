@@ -38,7 +38,8 @@ Use the `write-notes` skill whenever writing a new note or editing an existing o
 Do not hand-edit these automatic fields:
 
 - `lastUpdatedOn` frontmatter is set on commit.
-- Numeric file prefixes and `sidebar.order` are managed by `scripts/sync-note-metadata.ts`.
+- Numeric file prefixes are managed by `scripts/sync-note-metadata.ts`.
+- `slug` and `sidebar.order` are not frontmatter fields at all: both are derived from the file path at build/dev time (see "Slugs & file naming" below). A note may still carry a leftover `slug` or `sidebar.order` from before this changed; `sync-note-metadata.ts` deletes them the next time it touches that file, but nothing proactively rewrites the corpus, so don't be surprised to see them linger.
 
 ### Label and description formatting
 
@@ -122,7 +123,7 @@ Don't repeat the same heading text twice within a note, at any level. A note's a
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
 
-`prereq-scope` bans `prereqs` entries that point at a note in the same module — see "Slugs & file naming" below. `broken-link` validates internal doc links, in-page anchors, and relative image paths actually resolve, with fuzzy-match suggestions (`core/similarity.ts`) for near-miss slugs. `filename` (`rules/filename.ts`) bans uppercase letters anywhere in a note's filename, since slugs and sidebar order are derived from it by `sync-note-metadata.ts` and an uppercase letter there leaks into the URL, and separately bans the `.md` extension in favor of `.mdx` (a file can trip both checks at once, each reported as its own violation).
+`prereq-scope` bans `prereqs` entries that point at a note in the same module — see "Slugs & file naming" below. `broken-link` validates internal doc links, in-page anchors, and relative image paths actually resolve, with fuzzy-match suggestions (`core/similarity.ts`) for near-miss slugs. `filename` (`rules/filename.ts`) bans uppercase letters anywhere in a note's filename, since slug and sidebar order are derived from it at build/dev time (see "Slugs & file naming" below) and an uppercase letter there leaks into the URL, and separately bans the `.md` extension in favor of `.mdx` (a file can trip both checks at once, each reported as its own violation).
 
 After running `bun build`, always check the terminal output for `[notes-style-validator]` lines reporting violations (the build already fails on them, but read what broke).
 
@@ -144,14 +145,15 @@ bun run check-notes-style -- --filter s1/mathematics
 
 ## Slugs & file naming
 
-URLs come from the `slug` frontmatter field, not the file path. `sync-note-metadata.ts` derives everything from a numeric filename prefix:
+URLs come from the file path, not frontmatter. `slugFromDocsPath` (`src/utils/note-path.ts`) strips the numeric prefix from each path segment:
 
 - `docs/s2/theory-of-electricity/01-introduction.md` becomes slug `s2/theory-of-electricity/introduction`.
-- The prefix becomes `sidebar.order`.
+
+It's wired into the content collection as `generateId` in `src/content.config.ts`, so `entry.id` on a `notes` collection entry _is_ the slug (`getEntry("notes", slug)` works because of this). `sidebar.order` is derived the same way from `entry.filePath`'s leaf filename via `orderFromFilePath` (same file), used wherever notes need sorting (`src/lib/sidebar.ts`, `src/pages/[sem].astro`). Neither is read from frontmatter anymore; a note is free to still carry a stale `slug`/`sidebar.order` key left over from before this changed (see "Do not hand-edit" above), it's simply ignored.
 
 `images/` and `summary/` subdirectories are skipped.
 
-Frontmatter: `title` and `slug` are required; `sidebar.label`, `sidebar.order`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
+Frontmatter: `title` is required; `sidebar.label`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
 Do not put notes from the same module in `prereqs`. The sidebar order / prev-next navigation already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. Enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
 

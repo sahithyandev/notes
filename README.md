@@ -44,7 +44,7 @@ Notes are Markdown files in `docs/`. After adding or renaming any `.md` file, ru
 bun scripts/sync-note-metadata.ts <path/to/file.md>
 ```
 
-Files must be named with a numeric prefix (e.g. `01-introduction.md`). The prefix is stripped from the URL slug and becomes the sidebar order.
+Files must be named with a numeric prefix (e.g. `01-introduction.md`). The prefix isn't written into frontmatter: a note's URL slug and sidebar order are derived straight from its file path at build/dev time (`src/utils/note-path.ts`, wired into `src/content.config.ts`), so renaming or renumbering a file is all it takes to change either. The sync script still handles the numeric renumbering itself, the `.md` → `.mdx` rename, and stamping `dateCreated`/`lastUpdatedOn`.
 
 To check note content for style/link issues without a full build:
 
@@ -55,6 +55,22 @@ bun run check-notes-style
 Add `-- --filter <name>` to scope it to a semester, module, submodule, or note (e.g. `--filter s1/mathematics`).
 
 The same checks (title case, label/description formatting, dashes, math delimiters, broken links, and more) also run as part of `bun dev` and `bun build`, and the build fails on any violation.
+
+## Note Metadata
+
+Every note is validated against the `notes` schema in `src/content.config.ts`. Frontmatter fields:
+
+| Field           | Required? | Notes                                                                                           |
+| :-------------- | :-------- | :---------------------------------------------------------------------------------------------- |
+| `title`         | Yes       | Also used as the page's `<h1>`; must be title-cased and ≤40 characters.                         |
+| `dateCreated`   | No        | Set once by the sync script from the file's creation time; kept as-is after that.               |
+| `lastUpdatedOn` | No        | Stamped fresh by the sync script only when a commit actually changes the note's content.        |
+| `sidebar.label` | No        | Overrides the sidebar's display text; falls back to `title` when absent.                        |
+| `keywords`      | No        | Array of strings; not currently rendered, reserved for future SEO/search use.                   |
+| `prereqs`       | No        | Array of slugs for notes in _other_ modules this one assumes; same-module entries are rejected. |
+| `authors`       | No        | Array of author slugs from `src/data/authors.json`; defaults to `sahithyan` when omitted.       |
+
+**`slug` and `sidebar.order` are not frontmatter fields.** Both are derived at build/dev time straight from the file path by `slugFromDocsPath`/`orderFromFilePath` (`src/utils/note-path.ts`), which is wired into the `notes` collection's `generateId` in `content.config.ts`. Renaming or renumbering a file (`01-`, `02-`, ...) is all it takes to change either; nothing needs to be written by hand. A note may still carry a leftover `slug` or `sidebar.order` key from before this changed, the schema ignores it, and `scripts/sync-note-metadata.ts` deletes it (along with the older, likewise-dead `prev`/`next` fields) the next time it happens to rewrite that file, rather than proactively across the whole corpus.
 
 ## Onboarding a New Author
 
