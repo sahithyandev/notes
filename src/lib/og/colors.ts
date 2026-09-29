@@ -1,7 +1,7 @@
 // Imported as raw text (Vite `?raw` suffix) rather than read from disk at
-// runtime: this module gets bundled into the prerendered OG route, and a
-// filesystem path resolved from `import.meta.dirname` there would point at
-// the build output, not the source tree.
+// runtime: this module gets bundled into the OG route, and a filesystem
+// path resolved from `import.meta.dirname` there would point at the build
+// output, not the source tree.
 import globalCss from "../../styles/global.css?raw";
 
 export type RGB = [r: number, g: number, b: number];
