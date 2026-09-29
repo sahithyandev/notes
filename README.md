@@ -23,7 +23,7 @@ bun install
 
 ## Development
 
-`bun dev` runs a `notes-style-validator` pass on `docs/` as you edit (see below), and the dev server coalesces rapid successive file changes into a single browser reload instead of one per file, so editing several notes in quick succession (by hand, a script, or an AI coding agent) doesn't cause a reload storm.
+`bun dev` runs a `notes-style-validator` pass on `docs/` as you edit (see below), and the dev server coalesces rapid successive file changes into a single browser reload instead of one per file, so editing several notes in quick succession (by hand, a script, or an AI coding agent) doesn't cause a reload storm. Editing a note's Markdown/MDX file doesn't even trigger a full reload: the open note page patches itself in place instead. Anything else (components, scripts, config) still triggers a real reload.
 
 ## Testing
 

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -m 2 -X POST http://localhost:4321/__reload-lock/pause >/dev/null 2>&1 || true"
+            "command": "bun .claude/hooks/reload-lock.ts pause"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -s -m 2 -X POST http://localhost:4321/__reload-lock/resume >/dev/null 2>&1 || true"
+            "command": "bun .claude/hooks/reload-lock.ts resume"
           }
         ]
       }
