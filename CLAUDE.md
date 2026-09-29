@@ -157,7 +157,7 @@ It's wired into the content collection as `generateId` in `src/content.config.ts
 
 Frontmatter: `title` is required; `sidebar.label`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
 
-Do not put notes from the same module in `prereqs`. The sidebar order / prev-next navigation already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. Enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
+Do not put notes from the same module in `prereqs`. The sidebar order / prev-next navigation already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. A prereq also cannot point into a _later_ semester than the note's own (e.g. an `s2` note cannot list an `s5` note as a prereq), since that material hasn't been studied yet; a prereq in the _same_ semester but a different module is fine, since modules within a semester are often studied concurrently. Both enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
 
 ## Routing
 

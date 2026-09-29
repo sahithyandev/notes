@@ -11,7 +11,7 @@ function note(frontmatterExtra: string, body = "Body text."): string {
 test("flags a prereq in the same module (block-sequence form)", () => {
   const f = scanOne(
     note(
-      "prereqs:\n  - s1/mathematics/real-analysis/bar\n  - s2/other-module/baz",
+      "prereqs:\n  - s1/mathematics/real-analysis/bar\n  - s0/other-module/baz",
     ),
     NOTE_PATH,
   );
@@ -28,8 +28,23 @@ test("flags a prereq in the same module (inline array form)", () => {
   expect(checkPrereqScope(f)).toHaveLength(1);
 });
 
-test("does not flag a prereq in a different module", () => {
-  const f = scanOne(note("prereqs:\n  - s2/other-module/baz"), NOTE_PATH);
+test("does not flag a prereq in a different module in an earlier semester", () => {
+  const f = scanOne(
+    note("prereqs:\n  - s1/other-module/baz"),
+    "s2/mathematics/foo/01-bar.mdx",
+  );
+  expect(checkPrereqScope(f)).toHaveLength(0);
+});
+
+test("flags a prereq in a later semester", () => {
+  const f = scanOne(note("prereqs:\n  - s5/other-module/baz"), NOTE_PATH);
+  const violations = checkPrereqScope(f);
+  expect(violations).toHaveLength(1);
+  expect(violations[0].snippet).toBe("s5/other-module/baz");
+});
+
+test("does not flag a prereq in the same semester but a different module", () => {
+  const f = scanOne(note("prereqs:\n  - s1/other-module/baz"), NOTE_PATH);
   expect(checkPrereqScope(f)).toHaveLength(0);
 });
 
