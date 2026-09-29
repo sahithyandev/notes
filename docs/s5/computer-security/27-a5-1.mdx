@@ -1,0 +1,55 @@
+---
+title: A5/1 Stream Cipher
+dateCreated: 2026-09-29T00:00:00.000Z
+lastUpdatedOn: 2026-09-29T03:14:19.134Z
+---
+
+A5/1 is an [LFSR](/s5/computer-security/linear-feedback-shift-registers) based [stream cipher](/s5/computer-security/stream-ciphers) used to encrypt on-air mobile communication traffic in the GSM standard.
+
+It combines 3 LFSRs $R_1$, $R_2$, $R_3$ of lengths 19, 22 and 23 bits. The keystream bit at each step is the XOR of the output bits of the 3 registers.
+
+## Kerckhoffs's Principle Violation
+
+The A5/1 design was kept secret from its creation in 1987 until 1999, violating [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle).
+
+- 1999  
+  Marc Briceno reverse engineered the design.
+- 2006  
+  With the design public, Elad Barkan, Eli Biham and Nathan Keller showed how to break the cipher in real time.
+
+## Registers
+
+Each register is defined by a feedback polynomial.
+
+$$
+\begin{aligned}
+R_1 &: x^{19} + x^{18} + x^{17} + x^{14} + 1 \\
+R_2 &: x^{22} + x^{21} + 1 \\
+R_3 &: x^{23} + x^{22} + x^{21} + x^{8} + 1
+\end{aligned}
+$$
+
+## Irregular Clocking
+
+Each register has a clocking bit. At every step, the majority of the 3 clocking bits $c_1, c_2, c_3$ is computed.
+
+$$
+\text{maj} = (c_1 \cdot c_2) \oplus (c_2 \cdot c_3) \oplus (c_3 \cdot c_1)
+$$
+
+A register is clocked **iff** its clocking bit equals $\text{maj}$. At least 2 registers are clocked at every step.
+
+| $c_1$ | $c_2$ | $c_3$ | $\text{maj}$ | $R_1$ | $R_2$ | $R_3$ |
+| ----- | ----- | ----- | ------------ | ----- | ----- | ----- |
+| 0     | 0     | 0     | 0            | Y     | Y     | Y     |
+| 0     | 0     | 1     | 0            | Y     | Y     | N     |
+| 0     | 1     | 0     | 0            | Y     | N     | Y     |
+| 0     | 1     | 1     | 1            | N     | Y     | Y     |
+| 1     | 0     | 0     | 0            | N     | Y     | Y     |
+| 1     | 0     | 1     | 1            | Y     | N     | Y     |
+| 1     | 1     | 0     | 1            | Y     | Y     | N     |
+| 1     | 1     | 1     | 1            | Y     | Y     | Y     |
+
+Here Y means clocked and N means not clocked.
+
+Whether a register advances depends on the other registers, so the keystream is not a linear function of the key.

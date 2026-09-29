@@ -1,7 +1,7 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:13.881Z
+lastUpdatedOn: 2026-09-29T03:14:19.121Z
 ---
 
 A linear feedback shift register (LFSR) builds a [keystream](/s5/computer-security/stream-ciphers) from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
@@ -92,20 +92,6 @@ Targets a combined generator whose combining function $f$ correlates with 1 of i
 - The candidate whose sequence agrees with the keystream noticeably more than $50\%$ of the time is accepted as the recovered state.
 
 This reduces recovering an $m$-LFSR generator's full state from 1 search of size $2^{\sum n_j} - 1$ to $m$ separate searches of size $2^{n_j} - 1$ each, so correlation immunity directly defends against it.
-
-## A5/1
-
-A5/1 is the stream cipher GSM uses to encrypt the over-the-air voice and data channel between a phone and the base station, keyed by a 64-bit session key $K_c$.
-
-It combines 3 LFSRs of lengths 19, 22, and 23 bits, whose lengths sum to the 64-bit key, each initialised from $K_c$ and a public frame number. The keystream bit at each step is the XOR of the top bit of all 3 registers.
-
-Clocking a register means advancing it by 1 step: computing the feedback bit from its taps, shifting its contents, and inserting that bit. A standalone LFSR clocks unconditionally every step.
-
-Rather than a nonlinear combining function, A5/1 gets its nonlinearity from irregular clocking, where whether a register clocks on a given step is itself decided by the registers' own state. Each register has 1 designated clocking bit. At every step, the majority value among the 3 clocking bits is computed, and only the registers whose clocking bit matches the majority are clocked, so 2 or 3 registers advance each step but never just 1.
-
-Whether a given register advances depends on the other 2 registers' state, so the relationship between the key and the keystream is no longer linear, defeating a direct Berlekamp-Massey attack.
-
-A5/1 is still broken in practice. Its 64-bit state is small enough for a precomputed time-memory tradeoff attack to recover $K_c$ from a few seconds of captured traffic, and the majority clocking rule is itself biased enough to support a dedicated correlation attack.
 
 ## Example
 
