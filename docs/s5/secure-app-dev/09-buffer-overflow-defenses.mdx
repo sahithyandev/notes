@@ -1,0 +1,55 @@
+---
+title: Buffer Overflow Defenses
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-09-29T21:47:52.888Z
+---
+
+Defenses against [buffer overflow](/s5/computer-security/buffer-overflow) fall into 2 broad categories.
+
+- Compile-time defenses  
+  Harden new programs to resist attacks.
+- Run-time defenses  
+  Detect and abort attacks against existing programs.
+
+## Compile-Time Defenses
+
+The first 3 remove the vulnerability itself. The last 2 instead detect stack corruption after an overflow happens, before the corrupted data is used.
+
+- Modern high-level language  
+  Not vulnerable to buffer overflow, since the compiler enforces range checks and permissible operations. See [memory safe languages](/s5/secure-app-dev/memory-safety#memory-safe-languages) for the tradeoffs.
+- Safe coding techniques  
+  C prioritizes space and performance over type safety, assuming programmer discipline. The OpenBSD project audited its entire code base, OS, standard libraries, and utilities, producing one of the safest operating systems in widespread use.
+- Language extensions and safe libraries  
+  Replace unsafe standard library routines with safer variants, e.g. Libsafe, a dynamic library loaded before the standard libraries. Requires recompilation and can conflict with third-party applications.
+- Random canary  
+  Add function entry and exit code to detect stack corruption using a random, unpredictable canary value that varies across systems.
+- Stackshield and Return Address Defender (RAD)  
+  GCC extensions implementing the canary technique: entry code saves a copy of the return address to a safe region, exit code compares it against the stack copy, and aborts on mismatch.
+
+<Note>
+
+Both canary-based defenses are bypassed by a replacement stack frame attack, since it overwrites the saved frame pointer without touching the canary or return address directly.
+
+</Note>
+
+## Run-Time Defenses
+
+All 3 assume corruption has already happened, and instead limit what the corrupted control-flow data can do.
+
+- Executable address space protection  
+  Use virtual memory support to mark regions of memory, e.g. the stack, non-executable. Requires memory management unit (MMU) support and special provisions where executable stack code is legitimately needed. Bypassed by return-to-system-call, since it never needs to run injected code.
+- Address space randomization  
+  Randomly shift the location of the stack, heap, and global data per process. The large address range on modern systems makes the resulting waste negligible.
+- Guard pages  
+  Place pages flagged as illegal in the MMU between critical memory regions, e.g. between stack frames or around heap buffers, so any access attempt aborts the process. Costs execution time due to the number of page mappings required.
+
+## Defense Bypasses
+
+Every defense above narrows what an attacker can do rather than closing the attack surface entirely. Each bypass below targets a specific defense from the 2 sections above.
+
+- Replacement stack frame  
+  Overwrites the buffer and the saved frame pointer to point at a dummy stack frame. The current function then returns into the replacement frame, transferring control to shellcode in the overwritten buffer. Defeats canary-based stack protection, since the canary and return address are never touched directly. See [frame pointer overwrite](/s5/computer-security/buffer-overflow#frame-pointer-overwrite).
+- Off-by-one attack  
+  A coding error allows 1 more byte to be copied than the buffer has space for. On its own, still caught by stack protection, non-executable stacks, and randomization, since only 1 byte of adjacent memory is attacker-controlled.
+- Return-to-system-call (return-to-libc)  
+  Overwrites the return address with the address of a standard library function instead of shellcode, a response to non-executable stack defenses. The attacker constructs parameters on the stack above the return address so the "returned-to" function executes with attacker-chosen arguments, and calls can even be chained. Defeats executable address space protection, since it reuses existing executable code instead of injecting new code. Still caught by stack protection, since overwriting the return address still corrupts a canary placed before it, and by randomization, since the attacker needs to know the exact address of the library function.

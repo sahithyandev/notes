@@ -1,0 +1,46 @@
+---
+title: Heap Overflow
+prereqs:
+  - s5/computer-security/buffer-overflow
+dateCreated: 2026-08-18T00:00:00.000Z
+lastUpdatedOn: 2026-09-29T21:47:52.862Z
+---
+
+Refer to the [buffer overflow](/s5/computer-security/buffer-overflow) note before continuing on.
+
+A heap overflow is a buffer overflow where the overflowed buffer is a dynamic buffer, e.g. one allocated with `malloc`, on the heap. The heap typically sits above the program code, allocated for dynamic data structures.
+
+Adjacent to a heap buffer:
+
+- Other variables
+- vtables of C++ objects
+- Internal data structures of the memory allocator
+
+As with a stack overflow, an attacker controlling the buffer input overwrites this adjacent data, changing control flow or manipulating program data. There is no return address to hijack on the heap, so control transfer instead exploits function pointers stored nearby, or manipulates heap management data structures.
+
+## Allocator Metadata Corruption
+
+Malloc implementations differ by platform, e.g. jemalloc on Android, FreeBSD, and Firefox, dlmalloc/ptmalloc on glibc, tcmalloc on former Chrome, PartitionAlloc on current Chrome. All handle lists of chunks, where each chunk consists of metadata and user data.
+
+Corrupting a chunk's metadata is a technique to achieve arbitrary memory reads and writes, e.g. by forcing overlapping chunks.
+
+## vtable Overwrite
+
+A C++ object with virtual methods holds a pointer to a vtable, itself containing function pointers. If a vulnerable buffer sits before such an object, overflowing it overwrites the vtable pointer to reference an attacker-crafted vtable. Controlling the vtable pointer allows calling arbitrary functions.
+
+## Heartbleed
+
+A 2014 security bug in OpenSSL's TLS heartbeat extension. The heartbeat handler read the attacker-supplied payload length field without validating it against the actual payload size, then copied that many bytes into the response.
+
+`n2s` and `s2n` are OpenSSL macros for converting a 16-bit value to and from network byte order, big-endian. `n2s(p, s)` reads 2 bytes at `p` into `s`, advancing `p` by 2. `s2n(s, p)` writes `s` into the 2 bytes at `p`, advancing `p` by 2.
+
+```c
+hbtype = *p++;                      // message type, 1 byte
+n2s(p, payload);                    // read the claimed payload length, advance p past it
+pl = p;                             // pl points at the request's actual payload bytes
+*bp++ = TLS1_HB_RESPONSE;           // write the response's message type
+s2n(payload, bp);                   // echo the claimed length into the response, advance bp
+memcpy(bp, pl, payload);            // copy `payload` bytes from pl into the response
+```
+
+`payload` is never checked against the actual size of the request. A request with 1 actual payload byte but a claimed `payload` of 65535, the maximum a 16-bit field can hold, makes `memcpy` read 65535 bytes starting at `pl`, running past the end of the request into adjacent heap memory, and echo all of it back in the response. This is a buffer over-read, allowing an attacker to read up to 64KB of server memory per request.

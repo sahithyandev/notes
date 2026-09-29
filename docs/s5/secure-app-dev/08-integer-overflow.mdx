@@ -1,7 +1,7 @@
 ---
 title: Integer Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T16:27:05.832Z
+lastUpdatedOn: 2026-09-29T21:47:52.874Z
 ---
 
 Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safety) violation. It leads to one when the overflowed value is used:
@@ -19,20 +19,20 @@ An $n$-bit unsigned integer represents $x$ with $0 \leq x < 2^n$. On overflow, C
 An $n$-bit unsigned integer can overflow in multiple cases, for $0 \leq a,b < 2^n$:
 
 - Addition  
-  $a+b \geq 2^n$.
+  $a+b \geq 2^n$
 - Subtraction  
-  $a-b < 0$ if $b > a$.
+  $a-b < 0$ if $b > a$
 - Multiplication  
-  $a \cdot b \geq 2^n$.
+  $a \cdot b \geq 2^n$
 
 Examples:
 
 - Stagefright  
-  `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended.
+  `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended. Fixed by checking `size > UINT_MAX - chunk_size` before adding, rejecting the allocation instead of letting the sum wrap.
 
 ## Signed Overflow
 
-By the C++11 standard, if evaluating an expression produces a result not mathematically defined or not representable by its type, the behaviour is undefined. This applies only to signed integers, since unsigned arithmetic is defined modulo $2^n$.
+By the C++11 standard, if evaluating an expression produces a result not mathematically defined or not representable by its type, the behaviour is undefined. This applies only to signed integers.
 
 An $n$-bit signed integer can overflow in multiple cases, for $-2^{n-1} \leq a,b < 2^{n-1}$:
 
@@ -43,11 +43,11 @@ An $n$-bit signed integer can overflow in multiple cases, for $-2^{n-1} \leq a,b
 - Multiplication  
   $a \cdot b \geq 2^{n-1}$ or $a \cdot b < -2^{n-1}$. Multiplication by $-1$ reduces to negation.
 - Division  
-  $\frac{-2^{n-1}}{-1} = 2^{n-1}$, reducing to negation. Division by $0$ is also undefined.
+  $\frac{-2^{n-1}}{-1} = 2^{n-1}$, reducing to negation.
 
 Examples:
 
-- Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index.
+- Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index. Fixed by computing `mid = low + (high - low) / 2` instead, since `high - low` stays within the array's valid index range and cannot overflow.
 
 ## Type Conversion
 
@@ -80,7 +80,16 @@ For an arithmetic operation between 2 operands, the compiler chooses a common ty
 
 <Note>
 
-Rank is similar to size. An integer type's rank is at least as high as every type ranked below it.
+An integer type's rank increases in this order, lowest to highest:
+
+- `_Bool`
+- `char`, `signed char`, `unsigned char`
+- `short`, `unsigned short`
+- `int`, `unsigned int`
+- `long`, `unsigned long`
+- `long long`, `unsigned long long`
+
+A signed type and its unsigned counterpart of the same width have equal rank.
 
 </Note>
 

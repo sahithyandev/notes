@@ -1,16 +1,34 @@
 ---
 title: Buffer Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:17.081Z
+lastUpdatedOn: 2026-09-29T21:47:52.731Z
 ---
 
-A buffer is a data storage area inside memory, on the stack or heap, intended to hold a pre-defined amount of data. A buffer overflow occurs when data written to a buffer exceeds its allocated size, overwriting adjacent memory. If the overflowing data is executable code disguised as input, the victim machine can be fooled into executing it, giving the attacker control.
+A buffer is a data storage area inside memory, on the stack or heap, intended to hold a pre-defined amount of data.
+
+A buffer overflow, aka. a buffer overrun, is a [spatial memory safety violation](/s5/secure-app-dev/memory-safety) where data written to a buffer exceeds its allocated size, overwriting adjacent memory. That memory may hold other program variables, parameters, or control flow data. If the overflowing data is executable code disguised as input, the victim machine can be fooled into executing it, giving the attacker control.
+
+Buffer overflow was first widely exploited by the Morris Worm in 1988, and it remains a major concern despite well-known prevention techniques.
 
 <Note>
 
 Famous buffer overflow attacks: Morris worm (fingerd, 6000 machines), CodeRed (MS-IIS), SQL Slammer (MS-SQL, 75000 machines in 10 minutes), Sasser (Windows LSASS), Conficker (Windows Server, around 10 million machines).
 
 </Note>
+
+## Consequences
+
+- Corruption of program data.
+- Unexpected transfer of control.
+- Memory access violations.
+- Execution of code chosen by the attacker.
+
+To exploit a buffer overflow, an attacker needs:
+
+- A buffer overflow vulnerability triggerable using externally sourced, attacker-controlled data.
+- An understanding of how that buffer is stored in memory, to determine the potential for corruption.
+
+Vulnerable programs are identified by source inspection, tracing execution under oversized input, or automated fuzzing.
 
 ## Stack Frame Layout
 
@@ -32,24 +50,133 @@ void func(char *str) {
 
 `strcpy` does not check whether `*str` contains fewer than 126 characters. A string longer than the buffer overwrites adjacent stack locations, including `sfp` and the return address.
 
+Other common unsafe C standard library routines, none of which perform bounds checking against the destination buffer's size:
+
+- `gets`
+- `sprintf`
+- `strcat`
+- `strcpy`
+- `vsprintf`
+
+## Stack Overflow
+
+A buffer overflow where the vulnerable buffer is a local variable allocated on the stack. Overflowing it corrupts adjacent stack contents, such as other local variables, the saved frame pointer `sfp`, or the return address.
+
+## Shellcode
+
+Code supplied by the attacker, often saved in the buffer being overflowed. Shellcode traditionally transfers control to a command-line interpreter (a shell). It is machine code specific to the target processor and operating system, traditionally requiring assembly language skill to write, though tools such as the Metasploit Project now automate its generation.
+
+Stack overflow attacks can target:
+
+- Shellcode functions  
+  Launch a local or reverse remote shell, or use local exploits to establish one.
+- A trusted system utility  
+  Flush firewall rules currently blocking other attacks.
+- Commonly used library code  
+  Break out of a chroot environment, giving full system access.
+
 ## Attack Types
 
-- Smashing the stack  
-  Attacker-supplied input contains assembly instructions, e.g. the binary code of `execve("/bin/sh")`, plus an overflowed return address pointing back into the buffer. When the function exits, control jumps into the buffer and the injected code executes, giving the attacker a shell, root if the victim process is setuid root.
-- Variable overflow  
-  An adjacent variable, e.g. a flag `authenticated`, sits after a buffer in memory. Overflowing the buffer overwrites the flag directly without needing to hijack control flow.
-- Pointer variables  
-  A function pointer `fnptr` declared after a buffer gets overwritten by the overflow to point at injected malicious code. When `fnptr` is later invoked, the malicious code executes.
-- Frame pointer overwrite  
-  The overflow changes the caller's saved frame pointer (`sfp`) to point into the malicious code. The caller's return address is read relative to `sfp`, so when `func` returns, the malicious code runs.
-- Integer overflow  
-  A bounds check compares a signed length against a maximum, e.g. `len = MIN(len, sa->sa_len)`. A negative `len` passes this check, then gets reinterpreted as a huge unsigned integer in a subsequent copy operation, e.g. `copyout`, copying up to 4G of memory.
+### Stack Smashing
+
+Attacker-supplied input contains assembly instructions, e.g. the binary code of `execve("/bin/sh")`, plus an overflowed return address pointing back into the buffer. When the function exits, control jumps into the buffer and the injected code executes, giving the attacker a shell, root if the victim process is setuid root.
+
+```c
+void vulnerable(char *input) {
+    char buf[64];
+    strcpy(buf, input);
+}
+
+int main(int argc, char **argv) {
+    vulnerable(argv[1]);
+    return 0;
+}
+```
+
+An `argv[1]` longer than 64 bytes, built from shellcode followed by a repeated address pointing back into `buf`, overwrites `vulnerable`'s return address. On return, execution jumps into `buf` instead of back to `main`.
+
+### Variable Overflow
+
+An adjacent variable, e.g. a flag `authenticated`, sits after a buffer in memory. Overflowing the buffer overwrites the flag directly without needing to hijack control flow.
+
+```c
+void check_password(char *input) {
+    int authenticated = 0;
+    char buf[16];
+    strcpy(buf, input);
+    if (authenticated) {
+        grant_access();
+    }
+}
+```
+
+If the compiler places `authenticated` right after `buf` on the stack, an `input` longer than 16 bytes overwrites `authenticated` with a non-zero value, passing the check without a correct password.
+
+### Pointer Variables
+
+A function pointer `fnptr` declared after a buffer gets overwritten by the overflow to point at injected malicious code. When `fnptr` is later invoked, the malicious code executes.
+
+```c
+void log_message(char *input) {
+    char buf[32];
+    void (*fnptr)(void) = default_handler;
+    strcpy(buf, input);
+    fnptr();
+}
+```
+
+An `input` crafted to overflow `buf` overwrites `fnptr` with the address of attacker-supplied code. The call `fnptr()` then transfers control there instead of to `default_handler`.
+
+### Frame Pointer Overwrite
+
+The overflow changes the caller's saved frame pointer (`sfp`) to point into the malicious code. The caller's return address is read relative to `sfp`, so when `func` returns, the malicious code runs.
+
+```c
+void func(char *input) {
+    char buf[64];
+    strcpy(buf, input);
+}
+
+void caller(char *input) {
+    func(input);
+}
+```
+
+An `input` long enough to overflow `buf` overwrites `func`'s saved `sfp`, the frame pointer restored for `caller`. Once `caller` itself returns, its return address is read relative to this corrupted `sfp`, redirecting execution into the injected code.
+
+<Note>
+
+Stack smashing overwrites the return address directly, redirecting control as soon as `func` returns. Frame pointer overwrite instead corrupts `sfp`, so control redirects one return later, when `caller` reads its own return address relative to the now-corrupted `sfp`.
+
+</Note>
+
+### Integer Overflow
+
+A bounds check compares a signed length against a maximum, e.g. `len = MIN(len, sa->sa_len)`. A negative `len` passes this check, then gets reinterpreted as a huge unsigned integer in a subsequent copy operation, e.g. `copyout`, copying up to 4G of memory.
+
+```c
+#define MAX_LEN 256
+
+void copy_data(char *src, int len) {
+    char buf[MAX_LEN];
+    if (len > MAX_LEN) {
+        len = MAX_LEN;
+    }
+    memcpy(buf, src, len);
+}
+```
+
+An attacker-supplied `len` of `-1` passes the check since it compares as less than 256 in signed arithmetic. `memcpy`'s third parameter is `size_t`, an unsigned type, so `-1` gets reinterpreted as `0xFFFFFFFF`, copying nearly 4G from `src` into `buf`.
 
 <Note>
 
 `strncpy(dest, src, n)` bounds the copy to `n` characters but still requires the programmer to supply the correct `n`. In the Apache `htpasswd.c` fix, `strncpy(record, user, MAX_STRING_LEN-1)` followed by `strncat(record, cpw, MAX_STRING_LEN-1)` can still overflow `record`, since the second call's bound is not reduced by the length already written.
 
 </Note>
+
+## Global Data Overflow
+
+A buffer overflow where the vulnerable buffer is a global or static variable, stored in the global data region rather than on the stack or heap. This region may be located above program code. If a vulnerable buffer and a function pointer share a struct, or the buffer neighbors process management tables, the attack overwrites the function pointer so a later invocation runs attacker-controlled code.
 
 ## Prevention
 
