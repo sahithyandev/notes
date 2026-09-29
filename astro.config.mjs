@@ -140,6 +140,10 @@ export default defineConfig({
     },
   },
   adapter: vercel({
+    // satori (OG image rendering) loads harfbuzzjs's hb.wasm dynamically,
+    // so Vercel's node-file-trace can't see the reference and drops it from
+    // the deployed function, causing an ENOENT for hb.wasm at runtime.
+    includeFiles: ["node_modules/harfbuzzjs/hb.wasm"],
     isr: {
       expiration: 60 * 60 * 24, // 24 hours default; per-page revalidate overrides this
       // API routes must run per request: the ISR function only forwards the
