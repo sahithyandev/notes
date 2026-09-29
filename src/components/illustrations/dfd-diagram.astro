@@ -1,0 +1,231 @@
+---
+// Static example Data Flow Diagram: a login request crossing a trust
+// boundary from an external entity, through a process, to a data store.
+// Fixed example (not parametrized), following process-state-diagram.astro's
+// static figure pattern rather than flow-diagram.astro's step carousel,
+// since there's nothing here to step through.
+const uid = "dfd-" + Math.random().toString(36).slice(2, 9);
+
+const W = 760;
+const H = 320;
+
+const entity = { x: 40, y: 130, w: 120, h: 60 };
+const process = { cx: 380, cy: 160, r: 55 };
+const store = { x: 560, y: 130, w: 140, h: 60 };
+
+const boundaryX = 250;
+---
+
+<figure class="dfd" id={uid}>
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    width="100%"
+    role="img"
+    aria-label="Example data flow diagram: a login request from a user, through a web app process, to a user database, crossing a trust boundary between the user and the web app"
+  >
+    <defs>
+      <marker
+        id={`${uid}-arrow`}
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead" />
+      </marker>
+    </defs>
+
+    <line x1={boundaryX} y1="16" x2={boundaryX} y2={H - 16} class="boundary" />
+    <text x={boundaryX} y="12" text-anchor="middle" class="boundary-label">
+      trust boundary
+    </text>
+
+    <g class="edges">
+      <path
+        d={`M ${entity.x + entity.w} ${entity.y + 18} L ${process.cx - process.r + 6} ${process.cy - 18}`}
+        class="shaft"
+        marker-end={`url(#${uid}-arrow)`}
+      />
+      <text
+        x={(entity.x + entity.w + process.cx - process.r) / 2}
+        y={entity.y + 4}
+        text-anchor="middle"
+        class="edge-label"
+      >
+        1. login request
+      </text>
+
+      <path
+        d={`M ${process.cx - process.r + 6} ${process.cy + 18} L ${entity.x + entity.w} ${entity.y + entity.h - 18}`}
+        class="shaft"
+        marker-end={`url(#${uid}-arrow)`}
+      />
+      <text
+        x={(entity.x + entity.w + process.cx - process.r) / 2}
+        y={entity.y + entity.h + 16}
+        text-anchor="middle"
+        class="edge-label"
+      >
+        4. session token
+      </text>
+
+      <path
+        d={`M ${process.cx + process.r - 6} ${process.cy - 18} L ${store.x} ${store.y + 18}`}
+        class="shaft"
+        marker-end={`url(#${uid}-arrow)`}
+      />
+      <text
+        x={(process.cx + process.r + store.x) / 2}
+        y={store.y + 4}
+        text-anchor="middle"
+        class="edge-label"
+      >
+        2. query credentials
+      </text>
+
+      <path
+        d={`M ${store.x} ${store.y + store.h - 18} L ${process.cx + process.r - 6} ${process.cy + 18}`}
+        class="shaft"
+        marker-end={`url(#${uid}-arrow)`}
+      />
+      <text
+        x={(process.cx + process.r + store.x) / 2}
+        y={store.y + store.h + 16}
+        text-anchor="middle"
+        class="edge-label"
+      >
+        3. user record
+      </text>
+    </g>
+
+    <g class="entity">
+      <rect x={entity.x} y={entity.y} width={entity.w} height={entity.h} />
+      <text
+        x={entity.x + entity.w / 2}
+        y={entity.y + entity.h / 2}
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        User
+      </text>
+    </g>
+
+    <g class="process">
+      <circle cx={process.cx} cy={process.cy} r={process.r} />
+      <text
+        x={process.cx}
+        y={process.cy}
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        Web App
+      </text>
+    </g>
+
+    <g class="store">
+      <line x1={store.x} y1={store.y} x2={store.x + store.w} y2={store.y} />
+      <line
+        x1={store.x}
+        y1={store.y + store.h}
+        x2={store.x + store.w}
+        y2={store.y + store.h}
+      />
+      <text
+        x={store.x + store.w / 2}
+        y={store.y + store.h / 2}
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        User DB
+      </text>
+    </g>
+  </svg>
+
+  <figcaption>An example DFD with a trust boundary.</figcaption>
+</figure>
+
+<style>
+  .dfd {
+    max-width: 760px;
+    margin: 20px auto;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .boundary {
+    stroke: var(--danger, #c0392b);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
+  .boundary-label {
+    fill: var(--danger, #c0392b);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+
+  .shaft {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1.4;
+  }
+  .arrowhead {
+    fill: var(--text-secondary);
+  }
+  .edge-label {
+    fill: var(--text-secondary);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+
+  .entity rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .entity text {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-body);
+  }
+
+  .process circle {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .process text {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-body);
+  }
+
+  .store line {
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .store text {
+    fill: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-body);
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+  figcaption strong {
+    color: var(--text-primary);
+  }
+</style>

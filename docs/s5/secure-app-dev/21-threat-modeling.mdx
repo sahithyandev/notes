@@ -1,0 +1,72 @@
+---
+title: Threat Modeling
+dateCreated: 2026-09-29T00:00:00.000Z
+lastUpdatedOn: 2026-09-29T18:17:32.125Z
+---
+
+The process of identifying security threats in a system's design. Should be done before a single line of code is written.
+
+A bug is localized to a region of code, fixed and redeployed in isolation. An architectural flaw means redesigning how components trust and interact with each other, rippling through every part of the system built on that assumption.
+
+## Trust Boundary
+
+A trust boundary marks where data crosses from a low-trust zone into a high-trust zone. Security failures happen when that crossing lacks validation.
+
+Examples:
+
+- Unauthenticated public internet to application web server
+- User-space application to kernel-space driver
+- Standard app container to cloud backend database
+
+## Data Flow Diagram
+
+Aka. DFD. Maps a system's data pathways to expose it to threat modeling.
+
+Has 4 standard elements:
+
+- Processes  
+  Running code, execution units, services, or APIs. Drawn as circles or rounded rectangles.
+- Data stores  
+  Databases, flat files, queues, or cache memory. Drawn as parallel lines or open rectangles.
+- Data flows  
+  Network protocols, IPC pipes, or RPC calls, showing the direction data moves. Drawn as arrows.
+- External entities  
+  Actors outside the system's direct control, such as users or third-party APIs. Drawn as squares or rectangles.
+- Trust boundaries  
+  Drawn as a red dotted line intersecting a data flow, marking where administrative control or trust level changes.
+
+A Level 1 DFD, a breakdown into sub-systems, is the minimum requirement for functional threat modeling.
+
+<DfdDiagram />
+
+## STRIDE
+
+A mnemonic for 6 categories of security threat, one per letter, applied only to the categories that structurally match a given DFD component type.
+
+- Spoofing  
+  Violates authentication. An adversary impersonates a legitimate user, process, or device, e.g. session hijacking via a stolen cookie or a replayed token.
+- Tampering  
+  Violates integrity. Unauthorized modification of code or data in transit or at rest, e.g. altering pricing parameters in a client-side JSON request before submission.
+- Repudiation  
+  Violates non-repudiation. An actor denies performing an action because the system lacks undeniable proof, e.g. plaintext logs that can be altered or wiped.
+- Information disclosure  
+  Violates confidentiality. Sensitive data is exposed to an individual or process without authorization, e.g. a hardcoded API token in a public repository, or a stack trace on a user-facing error page.
+- Denial of service  
+  Violates availability. Resources are overwhelmed or broken so legitimate users cannot access a service, e.g. an oversized payload that triggers high CPU load or a memory leak.
+- Elevation of privilege  
+  Violates authorization. An actor gains higher privileges than permitted, e.g. altering a JWT's `role` claim from `user` to `admin`.
+
+Each identified threat needs its own cryptographic or systemic engineering control mapped directly to it.
+
+## Threat Modeling Workflow
+
+A threat modeling workflow is the iterative pipeline that applies STRIDE to a system's design, repeated as the design changes:
+
+- Decompose  
+  Build the Level 1 DFD and mark trust boundaries.
+- Analyze  
+  Evaluate each component systematically against the STRIDE matrix.
+- Mitigate  
+  Apply engineering controls to eliminate or reduce identified risks.
+- Validate  
+  Check the completed model against the actual implementation.

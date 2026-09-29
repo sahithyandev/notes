@@ -9,6 +9,7 @@ export { default as ComplexLogExplorer } from "./complex-log-explorer.astro";
 export { default as CpmStep } from "./cpm-step.astro";
 export { default as CpmTable } from "./cpm-table.astro";
 export { default as DemandCurveDiagram } from "./demand-curve-diagram.astro";
+export { default as DfdDiagram } from "./dfd-diagram.astro";
 export { default as ElasticityAlongDemandCurveDiagram } from "./elasticity-along-demand-curve-diagram.astro";
 export { default as ExcelSheet } from "./excel-sheet.astro";
 export { default as FlowDiagram } from "./flow-diagram.astro";
