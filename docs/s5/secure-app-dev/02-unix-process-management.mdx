@@ -1,10 +1,14 @@
 ---
 title: Unix Process Management
+prereqs:
+  - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-29T16:27:05.741Z
+lastUpdatedOn: 2026-09-29T17:52:41.364Z
 ---
 
-Unix identifies each [process](/s3/operating-systems/process#context) by a PID, an integer unique among running processes. Additional OS context tracked per process includes the parent PID, process accounting (CPU time used), open files, working directory, signal handlers, and umask.
+Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
+
+Refer [stopped](/s3/operating-systems/process#stopped), [zombie](/s3/operating-systems/process#zombie), and [orphan](/s3/operating-systems/process#orphan) for the Unix-specific additions to the [generic process state model](/s3/operating-systems/process#process-states).
 
 ## Process Creation with Fork
 
@@ -87,6 +91,23 @@ int main(int argc, char *argv[], char *envp[])
 
 </Note>
 
+```c
+pid_t pid = fork();
+
+if (pid < 0) {
+    // fork failed, no child created
+    handle_error();
+} else if (pid == 0) {
+    // child process
+    execl(path, arg0, ..., NULL);
+    // only reached if exec fails
+    exit(1);
+} else {
+    // parent process, pid is the child's PID
+    wait(&status);
+}
+```
+
 ## Process Termination
 
 ```c
@@ -94,16 +115,15 @@ int main(int argc, char *argv[], char *envp[])
 void exit(int status);
 ```
 
-- `status = 0`  
-  Normal termination.
-- `status != 0`  
-  Problematic execution, by convention.
+Non-zero `status` indicates an error or abnormal termination.
 
-`exit()` never returns.
+`_exit()` (the system call) performs immediate termination:
 
-`exit()` (the C library function) flushes and closes open C stdio streams, calls registered exit handlers, then invokes `_exit()`.
+- closes all open file descriptors
+- reparents any children to `init`
+- sends `SIGCHLD` to the parent.
 
-`_exit()` (the system call) performs immediate termination: it closes all open file descriptors, reparents any children to `init`, and sends `SIGCHLD` to the parent. It does not flush C stdio buffers.
+`exit()` (the C library function) flushes and closes open C stdio streams, calls registered exit handlers, then invokes `_exit()`. Never returns.
 
 Returning from `main()` implicitly calls `exit()`.
 
@@ -115,10 +135,11 @@ Returning from `main()` implicitly calls `exit()`.
 int wait(int *status);
 ```
 
-- Blocks the calling (parent) process until at least 1 child terminates.
-- Returns the PID of the terminated child.
-- `status`, passed by address, stores the child's exit status. Pass `NULL` if not needed.
-- Cleans up the remaining child resources not released by `exit()`.
+Blocks the calling (parent) process until at least 1 child terminates. Returns the PID of the terminated child. Cleans up the remaining child resources not released by `exit()`.
+
+The `status` parameter, passed by address, stores the child's exit status. Pass `NULL` if not needed.
+
+If there are no children, returns immediately with -1 and sets `errno` to `ECHILD`.
 
 Variants:
 
@@ -137,27 +158,15 @@ Sends a signal to a process, the Unix analog of a hardware interrupt, routed thr
 
 - `SIGSTOP`  
   Stop the process.
+- `SIGTERM`  
+  Request termination.
 - `SIGKILL`  
   Kill the process.
 - `SIGCONT`  
   Restart a stopped process.
 
-## Process States in Unix
-
-Unix refines the [generic process state model](/s3/operating-systems/process#process-states) with 1 additional state.
-
-- Stopped  
-  Process suspended by a `SIGSTOP` signal, resumed by `SIGCONT`.
-
-Zombie arises in 2 cases:
-
-- Parent terminates before the child  
-  `init` becomes the child's pseudo parent and calls `wait()` on its behalf.
-- Child terminates before the parent, and the parent never calls `wait()`  
-  The child remains a zombie, potentially filling the process table.
-
 <Note>
 
-A zombie cannot be killed, it is already dead. Its process table entry is retained solely until the parent retrieves its exit status via `wait()`.
+`SIGTERM` can be caught, blocked, or ignored, letting a process run a handler to clean up before exiting. `SIGKILL` cannot be caught, blocked, or ignored, the kernel terminates the process immediately.
 
 </Note>

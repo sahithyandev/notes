@@ -1,7 +1,7 @@
 ---
 title: Process
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-09-29T16:27:05.442Z
+lastUpdatedOn: 2026-09-29T17:52:40.999Z
 ---
 
 OS manages user-level and kernel-level processes, which includes creating, managing, scheduling and terminating.
@@ -116,7 +116,7 @@ Most OS model a process's lifecycle using 5 states: new, ready, running, waiting
 
 Some OS add suspended states (suspended-ready, suspended-waiting) for medium-term scheduling, when a process is swapped out of main memory to disk to free space.
 
-Zombie and orphan are UNIX-specific special cases.
+Stopped, zombie, and orphan are UNIX-specific special cases.
 
 <ProcessStateDiagram />
 
@@ -139,6 +139,10 @@ Aka. blocked. When a process is waiting for an event or a resource. Waits in an 
 ### Terminated
 
 When a process has finished execution or been killed. Its resources are reclaimed and a cleanup is performed.
+
+### Stopped
+
+When a process is suspended by a `SIGSTOP` signal. Resumed by a `SIGCONT` signal.
 
 ### Zombie
 

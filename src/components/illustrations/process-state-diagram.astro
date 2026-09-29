@@ -1,19 +1,27 @@
 ---
-// Static box-and-arrow diagram of the generic 5-state process model (New,
-// Ready, Running, Waiting, Terminated), replacing a hand-drawn PNG.
+// Box-and-arrow diagram of the generic 5-state process model (New, Ready,
+// Running, Waiting, Terminated) plus the Unix-specific additions (Stopped,
+// Zombie, Orphan), replacing a hand-drawn PNG. Unix states/edges are styled
+// distinctly (dashed, accent-colored) so they read as an extension rather
+// than part of the generic model. Running is the hub: every addition attaches
+// to it at its own angle so the fan-out of edges stays legible.
 interface StateBox {
   id: string;
   label: string;
   x: number;
   y: number;
+  unix?: boolean;
 }
 
 const boxes: StateBox[] = [
   { id: "new", label: "New", x: 90, y: 90 },
-  { id: "ready", label: "Ready", x: 360, y: 90 },
-  { id: "running", label: "Running", x: 640, y: 90 },
-  { id: "terminated", label: "Terminated", x: 900, y: 90 },
-  { id: "waiting", label: "Waiting", x: 640, y: 330 },
+  { id: "ready", label: "Ready", x: 380, y: 90 },
+  { id: "running", label: "Running", x: 680, y: 90 },
+  { id: "terminated", label: "Terminated", x: 960, y: 90 },
+  { id: "waiting", label: "Waiting", x: 380, y: 270 },
+  { id: "zombie", label: "Zombie", x: 960, y: 270, unix: true },
+  { id: "orphan", label: "Orphan", x: 500, y: 410, unix: true },
+  { id: "stopped", label: "Stopped", x: 860, y: 410, unix: true },
 ];
 
 const BOX_W = 110;
@@ -43,13 +51,17 @@ interface Edge {
   labelDy: number;
   labelAnchor?: "start" | "middle" | "end";
   // Overrides the auto-clipped edge points, for the 2 parallel arrows
-  // running between the same pair of boxes (Ready <-> Running).
+  // running between the same pair of boxes (Ready <-> Running, Running <->
+  // Stopped).
   fromPoint?: Point;
   toPoint?: Point;
+  // Unix-specific addition, drawn/styled differently from the generic model.
+  unix?: boolean;
 }
 
 const ready = byId.get("ready")!;
 const running = byId.get("running")!;
+const stopped = byId.get("stopped")!;
 
 const edges: Edge[] = [
   { from: "new", to: "ready", label: "admit", labelDx: 0, labelDy: -14 },
@@ -73,6 +85,22 @@ const edges: Edge[] = [
   },
   {
     from: "running",
+    to: "waiting",
+    label: "I/O or event wait",
+    labelDx: -90,
+    labelDy: 50,
+    labelAnchor: "end",
+  },
+  {
+    from: "waiting",
+    to: "ready",
+    label: "I/O or event completion",
+    labelDx: 14,
+    labelDy: -54,
+    labelAnchor: "start",
+  },
+  {
+    from: "running",
     to: "terminated",
     label: "exit",
     labelDx: 0,
@@ -80,19 +108,52 @@ const edges: Edge[] = [
   },
   {
     from: "running",
-    to: "waiting",
-    label: "I/O or event wait",
-    labelDx: 16,
-    labelDy: -6,
+    to: "zombie",
+    label: "exit",
+    labelDx: 14,
+    labelDy: -4,
     labelAnchor: "start",
+    unix: true,
   },
   {
-    from: "waiting",
-    to: "ready",
-    label: "I/O or event completion",
-    labelDx: -16,
-    labelDy: -6,
+    from: "zombie",
+    to: "terminated",
+    label: "wait() reaps",
+    labelDx: 14,
+    labelDy: 0,
+    labelAnchor: "start",
+    unix: true,
+  },
+  {
+    from: "running",
+    to: "stopped",
+    label: "SIGSTOP",
+    labelDx: 14,
+    labelDy: -4,
+    labelAnchor: "start",
+    fromPoint: { x: running.x + 12, y: running.y + HH },
+    toPoint: { x: stopped.x + 12, y: stopped.y - HH },
+    unix: true,
+  },
+  {
+    from: "stopped",
+    to: "running",
+    label: "SIGCONT",
+    labelDx: -14,
+    labelDy: 4,
     labelAnchor: "end",
+    fromPoint: { x: stopped.x - 12, y: stopped.y - HH },
+    toPoint: { x: running.x - 12, y: running.y + HH },
+    unix: true,
+  },
+  {
+    from: "running",
+    to: "orphan",
+    label: "parent exits",
+    labelDx: -14,
+    labelDy: -4,
+    labelAnchor: "end",
+    unix: true,
   },
 ];
 
@@ -116,11 +177,12 @@ const drawn = edges.map((edge) => {
     labelX: midX + edge.labelDx,
     labelY: midY + edge.labelDy,
     labelAnchor: edge.labelAnchor ?? "middle",
+    unix: edge.unix ?? false,
   };
 });
 
-const W = 1000;
-const H = 400;
+const W = 1080;
+const H = 480;
 ---
 
 <figure class="process-state" id={uid}>
@@ -128,7 +190,7 @@ const H = 400;
     viewBox={`0 0 ${W} ${H}`}
     width="100%"
     role="img"
-    aria-label="Diagram of the 5-state process model: New, Ready, Running, Waiting, Terminated"
+    aria-label="Diagram of the 5-state process model (New, Ready, Running, Waiting, Terminated) with the Unix-specific Stopped, Zombie, and Orphan additions shown dashed"
   >
     <defs>
       <marker
@@ -142,18 +204,29 @@ const H = 400;
       >
         <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead" />
       </marker>
+      <marker
+        id={`${uid}-arrow-unix`}
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="7"
+        markerHeight="7"
+        orient="auto-start-reverse"
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead-unix" />
+      </marker>
     </defs>
 
     <g class="edges">
       {drawn.map((e) => (
-        <g class="edge">
+        <g class={e.unix ? "edge unix" : "edge"}>
           <line
             x1={e.x1}
             y1={e.y1}
             x2={e.x2}
             y2={e.y2}
             class="shaft"
-            marker-end={`url(#${uid}-arrow)`}
+            marker-end={`url(#${uid}-${e.unix ? "arrow-unix" : "arrow"})`}
           />
           <text
             x={e.labelX}
@@ -170,7 +243,7 @@ const H = 400;
     <g class="boxes">
       {boxes.map((b) => (
         <g
-          class="box"
+          class={b.unix ? "box unix" : "box"}
           style={`transform: translate(${b.x - HW}px, ${b.y - HH}px)`}
         >
           <rect width={BOX_W} height={BOX_H} rx="8" />
@@ -181,12 +254,23 @@ const H = 400;
       ))}
     </g>
   </svg>
+
+  <figcaption>
+    The generic 5-state model in solid gray, with Unix's dashed
+    <strong>Stopped</strong>, <strong>Zombie</strong>, and{" "}
+    <strong>Orphan</strong> additions in gold.
+  </figcaption>
 </figure>
 
 <style>
   .process-state {
     max-width: 850px;
     margin: 20px auto;
+    --unix-accent: #8a5a00;
+  }
+
+  :global([data-theme="dark"]) .process-state {
+    --unix-accent: #f5c518;
   }
 
   svg {
@@ -210,6 +294,20 @@ const H = 400;
     font-family: var(--font-mono);
   }
 
+  .edge.unix .shaft {
+    stroke: var(--unix-accent);
+    stroke-dasharray: 4 3;
+  }
+
+  .arrowhead-unix {
+    fill: var(--unix-accent);
+  }
+
+  .edge.unix .edge-label {
+    fill: var(--unix-accent);
+    font-style: italic;
+  }
+
   .box rect {
     fill: var(--surface-2);
     stroke: var(--border-strong);
@@ -221,5 +319,28 @@ const H = 400;
     font-size: 13px;
     font-weight: 700;
     font-family: var(--font-body);
+  }
+
+  .box.unix rect {
+    fill: var(--surface);
+    stroke: var(--unix-accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 3;
+  }
+
+  .box.unix text {
+    fill: var(--unix-accent);
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  figcaption strong {
+    color: var(--text-primary);
   }
 </style>

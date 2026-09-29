@@ -109,16 +109,6 @@ const PRESETS = [
     ))}
   </div>
 
-  <div class="presets">
-    <span class="presets-label">Try</span>
-    {PRESETS.map((p) => (
-      <button type="button" class="preset" data-preset={p.mode}>
-        {p.mode}
-        <span class="preset-hint">{p.hint}</span>
-      </button>
-    ))}
-  </div>
-
   <div class="specials">
     <span class="presets-label">Special bits</span>
     <button
@@ -182,15 +172,26 @@ const PRESETS = [
   </ul>
 
   <p class="explanation" data-explanation></p>
+
+  <div class="presets">
+    <span class="presets-label">Try</span>
+    {PRESETS.map((p) => (
+      <button type="button" class="preset" data-preset={p.mode}>
+        {p.mode}
+        <span class="preset-hint">{p.hint}</span>
+      </button>
+    ))}
+  </div>
+
   <p class="live" aria-live="polite"></p>
 </Panel>
 
 <style>
   .permission-builder {
     /* Absolute width shared by every button and label column below, so
-         nothing drifts when it's computed in an "em" relative to a different
-         local font-size (the bug this fixes: .seg's 1.5em at font-size:1.3rem
-         is not the same length as a caption's 1.5em at font-size:0.6rem). */
+                 nothing drifts when it's computed in an "em" relative to a different
+                 local font-size (the bug this fixes: .seg's 1.5em at font-size:1.3rem
+                 is not the same length as a caption's 1.5em at font-size:0.6rem). */
     --seg-w: 1.95rem;
   }
 
@@ -286,7 +287,7 @@ const PRESETS = [
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
-    margin-bottom: 16px;
+    margin-top: 16px;
   }
   .presets-label {
     font-size: 0.7rem;
@@ -395,7 +396,7 @@ const PRESETS = [
   }
   .deriv-row {
     display: flex;
-    gap: 8px;
+    gap: 16px;
     font-size: 0.78rem;
     font-family: var(--font-mono);
     color: var(--text-secondary);
@@ -644,7 +645,7 @@ const PRESETS = [
         specialClause;
 
       explanation.innerHTML =
-        `<code>${combined}</code> is a ${typeLabel}, set with <code>chmod ${mode}</code>. ` +
+        `A ${typeLabel}, set with <code>chmod ${mode}</code>. ` +
         `The owner can ${describeTriad(user)}. ` +
         `The group can ${describeTriad(group)}. ` +
         `Others can ${describeTriad(other)}.` +

@@ -1,0 +1,58 @@
+---
+title: Discretionary Access Control
+dateCreated: 2026-07-05T10:00:00.000Z
+lastUpdatedOn: 2026-09-29T17:52:41.383Z
+---
+
+Discretionary Access Control (DAC) is Linux's traditional security model. A process running with root privileges is granted unrestricted access, while other accounts can do much less. Attackers therefore target root privileges.
+
+In Linux, most system resources, including memory, device drivers, and named pipes, are represented as files, so file system security is central to the model.
+
+The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only root may load or unload kernel modules.
+
+## Users and Groups
+
+- User account  
+  Represents an entity, human or process, capable of using files. Details are kept in `/etc/passwd`.
+- Group account  
+  A list of user accounts. A user has 1 main group and may belong to other groups. Details are kept in `/etc/group`.
+
+Users and groups are managed with `useradd`, `usermod`, `userdel`, and the equivalent `group*` commands.
+
+## File Permissions
+
+Every file has 2 owners, a user and a group, plus a third permission set for all other users. Each of the 3 sets carries read, write, and execute permissions, in the order user, group, other.
+
+Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read contributes 4, write 2, execute 1, summed per set (user, group, other).
+
+<PermissionBreakdown bits="-rw-rw-r--" />
+
+### Special Permission Bits
+
+On top of the 9 standard permission bits, there are 3 special permission bits, each a fourth leading octal digit in `chmod`:
+
+- Sticky bit  
+  Overloads other-execute, `t` if set, `T` if not. Restricts file deletion in a directory to the owner, even with write permission on the directory. Contributes 1 to the fourth digit. Set with `chmod +t` or `chmod 1777`.
+- SetUID  
+  Overloads user-execute, `s` if set, `S` if not. Runs the program with the owner's privileges, regardless of who executes it. The kernel sets the effective UID from the file's owner during `exec()`. No effect on directories. Contributes 4 to the fourth digit. Set with `chmod 4755`.
+- SetGID  
+  Overloads group-execute, `s` if set, `S` if not. Similar to SetUID, but runs the program as a member of the owning group and sets the effective GID instead. On a directory, new files inherit the directory's group. Contributes 2 to the fourth digit. Set with `chmod 2755`.
+
+A running process may separately call the `setuid()` or `setgid()` system calls to change its own UID or GID.
+
+SetUID and SetGID are ignored on non-executable files, and SetUID also on interpreted scripts on Linux, a protection against a race condition. The sticky bit is ignored on regular files, only enforced on directories.
+
+SetUID and SetGID are dangerous on a file owned by root or another privileged account, used to give unprivileged users controlled access to privileged resources, so such programs must be carefully written. A setuid root program typically calls `setuid()` once its privileged work is done, dropping permanently to an unprivileged UID. A bug in one may let an unprivileged user gain root. Modern distributions minimize setuid-root programs, but attackers still scan for them.
+
+SetUID and SetGID should only be used on binaries, not shell scripts. A script's interpreter reads its own environment, so the invoking user can hijack it via `PATH` or `IFS` even under an elevated UID. Locating and opening the interpreter are 2 separate steps, and swapping the script between them lets an attacker substitute it, the race Linux avoids by ignoring SetUID on scripts.
+
+## Directory Permissions
+
+Same permissions are applied to the directory.
+
+- Read  
+  List the directory's contents.
+- Write  
+  Create or delete files in the directory.
+- Execute  
+  Use anything in the directory, or change the working directory into it.

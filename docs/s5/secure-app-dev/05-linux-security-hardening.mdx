@@ -1,10 +1,10 @@
 ---
 title: Linux Security Hardening
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-29T16:27:05.780Z
+lastUpdatedOn: 2026-09-29T17:52:41.409Z
 ---
 
-Hardening [Linux's DAC model](/s5/secure-app-dev/linux-discretionary-access-control) requires mitigating risk at both the OS level and the application level.
+Hardening [Linux's DAC model](/s5/secure-app-dev/discretionary-access-control) requires mitigating risk at both the OS level and the application level.
 
 ## OS Installation and Patch Management
 
@@ -31,7 +31,7 @@ Log files must be rotated and old copies deleted, typically with `logrotate` run
 ## Application Security
 
 - Running as unprivileged user or group  
-  Every process runs as some user, and it is critical that user is not root, since a bug could otherwise compromise the entire system. If root privileges are briefly required, e.g. to bind a privileged port, a root parent should perform that step and hand off to an [unprivileged child](/s5/secure-app-dev/linux-discretionary-access-control#setuid-root-programs).
+  Every process runs as some user, and it is critical that user is not root, since a bug could otherwise compromise the entire system. If root privileges are briefly required, e.g. to bind a privileged port, a root parent should perform that step and hand off to an [unprivileged child](/s5/secure-app-dev/discretionary-access-control#special-permission-bits).
 - Running in a chroot jail  
   Confines a process to a subset of the file system by remapping the virtual root. Directories outside the jail are not visible or reachable. Contains the effects of a compromised daemon, but is complex to configure.
 - Modularity  
