@@ -1,0 +1,147 @@
+---
+title: MD Family Hash Functions
+sidebar:
+  label: MD Functions
+dateCreated: 2026-09-29T00:00:00.000Z
+lastUpdatedOn: 2026-09-29T03:42:16.921Z
+---
+
+The MD family is a line of [hash functions](/s5/computer-security/hash-functions) designed by Ronald Rivest, comprising MD2, MD4 and MD5. MD4 and MD5 defined the design that the SHA family later followed.
+
+## Merkle–Damgård Construction
+
+Builds a hash of arbitrary length input from a fixed-size compression function $f$. Ralph Merkle and Ivan Damgård proved the construction independently in 1989.
+
+- Padding  
+  Append a single 1 bit, then 0 bits, then the message length as a 64-bit integer, so the padded length is a multiple of the block size.
+- Chaining  
+  Split the padded message into blocks $m_1, \ldots, m_t$ and start from a fixed initialization vector $h_0$.
+  $$
+  h_i = f(h_{i-1}, m_i), \quad H(m) = h_t
+  $$
+
+If $f$ is collision resistant, then $H$ is collision resistant. The length in the padding is required for this proof.
+
+<Note>
+
+Merkle–Damgård hashes are vulnerable to length extension. The digest $H(m)$ is the final internal state, so an attacker who knows $H(m)$ and the length of $m$ computes $H(m \,\|\, \text{pad} \,\|\, x)$ for any $x$ without knowing $m$. This breaks the naive [MAC](/s5/computer-security/message-authentication-codes) $H(k \,\|\, m)$.
+
+</Note>
+
+## MD2
+
+Designed in 1989 for 8-bit machines.
+
+- Output size  
+  128 bits.
+- Block size  
+  16 bytes, with a 16-byte checksum appended before hashing.
+- Structure  
+  Byte-oriented compression using a substitution table derived from the digits of $\pi$.
+
+Collisions in the compression function were found in 1997 and a full collision in 2004. A preimage attack of about $2^{73}$ work followed in 2008. It was retired by RFC 6149 in 2011.
+
+## MD4
+
+Designed in 1990 as a fast hash for 32-bit machines.
+
+- Output size  
+  128 bits.
+- Block size  
+  512 bits.
+- Structure  
+  3 rounds of 16 steps, each step using 32-bit word operations and a different nonlinear function.
+
+The 3-round structure proved too weak. Den Boer and Bosselaers attacked reduced versions in 1991. Hans Dobbertin found full collisions in 1996. Wang et al. found collisions by hand in 2004. It is completely broken.
+
+## MD5
+
+Designed in 1991 as a strengthened MD4, published as RFC 1321 in 1992.
+
+- Output size  
+  128 bits.
+- Block size  
+  512 bits.
+- Structure  
+  4 rounds of 16 steps, so 64 steps in total. The 128-bit state is 4 words $A, B, C, D$, and each step adds a constant derived from the sine function.
+
+MD5 was the dominant hash of the 1990s and was used in file checksums, digital certificates and password storage.
+
+Timeline of attacks:
+
+- 1993  
+  Den Boer and Bosselaers find pseudo-collisions, meaning collisions in the compression function with a chosen $h_0$.
+- 1996  
+  Dobbertin finds a collision in the compression function with the real $h_0$. Cryptographers recommend moving away from MD5.
+- 2004  
+  Wang et al. find full collisions in hours on ordinary hardware.
+- 2007  
+  Stevens et al. give chosen-prefix collisions, where 2 messages with arbitrary different prefixes are extended into a collision.
+- 2008  
+  Researchers use a chosen-prefix collision to forge a rogue certificate authority certificate.
+- 2012  
+  The Flame malware uses an MD5 collision to forge a Microsoft code signing certificate.
+
+MD5 must not be used where collision resistance matters. It remains acceptable only as a non-security checksum. RFC 6151 records the attacks.
+
+## SHA Family
+
+The Secure Hash Algorithm family is published by NIST, using the MD4 and MD5 design pattern.
+
+### SHA-0 and SHA-1
+
+SHA-0 was published in 1993 and withdrawn in 1995 due to an undisclosed flaw. SHA-1 fixed it by adding a 1-bit rotation in the message expansion.
+
+- Output size  
+  160 bits.
+- Block size  
+  512 bits.
+- Structure  
+  80 rounds over a state of 5 words.
+
+The expected collision work is $2^{80}$ by the birthday bound. Attacks reduced it over time.
+
+- 2005  
+  Wang et al. reduce the collision cost to about $2^{69}$.
+- 2017  
+  The SHAttered attack by CWI and Google produces the first full collision, at about $2^{63}$ work.
+- 2020  
+  Leurent and Peyrin give a chosen-prefix collision, making certificate forgery practical.
+
+SHA-1 is deprecated for signatures and certificates.
+
+### SHA-2
+
+Published in 2001. It keeps the Merkle–Damgård design with a stronger compression function.
+
+- SHA-224 and SHA-256  
+  32-bit words, 512-bit blocks, 64 rounds.
+- SHA-384 and SHA-512  
+  64-bit words, 1024-bit blocks, 80 rounds.
+- SHA-512/224 and SHA-512/256  
+  SHA-512 with different initialization vectors and truncated output.
+
+No practical attack on full SHA-2 is known. The truncated variants SHA-224, SHA-384 and SHA-512/t are not vulnerable to length extension, since part of the state is never output.
+
+### SHA-3
+
+After the attacks on MD5 and SHA-1, NIST held a public competition from 2007. Keccak won in 2012 and was standardized as SHA-3 in FIPS 202 in 2015.
+
+SHA-3 does not use the Merkle–Damgård construction. It uses a sponge construction, in which the message is absorbed into a large state and the digest is squeezed out of it.
+
+- The state is never fully output, so there is no length extension.
+- The design is unrelated to SHA-2, so an attack on SHA-2 is unlikely to carry over.
+
+SHA-3 was designed as a fallback and SHA-2 remains widely used.
+
+## Summary
+
+| Function | Output bits | Block bits  | Status |
+| -------- | ----------- | ----------- | ------ |
+| MD2      | 128         | 128         | Broken |
+| MD4      | 128         | 512         | Broken |
+| MD5      | 128         | 512         | Broken |
+| SHA-1    | 160         | 512         | Broken |
+| SHA-256  | 256         | 512         | Secure |
+| SHA-512  | 512         | 1024        | Secure |
+| SHA-3    | 224 to 512  | 1152 to 576 | Secure |
