@@ -83,67 +83,6 @@ async function getSemestersData(): Promise<SemesterInfo[]> {
 }
 
 const semestersData: SemesterInfo[] = await getSemestersData();
-
-async function getRecentNotes(count: number = 4) {
-  const notes = await getCollection("notes");
-
-  // Filter notes that have lastUpdatedOn and sort by most recent
-  const notesWithDates = notes
-    .filter((note) => note.data.lastUpdatedOn)
-    .sort(
-      (a, b) =>
-        new Date(b.data.lastUpdatedOn!).getTime() -
-        new Date(a.data.lastUpdatedOn!).getTime(),
-    )
-    .slice(0, count);
-
-  return notesWithDates.map((note) => {
-    // Extract semester and module from slug
-    const slugParts = note.id.split("/");
-
-    let semesterNumber: number;
-    let moduleName: string;
-
-    if (slugParts[0].match(/s(\d)/g)) {
-      semesterNumber = parseInt(slugParts[0][1]);
-      moduleName = slugParts[1];
-    } else {
-      semesterNumber = 0;
-      moduleName = "General";
-    }
-
-    // Format module name (capitalize each word, replace hyphens with spaces)
-    const formattedModuleName = moduleName
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-
-    // Generate preview from first paragraph of content
-    const content = note.body || "";
-    const firstParagraph = content
-      .split("\n\n")[0]
-      .replace(/[#*`]/g, "")
-      .trim();
-    const preview =
-      firstParagraph.length > 150
-        ? firstParagraph.substring(0, 150) + "..."
-        : firstParagraph;
-
-    // Pass raw ISO date for client-side calculation
-    const lastUpdatedIso = note.data.lastUpdatedOn!;
-
-    return {
-      title: note.data.title,
-      semester: semesterNumber,
-      module: formattedModuleName,
-      preview,
-      lastUpdatedIso,
-      slug: note.id,
-    };
-  });
-}
-
-const recentNotes = await getRecentNotes();
 ---
 
 <Layout
@@ -174,35 +113,6 @@ const recentNotes = await getRecentNotes();
       ))}
     </div>
   </section>
-
-  <section>
-    <h2 class="section-title">Recent Notes</h2>
-    <div id="recent">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {recentNotes.map((note) => (
-          <a href={`/${note.slug}`} class="note-card">
-            <div
-              class="note-card-bar"
-              style={`background:var(--s${note.semester})`}
-            />
-            <div class="note-card-inner">
-              <div class="note-card-sem">
-                SEMESTER {note.semester} / {note.module.toUpperCase()}
-              </div>
-              <div class="note-card-title">{note.title}</div>
-              <div class="note-card-foot">
-                <span class="note-card-meta" data-date={note.lastUpdatedIso}>
-                  {note.lastUpdatedIso}
-                </span>
-                <span class="note-card-cta">Read &rarr;</span>
-              </div>
-            </div>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
   <Footer />
 </Layout>
 
