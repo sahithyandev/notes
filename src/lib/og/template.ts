@@ -42,8 +42,8 @@ const FULL_BLEED = {
 // The slab widens toward the bottom, so notes with more metadata (breadcrumb
 // + longer titles) still have room on the paper side while the cut still
 // reads as a single confident stroke.
-const CUT_TOP_X = OG_WIDTH * 0.64;
-const CUT_BOTTOM_X = OG_WIDTH * 0.44;
+const CUT_TOP_X = OG_WIDTH * 0.75;
+const CUT_BOTTOM_X = OG_WIDTH * 0.54;
 const SEAM_W = OG_WIDTH * 0.006;
 
 const PAPER_POLYGON = `polygon(0px 0px, ${CUT_TOP_X}px 0px, ${CUT_BOTTOM_X}px ${OG_HEIGHT}px, 0px ${OG_HEIGHT}px)`;
