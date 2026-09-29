@@ -6,6 +6,9 @@
 // instance) to get its own isolated copy of that state.
 import { test, expect } from "bun:test";
 import { EventEmitter } from "node:events";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { CONTENT_CHANGED_EVENT } from "./protocol.ts";
 
 let importId = 0;
@@ -28,7 +31,7 @@ function makeClient() {
   return { socket, sent };
 }
 
-function makeServer(clients: { socket: any }[]) {
+function makeServer(clients: { socket: any }[], root: string = ROOT) {
   const watcher = new EventEmitter();
   const connectionHandlers: ((socket: any) => void)[] = [];
   const middlewareHandlers: Array<
@@ -36,7 +39,7 @@ function makeServer(clients: { socket: any }[]) {
   > = [];
   const wsClients = clients.map((c) => c.socket);
   const server = {
-    config: { root: ROOT },
+    config: { root },
     watcher,
     ws: {
       clients: wsClients,
@@ -303,3 +306,60 @@ test("a non-reload websocket message passes straight through, untouched by coale
 
   expect(sent).toEqual([{ type: "connected" }]);
 });
+
+function withTempDocsRoot(fn: (root: string, file: string) => Promise<void>) {
+  return async () => {
+    const root = mkdtempSync(join(tmpdir(), "dev-reload-lock-"));
+    const dir = join(root, "docs", "s1", "topic");
+    mkdirSync(dir, { recursive: true });
+    const file = join(dir, "a.md");
+    writeFileSync(file, "---\ntitle: A\nprereqs: []\n---\nbody\n");
+    try {
+      await fn(root, file);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  };
+}
+
+test(
+  "editing a tracked note's frontmatter forces a full reload, not a content-only patch",
+  withTempDocsRoot(async (root, file) => {
+    const mod = await freshModule();
+    const { socket, sent } = makeClient();
+    const { server, watcher } = makeServer([{ socket }], root);
+    mod.default().configureServer(server as any);
+
+    writeFileSync(file, '---\ntitle: A\nprereqs: ["s2/topic/b"]\n---\nbody\n');
+    change(watcher, file);
+    triggerReload(socket);
+
+    await wait(1600);
+
+    expect(sent).toEqual([{ type: "full-reload" }]);
+  }),
+);
+
+test(
+  "editing only a tracked note's body still takes the content-only fast path",
+  withTempDocsRoot(async (root, file) => {
+    const mod = await freshModule();
+    const { socket, sent } = makeClient();
+    const { server, watcher } = makeServer([{ socket }], root);
+    mod.default().configureServer(server as any);
+
+    writeFileSync(file, "---\ntitle: A\nprereqs: []\n---\nnew body\n");
+    change(watcher, file);
+    triggerReload(socket);
+
+    await wait(200);
+
+    expect(sent).toEqual([
+      {
+        type: "custom",
+        event: CONTENT_CHANGED_EVENT,
+        data: { files: ["docs/s1/topic/a.md"] },
+      },
+    ]);
+  }),
+);

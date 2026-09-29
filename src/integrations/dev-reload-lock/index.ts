@@ -1,4 +1,5 @@
-import { relative } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import { CONTENT_CHANGED_EVENT } from "./protocol.ts";
 
@@ -74,6 +75,58 @@ const originalSends = new WeakMap<any, (data: string) => void>();
 // itself without re-running Astro's own render pipeline.
 const pendingContentFiles = new Set<string>();
 let pendingNonContentChange = false;
+
+// live-update.ts only ever patches <article>, the TOC, and a few text
+// fields (title, breadcrumb, sidebar label) that are all cheap to re-derive
+// from a note's own headings/title. Plenty of the page is instead driven by
+// other frontmatter fields (Prereqs, the WIP banner, author list, ...) and
+// none of that is in live-update.ts's swap list - a content-only patch
+// silently leaves those stale. Rather than teach the client every field a
+// note's frontmatter can affect, the server side tracks each tracked file's
+// raw frontmatter block and forces the safe, always-correct full reload
+// whenever it changes; only a body-only edit still takes the fast path.
+const frontmatterCache = new Map<string, string>();
+
+function extractFrontmatter(raw: string): string {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  return match ? match[1] : "";
+}
+
+function readFrontmatter(absPath: string): string | null {
+  try {
+    return extractFrontmatter(readFileSync(absPath, "utf-8"));
+  } catch {
+    return null;
+  }
+}
+
+function walkContentFiles(dir: string, files: string[] = []): string[] {
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return files;
+  }
+  for (const entry of entries) {
+    if (entry.name === "images" || entry.name === "summary") continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) walkContentFiles(full, files);
+    else if (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))
+      files.push(full);
+  }
+  return files;
+}
+
+// Primes frontmatterCache with every tracked file's current frontmatter
+// before any edit happens, so the first edit to a given file during this
+// dev server run has a real baseline to diff against instead of being
+// treated as "unknown, assume content-only".
+function primeFrontmatterCache(root: string): void {
+  for (const file of walkContentFiles(join(root, "docs"))) {
+    const fm = readFrontmatter(file);
+    if (fm !== null) frontmatterCache.set(file, fm);
+  }
+}
 
 function isTrackedContentFile(root: string, absPath: string): string | null {
   const rel = relative(root, absPath).split("\\").join("/");
@@ -166,24 +219,44 @@ export default function devReloadLock(): Plugin {
     configureServer(server: ViteDevServer) {
       activeServer = server;
       const root = server.config.root;
+      primeFrontmatterCache(root);
 
       // Only a "change" to a file that already exists as a tracked note
       // is safe to treat as content-only: an add/unlink can shift sidebar
       // structure, prev/next links, or the module tree, none of which a
       // page can patch into itself - those always fall back to a real
-      // reload via pendingNonContentChange.
+      // reload via pendingNonContentChange. Same for a change that edited
+      // the file's frontmatter (see frontmatterCache above) - only a
+      // body-only edit is still eligible for the content-only fast path.
       server.watcher.on("change", (file: string) => {
         if (isIgnoredPath(root, file)) return;
         const rel = isTrackedContentFile(root, file);
-        if (rel) pendingContentFiles.add(rel);
-        else pendingNonContentChange = true;
+        if (!rel) {
+          pendingNonContentChange = true;
+          return;
+        }
+        const previousFrontmatter = frontmatterCache.get(file);
+        const nextFrontmatter = readFrontmatter(file);
+        if (nextFrontmatter !== null)
+          frontmatterCache.set(file, nextFrontmatter);
+        if (
+          previousFrontmatter !== undefined &&
+          nextFrontmatter !== previousFrontmatter
+        ) {
+          pendingNonContentChange = true;
+        } else {
+          pendingContentFiles.add(rel);
+        }
       });
       server.watcher.on("add", (file: string) => {
         if (isIgnoredPath(root, file)) return;
+        const fm = readFrontmatter(file);
+        if (fm !== null) frontmatterCache.set(file, fm);
         pendingNonContentChange = true;
       });
       server.watcher.on("unlink", (file: string) => {
         if (isIgnoredPath(root, file)) return;
+        frontmatterCache.delete(file);
         pendingNonContentChange = true;
       });
 
