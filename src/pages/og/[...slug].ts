@@ -1,92 +1,33 @@
 export const prerender = true;
 
+import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
-import { OGImageRoute } from "astro-og-canvas";
 import { titleize } from "../../utils/index";
 import { SITE_NAME, SITE_DESCRIPTION } from "../../utils/values";
-
-type RGBColor = [r: number, g: number, b: number];
+import { renderOgImage } from "../../lib/og/render";
+import type { OgPage } from "../../lib/og/template";
 
 interface ParsedSlug {
   semester: string;
   module: string;
-  submodule?: string;
 }
 
-const LOGO_PATH = "./public/android-chrome-192x192.png";
-const LOGO_SIZE = 192;
-const LOGO_CONFIG: {
-  /** Path to the logo image file, e.g. `'./src/logo.png'` */
-  path: string;
-  /**
-   * Size to display logo at.
-   * - `undefined` — Use original image file dimensions. (Default)
-   * - `[width]` — Resize to the specified width, height will be resize proportionally.
-   * - `[width, height]` — Resized to the specified width and height.
-   */
-  size?: [width?: number, height?: number];
-} = {
-  path: LOGO_PATH,
-  size: [LOGO_SIZE],
-};
-
-// Semester color mapping (RGB arrays from CSS variables)
-const semesterColors: Record<string, { primary: RGBColor; bg: RGBColor }> = {
-  s1: { primary: [51, 72, 200], bg: [235, 237, 250] },
-  s2: { primary: [107, 56, 160], bg: [241, 235, 248] },
-  s3: { primary: [26, 122, 74], bg: [232, 243, 237] },
-  s4: { primary: [138, 90, 24], bg: [245, 239, 227] },
-  s5: { primary: [79, 58, 192], bg: [237, 237, 250] },
-  s6: { primary: [160, 36, 90], bg: [250, 235, 242] },
-  s7: { primary: [14, 122, 150], bg: [228, 242, 246] },
-  s8: { primary: [148, 64, 24], bg: [246, 237, 231] },
-};
-
-// Parse slug to extract semester, module, and submodule
 function parseSlug(slug: string): ParsedSlug {
   const parts = slug.split("/");
-  const semester = parts[0]; // e.g., "s2"
-  const module = parts[1]; // e.g., "theory-of-electricity"
-  const submodule = parts[2]; // e.g., "introduction" (optional)
-  return { semester, module, submodule };
+  return { semester: parts[0], module: parts[1] };
 }
-
-// Format module/submodule for display
-function formatModuleInfo(semester: string, module: string) {
-  return `Semester ${semester.slice(1)}: ${titleize(module)}`;
-}
-
-const BASE_OG_CONFIG = {
-  format: "JPEG" as const,
-  logo: LOGO_CONFIG,
-  padding: 60,
-  font: {
-    title: {
-      weight: "Bold" as const,
-      size: 90,
-      lineHeight: 1.2,
-    },
-    description: {
-      size: 32,
-    },
-  },
-} as const;
 
 const entries = await getCollection("notes");
 
-const pages: Record<
-  string,
-  {
-    data: (typeof entries)[number]["data"] & { slug: string };
-  }
-> = {};
-
-// Add default entry for homepage
-pages["default.jpg"] = {
-  data: {
+// Maps each output filename (e.g. "s3/operating-systems/raid.jpg",
+// "sem-3.jpg", "default.jpg") to the OG page description needed to render
+// it. Built once at build time, same enumeration as before: every note
+// except `*summary` slugs, one card per semester, and the homepage default.
+const pages: Record<string, OgPage> = {
+  "default.jpg": {
+    kind: "default",
     title: SITE_NAME,
-    slug: "default",
-    authors: [],
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -97,81 +38,41 @@ for (const entry of entries) {
   if (slug.endsWith("summary")) {
     continue;
   }
-  pages[`${slug}.jpg`] = { data: { ...data, slug } };
-  semesters.add(slug.split("/")[0]);
+  const { semester, module } = parseSlug(slug);
+  pages[`${slug}.jpg`] = {
+    kind: "note",
+    title: data.title,
+    semester,
+    module: titleize(module),
+  };
+  semesters.add(semester);
 }
 
 for (const semester of semesters) {
   pages[`sem-${semester.slice(1)}.jpg`] = {
-    data: {
-      title: `Semester ${semester.slice(1)}`,
-      slug: semester,
-      authors: [],
-    },
+    kind: "semester",
+    title: `Semester ${semester.slice(1)}`,
+    description: SITE_DESCRIPTION,
+    semester,
   };
 }
 
-export const { getStaticPaths, GET } = await OGImageRoute({
-  pages,
-  param: "slug",
-  getSlug: (path) => path.replace(/\.jpe?g$/i, "").concat(".jpg"),
-  getImageOptions: (_path, page: (typeof pages)[number]) => {
-    // Handle default homepage OG image
-    if (page.data.slug === "default") {
-      return {
-        ...BASE_OG_CONFIG,
-        title: SITE_NAME,
-        description: SITE_DESCRIPTION,
-        bgGradient: [[235, 237, 250]] as RGBColor[],
-        font: {
-          title: {
-            ...BASE_OG_CONFIG?.font.title,
-            color: [51, 72, 200] as RGBColor,
-          },
-          description: {
-            ...BASE_OG_CONFIG?.font.description,
-            color: [51, 72, 200] as RGBColor,
-          },
-        },
-      };
-    }
+export function getStaticPaths() {
+  return Object.keys(pages).map((path) => ({
+    params: { slug: path },
+  }));
+}
 
-    // Handle semester-specific OG images (e.g., sem-s1, sem-s2)
-    if (page.data.slug.match(/^s\d$/)) {
-      const colors = semesterColors[page.data.slug] || semesterColors.s1;
-      const semesterNum = page.data.slug.replace("s", "");
-      return {
-        ...BASE_OG_CONFIG,
-        title: `Semester ${semesterNum}`,
-        description: SITE_DESCRIPTION,
-        bgGradient: [colors.bg],
-        font: {
-          title: { ...BASE_OG_CONFIG.font.title, color: colors.primary },
-          description: {
-            ...BASE_OG_CONFIG.font.description,
-            color: colors.primary,
-          },
-        },
-      };
-    }
-
-    // Handle note pages
-    const { semester, module } = parseSlug(page.data.slug);
-    const colors = semesterColors[semester] || semesterColors.s1;
-    const description = formatModuleInfo(semester, module);
-
-    return {
-      ...BASE_OG_CONFIG,
-      title: page.data.title,
-      description,
-      bgGradient: [colors.bg],
-      font: {
-        title: { ...BASE_OG_CONFIG.font.title, color: colors.primary },
-        description: {
-          ...BASE_OG_CONFIG.font.description,
-          color: colors.primary,
-        },
-      },
-    };
-  },
-});
+export const GET: APIRoute = async ({ params }) => {
+  const page = pages[params.slug ?? ""];
+  if (!page) {
+    return new Response("Not found", { status: 404 });
+  }
+  const jpeg = await renderOgImage(page);
+  return new Response(jpeg, {
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
+};
