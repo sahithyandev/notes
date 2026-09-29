@@ -113,6 +113,23 @@ const semestersData: SemesterInfo[] = await getSemestersData();
       ))}
     </div>
   </section>
+
+  <section id="about">
+    <h2 class="section-title">About This Site</h2>
+    <p class="about-text">
+      These notes started as handwriting I could barely read back myself, then
+      moved through plain text files and Markdown before becoming this site in
+      April 2026. What began as a way to keep semester 1 organized is now my
+      main study reference for the whole degree, and a couple of friends have
+      since started contributing notes for their own modules.
+    </p>
+    <p class="about-text">
+      The site is built with Astro. Notes are Markdown files rendered through
+      content collections, math is typeset with KaTeX, and a custom style
+      validator checks formatting, broken links, and structure on every build.
+    </p>
+  </section>
+
   <Footer />
 </Layout>
 
@@ -131,6 +148,19 @@ const semestersData: SemesterInfo[] = await getSemestersData();
     padding-top: 24px;
     text-align: left;
     font-size: 1.3rem;
+  }
+
+  .about-text {
+    max-width: 62ch;
+    text-balance: pretty;
+    margin-bottom: 16px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  .about-text:last-child {
+    margin-bottom: 0;
   }
 
   .gpa-chip {
