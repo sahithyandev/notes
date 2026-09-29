@@ -1,10 +1,14 @@
 ---
 title: Secure Software Development Lifecycle
+sidebar:
+  label: SSDL
 dateCreated: 2026-09-03T05:24:45.100Z
-lastUpdatedOn: 2026-09-29T16:27:05.861Z
+lastUpdatedOn: 2026-09-29T18:38:18.044Z
 ---
 
 Security must be built into every phase of the SDLC, not bolted on as a final checklist. Fixing vulnerabilities early cuts remediation cost and deployment delay.
+
+This is secure software development: proactive and shift-left, covering engineering rules, secure coding standards, threat modeling, and pipeline architecture across the whole system, with the goal of building every component right. Secure application development is narrower and reactive, guarding a single finalized application already running in production, verified through its APIs, server configuration, authentication flows, and session management rather than its source code.
 
 ## Core Security Pillars
 
@@ -41,13 +45,3 @@ Foundational guidelines that hold across all languages and architectures. They s
   Keeps security intuitive so users do not bypass it.
 
 The [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework) formalizes these into 4 pillars. The [Principles of Secure System Design](/s5/computer-security/secure-system-design) note covers compartmentalization, defense in depth, and worked examples of these principles applied to real systems.
-
-## Secure Software Development vs Secure Application Development
-
-| Metric           | Secure Software Development                                                                                                            | Secure Application Development                                                                                                             |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Scope            | The whole ecosystem, covering engineering rules, secure coding standards, threat modeling, and pipeline architecture for any component | A narrower subset, securing a single finalized, running application                                                                        |
-| Primary approach | Proactive, embed security before deployment, shift-left                                                                                | Reactive and operational, guard the running system                                                                                         |
-| Technical focus  | Source code logic, dependency supply chain, framework integrity                                                                        | Vulnerabilities, APIs, server configuration, environment endpoints, session management, input validation, authentication flows, encryption |
-| Testing tools    | SAST, SCA, manual architecture review                                                                                                  | DAST, IAST, WAF configuration, penetration testing                                                                                         |
-| Core goal        | Building software right across all components                                                                                          | Protecting one application in production                                                                                                   |

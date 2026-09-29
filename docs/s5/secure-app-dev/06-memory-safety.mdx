@@ -1,45 +1,62 @@
 ---
 title: Memory Safety
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T16:27:05.794Z
+lastUpdatedOn: 2026-09-29T18:38:18.002Z
 ---
 
 A program execution is memory safe **iff** none of the following occur:
 
-- Access errors
-- Buffer overflow or over-read
-- Invalid pointer
-- Race condition
-- Use after free
-- Uninitialized variable or pointer access
-- Null pointer access
-- Memory leak
-- Stack or heap overflow
-- Invalid free
-- Unwanted aliasing
+- Access errors  
+  Reading or writing memory the program does not have permission to touch.
+- Buffer overflow or over-read  
+  Writing or reading past the end of an allocated buffer.
+- Invalid pointer  
+  A pointer that does not refer to a valid, live object.
+- Race condition  
+  Concurrent accesses to the same memory produce a result that depends on timing.
+- Use after free  
+  Accessing memory through a pointer after it has been freed.
+- Uninitialized variable or pointer access  
+  Reading a variable or pointer before it has been assigned a value.
+- Null pointer access  
+  Dereferencing a pointer that points to no object.
+- Memory leak  
+  Allocated memory that is never freed, even though nothing still references it.
+- Stack or heap overflow  
+  Writing past the bounds of a stack frame or heap allocation, corrupting adjacent memory.
+- Invalid free  
+  Freeing memory that was not allocated, or freeing it more than once.
+- Unwanted aliasing  
+  2 pointers unexpectedly referring to the same memory, so a write through 1 affects the other.
 
-## Spatial and Temporal Violations
+## Spatial Violation
 
-A spatial violation is a memory access outside an object's bounds.
+A memory access outside an object's bounds.
 
 - Buffer overflow
 - Out-of-bounds read, e.g. [Heartbleed](/s5/secure-app-dev/heap-overflow#heartbleed)
 - Null pointer dereference
 
-A temporal violation is a memory access referring to an invalid object.
+## Temporal Violation
 
+A memory access referring to an invalid object.
+
+Examples:
+
+- Buffer overflows
 - Use after free
 - Double free
 - Use of uninitialized memory
 
-Overflows, covered in [buffer overflow basics](/s5/secure-app-dev/buffer-overflow-basics), [heap overflow](/s5/secure-app-dev/heap-overflow), and [integer overflow](/s5/secure-app-dev/integer-overflow), are the most common form of spatial violation.
-
 ## Memory Safe Languages
 
-A memory safe language, e.g. Rust, Java, enforces memory safety at compile time or run time. Most code is still written in C/C++.
+A memory safe language enforces memory safety at compile time or run time.
 
-- C/C++ is supported nearly everywhere.
-- Low-level code such as operating systems cannot easily be implemented in memory safe languages.
-- Memory safe languages are still not fully mature.
+Examples: Rust, Java, Python.
 
-Adopting a memory safe language costs runtime overhead and loses some direct, low-level memory access, e.g. hardware-specific instructions needed by device drivers. C and related languages allow direct memory access without bounds checks, hence their vulnerability and large legacy of unsafe code.
+C and C++ are not memory safe and still widely used. Because:
+
+- supported nearly everywhere
+- low-level code such as operating systems cannot easily be implemented in memory safe languages.
+
+Adopting a memory safe language costs runtime overhead and loses some direct, low-level memory access such as hardware-specific instructions needed by device drivers. C and related languages allow direct memory access without bounds checks.

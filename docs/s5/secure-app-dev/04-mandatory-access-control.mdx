@@ -1,7 +1,7 @@
 ---
 title: Mandatory Access Control
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T17:52:41.396Z
+lastUpdatedOn: 2026-09-29T18:38:17.986Z
 ---
 
 Mandatory Access Control (MAC) imposes a global security policy on all users, on top of [Linux's native DAC model](/s5/secure-app-dev/discretionary-access-control). Users cannot set controls weaker than the policy, and normal administration does not carry authority to change the policy itself.
@@ -35,11 +35,7 @@ SELinux also implements:
 - Multi Level Security (MLS)  
   For classified data, enforced via file system labeling under a "no read up, no write down" rule.
 
-<Note>
-
 SELinux policies are complex, often hundreds of lines. RHEL ships a default "targeted" policy that only constrains selected network applications, leaving everything else to DAC.
-
-</Note>
 
 ## AppArmor
 
