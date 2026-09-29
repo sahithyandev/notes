@@ -1,16 +1,32 @@
 ---
 title: Boundary Value Problems
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-09-28T05:07:14.700Z
+lastUpdatedOn: 2026-09-29T14:51:58.601Z
 ---
 
 A boundary value problem (BVP) is a differential equation with conditions specified at 2 distinct points, called boundary conditions.
 
-## Standard Form
+### Standard Form
 
 $$
 y'' = f(x, y, y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
 $$
+
+### Linear and Nonlinear BVPs
+
+The BVP is linear if $f$ has the form
+
+$$
+f(x,y,y') = p(x)y' + q(x)y + r(x)
+$$
+
+for some functions $p$, $q$, $r$, giving
+
+$$
+y'' = p(x)y' + q(x)y + r(x), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+Otherwise, the BVP is nonlinear.
 
 ## Existence and Uniqueness
 
@@ -24,8 +40,235 @@ Examples:
 
 - $y'' + e^{-xy} + \sin(y') = 0$, $0 \leq x \leq 1$, $y(0) = y(1) = 0$ has a unique solution, since $f_y = xe^{-xy} > 0$ for all $x,y$ and $|f_{y'}| = |\cos(y')| \leq 1$ for all $y'$.
 
+A linear BVP is solved by the [linear shooting method](#linear-shooting-method) or a [linear finite-difference method](#linear-finite-difference-method). A nonlinear BVP is solved by the [nonlinear shooting method](#nonlinear-shooting-method) or a [nonlinear finite-difference method](#nonlinear-finite-difference-method).
+
+## Linear Shooting Method
+
+The linear shooting method solves a [linear BVP](#linear-and-nonlinear-bvps) by combining solutions to 2 initial value problems.
+
+Applying the [general existence and uniqueness theorem](#existence-and-uniqueness) to $f(x,y,y') = p(x)y' + q(x)y + r(x)$ gives $f_y = q(x)$ and $f_{y'} = p(x)$, so a unique solution exists **iff**
+
+- $p$, $q$, $r$ are continuous on $[a,b]$
+- $q(x) > 0$ for $x \in [a,b]$
+
+### Superposition Idea
+
+The ODE is linear, so if $y_1$ solves
+
+$$
+y_1'' = p(x)y_1' + q(x)y_1 + r(x)
+$$
+
+and $y_2$ solves the homogeneous equation
+
+$$
+y_2'' = p(x)y_2' + q(x)y_2
+$$
+
+then $y = y_1 + c\,y_2$ solves the same ODE for any constant $c$.
+
+### Auxiliary IVPs
+
+Fix
+
+$$
+y_1(a) = \alpha,\ y_1'(a) = 0, \qquad y_2(a) = 0,\ y_2'(a) = 1
+$$
+
+so that $y(a) = y_1(a) + c\,y_2(a) = \alpha$ for any $c$. Solve
+
+$$
+y_1'' = p(x)y_1' + q(x)y_1 + r(x), \quad a \leq x \leq b, \quad y_1(a) = \alpha,\ y_1'(a) = 0
+$$
+
+$$
+y_2'' = p(x)y_2' + q(x)y_2, \quad a \leq x \leq b, \quad y_2(a) = 0,\ y_2'(a) = 1
+$$
+
+by reducing each to a first-order system and applying [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps). $q(x) > 0$ guarantees $y_2(b) \neq 0$ whenever $y_2$ is non-constant.
+
+### Combining Solutions
+
+$c$ is chosen so that $y(b) = \beta$
+
+$$
+y_1(b) + c\,y_2(b) = \beta \implies c = \frac{\beta - y_1(b)}{y_2(b)}
+$$
+
+$$
+y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\, y_2(x)
+$$
+
+is the unique solution to the BVP.
+
+## Nonlinear Shooting Method
+
+The nonlinear shooting method solves a nonlinear BVP by approximating the initial slope $y'(a)$ that makes an initial value problem's solution hit the far boundary condition.
+
+### Idea
+
+For a guess $t$, let $y(x,t)$ solve the IVP
+
+$$
+y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t
+$$
+
+The method finds $t$ such that $y(b,t) - \beta = 0$, using [Newton's method](/s5/numerical-methods/newtons-method).
+
+### Newton Iteration
+
+$$
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{y'(b,t_{k-1})}
+$$
+
+$y'(b,t_{k-1})$ can't be obtained analytically since $y(b,t_{k-1})$ is only a point approximation. Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
+
+$$
+z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+$$
+
+Substituting $z(b,t_{k-1})$ for $y'(b,t_{k-1})$
+
+$$
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
+$$
+
+### Procedure
+
+- Choose an initial guess $t_0$
+- Repeat for $k = 0, 1, 2, \ldots$ until $|y(b,t_k) - \beta|$ is sufficiently small
+  - Approximate $y_k(x) = y(x,t_k)$ from
+
+    $$
+    y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t_k
+    $$
+
+  - Approximate $z_k(x) = z(x,t_k)$ from
+
+    $$
+    z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+    $$
+
+  - Update
+
+    $$
+    t_{k+1} = t_k - \frac{y_k(b) - \beta}{z_k(b)}
+    $$
+
 <Note>
 
-A linear BVP is solved by the [linear shooting method](/s5/numerical-methods/linear-shooting-method) or a [finite-difference method](/s5/numerical-methods/finite-difference-linear-bvp). A nonlinear BVP is solved by the [nonlinear shooting method](/s5/numerical-methods/nonlinear-shooting-method) or a [finite-difference method](/s5/numerical-methods/finite-difference-nonlinear-bvp).
+Both IVPs are reduced to first-order systems and solved with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
 
 </Note>
+
+## Linear Finite-Difference Method
+
+The finite-difference method approximates the solution of a linear BVP by replacing derivatives with centered difference formulas at mesh points and solving the resulting linear system.
+
+### Mesh Points
+
+Partition $[a,b]$ into $N+1$ subintervals of length $h = \dfrac{b-a}{N+1}$. Mesh points are
+
+$$
+x_i = a + ih, \quad i = 0, 1, \ldots, N+1
+$$
+
+### Centered Difference Formulas
+
+$$
+y''(x_i) = \frac{1}{h^2}\big(y(x_{i+1}) - 2y(x_i) + y(x_{i-1})\big) - \frac{h^2}{12}y^{(4)}(\xi_i)
+$$
+
+$$
+y'(x_i) = \frac{1}{2h}\big(y(x_{i+1}) - y(x_{i-1})\big) - \frac{h^2}{6}y'''(\eta_i)
+$$
+
+for some $\xi_i, \eta_i \in (x_{i-1}, x_{i+1})$.
+
+### Linear Difference Equation
+
+Substituting the centered difference formulas into the linear BVP and dropping the $O(h^2)$ error term, $y(x_i) \approx w_i$ satisfies
+
+$$
+w_0 = \alpha, \quad w_{N+1} = \beta
+$$
+
+$$
+-\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} + \big(2 + h^2 q(x_i)\big)w_i - \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = -h^2 r(x_i)
+$$
+
+for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
+
+### Matrix Form
+
+$$
+Aw = b
+$$
+
+with $A$ tridiagonal, using
+
+$$
+a_i = -1 - \frac{h}{2}p(x_i), \quad d_i = 2 + h^2 q(x_i), \quad c_i = -1 + \frac{h}{2}p(x_i)
+$$
+
+$$
+A = \begin{pmatrix}
+d_1 & c_1 & & \\
+a_2 & d_2 & c_2 & \\
+& \ddots & \ddots & \ddots \\
+& & a_N & d_N
+\end{pmatrix}
+$$
+
+$$
+w = \begin{pmatrix} w_1 \\ w_2 \\ \vdots \\ w_{N-1} \\ w_N \end{pmatrix}, \quad
+b = \begin{pmatrix}
+-h^2r(x_1) - a_1\alpha \\
+-h^2r(x_2) \\
+\vdots \\
+-h^2r(x_{N-1}) \\
+-h^2r(x_N) - c_N\beta
+\end{pmatrix}
+$$
+
+Solve for $w$ with [LU decomposition](/s5/numerical-methods/lu-decomposition) or another linear solver.
+
+If $p$, $q$, $r$ are continuous on $[a,b]$ and $q(x) \geq 0$ on $[a,b]$, the linear system has a unique solution whenever $h < \dfrac{2}{L}$, where $L = \max_{a \leq x \leq b} |p(x)|$.
+
+## Nonlinear Finite-Difference Method
+
+The finite-difference method for a nonlinear BVP replaces derivatives with centered difference formulas and solves the resulting nonlinear system with Newton's method.
+
+A unique solution exists **iff**
+
+- $f$, $f_y$, $f_{y'}$ are continuous for $x \in [a,b]$ and $y, y' \in (-\infty, \infty)$
+- $f_y(x,y,y') \geq \delta$ for some $\delta > 0$
+- a constant $k$ exists with $k = \max\big(|f_y(x,y,y')|,\ |f_{y'}(x,y,y')|\big)$
+
+### Nonlinear Difference Equation
+
+Using the [centered difference formulas](#centered-difference-formulas) at mesh points $x_0, \ldots, x_{N+1}$ on $[a,b]$, $y(x_i) \approx w_i$ satisfies
+
+$$
+w_0 = \alpha, \quad w_{N+1} = \beta
+$$
+
+$$
+-\frac{w_{i+1} - 2w_i + w_{i-1}}{h^2} + f\left(x_i, w_i, \frac{w_{i+1}-w_{i-1}}{2h}\right) = 0
+$$
+
+for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
+
+### Nonlinear System
+
+$$
+\begin{aligned}
+2w_1 - w_2 + h^2 f\left(x_1, w_1, \frac{w_2 - \alpha}{2h}\right) - \alpha &= 0 \\
+-w_1 + 2w_2 - w_3 + h^2 f\left(x_2, w_2, \frac{w_3 - w_1}{2h}\right) &= 0 \\
+&\ \ \vdots \\
+-w_{N-2} + 2w_{N-1} - w_N + h^2 f\left(x_{N-1}, w_{N-1}, \frac{w_N - w_{N-2}}{2h}\right) &= 0 \\
+-w_{N-1} + 2w_N + h^2 f\left(x_N, w_N, \frac{\beta - w_{N-1}}{2h}\right) - \beta &= 0
+\end{aligned}
+$$
+
+This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).
