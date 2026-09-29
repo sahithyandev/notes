@@ -1,7 +1,7 @@
 ---
 title: Process
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-09-28T13:22:04.679Z
+lastUpdatedOn: 2026-09-29T16:27:05.442Z
 ---
 
 OS manages user-level and kernel-level processes, which includes creating, managing, scheduling and terminating.
@@ -35,30 +35,62 @@ Programs that provide services to the user and the OS. Shipped with the OS. Not 
 
 Complete set of information about a process, that is required to pause, and later resume it exactly where it left off.
 
+A process's context splits into 3 categories.
+
+### Memory Context
+
+The process's address space.
+
+Includes the address space layout of the process's text, data, heap, and stack segments.
+
+### Hardware Context
+
+CPU state captured at the last context switch.
+
 Includes:
 
-- process id, state
-- parent process id
-- program counter
-- stack pointer
-- register contents
-- memory mappings
-- open files (file descriptors)
-- scheduler information such as priority, queue pointers
-- I/O devices
-- signal handlers
-- accounting information such as CPU time used, memory usage, I/O operations
-- other critical data
+- Program counter  
+  Address of the next instruction to execute.
+- Stack pointer  
+  Address of the top of the process's stack.
+- Register contents  
+  Values of the CPU's registers at the time of the last context switch.
 
-### Context Switching
+### OS Context
 
-The technique of saving the current process’s context and loading another process’s context. Required for multitasking. Introduces overhead.
+What the kernel tracks about the process beyond its memory and CPU state.
+
+Includes:
+
+- Process ID, state  
+  Unique identifier and current state of the process.
+- Parent process ID  
+  Identifier of the process that created this process.
+- Open files  
+  File descriptors for files currently in use by the process.
+- Scheduler information  
+  Priority, queue pointers, and other data used by the scheduler.
+- I/O devices  
+  Devices allocated to the process.
+- Signal handlers  
+  Routines registered to handle specific signals.
+- Accounting information  
+  CPU time used, memory usage, I/O operations.
 
 ### Process Control Block
 
 Aka. PCB, task control block. Representation of a process' context.
 
-#### Representation in Linux
+The kernel maintains 1 PCB per process, conceptually organized as a process table.
+
+Design issues:
+
+- Scalability  
+  How many concurrent processes the table can support.
+- Efficiency  
+  Access must be efficient with minimum space wastage.
+
+In Linux, a PCB is named `task_struct` and defined as follows:
 
 ```c
 struct task_struct {
@@ -72,7 +104,19 @@ struct task_struct {
 }
 ```
 
+`sizeof(struct task_struct)` is usually 3 to 4 KB on 64-bit systems. It varies by kernel version, architecture, and enabled debug config options.
+
+### Context Switching
+
+The technique of saving the current process’s context and loading another process’s context. Required for multitasking. Introduces overhead.
+
 ## Process States
+
+Most OS model a process's lifecycle using 5 states: new, ready, running, waiting, terminated. A process occupies exactly 1 state at a time.
+
+Some OS add suspended states (suspended-ready, suspended-waiting) for medium-term scheduling, when a process is swapped out of main memory to disk to free space.
+
+Zombie and orphan are UNIX-specific special cases.
 
 <ProcessStateDiagram />
 
@@ -98,11 +142,15 @@ When a process has finished execution or been killed. Its resources are reclaime
 
 ### Zombie
 
-When process is in terminated state, but its exit status has not yet been collected by its parent. Once the parent collects the exit code (using `wait()` or `waitpid()`), the process entry is completely deleted.
+When process is in terminated state, but its exit status has not yet been collected by its parent.
+
+Once the parent collects the exit code (using `wait()` or `waitpid()`), the process entry is completely deleted.
 
 ### Orphan
 
 When a parent process terminates before its child process. The orphaned child is adopted by the `init` process (PID 1).
+
+`init` periodically calls `wait()` on its adopted children, reaping any that are zombies. This is what cleans up a zombie whose original parent exited without collecting its exit status.
 
 ## Process Scheduling
 
@@ -123,6 +171,8 @@ Processes move across these queues continuously.
 ### Parent–Child Model
 
 A parent creates a child, forms a process tree. Parent and child may or may not share all or a subset of resources. Parent and child may run concurrently; or parent may wait for child to complete.
+
+The root of the tree is `init` (PID 1), started directly by the kernel at boot. Every other process descends from it.
 
 In UNIX:
 
