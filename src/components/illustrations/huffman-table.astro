@@ -1,0 +1,543 @@
+---
+// Step-through Huffman source reduction table. Column 0 lists the sources in
+// descending order of probability. Each reduction column merges the 2 lowest
+// probabilities (bracket and arrow) and re-sorts, until 2 sources remain.
+// The last steps assign codes back through the same columns, right to left.
+// The upper source of a merged pair gets bit 0 and the lower gets bit 1.
+//
+// Everything is computed at build time. Chrome comes from the shared
+// primitives (panel, step-bar, step-nav, step-note), and stepping is a small
+// driver in the <script> below since the stage is an SVG that reveals cells
+// and codes, not a table that diffs cells.
+import Panel from "./primitives/panel.astro";
+import StepBar from "./primitives/step-bar.astro";
+import StepNav from "./primitives/step-nav.astro";
+import StepNote from "./primitives/step-note.astro";
+
+interface Props {
+  /** Symbols with probabilities. A label like "a_1" renders as a subscript. */
+  symbols: { label: string; p: number }[];
+}
+
+const { symbols } = Astro.props;
+
+const uid = "huff-" + Math.random().toString(36).slice(2, 9);
+
+// Probabilities are compared as integers so sums like 0.2 + 0.1 tie exactly
+// with 0.3 instead of drifting by a float epsilon.
+const SCALE = 1_000_000;
+
+interface Source {
+  id: number;
+  label?: string;
+  w: number;
+  code: string;
+}
+
+interface Merge {
+  x: Source;
+  y: Source;
+  node: Source;
+}
+
+const fmt = (w: number) => String(+(w / SCALE).toFixed(4));
+const subHtml = (s: string) =>
+  s.replace(/([A-Za-z])_(\w+)/g, "$1<sub>$2</sub>");
+const subSvg = (s: string) =>
+  s.replace(
+    /([A-Za-z])_(\w+)/g,
+    '$1<tspan baseline-shift="-20%" font-size="0.7em">$2</tspan>',
+  );
+
+let nextId = 0;
+const leaves: Source[] = symbols.map((s) => ({
+  id: nextId++,
+  label: s.label,
+  w: Math.round(s.p * SCALE),
+  code: "",
+}));
+
+// Stable sort, so equal probabilities keep the order they were given in.
+const list = [...leaves].sort((a, b) => b.w - a.w);
+const columns: Source[][] = [[...list]];
+const merges: Merge[] = [];
+
+while (list.length > 1) {
+  const y = list.pop()!;
+  const x = list.pop()!;
+  const node: Source = { id: nextId++, w: x.w + y.w, code: "" };
+  merges.push({ x, y, node });
+  // The merged source goes after every entry with an equal or higher
+  // probability.
+  const at = list.findIndex((n) => n.w < node.w);
+  if (at === -1) list.push(node);
+  else list.splice(at, 0, node);
+  // The column stops at 2 sources. The final merge into 1 is implicit.
+  if (list.length >= 2) columns.push([...list]);
+}
+
+// Codes flow back from the last merge. Later merges are processed first, so a
+// merged source always has its own code before it is split.
+for (const { x, y, node } of [...merges].reverse()) {
+  x.code = node.code + "0";
+  y.code = node.code + "1";
+}
+
+const C = columns.length;
+const m = C - 1;
+const codeStep = (c: number) => m + C - c;
+const stepCount = 1 + m + C;
+
+const averageLength =
+  leaves.reduce((sum, n) => sum + n.w * n.code.length, 0) / SCALE;
+
+const plural = (n: number) => `${n} source${n === 1 ? "" : "s"}`;
+
+const steps: { label: string; note: string }[] = [
+  {
+    label: "Sort",
+    note: "List the sources in descending order of probability. The last 2 have the lowest probabilities and are merged first.",
+  },
+];
+for (let k = 1; k <= m; k++) {
+  const { x, y, node } = merges[k - 1];
+  steps.push({
+    label: `Reduction ${k}`,
+    note:
+      `Add the 2 lowest probabilities, ${fmt(x.w)} and ${fmt(y.w)}, into ${fmt(node.w)}. ` +
+      `Place ${fmt(node.w)} in column ${k} so the column stays in descending order. The other sources carry over.` +
+      (k === m
+        ? ` ${plural(columns[m].length)} remain, so the reduction stops.`
+        : ""),
+  });
+}
+for (let j = 0; j < C; j++) {
+  const c = C - 1 - j;
+  if (c === m) {
+    const [upper, lower] =
+      merges[m].x === columns[m][0]
+        ? [merges[m].x, merges[m].y]
+        : [merges[m].y, merges[m].x];
+    steps.push({
+      label: `Codes ${j + 1}`,
+      note: `Start from the last column. Assign ${upper.code} to the upper source and ${lower.code} to the lower source.`,
+    });
+  } else {
+    const { x, y, node } = merges[c];
+    steps.push({
+      label: `Codes ${j + 1}`,
+      note:
+        `In column ${c}, the ${fmt(node.w)} source with code ${node.code} splits into ${fmt(x.w)} and ${fmt(y.w)}. ` +
+        `Append 0 to the code of the upper source and 1 to the lower source. The other sources keep their codes.` +
+        (c === 0
+          ? ` These are the final codewords. Average length is ${+averageLength.toFixed(3)} bits per pixel.`
+          : ""),
+    });
+  }
+}
+if (m === 0) {
+  steps[steps.length - 1].note +=
+    ` These are the final codewords. Average length is ${+averageLength.toFixed(3)} bits per pixel.`;
+}
+
+// Steps in which a cell is highlighted: the 2 merged sources and the source
+// they form, both when the reduction is drawn and when its code is split.
+const highlights = new Map<string, number[]>();
+const mark = (c: number, n: Source, step: number) => {
+  const key = `${c}:${n.id}`;
+  highlights.set(key, [...(highlights.get(key) ?? []), step]);
+};
+columns[0].slice(-2).forEach((n) => mark(0, n, 0));
+merges.forEach(({ x, y, node }, j) => {
+  const steps = j < m ? [j + 1, codeStep(j)] : [codeStep(j)];
+  for (const s of steps) {
+    mark(j, x, s);
+    mark(j, y, s);
+    if (j < m) mark(j + 1, node, s);
+  }
+});
+
+const COL = 210;
+const ROW = 46;
+const SYM_X = 52;
+const PROB_X = 150;
+const colX = (c: number) => PROB_X + c * COL;
+const BODY_TOP = 86;
+const rowY = (r: number) => BODY_TOP + r * ROW + ROW / 2;
+const W = colX(m) + 110;
+const H = BODY_TOP + leaves.length * ROW + 10;
+// The SVG never scales above its natural size (so text is never enlarged on
+// wide screens) and never below this fraction of it (so text stays readable
+// on narrow screens). Below that width the wrapper scrolls horizontally.
+const MIN_SCALE = 0.75;
+const minWidth = Math.round(W * MIN_SCALE);
+
+const arrows = merges.slice(0, m).map(({ x, y, node }, j) => {
+  const src = columns[j];
+  const yx = rowY(src.indexOf(x));
+  const yy = rowY(src.indexOf(y));
+  const yn = rowY(columns[j + 1].indexOf(node));
+  const xs = colX(j) + 28;
+  const xv = xs + 22;
+  const xa = colX(j + 1) - 30;
+  return { step: j + 1, xs, xv, xa, yx, yy, yn };
+});
+---
+
+<Panel
+  class="huffman"
+  data-huffman
+  tabindex="0"
+  aria-roledescription="carousel"
+  style="--nav-accent: var(--sem, var(--accent))"
+>
+  <StepBar total={stepCount} />
+
+  <div class="scroll" data-scroll>
+    <svg
+      class="table"
+      viewBox={`0 0 ${W} ${H}`}
+      style={`min-width:${minWidth}px;max-width:${W}px`}
+      role="img"
+      aria-label="Huffman source reduction table built step by step"
+    >
+      <defs>
+        <marker
+          id={uid}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="8"
+          markerHeight="8"
+          orient="auto"
+        >
+          <path class="arrowhead" d="M0,0 L10,5 L0,10 z"></path>
+        </marker>
+      </defs>
+
+      <line class="rule" x1="8" y1="8" x2={W - 8} y2="8"></line>
+      <line class="rule" x1="8" y1="42" x2={W - 8} y2="42"></line>
+      <line class="rule" x1="8" y1="80" x2={W - 8} y2="80"></line>
+      <line class="rule" x1="8" y1={H - 4} x2={W - 8} y2={H - 4}></line>
+
+      <text class="head" x={(SYM_X + PROB_X) / 2} y="26">
+        Original source
+      </text>
+      <text class="head" x={SYM_X} y="64">
+        Symbol
+      </text>
+      <text class="head" x={PROB_X} y="64">
+        Prob.
+      </text>
+      {m > 0 && (
+        <text class="head off" data-in="1" x={(colX(1) + colX(m)) / 2} y="26">
+          Source reduction
+        </text>
+      )}
+      {columns.slice(1).map((_, i) => (
+        <text class="head off" data-in={String(i + 1)} x={colX(i + 1)} y="64">
+          {i + 1}
+        </text>
+      ))}
+
+      {columns[0].map((n, r) => (
+        <text
+          class="symbol"
+          x={SYM_X}
+          y={rowY(r)}
+          set:html={subSvg(n.label!)}
+        />
+      ))}
+
+      {columns.map((col, c) =>
+        col.map((n, r) => (
+          <g
+            class:list={[
+              "cell",
+              {
+                off: c > 0,
+                current: (highlights.get(`${c}:${n.id}`) ?? []).includes(0),
+              },
+            ]}
+            data-in={String(c)}
+            data-cur={(highlights.get(`${c}:${n.id}`) ?? []).join(" ")}
+          >
+            <rect
+              x={colX(c) - 30}
+              y={rowY(r) - 14}
+              width="60"
+              height="28"
+              rx="6"
+            />
+            <text class="prob" x={colX(c)} y={rowY(r)}>
+              {fmt(n.w)}
+            </text>
+            <text
+              class="code off"
+              data-in={String(codeStep(c))}
+              x={colX(c)}
+              y={rowY(r) + 22}
+            >
+              {n.code}
+            </text>
+          </g>
+        )),
+      )}
+
+      {arrows.map((a) => (
+        <g class="bracket off" data-in={String(a.step)}>
+          <path
+            d={`M${a.xs},${a.yx} H${a.xv} M${a.xs},${a.yy} H${a.xv} M${a.xv},${Math.min(a.yx, a.yy, a.yn)} V${Math.max(a.yx, a.yy, a.yn)} M${a.xv},${a.yn} H${a.xa}`}
+            marker-end={`url(#${uid})`}
+          ></path>
+        </g>
+      ))}
+    </svg>
+  </div>
+
+  <div class="stack">
+    {steps.map((s, idx) => (
+      <div class:list={["step", { active: idx === 0 }]} data-label={s.label}>
+        <StepNote>{s.note}</StepNote>
+      </div>
+    ))}
+  </div>
+
+  <StepNav />
+</Panel>
+
+<style>
+  .scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 4px auto 0;
+  }
+
+  .table [data-in] {
+    transition: opacity 0.2s ease;
+  }
+  .table .off {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .rule {
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .head {
+    font: 600 13px var(--font-ui);
+    fill: var(--text-primary);
+    text-anchor: middle;
+  }
+  .symbol {
+    font: 14px var(--font-ui);
+    fill: var(--text-primary);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .cell rect {
+    fill: transparent;
+    transition: fill 0.2s ease;
+  }
+  .cell.current rect {
+    fill: var(--sem-bg, var(--accent-subtle));
+  }
+  .cell .prob {
+    font: 14px var(--font-ui);
+    fill: var(--text-primary);
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell .code {
+    font: 700 12px var(--font-mono);
+    fill: var(--text-secondary);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .cell .code.fresh {
+    fill: var(--sem, var(--accent));
+  }
+
+  .bracket path {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1.3;
+  }
+  .arrowhead {
+    fill: var(--text-secondary);
+  }
+
+  /* The server renders the step 0 state (later cells, codes, arrows and notes
+     already hidden), so nothing flashes before the script runs. The bar and
+     nav are dead until then, so they only reserve their space. */
+  :global(.huffman:not(.ready) .bar),
+  :global(.huffman:not(.ready) .foot) {
+    visibility: hidden;
+  }
+  .stack {
+    display: grid;
+    margin-top: 2px;
+  }
+  .stack > .step {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+  }
+  .stack > .step.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .table [data-in],
+    .cell rect,
+    .stack > .step {
+      transition: none;
+    }
+  }
+</style>
+
+<noscript>
+  <style>
+    /* Without script nothing can step, so show the finished table and every
+       note in sequence. Unscoped, so each rule keeps the .huffman prefix. */
+    .huffman .table .off {
+      opacity: 1;
+    }
+    .huffman .table .cell.current rect {
+      fill: transparent;
+    }
+    .huffman .bar,
+    .huffman .foot {
+      display: none;
+    }
+    .huffman .stack {
+      display: block;
+    }
+    .huffman .stack > .step {
+      opacity: 1;
+      visibility: visible;
+      margin-top: 16px;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { createDot } from "./lib/dots";
+
+  function initHuffman(root: HTMLElement) {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
+    if (!steps.length) return;
+    const timed = Array.from(
+      root.querySelectorAll<SVGElement>(".table [data-in]"),
+    );
+    const cells = Array.from(root.querySelectorAll<SVGElement>(".table .cell"));
+    const codes = Array.from(root.querySelectorAll<SVGElement>(".table .code"));
+
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]")!;
+    const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+    const label = root.querySelector<HTMLElement>("[data-label]")!;
+    const current = root.querySelector<HTMLElement>("[data-current]")!;
+    const total = root.querySelector<HTMLElement>("[data-total]")!;
+    const dotWrap = root.querySelector<HTMLElement>(".dots")!;
+    const dotTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-dot-template]",
+    );
+    const live = root.querySelector<HTMLElement>(".live")!;
+
+    total.textContent = String(steps.length);
+    const last = steps.length - 1;
+
+    const dots = steps.map((s, idx) =>
+      createDot(
+        dotWrap,
+        dotTemplate,
+        s.dataset.label ?? `Step ${idx + 1}`,
+        () => show(idx),
+      ),
+    );
+
+    let i = 0;
+
+    // On narrow screens the table scrolls sideways. Center the highlighted
+    // cells so the step being explained is always in view.
+    const scroller = root.querySelector<HTMLElement>("[data-scroll]")!;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function revealCurrent() {
+      if (scroller.scrollWidth <= scroller.clientWidth) return;
+      const active = cells.filter((el) => el.classList.contains("current"));
+      if (!active.length) {
+        scroller.scrollTo({ left: 0, behavior: "auto" });
+        return;
+      }
+      const rects = active.map((el) => el.getBoundingClientRect());
+      const left = Math.min(...rects.map((r) => r.left));
+      const right = Math.max(...rects.map((r) => r.right));
+      const box = scroller.getBoundingClientRect();
+      const target =
+        scroller.scrollLeft + (left + right) / 2 - (box.left + box.width / 2);
+      scroller.scrollTo({
+        left: target,
+        behavior: reduceMotion.matches ? "auto" : "smooth",
+      });
+    }
+
+    function show(n: number) {
+      i = Math.max(0, Math.min(last, n));
+      timed.forEach((el) =>
+        el.classList.toggle("off", Number(el.dataset.in) > i),
+      );
+      cells.forEach((el) =>
+        el.classList.toggle(
+          "current",
+          (el.dataset.cur ?? "").split(" ").includes(String(i)),
+        ),
+      );
+      // The column whose codes were just assigned stands out from the rest.
+      codes.forEach((el) =>
+        el.classList.toggle("fresh", Number(el.dataset.in) === i),
+      );
+      revealCurrent();
+      steps.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      dots.forEach((d, idx) =>
+        d.setAttribute("aria-selected", idx === i ? "true" : "false"),
+      );
+      prev.disabled = i === 0;
+      next.disabled = i === last;
+      label.textContent = steps[i].dataset.label ?? "";
+      current.textContent = String(i + 1);
+      const noteText =
+        steps[i].querySelector(".step-note")?.textContent?.trim() ?? "";
+      live.textContent = `${label.textContent}. ${noteText}`;
+    }
+
+    prev.addEventListener("click", () => show(i - 1));
+    next.addEventListener("click", () => show(i + 1));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        show(i - 1);
+        e.preventDefault();
+      } else if (e.key === "ArrowRight") {
+        show(i + 1);
+        e.preventDefault();
+      }
+    });
+
+    root.classList.add("ready");
+    show(0);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-huffman]")
+    .forEach((el) => initHuffman(el));
+</script>

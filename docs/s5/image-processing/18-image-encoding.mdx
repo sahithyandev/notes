@@ -1,0 +1,192 @@
+---
+title: Image Encoding
+dateCreated: 2026-09-30T05:30:00.000Z
+lastUpdatedOn: 2026-09-30T07:23:57.735Z
+---
+
+Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
+
+For grey level $k$ with probability $P(k) = r_k / N$ and codeword length $l(k)$:
+
+$$
+L_{ave} = \sum_{k=0}^{L-1} l(k) P(k)
+$$
+
+$L_{ave}$ is the average number of bits per pixel of the coded image. It is bounded below by the entropy $B_{ave}$.
+
+$$
+L_{ave} \geq B_{ave}
+$$
+
+$$
+\text{Coding redundancy} = L_{ave} - B_{ave}
+$$
+
+The smallest $L_{ave}$ is achieved by assigning the shortest codeword to the most probable grey level.
+
+<Note>
+
+The mapping between grey levels and codewords is stored in a codebook.
+
+</Note>
+
+## Fixed Length Coding
+
+All grey levels are assigned codewords of the same length.
+
+$$
+l(k) = \lceil \log_2 L \rceil
+$$
+
+Here:
+
+- $L$: number of grey levels
+- $l(k)$: codeword length of grey level $k$
+
+- $L_{ave} = l(k)$ for every image, regardless of the grey level probabilities
+- $L_{ave} = B_{ave}$ only when all grey levels are equiprobable and $L$ is a power of 2
+- Simple to encode and decode, and allows random access to any pixel
+- Contains coding redundancy whenever the grey levels are not equiprobable
+
+Examples:
+
+- 8bpp image, $L = 256$, $l(k) = 8$ bits
+- 3 grey level image, $L = 3$, $l(k) = 2$ bits
+
+## Variable Length Coding
+
+Grey levels are assigned codewords of different lengths. More probable grey levels get shorter codewords.
+
+- Achieves $L_{ave}$ close to the entropy $B_{ave}$, with $L_{ave} = B_{ave}$ only when every $P(k)$ is a power of $\frac{1}{2}$
+- Must remain uniquely decodable
+- A prefix code satisfies this, since no codeword is a prefix of another codeword
+
+Example:
+
+For the 3 grey level image in the [entropy](/s5/image-processing/entropy) example:
+
+| Grey level | $P(k)$ | Fixed code | Variable code |
+| ---------- | ------ | ---------- | ------------- |
+| White      | 0.5    | 00         | 0             |
+| Grey       | 0.25   | 01         | 10            |
+| Black      | 0.25   | 10         | 11            |
+
+Fixed length code:
+
+$$
+L_{ave} = 2 \text{ bits}
+$$
+
+Variable length code:
+
+$$
+L_{ave} = 1(0.5) + 2(0.25) + 2(0.25) = 1.5 \text{ bits}
+$$
+
+$$
+CR = \frac{2}{1.5} \approx 1.33
+$$
+
+The variable length $L_{ave}$ equals $B_{ave}$, so no coding redundancy remains.
+
+### Huffman Coding
+
+Produces the optimal variable length codeword allocation while preserving decodability. Reduces the source by merging the least probable grey levels, then assigns codes back through the reductions.
+
+<Note title="Proof Hint">
+
+- List grey levels in descending order of probability
+- Add the 2 lowest probabilities into 1 and re-sort the list
+- Repeat until 2 probabilities remain
+- Assign 0 and 1 to the last 2 probabilities
+- Working backwards, append 0 and 1 to the code of every merged probability, one bit for each of the 2 probabilities it came from
+
+</Note>
+
+Example:
+
+An image has 4 grey levels with probabilities 0.4, 0.3, 0.2, 0.1.
+
+<HuffmanTable
+  symbols={[
+    { label: "a_1", p: 0.4 },
+    { label: "a_2", p: 0.3 },
+    { label: "a_3", p: 0.2 },
+    { label: "a_4", p: 0.1 },
+  ]}
+/>
+
+Codewords:
+
+| Grey level | $P$ | Codeword | $l$ |
+| ---------- | --- | -------- | --- |
+| $a_1$      | 0.4 | 1        | 1   |
+| $a_2$      | 0.3 | 00       | 2   |
+| $a_3$      | 0.2 | 010      | 3   |
+| $a_4$      | 0.1 | 011      | 3   |
+
+$$
+L_{ave} = 0.4(1) + 0.3(2) + 0.2(3) + 0.1(3) = 1.9 \text{ bits}
+$$
+
+$$
+B_{ave} \approx 1.85 \text{ bits}
+$$
+
+$$
+CR = \frac{2}{1.9} \approx 1.05
+$$
+
+A fixed length code needs 2 bits per pixel for 4 grey levels.
+
+## Decodability
+
+### Code
+
+A code assigns a codeword to each grey level. A codeword is a finite sequence of bits.
+
+- Encoded stream  
+  Concatenation of the codewords of all pixels in order, with no separators.
+- Codebook  
+  The mapping between grey levels and codewords.
+
+Example:
+
+For the variable code above, the pixels white, grey, black give the stream `01011`.
+
+### Unique Decodability
+
+A fixed length code is always uniquely decodable.
+
+A variable length code is uniquely decodable **iff** every bit stream can be split into codewords in exactly 1 way.
+
+The stream has no fixed boundaries, so the decoder must find where each codeword ends. A codeword that is a prefix of another makes this ambiguous.
+
+Example:
+
+For the code $a = 0$, $b = 01$, $c = 1$, the stream `01` decodes as $b$, or as $a$ followed by $c$.
+
+### Prefix Code
+
+A code is a prefix code **iff** no codeword is a prefix of another codeword.
+
+- Codewords sit only at the leaves of the code tree
+- A codeword is recognised as soon as its last bit is read, with no lookahead
+- Every prefix code is uniquely decodable
+- Huffman codes are prefix codes
+
+Decoding a prefix code:
+
+- Read bits until they match a codeword
+- Output the grey level and clear the bits read
+- Repeat from the next bit
+
+Example:
+
+For the variable code in the table above, the stream `010110` splits as `0`, `10`, `11`, `0`. It decodes to white, grey, black, white.
+
+<Note>
+
+A flipped bit shifts every later codeword boundary, so decoding errors propagate through the rest of the stream. The channel encoder in the [compression](/s5/image-processing/compression) pipeline adds controlled redundancy to limit this.
+
+</Note>

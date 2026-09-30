@@ -1,0 +1,68 @@
+---
+title: Entropy
+dateCreated: 2026-09-30T05:30:00.000Z
+lastUpdatedOn: 2026-09-30T07:23:57.724Z
+---
+
+Information conveyed by an event is negatively related to its probability.
+
+$$
+H(E) = \log \frac{1}{P(E)} = -\log P(E)
+$$
+
+For an image, entropy is the probability-weighted sum of the information carried by each grey level.
+
+$$
+B_{ave} = -\sum_{i=0}^{L-1} P(l_i) \log_2 P(l_i)
+$$
+
+Here:
+
+- $L$: number of grey levels
+- $P(l_i)$: probability of grey level $l_i$
+
+$B_{ave}$ is the minimum average number of bits per pixel required to represent the image.
+
+Example:
+
+An image has 100 pixels across 3 grey levels: white ($r_k = 50$, $P = 0.5$), grey ($r_k = 25$, $P = 0.25$), black ($r_k = 25$, $P = 0.25$).
+
+$$
+B_{total} = -50\log_2 0.5 - 25\log_2 0.25 - 25\log_2 0.25 = 150 \text{ bits}
+$$
+
+$$
+B_{ave} = 1.5 \text{ bits per pixel}
+$$
+
+## Worked Example
+
+Entropy of the following 4x4 image with grey levels 0 to 3.
+
+```
+0 0 1 0
+0 2 0 1
+1 0 0 3
+0 1 2 3
+```
+
+Count the pixels of each grey level, with $N = 16$ and $P(l_i) = r_i / N$:
+
+| Grey level $l_i$ | $r_i$ | $P(l_i)$ | $-\log_2 P(l_i)$ | $-P(l_i) \log_2 P(l_i)$ |
+| ---------------- | ----- | -------- | ---------------- | ----------------------- |
+| 0                | 8     | 0.5      | 1                | 0.5                     |
+| 1                | 4     | 0.25     | 2                | 0.5                     |
+| 2                | 2     | 0.125    | 3                | 0.375                   |
+| 3                | 2     | 0.125    | 3                | 0.375                   |
+
+Sum the last column.
+
+$$
+B_{ave} = 0.5 + 0.5 + 0.375 + 0.375 = 1.75 \text{ bits per pixel}
+$$
+
+$$
+B_{total} = 1.75 \times 16 = 28 \text{ bits}
+$$
+
+A fixed length code needs 2 bits per pixel, so 32 bits for the image. The gap of $2 - 1.75 = 0.25$ bits per pixel is the maximum saving from any encoding.
