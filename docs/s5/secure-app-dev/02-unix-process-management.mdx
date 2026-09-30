@@ -3,7 +3,7 @@ title: Unix Process Management
 prereqs:
   - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-29T17:52:41.364Z
+lastUpdatedOn: 2026-09-30T14:55:22.371Z
 ---
 
 Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
@@ -159,14 +159,10 @@ Sends a signal to a process, the Unix analog of a hardware interrupt, routed thr
 - `SIGSTOP`  
   Stop the process.
 - `SIGTERM`  
-  Request termination.
+  Request termination. Can be caught, blocked, ignored. Lets the process clean up before exiting.
 - `SIGKILL`  
-  Kill the process.
+  Kill the process. Cannot be caught, blocked, or ignored. The kernel terminates the process immediately.
 - `SIGCONT`  
   Restart a stopped process.
-
-<Note>
-
-`SIGTERM` can be caught, blocked, or ignored, letting a process run a handler to clean up before exiting. `SIGKILL` cannot be caught, blocked, or ignored, the kernel terminates the process immediately.
-
-</Note>
+- `SIGCHLD`  
+  Sent by the kernel to the parent when a child terminates, stops, or continues. Ignored by default. A parent can install a handler that calls `wait()` on receiving it, reaping terminated children without blocking. Children that are never reaped remain [zombies](/s3/operating-systems/process#zombie).

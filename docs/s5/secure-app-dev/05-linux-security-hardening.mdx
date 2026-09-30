@@ -1,7 +1,7 @@
 ---
 title: Linux Security Hardening
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-29T18:38:17.994Z
+lastUpdatedOn: 2026-09-30T14:55:22.404Z
 ---
 
 Hardening [Linux's DAC model](/s5/secure-app-dev/discretionary-access-control) requires mitigating risk at both the OS level and the application level.
@@ -12,6 +12,8 @@ Hardening [Linux's DAC model](/s5/secure-app-dev/discretionary-access-control) r
   Unused applications are liable to be left in a default, un-hardened, unpatched state. Avoid running X Window, RPC services, R-services, inetd, SMTP daemons, telnet, unless required.
 - Initial configuration  
   Set the root password, create a non-root user account, set a system security level, enable a host-based firewall, enable [SELinux](/s5/secure-app-dev/mandatory-access-control).
+- Secure root access  
+  Avoid running as a root user as much as possible. Prevents [rootkits](/s4/operating-systems-security/malware#rootkits) and unauthorized access.
 - Patch management  
   Installed applications must be configured securely and kept current with security patches. Automated update tools exist, e.g. `up2date`, `YaST`, `apt-get`. Automatic updates should not run on change-controlled systems without testing first.
 
