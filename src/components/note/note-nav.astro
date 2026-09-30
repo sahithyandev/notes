@@ -23,38 +23,36 @@ function trimLabel(label: string): string {
 const { prevNote, nextNote } = Astro.props;
 ---
 
-{
-  (prevNote || nextNote) && (
-    <div class="note-nav">
-      {prevNote && (
-        <a
-          href={`/${prevNote.slug}`}
-          class="note-nav-btn left"
-          title={prevNote.label}
-        >
-          <ArrowLeft class="note-nav-icon" />
-          <div class="note-nav-content">
-            <span class="note-nav-dir">Previous</span>
-            <span class="note-nav-title">{trimLabel(prevNote.label)}</span>
-          </div>
-        </a>
-      )}
-      {nextNote && (
-        <a
-          href={`/${nextNote.slug}`}
-          class="note-nav-btn right"
-          title={nextNote.label}
-        >
-          <ArrowRight class="note-nav-icon" />
-          <div class="note-nav-content">
-            <span class="note-nav-dir">Next</span>
-            <span class="note-nav-title">{trimLabel(nextNote.label)}</span>
-          </div>
-        </a>
-      )}
-    </div>
-  )
-}
+{(prevNote || nextNote) && (
+  <div class="note-nav">
+    {prevNote && (
+      <a
+        href={`/${prevNote.slug}`}
+        class="note-nav-btn left"
+        title={prevNote.label}
+      >
+        <ArrowLeft class="note-nav-icon" />
+        <div class="note-nav-content">
+          <span class="note-nav-dir">Previous</span>
+          <span class="note-nav-title">{trimLabel(prevNote.label)}</span>
+        </div>
+      </a>
+    )}
+    {nextNote && (
+      <a
+        href={`/${nextNote.slug}`}
+        class="note-nav-btn right"
+        title={nextNote.label}
+      >
+        <ArrowRight class="note-nav-icon" />
+        <div class="note-nav-content">
+          <span class="note-nav-dir">Next</span>
+          <span class="note-nav-title">{trimLabel(nextNote.label)}</span>
+        </div>
+      </a>
+    )}
+  </div>
+)}
 
 <style>
   .note-nav {

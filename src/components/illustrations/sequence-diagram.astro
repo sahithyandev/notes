@@ -88,72 +88,68 @@ const rows = steps.map((step, i) => {
       style={`max-height: ${totalH}px; aspect-ratio: ${W} / ${totalH}`}
     >
       <g class="lifelines">
-        {
-          participants.map((p, i) => (
-            <g style={`transform: translate(${xs[i]}px, 0)`}>
-              <line
-                x1="0"
-                y1={HEADER_H - 18}
-                x2="0"
-                y2={totalH - 10}
-                class="lifeline"
-              />
-              <g
-                class="chip"
-                style={`transform: translate(${-CHIP_W / 2}px, 8px)`}
+        {participants.map((p, i) => (
+          <g style={`transform: translate(${xs[i]}px, 0)`}>
+            <line
+              x1="0"
+              y1={HEADER_H - 18}
+              x2="0"
+              y2={totalH - 10}
+              class="lifeline"
+            />
+            <g
+              class="chip"
+              style={`transform: translate(${-CHIP_W / 2}px, 8px)`}
+            >
+              <rect width={CHIP_W} height={CHIP_H} rx="10" />
+              <text
+                x={CHIP_W / 2}
+                y={p.sub ? CHIP_H / 2 - 4 : CHIP_H / 2 + 4}
+                text-anchor="middle"
+                dominant-baseline="middle"
+                class="chip-name"
               >
-                <rect width={CHIP_W} height={CHIP_H} rx="10" />
+                {p.name}
+              </text>
+              {p.sub && (
                 <text
                   x={CHIP_W / 2}
-                  y={p.sub ? CHIP_H / 2 - 4 : CHIP_H / 2 + 4}
+                  y={CHIP_H / 2 + 15}
                   text-anchor="middle"
                   dominant-baseline="middle"
-                  class="chip-name"
+                  class="chip-sub"
                 >
-                  {p.name}
+                  {p.sub}
                 </text>
-                {p.sub && (
-                  <text
-                    x={CHIP_W / 2}
-                    y={CHIP_H / 2 + 15}
-                    text-anchor="middle"
-                    dominant-baseline="middle"
-                    class="chip-sub"
-                  >
-                    {p.sub}
-                  </text>
-                )}
-              </g>
+              )}
             </g>
-          ))
-        }
+          </g>
+        ))}
       </g>
 
-      {
-        rows.map((step, i) => (
-          <g
-            class="msg"
-            data-title={step.title ?? ""}
-            role="group"
-            aria-hidden="true"
+      {rows.map((step, i) => (
+        <g
+          class="msg"
+          data-title={step.title ?? ""}
+          role="group"
+          aria-hidden="true"
+        >
+          {step.d && (
+            <path
+              d={step.d}
+              class={`line ${step.kind === "media" ? "media" : ""}`}
+            />
+          )}
+          <text
+            x={step.labelX}
+            y={step.labelY}
+            text-anchor={step.kind === "note" ? "middle" : "middle"}
+            class={step.kind === "note" ? "note-label" : "msg-label"}
           >
-            {step.d && (
-              <path
-                d={step.d}
-                class={`line ${step.kind === "media" ? "media" : ""}`}
-              />
-            )}
-            <text
-              x={step.labelX}
-              y={step.labelY}
-              text-anchor={step.kind === "note" ? "middle" : "middle"}
-              class={step.kind === "note" ? "note-label" : "msg-label"}
-            >
-              {step.label}
-            </text>
-          </g>
-        ))
-      }
+            {step.label}
+          </text>
+        </g>
+      ))}
     </svg>
   </div>
 

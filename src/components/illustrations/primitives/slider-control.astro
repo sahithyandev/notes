@@ -14,9 +14,13 @@ const { id, min, max, step = 0.01, value = 0 } = Astro.props;
 ---
 
 <div class="control">
-  <label for={id}><slot /></label>
+  <label for={id}>
+    <slot />
+  </label>
   <input id={id} type="range" min={min} max={max} step={step} value={value} />
-  <output for={id} data-delta>{value}</output>
+  <output for={id} data-delta>
+    {value}
+  </output>
 </div>
 
 <style>

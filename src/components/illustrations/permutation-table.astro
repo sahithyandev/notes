@@ -14,14 +14,12 @@ const accent = new Set(accentCols);
 <figure class="permtable">
   {title && <figcaption class="title">{title}</figcaption>}
   <ol class="grid" style={`--cols:${columns}`}>
-    {
-      data.map((src, i) => (
-        <li class:list={["cell", { accent: accent.has(i % columns) }]}>
-          <span class="out">{i + 1}</span>
-          <span class="src">{src}</span>
-        </li>
-      ))
-    }
+    {data.map((src, i) => (
+      <li class:list={["cell", { accent: accent.has(i % columns) }]}>
+        <span class="out">{i + 1}</span>
+        <span class="src">{src}</span>
+      </li>
+    ))}
   </ol>
   {caption && <p class="caption">{caption}</p>}
 </figure>

@@ -19,21 +19,19 @@ const { nodes, minDepth = 2 } = Astro.props;
 ---
 
 <ul class="toc-list">
-  {
-    nodes.map((node) => (
-      <li class="toc-item-node">
-        <a
-          href={`#${node.heading.slug}`}
-          class={`toc-link ${node.heading.depth === 3 ? "toc-sub" : ""}`}
-          style={`margin-left: ${(node.heading.depth - minDepth) * 10}px;`}
-          set:html={node.heading.html}
-        />
-        {node.children.length > 0 && (
-          <Astro.self nodes={node.children} minDepth={minDepth} />
-        )}
-      </li>
-    ))
-  }
+  {nodes.map((node) => (
+    <li class="toc-item-node">
+      <a
+        href={`#${node.heading.slug}`}
+        class={`toc-link ${node.heading.depth === 3 ? "toc-sub" : ""}`}
+        style={`margin-left: ${(node.heading.depth - minDepth) * 10}px;`}
+        set:html={node.heading.html}
+      />
+      {node.children.length > 0 && (
+        <Astro.self nodes={node.children} minDepth={minDepth} />
+      )}
+    </li>
+  ))}
 </ul>
 
 <style>

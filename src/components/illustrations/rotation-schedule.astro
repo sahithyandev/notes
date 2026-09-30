@@ -9,14 +9,12 @@ const { shifts, caption } = Astro.props;
 
 <figure class="rotsched">
   <ol class="grid">
-    {
-      shifts.map((p, i) => (
-        <li class:list={["cell", { two: p === 2 }]}>
-          <span class="round">{i + 1}</span>
-          <span class="shift">{p}</span>
-        </li>
-      ))
-    }
+    {shifts.map((p, i) => (
+      <li class:list={["cell", { two: p === 2 }]}>
+        <span class="round">{i + 1}</span>
+        <span class="shift">{p}</span>
+      </li>
+    ))}
   </ol>
   {caption && <p class="caption">{caption}</p>}
 </figure>

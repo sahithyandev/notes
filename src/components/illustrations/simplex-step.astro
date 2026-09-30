@@ -25,70 +25,66 @@ const colCount = columns.length;
 ---
 
 <div class="step" data-label={label} style={`--col-count:${colCount}`}>
-  {
-    /* Hidden data source. The walkthrough clones one live table and copies
-      only the cells that actually change between steps. */
-  }
+  {/* Hidden data source. The walkthrough clones one live table and copies
+      only the cells that actually change between steps. */}
   <table class="tableau" data-stage aria-hidden="true">
     <colgroup>
       <col class="c-basic" />
-      {columns.map(() => <col class="c-data" />)}
+      {columns.map(() => (
+        <col class="c-data" />
+      ))}
       <col class="c-rhs" />
       <col class="c-ratio" />
     </colgroup>
     <thead>
       <tr>
         <th class="basic">Basic</th>
-        {
-          columns.map((c, ci) => (
-            <th
-              class:list={["num", { enter: ci === entering }]}
-              set:html={tex(c)}
-            />
-          ))
-        }
+        {columns.map((c, ci) => (
+          <th
+            class:list={["num", { enter: ci === entering }]}
+            set:html={tex(c)}
+          />
+        ))}
         <th class="num rhs">RHS</th>
         <th class="num">Ratio</th>
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((r, ri) => (
-          <tr class:list={{ leave: ri === leaving }}>
-            <td class="basic" set:html={tex(r.basic)} />
-            {r.cells.map((cell, ci) => (
-              <td
-                class:list={[
-                  "num",
-                  {
-                    enter: ci === entering,
-                    pivot: ci === entering && ri === leaving,
-                  },
-                ]}
-                set:html={tex(cell)}
-              />
-            ))}
-            <td class="num rhs" set:html={tex(r.rhs)} />
-            <td class="num ratio">{r.ratio ?? ""}</td>
-          </tr>
-        ))
-      }
-      {
-        ratioRow && (
-          <tr class="ratio-row">
-            <td class="basic ratio-label">Ratio</td>
-            {ratioRow.map((v) => (
-              <td class="num ratio-cell" set:html={v ? tex(v) : ""} />
-            ))}
-            <td class="num rhs" />
-            <td class="num" />
-          </tr>
-        )
-      }
+      {rows.map((r, ri) => (
+        <tr class:list={{ leave: ri === leaving }}>
+          <td class="basic" set:html={tex(r.basic)} />
+          {r.cells.map((cell, ci) => (
+            <td
+              class:list={[
+                "num",
+                {
+                  enter: ci === entering,
+                  pivot: ci === entering && ri === leaving,
+                },
+              ]}
+              set:html={tex(cell)}
+            />
+          ))}
+          <td class="num rhs" set:html={tex(r.rhs)} />
+          <td class="num ratio">{r.ratio ?? ""}</td>
+        </tr>
+      ))}
+      {ratioRow && (
+        <tr class="ratio-row">
+          <td class="basic ratio-label">Ratio</td>
+          {ratioRow.map((v) => (
+            <td class="num ratio-cell" set:html={v ? tex(v) : ""} />
+          ))}
+          <td class="num rhs" />
+          <td class="num" />
+        </tr>
+      )}
     </tbody>
   </table>
 
-  <StepNote><slot /></StepNote>
+  <StepNote>
+    <slot />
+  </StepNote>
 </div>
 
 <style>

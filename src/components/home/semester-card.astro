@@ -37,23 +37,20 @@ const semesterColor = `var(${semesterVar})`;
       Semester {number}
     </div>
     <ul class="sem-card-subjects">
-      {
-        subjects.map((subject) => (
-          <li>
-            <a
-              href={`/s${number}/${subject.slug}`}
-              class="sem-card-subject-link"
-            >
-              {subject.name}
-            </a>
-          </li>
-        ))
-      }
+      {subjects.map((subject) => (
+        <li>
+          <a href={`/s${number}/${subject.slug}`} class="sem-card-subject-link">
+            {subject.name}
+          </a>
+        </li>
+      ))}
     </ul>
   </div>
   <div class="sem-card-footer">
     <span class="sem-card-count">{notesCount} notes</span>
-    <span class="sem-open" style={`color:${semesterColor}`}>Open &rarr;</span>
+    <span class="sem-open" style={`color:${semesterColor}`}>
+      Open &rarr;
+    </span>
   </div>
 </div>
 

@@ -342,102 +342,96 @@ const drawn = links.map(drawLink);
       style={`max-height: ${H}px; aspect-ratio: ${W} / ${H}`}
     >
       <g class="row-titles">
-        {
-          layout.map((row, r) =>
-            row.title ? (
-              <text x={M} y={rowY[r] - BOX_H / 2 - 8} class="row-title">
-                {row.title}
-              </text>
-            ) : null,
-          )
-        }
+        {layout.map((row, r) =>
+          row.title ? (
+            <text x={M} y={rowY[r] - BOX_H / 2 - 8} class="row-title">
+              {row.title}
+            </text>
+          ) : null,
+        )}
       </g>
 
       <g class="boxes">
-        {
-          layout.map((row, r) =>
-            row.boxes.map((b, c) =>
-              b.spacer ? null : (
-                <g
-                  class="box"
-                  id={`box-${uid}-${r}-${c}`}
-                  style={`transform: translate(${b.x}px, ${rowY[r]}px)`}
+        {layout.map((row, r) =>
+          row.boxes.map((b, c) =>
+            b.spacer ? null : (
+              <g
+                class="box"
+                id={`box-${uid}-${r}-${c}`}
+                style={`transform: translate(${b.x}px, ${rowY[r]}px)`}
+              >
+                <rect
+                  width={row.boxW}
+                  height={BOX_H}
+                  rx="10"
+                  style={`transform: translate(${-row.boxW / 2}px, ${-BOX_H / 2}px)`}
+                />
+                <text
+                  x="0"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  class="box-label"
                 >
-                  <rect
-                    width={row.boxW}
-                    height={BOX_H}
-                    rx="10"
-                    style={`transform: translate(${-row.boxW / 2}px, ${-BOX_H / 2}px)`}
-                  />
+                  {b.lines.map((l, i) => (
+                    <tspan
+                      x="0"
+                      y={
+                        b.lines.length === 1
+                          ? b.sub
+                            ? -8
+                            : 3
+                          : (b.sub ? -16 : -10) + i * 20
+                      }
+                    >
+                      {l}
+                    </tspan>
+                  ))}
+                </text>
+                {b.subLines.length > 0 && (
                   <text
                     x="0"
                     text-anchor="middle"
                     dominant-baseline="middle"
-                    class="box-label"
+                    class="box-sub"
                   >
-                    {b.lines.map((l, i) => (
+                    {b.subLines.map((l, i) => (
                       <tspan
                         x="0"
-                        y={
-                          b.lines.length === 1
-                            ? b.sub
-                              ? -8
-                              : 3
-                            : (b.sub ? -16 : -10) + i * 20
-                        }
+                        y={b.subLines.length === 1 ? 16 : 9 + i * 13}
                       >
                         {l}
                       </tspan>
                     ))}
                   </text>
-                  {b.subLines.length > 0 && (
-                    <text
-                      x="0"
-                      text-anchor="middle"
-                      dominant-baseline="middle"
-                      class="box-sub"
-                    >
-                      {b.subLines.map((l, i) => (
-                        <tspan
-                          x="0"
-                          y={b.subLines.length === 1 ? 16 : 9 + i * 13}
-                        >
-                          {l}
-                        </tspan>
-                      ))}
-                    </text>
-                  )}
-                </g>
-              ),
+                )}
+              </g>
             ),
-          )
-        }
+          ),
+        )}
       </g>
 
       <g class="links">
-        {
-          drawn.map((l, i) => (
-            <g
-              class="link"
-              data-title={l.note ?? l.label ?? ""}
-              data-src={`box-${uid}-${l.src[0]}-${l.src[1]}`}
-              data-dst={`box-${uid}-${l.dst[0]}-${l.dst[1]}`}
-            >
-              <path d={l.shaftD} class={`shaft${l.dash ? " dash" : ""}`} />
-              <path d={l.headD} class="head" />
-              {l.label && (
-                <text
-                  x={l.labelX}
-                  y={l.labelY}
-                  text-anchor={l.anchor}
-                  class="link-label"
-                >
-                  {l.label}
-                </text>
-              )}
-            </g>
-          ))
-        }
+        {drawn.map((l, i) => (
+          <g
+            class="link"
+            data-title={l.note ?? l.label ?? ""}
+            data-src={`box-${uid}-${l.src[0]}-${l.src[1]}`}
+            data-dst={`box-${uid}-${l.dst[0]}-${l.dst[1]}`}
+          >
+            <path d={l.shaftD} class={`shaft${l.dash ? " dash" : ""}`} />
+            <path d={l.headD} class="head" />
+            {l.label && (
+              <text
+                x={l.labelX}
+                y={l.labelY}
+                text-anchor={l.anchor}
+                class="link-label"
+              >
+                {l.label}
+              </text>
+            )}
+          </g>
+        ))}
       </g>
     </svg>
   </div>

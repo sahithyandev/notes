@@ -13,9 +13,9 @@ const logoRule = semMatch
 
 <nav
   class="nav"
-  style={shouldStretchFull
-    ? "padding: 0 12px;"
-    : "padding: 0 var(--body-margin-x);"}
+  style={
+    shouldStretchFull ? "padding: 0 12px;" : "padding: 0 var(--body-margin-x);"
+  }
 >
   <span class="nav-drawer-slot nav-drawer-slot-start">
     <slot name="nav-start" />
@@ -24,9 +24,8 @@ const logoRule = semMatch
   <a href="/" class="nav-logo" aria-label="Sahithyan's Notes, home">
     <Logo width={20} height={20} class="nav-mark" rule={logoRule} />
     <span class="nav-name">
-      <span class="nav-name-owner">Sahithyan's</span><span class="nav-name-main"
-        >Notes</span
-      >
+      <span class="nav-name-owner">Sahithyan's</span>
+      <span class="nav-name-main">Notes</span>
     </span>
   </a>
 
@@ -66,9 +65,15 @@ const logoRule = semMatch
       title="Theme: auto"
       aria-label="Change theme"
     >
-      <span class="theme-icon" data-pref="auto"><Monitor size={15} /></span>
-      <span class="theme-icon" data-pref="light"><Sun size={15} /></span>
-      <span class="theme-icon" data-pref="dark"><Moon size={14} /></span>
+      <span class="theme-icon" data-pref="auto">
+        <Monitor size={15} />
+      </span>
+      <span class="theme-icon" data-pref="light">
+        <Sun size={15} />
+      </span>
+      <span class="theme-icon" data-pref="dark">
+        <Moon size={14} />
+      </span>
     </button>
   </div>
 </nav>

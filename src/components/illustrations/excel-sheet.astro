@@ -27,21 +27,21 @@ const normalize = (cell: CellInput): Cell =>
       <thead>
         <tr>
           <th class="corner"></th>
-          {colLetters.map((letter) => <th class="colhead">{letter}</th>)}
+          {colLetters.map((letter) => (
+            <th class="colhead">{letter}</th>
+          ))}
         </tr>
       </thead>
       <tbody>
-        {
-          rows.map((row, ri) => (
-            <tr>
-              <th class="rowhead">{ri + 1}</th>
-              {colLetters.map((_, ci) => {
-                const cell = normalize(row[ci]);
-                return <td class:list={["cell", cell.type]}>{cell.text}</td>;
-              })}
-            </tr>
-          ))
-        }
+        {rows.map((row, ri) => (
+          <tr>
+            <th class="rowhead">{ri + 1}</th>
+            {colLetters.map((_, ci) => {
+              const cell = normalize(row[ci]);
+              return <td class:list={["cell", cell.type]}>{cell.text}</td>;
+            })}
+          </tr>
+        ))}
       </tbody>
     </table>
   </div>

@@ -123,20 +123,18 @@ const totalH = rows.length * rowH;
   style={`max-height: ${totalH}px; aspect-ratio: ${W} / ${totalH}`}
 >
   <defs>
-    {
-      svgRows.map(({ svgFields, cellY, rowIdx }) =>
-        svgFields.map((f, fi) => (
-          <clipPath id={`${uid}-${rowIdx}-${fi}`}>
-            <rect
-              x={f.svgX + 4}
-              y={cellY}
-              width={Math.max(0, f.svgW - 8)}
-              height={ROW_H}
-            />
-          </clipPath>
-        )),
-      )
-    }
+    {svgRows.map(({ svgFields, cellY, rowIdx }) =>
+      svgFields.map((f, fi) => (
+        <clipPath id={`${uid}-${rowIdx}-${fi}`}>
+          <rect
+            x={f.svgX + 4}
+            y={cellY}
+            width={Math.max(0, f.svgW - 8)}
+            height={ROW_H}
+          />
+        </clipPath>
+      )),
+    )}
   </defs>
 
   {/* Outer border */}
@@ -147,70 +145,69 @@ const totalH = rows.length * rowH;
     height={totalH - 1}
     rx="5"
     ry="5"
-    class="frame"></rect>
+    class="frame"
+  ></rect>
 
-  {
-    svgRows.map(({ svgFields, svgY, cellY, rowIdx }) => (
-      <g>
-        {/* Horizontal row divider */}
-        {rowIdx > 0 && (
-          <line
-            x1="0.5"
-            y1={svgY + 0.5}
-            x2={W - 0.5}
-            y2={svgY + 0.5}
-            class="div-h"
-          />
-        )}
+  {svgRows.map(({ svgFields, svgY, cellY, rowIdx }) => (
+    <g>
+      {/* Horizontal row divider */}
+      {rowIdx > 0 && (
+        <line
+          x1="0.5"
+          y1={svgY + 0.5}
+          x2={W - 0.5}
+          y2={svgY + 0.5}
+          class="div-h"
+        />
+      )}
 
-        {/* Ruler offsets */}
-        {width &&
-          svgFields.map((f) => (
-            <text x={f.svgX + 3} y={svgY + RULER_H - 3} class="ruler">
-              {f.offset}
-            </text>
-          ))}
-
-        {/* Vertical field dividers */}
-        {svgFields.slice(0, -1).map((f, i) => {
-          const nextContinued = svgFields[i + 1].continued;
-          return (
-            <line
-              x1={f.svgX + f.svgW}
-              y1={cellY + 0.5}
-              x2={f.svgX + f.svgW}
-              y2={cellY + ROW_H - 0.5}
-              class={nextContinued ? "div-v div-dashed" : "div-v"}
-            />
-          );
-        })}
-
-        {/* Field labels */}
-        {svgFields.map((f, fi) => (
-          <g clip-path={`url(#${uid}-${rowIdx}-${fi})`}>
-            <text
-              x={f.cx}
-              y={cellY + ROW_H / 2 - 9}
-              text-anchor="middle"
-              dominant-baseline="middle"
-              class="fname"
-            >
-              {f.name}
-            </text>
-            <text
-              x={f.cx}
-              y={cellY + ROW_H / 2 + 10}
-              text-anchor="middle"
-              dominant-baseline="middle"
-              class="fsize"
-            >
-              {f.label}
-            </text>
-          </g>
+      {/* Ruler offsets */}
+      {width &&
+        svgFields.map((f) => (
+          <text x={f.svgX + 3} y={svgY + RULER_H - 3} class="ruler">
+            {f.offset}
+          </text>
         ))}
-      </g>
-    ))
-  }
+
+      {/* Vertical field dividers */}
+      {svgFields.slice(0, -1).map((f, i) => {
+        const nextContinued = svgFields[i + 1].continued;
+        return (
+          <line
+            x1={f.svgX + f.svgW}
+            y1={cellY + 0.5}
+            x2={f.svgX + f.svgW}
+            y2={cellY + ROW_H - 0.5}
+            class={nextContinued ? "div-v div-dashed" : "div-v"}
+          />
+        );
+      })}
+
+      {/* Field labels */}
+      {svgFields.map((f, fi) => (
+        <g clip-path={`url(#${uid}-${rowIdx}-${fi})`}>
+          <text
+            x={f.cx}
+            y={cellY + ROW_H / 2 - 9}
+            text-anchor="middle"
+            dominant-baseline="middle"
+            class="fname"
+          >
+            {f.name}
+          </text>
+          <text
+            x={f.cx}
+            y={cellY + ROW_H / 2 + 10}
+            text-anchor="middle"
+            dominant-baseline="middle"
+            class="fsize"
+          >
+            {f.label}
+          </text>
+        </g>
+      ))}
+    </g>
+  ))}
 </svg>
 
 <style>

@@ -59,26 +59,24 @@ const breadcrumbItems = generateBreadcrumb(slug, title);
 ---
 
 <div class="breadcrumb" aria-label="Breadcrumb">
-  {
-    breadcrumbItems.map((item, index) => (
-      <>
-        {index > 0 && (
-          <span
-            class={`breadcrumb-sep${index === breadcrumbItems.length - 1 ? " last" : ""}`}
-          >
-            /
-          </span>
-        )}
-        {item.href ? (
-          <a href={item.href} class="breadcrumb-link">
-            {item.label}
-          </a>
-        ) : (
-          <span class="breadcrumb-current">{item.label}</span>
-        )}
-      </>
-    ))
-  }
+  {breadcrumbItems.map((item, index) => (
+    <>
+      {index > 0 && (
+        <span
+          class={`breadcrumb-sep${index === breadcrumbItems.length - 1 ? " last" : ""}`}
+        >
+          /
+        </span>
+      )}
+      {item.href ? (
+        <a href={item.href} class="breadcrumb-link">
+          {item.label}
+        </a>
+      ) : (
+        <span class="breadcrumb-current">{item.label}</span>
+      )}
+    </>
+  ))}
 </div>
 
 <style>

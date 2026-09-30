@@ -10,15 +10,13 @@ const { modules } = Astro.props;
 ---
 
 <div class="sb-group-title">Modules</div>
-{
-  modules.map(({ module, href, count, active, elective }) => (
-    <a href={href} class={`sb-item${active ? " active" : ""}`}>
-      {titleize(module)}
-      {elective && <span class="sb-item-tag">Elective</span>}
-      <span class="sb-item-count">{count}</span>
-    </a>
-  ))
-}
+{modules.map(({ module, href, count, active, elective }) => (
+  <a href={href} class={`sb-item${active ? " active" : ""}`}>
+    {titleize(module)}
+    {elective && <span class="sb-item-tag">Elective</span>}
+    <span class="sb-item-count">{count}</span>
+  </a>
+))}
 
 <style>
   .sb-group-title {

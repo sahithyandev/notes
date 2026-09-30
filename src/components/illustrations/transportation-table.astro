@@ -70,135 +70,127 @@ const isSelectedCol = (ci: number) =>
   <table class="tableau" aria-hidden={dataSource ? "true" : undefined}>
     <colgroup>
       <col class="c-label" />
-      {cols.map(() => <col class="c-data" />)}
+      {cols.map(() => (
+        <col class="c-data" />
+      ))}
       <col class="c-margin" />
       {hasPenalties && <col class="c-margin" />}
     </colgroup>
     <thead>
       <tr>
         <th></th>
-        {
-          cols.map((c, ci) => (
-            <th
-              class:list={["num", { exhausted: isColExhausted(ci) }]}
-              set:html={tex(c)}
-            />
-          ))
-        }
+        {cols.map((c, ci) => (
+          <th
+            class:list={["num", { exhausted: isColExhausted(ci) }]}
+            set:html={tex(c)}
+          />
+        ))}
         <th class="num margin supply">Supply</th>
         {hasPenalties && <th class="num margin penalty">Penalty</th>}
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((r, ri) => (
-          <tr>
-            <th
-              class:list={{ exhausted: isRowExhausted(ri) }}
-              set:html={tex(r)}
-            />
-            {cols.map((_, ci) => {
-              const alloc = allocations?.[ri]?.[ci];
-              const occupied = alloc !== undefined && alloc !== null;
-              const sign = loopSign(ri, ci);
-              return (
-                <td
-                  class:list={[
-                    "cell",
-                    {
-                      plain: !hasAllocations,
-                      occupied,
-                      zero: alloc === 0,
-                      current: isHighlighted(ri, ci),
-                      exhausted:
-                        !occupied && (isRowExhausted(ri) || isColExhausted(ci)),
-                    },
-                    loopEdgeClasses(ri, ci),
-                  ]}
-                >
-                  <span class="cost">{costs[ri][ci]}</span>
-                  {occupied && <span class="alloc">{alloc}</span>}
-                  {sign && (
-                    <span
-                      class:list={["sign", sign === "+" ? "plus" : "minus"]}
-                    >
-                      {sign}
-                    </span>
-                  )}
-                </td>
-              );
-            })}
+      {rows.map((r, ri) => (
+        <tr>
+          <th
+            class:list={{ exhausted: isRowExhausted(ri) }}
+            set:html={tex(r)}
+          />
+          {cols.map((_, ci) => {
+            const alloc = allocations?.[ri]?.[ci];
+            const occupied = alloc !== undefined && alloc !== null;
+            const sign = loopSign(ri, ci);
+            return (
+              <td
+                class:list={[
+                  "cell",
+                  {
+                    plain: !hasAllocations,
+                    occupied,
+                    zero: alloc === 0,
+                    current: isHighlighted(ri, ci),
+                    exhausted:
+                      !occupied && (isRowExhausted(ri) || isColExhausted(ci)),
+                  },
+                  loopEdgeClasses(ri, ci),
+                ]}
+              >
+                <span class="cost">{costs[ri][ci]}</span>
+                {occupied && <span class="alloc">{alloc}</span>}
+                {sign && (
+                  <span class:list={["sign", sign === "+" ? "plus" : "minus"]}>
+                    {sign}
+                  </span>
+                )}
+              </td>
+            );
+          })}
+          <td
+            class:list={[
+              "num",
+              "margin",
+              "supply",
+              { exhausted: isRowExhausted(ri) },
+            ]}
+          >
+            {supply[ri]}
+          </td>
+          {hasPenalties && (
             <td
               class:list={[
                 "num",
                 "margin",
-                "supply",
-                { exhausted: isRowExhausted(ri) },
+                "penalty",
+                {
+                  selected: isSelectedRow(ri),
+                  exhausted: isRowExhausted(ri),
+                },
               ]}
             >
-              {supply[ri]}
+              {rowPenalties?.[ri] ?? "–"}
             </td>
-            {hasPenalties && (
-              <td
-                class:list={[
-                  "num",
-                  "margin",
-                  "penalty",
-                  {
-                    selected: isSelectedRow(ri),
-                    exhausted: isRowExhausted(ri),
-                  },
-                ]}
-              >
-                {rowPenalties?.[ri] ?? "–"}
-              </td>
-            )}
-          </tr>
-        ))
-      }
+          )}
+        </tr>
+      ))}
       <tr class="totals">
         <th>Demand</th>
-        {
-          demand.map((d, ci) => (
+        {demand.map((d, ci) => (
+          <td
+            class:list={[
+              "num",
+              "margin",
+              "demand",
+              { exhausted: isColExhausted(ci) },
+            ]}
+          >
+            {d}
+          </td>
+        ))}
+        <td class="margin supply"></td>
+        {hasPenalties && <td class="margin penalty" />}
+      </tr>
+      {hasPenalties && (
+        <tr class="totals">
+          <th>Penalty</th>
+          {cols.map((_, ci) => (
             <td
               class:list={[
                 "num",
                 "margin",
                 "demand",
-                { exhausted: isColExhausted(ci) },
+                {
+                  selected: isSelectedCol(ci),
+                  exhausted: isColExhausted(ci),
+                },
               ]}
             >
-              {d}
+              {colPenalties?.[ci] ?? "–"}
             </td>
-          ))
-        }
-        <td class="margin supply"></td>
-        {hasPenalties && <td class="margin penalty" />}
-      </tr>
-      {
-        hasPenalties && (
-          <tr class="totals">
-            <th>Penalty</th>
-            {cols.map((_, ci) => (
-              <td
-                class:list={[
-                  "num",
-                  "margin",
-                  "demand",
-                  {
-                    selected: isSelectedCol(ci),
-                    exhausted: isColExhausted(ci),
-                  },
-                ]}
-              >
-                {colPenalties?.[ci] ?? "–"}
-              </td>
-            ))}
-            <td class="margin supply" />
-            <td class="margin penalty" />
-          </tr>
-        )
-      }
+          ))}
+          <td class="margin supply" />
+          <td class="margin penalty" />
+        </tr>
+      )}
     </tbody>
   </table>
   {total && <figcaption set:html={tex(total)} />}

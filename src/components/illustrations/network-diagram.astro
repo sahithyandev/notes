@@ -73,44 +73,30 @@ const arrows = edges.map((edge) => {
       </marker>
     </defs>
 
-    {
-      arrows.map((a) => (
-        <g class="edge">
-          <line
-            x1={a.x1}
-            y1={a.y1}
-            x2={a.x2}
-            y2={a.y2}
-            class:list={["shaft", { dummy: a.dashed }]}
-            marker-end={`url(#${uid}-arrow)`}
-          />
-          <text
-            x={a.labelX}
-            y={a.labelY}
-            class="edge-label"
-            text-anchor="middle"
-          >
-            {a.label}
-          </text>
-        </g>
-      ))
-    }
+    {arrows.map((a) => (
+      <g class="edge">
+        <line
+          x1={a.x1}
+          y1={a.y1}
+          x2={a.x2}
+          y2={a.y2}
+          class:list={["shaft", { dummy: a.dashed }]}
+          marker-end={`url(#${uid}-arrow)`}
+        />
+        <text x={a.labelX} y={a.labelY} class="edge-label" text-anchor="middle">
+          {a.label}
+        </text>
+      </g>
+    ))}
 
-    {
-      nodes.map((n) => (
-        <g class="node">
-          <circle cx={n.x} cy={n.y} r={R} />
-          <text
-            x={n.x}
-            y={n.y}
-            text-anchor="middle"
-            dominant-baseline="central"
-          >
-            {n.id}
-          </text>
-        </g>
-      ))
-    }
+    {nodes.map((n) => (
+      <g class="node">
+        <circle cx={n.x} cy={n.y} r={R} />
+        <text x={n.x} y={n.y} text-anchor="middle" dominant-baseline="central">
+          {n.id}
+        </text>
+      </g>
+    ))}
   </svg>
 </figure>
 

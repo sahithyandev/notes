@@ -31,30 +31,30 @@ const mult = MULT[variable];
     <thead>
       <tr>
         <th class="basic">Basic</th>
-        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        {columns.map((c) => (
+          <th class="num" set:html={tex(c)} />
+        ))}
         <th class="num rhs">RHS</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="basic" set:html={tex("z")} />
-        {
-          columns.map((c) => {
-            if (c in baseReduced) {
-              return (
-                <td
-                  class="num"
-                  data-cost-for={c}
-                  data-base={baseReduced[c]}
-                  data-mult={mult[c]}
-                >
-                  {baseReduced[c]}
-                </td>
-              );
-            }
-            return <td class="num" set:html={tex("0")} />;
-          })
-        }
+        {columns.map((c) => {
+          if (c in baseReduced) {
+            return (
+              <td
+                class="num"
+                data-cost-for={c}
+                data-base={baseReduced[c]}
+                data-mult={mult[c]}
+              >
+                {baseReduced[c]}
+              </td>
+            );
+          }
+          return <td class="num" set:html={tex("0")} />;
+        })}
         <td class="num rhs" data-cost-for="z" data-base={36} data-mult={value}>
           36
         </td>
@@ -69,9 +69,7 @@ const mult = MULT[variable];
     step={0.01}
     value={0}
   >
-    &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
-      " "
-    }
+    &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{" "}
     {baseC}
   </SliderControl>
 

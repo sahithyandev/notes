@@ -39,14 +39,12 @@ const semesters = semesterNumbers.map((s) => ({
           <span class="link-label">Home</span>
           <span class="link-desc">All semesters and notes</span>
         </a>
-        {
-          semesters.map((sem) => (
-            <a href={sem.href} class="link-card">
-              <span class="link-label">{sem.label}</span>
-              <span class="link-desc">Browse modules</span>
-            </a>
-          ))
-        }
+        {semesters.map((sem) => (
+          <a href={sem.href} class="link-card">
+            <span class="link-label">{sem.label}</span>
+            <span class="link-desc">Browse modules</span>
+          </a>
+        ))}
         <a href="/license" class="link-card">
           <span class="link-label">License</span>
           <span class="link-desc">How you may use this content</span>

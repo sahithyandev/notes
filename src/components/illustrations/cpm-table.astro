@@ -38,15 +38,13 @@ const isCritical = (ei: number) => critical.includes(ei);
     </tr>
   </thead>
   <tbody>
-    {
-      events.map((e, ei) => (
-        <tr class:list={{ critical: isCritical(ei) }}>
-          <th set:html={tex(e)} />
-          <td class="num" set:html={earliest[ei] ? tex(earliest[ei]) : ""} />
-          <td class="num" set:html={latest[ei] ? tex(latest[ei]) : ""} />
-        </tr>
-      ))
-    }
+    {events.map((e, ei) => (
+      <tr class:list={{ critical: isCritical(ei) }}>
+        <th set:html={tex(e)} />
+        <td class="num" set:html={earliest[ei] ? tex(earliest[ei]) : ""} />
+        <td class="num" set:html={latest[ei] ? tex(latest[ei]) : ""} />
+      </tr>
+    ))}
   </tbody>
 </table>
 

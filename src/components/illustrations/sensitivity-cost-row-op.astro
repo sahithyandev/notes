@@ -47,47 +47,47 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
     <thead>
       <tr>
         <th class="basic">Basic</th>
-        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        {columns.map((c) => (
+          <th class="num" set:html={tex(c)} />
+        ))}
         <th class="num rhs">RHS</th>
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((r) => (
-          <tr class:list={{ "source-row": r.basic === variable }}>
-            <td class="basic" set:html={tex(r.basic)} />
-            {r.cells.map((cell, i) => {
-              const col = columns[i];
-              if (r.basic === "z" && nonBasicCols.includes(col)) {
-                const mult = toNum(sourceRow.cells[i]);
-                return (
-                  <td
-                    class="num target-cell"
-                    data-cost-for={col}
-                    data-base={toNum(cell)}
-                    data-mult={mult}
-                  >
-                    {cell}
-                  </td>
-                );
-              }
-              return <td class="num" set:html={tex(cell)} />;
-            })}
-            {r.basic === "z" ? (
-              <td
-                class="num rhs target-cell"
-                data-cost-for="z"
-                data-base={zRow.rhs}
-                data-mult={sourceRow.rhs}
-              >
-                {zRow.rhs}
-              </td>
-            ) : (
-              <td class="num rhs" set:html={tex(String(r.rhs))} />
-            )}
-          </tr>
-        ))
-      }
+      {rows.map((r) => (
+        <tr class:list={{ "source-row": r.basic === variable }}>
+          <td class="basic" set:html={tex(r.basic)} />
+          {r.cells.map((cell, i) => {
+            const col = columns[i];
+            if (r.basic === "z" && nonBasicCols.includes(col)) {
+              const mult = toNum(sourceRow.cells[i]);
+              return (
+                <td
+                  class="num target-cell"
+                  data-cost-for={col}
+                  data-base={toNum(cell)}
+                  data-mult={mult}
+                >
+                  {cell}
+                </td>
+              );
+            }
+            return <td class="num" set:html={tex(cell)} />;
+          })}
+          {r.basic === "z" ? (
+            <td
+              class="num rhs target-cell"
+              data-cost-for="z"
+              data-base={zRow.rhs}
+              data-mult={sourceRow.rhs}
+            >
+              {zRow.rhs}
+            </td>
+          ) : (
+            <td class="num rhs" set:html={tex(String(r.rhs))} />
+          )}
+        </tr>
+      ))}
     </tbody>
   </table>
 
@@ -98,9 +98,7 @@ const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
     step={0.01}
     value={0}
   >
-    &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{
-      " "
-    }
+    &Delta;, change to <span set:html={tex(`c_{${variable}}`)} />, currently{" "}
     {baseC}
   </SliderControl>
 

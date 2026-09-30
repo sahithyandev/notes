@@ -24,9 +24,7 @@ export function imageExists(sourceFile: string, relPath: string): boolean {
 }
 
 export type LinkViolationKind =
-  | "broken-link"
-  | "broken-anchor"
-  | "missing-image";
+  "broken-link" | "broken-anchor" | "missing-image";
 
 export interface LinkViolation {
   file: string;

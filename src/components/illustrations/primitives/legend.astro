@@ -31,17 +31,15 @@ const chipVars = ({ fill, border }: Chip) =>
 ---
 
 <p class="legend">
-  {
-    items.map((chip) => (
-      <span
-        class:list={["chip", chip.kind]}
-        style={chipVars(chip)}
-        data-glyph={chip.glyph}
-      >
-        {chip.label}
-      </span>
-    ))
-  }
+  {items.map((chip) => (
+    <span
+      class:list={["chip", chip.kind]}
+      style={chipVars(chip)}
+      data-glyph={chip.glyph}
+    >
+      {chip.label}
+    </span>
+  ))}
 </p>
 
 <style>

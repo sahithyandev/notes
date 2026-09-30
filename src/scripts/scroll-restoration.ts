@@ -61,8 +61,7 @@ function initScrollRestoration() {
   const pathKey = STORAGE_PREFIX + location.pathname;
 
   const navEntry = performance.getEntriesByType("navigation")[0] as
-    | PerformanceNavigationTiming
-    | undefined;
+    PerformanceNavigationTiming | undefined;
   const navType = navEntry?.type ?? "navigate";
 
   // ── Save positions as the user scrolls ──────────────────────────

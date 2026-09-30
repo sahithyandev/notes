@@ -37,29 +37,29 @@ const bIndex = slack.split("_")[1];
     <thead>
       <tr>
         <th class="basic">Basic</th>
-        {columns.map((c) => <th class="num" set:html={tex(c)} />)}
+        {columns.map((c) => (
+          <th class="num" set:html={tex(c)} />
+        ))}
         <th class="num rhs">RHS</th>
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((r) => (
-          <tr>
-            <td class="basic" set:html={tex(r.basic)} />
-            {r.cells.map((cell) => (
-              <td class="num" set:html={tex(cell)} />
-            ))}
-            <td
-              class="num rhs"
-              data-rhs-for={r.basic}
-              data-base={r.rhs}
-              data-mult={mult[r.basic]}
-            >
-              {r.rhs}
-            </td>
-          </tr>
-        ))
-      }
+      {rows.map((r) => (
+        <tr>
+          <td class="basic" set:html={tex(r.basic)} />
+          {r.cells.map((cell) => (
+            <td class="num" set:html={tex(cell)} />
+          ))}
+          <td
+            class="num rhs"
+            data-rhs-for={r.basic}
+            data-base={r.rhs}
+            data-mult={mult[r.basic]}
+          >
+            {r.rhs}
+          </td>
+        </tr>
+      ))}
     </tbody>
   </table>
 
@@ -70,8 +70,7 @@ const bIndex = slack.split("_")[1];
     step={0.01}
     value={0}
   >
-    &Delta;, change to <span set:html={tex(`b_${bIndex}`)} />, currently{" "}
-    {baseB}
+    &Delta;, change to <span set:html={tex(`b_${bIndex}`)} />, currently {baseB}
   </SliderControl>
 
   <StatusNote ok={true}>Feasible. Basis stays optimal.</StatusNote>

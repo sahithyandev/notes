@@ -189,6 +189,7 @@ Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Compo
 - No Tailwind Typography; prose styles are hand-written in `src/pages/[...slug].astro`. `global.css` holds only CSS variables and the box-sizing reset. Other component styles are scoped `<style>` blocks.
 - Math: `remark-math` + `rehype-katex`; KaTeX CSS from CDN in `Layout.astro`.
 - Custom Markdown classes: `.callout`, `.term`.
+- Never write a multi-line `/* ... */` comment inside an Astro `<style>` block. `prettier-plugin-astro` adds more indent to its continuation lines on every run, so `bun run format` never settles and `bun run lint` keeps failing. Write 1 single-line `/* ... */` comment per line instead.
 
 ## Commit conventions
 

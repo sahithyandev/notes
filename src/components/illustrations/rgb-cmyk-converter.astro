@@ -48,69 +48,70 @@ const rgb0 = [R0, G0, B0] as const;
           aria-label="Pick an RGB colour"
         />
       </div>
-      {
-        rgbChannels.map(({ ch, label }, i) => (
-          <label class="row">
-            <span class="ch">{label}</span>
-            <input
-              type="range"
-              min="0"
-              max="255"
-              step="1"
-              data-ch={ch}
-              value={rgb0[i]}
-            />
-            <input
-              type="number"
-              min="0"
-              max="255"
-              step="1"
-              data-ch={ch}
-              value={rgb0[i]}
-            />
-          </label>
-        ))
-      }
+      {rgbChannels.map(({ ch, label }, i) => (
+        <label class="row">
+          <span class="ch">{label}</span>
+          <input
+            type="range"
+            min="0"
+            max="255"
+            step="1"
+            data-ch={ch}
+            value={rgb0[i]}
+          />
+          <input
+            type="number"
+            min="0"
+            max="255"
+            step="1"
+            data-ch={ch}
+            value={rgb0[i]}
+          />
+        </label>
+      ))}
     </div>
 
     <div class="panel" data-space="cmyk">
       <div class="panel-head">
         <span class="panel-title">CMYK</span>
       </div>
-      {
-        cmykChannels.map(({ ch, label, v }) => (
-          <label class="row">
-            <span class="ch">{label}</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              data-ch={ch}
-              value={f2(v)}
-            />
-            <input
-              type="number"
-              min="0"
-              max="1"
-              step="0.01"
-              data-ch={ch}
-              value={f2(v)}
-            />
-          </label>
-        ))
-      }
+      {cmykChannels.map(({ ch, label, v }) => (
+        <label class="row">
+          <span class="ch">{label}</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            data-ch={ch}
+            value={f2(v)}
+          />
+          <input
+            type="number"
+            min="0"
+            max="1"
+            step="0.01"
+            data-ch={ch}
+            value={f2(v)}
+          />
+        </label>
+      ))}
     </div>
   </div>
 
   <div class="output">
-    <div class="chip" data-swatch style={`background:rgb(${R0}, ${G0}, ${B0})`}>
-    </div>
+    <div
+      class="chip"
+      data-swatch
+      style={`background:rgb(${R0}, ${G0}, ${B0})`}
+    ></div>
     <div class="caps">
-      <span class="cap" data-cap="rgb">rgb({R0}, {G0}, {B0})</span>
-      <span class="cap" data-cap="cmyk"
-        >cmyk({f2(c0.c)}, {f2(c0.m)}, {f2(c0.y)}, {f2(c0.k)})</span
-      >
+      <span class="cap" data-cap="rgb">
+        rgb({R0}, {G0}, {B0})
+      </span>
+      <span class="cap" data-cap="cmyk">
+        cmyk({f2(c0.c)}, {f2(c0.m)}, {f2(c0.y)}, {f2(c0.k)})
+      </span>
     </div>
   </div>
 

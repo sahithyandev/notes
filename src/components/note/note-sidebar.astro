@@ -31,19 +31,17 @@ const { sidebarData, slug, slugParts } = Astro.props;
       <ChevronDown class="sb-sem-chev" />
     </button>
     <div class="sb-sem-menu" id="sem-switcher-menu" hidden role="listbox">
-      {
-        sidebarData.semesters.map((s) => (
-          <a
-            href={`/${s.firstSlug}`}
-            class={`sb-sem-opt ${s.number === Number(sidebarData.currentSemester.slice(1)) ? "active" : ""}`}
-            style={`--opt-sem: var(--s${s.number}); --opt-sem-bg: var(--s${s.number}-bg); --opt-sem-border: var(--s${s.number}-border);`}
-            role="option"
-          >
-            <span class="sb-sem-opt-pip" />
-            <span>{s.label}</span>
-          </a>
-        ))
-      }
+      {sidebarData.semesters.map((s) => (
+        <a
+          href={`/${s.firstSlug}`}
+          class={`sb-sem-opt ${s.number === Number(sidebarData.currentSemester.slice(1)) ? "active" : ""}`}
+          style={`--opt-sem: var(--s${s.number}); --opt-sem-bg: var(--s${s.number}-bg); --opt-sem-border: var(--s${s.number}-border);`}
+          role="option"
+        >
+          <span class="sb-sem-opt-pip" />
+          <span>{s.label}</span>
+        </a>
+      ))}
     </div>
   </div>
 
@@ -67,7 +65,10 @@ const { sidebarData, slug, slugParts } = Astro.props;
   />
 
   <div class="sb-rule"></div>
-  <a href="/license" class="sb-item sb-license-link"> License </a>
+  <a href="/license" class="sb-item sb-license-link">
+    {" "}
+    License{" "}
+  </a>
 </aside>
 
 <script>

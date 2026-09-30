@@ -36,30 +36,30 @@ const AR = (W / S).toFixed(4);
     role="img"
     aria-label="Complex plane. Drag or use arrow keys to move z; Log z is plotted as a second point."
   >
-    {
-      [-4, -3, -2, -1, 0, 1, 2, 3, 4].map((n) => (
-        <line
-          x1={zx(n)}
-          y1={0}
-          x2={zx(n)}
-          y2={S}
-          class={n === 0 ? "axis" : "grid"}
-        />
-      ))
-    }
-    {
-      [-3, -2, -1, 0, 1, 2, 3].map((n) => (
-        <line
-          x1={0}
-          y1={zy(n)}
-          x2={W}
-          y2={zy(n)}
-          class={n === 0 ? "axis" : "grid"}
-        />
-      ))
-    }
-    <text x={W - 6} y={zy(0) - 4} class="axis-label" text-anchor="end">Re</text>
-    <text x={zx(0) + 5} y={10} class="axis-label">Im</text>
+    {[-4, -3, -2, -1, 0, 1, 2, 3, 4].map((n) => (
+      <line
+        x1={zx(n)}
+        y1={0}
+        x2={zx(n)}
+        y2={S}
+        class={n === 0 ? "axis" : "grid"}
+      />
+    ))}
+    {[-3, -2, -1, 0, 1, 2, 3].map((n) => (
+      <line
+        x1={0}
+        y1={zy(n)}
+        x2={W}
+        y2={zy(n)}
+        class={n === 0 ? "axis" : "grid"}
+      />
+    ))}
+    <text x={W - 6} y={zy(0) - 4} class="axis-label" text-anchor="end">
+      Re
+    </text>
+    <text x={zx(0) + 5} y={10} class="axis-label">
+      Im
+    </text>
 
     <line
       x1={zx(RE0)}
@@ -67,15 +67,23 @@ const AR = (W / S).toFixed(4);
       x2={zx(RE0)}
       y2={zy(0)}
       class="guide"
-      data-guide-v></line>
+      data-guide-v
+    ></line>
     <line
       x1={zx(RE0)}
       y1={zy(IM0)}
       x2={zx(0)}
       y2={zy(IM0)}
       class="guide"
-      data-guide-h></line>
-    <line x1={zx(0)} y1={zy(0)} x2={zx(RE0)} y2={zy(IM0)} class="ray" data-ray
+      data-guide-h
+    ></line>
+    <line
+      x1={zx(0)}
+      y1={zy(0)}
+      x2={zx(RE0)}
+      y2={zy(IM0)}
+      class="ray"
+      data-ray
     ></line>
 
     <circle cx={zx(0)} cy={zy(0)} r="3" class="origin"></circle>
@@ -86,12 +94,15 @@ const AR = (W / S).toFixed(4);
       x={zx(RE0) + 6}
       y={zy(IM0) - 6}
       text-anchor="start"
-      ><tspan data-zlabel-mod>{fmt(r0)}</tspan><tspan> e</tspan><tspan
+    >
+      <tspan data-zlabel-mod>{fmt(r0)}</tspan>
+      <tspan> e</tspan>
+      <tspan
         data-zlabel-arg
         baseline-shift="40%"
-        font-size="0.7em">{`${fmt(theta0)}i`}</tspan
-      ></text
-    >
+        font-size="0.7em"
+      >{`${fmt(theta0)}i`}</tspan>
+    </text>
 
     <circle
       cx={zx(RE0)}
@@ -102,7 +113,8 @@ const AR = (W / S).toFixed(4);
       tabindex="0"
       role="slider"
       aria-label="z. Drag, or focus and use arrow keys."
-      aria-valuetext={`${fmt(RE0)} + ${fmt(IM0)}i`}></circle>
+      aria-valuetext={`${fmt(RE0)} + ${fmt(IM0)}i`}
+    ></circle>
 
     <line
       x1={zx(lnr0)}
@@ -110,22 +122,24 @@ const AR = (W / S).toFixed(4);
       x2={zx(lnr0)}
       y2={zy(0)}
       class="guide logz-guide"
-      data-logz-guide-v></line>
+      data-logz-guide-v
+    ></line>
     <line
       x1={zx(lnr0)}
       y1={zy(theta0)}
       x2={zx(0)}
       y2={zy(theta0)}
       class="guide logz-guide"
-      data-logz-guide-h></line>
+      data-logz-guide-h
+    ></line>
 
     <text
       class="zlabel logz-label"
       data-logz-label
       x={zx(lnr0) + 6}
       y={zy(theta0) - 6}
-      text-anchor="start">{`Log z = ${fmt(lnr0)} + ${fmt(theta0)}i`}</text
-    >
+      text-anchor="start"
+    >{`Log z = ${fmt(lnr0)} + ${fmt(theta0)}i`}</text>
 
     <circle
       cx={zx(lnr0)}
@@ -133,7 +147,8 @@ const AR = (W / S).toFixed(4);
       r="3.5"
       class="dot"
       style={`fill:var(--dia-out)`}
-      data-logz-dot></circle>
+      data-logz-dot
+    ></circle>
   </svg>
 
   <p class="live" aria-live="polite" data-live></p>
