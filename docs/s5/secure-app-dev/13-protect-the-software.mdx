@@ -1,0 +1,104 @@
+---
+title: Protect the Software
+dateCreated: 2026-09-30T08:00:00.000Z
+lastUpdatedOn: 2026-09-30T08:41:37.109Z
+---
+
+Protect the Software (PS) is the second pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
+
+Stop code and released artifacts from being tampered with or leaked, at rest and in transit.
+
+## Protect All Forms of Code
+
+- Version-controlled source  
+  All source lives in version control, not only on a developer's local disk.
+- Least-privilege access  
+  Read and write access to a repository is scoped to the people who need it.
+- Mandatory review  
+  A change merges only after review by someone other than its author.
+- Signed commits  
+  Commits are cryptographically signed where feasible, so authorship of a change is verifiable after the fact.
+
+Examples:
+
+- Commit signing  
+  A firm requires every commit to be signed with a unique hardware key. A push using stolen software credentials is rejected because it lacks a valid signature.
+- Pipeline lockdown  
+  A bank disables direct edits to configuration files in production branches for all personal accounts. Changes travel only through a multi-approval automated pipeline using short-lived tokens.
+
+## Verify Integrity on Release
+
+- Published hash  
+  Every release ships with a cryptographic hash of its artifact.
+- Published signature  
+  Every release ships with a signature from the publishing organization's key.
+- Consumer verification  
+  A consumer recomputes the hash and checks the signature before trusting a downloaded artifact, catching tampering in transit or on a mirror.
+
+Examples:
+
+- Code signing and hashes  
+  An operating system vendor signs binaries inside a hardened, isolated environment and publishes SHA-256 hashes beside the downloads.
+- Attestation sharing  
+  A cloud provider attaches signed supply chain attestations to container images. The client's Kubernetes clusters use policy engines to block any deployment lacking a valid signature.
+- Codecov  
+  In 2021, attackers modified Codecov's Bash Uploader script so that it sent CI environment variables, including secrets, to a server they controlled. Customers who compared the script's hash to the published one could detect the change.
+
+## Archive Each Release
+
+- Exact source snapshot  
+  The precise source tree used for each shipped version is retained, not just the latest `main` branch.
+- Build inputs and settings  
+  Build parameters, compiler flags, and dependency versions used for that release are retained alongside the source.
+- Rebuildability  
+  An archived release can be rebuilt and investigated after a vulnerability report, even if the live codebase has since moved on.
+
+Examples:
+
+- SBOM archive  
+  A medical device maker generates an SBOM on every build and stores it in read-only cloud storage. When a library flaw is disclosed months later, the archive identifies every affected device version.
+- Immutable artifact storage  
+  A defense contractor mirrors approved open-source packages into an immutable private repository. The approved build stays available even if the upstream author deletes the package or publishes a malicious update.
+
+## Record Provenance
+
+- Dependency list  
+  Every dependency pulled into a build, direct and transitive, is recorded.
+- Build tool and parameter list  
+  The tools and settings used to produce the artifact are recorded alongside the dependencies.
+- Software Bill of Materials  
+  This record is usually published as a Software Bill of Materials (SBOM), a standardized manifest of a build's contents. [Software supply chain security](/s5/secure-app-dev/software-supply-chain-security) covers how this record is used to assess exposure to a disclosed flaw.
+- Downstream exposure assessment  
+  A consumer checks a newly disclosed component flaw against the SBOM to know immediately whether they are exposed, without re-auditing the whole artifact.
+
+Examples:
+
+- Log4Shell  
+  When Log4Shell (CVE-2021-44228) was disclosed in December 2021, organizations without an inventory of their components spent days searching for where Log4j was used. Organizations with an SBOM could query it instead.
+
+## Measure Software Protection
+
+Signing and access metrics.
+
+- Signed commit percentage  
+  Share of commits pushed to production branches with a valid signature. Target is 100%.
+- Pipeline bypass count  
+  Builds or deployments outside the authorized CI/CD toolchain. Target is 0.
+- Stale developer access  
+  Share of inactive or offboarded accounts that still hold active keys or tokens. Target is 0%.
+
+Release integrity metrics.
+
+- Signed release coverage  
+  Share of customer-facing builds, binaries, or container images carrying a valid signature. Target is 100%.
+- SBOM generation rate  
+  Share of production builds that automatically generate a machine-readable SBOM. Target is 100%.
+- Attestation verification success  
+  Rate at which downstream systems, such as production Kubernetes clusters, validate the signature before deployment.
+
+Archiving metrics.
+
+- Artifact retention compliance  
+  Share of historical production releases whose binaries, source snapshots, and SBOMs are verified intact in read-only storage. Target is 100%.
+- Mirrored dependency rate  
+  Share of external packages pulled from the secure internal mirror instead of the public internet. Target is 100%.

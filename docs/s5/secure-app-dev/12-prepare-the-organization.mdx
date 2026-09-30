@@ -1,0 +1,132 @@
+---
+title: Prepare the Organization
+prereqs:
+  - s5/computer-security/confidentiality-integrity-availability#access-control
+dateCreated: 2026-09-30T08:00:00.000Z
+lastUpdatedOn: 2026-09-30T08:41:37.096Z
+---
+
+Prepare the Organization (PO) is the first pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
+
+Put people, rules, and tooling in place before coding starts.
+
+## Define Security Requirements
+
+- Infrastructure and process requirements  
+  Security requirements for the development infrastructure and processes are documented.
+- Software requirements  
+  Security requirements for each product are documented, drawing on applicable laws, standards, and customer contracts.
+- Third-party communication  
+  Vendors and contractors who supply components receive the same requirements.
+- Scheduled review  
+  Requirements are reviewed on a fixed schedule and after any incident, so they track new threats and regulations.
+
+Examples:
+
+- Contractual requirements  
+  A government supplier adds a clause to vendor contracts requiring an SBOM and a signed release for every delivered component.
+
+## Train and Vet Staff
+
+- Role-based training  
+  Every developer completes secure coding training scoped to what their role touches, before they get commit access to production code.
+- Refresher cycles  
+  Training repeats on a schedule, since threats and languages in use change.
+- Personnel vetting  
+  Anyone with access to sensitive code or systems passes a background or clearance check matched to that access level.
+- Policy acknowledgment  
+  Security policies are distributed to staff and comprehension is checked with a quiz or signed acknowledgment.
+
+Examples:
+
+- Role-based curriculum  
+  A payments company gives front-end developers a course on XSS and CSRF, and back-end developers a course on injection and access control. A developer cannot merge to production until the matching course is complete.
+- Phishing simulation  
+  A software vendor runs quarterly phishing drills on staff with repository access. Staff who fail receive targeted retraining.
+
+## Control the Toolchain
+
+- Approved toolchain  
+  Compilers, build systems, test frameworks, and CI runners are drawn from an approved list, each with a documented, security-reviewed configuration.
+- Fed vulnerability data  
+  Build-system scanners pull fresh CVE feeds so a newly disclosed flaw in a dependency is caught on the next build.
+- Curated library list  
+  Third-party libraries come from a pre-vetted registry. A developer cannot pull an arbitrary package into the build.
+- Blocked unapproved tools  
+  Tooling outside the approved list is blocked at the network or package-manager level.
+
+Examples:
+
+- Internal package registry  
+  A bank proxies all package installs through an internal registry that holds only reviewed packages. A request for an unlisted package goes to the security team for approval.
+- Pinned build images  
+  A cloud company builds only inside container images pinned by digest and rebuilt monthly, so every build uses a known compiler and library set.
+- event-stream  
+  In 2018, the maintainer of the npm package `event-stream` handed it to a new maintainer, who added a dependency with code targeting the Copay bitcoin wallet. Projects that pulled packages without vetting took the change automatically.
+
+## Define Security Goals
+
+- Bug ban list  
+  Names classes of vulnerability, for example SQL injection or hardcoded credentials, that must never reach production regardless of severity elsewhere.
+- Severity-based deadlines  
+  Each severity tier has a fix-time rule, for example critical within 7 days, high within 30.
+- Security test pass mark  
+  A minimum score or zero-critical-finding bar on security testing gates release, applied the same way a functional test suite does.
+
+Examples:
+
+- Release gate  
+  A SaaS firm blocks release while any critical finding is open. A high finding needs a signed risk acceptance from the product owner.
+- Enforced ban list  
+  A firm bans `strcpy` and string-built SQL queries. The linter rejects any commit that contains either.
+
+## Lock Down the Environment
+
+- MFA and logging  
+  Developer accounts require multi-factor authentication, and every access to source or build systems is logged.
+- Isolated build servers  
+  Build servers sit on a network segment separate from general corporate traffic, reducing the blast radius of an unrelated compromise.
+- Separated environments  
+  Development and deployment environments are distinct systems, so a mistake or compromise in one does not directly reach the other.
+- Role-based access  
+  Access to each environment follows a formal [access control model](/s5/computer-security/confidentiality-integrity-availability#access-control).
+
+Examples:
+
+- Hardware keys  
+  A firm requires FIDO2 security keys for all repository and CI logins. Password-only logins are disabled.
+- Ephemeral build runners  
+  A CI system starts each build in a fresh virtual machine and destroys it afterwards, so a compromised build leaves nothing behind for the next one.
+- SolarWinds  
+  In 2020, attackers who had compromised SolarWinds' build environment inserted the SUNBURST backdoor into Orion updates. The updates were validly signed and reached about 18,000 customers.
+
+## Track Progress with Metrics
+
+- Training coverage  
+  Share of staff completing training and their quiz scores.
+- Scanner coverage  
+  Share of repositories with an active vulnerability scanner attached.
+- Unapproved library count  
+  Number of dependencies found outside the curated list.
+- Known-flaw releases  
+  Count of releases shipped with a known, unremediated vulnerability.
+- Fix-time compliance  
+  Share of critical fixes landed within their deadline.
+- MFA adoption  
+  Share of developer accounts with multi-factor authentication enabled.
+
+## Enforce a CI/CD Security Gate
+
+- Hard fail  
+  The gate exits with a non-zero status on any violation, so a committed API key or a vulnerable library stops the build outright rather than logging a warning.
+- Cheap checks first  
+  Fast checks such as secret scanning and linting run before slow ones such as full dependency builds, so a doomed build fails early.
+- No bypass path  
+  The gate cannot be skipped by a developer under deadline pressure. An override, if one exists, requires a second approver.
+
+Examples:
+
+- Secret scanning  
+  A pipeline runs a secret scanner on every push. A commit containing a cloud access key fails the build, and the key is revoked and rotated.
+- Two-person override  
+  An emergency deploy that skips a failed scan needs approval from a security engineer and an engineering manager, and is logged for audit.

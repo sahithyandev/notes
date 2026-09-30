@@ -1,0 +1,77 @@
+---
+title: Secure Software Development Lifecycle
+sidebar:
+  label: SSDL
+dateCreated: 2026-09-03T05:24:45.100Z
+lastUpdatedOn: 2026-09-30T08:41:37.069Z
+---
+
+Security must be built into every phase of the SDLC, not bolted on as a final checklist. Fixing vulnerabilities early cuts remediation cost and deployment delay.
+
+Software is any code a system runs, including libraries, frameworks, operating systems, firmware, services, and build tooling. Secure software development is proactive and shift-left. Applies secure coding standards, threat modeling, and pipeline controls across every component of the system.
+
+An application is one finished program that users or clients interact with, such as a web or mobile app. Secure application development is narrower and reactive. Tests a finished application in production through its APIs, server configuration, authentication flows, and sessions.
+
+## Core Security Pillars
+
+### Threat Modeling
+
+Finds attack vectors and design flaws during architecture, before code is written. Maps assets, [trust boundaries](/s5/secure-app-dev/threat-modeling#trust-boundary), and [data flows](/s5/secure-app-dev/threat-modeling#data-flow-diagram), often with a method like [STRIDE](/s5/secure-app-dev/threat-modeling#stride), then ranks the threats and assigns mitigations. A flaw fixed here costs far less than one fixed after release.
+
+### Secure Coding
+
+Applies defensive standards against common flaws like [SQL injection](/s5/secure-app-dev/owasp-top-10#injection-flaws), [XSS](/s5/secure-app-dev/owasp-top-10#cross-site-scripting), and [buffer overflows](/s5/computer-security/buffer-overflow). Core practices are [input validation](/s5/computer-security/incomplete-mediation), output encoding, [parameterized queries](/s3/database-systems/sql/prepared-statements), and [safe memory handling](/s5/secure-app-dev/memory-safety), enforced through coding standards and code review.
+
+### Dependency Management
+
+Scans and updates third-party components against [supply chain attacks](/s5/secure-app-dev/software-supply-chain-security). [Software composition analysis](/s5/secure-app-dev/static-analysis#software-composition-analysis) (SCA) tools flag known vulnerable versions, while lockfiles and an [SBOM](#software-bill-of-materials) record exactly what ships.
+
+### Automated Testing
+
+Runs SAST and DAST in the CI/CD pipeline. [SAST](/s5/secure-app-dev/static-analysis) analyzes source code without running it and catches flaws early. [DAST](/s5/secure-app-dev/dynamic-analysis) probes the running application from outside and catches runtime and configuration issues. A failed scan can block the merge or deployment.
+
+### Identity Management
+
+Enforces strong [authentication](/s4/operating-systems-security/authentication), MFA, and RBAC. Passwords are stored hashed, sessions expire, and each role is limited to what the job needs, which applies least privilege.
+
+### Data Protection
+
+Encrypts sensitive data at rest and in transit. TLS protects traffic, strong algorithms such as [AES](/s5/computer-security/aes) with managed keys protect stored data, and secrets such as keys and credentials stay out of source code.
+
+## Software Bill of Materials
+
+Aka. SBOM. A machine-readable inventory of every component in a build. It lists each component's name, version, supplier, and dependency relationships. When a flaw is disclosed in a component, the SBOM shows which releases are affected. Common formats are SPDX and CycloneDX.
+
+Manifests such as `package.json` and `Cargo.toml` are not SBOMs. They list direct dependencies as version ranges.
+
+Lockfiles such as `package-lock.json` and `Cargo.lock` pin exact versions, including transitive dependencies. They are still not SBOMs because:
+
+- Limited scope  
+  Cover only the packages of one package manager. Vendored code, system libraries, and base images are missing.
+- Missing metadata  
+  Carry no supplier or licence data and follow no standard format.
+- Not the shipped artifact  
+  Describe what the package manager installs, not necessarily what ships.
+
+Tools such as `syft` and `cargo-cyclonedx` generate an SBOM from manifests, lockfiles, and the built artifact.
+
+## Core Security Design Principles
+
+Foundational guidelines that hold across all languages and architectures. They should not be relaxed for a specific customer or environment.
+
+- Least privilege  
+  Grants only the minimum access rights needed for a task.
+- Defense in depth  
+  Stacks redundant layers of controls, so one failed layer does not expose the system.
+- Fail securely  
+  An error or crash lands in the most secure state.
+- Complete mediation  
+  Checks access rights on every request, never on cached permissions.
+- Open design  
+  Keeps security independent of secret implementation or source.
+- Minimizing the attack surface  
+  Disables unused features, ports, and protocols.
+- Psychological acceptability  
+  Keeps security intuitive so users do not bypass it.
+
+The [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework) formalizes these into 4 pillars. The [Principles of Secure System Design](/s5/computer-security/secure-system-design) note covers compartmentalization, defense in depth, and worked examples of these principles applied to real systems.

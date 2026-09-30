@@ -1,0 +1,122 @@
+---
+title: Produce Well-Secured Software
+dateCreated: 2026-09-30T08:00:00.000Z
+lastUpdatedOn: 2026-09-30T08:41:37.121Z
+---
+
+Produce Well-Secured Software (PW) is the third pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
+
+Design, write, and test so that few vulnerabilities exist at release, and those that do are found early.
+
+## Start with Security Requirements
+
+- Threat modeling  
+  Data flows, trust boundaries, and abuse cases are modeled before implementation starts, so an attack path is a design question rather than a post-hoc discovery.
+- Architecture revision  
+  Each identified threat is removed or mitigated by revising the architecture.
+
+Examples:
+
+- Threat modeling  
+  A fintech team designing a peer-to-peer payment feature builds a data-flow diagram with a security engineer. It finds that an attacker could tamper with transaction amounts in transit, so the team mandates server-side validation and mutual TLS before writing functional code.
+- Defense in depth  
+  An e-commerce platform prevents the web server from reaching the credit card database directly. An isolated API microservice between them filters queries, so the data stays defended if the web server is compromised.
+- Microsoft SDL  
+  After its 2002 Trustworthy Computing memo, Microsoft made threat modeling a required step of its Security Development Lifecycle.
+
+## Reuse Well-Secured Components
+
+- Prefer vetted modules  
+  Authentication, cryptography, and parsing use vetted internal or third-party components instead of custom implementations, since these are the areas most prone to subtle, exploitable mistakes.
+- Version and flaw tracking  
+  Reused components have their versions and known vulnerabilities tracked for the life of the product.
+
+Examples:
+
+- Software composition analysis  
+  A health tech company configures its dependency manager to block packages with known vulnerabilities or restrictive licenses. Adding a logging library with a high-severity flaw breaks the build and suggests a patched version.
+- Centralized authentication library  
+  A retail corporation builds one heavily audited authentication library. All internal teams must use it for login instead of writing their own login and session handling.
+
+## Follow Secure Coding Practices
+
+- Safer languages and functions  
+  Memory-safe languages and hardened library functions are preferred over ones known to be error-prone, where the choice is available.
+- Compiler warnings and hardening flags  
+  Builds enable compiler warnings and hardening flags such as stack protection, and treat new warnings as build failures.
+- Organizational coding standard  
+  Developers follow a documented coding standard rather than individual style, so review and tooling can assume a consistent baseline.
+- Tool over human for error-prone tasks  
+  A task with a known high human error rate, such as manual memory management or manual escaping, is handed to a tool wherever one exists.
+
+Examples:
+
+- Compiler hardening flags  
+  A C++ embedded systems firm configures its build servers to apply ASLR and stack protection to every compilation. The output binaries resist memory corruption exploits.
+- Heartbleed  
+  In 2014, a missing bounds check in OpenSSL's heartbeat extension (CVE-2014-0160) let attackers read server memory, including private keys. The bug sat in C code, where bounds checking is manual.
+
+## Review and Test Code
+
+- Human review  
+  A person reviews code for logic and security issues a tool would miss.
+- Static analysis  
+  Automated static analysis runs on every change to catch known-pattern flaws at low cost.
+- Dynamic analysis and fuzzing  
+  Running code is tested with dynamic analysis and fuzzing to catch flaws that only appear at execution time.
+- Negative testing  
+  Tests assert what must not happen, for example that an unauthenticated request is rejected.
+- Root cause fixes  
+  A finding is fixed at its underlying cause.
+
+Examples:
+
+- Mandatory peer review  
+  A SaaS provider allows no merge into production without approval from at least 2 senior developers. Reviewers use a security checklist to verify that inputs are sanitized and database queries are parameterized.
+- Dynamic security testing  
+  An insurance company runs an automated web vulnerability scanner against staging every Friday night. It attempts XSS and injection attacks on the running application and produces a weekend report.
+
+## Configure Defaults Securely
+
+- Least privilege by default  
+  A default install runs with the minimum privilege it needs.
+- Features off by default  
+  Optional features, especially ones that expand attack surface, ship disabled until explicitly enabled.
+- Logging on by default  
+  Security-relevant logging is enabled out of the box, since a default install is often never revisited.
+
+Examples:
+
+- Secure installer defaults  
+  A database ships with remote access disabled and no default administrator password. The installer forces the administrator to set one on first run.
+- Hardened container image  
+  A vendor's container runs as a non-root user with a read-only filesystem by default. Operators must opt in to any extra privilege.
+- Exposed MongoDB  
+  In 2017, attackers wiped thousands of exposed MongoDB databases and demanded ransom. Many were default installs with no authentication, reachable from the internet. Current releases bind to localhost by default.
+
+## Measure Secure Production
+
+Secure design and component metrics.
+
+- Threat model coverage  
+  Share of new features or microservices that had a formal threat modeling session before development.
+- Vetted dependency rate  
+  Share of open-source packages in production that comply with the allowed component list.
+- Vulnerability MTTR  
+  Mean time to resolution. Average days to patch or replace a third-party dependency after a new CVE is disclosed.
+
+Reuse and hardening metrics.
+
+- Security library adoption  
+  Share of applications using the approved centralized modules for authentication, encryption, and logging.
+- Binary hardening coverage  
+  Share of compiled binaries verified to have security flags active, such as ASLR, DEP, and stack protection.
+
+Review and analysis metrics.
+
+- Peer review audit rate  
+  Share of production-merged pull requests that received the mandatory number of human security reviews.
+- Vulnerability density  
+  Injection, authorization, or logic flaws found per 1,000 lines of code (KLOC).
+- Defect escape rate  
+  Share of vulnerabilities discovered after release, by customers or bug bounties, compared to those caught before release by internal scanners.

@@ -1,0 +1,95 @@
+---
+title: Respond to Vulnerabilities
+dateCreated: 2026-09-30T08:00:00.000Z
+lastUpdatedOn: 2026-09-30T08:41:37.135Z
+---
+
+Respond to Vulnerabilities (RV) is the fourth pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
+
+Find and fix flaws that reach production, and feed the lessons back into development.
+
+## Identify Vulnerabilities Continuously
+
+- Disclosure programme  
+  A known, monitored intake channel exists for external reports, for example a security contact address or a bug bounty programme.
+- Advisory monitoring  
+  Security advisories for every component in use are monitored on an ongoing basis.
+- Continuous scanning  
+  Released software is rescanned periodically, since a component clean at release can gain a disclosed flaw later.
+
+Examples:
+
+- Vulnerability disclosure program  
+  A fintech enterprise publishes a `/security` page with reporting instructions and a PGP key. White-hat hackers submit an authentication bypass report without exposing the flaw publicly.
+- Threat intelligence monitoring  
+  An automotive software company connects its software catalog to threat intelligence feeds. A zero-day advisory for an open-source protocol used in its vehicles automatically opens an internal ticket.
+
+## Assess, Prioritise, and Remediate
+
+- Confirmation  
+  Each report is reproduced and confirmed before work starts on it.
+- Severity and exploitability judgment  
+  Confirmed reports are ranked by severity and how easily they can be exploited in practice.
+- Deadline-bound patching  
+  Each report is patched within the fix-time rule set for its severity tier under [Define Security Goals](/s5/secure-app-dev/prepare-the-organization#define-security-goals).
+- Disclosure to affected users  
+  Users affected by a confirmed vulnerability are notified.
+
+Examples:
+
+- CVSS and EPSS triage  
+  A health insurer receives a bug report on its member portal. The Common Vulnerability Scoring System (CVSS) rates the bug as complex, but the Exploit Prediction Scoring System (EPSS) shows it is actively exploited in the wild. The team raises it to Critical and patches it within 24 hours.
+- Equifax  
+  In 2017, Equifax left a public-facing Apache Struts flaw (CVE-2017-5638) unpatched for about 2 months after the fix was released. Attackers exploited it and exposed data on about 147 million people.
+
+## Analyse Root Cause
+
+- Underlying cause identification  
+  Each confirmed vulnerability is traced to its underlying cause.
+- Similar flaw search  
+  The codebase is checked for the same class of flaw elsewhere, since one instance rarely occurs in isolation.
+- Feedback into process  
+  Requirements, design guidance, tooling, or training are updated so the class of flaw does not recur, closing the loop back to [Prepare the Organization](/s5/secure-app-dev/prepare-the-organization).
+
+Example:
+
+- Post-mortem  
+  After patching a critical data-leak flaw, a team traces the cause to missing input validation. It updates its secure coding training and adds a SAST rule that catches the mistake automatically.
+
+## Run Incident Response
+
+An incident response runs through 4 phases.
+
+- Triage and declare  
+  Confirm the event is a security incident, rate its severity, name an incident lead, and open a record of actions and timestamps.
+- Mitigation and contain  
+  Limit the damage by isolating affected systems, revoking exposed keys and tokens, disabling the vulnerable feature, or shipping a temporary workaround. Preserve logs and evidence.
+- Escalation and governance  
+  Notify leadership, legal, and any affected customers or regulators according to severity and legal deadlines.
+- Resolution and post-mortem  
+  Ship the permanent fix, verify it, and review the timeline. Findings feed into root cause analysis and the process changes under [Prepare the Organization](/s5/secure-app-dev/prepare-the-organization).
+
+Examples:
+
+- Leaked signing key  
+  A build system's code signing key is found in a public repository. The team declares an incident and revokes the key. It re-signs recent releases with a new key and notifies customers to update their trust settings. Afterwards it adds a secret scanning rule to the pipeline.
+
+## Measure Vulnerability Response
+
+Inbound metrics.
+
+- Time to acknowledge  
+  Average hours between a researcher submitting a report and the team acknowledging receipt. Target is under 24 hours.
+- False positive ratio  
+  Share of external reports closed as invalid, duplicate, or spam. Target is under 25%.
+- Intel trigger latency  
+  Delay between a public CVE announcement affecting the supply chain and internal scanners flagging it. Target is under 12 hours.
+
+Triage metrics.
+
+- Mean time to triage  
+  Average time to validate a report, calculate its CVSS score, and assign it to a development team. Target is under 48 hours.
+- SLA breach rate  
+  Share of confirmed vulnerabilities not patched or mitigated within the policy window. Target is 0%.
+- Recurrence rate  
+  Share of fixed vulnerabilities that reappear in later releases because of poor regression testing or partial patching. Target is 0%.
