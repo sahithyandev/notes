@@ -1,7 +1,7 @@
 ---
 title: Web Browsers
 dateCreated: 2026-09-03T05:28:58.273Z
-lastUpdatedOn: 2026-09-30T08:41:37.243Z
+lastUpdatedOn: 2026-09-30T15:28:09.404Z
 ---
 
 A browser is a large, complex, network-facing codebase written in memory-unsafe languages, with features added constantly.
@@ -45,8 +45,23 @@ Goals:
 - Stop a renderer receiving cross-site cookies, stored data, saved passwords, or another site's granted permissions.
 - Block cross-site pages in iframes per `X-Frame-Options`.
 - Keep cross-site DOM out of reach of UXSS bugs.
+- Contain speculative side channels, so JavaScript in a renderer cannot read another site's memory.
 
 Cross-Origin Read Blocking (CORB) blocks cross-site delivery of HTML, XML, and JSON responses. It works reliably when the response has a correct `Content-Type` and `X-Content-Type-Options: nosniff`. Without `nosniff`, Chrome sniffs the start of the file and protects it only if it can confirm the type, avoiding breaking mislabeled JavaScript files.
+
+## Sites Sharing a Process
+
+Site isolation can fail under memory pressure or through `document.domain`, leaving pages from different sites in 1 renderer process. Every page in that process shares 1 address space, so the [same-origin policy](/s5/secure-app-dev/web-browsers#site-isolation) is enforced only by the browser's software checks, not by process boundaries.
+
+Attack scenario using Spectre:
+
+1. The user has a logged-in tab of `bank.com`. Its DOM, cookies, and tokens sit in the renderer's memory.
+2. The user opens `evil.com`, and the browser places it in the same renderer process.
+3. JavaScript on `evil.com` runs a [Spectre variant 1](/s5/secure-app-dev/meltdown-and-spectre#variant-1) gadget. It trains a bounds check, then passes an out-of-bounds index that points into `bank.com` data.
+4. The speculative read leaves a trace in the cache. The script times reads of a probe array to recover 1 byte.
+5. Repeating this leaks session tokens or account details from `bank.com`, without any bug in the same-origin policy.
+
+The same layout also lets a renderer memory corruption exploit or a UXSS bug reach `bank.com` data directly.
 
 ## Secure Coding in JavaScript
 

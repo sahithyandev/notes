@@ -1,0 +1,54 @@
+---
+title: Chain of Trust
+dateCreated: 2026-09-30T15:00:00.000Z
+lastUpdatedOn: 2026-09-30T15:28:09.420Z
+---
+
+A chain of trust is a sequence of components where each component verifies the next one before passing control to it. Trust in the final component follows from trust in the first.
+
+The first component is the root of trust. It is trusted without verification, so it must be immutable, typically a boot ROM or a hardware module.
+
+## Boot Chain
+
+```
+Root of trust (boot ROM / TPM)
+        │ verifies
+        ▼
+Firmware (UEFI)
+        │ verifies
+        ▼
+Bootloader (GRUB)
+        │ verifies
+        ▼
+Kernel and initramfs
+        │ verifies
+        ▼
+Kernel modules and init
+        │ verifies
+        ▼
+Applications and data
+```
+
+At each link:
+
+1. The current component computes a hash of the next one.
+2. The hash is compared against a known-good value or a digital signature.
+3. Control is passed only if the check succeeds.
+
+## Properties
+
+- Transitive  
+  Each link is trusted only because the previous link is trusted.
+- Broken at the weakest link  
+  A single unverified component lets an attacker compromise everything after it.
+- Ordered  
+  A component must be verified before it executes. Code that runs first can lie about everything after it.
+
+A rootkit that infects a bootloader or the kernel breaks the chain, since the components below it can no longer be trusted.
+
+## Verification Modes
+
+- Secure boot  
+  Each stage checks the next stage's signature against keys held by the firmware. A stage that fails the check is not executed.
+- Measured boot  
+  Each stage records a hash of the next stage in tamper-resistant storage before running it. Nothing is blocked. A separate party later decides whether the recorded values are acceptable. See [TPM](/s5/secure-app-dev/trusted-platform-module).

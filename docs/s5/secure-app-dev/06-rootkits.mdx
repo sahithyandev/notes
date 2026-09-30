@@ -1,0 +1,132 @@
+---
+title: Rootkits
+prereqs:
+  - s4/operating-systems-security/malware
+dateCreated: 2026-09-30T15:00:00.000Z
+lastUpdatedOn: 2026-09-30T15:28:09.139Z
+---
+
+A [rootkit](/s4/operating-systems-security/malware#rootkits) is malicious code that attains root-level privileges and hides its own presence and the presence of other malicious activity from the operating system and its users. It is usually installed after an attacker gains root, to keep that access and stay undetected. Rootkits are extremely difficult to detect or eradicate.
+
+On Linux, a rootkit is possible because [DAC](/s5/secure-app-dev/discretionary-access-control) grants a root process unrestricted access. Once root is obtained, the attacker can modify any file and load code into the kernel.
+
+Rootkits can:
+
+- Intercept OS function calls  
+  To filter or modify results before passing to caller.
+- Replace OS functions to be harmful
+- Rewrite interrupt handler pointers
+- Remove checkers from startup list
+- Bypass audit logging
+- Take full control of the file system
+
+## Goals
+
+- Persistence  
+  Survive reboots and cleanup attempts.
+- Stealth  
+  Hide processes, files, network connections, and logins from tools such as `ps`, `ls`, `netstat`, and `who`.
+- Privileged access  
+  Provide a hidden backdoor that returns root on demand.
+
+## Rootkit Levels
+
+Rootkits work at different permission levels (in increasing difficulty to eradicate):
+
+- User mode  
+  Only user permissions. Replaces or hooks user space programs and libraries. Limited harm.
+- Kernel mode  
+  Runs inside the [kernel](/s3/operating-systems/kernel), so it can alter what every process sees. Modifies OS functions. Halts processes.
+- Bootkit  
+  Activates on boot. Infects the bootloader or boot sector to load before the OS. Embedded in OS startup.
+- Hypervisor/virtual machine  
+  Runs under OS and virtualizes it. Intercepts OS calls.
+- Hardware/firmware  
+  Embedded in hardware or writable microcode, such as the BIOS/UEFI, a NIC, or a disk controller. Survives an OS reinstall.
+
+## Attack Steps on Linux
+
+1. Initial compromise  
+   The attacker gains a foothold as an unprivileged user. Typical vectors are a memory corruption bug in a network service, stolen or weak credentials, or a trojaned package.
+2. Privilege escalation  
+   The attacker becomes root. Typical vectors are a bug in a setuid-root program, a kernel exploit, or a misconfigured `sudo` rule.
+3. Rootkit installation  
+   The attacker installs the rootkit at the level they need, using the techniques below. Loading a kernel module requires root, which is why step 2 comes first.
+4. Hiding  
+   The rootkit filters what tools see. Hooked calls such as `getdents()` remove the attacker's files from directory listings, and hooked reads of `/proc` hide processes and network connections. A kernel module also removes itself from the kernel's module list.
+5. Persistence  
+   The rootkit survives a reboot by modifying an init script or `systemd` unit, adding itself to the list of modules loaded on boot, or infecting the bootloader or firmware.
+6. Backdoor and cleanup  
+   The attacker opens a hidden backdoor or reverse shell, then edits or deletes entries in the logs.
+
+## User Mode Techniques
+
+- Binary replacement  
+  Trojaned copies of `ps`, `ls`, `netstat` skip entries that belong to the attacker.
+- Library preloading  
+  A malicious shared library is listed in the `LD_PRELOAD` environment variable or in `/etc/ld.so.preload`. The dynamic linker loads it first, so its versions of `readdir()` or `open()` override the libc ones and filter results. Statically linked binaries are not vulnerable to this.
+
+## Kernel Mode Techniques
+
+Code running in kernel space is not limited by process isolation, so it can subvert every user space tool at once.
+
+- Loadable kernel module  
+  The rootkit is loaded as a [kernel module](/s3/operating-systems/kernel#loadable-kernel-module) with `insmod`. It requires root, but afterwards it has full kernel privileges.
+- System call table hooking  
+  The rootkit overwrites entries in the system call table with its own functions. A hooked `getdents()` drops the attacker's files from directory listings.
+- Function tracing hooks  
+  Kernel facilities such as `ftrace` and `kprobes` let a module intercept arbitrary kernel functions without editing the system call table.
+- Direct kernel object manipulation  
+  The rootkit edits kernel data structures directly. Unlinking a process from the kernel's task list hides it from `ps`, yet the scheduler still runs it.
+
+### Splicing
+
+An evasion technique where the first bytes of a system function are overwritten with a jump instruction pointing to the rootkit's code. Any driver modified this way is called a hooked driver. Legitimate calls to the function silently execute the rootkit code first.
+
+## Rootkit Detection
+
+- Rootkit revealers  
+  Read the disk directly to find rootkits.
+- Cross-view comparison  
+  Compare results from 2 sources, such as a `ps` listing against the entries in `/proc`. A difference reveals hidden objects.
+- Integrity checking  
+  Compare system binaries, the system call table, and kernel text against known-good hashes or copies.
+- Offline scanning  
+  Boot from trusted media and scan the disk, since the running OS cannot be trusted.
+- Memory forensics  
+  Analyze a memory dump outside the compromised system to find hidden processes and modules.
+- Behavioural monitoring  
+  Watch for unexpected module loads, hidden network ports, and traffic that host tools do not report.
+
+Tools such as `chkrootkit` and `rkhunter` automate several of these checks. A kernel mode rootkit can defeat them, so they are less reliable on an already compromised host.
+
+## Rootkit Prevention
+
+- Least privilege  
+  Installing a rootkit needs root. Limiting root access limits installation.
+- Patching  
+  Patch setuid programs and the kernel to close the escalation path.
+- Module signing  
+  The kernel refuses to load modules without a valid signature.
+- Disable module loading  
+  Setting `kernel.modules_disabled=1` blocks any further module loads until reboot.
+- Kernel lockdown  
+  Lockdown mode blocks access to `/dev/mem`, unsigned modules, and other paths to kernel memory, even for root.
+- Secure boot  
+  Verifies the bootloader and kernel signatures, preventing bootkits. See [chain of trust](/s5/secure-app-dev/chain-of-trust).
+- Read-only system files  
+  Mount system directories read-only and monitor them with a file integrity tool.
+
+<Note>
+
+Once a rootkit is confirmed, reinstalling the OS from trusted media is the safe recovery. Removal cannot be trusted, since the rootkit may hide remnants.
+
+</Note>
+
+## Non-Malicious Rootkits
+
+Used by:
+
+- Parental monitoring tools (eBlaster, Spector)
+- Law enforcement (on suspects' machines).
+- Security tools (antivirus, IDS)

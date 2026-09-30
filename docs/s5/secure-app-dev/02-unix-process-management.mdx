@@ -3,14 +3,43 @@ title: Unix Process Management
 prereqs:
   - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-30T14:55:22.371Z
+lastUpdatedOn: 2026-09-30T15:28:09.090Z
 ---
 
 Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
 
 Refer [stopped](/s3/operating-systems/process#stopped), [zombie](/s3/operating-systems/process#zombie), and [orphan](/s3/operating-systems/process#orphan) for the Unix-specific additions to the [generic process state model](/s3/operating-systems/process#process-states).
 
-## Process Creation with Fork
+## Kernel Data Structures
+
+### Process Table and PCB
+
+The kernel keeps 1 [PCB](/s3/operating-systems/process#process-control-block) per process. The process table is the collection of these PCBs. In Linux a PCB is a `task_struct`.
+
+### Process Memory Space
+
+Each PCB points to the address space of its process. The address space is divided into regions, from low to high addresses:
+
+- Text  
+  The program's machine code. Read-only and executable, shared between processes running the same program.
+- Initialized data  
+  Global and static variables with a non-zero initial value.
+- BSS  
+  Global and static variables initialized to zero. Not stored in the executable file, the kernel zero-fills them on load.
+- Heap  
+  Dynamically allocated memory, e.g. from `malloc()`. Grows upward toward higher addresses.
+- Memory-mapped region  
+  Shared libraries and files mapped with `mmap()`, between the heap and the stack.
+- Stack  
+  Stack frames holding local variables, arguments, and return addresses of each function call. Grows downward toward lower addresses.
+- Command line arguments and environment  
+  The `argv` and `envp` strings, placed at the top of the user address space.
+
+The kernel is mapped into the upper part of the address space, but is not accessible from user mode.
+
+## Process Creation
+
+### Fork
 
 ```c
 #include <unistd.h>
@@ -25,7 +54,7 @@ int fork(void);
 
 Both parent and child continue executing the instructions after `fork()`. Since each has an independent memory copy, modifying a variable in one process does not affect the other's copy.
 
-## Implementing Fork
+### Fork Implementation
 
 Simplified steps:
 
@@ -47,7 +76,7 @@ Copying the full memory space (step 6) is expensive. Copy-on-write defers duplic
 
 Linux additionally provides `clone()`, a more general primitive than `fork()` that allows partial resource sharing between parent and child, used to implement threads.
 
-## Executing a New Program with Exec
+### Exec
 
 `fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family, a group of 6 related system calls sharing a naming convention.
 
@@ -85,6 +114,8 @@ int main(int argc, char *argv[], char *envp[])
 - `envp`  
   NULL-terminated array of `key=value` strings, the environment.
 
+### Fork and Exec Together
+
 <Note>
 
 `fork()` followed by `exec()` is the standard Unix mechanism to run a new program in a new process: the parent spawns a child, the child replaces itself via `exec()`, and the parent continues or exits.
@@ -108,7 +139,9 @@ if (pid < 0) {
 }
 ```
 
-## Process Termination
+## Termination and Synchronization
+
+### Exit
 
 ```c
 #include <stdlib.h>
@@ -127,7 +160,7 @@ Non-zero `status` indicates an error or abnormal termination.
 
 Returning from `main()` implicitly calls `exit()`.
 
-## Parent-Child Synchronization
+### Wait
 
 ```c
 #include <sys/types.h>
@@ -148,7 +181,7 @@ Variants:
 - `waitid()`  
   Wait for any child process to change status.
 
-## Kill and Signals
+## Signals
 
 ```c
 int kill(pid_t pid, int sig);
@@ -166,3 +199,67 @@ Sends a signal to a process, the Unix analog of a hardware interrupt, routed thr
   Restart a stopped process.
 - `SIGCHLD`  
   Sent by the kernel to the parent when a child terminates, stops, or continues. Ignored by default. A parent can install a handler that calls `wait()` on receiving it, reaping terminated children without blocking. Children that are never reaped remain [zombies](/s3/operating-systems/process#zombie).
+
+## Building a Shell
+
+A console application that runs utilities such as `someutil` is a shell. It reads a command line, then uses `fork()` and `exec()` to run the utility in a child process.
+
+### Shell Loop
+
+```text
+loop forever
+    print prompt
+    line = read_line()
+    if line is empty
+        continue
+    args = split(line)
+    if args[0] == "exit"
+        break
+
+    pid = fork()
+    if pid < 0
+        print "fork failed"
+    else if pid == 0
+        execvp(args[0], args)
+        print "command not found"
+        exit(1)
+    else
+        waitpid(pid, &status, 0)
+```
+
+### Command Trace
+
+Command trace for running `someutil` with the arguments `-v` and `data.txt`:
+
+```text
+$ someutil -v data.txt
+```
+
+- The shell reads the line and splits it into `args = ["someutil", "-v", "data.txt", NULL]`.
+- The shell calls `fork()`. The child is a copy of the shell.
+- The child calls `execvp("someutil", args)`. It searches `PATH` and replaces its image with `someutil`.
+- The parent shell calls `waitpid()` and blocks until `someutil` terminates.
+- The shell collects the exit status, prints the prompt, and reads the next command.
+
+<Note>
+
+A utility outside `PATH` needs its path typed, such as `./someutil -v data.txt`.
+
+</Note>
+
+## Process Misbehavior
+
+### Fork Bomb
+
+A process that calls `fork()` in an infinite loop is a fork bomb. Each child continues the same loop, so the number of processes doubles every iteration.
+
+```text
+while true
+    fork()
+```
+
+- After $n$ iterations there are $2^n$ processes.
+- The process table fills, so no new process can be created.
+- Memory and CPU time are consumed by the running copies, so the system stops responding.
+
+Limiting the number of processes per user (`ulimit -u`) contains this.

@@ -1,7 +1,7 @@
 ---
 title: Meltdown and Spectre
 dateCreated: 2026-09-03T05:28:35.093Z
-lastUpdatedOn: 2026-09-30T08:41:37.229Z
+lastUpdatedOn: 2026-09-30T15:28:09.389Z
 ---
 
 Meltdown and Spectre are 3 CPU vulnerabilities disclosed in 2018 that leak memory through microarchitectural side channels.
@@ -12,6 +12,15 @@ Meltdown and Spectre are 3 CPU vulnerabilities disclosed in 2018 that leak memor
   Branch target injection, CVE-2017-5715, Spectre.
 - Variant 3  
   Rogue data cache load, CVE-2017-5754, Meltdown.
+
+## Side Channel Attacks
+
+A side channel attack infers secret data from an observable side effect of a computation, such as timing, cache state, power use, or electromagnetic emission. The attacker never reads the secret through a legitimate interface, and the program's logic has no bug that reveals it.
+
+- Indirect nature  
+  The leak comes from shared hardware state, so a correct program under a correct OS can still be attacked.
+- Hard to foresee  
+  Developers reason about the architectural behaviour of code, not its microarchitectural side effects.
 
 ## Exploited CPU Features
 
@@ -61,13 +70,27 @@ The victim speculatively touches memory it is allowed to access, so KPTI does no
 
 ### Variant 1
 
-Conditional branch misprediction. Take code like `if (x < array1_len) y = array2[array1[x] * 4096]`. Train the branch with valid `x`, then pass an out-of-bounds `x` chosen so `array1[x]` reads a secret. The CPU speculatively runs the body, loads the secret, and indexes `array2` with it. This leaves a cache trace read out via the side channel.
+Conditional branch misprediction. The target is a bounds check such as `if (x < array1_len) y = array2[array1[x] * 4096]`.
+
+1. Call the victim code many times with valid `x`, so the branch predictor learns that the branch is taken.
+2. Flush `array2` and `array1_len` from the cache. A slow `array1_len` load widens the speculation window.
+3. Call the victim code with an out-of-bounds `x`, chosen so `array1[x]` is the address of a secret byte.
+4. The CPU predicts the branch as taken and speculatively runs the body. It loads the secret byte $s$ and reads `array2[s * 4096]`, which caches 1 page of `array2`.
+5. The bounds check resolves as failed. The CPU discards the results, but the cached page stays.
+6. Time reads of each page of `array2`. The page that reads fast reveals $s$.
 
 Mitigation: put an `lfence` after a bounds check to block speculation past it, or mask the index into a safe range instead of branching.
 
 ### Variant 2
 
-Indirect branch poisoning. Train the Branch Target Buffer (BTB) so an indirect branch in the victim mispredicts to an attacker-chosen Spectre gadget in the victim's address space. Its speculative execution leaks a secret into the cache. Only the low 31 bits of the branch address index the BTB.
+Indirect branch poisoning. The target is an indirect branch in the victim, such as a function pointer call.
+
+1. Find a Spectre gadget in the victim's address space. It reads a secret and uses it to index a probe array, leaving a cache trace.
+2. Train the Branch Target Buffer (BTB) from the attacker's process. Repeatedly run an indirect branch at an address that aliases the victim's branch, with the gadget's address as its target. Only the low 31 bits of the branch address index the BTB.
+3. Flush the probe array and the victim's real branch target from the cache, to widen the speculation window.
+4. The victim executes its indirect branch. The BTB predicts the gadget, so the CPU speculatively runs it and caches a probe array page selected by the secret.
+5. The misprediction is detected and the results are discarded, but the cached page stays.
+6. Time reads of the probe array to recover the secret.
 
 Mitigation: retpoline replaces indirect branches with a construct that steers speculation to a harmless spin loop instead of the poisoned BTB target.
 

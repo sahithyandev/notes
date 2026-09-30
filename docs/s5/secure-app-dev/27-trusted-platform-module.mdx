@@ -1,0 +1,107 @@
+---
+title: Trusted Platform Module
+dateCreated: 2026-09-30T15:00:00.000Z
+lastUpdatedOn: 2026-09-30T15:28:09.431Z
+---
+
+Aka. TPM. A tamper-resistant cryptographic coprocessor on the motherboard. It serves as the hardware [root of trust](/s5/secure-app-dev/chain-of-trust) of a platform.
+
+## Components
+
+- Cryptographic engines  
+  Asymmetric encryption and signing, hashing, and a random number generator.
+- Non-volatile storage  
+  Holds long-lived keys. Private keys never leave the chip in plain form.
+- Platform Configuration Registers (PCRs)  
+  Secure registers that store measurements. They cannot be written directly, only extended.
+- Endorsement key  
+  A unique key burned in by the manufacturer, identifying the TPM.
+- Storage root key  
+  Wraps other keys, so keys can be stored outside the TPM while remaining protected by it.
+
+## PCR Extend
+
+A PCR can only be updated by combining its current value with a new measurement.
+
+$$
+PCR_{new} = H(PCR_{old} \parallel m)
+$$
+
+Here:
+
+- $H$: hash function
+- $m$: hash of the component being measured
+- $\parallel$: concatenation
+
+The final value depends on every measurement and their order. A PCR cannot be set to an arbitrary value, so malware cannot erase an earlier measurement.
+
+## Establishing the Chain of Trust
+
+Measured boot uses the TPM to record each link of the chain.
+
+```
+Boot ROM (core root of trust for measurement)
+   │ measures UEFI firmware      → extends PCR 0
+   ▼
+UEFI firmware
+   │ measures bootloader         → extends PCR 4
+   ▼
+Bootloader
+   │ measures kernel, initramfs  → extends PCR 8, 9
+   ▼
+Kernel
+   │ measures applications       → extends PCR 10
+   ▼
+Applications
+```
+
+Each component measures the next before executing it. A modified component produces a different PCR value.
+
+The recorded PCR values are then used in 2 ways.
+
+- Sealing  
+  A secret, such as a disk encryption key, is encrypted by the TPM under a PCR policy. The TPM releases it only if the current PCR values match. A tampered boot chain never receives the key.
+- Remote attestation  
+  The TPM signs the PCR values, together with a nonce from the verifier, using an attestation key. The verifier checks the signature and compares the PCRs against known-good values. The nonce prevents replay.
+
+Secure boot and measured boot are complementary. Secure boot prevents unauthorized code from running. Measured boot produces evidence of what did run.
+
+## Extension to the Operating System
+
+The chain continues past the kernel through the OS.
+
+- Linux Integrity Measurement Architecture (IMA)  
+  The kernel hashes each executable, library, and configured file when it is loaded or opened. It appends the hash to a measurement log and extends PCR 10.
+- IMA appraisal  
+  The kernel compares a file's hash or signature against a value stored in the file's extended attributes. The file is refused if it does not match.
+- Extended Verification Module (EVM)  
+  Protects file metadata such as owner and permission bits.
+- Disk encryption  
+  A disk key sealed to the boot PCRs is released only when the boot chain is intact.
+
+## Extension to User Applications
+
+Application developers use the TPM through a software stack such as TPM2 Software Stack (TSS) or PKCS#11 rather than talking to the chip directly.
+
+Developers should:
+
+- Generate keys inside the TPM  
+  Mark them non-exportable, so a compromised application cannot copy them.
+- Seal application secrets  
+  Bind secrets such as API keys and data encryption keys to a PCR policy, so they are only released to an untampered platform.
+- Sign and verify code  
+  Verify signatures on binaries, plugins, and updates before loading them.
+- Attest to remote servers  
+  Send a signed quote with a fresh nonce before a server releases sensitive data.
+- Use monotonic counters  
+  Prevent rollback to an older, vulnerable version of the application or its data.
+- Use the TPM random number generator
+  For keys and nonces.
+- Reseal after legitimate updates  
+  A software update changes the PCR values and would otherwise lock the application out of its own secrets.
+
+<Note>
+
+Measurement happens at load time only. A TPM does not stop a running application from being exploited, for example through a buffer overflow. It must be combined with secure coding.
+
+</Note>
