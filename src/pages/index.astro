@@ -4,6 +4,7 @@ import Footer from "../components/layout/footer.astro";
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/layout/nav.astro";
 import SemesterCard from "../components/home/semester-card.astro";
+import Contributors from "../components/home/contributors.astro";
 import { getCollection } from "astro:content";
 import {
   SITE_NAME,
@@ -128,6 +129,11 @@ const semestersData: SemesterInfo[] = await getSemestersData();
       content collections, math is typeset with KaTeX, and a custom style
       validator checks formatting, broken links, and structure on every build.
     </p>
+  </section>
+
+  <section id="contributors">
+    <h2 class="section-title">Contributors</h2>
+    <Contributors />
   </section>
 
   <Footer />
