@@ -1,0 +1,143 @@
+---
+title: Improper Trigonometric Integrals
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.308Z
+---
+
+Integrals of a rational function multiplied by $\cos(\alpha x)$ or $\sin(\alpha x)$ use
+
+$$
+e^{i\alpha x} = \cos(\alpha x) + i\sin(\alpha x)
+$$
+
+and compare real and imaginary parts.
+
+## Existence
+
+Let $R(z) = \frac{P(z)}{Q(z)}$ where $P$ and $Q$ are polynomials with real coefficients of degrees $m$ and $n$. Suppose
+
+- $Q(x) \neq 0$ for all $x \in \mathbb{R}$
+- $n \ge m + 1$
+
+Then for each $\alpha > 0$, the Cauchy principal values
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} R(x)\cos(\alpha x)\,\text{d}x \quad \text{and} \quad \text{P.V.} \int_{-\infty}^{\infty} R(x)\sin(\alpha x)\,\text{d}x
+$$
+
+exist.
+
+## Evaluation
+
+Under the same conditions with $\alpha > 0$, let
+
+$$
+F(z) = R(z) e^{i\alpha z}
+$$
+
+If $z_1, z_2, \ldots, z_k$ are the poles of $F$ in the upper half-plane, then
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} R(x) e^{i\alpha x}\,\text{d}x = 2\pi i \sum_{j=1}^{k} \text{Res}(F, z_j)
+$$
+
+Consequently,
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} R(x)\cos(\alpha x)\,\text{d}x = -2\pi \sum_{j=1}^{k} \text{Im}\left(\text{Res}(F, z_j)\right)
+$$
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} R(x)\sin(\alpha x)\,\text{d}x = 2\pi \sum_{j=1}^{k} \text{Re}\left(\text{Res}(F, z_j)\right)
+$$
+
+<Note>
+
+The exponential factor must be $e^{i\alpha z}$ when the integral contains $\cos(\alpha x)$ or $\sin(\alpha x)$. This is where $\alpha$ enters the complex integral.
+
+</Note>
+
+Examples:
+
+- $\text{P.V.} \int_{-\infty}^{\infty} \frac{x\sin x}{x^2+4}\,\text{d}x = \frac{\pi}{e^2}$
+- $\text{P.V.} \int_{-\infty}^{\infty} \frac{\cos x}{x^4+4}\,\text{d}x = \frac{\pi(\cos 1 + \sin 1)}{4e}$
+
+## Worked Examples
+
+### Cosine Integral
+
+Evaluate $\text{P.V.} \int_{-\infty}^{\infty} \frac{\cos x}{x^2+1}\,\text{d}x$.
+
+Here $m = 0$, $n = 2 \ge m + 1$, $\alpha = 1$, and $F(z) = \frac{e^{iz}}{z^2+1}$. The only pole in the upper half-plane is $z = i$.
+
+$$
+\text{Res}(F, i) = \frac{e^{i \cdot i}}{2i} = \frac{1}{2ie}
+$$
+
+Then $\text{Res}(F, i) = -\frac{i}{2e}$, so $\text{Im}\left(\text{Res}(F, i)\right) = -\frac{1}{2e}$ and $\text{Re}\left(\text{Res}(F, i)\right) = 0$.
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} \frac{\cos x}{x^2+1}\,\text{d}x = -2\pi \cdot \left(-\frac{1}{2e}\right) = \frac{\pi}{e}
+$$
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} \frac{\sin x}{x^2+1}\,\text{d}x = 2\pi \cdot 0 = 0
+$$
+
+### Sine Integral
+
+Show that $\text{P.V.} \int_{-\infty}^{\infty} \frac{x \sin x}{x^2+4}\,\text{d}x = \frac{\pi}{e^2}$.
+
+Here $m = 1$, $n = 2 \ge m + 1$, $\alpha = 1$, and $F(z) = \frac{z e^{iz}}{z^2+4}$. The only pole in the upper half-plane is $z = 2i$.
+
+$$
+\text{Res}(F, 2i) = \frac{2i \cdot e^{-2}}{4i} = \frac{1}{2e^2}
+$$
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} \frac{x \sin x}{x^2+4}\,\text{d}x = 2\pi \,\text{Re}\left(\frac{1}{2e^2}\right) = \frac{\pi}{e^2}
+$$
+
+### Two Poles
+
+Show that $\text{P.V.} \int_{-\infty}^{\infty} \frac{\cos x}{x^4+4}\,\text{d}x = \frac{\pi(\cos 1 + \sin 1)}{4e}$.
+
+Here $F(z) = \frac{e^{iz}}{z^4+4}$. The roots of $z^4 = -4$ in the upper half-plane are $z = 1 + i$ and $z = -1 + i$.
+
+For a simple pole $z_k$, using $z_k^4 = -4$,
+
+$$
+\text{Res}(F, z_k) = \frac{e^{iz_k}}{4z_k^3} = -\frac{z_k e^{iz_k}}{16}
+$$
+
+For $z = 1 + i$, $e^{iz} = e^{-1} e^{i}$.
+
+$$
+\text{Res}(F, 1+i) = -\frac{(1+i)e^{i}}{16e}
+$$
+
+For $z = -1 + i$, $e^{iz} = e^{-1} e^{-i}$.
+
+$$
+\text{Res}(F, -1+i) = \frac{(1-i)e^{-i}}{16e}
+$$
+
+Expand the products.
+
+$$
+(1+i)e^{i} = (\cos 1 - \sin 1) + i(\cos 1 + \sin 1)
+$$
+
+$$
+(1-i)e^{-i} = (\cos 1 - \sin 1) - i(\cos 1 + \sin 1)
+$$
+
+The sum of the residues is
+
+$$
+\frac{-2i(\cos 1 + \sin 1)}{16e} = -\frac{i(\cos 1 + \sin 1)}{8e}
+$$
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} \frac{\cos x}{x^4+4}\,\text{d}x = -2\pi \left(-\frac{\cos 1 + \sin 1}{8e}\right) = \frac{\pi(\cos 1 + \sin 1)}{4e}
+$$

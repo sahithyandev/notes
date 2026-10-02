@@ -1,0 +1,123 @@
+---
+title: Isolated Singularities
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.237Z
+---
+
+A point $z_0 \in \mathbb{C}$ is a singular point, or a singularity, of $f$ **if** $f$ fails to be analytic at $z_0$ **and** $f$ is analytic at some point in every neighborhood of $z_0$.
+
+A singular point $z_0$ of $f$ is an isolated singularity **iff** $f$ is analytic in some punctured disk $D_r(z_0) \setminus \{z_0\}$. Otherwise it is a non-isolated singularity.
+
+Examples:
+
+- $f(z) = \frac{1}{1-z}$ has an isolated singularity at $z = 1$
+
+## Classification
+
+Let $\alpha$ be an isolated singularity of $f$ with the [Laurent series](/s5/calculus/complex-functions/laurent-series)
+
+$$
+f(z) = \sum_{k=-\infty}^{\infty} a_k (z-\alpha)^k, \quad 0 < |z-\alpha| < R
+$$
+
+Then $\alpha$ is
+
+- Removable singularity  
+  **iff** $a_k = 0$ for all $k < 0$.
+- Pole of order $n$  
+  **iff** $a_{-n} \neq 0$ and $a_k = 0$ for all $k < -n$.
+- Essential singularity  
+  **iff** $a_k \neq 0$ for infinitely many $k < 0$.
+
+A pole of order 1 is called a simple pole.
+
+Examples:
+
+- $\frac{\sin z}{z}$ and $\frac{\cos z - 1}{z^2}$ have removable singularities at $z = 0$
+- $\frac{\sin z}{z^3}$ has a pole of order 2 at $z = 0$
+- $\frac{e^z}{z}$ has a simple pole at $z = 0$
+- $z^2 \sin\left(\frac{1}{z}\right)$ has an essential singularity at $z = 0$
+
+## Residue
+
+The coefficient $a_{-1}$ is called the residue of $f$ at $\alpha$.
+
+$$
+\text{Res}(f, \alpha) = a_{-1}
+$$
+
+## Worked Examples
+
+### Isolated Singularity
+
+Show that $z = 1$ is an isolated singularity of $f(z) = \frac{1}{1-z}$.
+
+$f$ is analytic everywhere except at $z = 1$, so it is analytic in the punctured disk $D_1(1) \setminus \{1\}$. Every neighborhood of $1$ contains points where $f$ is analytic, so $z = 1$ is a singular point.
+
+The Laurent series centered at $1$ is $f(z) = -\frac{1}{z-1}$. Only $a_{-1} = -1$ is non-zero, so $z = 1$ is a simple pole with $\text{Res}(f, 1) = -1$.
+
+### Non-Isolated Singularity
+
+Show that $z = 0$ is a non-isolated singularity of $f(z) = \frac{1}{\sin(1/z)}$.
+
+$f$ is not analytic at $z_k = \frac{1}{k\pi}$ for each non-zero integer $k$, since $\sin(1/z_k) = 0$.
+
+$z_k \to 0$ as $k \to \infty$, so every punctured disk centered at $0$ contains a singular point. $f$ is not analytic in any punctured disk centered at $0$, so $z = 0$ is a non-isolated singularity.
+
+### Removable Singularity
+
+Show that $\frac{\sin z}{z}$ and $\frac{\cos z - 1}{z^2}$ have removable singularities at $z = 0$.
+
+$$
+\frac{\sin z}{z} = 1 - \frac{z^2}{6} + \frac{z^4}{120} - \cdots
+$$
+
+$$
+\frac{\cos z - 1}{z^2} = -\frac{1}{2} + \frac{z^2}{24} - \cdots
+$$
+
+Both series have $a_k = 0$ for all $k < 0$.
+
+### Pole
+
+Show that $\frac{\sin z}{z^3}$ has a pole of order 2 and $\frac{e^z}{z}$ has a pole of order 1 at $z = 0$.
+
+$$
+\frac{\sin z}{z^3} = \frac{1}{z^2} - \frac{1}{6} + \frac{z^2}{120} - \cdots
+$$
+
+$a_{-2} = 1 \neq 0$ and $a_k = 0$ for all $k < -2$. The residue is $a_{-1} = 0$.
+
+$$
+\frac{e^z}{z} = \frac{1}{z} + 1 + \frac{z}{2} + \cdots
+$$
+
+$a_{-1} = 1 \neq 0$ and $a_k = 0$ for all $k < -1$. The residue is $1$.
+
+### Essential Singularity
+
+Show that $z^2 \sin\left(\frac{1}{z}\right)$ has an essential singularity at $z = 0$.
+
+$$
+z^2 \sin\left(\frac{1}{z}\right) = z^2 \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)!\, z^{2n+1}} = z - \frac{1}{6z} + \frac{1}{120z^3} - \cdots
+$$
+
+$a_k \neq 0$ for $k = -1, -3, -5, \ldots$, which is infinitely many $k < 0$. The residue is $-\frac{1}{6}$.
+
+### Classify from the Series
+
+Classify the singularity of $\frac{e^z - 1 - z}{z^3}$ at $z = 0$ and find the residue.
+
+$$
+\frac{e^z - 1 - z}{z^3} = \frac{\frac{z^2}{2} + \frac{z^3}{6} + \frac{z^4}{24} + \cdots}{z^3} = \frac{1}{2z} + \frac{1}{6} + \frac{z}{24} + \cdots
+$$
+
+$z = 0$ is a simple pole with $\text{Res} = \frac{1}{2}$.
+
+Classify the singularity of $z^3 \cos\left(\frac{1}{z}\right)$ at $z = 0$ and find the residue.
+
+$$
+z^3 \cos\left(\frac{1}{z}\right) = z^3 - \frac{z}{2} + \frac{1}{24z} - \frac{1}{720z^3} + \cdots
+$$
+
+$z = 0$ is an essential singularity with $\text{Res} = \frac{1}{24}$.

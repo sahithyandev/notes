@@ -1,0 +1,150 @@
+---
+title: Zeros and Poles
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.249Z
+---
+
+Let $f$ be analytic in $D_R(\alpha)$ and $k$ be a positive integer. $f$ has a zero of order $k$ at $z = \alpha$ **iff**
+
+$$
+f(\alpha) = f'(\alpha) = \cdots = f^{(k-1)}(\alpha) = 0 \quad \text{and} \quad f^{(k)}(\alpha) \neq 0
+$$
+
+A zero of order 1 is called a simple zero.
+
+## Zeros
+
+Let the [Taylor series](/s5/calculus/complex-functions/taylor-series) of $f$ centered at $\alpha$ be $\sum_{n=0}^{\infty} c_n (z-\alpha)^n$. $f$ has a zero of order $k$ at $z = \alpha$ **iff**
+
+$$
+c_0 = c_1 = \cdots = c_{k-1} = 0 \quad \text{and} \quad c_k \neq 0
+$$
+
+Equivalently, $f$ has a zero of order $k$ at $z = \alpha$ **iff**
+
+$$
+f(z) = (z-\alpha)^k g(z)
+$$
+
+where $g$ is analytic at $\alpha$ and $g(\alpha) \neq 0$.
+
+If $f$ and $g$ have zeros of orders $m$ and $n$ at $z = \alpha$, then $fg$ has a zero of order $m + n$ at $z = \alpha$.
+
+Examples:
+
+- $z \sin(z^2)$ has a zero of order 3 at $z = 0$
+
+## Poles
+
+Let $f$ be analytic in the punctured disk $D_R^*(\alpha)$. $f$ has a pole of order $k$ at $z = \alpha$ **iff**
+
+$$
+f(z) = \frac{h(z)}{(z-\alpha)^k}
+$$
+
+where $h$ is analytic at $\alpha$ and $h(\alpha) \neq 0$.
+
+If $f$ and $g$ have poles of orders $m$ and $n$ at $z = \alpha$, then $fg$ has a pole of order $m + n$ at $z = \alpha$.
+
+## Reciprocals
+
+- If $f$ is analytic at $\alpha$ with a zero of order $k$, then $\frac{1}{f}$ has a pole of order $k$ at $\alpha$.
+- If $f$ has a pole of order $k$ at $\alpha$, then $\frac{1}{f}$ has a removable singularity at $\alpha$. After redefining the value at $\alpha$, the resulting analytic function has a zero of order $k$ at $\alpha$.
+
+## Quotients
+
+Let $f$ and $g$ be analytic at $\alpha$ with zeros of orders $m$ and $n$ respectively. Let $h = \frac{f}{g}$.
+
+- If $m > n$  
+  $h$ has a removable singularity at $\alpha$. After redefining $h(\alpha) = 0$, $h$ has a zero of order $m - n$.
+- If $m < n$  
+  $h$ has a pole of order $n - m$ at $\alpha$.
+- If $m = n$  
+  $h$ has a removable singularity at $\alpha$. Redefining $h(\alpha) = \lim_{z \to \alpha} h(z)$ makes $h$ analytic at $\alpha$.
+
+Examples:
+
+- $\frac{\tan z}{z}$ has a removable singularity at $z = 0$, simple zeros at $z = k\pi$ for $k \neq 0$, and simple poles at $z = \frac{\pi}{2} + k\pi$
+- $\frac{1}{5z^4 + 26z^2 + 5}$ has simple poles at $z = \pm \frac{i}{\sqrt{5}}$ and $z = \pm i\sqrt{5}$
+
+## Worked Examples
+
+### Zero by Derivatives
+
+Find the order of the zero of $f(z) = 1 - \cos z$ at $z = 0$.
+
+$$
+f(0) = 0, \quad f'(z) = \sin z \Rightarrow f'(0) = 0, \quad f''(z) = \cos z \Rightarrow f''(0) = 1 \neq 0
+$$
+
+$f$ has a zero of order 2.
+
+### Zero by Taylor Series
+
+Show that $z \sin(z^2)$ has a zero of order 3 at $z = 0$.
+
+$$
+z \sin(z^2) = z\left(z^2 - \frac{z^6}{6} + \cdots\right) = z^3 - \frac{z^7}{6} + \cdots
+$$
+
+$c_0 = c_1 = c_2 = 0$ and $c_3 = 1 \neq 0$, so the zero has order 3.
+
+In factored form, $z \sin(z^2) = z^3 g(z)$ where $g(z) = \frac{\sin(z^2)}{z^2}$ is analytic at $0$ with $g(0) = 1$.
+
+### Product of Zeros
+
+Find the order of the zero of $(1 - \cos z)\sin z$ at $z = 0$.
+
+$1 - \cos z$ has a zero of order 2 and $\sin z$ has a zero of order 1. The product has a zero of order $2 + 1 = 3$.
+
+### Pole by Factored Form
+
+Show that $\frac{\sin z}{z^3}$ has a pole of order 2 at $z = 0$.
+
+$$
+\frac{\sin z}{z^3} = \frac{h(z)}{z^2}, \quad h(z) = \frac{\sin z}{z}
+$$
+
+$h$ is analytic at $0$ with $h(0) = 1 \neq 0$, so the pole has order 2.
+
+### Product of Poles
+
+Find the order of the pole of $\frac{e^z}{z} \cdot \frac{1}{z^2}$ at $z = 0$.
+
+$\frac{e^z}{z}$ has a pole of order 1 and $\frac{1}{z^2}$ has a pole of order 2. The product $\frac{e^z}{z^3}$ has a pole of order $1 + 2 = 3$.
+
+### Reciprocal
+
+Find the singularity of $\frac{1}{1 - \cos z}$ at $z = 0$.
+
+$1 - \cos z$ has a zero of order 2 at $0$, so $\frac{1}{1 - \cos z}$ has a pole of order 2.
+
+Conversely, $\frac{1}{z^2}$ has a pole of order 2, so its reciprocal $z^2$ has a zero of order 2.
+
+### Quotient of Zeros
+
+Let $f$ have a zero of order $m$ and $g$ a zero of order $n$ at $0$.
+
+- For $f = z^3$ and $g = \sin z$, $m = 3 > n = 1$. $\frac{z^3}{\sin z}$ has a removable singularity. After setting the value to $0$, it has a zero of order $2$.
+- For $f = \sin z$ and $g = z^3$, $m = 1 < n = 3$. $\frac{\sin z}{z^3}$ has a pole of order $2$.
+- For $f = \sin z$ and $g = z$, $m = n = 1$. $\frac{\sin z}{z}$ has a removable singularity. Setting the value to $\lim_{z \to 0} \frac{\sin z}{z} = 1$ makes it analytic.
+
+### Locating Zeros and Poles
+
+Locate the zeros and poles of $h(z) = \frac{\tan z}{z} = \frac{\sin z}{z \cos z}$.
+
+- At $z = 0$, the numerator and denominator both have simple zeros. $h$ has a removable singularity with $h(0) = 1$.
+- At $z = k\pi$ with $k \neq 0$, the numerator has a simple zero and the denominator is non-zero. $h$ has a simple zero.
+- At $z = \frac{\pi}{2} + k\pi$, the numerator equals $\pm 1$ and $\cos z$ has a simple zero. $h$ has a simple pole.
+
+Locate the zeros and poles of $f(z) = \frac{z^2 + 1}{z^2 (z-1)^3}$.
+
+$z^2 + 1 = (z-i)(z+i)$, so $f$ has simple zeros at $z = \pm i$. The numerator is non-zero at $0$ and $1$, so $f$ has a pole of order 2 at $z = 0$ and a pole of order 3 at $z = 1$.
+
+Locate the poles of $g(z) = \frac{1}{5z^4 + 26z^2 + 5}$.
+
+$$
+5z^4 + 26z^2 + 5 = (5z^2 + 1)(z^2 + 5)
+$$
+
+The 4 roots $z = \pm \frac{i}{\sqrt{5}}$ and $z = \pm i\sqrt{5}$ are distinct, so each is a simple zero of the denominator. $g$ has simple poles at all 4 points.

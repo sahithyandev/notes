@@ -1,0 +1,160 @@
+---
+title: Power Series
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.199Z
+---
+
+A power series centered at $\alpha$ is a series of the form
+
+$$
+\sum_{n=0}^{\infty} c_n (z-\alpha)^n
+$$
+
+Here:
+
+- $\alpha$: center, a fixed complex number
+- $c_n$: coefficients, fixed complex numbers
+
+## Radius of Convergence
+
+There exists $\rho$ with $0 \le \rho \le \infty$ such that the series
+
+- converges for $|z-\alpha| < \rho$
+- diverges for $|z-\alpha| > \rho$
+
+$\rho$ is called the radius of convergence.
+
+Ignoring boundary points, the convergence region is 1 of the following.
+
+- Single point  
+  The point $\alpha$, when $\rho = 0$.
+- Disk  
+  $D_\rho(\alpha) = \{z \in \mathbb{C} : |z-\alpha| < \rho\}$, when $0 < \rho < \infty$.
+- Entire complex plane  
+  When $\rho = \infty$.
+
+<Note>
+
+Convergence on the boundary $|z-\alpha| = \rho$, when $0 < \rho < \infty$, must be checked separately.
+
+</Note>
+
+Examples:
+
+- $\sum_{n=0}^{\infty} \frac{(n+1)(z-2)^n}{3^n}$ has $\rho = 3$ and disk of convergence $D_3(2)$
+
+## Algebra of Power Series
+
+Let $f$ and $g$ have power series representations
+
+$$
+f(z) = \sum_{n=0}^{\infty} a_n (z-\alpha)^n, \quad z \in D_{r_1}(\alpha)
+$$
+
+$$
+g(z) = \sum_{n=0}^{\infty} b_n (z-\alpha)^n, \quad z \in D_{r_2}(\alpha)
+$$
+
+Let $r = \min\{r_1, r_2\}$ and $\beta \in \mathbb{C}$. Then for $z \in D_r(\alpha)$:
+
+- Scalar multiple  
+  $\beta f(z) = \sum_{n=0}^{\infty} \beta a_n (z-\alpha)^n$
+- Sum  
+  $f(z) + g(z) = \sum_{n=0}^{\infty} (a_n + b_n)(z-\alpha)^n$
+- Product  
+  $f(z)g(z) = \sum_{n=0}^{\infty} c_n (z-\alpha)^n$
+
+The coefficients of the product are
+
+$$
+c_n = \sum_{k=0}^{n} a_k b_{n-k}
+$$
+
+This is the Cauchy product of the series.
+
+Examples:
+
+- The first 4 non-zero terms of the Maclaurin series of $e^z \sin z$ are $z + z^2 + \frac{z^3}{3} - \frac{z^5}{30}$
+
+## Worked Examples
+
+### Radius and Boundary
+
+Find the disk of convergence of $\sum_{n=0}^{\infty} \frac{(n+1)(z-2)^n}{3^n}$.
+
+Apply the ratio test.
+
+$$
+\left|\frac{a_{n+1}}{a_n}\right| = \frac{n+2}{n+1} \cdot \frac{|z-2|}{3} \to \frac{|z-2|}{3}
+$$
+
+The series converges for $\frac{|z-2|}{3} < 1$, so $\rho = 3$ and the disk is $D_3(2)$.
+
+On the boundary $|z-2| = 3$, the terms have modulus $n+1 \to \infty$, so the series diverges at every boundary point.
+
+### All 3 Regions
+
+- $\sum n!\, z^n$  
+  The ratio is $(n+1)|z|$, which tends to $\infty$ for every $z \neq 0$. So $\rho = 0$ and the region is the point $0$.
+- $\sum z^n$  
+  The ratio is $|z|$, so $\rho = 1$ and the region is $D_1(0)$.
+- $\sum \frac{z^n}{n!}$  
+  The ratio is $\frac{|z|}{n+1} \to 0$ for every $z$. So $\rho = \infty$ and the region is the entire plane.
+
+### Sum of 2 Series
+
+Let $f(z) = \frac{1}{1-z} = \sum z^n$ and $g(z) = \frac{1}{1+z} = \sum (-1)^n z^n$, both valid in $D_1(0)$.
+
+$$
+f(z) + g(z) = \sum_{n=0}^{\infty} \left(1 + (-1)^n\right) z^n = 2\sum_{n=0}^{\infty} z^{2n} = \frac{2}{1-z^2}
+$$
+
+The odd coefficients cancel and the even coefficients equal $2$. The series is valid in $D_1(0)$.
+
+### Cauchy Product of Exponential and Sine
+
+Find the first 4 non-zero terms of the Maclaurin series of $e^z \sin z$.
+
+The coefficients are
+
+$$
+a_n = \frac{1}{n!}, \quad b_1 = 1, \; b_3 = -\frac{1}{6}, \; b_5 = \frac{1}{120}, \quad b_0 = b_2 = b_4 = 0
+$$
+
+Apply $c_n = \sum_{k=0}^{n} a_k b_{n-k}$.
+
+$$
+c_0 = 0, \quad c_1 = a_0 b_1 = 1, \quad c_2 = a_1 b_1 = 1
+$$
+
+$$
+c_3 = a_2 b_1 + a_0 b_3 = \frac{1}{2} - \frac{1}{6} = \frac{1}{3}
+$$
+
+$$
+c_4 = a_3 b_1 + a_1 b_3 = \frac{1}{6} - \frac{1}{6} = 0
+$$
+
+$$
+c_5 = a_4 b_1 + a_2 b_3 + a_0 b_5 = \frac{1}{24} - \frac{1}{12} + \frac{1}{120} = -\frac{1}{30}
+$$
+
+$$
+e^z \sin z = z + z^2 + \frac{z^3}{3} - \frac{z^5}{30} + \cdots
+$$
+
+### Cauchy Product with Geometric Series
+
+Find the first 5 non-zero terms of the Maclaurin series of $\frac{e^z}{1-z}$.
+
+Here $a_n = \frac{1}{n!}$ and $b_n = 1$, so $c_n = \sum_{k=0}^{n} \frac{1}{k!}$.
+
+$$
+c_0 = 1, \quad c_1 = 2, \quad c_2 = \frac{5}{2}, \quad c_3 = \frac{8}{3}, \quad c_4 = \frac{65}{24}
+$$
+
+$$
+\frac{e^z}{1-z} = 1 + 2z + \frac{5}{2}z^2 + \frac{8}{3}z^3 + \frac{65}{24}z^4 + \cdots
+$$
+
+The series is valid in $D_1(0)$.

@@ -1,0 +1,188 @@
+---
+title: Laurent Series
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.224Z
+---
+
+For $0 \le r < R \le \infty$, the annulus $A(r, R, \alpha)$ is
+
+$$
+A(r, R, \alpha) = \{z \in \mathbb{C} : r < |z-\alpha| < R\}
+$$
+
+Let $c_n \in \mathbb{C}$ for each $n \in \mathbb{Z}$. The doubly infinite series
+
+$$
+\sum_{n=-\infty}^{\infty} c_n (z-\alpha)^n = \sum_{n=1}^{\infty} c_{-n}(z-\alpha)^{-n} + \sum_{n=0}^{\infty} c_n (z-\alpha)^n
+$$
+
+is called a Laurent series, provided both series on the right-hand side converge.
+
+## Laurent's Theorem
+
+Let $f$ be analytic in the annulus $A(r, R, \alpha)$. Then $f$ has a Laurent series representation on $A(r, R, \alpha)$.
+
+$$
+f(z) = \sum_{n=-\infty}^{\infty} c_n (z-\alpha)^n, \quad z \in A(r, R, \alpha)
+$$
+
+The coefficients are
+
+$$
+c_n = \frac{1}{2\pi i}\int_{|\zeta-\alpha|=s} \frac{f(\zeta)}{(\zeta-\alpha)^{n+1}}\,\text{d}\zeta
+$$
+
+Here:
+
+- $n \in \mathbb{Z}$
+- $s$: any radius with $r < s < R$
+- the circle $|\zeta-\alpha| = s$ is oriented counterclockwise
+
+## Properties
+
+- The Laurent series representation of $f$ on $A(r, R, \alpha)$ is unique.
+- A Laurent series can be differentiated term by term inside its annulus of convergence.
+
+<Note>
+
+A function analytic in $D_R(\alpha)$ has $c_n = 0$ for all $n < 0$, so its Laurent series is its [Taylor series](/s5/calculus/complex-functions/taylor-series).
+
+</Note>
+
+Examples:
+
+- $\frac{\cos z - 1}{z^4} = -\frac{1}{2z^2} + \frac{1}{24} - \frac{z^2}{720} + \cdots$ centered at $0$
+- $\exp\left(-\frac{1}{z^2}\right) = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!\, z^{2n}}$ centered at $0$
+
+## Different Annuli
+
+The same function has a different Laurent series on each annulus bounded by its singular points.
+
+Consider
+
+$$
+f(z) = \frac{3}{2+z-z^2} = \frac{1}{2-z} + \frac{1}{1+z}
+$$
+
+The singular points are $z = 2$ and $z = -1$ with $|z| = 2$ and $|z| = 1$. The centered series at $0$ are as follows.
+
+- $|z| < 1$  
+  $\sum_{n=0}^{\infty} \left(\frac{1}{2^{n+1}} + (-1)^n\right) z^n$
+- $1 < |z| < 2$  
+  $\sum_{n=0}^{\infty} \frac{z^n}{2^{n+1}} + \sum_{n=0}^{\infty} (-1)^n z^{-n-1}$
+- $|z| > 2$  
+  $\sum_{n=0}^{\infty} \left((-1)^n - 2^n\right) z^{-n-1}$
+
+## Worked Examples
+
+### Coefficient Formula
+
+Find $c_{-2}$ of $f(z) = \frac{1}{z^2}$ centered at $0$.
+
+$$
+c_{-2} = \frac{1}{2\pi i}\int_{|\zeta|=s} \frac{\zeta^{-2}}{\zeta^{-2+1}}\,\text{d}\zeta = \frac{1}{2\pi i}\int_{|\zeta|=s} \zeta^{-1}\,\text{d}\zeta = \frac{1}{2\pi i} \cdot 2\pi i = 1
+$$
+
+For general $n$, the integrand is $\zeta^{-n-3}$.
+
+The other coefficients vanish since $\int_{|\zeta|=s} \zeta^{k}\,\text{d}\zeta = 0$ for $k \neq -1$.
+
+### Cosine over a Power
+
+Find the Laurent series of $\frac{\cos z - 1}{z^4}$ centered at $0$.
+
+$$
+\cos z - 1 = -\frac{z^2}{2} + \frac{z^4}{24} - \frac{z^6}{720} + \cdots
+$$
+
+Divide by $z^4$.
+
+$$
+\frac{\cos z - 1}{z^4} = -\frac{1}{2z^2} + \frac{1}{24} - \frac{z^2}{720} + \cdots
+$$
+
+The series is valid for $0 < |z| < \infty$.
+
+### Exponential of a Reciprocal
+
+Find the Laurent series of $\exp\left(-\frac{1}{z^2}\right)$ centered at $0$.
+
+Substitute $w = -\frac{1}{z^2}$ in $e^w = \sum \frac{w^n}{n!}$.
+
+$$
+\exp\left(-\frac{1}{z^2}\right) = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!\, z^{2n}} = 1 - \frac{1}{z^2} + \frac{1}{2z^4} - \cdots
+$$
+
+The series is valid for $0 < |z| < \infty$.
+
+### Simple Fractions
+
+Find the Laurent series of $\frac{1}{z(1-z)}$ centered at $0$ in $0 < |z| < 1$.
+
+$$
+\frac{1}{z(1-z)} = \frac{1}{z} + \frac{1}{1-z} = \frac{1}{z} + \sum_{n=0}^{\infty} z^n
+$$
+
+Find the Laurent series of $\frac{1}{(z-1)(z-3)}$ centered at $0$ in $1 < |z| < 3$.
+
+$$
+\frac{1}{(z-1)(z-3)} = \frac{1}{2}\left(\frac{1}{z-3} - \frac{1}{z-1}\right)
+$$
+
+For $|z| < 3$,
+
+$$
+\frac{1}{z-3} = -\frac{1}{3} \cdot \frac{1}{1 - \frac{z}{3}} = -\sum_{n=0}^{\infty} \frac{z^n}{3^{n+1}}
+$$
+
+For $|z| > 1$,
+
+$$
+\frac{1}{z-1} = \frac{1}{z} \cdot \frac{1}{1 - \frac{1}{z}} = \sum_{n=0}^{\infty} z^{-n-1}
+$$
+
+$$
+\frac{1}{(z-1)(z-3)} = -\frac{1}{2}\sum_{n=0}^{\infty} \frac{z^n}{3^{n+1}} - \frac{1}{2}\sum_{n=0}^{\infty} z^{-n-1}
+$$
+
+### 3 Series for 1 Function
+
+Find all Laurent series of $f(z) = \frac{3}{2+z-z^2}$ centered at $0$.
+
+Factor $2 + z - z^2 = (2-z)(1+z)$. Partial fractions give
+
+$$
+f(z) = \frac{1}{2-z} + \frac{1}{1+z}
+$$
+
+The singular points $z = -1$ and $z = 2$ split the plane into $|z| < 1$, $1 < |z| < 2$, and $|z| > 2$.
+
+For $|z| < 2$,
+
+$$
+\frac{1}{2-z} = \frac{1}{2} \cdot \frac{1}{1 - \frac{z}{2}} = \sum_{n=0}^{\infty} \frac{z^n}{2^{n+1}}
+$$
+
+For $|z| > 2$,
+
+$$
+\frac{1}{2-z} = -\frac{1}{z} \cdot \frac{1}{1 - \frac{2}{z}} = -\sum_{n=0}^{\infty} 2^n z^{-n-1}
+$$
+
+For $|z| < 1$,
+
+$$
+\frac{1}{1+z} = \sum_{n=0}^{\infty} (-1)^n z^n
+$$
+
+For $|z| > 1$,
+
+$$
+\frac{1}{1+z} = \frac{1}{z} \cdot \frac{1}{1 + \frac{1}{z}} = \sum_{n=0}^{\infty} (-1)^n z^{-n-1}
+$$
+
+Combine the matching pieces.
+
+- For $|z| < 1$, the series is $\sum_{n=0}^{\infty} \left(\frac{1}{2^{n+1}} + (-1)^n\right) z^n$.
+- For $1 < |z| < 2$, the series is $\sum_{n=0}^{\infty} \frac{z^n}{2^{n+1}} + \sum_{n=0}^{\infty} (-1)^n z^{-n-1}$.
+- For $|z| > 2$, the series is $\sum_{n=0}^{\infty} \left((-1)^n - 2^n\right) z^{-n-1}$.

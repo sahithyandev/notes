@@ -1,0 +1,132 @@
+---
+title: Improper Rational Integrals
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.291Z
+---
+
+## Improper Integrals
+
+Let $f$ be continuous on $[0, \infty)$. The improper integral of $f$ over $[0, \infty)$ is
+
+$$
+\int_0^{\infty} f(x)\,\text{d}x = \lim_{b \to \infty} \int_0^b f(x)\,\text{d}x
+$$
+
+provided the limit exists.
+
+If $f$ is defined on all of $\mathbb{R}$, the improper integral over $(-\infty, \infty)$ is
+
+$$
+\int_{-\infty}^{\infty} f(x)\,\text{d}x = \lim_{a \to -\infty} \int_a^0 f(x)\,\text{d}x + \lim_{b \to \infty} \int_0^b f(x)\,\text{d}x
+$$
+
+provided both limits exist.
+
+## Cauchy Principal Value
+
+If $f$ is defined on all of $\mathbb{R}$, the Cauchy principal value of the integral over $(-\infty, \infty)$ is
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} f(x)\,\text{d}x = \lim_{R \to \infty} \int_{-R}^{R} f(x)\,\text{d}x
+$$
+
+provided the limit exists.
+
+Examples:
+
+- $\text{P.V.} \int_{-\infty}^{\infty} x\,\text{d}x = 0$, but $\int_{-\infty}^{\infty} x\,\text{d}x$ does not exist as an improper integral
+
+## Rational Functions
+
+Let $R(z) = \frac{P(z)}{Q(z)}$ where $P$ and $Q$ are polynomials with real coefficients of degrees $m$ and $n$. Suppose
+
+- $Q(x) \neq 0$ for all $x \in \mathbb{R}$
+- $n \ge m + 2$
+
+If $z_1, z_2, \ldots, z_k$ are the poles of $R$ in the upper half-plane, then
+
+$$
+\int_{-\infty}^{\infty} \frac{P(x)}{Q(x)}\,\text{d}x = 2\pi i \sum_{j=1}^{k} \text{Res}\left(\frac{P}{Q}, z_j\right)
+$$
+
+Under $n \ge m + 2$, the ordinary improper integral exists, so its value agrees with the principal value.
+
+<Note title="Proof Hint">
+
+- Integrate $R(z)$ over the positively oriented upper semicircle of radius $\rho$
+- Apply [Cauchy's residue theorem](/s5/calculus/complex-functions/residues)
+- Bound the arc integral by $\frac{\text{const}}{\rho^{n-m-1}}$
+- Let $\rho \to \infty$
+
+</Note>
+
+Examples:
+
+- $\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+1)(x^2+4)} = \frac{\pi}{6}$
+- $\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+4)^3} = \frac{3\pi}{256}$
+
+## Worked Examples
+
+### Improper Integral
+
+Evaluate $\int_0^{\infty} e^{-x}\,\text{d}x$.
+
+$$
+\int_0^{\infty} e^{-x}\,\text{d}x = \lim_{b \to \infty} \left(1 - e^{-b}\right) = 1
+$$
+
+### Principal Value Without Improper Integral
+
+Show that $\text{P.V.} \int_{-\infty}^{\infty} x\,\text{d}x = 0$ but $\int_{-\infty}^{\infty} x\,\text{d}x$ does not exist.
+
+$$
+\text{P.V.} \int_{-\infty}^{\infty} x\,\text{d}x = \lim_{R \to \infty} \left(\frac{R^2}{2} - \frac{R^2}{2}\right) = 0
+$$
+
+For the improper integral, $\int_0^b x\,\text{d}x = \frac{b^2}{2} \to \infty$, so the limit at $+\infty$ does not exist.
+
+### Simple Poles
+
+Show that $\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+1)(x^2+4)} = \frac{\pi}{6}$.
+
+Here $m = 0$ and $n = 4 \ge m + 2$, and the denominator has no real roots. The poles in the upper half-plane are $z = i$ and $z = 2i$.
+
+$$
+\text{Res}(R, i) = \frac{1}{2i \cdot (-1 + 4)} = \frac{1}{6i}
+$$
+
+$$
+\text{Res}(R, 2i) = \frac{1}{(-4 + 1) \cdot 4i} = -\frac{1}{12i}
+$$
+
+$$
+\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+1)(x^2+4)} = 2\pi i \left(\frac{1}{6i} - \frac{1}{12i}\right) = \frac{\pi}{6}
+$$
+
+### Pole of Order 2
+
+Show that $\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+1)^2} = \frac{\pi}{2}$.
+
+The only pole in the upper half-plane is $z = i$, of order 2.
+
+$$
+\text{Res}(R, i) = \lim_{z \to i} \frac{\text{d}}{\text{d}z} (z+i)^{-2} = \lim_{z \to i} -2(z+i)^{-3} = -\frac{2}{(2i)^3} = \frac{1}{4i}
+$$
+
+$$
+\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+1)^2} = 2\pi i \cdot \frac{1}{4i} = \frac{\pi}{2}
+$$
+
+### Pole of Order 3
+
+Show that $\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+4)^3} = \frac{3\pi}{256}$.
+
+The only pole in the upper half-plane is $z = 2i$, of order 3.
+
+$$
+\text{Res}(R, 2i) = \frac{1}{2!} \lim_{z \to 2i} \frac{\text{d}^2}{\text{d}z^2} (z+2i)^{-3} = \frac{1}{2} \cdot \frac{12}{(4i)^5} = \frac{6}{1024\, i}
+$$
+
+$$
+\int_{-\infty}^{\infty} \frac{\text{d}x}{(x^2+4)^3} = 2\pi i \cdot \frac{6}{1024\, i} = \frac{3\pi}{256}
+$$

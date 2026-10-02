@@ -1,0 +1,140 @@
+---
+title: Taylor Series
+dateCreated: 2026-10-02T00:00:00.000Z
+lastUpdatedOn: 2026-10-02T18:33:07.212Z
+---
+
+If $f(z)$ is [analytic](/s5/calculus/complex-functions/analytic-functions) at $z = \alpha$, the series
+
+$$
+\sum_{n=0}^{\infty} \frac{f^{(n)}(\alpha)}{n!}(z-\alpha)^n = f(\alpha) + f'(\alpha)(z-\alpha) + \frac{f''(\alpha)}{2!}(z-\alpha)^2 + \cdots
+$$
+
+is called the Taylor series of $f(z)$ centered at $\alpha$. When $\alpha = 0$, it is called the Maclaurin series of $f(z)$.
+
+## Taylor's Theorem
+
+Let $f$ be analytic in a domain $G$, and let the disk $D_R(\alpha)$ be contained in $G$. Then the Taylor series of $f$ centered at $\alpha$ converges to $f(z)$ for all $z \in D_R(\alpha)$.
+
+$$
+f(z) = \sum_{n=0}^{\infty} \frac{f^{(n)}(\alpha)}{n!}(z-\alpha)^n, \quad z \in D_R(\alpha)
+$$
+
+The convergence is uniform on every closed disk $\{z : |z-\alpha| \le r\}$ with $0 < r < R$.
+
+## Radius from Singular Points
+
+Let $f$ be analytic in a domain $G$ containing $\alpha$. Let $z_0$ be a nearest singular point of $f$ to $\alpha$, and let $R = |z_0 - \alpha|$.
+
+- The Taylor series of $f$ centered at $\alpha$ converges to $f(z)$ for each $z \in D_R(\alpha)$.
+- No disk centered at $\alpha$ with a radius larger than $R$ can be a disk on which the series represents $f$.
+
+## Uniqueness
+
+Suppose
+
+$$
+f(z) = \sum_{n=0}^{\infty} a_n (z-\alpha)^n = \sum_{n=0}^{\infty} b_n (z-\alpha)^n
+$$
+
+in some disk $D_r(\alpha)$ with $r > 0$. Then $a_n = b_n$ for each $n \in \mathbb{N} \cup \{0\}$.
+
+Any power series representation of $f(z)$ in a disk centered at $\alpha$ is automatically the Taylor series of $f$ centered at $\alpha$.
+
+<Note title="Proof Hint">
+
+- Set $z = \alpha$ to get $a_0 = b_0$
+- Differentiate term by term
+- Set $z = \alpha$ again to get $a_1 = b_1$
+- Repeat for each $n$
+
+</Note>
+
+Examples:
+
+- $\frac{1}{(1-z)^2} = \sum_{n=0}^{\infty} (n+1) z^n$ is valid for $z \in D_1(0)$
+- $\sin z = \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n+1}}{(2n+1)!}$
+
+## Worked Examples
+
+### Maclaurin Series of Sine
+
+Find the Maclaurin series of $\sin z$.
+
+The derivatives at $0$ cycle through $\sin z, \cos z, -\sin z, -\cos z$, so
+
+$$
+f(0) = 0, \quad f'(0) = 1, \quad f''(0) = 0, \quad f'''(0) = -1, \quad \ldots
+$$
+
+Only odd powers survive.
+
+$$
+\sin z = \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n+1}}{(2n+1)!}
+$$
+
+$\sin z$ is entire, so the series is valid for all $z$.
+
+### Series by Differentiation
+
+Show that $\frac{1}{(1-z)^2} = \sum_{n=0}^{\infty} (n+1) z^n$ for $z \in D_1(0)$.
+
+Start with the geometric series.
+
+$$
+\frac{1}{1-z} = \sum_{n=0}^{\infty} z^n, \quad |z| < 1
+$$
+
+Differentiate both sides term by term.
+
+$$
+\frac{1}{(1-z)^2} = \sum_{n=1}^{\infty} n z^{n-1} = \sum_{n=0}^{\infty} (n+1) z^n
+$$
+
+The only singular point is $z = 1$, so $R = 1$.
+
+### Series Centered at a Nonzero Point
+
+Find the Taylor series of $\frac{1}{z}$ centered at $\alpha = 1$ and its disk of validity.
+
+Write $z = 1 + (z-1)$.
+
+$$
+\frac{1}{z} = \frac{1}{1 + (z-1)} = \sum_{n=0}^{\infty} (-1)^n (z-1)^n
+$$
+
+The geometric series converges for $|z-1| < 1$. The nearest singular point is $0$, so $R = |0 - 1| = 1$ and the disk is $D_1(1)$.
+
+### Series Valid in a Disk
+
+Find the Taylor series of $\frac{1}{z+2}$ centered at $0$ and its disk of validity.
+
+$$
+\frac{1}{z+2} = \frac{1}{2} \cdot \frac{1}{1 + \frac{z}{2}} = \sum_{n=0}^{\infty} \frac{(-1)^n z^n}{2^{n+1}}
+$$
+
+The nearest singular point is $-2$, so $R = 2$ and the disk is $D_2(0)$.
+
+### Coefficients from Uniqueness
+
+Find $a_0, \ldots, a_4$ if $\sum_{n=0}^{\infty} a_n z^n = e^z + z^2$ near $0$.
+
+By uniqueness, the $a_n$ are the Taylor coefficients of $e^z + z^2$.
+
+$$
+e^z + z^2 = 1 + z + \left(\frac{1}{2} + 1\right) z^2 + \frac{z^3}{6} + \frac{z^4}{24} + \cdots
+$$
+
+$$
+a_0 = 1, \quad a_1 = 1, \quad a_2 = \frac{3}{2}, \quad a_3 = \frac{1}{6}, \quad a_4 = \frac{1}{24}
+$$
+
+### Polynomial Times Cosine
+
+Find the Maclaurin series of $z^2 \cos z$ and its radius of convergence.
+
+$$
+z^2 \cos z = z^2 \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n}}{(2n)!} = \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n+2}}{(2n)!}
+$$
+
+$z^2 \cos z$ is entire, so $R = \infty$.
