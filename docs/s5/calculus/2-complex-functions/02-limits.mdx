@@ -1,10 +1,10 @@
 ---
 title: Limits
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:29.997Z
+lastUpdatedOn: 2026-10-02T18:36:17.176Z
 ---
 
-Let $S \subseteq \mathbb{C}$, let $f: S \to \mathbb{C}$ be a [function](/s5/calculus/complex-functions/introduction), and let $z_0$ be a limit point of $S$, so every deleted neighborhood of $z_0$ contains at least 1 point of $S$. For $\omega_0 \in \mathbb{C}$,
+Let $S \subseteq \mathbb{C}$, let $f: S \to \mathbb{C}$ be a [function](/s5/calculus/complex-functions/introduction), and let $z_0$ be a [limit point](/s5/calculus/complex-functions/introduction#limit-point) of $S$, so every deleted neighborhood of $z_0$ contains at least 1 point of $S$. $z_0$ need not belong to $S$. For $\omega_0 \in \mathbb{C}$,
 
 $$
 \lim_{z \to z_0} f(z) = \omega_0
@@ -44,11 +44,57 @@ $$
 
 ## Limit Laws
 
-Suppose $\displaystyle\lim_{z \to z_0} f(z) = \omega_0$ and $\displaystyle\lim_{z \to z_0} g(z) = \Omega_0$. Then:
+Suppose $\displaystyle\lim_{z \to z_0} f(z) = \omega_0$ and $\displaystyle\lim_{z \to z_0} g(z) = \Omega_0$ for the rest of this section.
 
-- $\displaystyle\lim_{z \to z_0} (f(z)+g(z)) = \omega_0+\Omega_0$
-- $\displaystyle\lim_{z \to z_0} (f(z)g(z)) = \omega_0\Omega_0$
-- $\displaystyle\lim_{z \to z_0} \frac{f(z)}{g(z)} = \frac{\omega_0}{\Omega_0}$, provided $\Omega_0 \ne 0$
+### Sum Law
+
+$$
+\displaystyle\lim_{z \to z_0} (f(z)+g(z)) = \omega_0+\Omega_0
+$$
+
+<Note title="Proof Hint">
+
+- Fix $\epsilon > 0$
+- Choose $\delta_1$ such that $0 < |z-z_0| < \delta_1 \implies |f(z)-\omega_0| < \epsilon/2$
+- Choose $\delta_2$ such that $0 < |z-z_0| < \delta_2 \implies |g(z)-\Omega_0| < \epsilon/2$
+- Let $\delta = \min(\delta_1, \delta_2)$
+- Rewrite $|f(z)+g(z)-(\omega_0+\Omega_0)|$ as $|(f(z)-\omega_0)+(g(z)-\Omega_0)|$
+- Apply the triangle inequality
+
+</Note>
+
+### Product Law
+
+$$
+\displaystyle\lim_{z \to z_0} (f(z)g(z)) = \omega_0\Omega_0
+$$
+
+<Note title="Proof Hint">
+
+- Rewrite $f(z)g(z)-\omega_0\Omega_0$ as $(f(z)-\omega_0)g(z)+\omega_0(g(z)-\Omega_0)$
+- Apply the definition of the limit of $g$ with $\epsilon = 1$ to get $|g(z)| < |\Omega_0|+1$ near $z_0$
+- Choose $\delta_1$ such that $|f(z)-\omega_0| < \dfrac{\epsilon}{2(|\Omega_0|+1)}$
+- Choose $\delta_2$ such that $|g(z)-\Omega_0| < \dfrac{\epsilon}{2(|\omega_0|+1)}$
+- Let $\delta$ be the minimum of all 3 radii
+- Apply the triangle inequality
+
+</Note>
+
+### Quotient Law
+
+$$
+\displaystyle\lim_{z \to z_0} \frac{f(z)}{g(z)} = \frac{\omega_0}{\Omega_0}, \quad \text{provided} \quad \Omega_0 \ne 0
+$$
+
+<Note title="Proof Hint">
+
+- Prove $\displaystyle\lim_{z \to z_0} \frac{1}{g(z)} = \frac{1}{\Omega_0}$, then apply the product law with $f(z)$
+- Apply the definition of the limit of $g$ with $\epsilon = |\Omega_0|/2$ to get $|g(z)| > |\Omega_0|/2$ near $z_0$
+- Rewrite $\left|\dfrac{1}{g(z)}-\dfrac{1}{\Omega_0}\right|$ as $\dfrac{|g(z)-\Omega_0|}{|g(z)||\Omega_0|}$
+- Bound it by $\dfrac{2|g(z)-\Omega_0|}{|\Omega_0|^2}$
+- Choose $\delta$ such that $|g(z)-\Omega_0| < \dfrac{\epsilon|\Omega_0|^2}{2}$
+
+</Note>
 
 ## Limit of a Composition
 
@@ -64,10 +110,66 @@ $$
 \lim_{\omega \to \omega_0} f(g(\omega)) = L
 $$
 
+<Note title="Proof Hint">
+
+- Fix $\epsilon > 0$
+- Choose $\delta_1$ such that $0 < |z-z_0| < \delta_1 \implies |f(z)-L| < \epsilon$
+- Choose $\delta_2$ such that $0 < |\omega-\omega_0| < \delta_2 \implies |g(\omega)-z_0| < \delta_1$
+- Choose $\delta_3$ such that $0 < |\omega-\omega_0| < \delta_3 \implies g(\omega) \ne z_0$
+- Let $\delta = \min(\delta_2, \delta_3)$
+- Conclude $0 < |g(\omega)-z_0| < \delta_1$, so $|f(g(\omega))-L| < \epsilon$
+
+</Note>
+
 ## Limits Involving Infinity
 
 Let $z_0, \omega_0 \in \mathbb{C}$.
 
-- $\displaystyle\lim_{z \to z_0} f(z) = \infty$ **iff** $\displaystyle\lim_{z \to z_0} \frac{1}{f(z)} = 0$, where $f(z) \ne 0$ for all $z$ sufficiently close to $z_0$ with $z \ne z_0$
-- $\displaystyle\lim_{z \to \infty} f(z) = \omega_0$ **iff** $\displaystyle\lim_{z \to 0} f\left(\frac{1}{z}\right) = \omega_0$
-- $\displaystyle\lim_{z \to \infty} f(z) = \infty$ **iff** $\displaystyle\lim_{z \to 0} \frac{1}{f(1/z)} = 0$
+### Infinite Limit at a Point
+
+$$
+\lim_{z \to z_0} f(z) = \infty \iff \lim_{z \to z_0} \frac{1}{f(z)} = 0
+$$
+
+where $f(z) \ne 0$ for all $z$ sufficiently close to $z_0$ with $z \ne z_0$.
+
+<Note title="Proof Hint">
+
+- Start with the definition $\displaystyle\lim_{z \to z_0} f(z) = \infty$ **iff** $\forall M > 0, \exists \delta > 0$ such that $0 < |z-z_0| < \delta \implies |f(z)| > M$
+- Set $M = 1/\epsilon$
+- Rewrite $|f(z)| > 1/\epsilon$ as $\left|\dfrac{1}{f(z)}-0\right| < \epsilon$
+- Reverse the steps for the other direction
+
+</Note>
+
+### Finite Limit at Infinity
+
+$$
+\lim_{z \to \infty} f(z) = \omega_0 \iff \lim_{z \to 0} f\left(\frac{1}{z}\right) = \omega_0
+$$
+
+<Note title="Proof Hint">
+
+- Start with the definition $\displaystyle\lim_{z \to \infty} f(z) = \omega_0$ **iff** $\forall \epsilon > 0, \exists R > 0$ such that $|z| > R \implies |f(z)-\omega_0| < \epsilon$
+- Set $\delta = 1/R$
+- Substitute $z \mapsto 1/z$ so $0 < |z| < \delta$ becomes $|1/z| > R$
+- Reverse the steps for the other direction
+
+</Note>
+
+### Infinite Limit at Infinity
+
+$\displaystyle\lim_{z \to \infty} f(z) = \infty$ **iff** $\forall M > 0, \exists R > 0$ such that $|z| > R \implies |f(z)| > M$.
+
+$$
+\lim_{z \to \infty} f(z) = \infty \iff \lim_{z \to 0} \frac{1}{f(1/z)} = 0
+$$
+
+<Note title="Proof Hint">
+
+- Set $M = 1/\epsilon$ and $\delta = 1/R$
+- Substitute $z \mapsto 1/z$
+- Rewrite $|f(1/z)| > 1/\epsilon$ as $\left|\dfrac{1}{f(1/z)}\right| < \epsilon$
+- Reverse the steps for the other direction
+
+</Note>

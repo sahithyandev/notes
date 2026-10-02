@@ -3,7 +3,7 @@ title: Introduction to Complex Functions
 sidebar:
   label: Introduction
 dateCreated: 2026-07-01T06:36:46.266Z
-lastUpdatedOn: 2026-09-13T14:55:24.286Z
+lastUpdatedOn: 2026-10-02T18:36:17.098Z
 ---
 
 Let $S$ be a set of complex numbers. A function $f: S \to \mathbb{C}$ is a rule that assigns to each $z \in S$ a complex number $\omega$, written $\omega = f(z)$. $S$ is the domain of $f$.
@@ -41,7 +41,38 @@ Translation, rotation, and reflection describe the dominant geometric characteri
 Examples:
 
 - $\omega = z+1$ translates each point $z$ one unit to the right.
+- $\omega = z+i$ translates each point $z$ one unit upwards.
 - $\omega = e^{i\theta}$ rotates each point $z$ through an angle $\theta$ about the origin, counterclockwise, since $e^{i\theta} = \cos\theta + i\sin\theta$.
 - $\omega = iz$ rotates each non-zero point $z$ through a 90 degree angle about the origin, counterclockwise, since $i = e^{i\pi/2}$.
 - $\omega = \bar{z}$ reflects each point $z$ about the real axis.
 - $\omega = -z$ reflects each point $z$ about the imaginary axis.
+
+## Neighborhood
+
+A neighborhood of $z_0$ is any set containing $D_r(z_0)$ for some $r > 0$.
+
+$D_r(z_0)$ is the open disk of radius $r$ centered at $z_0$.
+
+$$
+D_r(z_0) = \{z \in \mathbb{C} : |z-z_0| < r\}
+$$
+
+### Deleted Neighborhood
+
+Aka. punctured neighborhood. A deleted neighborhood of $z_0$ is a neighborhood with $z_0$ removed. The deleted disk of radius $r$ is
+
+$$
+D_r(z_0) \setminus \{z_0\} = \{z \in \mathbb{C} : 0 < |z-z_0| < r\}
+$$
+
+## Limit Point
+
+Let $D \subseteq \mathbb{C}$ and $z_0 \in \mathbb{C}$. $z_0$ is a limit point of $D$ **iff** every deleted neighborhood of $z_0$ contains at least 1 point of $D$.
+
+A limit point of $D$ need not belong to $D$.
+
+## Isolated Point
+
+Let $D \subseteq \mathbb{C}$ and $z_0 \in D$. $z_0$ is an isolated point of $D$ **iff** $z_0$ is not a limit point of $D$. Equivalently, some deleted neighborhood of $z_0$ contains no point of $D$.
+
+Otherwise the point is a non-isolated point of $D$. It is a limit point of $D$ that belongs to $D$.
