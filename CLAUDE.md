@@ -104,6 +104,18 @@ The `title` frontmatter field must be 40 characters or fewer, enforced by the `t
 
 Exempt: a title starting with `Introduction to `, since that's a fixed opener pattern used across the corpus for module/topic-level notes and reads fine at any length.
 
+### Singular vs plural in titles and headings
+
+This is a guideline, not a validated rule. Use judgment, and keep the existing wording when unsure.
+
+- A title or heading that names 1 concept, method, law, or thing is singular: `Newton's Method`, `Number System`, `Entropy`.
+- A note or section that surveys a class of several things is plural: `Circuit Elements`, `Design Patterns`, `Resistors`.
+- A heading that lists several items under one parent is plural: `Properties`, `Types`, `Steps`, `Examples`, `Applications`.
+- The noun after `of` follows the word before it: `System of Linear Equations`, `Types of Graphs`. A mass noun stays singular: `Sources of Energy`, `Types of Power`.
+- A defined name keeps its published form, such as the NIST SSDF practice names (`Respond to Vulnerabilities`) and `Software Bill of Materials`.
+
+Don't retitle or rename a note only to change its number. The filename sets the URL, so a number-only rename breaks existing links for no gain.
+
 ### Note components
 
 Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
