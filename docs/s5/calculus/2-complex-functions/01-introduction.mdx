@@ -3,7 +3,7 @@ title: Introduction to Complex Functions
 sidebar:
   label: Introduction
 dateCreated: 2026-07-01T06:36:46.266Z
-lastUpdatedOn: 2026-10-02T18:36:17.098Z
+lastUpdatedOn: 2026-10-03T16:22:25.816Z
 ---
 
 Let $S$ be a set of complex numbers. A function $f: S \to \mathbb{C}$ is a rule that assigns to each $z \in S$ a complex number $\omega$, written $\omega = f(z)$. $S$ is the domain of $f$.
@@ -69,10 +69,24 @@ $$
 
 Let $D \subseteq \mathbb{C}$ and $z_0 \in \mathbb{C}$. $z_0$ is a limit point of $D$ **iff** every deleted neighborhood of $z_0$ contains at least 1 point of $D$.
 
+$z_0$ is a limit point of $D$ **iff**
+
+$$
+\forall r > 0,\ \big(D_r(z_0) \setminus \{z_0\}\big) \cap D \neq \varnothing
+$$
+
 A limit point of $D$ need not belong to $D$.
 
 ## Isolated Point
 
 Let $D \subseteq \mathbb{C}$ and $z_0 \in D$. $z_0$ is an isolated point of $D$ **iff** $z_0$ is not a limit point of $D$. Equivalently, some deleted neighborhood of $z_0$ contains no point of $D$.
+
+$z_0$ is an isolated point of $D$ **iff**
+
+$$
+z_0 \in D \text{ and } \exists r > 0,\ \big(D_r(z_0) \setminus \{z_0\}\big) \cap D = \varnothing
+$$
+
+This is the same as $D_r(z_0) \cap D = \{z_0\}$ for some $r > 0$.
 
 Otherwise the point is a non-isolated point of $D$. It is a limit point of $D$ that belongs to $D$.
