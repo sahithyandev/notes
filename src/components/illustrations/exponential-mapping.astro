@@ -1,0 +1,451 @@
+---
+// Drag z in the left plane. Its vertical line x = Re z maps to the circle
+// |w| = e^x and its horizontal line y = Im z maps to the ray arg w = y in the
+// right plane. The faint grid shows the same correspondence for every
+// half-integer x and every multiple of π/6 for y.
+const LX0 = -3;
+const LX1 = 1.5;
+const LY = 3.5;
+const PL = 30;
+const WL = (LX1 - LX0) * PL;
+const H = 2 * LY * PL;
+
+const R = 4.6;
+const SR = 150;
+const PR = SR / (2 * R);
+const GAP = 30;
+const OX = WL + GAP;
+const W = OX + SR;
+
+const RE0 = 0.5;
+const IM0 = 1;
+
+const lx = (re: number) => (re - LX0) * PL;
+const ly = (im: number) => (LY - im) * PL;
+const rx = (w: number) => OX + (w + R) * PR;
+const ry = (w: number) => H / 2 - w * PR;
+const fmt = (n: number) => (Object.is(n, -0) ? "0.00" : n.toFixed(2));
+
+const modulus0 = Math.exp(RE0);
+const wRe0 = modulus0 * Math.cos(IM0);
+const wIm0 = modulus0 * Math.sin(IM0);
+const argEnd = (len: number, t: number) => ({
+  x: rx(0) + len * Math.cos(t),
+  y: ry(0) - len * Math.sin(t),
+});
+const ray0 = argEnd(2 * H, IM0);
+
+const gridX = [-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5];
+const gridY = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6].map(
+  (k) => (k * Math.PI) / 6,
+);
+
+const uid = Math.random().toString(36).slice(2, 8);
+const AR = (W / H).toFixed(4);
+---
+
+<figure class="expmap">
+  <svg
+    class="plot"
+    style={`--ar:${AR}`}
+    viewBox={`0 0 ${W} ${H}`}
+    role="img"
+    aria-label="Left: the z-plane with a draggable point z. Right: the w-plane showing w equals e to the z. The vertical line through z maps to a circle and the horizontal line maps to a ray."
+  >
+    <defs>
+      <clipPath id={`l-${uid}`}>
+        <rect x="0" y="0" width={WL} height={H}></rect>
+      </clipPath>
+      <clipPath id={`r-${uid}`}>
+        <rect x={OX} y="0" width={SR} height={H}></rect>
+      </clipPath>
+    </defs>
+
+    <rect x="0" y="0" width={WL} height={H} class="frame"></rect>
+    <rect x={OX} y="0" width={SR} height={H} class="frame"></rect>
+
+    <g clip-path={`url(#l-${uid})`}>
+      <rect
+        x="0"
+        y={ly(Math.PI)}
+        width={WL}
+        height={ly(-Math.PI) - ly(Math.PI)}
+        class="strip"
+      ></rect>
+      {gridX.map((x) => (
+        <line
+          x1={lx(x)}
+          y1="0"
+          x2={lx(x)}
+          y2={H}
+          class={x === 0 ? "axis" : "grid"}
+        />
+      ))}
+      {gridY.map((y) => (
+        <line
+          x1="0"
+          y1={ly(y)}
+          x2={WL}
+          y2={ly(y)}
+          class={y === 0 ? "axis" : "grid"}
+        />
+      ))}
+      <line
+        x1="0"
+        y1={ly(Math.PI)}
+        x2={WL}
+        y2={ly(Math.PI)}
+        class="edge"
+      ></line>
+      <line
+        x1="0"
+        y1={ly(-Math.PI)}
+        x2={WL}
+        y2={ly(-Math.PI)}
+        class="edge"
+      ></line>
+
+      <line
+        x1={lx(RE0)}
+        y1="0"
+        x2={lx(RE0)}
+        y2={H}
+        class="hl-v"
+        data-vline
+      ></line>
+      <line
+        x1="0"
+        y1={ly(IM0)}
+        x2={WL}
+        y2={ly(IM0)}
+        class="hl-h"
+        data-hline
+      ></line>
+    </g>
+
+    <text x="3" y={ly(Math.PI) - 3} class="tick">
+      π
+    </text>
+    <text x="3" y={ly(-Math.PI) + 9} class="tick">
+      -π
+    </text>
+    <text x={WL - 3} y={ly(0) - 3} class="tick" text-anchor="end">
+      Re z
+    </text>
+    <text x={lx(0) + 3} y="9" class="tick">
+      Im z
+    </text>
+    <text x={WL - 3} y={H - 4} class="title" text-anchor="end">
+      z-plane
+    </text>
+
+    <g clip-path={`url(#r-${uid})`}>
+      {gridX.map((x) => (
+        <circle
+          cx={rx(0)}
+          cy={ry(0)}
+          r={Math.exp(x) * PR}
+          class="grid"
+          fill="none"
+        />
+      ))}
+      <line x1={rx(-R)} y1={ry(0)} x2={rx(R)} y2={ry(0)} class="axis"></line>
+      <line x1={rx(0)} y1="0" x2={rx(0)} y2={H} class="axis"></line>
+      {gridY.map((t) => {
+        const e = argEnd(2 * H, t);
+        return <line x1={rx(0)} y1={ry(0)} x2={e.x} y2={e.y} class="grid" />;
+      })}
+
+      <circle
+        cx={rx(0)}
+        cy={ry(0)}
+        r={modulus0 * PR}
+        class="hl-v"
+        fill="none"
+        data-circle
+      ></circle>
+      <line
+        x1={rx(0)}
+        y1={ry(0)}
+        x2={ray0.x}
+        y2={ray0.y}
+        class="hl-h"
+        data-ray
+      ></line>
+    </g>
+
+    <circle cx={rx(0)} cy={ry(0)} r="2.5" class="origin"></circle>
+    <text x={rx(R) - 3} y={ry(0) - 3} class="tick" text-anchor="end">
+      Re w
+    </text>
+    <text x={rx(0) + 3} y="9" class="tick">
+      Im w
+    </text>
+    <text x={OX + 3} y={H - 4} class="title">
+      w-plane
+    </text>
+
+    <circle cx={rx(wRe0)} cy={ry(wIm0)} r="3.5" class="wdot" data-wdot></circle>
+
+    <rect x="0" y="0" width={WL} height={H} class="hit" data-hit></rect>
+    <circle
+      cx={lx(RE0)}
+      cy={ly(IM0)}
+      r="4"
+      class="handle"
+      data-handle
+      tabindex="0"
+      role="slider"
+      aria-label="z. Drag, or focus and use arrow keys."
+      aria-valuetext={`${fmt(RE0)} + ${fmt(IM0)}i`}
+    ></circle>
+  </svg>
+
+  <p class="readout">
+    <span class="rz" data-rz>
+      {`z = ${fmt(RE0)} + ${fmt(IM0)}i`}
+    </span>
+    <span class="rw" data-rw>
+      {`|w| = e^${fmt(RE0)} = ${fmt(modulus0)}, arg w = ${fmt(IM0)}`}
+    </span>
+  </p>
+  <p class="live" aria-live="polite" data-live></p>
+</figure>
+
+<style>
+  .expmap {
+    margin: 24px auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    overflow: hidden;
+    font-family: var(--font-ui);
+    max-width: 80ch;
+  }
+
+  svg.plot {
+    max-width: unset;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ar);
+    touch-action: none;
+  }
+
+  .frame {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 0.75;
+  }
+  .strip {
+    fill: color-mix(in oklab, var(--sem, var(--accent)) 8%, transparent);
+  }
+  .grid {
+    stroke: var(--border);
+    stroke-width: 0.5;
+  }
+  .axis {
+    stroke: var(--border-strong);
+    stroke-width: 0.9;
+  }
+  .edge {
+    stroke: var(--text-muted);
+    stroke-width: 0.75;
+    stroke-dasharray: 3 3;
+  }
+  .hl-v {
+    stroke: var(--sem, var(--accent));
+    stroke-width: 1.8;
+  }
+  .hl-h {
+    stroke: var(--dia-out);
+    stroke-width: 1.8;
+  }
+  .hl-h[data-ray] {
+    stroke-linecap: round;
+  }
+  .origin {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1.2;
+  }
+  .tick,
+  .title {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 6px;
+  }
+  .title {
+    fill: var(--text-secondary);
+    font-size: 6.5px;
+  }
+  .hit {
+    fill: transparent;
+    cursor: crosshair;
+  }
+  .handle {
+    fill: var(--surface);
+    stroke: var(--sem, var(--accent));
+    stroke-width: 1.5;
+    cursor: grab;
+  }
+  .handle:focus {
+    outline: none;
+  }
+  .handle:focus-visible {
+    stroke-width: 2.5;
+  }
+  .wdot {
+    fill: var(--dia-out);
+    stroke: var(--surface);
+    stroke-width: 1;
+  }
+
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    padding: 8px 14px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+  }
+  .rz {
+    color: var(--sem, var(--accent));
+  }
+  .rw {
+    color: var(--dia-out);
+  }
+
+  .live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  const LX0 = -3;
+  const LX1 = 1.5;
+  const LY = 3.5;
+  const PL = 30;
+  const WL = (LX1 - LX0) * PL;
+  const H = 2 * LY * PL;
+  const R = 4.6;
+  const SR = 150;
+  const PR = SR / (2 * R);
+  const OX = WL + 30;
+  const W = OX + SR;
+
+  const lx = (re: number) => (re - LX0) * PL;
+  const ly = (im: number) => (LY - im) * PL;
+  const rx = (w: number) => OX + (w + R) * PR;
+  const ry = (w: number) => H / 2 - w * PR;
+  const fmt = (n: number) => (Object.is(n, -0) ? "0.00" : n.toFixed(2));
+  const clamp = (n: number, lo: number, hi: number) =>
+    Math.min(hi, Math.max(lo, n));
+
+  function init(root: HTMLElement) {
+    const q = <T extends Element>(sel: string) => root.querySelector<T>(sel)!;
+    const svg = q<SVGSVGElement>("svg.plot");
+    const hit = q<SVGRectElement>("[data-hit]");
+    const handle = q<SVGCircleElement>("[data-handle]");
+    const vline = q<SVGLineElement>("[data-vline]");
+    const hline = q<SVGLineElement>("[data-hline]");
+    const circle = q<SVGCircleElement>("[data-circle]");
+    const ray = q<SVGLineElement>("[data-ray]");
+    const wdot = q<SVGCircleElement>("[data-wdot]");
+    const rz = q<HTMLElement>("[data-rz]");
+    const rw = q<HTMLElement>("[data-rw]");
+    const live = q<HTMLElement>("[data-live]");
+
+    let re = 0.5;
+    let im = 1;
+
+    const set = (el: Element, attrs: Record<string, number | string>) => {
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+    };
+
+    function render() {
+      const m = Math.exp(re);
+      const wRe = m * Math.cos(im);
+      const wIm = m * Math.sin(im);
+      const arg = Math.atan2(Math.sin(im), Math.cos(im));
+      const zText = `${fmt(re)} + ${fmt(im)}i`;
+
+      set(handle, {
+        cx: lx(re),
+        cy: ly(im),
+        "aria-valuetext": zText,
+      });
+      set(vline, { x1: lx(re), x2: lx(re) });
+      set(hline, { y1: ly(im), y2: ly(im) });
+      set(circle, { r: m * PR });
+      set(ray, {
+        x2: rx(0) + 2 * H * Math.cos(im),
+        y2: ry(0) - 2 * H * Math.sin(im),
+      });
+      set(wdot, { cx: rx(wRe), cy: ry(wIm) });
+
+      rz.textContent = `z = ${zText}`;
+      rw.textContent = `|w| = e^${fmt(re)} = ${fmt(m)}, arg w = ${fmt(arg)}`;
+      live.textContent = `z = ${zText}, w = e^z has modulus ${fmt(m)} and argument ${fmt(arg)}`;
+    }
+
+    function setFromClient(clientX: number, clientY: number) {
+      const rect = svg.getBoundingClientRect();
+      const px = ((clientX - rect.left) / rect.width) * W;
+      const py = ((clientY - rect.top) / rect.height) * H;
+      re = clamp(Math.round((px / PL + LX0) * 20) / 20, LX0, LX1);
+      im = clamp(Math.round((LY - py / PL) * 20) / 20, -LY, LY);
+      render();
+    }
+
+    let dragging = false;
+    const down = (e: PointerEvent) => {
+      dragging = true;
+      svg.setPointerCapture(e.pointerId);
+      setFromClient(e.clientX, e.clientY);
+      handle.focus();
+    };
+    hit.addEventListener("pointerdown", down);
+    handle.addEventListener("pointerdown", down);
+    svg.addEventListener("pointermove", (e) => {
+      if (dragging) setFromClient(e.clientX, e.clientY);
+    });
+    svg.addEventListener("pointerup", (e) => {
+      dragging = false;
+      svg.releasePointerCapture(e.pointerId);
+    });
+
+    handle.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.5 : 0.1;
+      switch (e.key) {
+        case "ArrowLeft":
+          re = clamp(re - step, LX0, LX1);
+          break;
+        case "ArrowRight":
+          re = clamp(re + step, LX0, LX1);
+          break;
+        case "ArrowUp":
+          im = clamp(im + step, -LY, LY);
+          break;
+        case "ArrowDown":
+          im = clamp(im - step, -LY, LY);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>(".expmap").forEach(init);
+</script>

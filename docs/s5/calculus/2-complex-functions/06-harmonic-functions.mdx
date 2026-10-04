@@ -1,7 +1,7 @@
 ---
 title: Harmonic Functions
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.040Z
+lastUpdatedOn: 2026-10-04T17:55:52.750Z
 ---
 
 Let $D$ be a domain in the $xy$-plane. A real-valued function $u(x,y)$ is harmonic in $D$ **iff**:
@@ -13,9 +13,9 @@ $$
 \nabla^2 u = u_{xx} + u_{yy} = 0
 $$
 
-## Component Functions of an Analytic Function
+## Component Functions
 
-If $f(z) = u(x,y) + iv(x,y)$ is analytic in a domain $D$, then $u$ and $v$ are harmonic in $D$.
+**If** $f(z) = u(x,y) + iv(x,y)$ is analytic in a domain $D$, **then** $u$ and $v$ are harmonic in $D$.
 
 <Note title="Proof Hint">
 
@@ -30,11 +30,30 @@ If $f(z) = u(x,y) + iv(x,y)$ is analytic in a domain $D$, then $u$ and $v$ are h
 
 Let $u$ and $v$ be real-valued functions on a region $D \subseteq \mathbb{R}^2$. $v$ is a harmonic conjugate of $u$ **iff** $f(z) = u(x,y) + iv(x,y)$ is analytic on $D$.
 
+A harmonic conjugate of $u$ exists only **if** $u$ is harmonic on $D$. A harmonic $u$ does not always have one.
+
+If $D$ is [simply connected](/s5/calculus/vector-values-functions/independence-of-path#simply-connected-region), a harmonic conjugate always exists and is unique up to an additive constant. Otherwise it may fail to exist.
+
+For example: $u = \ln|z|$ is harmonic on $\mathbb{C} \setminus \{0\}$, but the only candidate $v = \arg z$ is multivalued, so no harmonic conjugate exists there.
+
 <Note>
 
 Order matters. $u$ and $v$ can both be harmonic on $D$ without $v$ being a harmonic conjugate of $u$.
 
 </Note>
+
+### Finding a Conjugate
+
+Given a harmonic $u(x,y)$ on a simply connected domain:
+
+1. Check that $u_{xx} + u_{yy} = 0$.
+2. Compute $u_x$ and $u_y$.
+3. Use the Cauchy-Riemann equation $v_y = u_x$. Integrate with respect to $y$ to get $v = \int u_x \, dy + \phi(x)$, where $\phi(x)$ is an unknown function of $x$ alone.
+4. Differentiate this $v$ with respect to $x$ and equate it to $-u_y$, from the Cauchy-Riemann equation $v_x = -u_y$. All terms containing $y$ cancel because $u$ is harmonic, which leaves an expression for $\phi'(x)$.
+5. Integrate $\phi'(x)$ to get $\phi(x)$, including an arbitrary constant $C$.
+6. Substitute $\phi(x)$ into $v$. Then $f = u + iv$ is analytic, and can be written in terms of $z$.
+
+Integrating $v_x = -u_y$ with respect to $x$ first and adding an unknown function of $y$ works the same way.
 
 ## Worked Example
 

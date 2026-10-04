@@ -12,6 +12,7 @@ export { default as DemandCurveDiagram } from "./demand-curve-diagram.astro";
 export { default as DfdDiagram } from "./dfd-diagram.astro";
 export { default as ElasticityAlongDemandCurveDiagram } from "./elasticity-along-demand-curve-diagram.astro";
 export { default as ExcelSheet } from "./excel-sheet.astro";
+export { default as ExponentialMapping } from "./exponential-mapping.astro";
 export { default as FlowDiagram } from "./flow-diagram.astro";
 export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.astro";
 export { default as HuffmanTable } from "./huffman-table.astro";

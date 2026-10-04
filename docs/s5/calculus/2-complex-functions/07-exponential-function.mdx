@@ -1,7 +1,7 @@
 ---
 title: Exponential Function
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.049Z
+lastUpdatedOn: 2026-10-04T17:55:52.761Z
 ---
 
 For any complex number $z$,
@@ -33,3 +33,16 @@ $$
 $e^z$ is periodic with period $2\pi i$.
 
 </Note>
+
+## Mapping
+
+Let $\omega = e^z$ with $z = x + iy$. In polar form, $\omega$ has modulus $e^x$ and argument $y$. So the real part $x$ of $z$ sets the distance of $\omega$ from the origin, and the imaginary part $y$ sets the angle of $\omega$.
+
+<ExponentialMapping />
+
+- A vertical line $x = c$ maps onto the circle $|\omega| = e^c$ centered at the origin. As $y$ increases by $2\pi$, the image goes around the circle once.
+- A horizontal line $y = c$ maps onto the ray $\arg \omega = c$ from the origin, excluding the origin.
+- A horizontal strip $\alpha < y < \alpha + 2\pi$ maps one-to-one onto the plane with the origin and the ray $\arg \omega = \alpha$ removed.
+- A rectangle $a < x < b$, $\alpha < y < \beta$ with $\beta - \alpha \le 2\pi$ maps one-to-one onto a part of an annulus, between the circles $|\omega| = e^a$ and $|\omega| = e^b$ and between the rays $\arg \omega = \alpha$ and $\arg \omega = \beta$.
+
+The whole $z$-plane maps onto $\mathbb{C} \setminus \{0\}$, covering each point infinitely many times, once per strip of height $2\pi$. The image never contains $0$, since $|e^z| = e^x > 0$.
