@@ -107,6 +107,13 @@ function hasRealChange(
 
 const PATTERN_TITLE_PREFIX = /(\d+)-/;
 
+// docs/<sem>/<module>/<submodule>: 3 or more directory segments below docs/.
+function isSubmoduleDir(dir: string): boolean {
+  const docsIndex = dir.lastIndexOf("docs/");
+  const below = docsIndex >= 0 ? dir.slice(docsIndex + "docs/".length) : dir;
+  return below.split("/").filter(Boolean).length >= 3;
+}
+
 async function renumberFiles(
   filePaths: string[],
   dryRun: boolean,
@@ -123,16 +130,19 @@ async function renumberFiles(
 
   const renames = new Map<string, string>();
 
-  for (const [, files] of byDir) {
+  for (const [dir, files] of byDir) {
     files.sort((a, b) => {
       const na = parseInt(basename(a).match(PATTERN_TITLE_PREFIX)![1]);
       const nb = parseInt(basename(b).match(PATTERN_TITLE_PREFIX)![1]);
       return na - nb;
     });
 
-    const firstNum = parseInt(
-      basename(files[0]).match(PATTERN_TITLE_PREFIX)![1],
-    );
+    // Notes in a submodule are numbered from 01 within it (enforced by the
+    // submodule-numbering rule); anywhere else the existing first number is
+    // kept, so a module's notes can start wherever they already do.
+    const firstNum = isSubmoduleDir(dir)
+      ? 1
+      : parseInt(basename(files[0]).match(PATTERN_TITLE_PREFIX)![1]);
 
     for (let i = 0; i < files.length; i++) {
       const expected = firstNum + i;

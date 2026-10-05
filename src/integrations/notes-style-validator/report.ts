@@ -16,7 +16,8 @@ export type RuleId =
   | "broken-link"
   | "filename"
   | "title-heading-duplicate"
-  | "duplicate-heading";
+  | "duplicate-heading"
+  | "submodule-numbering";
 
 export interface Violation {
   rule: RuleId;

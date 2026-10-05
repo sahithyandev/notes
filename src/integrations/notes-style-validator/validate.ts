@@ -1,5 +1,9 @@
 import { scanFiles, type ScannedFile } from "./scan.ts";
-import { runPerFileRules, checkBrokenLinks } from "./rules/index.ts";
+import {
+  runPerFileRules,
+  checkBrokenLinks,
+  checkSubmoduleNumbering,
+} from "./rules/index.ts";
 import { matchesFilter } from "./filter.ts";
 import {
   groupByFile,
@@ -31,6 +35,7 @@ function collectViolations(
     }
   }
   flat.push(...checkBrokenLinks(files, extraValidUrls));
+  flat.push(...checkSubmoduleNumbering(files));
   return flat;
 }
 

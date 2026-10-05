@@ -15,7 +15,9 @@ import { checkFilename } from "./filename.ts";
 import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 import { checkDuplicateHeading } from "./duplicate-heading.ts";
 
-export { checkBrokenLinks };
+import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
+
+export { checkBrokenLinks, checkSubmoduleNumbering };
 
 // Every rule except broken-link runs per file, independent of the rest of
 // the corpus. broken-link needs every file's slug/headings up front to know
