@@ -6,6 +6,7 @@
 import Panel from "./primitives/panel.astro";
 import StepBar from "./primitives/step-bar.astro";
 import StepNav from "./primitives/step-nav.astro";
+import { makeUid } from "./lib/uid";
 
 type Box = {
   label: string;
@@ -38,7 +39,7 @@ interface Props {
 
 const { rows, links, sbw } = Astro.props;
 
-const uid = "flow-" + Math.random().toString(36).slice(2, 9);
+const uid = makeUid("flow");
 
 const W = 900;
 const M = 28;

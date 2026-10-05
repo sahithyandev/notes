@@ -3,6 +3,8 @@
 // |w| = e^x and its horizontal line y = Im z maps to the ray arg w = y in the
 // right plane. The faint grid shows the same correspondence for every
 // half-integer x and every multiple of π/6 for y.
+import { makeUid } from "./lib/uid";
+
 const LX0 = -3;
 const LX1 = 1.5;
 const LY = 3.5;
@@ -40,7 +42,7 @@ const gridY = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6].map(
   (k) => (k * Math.PI) / 6,
 );
 
-const uid = Math.random().toString(36).slice(2, 8);
+const uid = makeUid("exp");
 const AR = (W / H).toFixed(4);
 ---
 

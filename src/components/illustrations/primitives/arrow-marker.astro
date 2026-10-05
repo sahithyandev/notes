@@ -1,0 +1,52 @@
+---
+// SVG arrowhead <marker>, rendered inside the consuming diagram's <defs>.
+// `filled` is a solid triangle painted with `fill`; `open` is a chevron that
+// takes the stroke colour of whichever line references it (context-stroke).
+// Reference it as `marker-end="url(#<id>)"` from a line or path.
+interface Props {
+  id: string;
+  variant?: "filled" | "open";
+  // Marker width and height.
+  size?: number;
+  // Where along the head the line's end point sits.
+  refX?: number;
+  orient?: string;
+  units?: "strokeWidth" | "userSpaceOnUse";
+  // Any CSS colour, including var(...). Filled variant only.
+  fill?: string;
+}
+
+const {
+  id,
+  variant = "filled",
+  size = variant === "filled" ? 7 : 6,
+  refX = variant === "filled" ? 9 : 8,
+  orient = "auto-start-reverse",
+  units,
+  fill = "var(--text-secondary)",
+} = Astro.props;
+---
+
+<marker
+  id={id}
+  viewBox="0 0 10 10"
+  refX={refX}
+  refY="5"
+  markerWidth={size}
+  markerHeight={size}
+  markerUnits={units}
+  orient={orient}
+>
+  {variant === "filled" ? (
+    <path d="M 0 0 L 10 5 L 0 10 z" style={`fill: ${fill}`} />
+  ) : (
+    <path
+      d="M2 1L8 5L2 9"
+      fill="none"
+      stroke="context-stroke"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  )}
+</marker>

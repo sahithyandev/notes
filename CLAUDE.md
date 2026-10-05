@@ -187,10 +187,47 @@ Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Compo
 
 - **Leaf illustrations** — the domain-specific components (`simplex-step.astro`, `transportation-table.astro`, `sensitivity-rhs-slider.astro`, `flow-diagram.astro`, ...). These carry the actual math/data and are what notes reference in MDX.
 - **Composites** — components that assemble primitives into a reusable shape. `walkthrough.astro` is the one generic step carousel (`<Walkthrough variant="simplex" | "transportation" | "assignment">`); step components (`simplex-step.astro`, etc.) render into it via a hidden `[data-stage]` element that the shared controller clones and updates.
-- **`primitives/`** — chrome with no domain knowledge: `panel.astro` (bordered surface box), `step-bar.astro` (label + counter), `legend.astro` (a closed vocabulary of chip kinds: `swatch` / `outline` / `line` / `glyph` / `text`), `step-nav.astro` (dots + prev/next + aria-live), `step-note.astro`, `slider-control.astro`, `status-note.astro`.
-- **`lib/`** — pure TS, no markup: `walkthrough.ts` (the shared carousel driver), `dots.ts` (clones a dot button from `step-nav.astro`'s `<template>` so it carries that component's scoped-CSS id), `format.ts` (slider number formatting), `legend-presets.ts` (per-`variant` legend chips), plus `src/utils/tex.ts` for the shared KaTeX render helper used across the directory.
+- **`primitives/`** — chrome with no domain knowledge: `panel.astro` (bordered surface box), `step-bar.astro` (label + counter), `legend.astro` (a closed vocabulary of chip kinds: `swatch` / `outline` / `line` / `glyph` / `text`), `step-nav.astro` (dots + prev/next + aria-live), `step-note.astro`, `slider-control.astro`, `status-note.astro`, plus 2 for SVG diagrams:
+  - `axes-figure.astro`
+    The shell for 2-axis curve diagrams: sized `<figure>`, `<svg>` with `<title>` (and optional `desc`, wired to `aria-labelledby`), both axes with labels, and the shared curve, point, guide and caption styling. Curves, points and labels go in the default slot, the caption in `slot="caption"`. `size="sm"` (420×340) and `size="lg"` (620×430, heavier strokes) are presets, and `viewBox`, `x0`, `y0`, `top`, `right`, `yLabelOffset`, `xLabelOffset` and `maxWidth` override them for other geometries.
+  - `arrow-marker.astro`
+    An SVG arrowhead `<marker>` to place inside the diagram's `<defs>`. `variant="filled"` is a solid triangle painted by `fill`, `variant="open"` is a chevron that takes the referencing line's stroke colour.
+- **`lib/`** — pure TS, no markup: `uid.ts` (`makeUid("prefix")`, the per-instance id for markers, clip paths and DOM hooks), `walkthrough.ts` (the shared carousel driver), `dots.ts` (clones a dot button from `step-nav.astro`'s `<template>` so it carries that component's scoped-CSS id), `format.ts` (slider number formatting), `legend-presets.ts` (per-`variant` legend chips), plus `src/utils/tex.ts` for the shared KaTeX render helper used across the directory.
 
 **When adding a new interactive illustration, compose the existing primitives instead of copying chrome from another component.** If a primitive doesn't fit (e.g. it needs a different accent colour or box padding), extend the primitive with a CSS custom property or a scoped `:global()` override in the consuming component's own `<style>` block, rather than duplicating its markup and CSS — see `flow-diagram.astro`'s `--nav-accent` override for the pattern.
+
+### SVG diagram conventions
+
+- A new 2-axis curve diagram (demand/supply curves, isoquants, cost curves, ...) wraps its content in `<AxesFigure>`. It never hand-writes the `<figure>`, `<svg>`, axis lines, axis labels, or the `.axis` / `.axis-label` / `.curve` / `.guide` / caption CSS. See `demand-curve-diagram.astro` (`sm`) and `isoquant-diagram.astro` (`lg`) for the pattern.
+- Colour comes from a tone class on the element: `tone-s5`, `tone-ct`, `tone-pt`, `tone-key` or `tone-ink`. The same class on a curve and on its caption `<span>` keeps the two in sync. Use `dashed` for a shifted curve and `round` for round line caps.
+- Styles that only 1 diagram needs (a tangent line, a shaded region, a special label) go in that component's own `<style>` block, using `var(--tone)` where the colour should follow the tone class. Scoped styles do reach slotted content written in the same file, so a plain class selector works there. Avoid redefining a class `AxesFigure` already styles (such as `.guide`), since the 2 rules have equal specificity. Use a new class name instead.
+- Every arrowhead is an `<ArrowMarker>` inside `<defs>`, never a hand-written `<marker>` plus an `.arrowhead` rule.
+- Every generated id (marker, clip path, DOM hook) comes from `makeUid("prefix")`, never an inline `Math.random()`.
+- Diagrams are static figures without a `figure id`, so don't reference them by anchor.
+
+### When to extract a primitive
+
+Extract when all of these hold, and not before:
+
+1. The same markup or CSS appears in 3 or more illustrations. For 2 copies, leave them and watch for a third.
+2. The copies differ only in data, colour, size or a few offsets, so the difference can be a prop, a slot or a CSS custom property.
+3. The extracted piece has no domain knowledge, such as demand curves or Kerberos tickets. Domain pieces stay in a leaf or become a composite.
+
+How to extract:
+
+- Put markup in `primitives/` and pure logic in `lib/`.
+- Use a slot for content that varies and a prop for a value that varies. Choose defaults that match the most common existing use, so the first migration needs no overrides.
+- Migrate 2 or 3 existing illustrations first and check the pages render before migrating the rest. A prop that the first migrations never needed is a sign the primitive is too general.
+- Delete the now-unused CSS from each migrated file in the same change, and run `bun run lint`.
+- Add the primitive to the list above, with what its props and slots do.
+
+Do not extract:
+
+- A shape that appears once or twice, or that only looks alike on the surface.
+- Something where the props would outnumber the lines saved, or where it needs a different prop for each caller.
+- A layout that is specific to one diagram, such as the node placement in `tree-properties-proofs.astro`.
+
+If a migrated diagram shows a small visual difference (a stroke width, a font size), prefer adopting the shared value over adding a prop for 1 caller, and say so in the change description. Add a prop only when 2 or more diagrams need the difference.
 
 `src/components/illustrations/index.ts` re-exports every illustration component; `[...slug].astro` imports it once (`import * as Illustrations from "../components/illustrations"`) and spreads it into the MDX `components` map, rather than hand-listing each one.
 

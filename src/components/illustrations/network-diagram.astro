@@ -1,6 +1,9 @@
 ---
 // Static node-and-arrow project network diagram: events as circles, activities
 // as labeled directed arrows between them (dashed for a dummy activity).
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+
 interface Node {
   id: string;
   x: number;
@@ -23,7 +26,7 @@ interface Props {
 
 const { nodes, edges, width = 560, height = 300 } = Astro.props;
 
-const uid = "net-" + Math.random().toString(36).slice(2, 9);
+const uid = makeUid("net");
 
 const R = 18;
 
@@ -60,17 +63,7 @@ const arrows = edges.map((edge) => {
     aria-label="Project network diagram"
   >
     <defs>
-      <marker
-        id={`${uid}-arrow`}
-        viewBox="0 0 10 10"
-        refX="9"
-        refY="5"
-        markerWidth="7"
-        markerHeight="7"
-        orient="auto-start-reverse"
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"></path>
-      </marker>
+      <ArrowMarker id={`${uid}-arrow`} />
     </defs>
 
     {arrows.map((a) => (
@@ -119,10 +112,6 @@ const arrows = edges.map((edge) => {
 
   .shaft.dummy {
     stroke-dasharray: 5 4;
-  }
-
-  .arrowhead {
-    fill: var(--text-secondary);
   }
 
   .edge-label {

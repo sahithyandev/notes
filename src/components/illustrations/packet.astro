@@ -1,5 +1,6 @@
 ---
 import type { PacketField } from "../../utils/types";
+import { makeUid } from "./lib/uid";
 
 interface RowField {
   name: string;
@@ -94,7 +95,7 @@ const rowH = width ? ROW_H + RULER_H : ROW_H;
 const rows = computeRows(fields, width);
 const effectiveRowWidth = width ?? fields.reduce((s, f) => s + f.size, 0);
 
-const uid = Math.random().toString(36).slice(2, 7);
+const uid = makeUid("pkt");
 
 let rowStartOffset = 0;
 const svgRows = rows.map((row, rowIdx) => {

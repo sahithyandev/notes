@@ -1,0 +1,222 @@
+---
+import { makeUid } from "../lib/uid";
+// Figure shell for 2-axis curve diagrams: the sized <figure>, the <svg> with
+// its <title>, the two axes with their labels, and the shared curve / point /
+// caption styling. The default slot receives the SVG content (curves, guides,
+// points); the `caption` slot receives the figcaption content.
+//
+// Colour is chosen with a tone class on any element: `tone-s5`, `tone-ct`,
+// `tone-pt`, `tone-key`. `.curve` strokes, `.curve-label` / `.pt-label` text, `circle.pt`
+// fills and caption `<span>`s all read the tone, so a legend span and the
+// curve it names share one class. Add `dashed` to a `.curve` for a shifted one.
+// `tone-ink` gives the neutral text colour, for marked points and similar.
+//
+// `size` picks a preset: `sm` (420x340, light strokes) or `lg` (620x430, heavier
+// strokes and larger labels). Any geometry prop overrides the preset.
+interface Props {
+  size?: "sm" | "lg";
+  title: string;
+  // Longer description, exposed to assistive tech alongside the title.
+  desc?: string;
+  // Caps the figure width; defaults to the viewBox width.
+  maxWidth?: number;
+  xLabel: string;
+  yLabel: string;
+  viewBox?: string;
+  // Axes meet at (x0, y0); the y axis runs up to `top`, the x axis right to `right`.
+  x0?: number;
+  y0?: number;
+  top?: number;
+  right?: number;
+  // Distance of each axis label from its axis end.
+  yLabelOffset?: number;
+  xLabelOffset?: number;
+}
+
+const PRESETS = {
+  sm: {
+    viewBox: "0 0 420 340",
+    x0: 50,
+    y0: 290,
+    top: 20,
+    right: 390,
+    yLabelOffset: 6,
+    xLabelOffset: 25,
+  },
+  lg: {
+    viewBox: "0 0 620 430",
+    x0: 75,
+    y0: 355,
+    top: 35,
+    right: 565,
+    yLabelOffset: 13,
+    xLabelOffset: 30,
+  },
+};
+
+const {
+  size = "sm",
+  title,
+  desc,
+  maxWidth: maxWidthProp,
+  xLabel,
+  yLabel,
+  ...overrides
+} = Astro.props;
+const { viewBox, x0, y0, top, right, yLabelOffset, xLabelOffset } = {
+  ...PRESETS[size],
+  ...Object.fromEntries(
+    Object.entries(overrides).filter(([, v]) => v !== undefined),
+  ),
+};
+
+const maxWidth = maxWidthProp ?? Number(viewBox.split(/\s+/)[2]);
+
+const uid = makeUid("axes");
+const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
+---
+
+<figure class:list={["axes-figure", size]} style={`max-width: ${maxWidth}px`}>
+  <svg
+    viewBox={viewBox}
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby={labelledBy}
+  >
+    <title id={`${uid}-title`}>{title}</title>
+    {desc && <desc id={`${uid}-desc`}>{desc}</desc>}
+
+    <line class="axis" x1={x0} y1={top} x2={x0} y2={y0}></line>
+    <line class="axis" x1={x0} y1={y0} x2={right} y2={y0}></line>
+    <text class="axis-label" x={x0} y={top - yLabelOffset} text-anchor="middle">
+      {yLabel}
+    </text>
+    <text class="axis-label" x={right} y={y0 + xLabelOffset} text-anchor="end">
+      {xLabel}
+    </text>
+
+    <slot />
+  </svg>
+  <figcaption>
+    <slot name="caption" />
+  </figcaption>
+</figure>
+
+<style>
+  .axes-figure {
+    margin: 24px auto;
+  }
+
+  .axes-figure svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .axes-figure :global(.tone-s5) {
+    --tone: var(--s5);
+  }
+
+  .axes-figure :global(.tone-ct) {
+    --tone: var(--dia-ct);
+  }
+
+  .axes-figure :global(.tone-pt) {
+    --tone: var(--dia-pt);
+  }
+
+  .axes-figure :global(.tone-key) {
+    --tone: var(--dia-key);
+  }
+
+  .axes-figure :global(.tone-ink) {
+    --tone: var(--text-primary);
+  }
+
+  .axes-figure :global(.axis) {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  .axes-figure :global(.axis-label) {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .axes-figure :global(.axis-tick) {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .axes-figure :global(.curve) {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 2.5;
+  }
+
+  .axes-figure :global(.curve.round) {
+    stroke-linecap: round;
+  }
+
+  .axes-figure :global(.curve.dashed) {
+    stroke-dasharray: 6 5;
+  }
+
+  .axes-figure :global(.guide) {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .axes-figure :global(circle.pt) {
+    fill: var(--tone);
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+
+  .axes-figure :global(.curve-label),
+  .axes-figure :global(.pt-label) {
+    fill: var(--tone);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .axes-figure.lg {
+    margin: 28px auto;
+  }
+
+  .axes-figure.lg :global(.axis) {
+    stroke-width: 1.8;
+  }
+
+  .axes-figure.lg :global(.axis-label) {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .axes-figure.lg :global(.curve) {
+    stroke-width: 3;
+  }
+
+  .axes-figure.lg :global(.curve-label) {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .axes-figure.lg figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+  }
+
+  .axes-figure figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .axes-figure figcaption :global([class*="tone-"]) {
+    font-weight: 600;
+    color: var(--tone);
+  }
+</style>

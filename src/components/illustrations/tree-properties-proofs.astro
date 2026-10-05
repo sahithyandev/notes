@@ -1,3 +1,7 @@
+---
+import ArrowMarker from "./primitives/arrow-marker.astro";
+---
+
 <svg id="tree-props-proof" width="100%" viewBox="0 0 680 720" role="img">
   <title>Tree characterisation equivalence proof</title>
   <desc>
@@ -5,24 +9,7 @@
     uses a dedicated lane so no two arrow paths share the same corridor.
   </desc>
   <defs>
-    <marker
-      id="arrow"
-      viewBox="0 0 10 10"
-      refX="8"
-      refY="5"
-      markerWidth="6"
-      markerHeight="6"
-      orient="auto-start-reverse"
-    >
-      <path
-        d="M2 1L8 5L2 9"
-        fill="none"
-        stroke="context-stroke"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></path>
-    </marker>
+    <ArrowMarker id="arrow" variant="open" />
   </defs>
 
   <!-- NODE 1 (top centre): x=220..460, y=50..114 -->

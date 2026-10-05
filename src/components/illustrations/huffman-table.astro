@@ -13,6 +13,8 @@ import Panel from "./primitives/panel.astro";
 import StepBar from "./primitives/step-bar.astro";
 import StepNav from "./primitives/step-nav.astro";
 import StepNote from "./primitives/step-note.astro";
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
 
 interface Props {
   /** Symbols with probabilities. A label like "a_1" renders as a subscript. */
@@ -21,7 +23,7 @@ interface Props {
 
 const { symbols } = Astro.props;
 
-const uid = "huff-" + Math.random().toString(36).slice(2, 9);
+const uid = makeUid("huff");
 
 // Probabilities are compared as integers so sums like 0.2 + 0.1 tie exactly
 // with 0.3 instead of drifting by a float epsilon.
@@ -202,17 +204,7 @@ const arrows = merges.slice(0, m).map(({ x, y, node }, j) => {
       aria-label="Huffman source reduction table built step by step"
     >
       <defs>
-        <marker
-          id={uid}
-          viewBox="0 0 10 10"
-          refX="9"
-          refY="5"
-          markerWidth="8"
-          markerHeight="8"
-          orient="auto"
-        >
-          <path class="arrowhead" d="M0,0 L10,5 L0,10 z"></path>
-        </marker>
+        <ArrowMarker id={uid} size={8} orient="auto" />
       </defs>
 
       <line class="rule" x1="8" y1="8" x2={W - 8} y2="8"></line>
@@ -371,9 +363,6 @@ const arrows = merges.slice(0, m).map(({ x, y, node }, j) => {
     fill: none;
     stroke: var(--text-secondary);
     stroke-width: 1.3;
-  }
-  .arrowhead {
-    fill: var(--text-secondary);
   }
 
   /* The server renders the step 0 state (later cells, codes, arrows and notes

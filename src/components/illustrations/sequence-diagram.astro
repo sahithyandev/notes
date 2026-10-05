@@ -5,6 +5,7 @@
 import Panel from "./primitives/panel.astro";
 import StepBar from "./primitives/step-bar.astro";
 import StepNav from "./primitives/step-nav.astro";
+import { makeUid } from "./lib/uid";
 
 interface Step {
   from: number;
@@ -21,7 +22,7 @@ interface Props {
 
 const { participants, steps } = Astro.props;
 
-const uid = "seq-" + Math.random().toString(36).slice(2, 9);
+const uid = makeUid("seq");
 
 const W = 920;
 const PAD_X = 80;
