@@ -4,6 +4,7 @@
 // right plane. The faint grid shows the same correspondence for every
 // half-integer x and every multiple of π/6 for y.
 import { makeUid } from "./lib/uid";
+import FigureCaption from "./primitives/figure-caption.astro";
 
 const LX0 = -3;
 const LX1 = 1.5;
@@ -212,6 +213,10 @@ const AR = (W / H).toFixed(4);
     </span>
   </p>
   <p class="live" aria-live="polite" data-live></p>
+  <FigureCaption hidden>
+    Interactive z-plane and w-plane showing the map w = e^z. Drag z to see how
+    its vertical and horizontal lines map to a circle and a ray.
+  </FigureCaption>
 </figure>
 
 <style>

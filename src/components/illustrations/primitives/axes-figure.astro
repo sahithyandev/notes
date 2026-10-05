@@ -1,5 +1,4 @@
 ---
-import { makeUid } from "../lib/uid";
 // Figure shell for 2-axis curve diagrams: the sized <figure>, the <svg> with
 // its <title>, the two axes with their labels, and the shared curve / point /
 // caption styling. The default slot receives the SVG content (curves, guides,
@@ -13,7 +12,13 @@ import { makeUid } from "../lib/uid";
 //
 // `size` picks a preset: `sm` (420x340, light strokes) or `lg` (620x430, heavier
 // strokes and larger labels). Any geometry prop overrides the preset.
-interface Props {
+//
+// A caption is required by type (see lib/caption.ts): pass plain text as
+// `caption`, or `captionSlot` plus `<Fragment slot="caption">` for markup.
+import { makeUid } from "../lib/uid";
+import { assertCaption, type CaptionProps } from "../lib/caption";
+
+type Props = CaptionProps & {
   size?: "sm" | "lg";
   title: string;
   // Longer description, exposed to assistive tech alongside the title.
@@ -31,7 +36,7 @@ interface Props {
   // Distance of each axis label from its axis end.
   yLabelOffset?: number;
   xLabelOffset?: number;
-}
+};
 
 const PRESETS = {
   sm: {
@@ -61,8 +66,12 @@ const {
   maxWidth: maxWidthProp,
   xLabel,
   yLabel,
+  caption,
+  captionSlot: _captionSlot,
   ...overrides
 } = Astro.props;
+
+assertCaption("AxesFigure", caption, Astro.slots.has("caption"));
 const { viewBox, x0, y0, top, right, yLabelOffset, xLabelOffset } = {
   ...PRESETS[size],
   ...Object.fromEntries(
@@ -98,6 +107,7 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
     <slot />
   </svg>
   <figcaption>
+    {caption}
     <slot name="caption" />
   </figcaption>
 </figure>

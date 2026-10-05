@@ -1,4 +1,6 @@
 ---
+import FigureCaption from "./primitives/figure-caption.astro";
+
 interface Cell {
   text?: string;
   type?: "label" | "input" | "formula" | "limit";
@@ -45,7 +47,11 @@ const normalize = (cell: CellInput): Cell =>
       </tbody>
     </table>
   </div>
-  {caption && <figcaption>{caption}</figcaption>}
+  {caption ? (
+    <figcaption>{caption}</figcaption>
+  ) : (
+    <FigureCaption hidden>Spreadsheet example</FigureCaption>
+  )}
 </figure>
 
 <style>

@@ -1,4 +1,6 @@
 ---
+import FigureCaption from "./primitives/figure-caption.astro";
+
 interface Props {
   data: number[];
   columns?: number;
@@ -12,7 +14,11 @@ const accent = new Set(accentCols);
 ---
 
 <figure class="permtable">
-  {title && <figcaption class="title">{title}</figcaption>}
+  {title ? (
+    <figcaption class="title">{title}</figcaption>
+  ) : (
+    <FigureCaption hidden>Permutation table</FigureCaption>
+  )}
   <ol class="grid" style={`--cols:${columns}`}>
     {data.map((src, i) => (
       <li class:list={["cell", { accent: accent.has(i % columns) }]}>

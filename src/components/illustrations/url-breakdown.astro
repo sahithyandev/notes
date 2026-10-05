@@ -7,9 +7,13 @@ import Legend from "./primitives/legend.astro";
 
 interface Props {
   url: string;
+  caption?: string;
 }
 
-const { url } = Astro.props;
+const {
+  url,
+  caption = `The URL ${url} split into scheme, host, path and query segments`,
+} = Astro.props;
 
 type SegmentKind =
   "scheme" | "host" | "path" | "param-name" | "param-value" | "connector";
@@ -69,7 +73,7 @@ const legendItems = LEGEND.filter((l) => presentKinds.has(l.kind)).map((l) => ({
 }));
 ---
 
-<Panel class="url-breakdown">
+<Panel class="url-breakdown" caption={caption} hideCaption>
   <p class="url">
     {segments.map((s) => (
       <span class:list={["seg", s.kind]}>{s.text}</span>

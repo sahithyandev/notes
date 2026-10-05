@@ -35,9 +35,15 @@ interface Props {
   rows: { title?: string; boxes: (string | Box)[] }[];
   links: Link[];
   sbw?: number;
+  caption?: string;
 }
 
-const { rows, links, sbw } = Astro.props;
+const {
+  rows,
+  links,
+  sbw,
+  caption = "Flow diagram, revealed one step at a time",
+} = Astro.props;
 
 const uid = makeUid("flow");
 
@@ -328,6 +334,8 @@ const drawn = links.map(drawLink);
 
 <Panel
   class="flow"
+  caption={caption}
+  hideCaption
   id={uid}
   tabindex="0"
   aria-roledescription="carousel"

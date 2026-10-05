@@ -1,4 +1,6 @@
 ---
+import FigureCaption from "./primitives/figure-caption.astro";
+
 interface Props {
   shifts: number[];
   caption?: string;
@@ -16,7 +18,9 @@ const { shifts, caption } = Astro.props;
       </li>
     ))}
   </ol>
-  {caption && <p class="caption">{caption}</p>}
+  <FigureCaption hidden={!caption}>
+    {caption ?? "Rotation schedule showing the shift used in each round"}
+  </FigureCaption>
 </figure>
 
 <style>
@@ -67,12 +71,5 @@ const { shifts, caption } = Astro.props;
 
   .shift {
     margin-top: 0.35em;
-  }
-
-  .caption {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin: 8px auto 0;
-    max-width: 32rem;
   }
 </style>

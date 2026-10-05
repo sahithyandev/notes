@@ -2,8 +2,10 @@ import type { Chip } from "../primitives/legend.astro";
 
 // One legend preset per walkthrough family, replacing the near-identical
 // <p class="legend">...</p> markup each of the 3 walkthroughs used to carry.
+// `caption` is the default accessible description of the carousel.
 export const WALKTHROUGH_PRESETS = {
   simplex: {
+    caption: "Step-by-step walkthrough of the simplex method on a tableau",
     legend: [
       {
         label: "entering column",
@@ -27,6 +29,7 @@ export const WALKTHROUGH_PRESETS = {
     ] satisfies Chip[],
   },
   transportation: {
+    caption: "Step-by-step walkthrough of a transportation problem solution",
     legend: [
       { label: "occupied cell", kind: "swatch", fill: "var(--accent-subtle)" },
       { label: "0 allocation", kind: "swatch", fill: "var(--accent-subtle)" },
@@ -52,6 +55,7 @@ export const WALKTHROUGH_PRESETS = {
     ] satisfies Chip[],
   },
   assignment: {
+    caption: "Step-by-step walkthrough of an assignment problem solution",
     legend: [
       {
         label: "0 entry",
@@ -70,6 +74,7 @@ export const WALKTHROUGH_PRESETS = {
     ] satisfies Chip[],
   },
   cpm: {
+    caption: "Step-by-step walkthrough of a critical path method calculation",
     legend: [
       {
         label: "critical event (E(i) = L(i))",
@@ -79,6 +84,6 @@ export const WALKTHROUGH_PRESETS = {
       { label: "updated this step", kind: "text" },
     ] satisfies Chip[],
   },
-} satisfies Record<string, { legend: Chip[] }>;
+} satisfies Record<string, { caption: string; legend: Chip[] }>;
 
 export type WalkthroughVariant = keyof typeof WALKTHROUGH_PRESETS;

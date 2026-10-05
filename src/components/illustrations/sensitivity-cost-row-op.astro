@@ -10,9 +10,16 @@ interface Props {
   baseC: number;
   deltaMin: number;
   deltaMax: number;
+  caption?: string;
 }
 
-const { variable, baseC, deltaMin, deltaMax } = Astro.props;
+const {
+  variable,
+  baseC,
+  deltaMin,
+  deltaMax,
+  caption = `Row operation on the objective row when the cost of ${variable} changes`,
+} = Astro.props;
 
 const columns = ["x_1", "x_2", "s_1", "s_2", "s_3"];
 const rows = [
@@ -35,7 +42,7 @@ const sourceRow = rows.find((r) => r.basic === variable)!;
 const nonBasicCols = columns.filter((c) => !rows.some((r) => r.basic === c));
 ---
 
-<Panel class="row-op">
+<Panel class="row-op" caption={caption} hideCaption>
   <p class="formula">
     <span
       set:html={tex("z\\text{-row} \\leftarrow z\\text{-row} + \\Delta \\cdot")}

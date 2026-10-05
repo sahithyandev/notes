@@ -7,9 +7,13 @@ import Panel from "./primitives/panel.astro";
 
 interface Props {
   bits?: string;
+  caption?: string;
 }
 
-const { bits = "-rw-rw-r--" } = Astro.props;
+const {
+  bits = "-rw-rw-r--",
+  caption = "Interactive Unix file permission builder with the equivalent chmod mode",
+} = Astro.props;
 
 const TYPES = ["-", "d", "l", "c", "b", "p", "s"] as const;
 
@@ -69,7 +73,7 @@ const PRESETS = [
 ] as const;
 ---
 
-<Panel class="permission-builder">
+<Panel class="permission-builder" caption={caption} hideCaption>
   <div class="perm-row">
     <button
       type="button"

@@ -1,5 +1,6 @@
 ---
 import { tex } from "../../utils/tex";
+import FigureCaption from "./primitives/figure-caption.astro";
 
 interface Row {
   label: string;
@@ -67,7 +68,11 @@ const format = (v: number | null, negative: boolean) => {
       ))}
     </tbody>
   </table>
-  {caption && <figcaption>{caption}</figcaption>}
+  {caption ? (
+    <figcaption>{caption}</figcaption>
+  ) : (
+    <FigureCaption hidden>Overhead distribution table</FigureCaption>
+  )}
 </figure>
 
 <style>

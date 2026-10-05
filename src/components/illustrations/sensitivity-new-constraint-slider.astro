@@ -8,12 +8,18 @@ interface Props {
   currentSum: number;
   min: number;
   max: number;
+  caption?: string;
 }
 
-const { currentSum, min, max } = Astro.props;
+const {
+  currentSum,
+  min,
+  max,
+  caption = "Feasibility of a new constraint as its right-hand side changes",
+} = Astro.props;
 ---
 
-<Panel class="new-constraint-slider">
+<Panel class="new-constraint-slider" caption={caption} hideCaption>
   <div class="row">
     <span class="label">
       <span set:html={tex("x_1 + x_2")} /> at the current optimum

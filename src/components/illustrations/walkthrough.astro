@@ -17,14 +17,23 @@ import {
 interface Props {
   variant?: WalkthroughVariant;
   legend?: Chip[];
+  // Overrides the preset's caption.
+  caption?: string;
 }
 
-const { variant, legend } = Astro.props;
+const { variant, legend, caption } = Astro.props;
 const chips = legend ?? (variant ? WALKTHROUGH_PRESETS[variant].legend : []);
 ---
 
 <Panel
   class="walkthrough"
+  caption={
+    caption ??
+    (variant
+      ? WALKTHROUGH_PRESETS[variant].caption
+      : "Step-by-step walkthrough")
+  }
+  hideCaption
   data-walkthrough
   tabindex="0"
   aria-roledescription="carousel"

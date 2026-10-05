@@ -3,6 +3,8 @@
 // using the exact formulas from the note. One swatch: a display emits RGB
 // only, so a separate CMYK swatch would be the same pixels. The readout
 // instead shows the canonical CMYK a round trip through RGB lands on.
+import FigureCaption from "./primitives/figure-caption.astro";
+
 function rgbToCmyk(r: number, g: number, b: number) {
   const R = r / 255,
     G = g / 255,
@@ -117,6 +119,10 @@ const rgb0 = [R0, G0, B0] as const;
 
   <p class="canonical" hidden data-canonical></p>
   <p class="live" aria-live="polite"></p>
+  <FigureCaption hidden>
+    Side-by-side RGB and CMYK color editors. Editing one space updates the
+    other.
+  </FigureCaption>
 </figure>
 
 <style>

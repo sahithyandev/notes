@@ -1,17 +1,36 @@
 ---
-// The bordered surface box shared by the walkthrough carousel and (later)
-// the sensitivity sliders. Attributes beyond `class` (tabindex,
-// aria-roledescription, id, ...) are passed through to the root element so
-// carousel-specific semantics stay in the component that needs them.
+// The bordered surface box shared by the walkthrough carousel, the
+// sensitivity sliders and the other interactive widgets. Attributes beyond
+// `class` (tabindex, aria-roledescription, id, ...) are passed through to the
+// root element so carousel-specific semantics stay in the component that needs
+// them. The caption is required by type (see lib/caption.ts); `hideCaption`
+// makes it screen-reader-only.
 import type { HTMLAttributes } from "astro/types";
+import { assertCaption, type CaptionProps } from "../lib/caption";
+import FigureCaption from "./figure-caption.astro";
 
-interface Props extends HTMLAttributes<"figure"> {}
+type Props = HTMLAttributes<"figure"> &
+  CaptionProps & {
+    hideCaption?: boolean;
+  };
 
-const { class: className, ...rest } = Astro.props;
+const {
+  class: className,
+  caption,
+  captionSlot: _captionSlot,
+  hideCaption = false,
+  ...rest
+} = Astro.props;
+
+assertCaption("Panel", caption, Astro.slots.has("caption"));
 ---
 
 <figure class:list={["panel", className]} {...rest}>
   <slot />
+  <FigureCaption hidden={hideCaption}>
+    {caption}
+    <slot name="caption" />
+  </FigureCaption>
 </figure>
 
 <style>

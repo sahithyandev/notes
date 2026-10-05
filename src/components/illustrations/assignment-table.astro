@@ -1,5 +1,6 @@
 ---
 import { tex } from "../../utils/tex";
+import FigureCaption from "./primitives/figure-caption.astro";
 
 interface Props {
   agents: string[];
@@ -68,7 +69,11 @@ const isAssigned = (ri: number, ci: number) =>
       ))}
     </tbody>
   </table>
-  {total && <figcaption set:html={tex(total)} />}
+  {total ? (
+    <figcaption set:html={tex(total)} />
+  ) : (
+    <FigureCaption hidden>Assignment problem cost table</FigureCaption>
+  )}
 </figure>
 
 <style>

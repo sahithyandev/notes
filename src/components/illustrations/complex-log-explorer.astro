@@ -3,6 +3,8 @@
 // is plotted, as a second point on the same axes, with the same visual
 // treatment as z itself: dashed projection guides to the axes, and a
 // value label next to it.
+import FigureCaption from "./primitives/figure-caption.astro";
+
 const RE0 = 2;
 const IM0 = 1;
 
@@ -152,6 +154,10 @@ const AR = (W / S).toFixed(4);
   </svg>
 
   <p class="live" aria-live="polite" data-live></p>
+  <FigureCaption hidden>
+    Interactive plot of a point z and its principal logarithm Log z on the same
+    axes. Pick z with the pointer or the keyboard.
+  </FigureCaption>
 </figure>
 
 <style>

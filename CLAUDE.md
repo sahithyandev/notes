@@ -187,14 +187,26 @@ Content collection (`src/content.config.ts`) globs `./docs/**/*.{md,mdx}`. Compo
 
 - **Leaf illustrations** — the domain-specific components (`simplex-step.astro`, `transportation-table.astro`, `sensitivity-rhs-slider.astro`, `flow-diagram.astro`, ...). These carry the actual math/data and are what notes reference in MDX.
 - **Composites** — components that assemble primitives into a reusable shape. `walkthrough.astro` is the one generic step carousel (`<Walkthrough variant="simplex" | "transportation" | "assignment">`); step components (`simplex-step.astro`, etc.) render into it via a hidden `[data-stage]` element that the shared controller clones and updates.
-- **`primitives/`** — chrome with no domain knowledge: `panel.astro` (bordered surface box), `step-bar.astro` (label + counter), `legend.astro` (a closed vocabulary of chip kinds: `swatch` / `outline` / `line` / `glyph` / `text`), `step-nav.astro` (dots + prev/next + aria-live), `step-note.astro`, `slider-control.astro`, `status-note.astro`, plus 2 for SVG diagrams:
+- **`primitives/`** — chrome with no domain knowledge: `panel.astro` (bordered surface box), `step-bar.astro` (label + counter), `legend.astro` (a closed vocabulary of chip kinds: `swatch` / `outline` / `line` / `glyph` / `text`), `step-nav.astro` (dots + prev/next + aria-live), `step-note.astro`, `slider-control.astro`, `status-note.astro`, plus 3 more:
+  - `figure-caption.astro`
+    The `<figcaption>` used by `Panel` and by illustrations that render their own `<figure>`. `hidden` makes it screen-reader-only.
   - `axes-figure.astro`
-    The shell for 2-axis curve diagrams: sized `<figure>`, `<svg>` with `<title>` (and optional `desc`, wired to `aria-labelledby`), both axes with labels, and the shared curve, point, guide and caption styling. Curves, points and labels go in the default slot, the caption in `slot="caption"`. `size="sm"` (420×340) and `size="lg"` (620×430, heavier strokes) are presets, and `viewBox`, `x0`, `y0`, `top`, `right`, `yLabelOffset`, `xLabelOffset` and `maxWidth` override them for other geometries.
+    The shell for 2-axis curve diagrams: sized `<figure>`, `<svg>` with `<title>` (and optional `desc`, wired to `aria-labelledby`), both axes with labels, and the shared curve, point, guide and caption styling. Curves, points and labels go in the default slot, the caption via `caption` or `slot="caption"` (see "Captions" below). `size="sm"` (420×340) and `size="lg"` (620×430, heavier strokes) are presets, and `viewBox`, `x0`, `y0`, `top`, `right`, `yLabelOffset`, `xLabelOffset` and `maxWidth` override them for other geometries.
   - `arrow-marker.astro`
     An SVG arrowhead `<marker>` to place inside the diagram's `<defs>`. `variant="filled"` is a solid triangle painted by `fill`, `variant="open"` is a chevron that takes the referencing line's stroke colour.
-- **`lib/`** — pure TS, no markup: `uid.ts` (`makeUid("prefix")`, the per-instance id for markers, clip paths and DOM hooks), `walkthrough.ts` (the shared carousel driver), `dots.ts` (clones a dot button from `step-nav.astro`'s `<template>` so it carries that component's scoped-CSS id), `format.ts` (slider number formatting), `legend-presets.ts` (per-`variant` legend chips), plus `src/utils/tex.ts` for the shared KaTeX render helper used across the directory.
+- **`lib/`** — pure TS, no markup: `uid.ts` (`makeUid("prefix")`, the per-instance id for markers, clip paths and DOM hooks), `caption.ts` (the `CaptionProps` type that makes a caption mandatory), `walkthrough.ts` (the shared carousel driver), `dots.ts` (clones a dot button from `step-nav.astro`'s `<template>` so it carries that component's scoped-CSS id), `format.ts` (slider number formatting), `legend-presets.ts` (per-`variant` legend chips), plus `src/utils/tex.ts` for the shared KaTeX render helper used across the directory.
 
 **When adding a new interactive illustration, compose the existing primitives instead of copying chrome from another component.** If a primitive doesn't fit (e.g. it needs a different accent colour or box padding), extend the primitive with a CSS custom property or a scoped `:global()` override in the consuming component's own `<style>` block, rather than duplicating its markup and CSS — see `flow-diagram.astro`'s `--nav-accent` override for the pattern.
+
+### Captions
+
+Every illustration that renders a `<figure>` must render a `<figcaption>`, because it is the figure's accessible description.
+
+- `Panel` and `AxesFigure` take `CaptionProps` (`lib/caption.ts`). Pass either plain text as `caption="..."`, or `captionSlot` plus `<Fragment slot="caption">` for a caption with markup. Passing neither is a type error under `astro check`, and `captionSlot` with an empty slot throws at render time.
+- A leaf component that wraps `Panel` takes an optional `caption` prop with a default built from its other props, so existing MDX needs no change. Interactive widgets pass `hideCaption`, which keeps the caption for assistive tech and out of the layout. A static diagram shows its caption.
+- A component that writes its own `<figure>` renders a `<figcaption>` on every path. When the caption is optional, fall back to `<FigureCaption hidden>` with a default instead of omitting the element.
+- `figcaption.test.ts` scans the sources for a `<figure>` without a figcaption and for a `Panel` or `AxesFigure` without a caption. It runs with `bun test`.
+- `astro check` currently refuses to run on TypeScript 7 (this repo's version), so the type-level check needs TypeScript 6, for example in a scratch copy of the project. The test above is the check that runs here.
 
 ### SVG diagram conventions
 

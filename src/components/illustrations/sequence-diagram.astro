@@ -18,9 +18,14 @@ interface Step {
 interface Props {
   participants: { name: string; sub?: string }[];
   steps: Step[];
+  caption?: string;
 }
 
-const { participants, steps } = Astro.props;
+const {
+  participants,
+  steps,
+  caption = `Message sequence diagram between ${participants.map((p) => p.name).join(", ")}, revealed one message at a time`,
+} = Astro.props;
 
 const uid = makeUid("seq");
 
@@ -74,6 +79,8 @@ const rows = steps.map((step, i) => {
 
 <Panel
   class="sequence"
+  caption={caption}
+  hideCaption
   id={uid}
   tabindex="0"
   aria-roledescription="carousel"

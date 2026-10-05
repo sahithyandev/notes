@@ -19,9 +19,13 @@ import ArrowMarker from "./primitives/arrow-marker.astro";
 interface Props {
   /** Symbols with probabilities. A label like "a_1" renders as a subscript. */
   symbols: { label: string; p: number }[];
+  caption?: string;
 }
 
-const { symbols } = Astro.props;
+const {
+  symbols,
+  caption = `Huffman source reduction table for ${symbols.length} symbols, revealed one step at a time`,
+} = Astro.props;
 
 const uid = makeUid("huff");
 
@@ -188,6 +192,8 @@ const arrows = merges.slice(0, m).map(({ x, y, node }, j) => {
 
 <Panel
   class="huffman"
+  caption={caption}
+  hideCaption
   data-huffman
   tabindex="0"
   aria-roledescription="carousel"

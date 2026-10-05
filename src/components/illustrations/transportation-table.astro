@@ -1,5 +1,6 @@
 ---
 import { tex } from "../../utils/tex";
+import FigureCaption from "./primitives/figure-caption.astro";
 
 interface Props {
   rows: string[];
@@ -193,7 +194,11 @@ const isSelectedCol = (ci: number) =>
       )}
     </tbody>
   </table>
-  {total && <figcaption set:html={tex(total)} />}
+  {total ? (
+    <figcaption set:html={tex(total)} />
+  ) : (
+    <FigureCaption hidden>Transportation problem table</FigureCaption>
+  )}
 </figure>
 
 <style>

@@ -3,6 +3,7 @@
 // as labeled directed arrows between them (dashed for a dummy activity).
 import { makeUid } from "./lib/uid";
 import ArrowMarker from "./primitives/arrow-marker.astro";
+import FigureCaption from "./primitives/figure-caption.astro";
 
 interface Node {
   id: string;
@@ -22,9 +23,16 @@ interface Props {
   edges: Edge[];
   width?: number;
   height?: number;
+  caption?: string;
 }
 
-const { nodes, edges, width = 560, height = 300 } = Astro.props;
+const {
+  nodes,
+  edges,
+  width = 560,
+  height = 300,
+  caption = "Project network diagram with events as circles and activities as arrows between them",
+} = Astro.props;
 
 const uid = makeUid("net");
 
@@ -91,6 +99,7 @@ const arrows = edges.map((edge) => {
       </g>
     ))}
   </svg>
+  <FigureCaption hidden>{caption}</FigureCaption>
 </figure>
 
 <style>

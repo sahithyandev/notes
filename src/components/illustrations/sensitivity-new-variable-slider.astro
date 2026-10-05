@@ -8,12 +8,18 @@ interface Props {
   zTerm: number;
   deltaMin: number;
   deltaMax: number;
+  caption?: string;
 }
 
-const { zTerm, deltaMin, deltaMax } = Astro.props;
+const {
+  zTerm,
+  deltaMin,
+  deltaMax,
+  caption = "Reduced cost of a new variable as its cost coefficient changes",
+} = Astro.props;
 ---
 
-<Panel class="new-var-slider">
+<Panel class="new-var-slider" caption={caption} hideCaption>
   <div class="row">
     <span class="label">
       <span set:html={tex("z_{\\text{new}} - c_{\\text{new}}")} /> = {zTerm} -{" "}
