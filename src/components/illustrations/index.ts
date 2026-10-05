@@ -16,6 +16,8 @@ export { default as ExponentialMapping } from "./exponential-mapping.astro";
 export { default as FlowDiagram } from "./flow-diagram.astro";
 export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.astro";
 export { default as HuffmanTable } from "./huffman-table.astro";
+export { default as KerberosDiagram } from "./kerberos-diagram.astro";
+export { default as KerberosDataFlow } from "./kerberos-data-flow.astro";
 export { default as MarketEquilibriumDiagram } from "./market-equilibrium-diagram.astro";
 export { default as NetworkDiagram } from "./network-diagram.astro";
 export { default as Packet } from "./packet.astro";

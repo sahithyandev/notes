@@ -1,0 +1,1025 @@
+---
+// Data-lineage view of the 5 Kerberos messages. Each step is a card holding
+// its equation as field chips (Enc[K](...) is a nested box labelled with its
+// key), and connectors show where each value is produced and where the next
+// step reuses it. Key and ticket connectors are heavy and coloured, all other
+// fields are thin. Hovering or tapping a chip highlights every occurrence of
+// that value and its connectors. Orange is the TGT side, green the SGT side,
+// purple the password-derived key.
+const uid = "kdf-" + Math.random().toString(36).slice(2, 9);
+
+const W = 1000;
+const TOP = 14;
+const CARD_H = 104;
+const GAP = 52;
+const X0 = 156;
+const CH = 30;
+const KH = 22;
+const CELL_GAP = 8;
+const ITEM_GAP = 24;
+const H = TOP + 5 * CARD_H + 4 * GAP + 110;
+
+// Actors that can hold keys. A box lists who can decrypt it.
+const ACTORS = ["C", "AS", "TGS", "V"];
+const PILL_W: Record<string, number> = { C: 17, AS: 23, TGS: 29, V: 17 };
+const PILL_GAP = 4;
+const BADGES_W =
+  ACTORS.reduce((a, r) => a + PILL_W[r], 0) + PILL_GAP * (ACTORS.length - 1);
+
+type Chip = {
+  id: string;
+  text: string;
+  g: string;
+  cls?: string;
+  ticket?: "tgt" | "sgt";
+  readers?: string;
+  keylabel?: boolean;
+};
+type Box = {
+  id: string;
+  name?: string;
+  key: Chip;
+  g: string;
+  cls: string;
+  readers?: string;
+  tkt?: boolean;
+  kids: Chip[];
+};
+type Item = Chip | Box;
+type Step = { n: number; msg: string; route: string; items: Item[] };
+
+function fmt(s: string): string {
+  return s.replace(
+    /_\{([^}]+)\}/g,
+    '<tspan baseline-shift="sub" font-size="70%">$1</tspan>',
+  );
+}
+function plain(s: string): string {
+  return s.replace(/_\{([^}]+)\}/g, " $1");
+}
+function textW(s: string): number {
+  const subs = [...s.matchAll(/_\{([^}]+)\}/g)].reduce(
+    (a, m) => a + m[1].length,
+    0,
+  );
+  return s.replace(/_\{[^}]+\}/g, "").length * 7.2 + subs * 5;
+}
+const chipW = (s: string, min = 36) => Math.max(min, Math.round(textW(s) + 16));
+
+const steps: Step[] = [
+  {
+    n: 1,
+    msg: "AS_REQ",
+    route: "C to AS",
+    items: [
+      { id: "s1.C", text: "C", g: "C" },
+      { id: "s1.T", text: "T", g: "T" },
+      { id: "s1.IPL", text: "IP-list", g: "IPL" },
+      { id: "s1.LT", text: "lifetime_{requested}", g: "LT" },
+    ],
+  },
+  {
+    n: 2,
+    msg: "AS_REP",
+    route: "AS to C",
+    items: [
+      {
+        id: "s2.rep",
+        g: "",
+        readers: "C AS",
+        cls: "kc",
+        key: { id: "s2.rep.key", text: "K_{C}", g: "KC", cls: "kc" },
+        kids: [
+          { id: "s2.rep.T", text: "T", g: "T" },
+          { id: "s2.rep.TS", text: "timestamp_{AS}", g: "TSAS" },
+          { id: "s2.rep.LT", text: "lifetime_{granted}", g: "LT" },
+          { id: "s2.rep.KCT", text: "K_{C,T}", g: "KCT", cls: "kct" },
+        ],
+      },
+      {
+        id: "s2.tgt",
+        readers: "AS TGS",
+        name: "TGT",
+        tkt: true,
+        g: "TGT",
+        cls: "kt",
+        key: { id: "s2.tgt.key", text: "K_{T}", g: "KT TGT", cls: "kt" },
+        kids: [
+          { id: "s2.tgt.C", text: "C", g: "C TGT" },
+          { id: "s2.tgt.IPL", text: "IP-list_{modified}", g: "IPL TGT" },
+          { id: "s2.tgt.TS", text: "timestamp_{AS}", g: "TSAS TGT" },
+          { id: "s2.tgt.LT", text: "lifetime_{granted}", g: "LT TGT" },
+          { id: "s2.tgt.KCT", text: "K_{C,T}", g: "KCT TGT", cls: "kct" },
+        ],
+      },
+    ],
+  },
+  {
+    n: 3,
+    msg: "TGS_REQ",
+    route: "C to TGS",
+    items: [
+      { id: "s3.V", text: "V", g: "V" },
+      { id: "s3.LT", text: "lifetime_{requested}", g: "LT3" },
+      {
+        id: "s3.auth",
+        readers: "C AS TGS",
+        name: "Auth_{1}",
+        g: "AUTH1",
+        cls: "kct",
+        key: {
+          id: "s3.auth.key",
+          text: "K_{C,T}",
+          g: "KCT AUTH1",
+          cls: "kct",
+        },
+        kids: [
+          { id: "s3.auth.C", text: "C", g: "C AUTH1" },
+          { id: "s3.auth.TS", text: "timestamp_{C}", g: "TSC AUTH1" },
+        ],
+      },
+      {
+        id: "s3.tgt",
+        readers: "AS TGS",
+        text: "TGT",
+        g: "TGT C IPL TSAS LT KCT",
+        ticket: "tgt",
+      },
+    ],
+  },
+  {
+    n: 4,
+    msg: "TGS_REP",
+    route: "TGS to C",
+    items: [
+      {
+        id: "s4.rep",
+        g: "",
+        readers: "C AS TGS",
+        cls: "kct",
+        key: { id: "s4.rep.key", text: "K_{C,T}", g: "KCT", cls: "kct" },
+        kids: [
+          { id: "s4.rep.V", text: "V", g: "V" },
+          { id: "s4.rep.TS", text: "timestamp_{TGS}", g: "TSTGS" },
+          { id: "s4.rep.LT", text: "lifetime_{granted}", g: "LT LT3" },
+          { id: "s4.rep.KCV", text: "K_{C,V}", g: "KCV", cls: "kcv" },
+        ],
+      },
+      {
+        id: "s4.sgt",
+        readers: "TGS V",
+        name: "SGT",
+        tkt: true,
+        g: "SGT",
+        cls: "kv",
+        key: { id: "s4.sgt.key", text: "K_{V}", g: "KV SGT", cls: "kv" },
+        kids: [
+          { id: "s4.sgt.C", text: "C", g: "C SGT" },
+          { id: "s4.sgt.IPL", text: "IP-list_{modified}", g: "IPL SGT" },
+          { id: "s4.sgt.TS", text: "timestamp_{TGS}", g: "TSTGS SGT" },
+          { id: "s4.sgt.LT", text: "lifetime_{granted}", g: "LT LT3 SGT" },
+          { id: "s4.sgt.KCV", text: "K_{C,V}", g: "KCV SGT", cls: "kcv" },
+        ],
+      },
+    ],
+  },
+  {
+    n: 5,
+    msg: "AP_REQ",
+    route: "C to V",
+    items: [
+      {
+        id: "s5.auth",
+        readers: "C TGS V",
+        name: "Auth_{2}",
+        g: "AUTH2",
+        cls: "kcv",
+        key: {
+          id: "s5.auth.key",
+          text: "K_{C,V}",
+          g: "KCV AUTH2",
+          cls: "kcv",
+        },
+        kids: [
+          { id: "s5.auth.C", text: "C", g: "C AUTH2" },
+          { id: "s5.auth.TS", text: "timestamp_{C}", g: "TSC AUTH2" },
+        ],
+      },
+      {
+        id: "s5.sgt",
+        readers: "TGS V",
+        text: "SGT",
+        g: "SGT C IPL TSTGS LT LT3 KCV",
+        ticket: "sgt",
+      },
+    ],
+  },
+];
+
+type Pos = { x: number; y: number; w: number; h: number };
+const pos: Record<string, Pos> = {};
+const chips: (Chip & Pos)[] = [];
+const boxes: (Box &
+  Pos & {
+    has: string;
+    nameX: number;
+    encX: number;
+    textY: number;
+    keyPos: Pos;
+  })[] = [];
+const kidStrip: Record<string, [number, number][]> = {};
+const cards: { y: number; mid: number; step: Step }[] = [];
+
+steps.forEach((step, i) => {
+  const cy = TOP + i * (CARD_H + GAP);
+  const mid = cy + CARD_H / 2;
+  cards.push({ y: cy, mid, step });
+  let x = X0;
+  for (const it of step.items) {
+    if (!("kids" in it)) {
+      const w = it.ticket ? 56 : chipW(it.text);
+      const p = { x, y: mid - CH / 2, w, h: CH };
+      pos[it.id] = p;
+      chips.push({ ...it, ...p });
+      x += w + ITEM_GAP;
+      continue;
+    }
+    const bh = 8 + KH + 6 + CH + 8;
+    const by = cy + (CARD_H - bh) / 2;
+    let sx = x + 10;
+    const nameX = sx;
+    if (it.name) sx += textW(it.name) + 12;
+    const encX = sx;
+    sx += 3 * 7.2 + 8;
+    const kw = Math.max(32, Math.round(textW(it.key.text) + 14));
+    const keyPos = { x: sx, y: by + 8, w: kw, h: KH };
+    const stripW = sx + kw - x + 16 + BADGES_W + 10;
+    const kidsW =
+      it.kids.reduce((a, k) => a + chipW(k.text), 0) +
+      CELL_GAP * (it.kids.length - 1);
+    const bw = Math.max(stripW, kidsW + 20);
+    let kx = x + (bw - kidsW) / 2;
+    const ky = by + 8 + KH + 6;
+    const strip: [number, number][] = [
+      [encX, encX + 22],
+      [keyPos.x, keyPos.x + kw],
+    ];
+    if (it.name) strip.push([nameX, nameX + textW(it.name)]);
+    for (const k of it.kids) kidStrip[k.id] = strip;
+    const readers = it.readers;
+    const has = [
+      ...new Set(
+        [it.g, it.key.g, ...it.kids.map((k) => k.g)]
+          .join(" ")
+          .split(" ")
+          .filter(Boolean),
+      ),
+    ].join(" ");
+    pos[it.key.id] = keyPos;
+    chips.push({ ...it.key, ...keyPos, readers: it.readers, keylabel: true });
+    for (const k of it.kids) {
+      const w = chipW(k.text);
+      const p = { x: kx, y: ky, w, h: CH };
+      pos[k.id] = p;
+      chips.push({ ...k, ...p, readers });
+      kx += w + CELL_GAP;
+    }
+    const bp = { x, y: by, w: bw, h: bh };
+    pos[it.id] = bp;
+    boxes.push({ ...it, ...bp, nameX, encX, textY: by + 8 + 15, keyPos, has });
+    x += bw + ITEM_GAP;
+  }
+});
+
+// Connectors: [from, to, group, kind]. "tgt"/"sgt" are the heavy key and
+// ticket flows, "thin" is any other field.
+const links: [string, string, string, "tgt" | "sgt" | "thin"][] = [
+  ["s1.C", "s2.tgt.C", "C", "thin"],
+  ["s1.T", "s2.rep.T", "T", "thin"],
+  ["s1.IPL", "s2.tgt.IPL", "IPL", "thin"],
+  ["s1.LT", "s2.tgt.LT", "LT", "thin"],
+  ["s2.tgt", "s3.tgt", "TGT", "tgt"],
+  ["s2.rep.KCT", "s3.auth.key", "KCT", "tgt"],
+  ["s2.tgt.C", "s3.auth.C", "C", "thin"],
+  ["s3.tgt", "s4.rep.key", "KCT", "tgt"],
+  ["s3.tgt", "s4.sgt.C", "C", "thin"],
+  ["s3.tgt", "s4.sgt.IPL", "IPL", "thin"],
+  ["s3.tgt", "s4.sgt.LT", "LT", "thin"],
+  ["s3.V", "s4.rep.V", "V", "thin"],
+  ["s3.LT", "s4.sgt.LT", "LT3", "thin"],
+  ["s4.sgt", "s5.sgt", "SGT", "sgt"],
+  ["s4.rep.KCV", "s5.auth.key", "KCV", "sgt"],
+  ["s4.sgt.C", "s5.auth.C", "C", "thin"],
+];
+
+const outCount: Record<string, number> = {};
+const inCount: Record<string, number> = {};
+for (const [f, t] of links) {
+  outCount[f] = (outCount[f] ?? 0) + 1;
+  inCount[t] = (inCount[t] ?? 0) + 1;
+}
+const outSeen: Record<string, number> = {};
+const inSeen: Record<string, number> = {};
+function spread(p: Pos, k: number, n: number): number {
+  const off = (k - (n - 1) / 2) * 9;
+  const lim = p.w / 2 - 7;
+  return p.x + p.w / 2 + Math.max(-lim, Math.min(lim, off));
+}
+const conns = links.map(([f, t, g, kind]) => {
+  const a = pos[f];
+  const b = pos[t];
+  const x1 = spread(a, (outSeen[f] = (outSeen[f] ?? -1) + 1), outCount[f]);
+  let x2 = spread(b, (inSeen[t] = (inSeen[t] ?? -1) + 1), inCount[t]);
+  const blocked = (x: number) =>
+    (kidStrip[t] ?? []).some(([lo, hi]) => x > lo - 5 && x < hi + 5);
+  if (blocked(x2)) {
+    let best = x2;
+    let bestD = Infinity;
+    for (let x = b.x + 7; x <= b.x + b.w - 7; x += 2) {
+      if (!blocked(x) && Math.abs(x - x2) < bestD) {
+        best = x;
+        bestD = Math.abs(x - x2);
+      }
+    }
+    x2 = best;
+  }
+  const y1 = a.y + a.h;
+  const y2 = b.y - 1;
+  const d = Math.max(16, (y2 - y1) * 0.5);
+  return {
+    g,
+    kind,
+    path: `M ${x1} ${y1} C ${x1} ${y1 + d}, ${x2} ${y2 - d - 10}, ${x2} ${y2 - 10} L ${x2} ${y2}`,
+  };
+});
+
+const ly = H - 76;
+const ry = H - 36;
+---
+
+<figure class="kdf" id={uid}>
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    width="100%"
+    role="group"
+    aria-label="Kerberos data flow. For each of the 5 messages, the fields it carries, with connectors showing which values from one step are reused in the next. The session key K_C,T from the AS reply keys the first Authenticator and the TGS reply, the TGT is presented to the TGS, the session key K_C,V from the TGS reply keys the second Authenticator, and the SGT is presented to the Service."
+  >
+    <defs>
+      {["plain", "tgt", "sgt"].map((k) => (
+        <marker
+          id={`${uid}-arrow-${k}`}
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerUnits="userSpaceOnUse"
+          markerWidth={k === "plain" ? 8 : 10}
+          markerHeight={k === "plain" ? 8 : 10}
+          orient="auto"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class={`head ${k}`} />
+        </marker>
+      ))}
+    </defs>
+
+    <!-- Step cards -->
+    {cards.map((c) => (
+      <g>
+        <rect
+          x="8"
+          y={c.y}
+          width={W - 16}
+          height={CARD_H}
+          rx="12"
+          class="card"
+        />
+        <circle cx="36" cy={c.mid} r="13" class="badge" />
+        <text x="36" y={c.mid + 5.5} text-anchor="middle" class="badge-text">
+          {c.step.n}
+        </text>
+        <text x="58" y={c.mid - 2} class="msg-name">
+          {c.step.msg}
+        </text>
+        <text x="58" y={c.mid + 15} class="msg-route">
+          {c.step.route}
+        </text>
+      </g>
+    ))}
+
+    <!-- Enc boxes -->
+    {boxes.map((b) => (
+      <g>
+        <rect
+          x={b.x}
+          y={b.y}
+          width={b.w}
+          height={b.h}
+          rx="10"
+          class={`box bx ${b.cls}${b.tkt ? " tkt" : ""}`}
+          data-has={b.has}
+          data-g={b.g || undefined}
+          data-r={b.readers}
+          tabindex={b.g ? 0 : undefined}
+          role={b.g ? "button" : undefined}
+          aria-label={b.g ? `Highlight ${b.name}` : undefined}
+        />
+      </g>
+    ))}
+
+    <!-- Connectors -->
+    {conns.map((c) => (
+      <path
+        d={c.path}
+        class={`gx conn ${c.kind === "thin" ? "thin" : `key ${c.kind}`}`}
+        data-g={c.g}
+        marker-end={`url(#${uid}-arrow-${c.kind === "thin" ? "plain" : c.kind})`}
+      />
+    ))}
+
+    <!-- Box labels -->
+    {boxes.map((b) => (
+      <g class="box-labels bx" data-has={b.has}>
+        {b.name && (
+          <text
+            x={b.nameX}
+            y={b.textY}
+            class={`box-name ${b.cls}`}
+            set:html={fmt(b.name)}
+          />
+        )}
+        <text x={b.encX} y={b.textY} class="box-enc">
+          Enc
+        </text>
+        {b.readers && (
+          <g class="pills">
+            {(() => {
+              let px = b.x + b.w - 10 - BADGES_W;
+              return ACTORS.map((r) => {
+                const x = px;
+                px += PILL_W[r] + PILL_GAP;
+                const can = b.readers!.split(" ").includes(r);
+                return (
+                  <g class={`pill ${r.toLowerCase()}${can ? " can" : ""}`}>
+                    <rect
+                      x={x}
+                      y={b.y + 8 + 3}
+                      width={PILL_W[r]}
+                      height="16"
+                      rx="8"
+                    />
+                    <text
+                      x={x + PILL_W[r] / 2}
+                      y={b.y + 8 + 14.5}
+                      text-anchor="middle"
+                    >
+                      {r}
+                    </text>
+                  </g>
+                );
+              });
+            })()}
+          </g>
+        )}
+      </g>
+    ))}
+
+    <!-- Chips -->
+    {chips.map((c) => (
+      <g
+        class={`gx chip-g${c.keylabel ? " keylabel" : ""}`}
+        data-g={c.g}
+        data-r={c.readers}
+        tabindex="0"
+        role="button"
+        aria-label={`Highlight ${plain(c.text)}`}
+      >
+        {c.ticket ? (
+          <>
+            <rect
+              x={c.x}
+              y={c.y}
+              width={c.w}
+              height={c.h}
+              rx="4"
+              class={`ticket ${c.ticket}`}
+            />
+            <circle cx={c.x} cy={c.y + c.h / 2} r="4" class="notch" />
+            <circle cx={c.x + c.w} cy={c.y + c.h / 2} r="4" class="notch" />
+            <text
+              x={c.x + c.w / 2}
+              y={c.y + c.h / 2 + 4}
+              text-anchor="middle"
+              class="ticket-text"
+            >
+              {c.text}
+            </text>
+          </>
+        ) : (
+          <>
+            <rect
+              x={c.x}
+              y={c.y}
+              width={c.w}
+              height={c.h}
+              rx={c.h / 4}
+              class={`chip ${c.cls ?? ""}`}
+            />
+            <text
+              x={c.x + c.w / 2}
+              y={c.y + c.h / 2 + 4}
+              text-anchor="middle"
+              class={c.h < CH ? "chip-text small" : "chip-text"}
+              set:html={fmt(c.text)}
+            />
+          </>
+        )}
+      </g>
+    ))}
+
+    <!-- Legend -->
+    <g class="legend">
+      <line x1="24" y1={ly} x2="58" y2={ly} class="conn key tgt"></line>
+      <text x="66" y={ly + 4} set:html={fmt("TGT and K_{C,T}")} />
+      <line x1="250" y1={ly} x2="284" y2={ly} class="conn key sgt"></line>
+      <text x="292" y={ly + 4} set:html={fmt("SGT and K_{C,V}")} />
+      <line x1="476" y1={ly} x2="510" y2={ly} class="conn thin"></line>
+      <text x="518" y={ly + 4}>
+        every other field
+      </text>
+      <rect
+        x="680"
+        y={ly - 9}
+        width="30"
+        height="18"
+        rx="5"
+        class="chip kc"
+      ></rect>
+      <text x="718" y={ly + 4}>
+        derived from the password, never forwarded
+      </text>
+      <text x="24" y={ry + 4}>
+        Who can read the encrypted fields
+      </text>
+      {(() => {
+        let px = 262;
+        return ACTORS.map((r) => {
+          const x = px;
+          px += PILL_W[r] + 22 + PILL_GAP + 6;
+          return (
+            <g
+              class={`rd pill can ${r.toLowerCase()}`}
+              data-reader={r}
+              tabindex="0"
+              role="button"
+              aria-label={`Show what ${r} can read`}
+            >
+              <rect
+                x={x}
+                y={ry - 9}
+                width={PILL_W[r] + 22}
+                height="22"
+                rx="11"
+              />
+              <text
+                x={x + (PILL_W[r] + 22) / 2}
+                y={ry + 6}
+                text-anchor="middle"
+              >
+                {r}
+              </text>
+            </g>
+          );
+        });
+      })()}
+      <text x="520" y={ry + 4}>
+        Hover or tap one to blank out what it cannot read
+      </text>
+    </g>
+  </svg>
+
+  <figcaption>
+    Where each value comes from and where the next step reuses it. Hover or tap
+    a value to follow it. Tap it again, or tap empty space, to clear. The badges
+    on each box show who can decrypt it.
+  </figcaption>
+</figure>
+
+<style>
+  .kdf {
+    --c-tgt: var(--dia-ct);
+    --c-sgt: var(--dia-pt);
+    --c-pw: var(--dia-key);
+    --on-color: #fff;
+    --r-c: #4f86e6;
+    --r-as: #d0558f;
+    --r-tgs: #1f9fae;
+    --r-v: #b98f12;
+    max-width: 1000px;
+    margin: 20px auto;
+  }
+  :global([data-theme="dark"]) .kdf {
+    --on-color: #15161a;
+    --r-c: #7aa6f2;
+    --r-as: #e585b2;
+    --r-tgs: #4cc3d0;
+    --r-v: #e0b83e;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-ui);
+  }
+
+  .card {
+    fill: var(--surface-2);
+    stroke: var(--border);
+    stroke-width: 1.5;
+  }
+  .badge {
+    fill: var(--surface);
+    stroke: var(--text-muted);
+    stroke-width: 3;
+  }
+  .badge-text {
+    fill: var(--text-primary);
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .msg-name {
+    fill: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  .msg-route {
+    fill: var(--text-muted);
+    font-size: 11.5px;
+  }
+
+  .box {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    transition: stroke-width 0.15s;
+  }
+  .box.kc {
+    stroke: var(--c-pw);
+  }
+  .box.kt,
+  .box.kct {
+    stroke: var(--c-tgt);
+  }
+  .box.kv,
+  .box.kcv {
+    stroke: var(--c-sgt);
+  }
+  .box.tkt {
+    stroke-width: 1.4;
+  }
+  .box.tkt.kt {
+    fill: color-mix(in srgb, var(--c-tgt) 9%, var(--surface));
+  }
+  .box.tkt.kv {
+    fill: color-mix(in srgb, var(--c-sgt) 9%, var(--surface));
+  }
+  .box-labels {
+    pointer-events: none;
+  }
+  .box-name {
+    fill: var(--text-primary);
+    font-size: 12px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+  }
+  .box-name.kt {
+    fill: var(--c-tgt);
+  }
+  .box-name.kv {
+    fill: var(--c-sgt);
+  }
+  .box-enc {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+
+  .chip {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+  .chip.kc {
+    stroke: var(--c-pw);
+    stroke-width: 2.5;
+  }
+  .chip.kt,
+  .chip.kct {
+    stroke: var(--c-tgt);
+    stroke-width: 2.5;
+  }
+  .chip.kv,
+  .chip.kcv {
+    stroke: var(--c-sgt);
+    stroke-width: 2.5;
+  }
+  .chip-text {
+    fill: var(--text-primary);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  .chip-text.small {
+    font-size: 11px;
+  }
+
+  .ticket {
+    fill: var(--text-muted);
+  }
+  .ticket.tgt {
+    fill: var(--c-tgt);
+  }
+  .ticket.sgt {
+    fill: var(--c-sgt);
+  }
+  .notch {
+    fill: var(--surface-2);
+  }
+  .ticket-text {
+    fill: var(--on-color);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+
+  .conn {
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+  .conn.thin {
+    stroke: var(--text-muted);
+    stroke-width: 1.3;
+    opacity: 0.35;
+  }
+  .conn.key {
+    stroke-width: 2.8;
+    opacity: 0.55;
+  }
+  .legend .conn,
+  .legend .conn.thin,
+  .legend .conn.key {
+    opacity: 1;
+  }
+  .conn.key.tgt {
+    stroke: var(--c-tgt);
+  }
+  .conn.key.sgt {
+    stroke: var(--c-sgt);
+  }
+  .head {
+    fill: var(--text-muted);
+  }
+  .head.tgt {
+    fill: var(--c-tgt);
+  }
+  .head.sgt {
+    fill: var(--c-sgt);
+  }
+
+  .gx {
+    transition: opacity 0.15s;
+  }
+  .chip-g,
+  .box[data-g] {
+    cursor: pointer;
+    outline: none;
+  }
+  .bx {
+    transition: opacity 0.15s;
+  }
+  svg.active .bx.off {
+    opacity: 0.14;
+  }
+  svg.active .gx {
+    opacity: 0.14;
+  }
+  svg.active .gx.on {
+    opacity: 1;
+  }
+  svg.active .conn.thin.on {
+    stroke: var(--text-secondary);
+    stroke-width: 2.2;
+  }
+  svg.active .conn.key.on {
+    stroke-width: 3.6;
+  }
+  .chip-g.on .chip,
+  .chip-g:focus-visible .chip {
+    stroke-width: 3.2;
+  }
+  .chip-g.on .chip:not(.kc, .kt, .kct, .kv, .kcv),
+  .chip-g:focus-visible .chip:not(.kc, .kt, .kct, .kv, .kcv) {
+    stroke: var(--text-primary);
+  }
+  .box.on,
+  .box:focus-visible {
+    stroke-width: 2.4;
+  }
+
+  .pills,
+  .pill text {
+    pointer-events: none;
+  }
+  .pill {
+    --pc: var(--r-c);
+  }
+  .pill.as {
+    --pc: var(--r-as);
+  }
+  .pill.tgs {
+    --pc: var(--r-tgs);
+  }
+  .pill.v {
+    --pc: var(--r-v);
+  }
+  .pill rect {
+    fill: none;
+    stroke: var(--pc);
+    stroke-width: 1;
+    opacity: 0.45;
+  }
+  .pill text {
+    fill: var(--pc);
+    font-size: 9.5px;
+    font-weight: 700;
+    opacity: 0.55;
+  }
+  .pill.can rect {
+    fill: var(--pc);
+    opacity: 1;
+  }
+  .pill.can text {
+    fill: var(--on-color);
+    opacity: 1;
+  }
+  .rd {
+    cursor: pointer;
+    outline: none;
+  }
+  .rd text {
+    pointer-events: none;
+    font-size: 12px;
+  }
+  .rd:focus-visible rect,
+  .rd.on rect {
+    stroke: var(--text-primary);
+    stroke-width: 2.4;
+  }
+  svg.reading .conn {
+    opacity: 0.3;
+  }
+  svg.reading .chip-g.blind.keylabel {
+    opacity: 0.3;
+  }
+  svg.reading .chip-g.blind:not(.keylabel) .chip {
+    fill: var(--border);
+    stroke: none;
+  }
+  svg.reading .chip-g.blind:not(.keylabel) .chip-text,
+  svg.reading .chip-g.blind .ticket-text {
+    opacity: 0;
+  }
+  svg.reading .chip-g.blind .ticket {
+    fill: var(--border);
+  }
+  svg.reading .box.blind {
+    stroke-dasharray: 5 4;
+    opacity: 0.55;
+  }
+  svg.reading .box:not(.blind).can-read {
+    stroke-width: 2.4;
+  }
+
+  .legend text {
+    fill: var(--text-secondary);
+    font-size: 12px;
+  }
+  .legend text :global(tspan) {
+    fill: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gx,
+    .box {
+      transition: none;
+    }
+  }
+
+  figcaption {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".kdf").forEach((fig) => {
+    const svg = fig.querySelector("svg");
+    if (!svg) return;
+    const els = [...svg.querySelectorAll<SVGElement>("[data-g]")];
+    const boxEls = [...svg.querySelectorAll<SVGElement>("[data-has]")];
+    const secret = [...svg.querySelectorAll<SVGElement>("[data-r]")];
+    const pills = [...svg.querySelectorAll<SVGElement>(".rd")];
+    let pinned: string | null = null;
+    let pinnedReader: string | null = null;
+
+    const primary = (t: EventTarget | null) =>
+      (t as Element | null)
+        ?.closest("[data-g]")
+        ?.getAttribute("data-g")
+        ?.split(" ")[0] ?? null;
+    const reader = (t: EventTarget | null) =>
+      (t as Element | null)?.closest(".rd")?.getAttribute("data-reader") ??
+      null;
+
+    const show = (g: string | null) => {
+      svg.classList.toggle("active", g !== null);
+      for (const el of els) {
+        const on = g !== null && el.dataset.g!.split(" ").includes(g);
+        el.classList.toggle("on", on);
+      }
+      for (const el of boxEls) {
+        const off = g !== null && !el.dataset.has!.split(" ").includes(g);
+        el.classList.toggle("off", off);
+      }
+    };
+
+    const showReader = (r: string | null) => {
+      svg.classList.toggle("reading", r !== null);
+      for (const el of secret) {
+        const can = r === null || el.dataset.r!.split(" ").includes(r);
+        el.classList.toggle("blind", !can);
+        el.classList.toggle("can-read", r !== null && can);
+      }
+      for (const p of pills) {
+        p.classList.toggle("on", r !== null && p.dataset.reader === r);
+      }
+    };
+
+    const toggle = (g: string | null) => {
+      if (g === null || pinned === g) {
+        pinned = null;
+        show(null);
+      } else {
+        pinned = g;
+        show(g);
+      }
+    };
+
+    const toggleReader = (r: string | null) => {
+      pinned = null;
+      show(null);
+      pinnedReader = r === null || pinnedReader === r ? null : r;
+      showReader(pinnedReader);
+    };
+
+    svg.addEventListener("pointerover", (e) => {
+      if (e.pointerType === "touch") return;
+      const r = reader(e.target);
+      if (r) {
+        if (!pinnedReader) showReader(r);
+        return;
+      }
+      if (pinned || pinnedReader) return;
+      show(primary(e.target));
+    });
+    svg.addEventListener("pointerleave", (e) => {
+      if (e.pointerType === "touch") return;
+      if (!pinnedReader) showReader(null);
+      if (!pinned) show(null);
+    });
+    svg.addEventListener("click", (e) => {
+      const r = reader(e.target);
+      if (r) return toggleReader(r);
+      if (pinnedReader) return toggleReader(null);
+      toggle(primary(e.target));
+    });
+    svg.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      const r = reader(e.target);
+      if (r) return toggleReader(r);
+      toggle(primary(e.target));
+    });
+    svg.addEventListener("focusin", (e) => {
+      if (reader(e.target) || pinned || pinnedReader) return;
+      show(primary(e.target));
+    });
+    svg.addEventListener("focusout", () => {
+      if (!pinned && !pinnedReader) show(null);
+    });
+  });
+</script>
