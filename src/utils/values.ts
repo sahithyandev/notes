@@ -17,6 +17,7 @@ export const isWip = (slug: string): boolean =>
 export const ELECTIVE_PREFIXES: string[] = [
   "s5/image-processing",
   "s5/advanced-networking",
+  "s5/advanced-software-engineering",
 ];
 
 export const isElective = (slug: string): boolean =>
