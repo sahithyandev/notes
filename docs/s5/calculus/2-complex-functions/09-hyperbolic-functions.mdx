@@ -1,7 +1,7 @@
 ---
 title: Hyperbolic Functions
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.062Z
+lastUpdatedOn: 2026-10-05T17:24:31.597Z
 ---
 
 For any complex number $z$,
@@ -47,6 +47,27 @@ For $z = x + iy$:
 
 - $\cosh z = \cosh x \cos y + i\sinh x \sin y$
 - $\sinh z = \sinh x \cos y + i\cosh x \sin y$
+
+## Infinite Series
+
+Both series are Maclaurin series. They converge for all $z \in \mathbb{C}$, since $\sinh z$ and $\cosh z$ are entire.
+
+$$
+\sinh z = \sum_{n=0}^{\infty} \frac{z^{2n+1}}{(2n+1)!} = z + \frac{z^3}{3!} + \frac{z^5}{5!} + \cdots
+$$
+
+$$
+\cosh z = \sum_{n=0}^{\infty} \frac{z^{2n}}{(2n)!} = 1 + \frac{z^2}{2!} + \frac{z^4}{4!} + \cdots
+$$
+
+<Note title="Proof Hint">
+
+- Start with $e^z = \sum_{n=0}^{\infty} \dfrac{z^n}{n!}$
+- Write $e^{-z} = \sum_{n=0}^{\infty} \dfrac{(-z)^n}{n!}$
+- Substitute both into the definitions
+- Odd powers cancel in $\cosh z$, even powers cancel in $\sinh z$
+
+</Note>
 
 ## Relation to Trigonometric Functions
 
