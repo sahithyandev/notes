@@ -1,0 +1,105 @@
+---
+title: Architectural Style Concepts
+sidebar:
+  label: Architectural Style Concepts
+authors:
+  - nalina
+dateCreated: 2026-09-26T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.930Z
+---
+
+## Properties of an Architectural Style
+
+An architectural style can be described using four main properties:
+
+### Design Vocabulary
+
+Defines the types of architectural elements used in the style.
+
+Examples include:
+
+- Component types
+- Connector types
+- Data elements
+
+### Configuration Rules
+
+Define how architectural elements can be composed and connected.
+
+These include the structural or topological constraints of the style.
+
+### Semantic Interpretation
+
+Defines the meaning of compositions of the architectural elements.
+
+### Style-Specific Analysis
+
+The constraints of a style can make certain architectural analyses possible.
+
+## Important Style Concepts
+
+### Layered Style
+
+- Each layer exposes an interface to layers above it.
+- A layer acts as a **server** to layers above.
+- A layer acts as a **client** of layers below.
+- Connectors are protocols of layer interaction.
+
+### Pipe and Filter Variations
+
+- **Pipelines**  
+  Linear sequences of filters.
+
+- **Bounded pipes**  
+  Pipes with a limited amount of data.
+
+- **Typed pipes**  
+  Pipes where data is strongly typed.
+
+### Rule-Based Style
+
+The main components are:
+
+- User interface
+- Inference engine
+- Knowledge base
+
+The inference engine determines whether input is a fact/rule or a query.
+
+### Interpreter Style
+
+An interpreter:
+
+1. Parses input commands.
+2. Executes the commands.
+3. Updates the interpreter state.
+
+The style supports dynamically changing capabilities.
+
+### Mobile-Code Variants
+
+- **Code-on-demand**
+- **Remote evaluation**
+- **Mobile agent**
+
+### Publish-Subscribe
+
+- Subscribers register or deregister to receive specific messages or content.
+- Publishers broadcast messages to subscribers.
+- Communication may be synchronous or asynchronous.
+- Subscribers may connect directly to publishers or through intermediaries.
+
+### Event-Based Style
+
+- Components independently generate and consume events.
+- Events are communicated through event buses.
+- Components communicate with the event bus rather than directly with each other.
+- Communication may be **push-based** or **pull-based**.
+
+### Peer-to-Peer Style
+
+- State and behavior are distributed among peers.
+- Each peer can act as either a client or server.
+- Peers have their own state and control thread.
+- Communication commonly uses network protocols.
+- The topology can vary dynamically.

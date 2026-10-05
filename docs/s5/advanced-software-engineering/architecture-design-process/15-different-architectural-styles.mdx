@@ -1,0 +1,50 @@
+---
+title: Architectural Styles
+sidebar:
+  label: Different Architectural Styles
+authors:
+  - nalina
+dateCreated: 2026-09-26T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.913Z
+---
+
+An **architectural style** is a named collection of architectural design decisions that:
+
+- Are applicable in a given development context.
+- Constrain architectural design decisions for a particular system.
+- Help achieve beneficial qualities in the resulting system.
+
+## Architectural Styles Comparison
+
+| Category            | Style                            | Components                                             | Connectors                           | Data / Information                                  | Key Characteristics                                                                     |
+| ------------------- | -------------------------------- | ------------------------------------------------------ | ------------------------------------ | --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Traditional         | **Main Program and Subroutines** | Main program, subroutines                              | Procedure calls                      | Parameters and return values                        | Main program coordinates execution through subroutine calls.                            |
+| Traditional         | **Object-Oriented**              | Objects                                                | Messages and method invocations      | Object state                                        | Objects encapsulate their internal representation.                                      |
+| Layered             | **Layered**                      | Layers                                                 | Layer interaction protocols          | Data between layers                                 | Each layer provides services to the layer above and uses services from the layer below. |
+| Layered             | **Virtual Machine**              | Opaque layers                                          | Layer interfaces                     | Data between layers                                 | Results from fully opaque layers.                                                       |
+| Layered             | **Client-Server**                | Clients and servers                                    | RPC-based network protocols          | Requests and responses                              | Clients know server identities; servers do not need to know client identities.          |
+| Data-Flow           | **Batch Sequential**             | Separate programs                                      | Data transfer between programs       | Aggregate data                                      | Programs execute in sequence and pass completed data to the next program.               |
+| Data-Flow           | **Pipe and Filter**              | Filters                                                | Pipes                                | Data streams                                        | Filters transform input streams into output streams.                                    |
+| Shared Memory       | **Blackboard**                   | Blackboard and components operating on it              | Data access                          | Shared blackboard state                             | System control is driven by the blackboard state.                                       |
+| Shared Memory       | **Rule-Based**                   | User interface, inference engine, knowledge base       | Procedure calls and/or shared memory | Facts and queries                                   | Inference engine uses rules in the knowledge base.                                      |
+| Interpreter         | **Interpreter**                  | Command interpreter, interpreter state, user interface | Procedure calls and shared state     | Commands and program state                          | Commands are parsed and executed while interpreter state is updated.                    |
+| Interpreter         | **Mobile-Code**                  | Execution dock, compiler/interpreter                   | Network protocols                    | Code, program state, data                           | Program representations can become processing components.                               |
+| Implicit Invocation | **Implicit Invocation**          | Event-related components                               | Event-based invocation               | Events                                              | Components respond to announced events.                                                 |
+| Implicit Invocation | **Publish-Subscribe**            | Publishers, subscribers, proxies                       | Network protocols                    | Subscriptions, notifications, published information | Publishers broadcast information to registered subscribers.                             |
+| Event-Based         | **Event-Based**                  | Event generators and consumers                         | Event buses                          | Events                                              | Components communicate through event buses.                                             |
+| Distributed         | **Peer-to-Peer**                 | Independent peers                                      | Network protocols                    | Network messages                                    | Peers can act as clients or servers.                                                    |
+| Other               | **C2**                           | —                                                      | —                                    | —                                                   | Common architectural style identified in the lecture.                                   |
+| Other               | **CORBA**                        | —                                                      | —                                    | —                                                   | Common architectural style identified in the lecture.                                   |
+
+## Advantages and Disadvantages
+
+| Style                   | Advantages                                                                                                 | Disadvantages                                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Object-Oriented**     | Infinite malleability of object internals; decomposition into interacting agents                           | Objects must know server identities; side effects in method invocations                                              |
+| **Layered**             | Increasing abstraction; evolvability; reuse; different implementations can preserve the interface          | Not universally applicable; performance issues; layers may need to be skipped                                        |
+| **Pipe and Filter**     | Filter addition, replacement and reuse; analysis of throughput, latency and deadlock; concurrent execution | Batch-oriented processing; limitations for interactive applications; lowest common denominator for data transmission |
+| **Rule-Based**          | Behavior can be modified by adding or deleting rules                                                       | Large numbers of interacting rules can become difficult to understand                                                |
+| **Implicit Invocation** | Component reuse; system evolution at construction-time and run-time                                        | Counter-intuitive structure; components relinquish computation control; response and ordering may be unknown         |
+| **Publish-Subscribe**   | Efficient one-way dissemination; very low coupling                                                         | —                                                                                                                    |
+| **Event-Based**         | Highly scalable; easy to evolve; effective for highly distributed applications                             | —                                                                                                                    |
+| **Peer-to-Peer**        | Decentralized computing; robust to node failure; scalable access to resources and computing power          | Protocol requires careful consideration                                                                              |

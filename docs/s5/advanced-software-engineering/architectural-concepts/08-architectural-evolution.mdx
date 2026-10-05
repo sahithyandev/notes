@@ -1,0 +1,75 @@
+---
+title: Architectural Evolution
+sidebar:
+  label: Architectural Evolution
+authors:
+  - nalina
+dateCreated: 2026-09-25T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.811Z
+---
+
+## Prescriptive vs. Descriptive Architecture
+
+### Prescriptive Architecture
+
+A system's **prescriptive architecture** captures the design decisions made before system construction.
+
+It represents the:
+
+- **As-conceived architecture**
+- **As-intended architecture**
+
+### Descriptive Architecture
+
+A system's **descriptive architecture** describes how the system has actually been built.
+
+It represents the:
+
+- **As-implemented architecture**
+- **As-realized architecture**
+
+## Architecture During System Evolution
+
+When a system evolves, ideally its **prescriptive architecture is modified first**.
+
+In practice, the system and its descriptive architecture are often modified directly.
+
+This can happen because of:
+
+- Developer sloppiness
+- Short deadlines that prevent proper thinking and documentation
+- Lack of documented prescriptive architecture
+- Need or desire for code optimization
+- Inadequate techniques or tool support
+
+## Architectural Degradation
+
+Architectural degradation includes two related concepts:
+
+- **Architectural drift**
+- **Architectural erosion**
+
+### Architectural Drift
+
+Architectural drift occurs when principal design decisions are introduced into the descriptive architecture that:
+
+- Are not included in, encompassed by, or implied by the prescriptive architecture.
+- Do not violate the prescriptive architecture's existing design decisions.
+
+### Architectural Erosion
+
+Architectural erosion occurs when architectural design decisions are introduced into the descriptive architecture that **violate the prescriptive architecture**.
+
+## Architectural Recovery
+
+If architectural degradation is allowed to occur, the system's architecture may need to be recovered.
+
+**Architectural recovery** is the process of determining a software system's architecture from its implementation-level artifacts.
+
+Examples of implementation-level artifacts include:
+
+- Source code
+- Executable files
+- Java `.class` files
+
+Implementation-level views can become **complex and virtually incomprehensible**, making architectural recovery important.

@@ -1,0 +1,133 @@
+---
+title: Architectural Patterns and DSSA
+sidebar:
+  label: Architectural Patterns and DSSA
+authors:
+  - nalina
+dateCreated: 2026-09-26T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.883Z
+---
+
+## Patterns, Styles, and DSSAs
+
+Patterns, styles, and DSSAs differ in their **scope** and **application-domain knowledge**.
+
+- **Program design patterns**  
+  Smaller scope and shallower domain knowledge.
+
+- **Architectural patterns**  
+  Broader scope and greater architectural knowledge.
+
+- **Architectural styles**  
+  Wider scope and less domain specificity than architectural patterns.
+
+- **DSSAs**  
+  Broad system scope with deep application-domain knowledge.
+
+## Domain-Specific Software Architectures
+
+A **Domain-Specific Software Architecture (DSSA)** is an assemblage of software components that are:
+
+- Specialized for a particular type of task or domain.
+- Generalized for effective use across that domain.
+- Composed in a standardized structure (topology) for building successful applications.
+
+DSSAs are useful when an architecture already exists for the domain in which a new application is being developed.
+
+DSSAs provide extensive reuse of:
+
+- Knowledge
+- Previous development
+- Architectural solutions
+
+## Architectural Patterns
+
+An **architectural pattern** is a set of architectural design decisions that:
+
+- Applies to a recurring design problem.
+- Is parameterized for different software development contexts.
+
+Architectural patterns are similar to DSSAs but are applied at a **lower level** and within a **narrower scope**.
+
+## State-Logic-Display: Three-Tiered Pattern
+
+The **State-Logic-Display** pattern separates an application into three parts:
+
+### Display
+
+Provides the **user interface**.
+
+### Logic
+
+Contains the application's **business logic**.
+
+### State
+
+Stores and manages the application's **data**.
+
+The pattern can be used in:
+
+- Business applications
+- Multi-player games
+- Web-based applications
+
+## Model-View-Controller
+
+**Model-View-Controller (MVC)** separates:
+
+- Information
+- Presentation
+- User interaction
+
+### Model
+
+Encapsulates information.
+
+### View
+
+Encapsulates display choices and presents information to the user.
+
+### Controller
+
+Encapsulates interaction semantics and handles user input.
+
+When model data changes, the view and controller can be notified.
+
+When the user generates an event, the controller can update the model when required.
+
+## Sense-Compute-Control
+
+The **Sense-Compute-Control** pattern is used for structuring **embedded control applications**.
+
+The computer:
+
+1. Reads sensor values.
+2. Computes control outputs.
+3. Sends controls to actuators.
+4. Repeats the process.
+
+## Problems with Sense-Compute-Control
+
+The Sense-Compute-Control approach can become computationally demanding because all information is processed centrally.
+
+### Behavioral Module Solution
+
+A solution is to implement the system as a set of **behavioral modules (horizontal slices)**.
+
+Each module processes only some of the available information.
+
+This approach was associated with **Rodney Brooks** in the 1980s at MIT.
+
+## Behavior-Based Approach
+
+A **behavior-based approach** divides a system into multiple behavioral modules, where each module is responsible for a specific behavior.
+
+Each behavioral module:
+
+- Receives relevant sensory or input information.
+- Processes the information independently.
+- Proposes an action based on its behavior.
+
+An **Action Selection Mechanism (ASM)** selects or coordinates the proposed actions from the behavioral modules to determine the system's overall action.
+
+This approach allows different behaviors to operate as separate modules rather than processing all information centrally.

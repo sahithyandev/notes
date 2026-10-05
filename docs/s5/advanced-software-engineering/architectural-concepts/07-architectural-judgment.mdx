@@ -1,0 +1,47 @@
+---
+title: Architectural Judgment
+sidebar:
+  label: Architectural Judgment
+authors:
+  - nalina
+dateCreated: 2026-09-25T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.796Z
+---
+
+## What Makes a Good Architecture?
+
+There is no architecture that is inherently **good** or **bad**.
+
+An architecture is more or less suitable depending on its **stated purpose and goals**.
+
+For example, a distributed 3-tier client-server architecture may be suitable for an enterprise finance management system but may not be suitable for an avionics application.
+
+Architecture can be evaluated, but the evaluation must be done in the context of **specific goals**.
+
+## Rules of Thumb
+
+**Rules of thumb** are principles that can be broadly applied when designing an architecture.
+
+- They are not intended to be strictly accurate or reliable for every situation.
+- Failure to apply a rule of thumb does not necessarily mean that the architecture is flawed.
+
+Rules of thumb can be categorized into:
+
+- **Process recommendations**
+- **Structural (product) recommendations**
+
+## Process Recommendations
+
+- The architecture team should have the **functional requirements** and a prioritized list of **quality attributes** that the system must satisfy.
+- The architecture should be actively reviewed with the involvement of system stakeholders.
+- The architecture should be analyzed using relevant quantitative measures, such as maximum throughput.
+- The architecture should be formally evaluated for quality attributes before changes become difficult.
+- The architecture should support incremental implementation through a **skeletal system**.
+
+## Structural Recommendations
+
+- The architecture should have well-defined modules based on **information hiding** and **separation of concerns**.
+- Each module should have a well-defined interface so development teams can work independently.
+- Modules that produce data should be separated from modules that consume data to improve modifiability and support staged upgrades.
+- The architecture should avoid depending on a particular version of a product or tool.
+- If such dependency exists, changing to another product should be easy and inexpensive.

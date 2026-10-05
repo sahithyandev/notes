@@ -1,0 +1,103 @@
+---
+title: "Styles, Patterns and DSSA"
+sidebar:
+  label: "Styles, Patterns and DSSA"
+authors:
+  - nalina
+dateCreated: 2026-09-25T00:00:00.000Z
+lastUpdatedOn: 2026-10-05T17:04:10.829Z
+---
+
+## Architectural Styles
+
+Certain design choices regularly result in solutions with superior properties compared with other alternatives.
+
+These solutions may be more:
+
+- Elegant
+- Effective
+- Efficient
+- Dependable
+- Evolvable
+- Scalable
+
+### Definition
+
+An **architectural style** is a named collection of architectural design decisions that:
+
+- Are applicable in a given development context.
+- Constrain architectural design decisions for a particular system within that context.
+- Elicit beneficial qualities in the resulting system.
+
+## Architectural Style Example
+
+- Physically separate components that request services from components that provide services.
+- Make service providers unaware of requesters' identities.
+- Insulate requesters from one another.
+- Allow multiple service providers to emerge dynamically to balance the load.
+
+These decisions support distribution, scaling, independent addition and removal, and load balancing.
+
+## Architectural Patterns
+
+An **architectural pattern** is a set of architectural design decisions that:
+
+- Applies to a recurring design problem.
+- Is parameterized for different software development contexts in which the problem appears.
+
+A widely used pattern in modern distributed systems is the **three-tiered system pattern**.
+
+It is used in areas such as:
+
+- Science
+- Banking
+- E-commerce
+- Reservation systems
+
+> Architectural styles are **strategic**, while architectural patterns are **tactical**.
+
+## Three-Tiered Pattern
+
+### Front Tier
+
+Contains the user interface functionality used to access the system's services.
+
+### Middle Tier
+
+Contains the application's major functionality.
+
+### Back Tier
+
+Contains the application's data access and storage functionality.
+
+## Domain Specific Software Architecture
+
+**Domain Specific Software Architecture (DSSA)** captures and characterizes the best solutions and best practices from past projects within a particular domain.
+
+DSSA allows:
+
+- New applications to focus on points of **novel variation**.
+- Reuse of applicable parts of the architecture and implementation.
+- Reuse across **product lines**.
+
+A DSSA is an assemblage of software components that are:
+
+- **Specialized** for a particular type of task or domain.
+- **Generalized** for effective use across that domain.
+- **Composed in a standardized structure (topology)** effective for building successful applications.
+
+## Patterns, Styles and DSSAs
+
+Patterns, styles, and DSSAs differ mainly in their **scope** and **application-domain knowledge**:
+
+- **Program design patterns**  
+  Smaller scope and shallower domain knowledge.
+
+- **Architectural patterns**  
+  Broader scope and greater architectural knowledge.
+
+- **Architectural styles**  
+  Wider application scope and architectural constraints.
+
+- **Domain-specific software architectures**  
+  Broad system scope and deep domain knowledge.
