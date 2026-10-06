@@ -10,7 +10,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import parser from "@babel/parser";
+import { parse } from "@babel/parser";
 import generate from "@babel/generator";
 
 interface Heading {
@@ -118,7 +118,7 @@ function extractSvgsFromMdx(content: string): Svg[] {
 
     try {
       // Validate and clean the SVG using Babel
-      const ast = parser.parse(svgContent, {
+      const ast = parse(svgContent, {
         sourceType: "module",
         plugins: ["jsx"],
       });
