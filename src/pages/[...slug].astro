@@ -21,6 +21,7 @@ import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
 import ImageZoom from "../components/note/image-zoom.astro";
+import LinkPreview from "../components/note/link-preview.astro";
 import {
   titleize,
   calculateReadTime,
@@ -217,6 +218,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     import "../scripts/image-zoom";
   </script>
   <ImageZoom />
+  <LinkPreview />
+  <script>
+    import "../scripts/link-preview";
+  </script>
   {import.meta.env.DEV && <script>
     import "../scripts/live-update";
   </script>}

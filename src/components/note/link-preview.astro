@@ -1,0 +1,121 @@
+---
+---
+
+<div id="link-preview" role="tooltip" hidden>
+  <a class="lp-link" href="/">
+    <span class="lp-module"></span>
+    <span class="lp-title"></span>
+    <span class="lp-section" hidden></span>
+    <div class="lp-body"></div>
+  </a>
+</div>
+
+<style>
+  #link-preview {
+    position: fixed;
+    z-index: 60;
+    width: min(360px, calc(100vw - 32px));
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--lp-accent, var(--s1));
+    border-radius: 9px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    opacity: 0;
+    transform: translateY(2px) scale(0.98);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease;
+  }
+
+  #link-preview.open {
+    opacity: 1;
+    transform: none;
+  }
+
+  .lp-link {
+    display: block;
+    padding: 12px 14px 14px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .lp-module {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--lp-accent, var(--s1));
+  }
+
+  .lp-title {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+
+  .lp-section {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .lp-body {
+    margin-top: 8px;
+    max-height: 9.5rem;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .lp-body[data-clipped] {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+  }
+
+  .lp-body :global(p),
+  .lp-body :global(ul),
+  .lp-body :global(ol) {
+    margin: 0 0 6px;
+  }
+
+  .lp-body :global(ul) {
+    list-style: disc outside;
+    padding-left: 1.2rem;
+  }
+
+  .lp-body :global(ol) {
+    list-style: decimal outside;
+    padding-left: 1.2rem;
+  }
+
+  .lp-body :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+
+  .lp-body :global(strong) {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #link-preview {
+      transition: none;
+      transform: none;
+    }
+  }
+</style>
