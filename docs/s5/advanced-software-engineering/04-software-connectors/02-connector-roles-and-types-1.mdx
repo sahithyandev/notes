@@ -1,0 +1,273 @@
+---
+title: Connector Roles and Types I
+sidebar:
+  label: Connector Roles and Types I
+authors:
+  - nalina
+dateCreated: 2026-10-06T00:00:00.000Z
+lastUpdatedOn: 2026-10-06T10:22:03.710Z
+---
+
+## Connector Roles
+
+Connector services can be grouped into four main classes.
+
+| Role              | Function                                                               |
+| ----------------- | ---------------------------------------------------------------------- |
+| **Communication** | Transmission of data between components.                               |
+| **Coordination**  | Transfer of control between components.                                |
+| **Conversion**    | Conversion of data formats and wrapping legacy components.             |
+| **Facilitation**  | Supports load balancing, scheduling services, and concurrency control. |
+
+## Connector Types
+
+The lecture identifies eight main connector types:
+
+- **Procedure Call**
+- **Event**
+- **Data Access**
+- **Linkage**
+- **Stream**
+- **Arbitrator**
+- **Adaptor**
+- **Distributor**
+
+## Procedure Call Connectors
+
+**Procedure call connectors** support interaction through procedure or method calls.
+
+They are mainly **coordination connectors**.
+
+### Procedure Call Dimensions
+
+#### Parameters
+
+Define how information is passed during a procedure call.
+
+- **Data transfer** Data can be passed by reference, value, or using default values.
+- **Semantics** Parameters can use different parameter-passing conventions.
+- **Return values** Define how results are returned.
+- **Invocation record** Describes how invocation information is handled.
+
+#### Entry Point
+
+Defines how the called component is accessed.
+
+- **Single** One entry point.
+- **Multiple** Multiple possible entry points.
+
+#### Invocation
+
+Describes how the procedure or method is invoked.
+
+- **Explicit** The caller directly invokes the operation.
+- **Implicit** Invocation can occur indirectly through mechanisms such as exceptions, callbacks, or delegation.
+
+#### Procedure Synchronicity
+
+Defines whether the caller waits for the called operation.
+
+- **Synchronous** The caller waits for completion.
+- **Asynchronous** The caller can continue without waiting.
+
+#### Procedure Cardinality
+
+Defines how many participants can be involved in the interaction.
+
+- **Fan-in** Multiple sources communicate with one destination.
+- **Fan-out** One source communicates with multiple destinations.
+
+#### Accessibility
+
+Defines who or what can access the procedure.
+
+- **Private**
+- **Protected**
+- **Public**
+
+## Event Connectors
+
+**Event connectors** support interaction through events.
+
+They are mainly **coordination connectors**.
+
+### Event Connector Dimensions
+
+#### Event Cardinality
+
+Describes the number and type of participants involved in an event.
+
+- **Producers** Components that generate events.
+- **Observers** Components that receive or observe events.
+- **Event patterns** Rules or patterns describing event interactions.
+
+#### Delivery
+
+Defines how reliably an event is delivered.
+
+- **Best effort** Delivery is attempted without a strict guarantee.
+- **Exactly once** The event is delivered exactly one time.
+- **At most once** The event is delivered zero or one time.
+- **At least once** The event may be delivered one or more times.
+
+#### Priority
+
+Defines the priority associated with events.
+
+- **Outgoing** Priority assigned when sending an event.
+- **Incoming** Priority considered when receiving an event.
+
+#### Event Synchronicity
+
+Defines how event processing occurs.
+
+- **Synchronous**
+- **Asynchronous**
+- **Timeout synchronous**
+
+#### Notification
+
+Defines how components are informed about events.
+
+Examples include:
+
+- **Polled**
+- **Publish/subscribe**
+- **Central update**
+- **Queued dispatch**
+
+#### Causality
+
+Defines the relationship between events and their effects.
+
+- **Absolute**
+- **Relative**
+
+#### Mode
+
+Describes the source or mechanism through which an event occurs.
+
+- **Hardware** For example, page faults, interrupts, and traps.
+- **Software** For example, signals, GUI input/output, and triggers.
+
+## Data Access Connectors
+
+**Data access connectors** mainly provide **communication services**.
+
+They support access to data.
+
+### Data Access Connector Dimensions
+
+#### Locality
+
+Defines where the data is located.
+
+Examples include:
+
+- Thread-specific
+- Process-specific
+- Global
+
+#### Access
+
+Defines how the data can be accessed.
+
+Examples include:
+
+- Accessor
+- Mutator
+
+#### Availability
+
+Defines how the data is made available.
+
+### Transient Data
+
+Data exists temporarily during execution.
+
+Examples include:
+
+- Registers
+- Cache
+- DMA
+- Heap
+- Stack
+
+### Persistent Data
+
+Data remains available beyond a particular execution.
+
+Examples include:
+
+- Repository access
+- File I/O
+- Dynamic data exchange
+- Database access
+
+#### Data Accessibility
+
+Defines who can access the data.
+
+- **Private**
+- **Protected**
+- **Public**
+
+#### Lifecycle
+
+Defines how the data is managed throughout its lifetime.
+
+- **Initialization**
+- **Termination**
+
+#### Data Cardinality
+
+Defines the relationship between components and the data.
+
+- **Defines**
+- **Uses**
+
+## Linkage Connectors
+
+**Linkage connectors** provide **facilitation services**.
+
+They are used by higher-order connectors to enforce:
+
+- Interconnection units
+- Relationship syntax
+- Interaction semantics
+
+### Linkage Connector Dimensions
+
+#### Reference
+
+Defines how connected elements are referenced.
+
+- **Implicit**
+- **Explicit**
+
+#### Granularity
+
+Defines the level at which the connection is established.
+
+- **Unit**
+- **Syntactic**
+- **Semantic**
+
+The connection may be based on a variable, procedure, function, constant, or type.
+
+#### Linkage Cardinality
+
+Describes the relationship between connected elements.
+
+- **Defines**
+- **Uses**
+- **Provides**
+- **Requires**
+
+#### Binding
+
+Defines when the connection is established.
+
+- **Compile-time**
+- **Run-time**
+- **Pre-compile-time**

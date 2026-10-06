@@ -1,0 +1,74 @@
+---
+title: Example Connectors
+sidebar:
+  label: Example Connectors
+authors:
+  - nalina
+dateCreated: 2026-10-06T00:00:00.000Z
+lastUpdatedOn: 2026-10-06T10:22:03.789Z
+---
+
+## Data Distribution Connectors
+
+Data distribution connectors can involve a composition of different connector types:
+
+- Procedure call
+- Event
+- Arbitrator
+- Data access
+- Stream
+- Distributor
+
+A data distribution connector can combine these connector types to support the movement and distribution of data between components.
+
+## Event-Based Data Distribution
+
+Event-based data distribution connectors are composed of:
+
+- Event
+- Data access
+- Stream
+- Distributor
+
+They send and receive data through **asynchronous notifications (events)**.
+
+An example is **publish-subscribe middleware**.
+
+## Client-Server Based Distribution
+
+Client-server based distribution connectors allow seamless distribution of data between distributed systems using **RPC (Remote Procedure Call)**.
+
+They are composed of:
+
+- Procedure call
+- Data access
+- Stream
+- Distributor
+
+Invocation occurs through a **synchronous remote procedure call** that appears as if it were a local method call.
+
+Examples include:
+
+- HTTP/REST
+- Java RMI
+- CORBA
+- FTP
+- SOAP
+
+## P2P Based Data Distribution
+
+P2P-based data distribution connectors are composed of:
+
+- Arbitrator
+- Data access
+- Stream
+- Distributor
+
+They:
+
+- Use arbitration for synchronization and invocation.
+- Use **rendezvous** to achieve concurrency and scheduling.
+- Often provide transaction support.
+- Can roll back an invocation when necessary.
+
+An example is **BitTorrent**.

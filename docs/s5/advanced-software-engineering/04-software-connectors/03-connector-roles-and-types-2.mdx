@@ -1,0 +1,264 @@
+---
+title: Connector Roles and Types II
+sidebar:
+  label: Connector Roles and Types II
+authors:
+  - nalina
+dateCreated: 2026-10-06T00:00:00.000Z
+lastUpdatedOn: 2026-10-06T10:22:03.754Z
+---
+
+## Stream Connectors
+
+**Stream connectors** provide **communication services**.
+
+They are used to transfer **large amounts of data between autonomous processes**.
+
+### Stream Connector Dimensions
+
+#### Delivery
+
+Defines how stream data is delivered.
+
+- **Best effort**
+- **Exactly once**
+- **At most once**
+- **At least once**
+
+#### Bounds
+
+Defines whether the amount of data that can be transferred is limited.
+
+- **Bounded**
+- **Unbounded**
+
+#### Buffering
+
+Defines whether data is temporarily stored during transfer.
+
+- **Buffered**
+- **Unbuffered**
+
+#### Throughput
+
+Defines the amount of data processed or transferred over time.
+
+- **Atomic units**
+- **Higher-order units**
+
+#### State
+
+Defines whether the stream maintains state.
+
+- **Stateless**
+- **Stateful**
+
+#### Identity
+
+Defines whether the communicating stream has an identity.
+
+- **Named**
+- **Unnamed**
+
+#### Locality
+
+Defines where the communicating processes are located.
+
+- **Local**
+- **Remote**
+
+#### Synchronicity
+
+Defines how stream communication is synchronized.
+
+- **Synchronous**
+- **Asynchronous**
+- **Timeout synchronous**
+
+#### Format
+
+Defines the representation of the transferred data.
+
+- **Raw**
+- **Structured**
+
+#### Cardinality
+
+Defines the number of senders and receivers.
+
+- **Multi-sender**
+- **Multi-receiver**
+- **Multi-sender / multi-receiver**
+
+## Arbitrator Connectors
+
+**Arbitrator connectors** provide both **facilitation** and **coordination** services.
+
+They are useful when components cannot make assumptions about their state and needs.
+
+An arbitrator can:
+
+- **Streamline system operations and resolve conflicts** through facilitation.
+- **Redirect the flow of control** through coordination.
+
+### Arbitrator Connector Dimensions
+
+The lecture identifies several dimensions for arbitrators:
+
+#### Fault Handling
+
+Defines how failures are handled.
+
+Examples include:
+
+- Authoritative
+- Voting
+- Separative
+
+#### Concurrency
+
+Defines how concurrent activities are controlled.
+
+Examples include:
+
+- Monitor
+- Lock
+- Light
+- Heavy
+
+#### Transactions
+
+Defines how transaction-related behavior is handled.
+
+Important aspects include:
+
+- **Awareness** Whether transaction information is considered.
+- **Isolation** How independently transactions operate.
+
+#### Security
+
+Defines how access and protection are controlled.
+
+Includes:
+
+- **Authentication** Verifying identity.
+- **Authorization** Determining permitted access.
+- **Privacy** Protecting information.
+- **Integrity** Ensuring information remains correct.
+- **Durability** Preserving information over time.
+
+#### Scheduling
+
+Defines how activities are scheduled.
+
+Important factors include:
+
+- **Time**
+- **Weight**
+
+## Adaptor Connectors
+
+**Adaptor connectors** facilitate interaction between components that were **not designed to interoperate**.
+
+They provide **conversion services**.
+
+### Types of Conversion
+
+#### Invocation Conversion
+
+Converts one invocation mechanism into another.
+
+Examples:
+
+- Address mapping
+- Marshalling
+- Translation
+
+#### Packaging Conversion
+
+Changes how components or data are packaged.
+
+Examples:
+
+- Wrappers
+- Packagers
+
+#### Protocol Conversion
+
+Converts one communication protocol into another.
+
+#### Presentation Conversion
+
+Converts the way information is presented between interacting components.
+
+## Distributor Connectors
+
+**Distributor connectors** provide **facilitation services**.
+
+They:
+
+1. Identify interaction paths.
+2. Route communication through those paths.
+3. Coordinate components along the paths.
+
+### Distributor Connector Dimensions
+
+#### Naming
+
+Defines how interaction paths or destinations are identified.
+
+Naming can be:
+
+- **Structure-based**
+  - Hierarchical
+  - Flat
+- **Attribute-based**
+
+#### Distributor Delivery
+
+Defines how communication is delivered.
+
+### Delivery Semantics
+
+- **Best effort**
+- **Exactly once**
+- **At most once**
+- **At least once**
+
+### Delivery Mechanism
+
+- **Unicast** One destination.
+- **Multicast** Multiple selected destinations.
+- **Broadcast** All relevant destinations.
+
+#### Routing
+
+Defines how communication paths are selected.
+
+### Membership
+
+Defines how participants belong to the communication group.
+
+- **Bounded**
+- **Ad-hoc**
+
+### Path
+
+Defines how the communication path is maintained.
+
+- **Static**
+- **Cached**
+- **Dynamic**
+
+## Connector Types at a Glance
+
+| Connector          | Main Role                   | Main Purpose                                                  |
+| ------------------ | --------------------------- | ------------------------------------------------------------- |
+| **Procedure Call** | Coordination                | Coordinates components through procedure or method calls.     |
+| **Event**          | Coordination                | Coordinates components through events.                        |
+| **Data Access**    | Communication               | Provides access to data.                                      |
+| **Linkage**        | Facilitation                | Enforces connection and interaction rules.                    |
+| **Stream**         | Communication               | Transfers large amounts of data between autonomous processes. |
+| **Arbitrator**     | Facilitation + Coordination | Resolves conflicts and redirects control.                     |
+| **Adaptor**        | Conversion                  | Allows incompatible components to interoperate.               |
+| **Distributor**    | Facilitation                | Identifies interaction paths and routes communication.        |
