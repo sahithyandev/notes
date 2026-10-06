@@ -1,0 +1,259 @@
+---
+title: Contour Integral
+dateCreated: 2026-09-11T00:00:00.000Z
+lastUpdatedOn: 2026-10-06T22:30:16.414Z
+---
+
+The contour integral of $f$ over a [contour](/s5/calculus/complex-functions/contour) $C$ is
+
+$$
+\int_C f(z)\,\text{d}z = \lim_{\|P\| \to 0} \sum_{k=1}^n f(c_k)\Delta z_k
+$$
+
+provided the limit exists and is independent of the choice of partition and points $c_k$.
+
+## Riemann Sum
+
+Let $C$ be a contour with initial point $A$ and terminal point $B$.
+
+A partition of $C$ is a finite set of points $P = \{z_0, z_1, \ldots, z_n\}$, occurring in order along $C$, with $z_0 = A$ and $z_n = B$.
+
+$$
+\Delta z_k = z_k - z_{k-1}, \qquad k = 1, 2, \ldots, n
+$$
+
+$c_k$ is any point on the part of $C$ between $z_{k-1}$ and $z_k$.
+
+The Riemann sum for this partition, for a function $f$ is
+
+$$
+\sum_{k=1}^n f(c_k)\Delta z_k
+$$
+
+$\|P\|$ is the maximum length of the subarcs determined by $P$.
+
+## Evaluation via Parametrization
+
+Let $f(z)$ be continuous on a set containing the contour $C$, and let $z = z(t)$, $a \le t \le b$, be a piecewise smooth [parametrization](/s5/calculus/complex-functions/contour#parametrization) of $C$.
+
+$$
+\int_C f(z)\,\text{d}z = \int_a^b f(z(t))z'(t)\,\text{d}t
+$$
+
+When $z(t)$ is only piecewise smooth, the right side is evaluated piecewise.
+
+<Note>
+
+The value of $\int_C f(z)\,\text{d}z$ depends on the path $C$, not just the endpoints, unless $f$ is analytic on a simply connected domain containing $C$.
+
+</Note>
+
+## Properties
+
+### Piecewise Contours
+
+If $C$ is made of smooth curves $C_1, C_2, \ldots, C_n$, the integral is the sum over the pieces.
+
+$$
+\int_C f(z)\,\text{d}z = \sum_{k=1}^n \int_{C_k} f(z)\,\text{d}z
+$$
+
+### Reversed Orientation
+
+$$
+\int_{-C} f(z)\,\text{d}z = -\int_C f(z)\,\text{d}z
+$$
+
+## Integral Triangle Inequality
+
+Let $f(t) = u(t) + iv(t)$ be continuous on $[a,b]$.
+
+$$
+\left|\int_a^b f(t)\,\text{d}t\right| \le \int_a^b |f(t)|\,\text{d}t
+$$
+
+<Note title="Proof Hint">
+
+- Write $\int_a^b f(t)\,\text{d}t = re^{i\theta}$ for some $r \ge 0$
+- Then $r = e^{-i\theta}\int_a^b f(t)\,\text{d}t = \int_a^b e^{-i\theta}f(t)\,\text{d}t$
+- $r$ is real, so it equals the real part of the last integral
+- $\text{Re}(e^{-i\theta}f(t)) \le |e^{-i\theta}f(t)| = |f(t)|$ for every $t$
+- Integrate this bound over $[a,b]$ to get $r \le \int_a^b |f(t)|\,\text{d}t$
+
+</Note>
+
+## ML Inequality
+
+Let $f$ be continuous on a contour $C$, with $|f(z)| \le M$ for all $z$ on $C$, and let $L$ be the length of $C$.
+
+$$
+\left|\int_C f(z)\,\text{d}z\right| \le ML
+$$
+
+<Note title="Proof Hint">
+
+- Parametrize $C$ by $z(t)$, $a \le t \le b$
+- Apply the integral triangle inequality to $\int_a^b f(z(t))z'(t)\,\text{d}t$
+- Bound $|f(z(t))|$ by $M$
+- Recognize $\int_a^b |z'(t)|\,\text{d}t$ as $L$
+
+</Note>
+
+To bound $|f(z)|$ from above, bound the numerator from above and the denominator from below using the reverse triangle inequality.
+
+$$
+|a+b| \ge \big||a|-|b|\big|
+$$
+
+## Cauchy-Goursat Theorem
+
+Let $f$ be analytic in a [simply connected](/s5/calculus/vector-values-functions/independence-of-path#simply-connected-region) domain $D$. If $C$ is a [simple closed](/s5/calculus/complex-functions/contour#simple-closed-contour) contour lying in $D$,
+
+$$
+\int_C f(z)\,\text{d}z = 0
+$$
+
+## Deformation Invariance Theorem
+
+Let $C_1$ and $C_2$ be 2 [positively oriented](/s5/calculus/complex-functions/contour#positive-orientation) [simple closed](/s5/calculus/complex-functions/contour#simple-closed-contour) contours, with $C_2$ lying inside the interior of $C_1$. Let $f$ be analytic in a domain $D$ that contains both $C_1$ and $C_2$, together with the region between them.
+
+$$
+\int_{C_1} f(z)\,\text{d}z = \int_{C_2} f(z)\,\text{d}z
+$$
+
+<Note title="Proof Hint">
+
+- Split the region between $C_1$ and $C_2$ so its boundary is $C_1$ together with $C_2$ reversed
+- Apply the Cauchy-Goursat theorem to the whole boundary to get $0$
+- Rearrange
+
+</Note>
+
+The integral over a closed contour depends only on which singularities the contour encloses, not on its shape.
+
+<Note>
+
+The theorem lets $C_1$ be replaced by any simpler contour $C_2$ enclosing the same singularities of $f$, without changing the value of the integral.
+
+</Note>
+
+To evaluate $\int_C f(z)\,\text{d}z$, replace $C$ by a small circle $|z-a| = \varepsilon$ around each singular point $a$ inside $C$.
+
+### Corollary of DIT
+
+Let $z_0$ be a fixed complex number, and let $C$ be a simple closed contour with positive orientation such that $z_0$ lies inside $C$.
+
+$$
+\int_C \frac{1}{z - z_0}\,\text{d}z = 2\pi i
+$$
+
+$$
+\int_C \frac{1}{(z-z_0)^n}\,\text{d}z = 0, \qquad n \in \mathbb{Z}, n > 1
+$$
+
+<Note title="Proof Hint">
+
+- Deform $C$ to a circle of radius $r$ centered at $z_0$, by the deformation invariance theorem
+- Parametrize the circle as $z = z_0 + re^{i\theta}$, $0 \le \theta \le 2\pi$
+- Substitute and simplify the integrand
+- Integrate directly over $\theta$
+
+</Note>
+
+For $n \ge 2$, $\dfrac{-1}{(n-1)(z-z_0)^{n-1}}$ is a single-valued antiderivative on $\mathbb{C}\setminus\{z_0\}$. Every closed integral is $0$.
+
+For $n=1$ the antiderivative is $\ln(z-z_0)$. Its argument increases by $2\pi$ per loop around $z_0$. This jump gives $2\pi i$.
+
+### When to Use DIT
+
+Consider deformation invariance when all of these hold:
+
+- $C$ is a closed contour
+- The integrand is analytic on and inside $C$ except at finitely many points
+- Those exceptional points lie inside $C$
+
+### Singularities Inside and Outside
+
+Split the integrand by partial fractions into terms with 1 singular point each.
+
+| Term                           | Singular point $a$ | Value of $\int_C$ |
+| ------------------------------ | ------------------ | ----------------- |
+| $\dfrac{c}{z-a}$               | outside $C$        | $0$               |
+| $\dfrac{c}{z-a}$               | inside $C$         | $2\pi i\,c$       |
+| $\dfrac{c}{(z-a)^n},\ n \ge 2$ | inside $C$         | $0$               |
+
+A singular point on $C$ is not covered and needs separate treatment.
+
+Singularities outside $C$ never obstruct the deformation, since shrinking $C$ only sweeps its interior.
+
+$$
+\int_C f(z)\,\text{d}z = 2\pi i \sum c_a
+$$
+
+Here:
+
+- $c_a$: coefficient of $\dfrac{1}{z-a}$, summed over the singular points $a$ inside $C$
+
+### Logarithm Shortcut
+
+$\displaystyle\int_C \frac{g'(z)}{g(z)}\,\text{d}z$ cannot be evaluated directly as $\ln g$ at the endpoints.
+
+The shortcut $\int_C F'\,\text{d}z = F(\text{end}) - F(\text{start})$ needs $F$ single-valued and analytic on a domain containing $C$. Here $\ln g = \ln|g| + i\arg g$, and $\arg g$ is multivalued when $g$ has zeros inside $C$.
+
+A valid but laborious version uses the change in argument. The $\ln|g|$ part cancels on a closed curve.
+
+$$
+\int_C \frac{g'(z)}{g(z)}\,\text{d}z = i\,\Delta_C \arg g
+$$
+
+Partial fractions with deformation is the preferred route.
+
+## Examples
+
+### Line Integral of $z$ from $0$ to $1+i$
+
+Let $C$ be the line segment from $0$ to $1+i$, parametrized by $z(t) = t(1+i)$, $0 \le t \le 1$. $z'(t) = 1+i$.
+
+$$
+\int_C z\,\text{d}z = \int_0^1 t(1+i)(1+i)\,\text{d}t = (1+i)^2\int_0^1 t\,\text{d}t
+$$
+
+$(1+i)^2 = 2i$ and $\displaystyle\int_0^1 t\,\text{d}t = \dfrac{1}{2}$
+
+$$
+\int_C z\,\text{d}z = 2i \cdot \frac{1}{2} = i
+$$
+
+### ML Bound on a Large Circle
+
+Bound $\displaystyle\int_C \frac{z^2}{(z^2+9)^2}\,\text{d}z$ for $C: |z| = R > 3$.
+
+$L = 2\pi R$. On $C$, $|z^2| = R^2$ and $|z^2+9| \ge R^2 - 9 > 0$.
+
+$$
+|f(z)| \le \frac{R^2}{(R^2-9)^2} = M
+$$
+
+$$
+\left|\int_C \frac{z^2}{(z^2+9)^2}\,\text{d}z\right| \le \frac{2\pi R^3}{(R^2-9)^2}
+$$
+
+The bound behaves like $\dfrac{2\pi}{R}$, so it tends to $0$ as $R \to \infty$.
+
+### Integral Using Partial Fractions
+
+Show $\displaystyle\int_C \frac{2z}{z^2+2}\,\text{d}z = 4\pi i$ for $C: |z|=2$, positively oriented.
+
+$z^2+2 = (z-i\sqrt{2})(z+i\sqrt{2})$ and $|\pm i\sqrt{2}| = \sqrt{2} < 2$, so both poles lie inside $C$.
+
+$$
+\frac{2z}{z^2+2} = \frac{1}{z-i\sqrt{2}} + \frac{1}{z+i\sqrt{2}}
+$$
+
+Each term integrates to $2\pi i$ by the key integral.
+
+$$
+\int_C \frac{2z}{z^2+2}\,\text{d}z = 2\pi i + 2\pi i = 4\pi i
+$$
+
+Using the argument change instead, $g(2e^{i\theta}) = 4e^{2i\theta}\left(1+\tfrac{1}{2}e^{-2i\theta}\right)$. The first factor changes its argument by $4\pi$ and the second by $0$, so the integral is $i \cdot 4\pi = 4\pi i$.

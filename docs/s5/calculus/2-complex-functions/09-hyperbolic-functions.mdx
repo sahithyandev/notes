@@ -1,7 +1,7 @@
 ---
 title: Hyperbolic Functions
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-10-05T17:24:31.597Z
+lastUpdatedOn: 2026-10-06T22:30:16.357Z
 ---
 
 For any complex number $z$,
@@ -21,6 +21,30 @@ $$
 $$
 \operatorname{sech} z = \frac{1}{\cosh z}, \qquad \operatorname{csch} z = \frac{1}{\sinh z}
 $$
+
+## Analyticity
+
+$\sinh z$ and $\cosh z$ are analytic on $\mathbb{C}$, since $e^z$ and $e^{-z}$ are.
+
+The other 4 functions are quotients, so each is analytic wherever its denominator is non-zero.
+
+| Function                           | Analytic on                                        |
+| ---------------------------------- | -------------------------------------------------- |
+| $\tanh z$, $\operatorname{sech} z$ | $\mathbb{C} \setminus \{i(\frac{\pi}{2} + n\pi)\}$ |
+| $\coth z$, $\operatorname{csch} z$ | $\mathbb{C} \setminus \{n\pi i\}$                  |
+
+Here $n \in \mathbb{Z}$.
+
+$\sinh z = 0$ **iff** $z = n\pi i$, and $\cosh z = 0$ **iff** $z = i(\frac{\pi}{2} + n\pi)$. All zeros are purely imaginary.
+
+<Note title="Proof Hint">
+
+- Use $\sinh z = -i\sin(iz)$ and $\cosh z = \cos(iz)$
+- $\sin(iz) = 0$ **iff** $iz = n\pi$
+- $\cos(iz) = 0$ **iff** $iz = \frac{\pi}{2} + n\pi$
+- Multiply by $-i$ to solve for $z$
+
+</Note>
 
 ## Derivatives
 

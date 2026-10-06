@@ -1,7 +1,7 @@
 ---
 title: Exponents
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.077Z
+lastUpdatedOn: 2026-10-06T22:30:16.378Z
 ---
 
 Let $c \in \mathbb{C}$ and $z \ne 0$.
@@ -19,6 +19,32 @@ Obtained by using $\operatorname{Log} z$ in place of $\log z$.
 $$
 z^c = e^{c\operatorname{Log} z}
 $$
+
+## Analyticity
+
+The principal value $z^c = e^{c\operatorname{Log} z}$ is analytic on $\mathbb{C} \setminus (-\infty, 0]$ and
+
+$$
+\frac{\text{d}}{\text{d}z}\,z^c = cz^{c-1}
+$$
+
+<Note title="Proof Hint">
+
+- Note that $\operatorname{Log} z$ is [analytic](/s5/calculus/complex-functions/logarithm#analyticity) on $\mathbb{C} \setminus (-\infty, 0]$
+- Compose it with $w \mapsto e^{cw}$, which is entire
+- Apply the chain rule to get $e^{c\operatorname{Log} z} \cdot \dfrac{c}{z}$
+- Use $\dfrac{e^{c\operatorname{Log} z}}{z} = e^{(c-1)\operatorname{Log} z}$
+
+</Note>
+
+The domain is larger for some values of $c$.
+
+- $c$ is a non-negative integer  
+  $z^c$ is single-valued and analytic on $\mathbb{C}$.
+- $c$ is a negative integer  
+  $z^c$ is single-valued and analytic on $\mathbb{C} \setminus \{0\}$.
+- $c$ is any other value  
+  $z^c$ is multi-valued. The negative real axis is the branch cut and $0$ is a branch point.
 
 ## Worked Examples
 

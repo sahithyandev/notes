@@ -1,7 +1,7 @@
 ---
 title: Logarithm
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.068Z
+lastUpdatedOn: 2026-10-06T22:30:16.366Z
 ---
 
 For a non-zero complex number $z$, $\log z$ is the set of all $w \in \mathbb{C}$ with $e^w = z$.
@@ -40,6 +40,33 @@ $$
 Below you can change $z$ and see how $\operatorname{Log}(z)$ changes.
 
 <ComplexLogExplorer />
+
+## Analyticity
+
+$\operatorname{Log} z$ is analytic on $\mathbb{C} \setminus (-\infty, 0]$ and
+
+$$
+\frac{\text{d}}{\text{d}z}\operatorname{Log} z = \frac{1}{z}
+$$
+
+$\operatorname{Log} z$ is not analytic at any point of $(-\infty, 0]$.
+
+- At $z = 0$ it is undefined.
+- On the negative real axis $\operatorname{Arg} z$ jumps by $2\pi$, so $\operatorname{Log} z$ is not continuous there.
+
+<Note title="Proof Hint">
+
+- Write $\operatorname{Log} z = u + iv$ with $u = \ln r$ and $v = \theta$, where $-\pi < \theta < \pi$
+- Compute $u_r = \dfrac{1}{r}$, $v_\theta = 1$, $u_\theta = 0$, $v_r = 0$
+- Verify the polar Cauchy-Riemann equations $u_r = \dfrac{1}{r}v_\theta$ and $v_r = -\dfrac{1}{r}u_\theta$
+- Conclude analyticity from the continuity of the partials
+- Use $f'(z) = e^{-i\theta}(u_r + iv_r) = \dfrac{1}{z}$
+
+</Note>
+
+The negative real axis is the branch cut of $\operatorname{Log} z$. Any single-valued branch of $\log z$ is analytic on the plane minus a ray from $0$.
+
+$0$ is a branch point. No branch is analytic on a neighbourhood of $0$ with only $0$ removed, since going once around $0$ changes $\arg z$ by $2\pi$.
 
 ## Properties
 

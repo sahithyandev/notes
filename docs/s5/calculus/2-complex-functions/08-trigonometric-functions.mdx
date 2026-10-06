@@ -1,7 +1,7 @@
 ---
 title: Trigonometric Functions
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.056Z
+lastUpdatedOn: 2026-10-06T22:30:16.345Z
 ---
 
 For any complex number $z$,
@@ -28,3 +28,41 @@ $$
 ## Other Trigonometric Functions
 
 $\tan z$, $\cot z$, $\sec z$, and $\csc z$ are defined from $\sin z$ and $\cos z$ as in the real case.
+
+## Analyticity
+
+$\sin z$ and $\cos z$ are analytic on $\mathbb{C}$.
+
+$$
+\frac{\text{d}}{\text{d}z}\sin z = \cos z, \qquad \frac{\text{d}}{\text{d}z}\cos z = -\sin z
+$$
+
+<Note title="Proof Hint">
+
+- Write $\sin z$ and $\cos z$ in exponential form
+- Note that $e^{iz}$ and $e^{-iz}$ are analytic on $\mathbb{C}$ by the chain rule
+- Combine them using the algebra of analytic functions
+- Differentiate term by term
+
+</Note>
+
+The other 4 functions are quotients, so each is analytic wherever its denominator is non-zero.
+
+| Function           | Analytic on                                     |
+| ------------------ | ----------------------------------------------- |
+| $\tan z$, $\sec z$ | $\mathbb{C} \setminus \{\frac{\pi}{2} + n\pi\}$ |
+| $\cot z$, $\csc z$ | $\mathbb{C} \setminus \{n\pi\}$                 |
+
+Here $n \in \mathbb{Z}$.
+
+$\sin z = 0$ **iff** $z = n\pi$, and $\cos z = 0$ **iff** $z = \frac{\pi}{2} + n\pi$. All zeros are real.
+
+<Note title="Proof Hint">
+
+- Write $\sin z = \sin x\cosh y + i\cos x\sinh y$
+- Set both the real and imaginary parts to $0$
+- $\cosh y \ge 1$, so $\sin x = 0$
+- Then $\cos x = \pm 1$, so $\sinh y = 0$ and $y = 0$
+- Repeat with $\cos z = \cos x\cosh y - i\sin x\sinh y$
+
+</Note>

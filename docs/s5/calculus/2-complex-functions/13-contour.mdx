@@ -1,104 +1,127 @@
 ---
 title: Contour
 dateCreated: 2026-09-11T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.098Z
+lastUpdatedOn: 2026-10-06T22:30:16.398Z
 ---
 
-A contour is a curve $C$ in the complex plane constructed by joining finitely many smooth curves end to end.
+A curve in the complex plane is the set of points $z(t) = x(t) + iy(t)$, $a \le t \le b$, where $x(t)$ and $y(t)$ are continuous.
 
-## Riemann Sum
+The curve is smooth **iff**:
 
-Let $C$ be a contour with initial point $A$ and terminal point $B$.
+- $z'(t)$ exists and is continuous on $[a,b]$
+- $z'(t) \ne 0$ for every $t$ in $[a,b]$
 
-A partition of $C$ is a finite set of points $P = \{z_0, z_1, \ldots, z_n\}$, occurring in order along $C$, with $z_0 = A$ and $z_n = B$.
+A contour is a curve $C$ constructed by joining finitely many smooth curves end to end.
 
-$$
-\Delta z_k = z_k - z_{k-1}, \qquad k = 1, 2, \ldots, n
-$$
+A smooth curve is a contour with 1 piece.
 
-$c_k$ is any point on the part of $C$ between $z_{k-1}$ and $z_k$.
+## Properties
 
-The Riemann sum for this partition, for a function $f$ is
+### Orientation
 
-$$
-\sum_{k=1}^n f(c_k)\Delta z_k
-$$
+The orientation of a contour is the direction in which its points are traced as $t$ increases.
 
-## Contour Integral
+The initial point is $z(a)$ and the terminal point is $z(b)$. Joining the smooth curves end to end fixes the direction along the whole contour.
 
-The contour integral of $f$ over $C$ is
+### Length
 
-$$
-\int_C f(z)\,\text{d}z = \lim_{\|P\| \to 0} \sum_{k=1}^n f(c_k)\Delta z_k
-$$
-
-provided the limit exists and is independent of the choice of partition and points $c_k$.
-
-$\|P\|$ is the maximum length of the subarcs determined by $P$.
-
-### Evaluation via Parametrization
-
-Let $f(z)$ be continuous on a set containing the contour $C$, and let $z = z(t)$, $a \le t \le b$, be a piecewise smooth parametrization of $C$.
+The length of a smooth curve given by $z(t)$, $a \le t \le b$, is
 
 $$
-\int_C f(z)\,\text{d}z = \int_a^b f(z(t))z'(t)\,\text{d}t
+L = \int_a^b |z'(t)|\,\text{d}t
 $$
 
-When $z(t)$ is only piecewise smooth, the right side is evaluated piecewise.
+The length of a contour is the sum of the lengths of its smooth curves.
 
-<Note>
+## Types
 
-The value of $\int_C f(z)\,\text{d}z$ depends on the path $C$, not just the endpoints, unless $f$ is analytic on a simply connected domain containing $C$.
+### Closed Contour
 
-</Note>
+A contour is closed **iff** $z(a) = z(b)$.
 
-### Integral Triangle Inequality
+### Simple Contour
 
-Let $f(t) = u(t) + iv(t)$ be continuous on $[a,b]$.
+A contour is simple **iff** it does not cross itself, so $z(t_1) \ne z(t_2)$ for $t_1 \ne t_2$.
 
-$$
-\left|\int_a^b f(t)\,\text{d}t\right| \le \int_a^b |f(t)|\,\text{d}t
-$$
+### Simple Closed Contour
 
-<Note title="Proof Hint">
+Aka. [Jordan curve](/s5/calculus/vector-values-functions/jordan-curve). A simple closed contour is a closed contour with $z(t_1) \ne z(t_2)$ for $a \le t_1 < t_2 < b$. Only the endpoints coincide.
 
-- Write $\int_a^b f(t)\,\text{d}t = re^{i\theta}$ for some $r \ge 0$
-- Then $r = e^{-i\theta}\int_a^b f(t)\,\text{d}t = \int_a^b e^{-i\theta}f(t)\,\text{d}t$
-- $r$ is real, so it equals the real part of the last integral
-- $\text{Re}(e^{-i\theta}f(t)) \le |e^{-i\theta}f(t)| = |f(t)|$ for every $t$
-- Integrate this bound over $[a,b]$ to get $r \le \int_a^b |f(t)|\,\text{d}t$
+The Jordan curve theorem states that the complement of a simple closed contour $C$ in the plane has exactly 2 connected components, and $C$ is the boundary of each.
 
-</Note>
+- Interior  
+  The bounded component.
+- Exterior  
+  The unbounded component.
 
-### ML Inequality
+### Positive Orientation
 
-Let $f$ be continuous on a contour $C$, with $|f(z)| \le M$ for all $z$ on $C$, and let $L$ be the length of $C$.
+A simple closed contour is positively oriented **iff** its interior lies on the left as it is traversed. Equivalently, it is traversed counterclockwise.
 
-$$
-\left|\int_C f(z)\,\text{d}z\right| \le ML
-$$
+A negatively oriented contour is traversed clockwise.
 
-<Note title="Proof Hint">
+## Parametrization
 
-- Parametrize $C$ by $z(t)$, $a \le t \le b$
-- Apply the integral triangle inequality to $\int_a^b f(z(t))z'(t)\,\text{d}t$
-- Bound $|f(z(t))|$ by $M$
-- Recognize $\int_a^b |z'(t)|\,\text{d}t$ as $L$
+A parametrization $z(t)$, $a \le t \le b$, must trace $C$ once in the required direction.
 
-</Note>
+### Line Segment
 
-## Examples
-
-### Line Integral of $z$ from $0$ to $1+i$
-
-Let $C$ be the line segment from $0$ to $1+i$, parametrized by $z(t) = t(1+i)$, $0 \le t \le 1$. $z'(t) = 1+i$.
+The segment from $z_1$ to $z_2$ is
 
 $$
-\int_C z\,\text{d}z = \int_0^1 t(1+i)(1+i)\,\text{d}t = (1+i)^2\int_0^1 t\,\text{d}t
+z(t) = z_1 + t(z_2 - z_1), \qquad 0 \le t \le 1
 $$
 
-$(1+i)^2 = 2i$ and $\displaystyle\int_0^1 t\,\text{d}t = \dfrac{1}{2}$
+### Circle and Arcs
+
+The circle of radius $r$ centered at $z_0$, traversed counterclockwise, is
 
 $$
-\int_C z\,\text{d}z = 2i \cdot \frac{1}{2} = i
+z(t) = z_0 + re^{it}, \qquad 0 \le t \le 2\pi
+$$
+
+An arc from angle $\theta_1$ to angle $\theta_2$ restricts the parameter range.
+
+$$
+\theta_1 \le t \le \theta_2
+$$
+
+Examples:
+
+- Upper semicircle of $|z| = r$ from $r$ to $-r$ uses $z(t) = re^{it}$, $0 \le t \le \pi$
+- Lower semicircle of $|z| = r$ from $r$ to $-r$ uses $z(t) = re^{-it}$, $0 \le t \le \pi$
+- Clockwise circle uses $z(t) = z_0 + re^{-it}$, $0 \le t \le 2\pi$
+
+### Ellipse
+
+The ellipse with semi-axes $a$ and $b$ centered at $z_0$, traversed counterclockwise, is
+
+$$
+z(t) = z_0 + a\cos t + ib\sin t, \qquad 0 \le t \le 2\pi
+$$
+
+### Graph of a Function
+
+A curve $y = g(x)$ from $x = a$ to $x = b$ uses $x$ as the parameter.
+
+$$
+z(x) = x + ig(x), \qquad a \le x \le b
+$$
+
+A curve $x = g(y)$ uses $y$ as the parameter.
+
+$$
+z(y) = g(y) + iy
+$$
+
+### Piecewise Contours
+
+A polygon, such as a triangle or rectangle, is parametrized side by side. Each side is a line segment.
+
+### Reversed Orientation
+
+Let $-C$ be the contour $C$ traversed in the opposite direction. It is parametrized by
+
+$$
+z_\text{rev}(t) = z(a + b - t), \qquad a \le t \le b
 $$

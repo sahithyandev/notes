@@ -1,10 +1,10 @@
 ---
 title: Complex Integration Theorems
 dateCreated: 2026-09-11T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:30.124Z
+lastUpdatedOn: 2026-10-06T22:30:16.432Z
 ---
 
-Let $f$ be analytic in a simply connected domain $D$, and let $z_0$ be a fixed point in $D$. For each $z \in D$, let $C_z$ be any contour in $D$ from $z_0$ to $z$.
+Let $f$ be analytic in a [simply connected](/s5/calculus/vector-values-functions/independence-of-path#simply-connected-region) domain $D$, and let $z_0$ be a fixed point in $D$. For each $z \in D$, let $C_z$ be any contour in $D$ from $z_0$ to $z$.
 
 $$
 F(z) = \int_{C_z} f(\zeta)\,\text{d}\zeta
@@ -18,14 +18,48 @@ $$
 
 <Note>
 
-$F$ is well defined because $\int_{C_z} f(\zeta)\,\text{d}\zeta$ is independent of the choice of $C_z$, by the Cauchy-Goursat theorem.
+$F$ is well defined because $\int_{C_z} f(\zeta)\,\text{d}\zeta$ is independent of the choice of $C_z$, by the [Cauchy-Goursat theorem](/s5/calculus/complex-functions/contour-integral#cauchy-goursat-theorem).
 
 </Note>
 
 ## Definite Integrals
 
-Let $f$ be analytic in a simply connected domain $D$, and let $F$ be an antiderivative of $f$ in $D$. If $C$ is any contour in $D$ from $z_1$ to $z_2$,
+Let $f$ be analytic in a [simply connected](/s5/calculus/vector-values-functions/independence-of-path#simply-connected-region) domain $D$, and let $F$ be an antiderivative of $f$ in $D$. If $C$ is any contour in $D$ from $z_1$ to $z_2$,
 
 $$
 \int_C f(z)\,\text{d}z = F(z_2) - F(z_1)
 $$
+
+## Cauchy's Integral Formula
+
+Let $f$ be analytic in a [simply connected](/s5/calculus/vector-values-functions/independence-of-path#simply-connected-region) domain $D$, and let $C$ be a [positively oriented](/s5/calculus/complex-functions/contour#positive-orientation) [simple closed](/s5/calculus/complex-functions/contour#simple-closed-contour) contour lying in $D$. If $z_0$ lies inside $C$,
+
+$$
+f(z_0) = \frac{1}{2\pi i}\int_C \frac{f(z)}{z - z_0}\,\text{d}z
+$$
+
+Equivalently,
+
+$$
+\int_C \frac{f(z)}{z - z_0}\,\text{d}z = 2\pi i f(z_0)
+$$
+
+### Derivatives
+
+Under the same conditions, for $n = 1, 2, 3, \ldots$,
+
+$$
+f^{(n)}(z_0) = \frac{n!}{2\pi i}\int_C \frac{f(z)}{(z-z_0)^{n+1}}\,\text{d}z
+$$
+
+Equivalently,
+
+$$
+\int_C \frac{f(z)}{(z-z_0)^{n+1}}\,\text{d}z = \frac{2\pi i}{n!}f^{(n)}(z_0)
+$$
+
+<Note>
+
+Analyticity of $f$ on $D$ forces $f$ to be infinitely differentiable there, since $f^{(n)}(z_0)$ exists for every $n$.
+
+</Note>
