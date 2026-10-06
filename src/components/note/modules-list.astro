@@ -11,9 +11,13 @@ const { modules } = Astro.props;
 
 <div class="sb-group-title">Modules</div>
 {modules.map(({ module, href, count, active, elective }) => (
-  <a href={href} class={`sb-item${active ? " active" : ""}`}>
-    {titleize(module)}
-    {elective && <span class="sb-item-tag">Elective</span>}
+  <a
+    href={href}
+    class={`sb-item${active ? " active" : ""}${elective ? " elective" : ""}`}
+    title={elective ? "Elective" : undefined}
+  >
+    <span class="sb-item-name">{titleize(module)}</span>
+    {elective && <span class="sr-only">(elective)</span>}
     <span class="sb-item-count">{count}</span>
   </a>
 ))}
@@ -63,15 +67,24 @@ const { modules } = Astro.props;
     color: var(--text-muted);
   }
 
-  .sb-item-tag {
-    margin-left: 6px;
-    padding: 1px 5px;
-    font-size: 0.5625rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+  .sb-item.elective .sb-item-name {
+    font-style: italic;
+  }
+
+  .sb-item.elective:not(.active) {
     color: var(--text-muted);
-    border: 1px solid var(--border);
-    border-radius: 3px;
+  }
+
+  .sb-item.elective:not(.active):hover {
+    color: var(--text-primary);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 </style>
