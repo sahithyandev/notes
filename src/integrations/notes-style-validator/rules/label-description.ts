@@ -33,10 +33,13 @@ function wordCount(s: string): number {
 
 const MAX_LABEL_WORDS = 5;
 
-// Bans `- Label: description`. A label is exempt when it overlaps a
-// math/inline-code span from the shared mask pass (glossary bullets like
-// `- $L$: unit lower triangular` or `` - `IN`: … ``, including a label that's
-// only partly math like `- $(1)$ is $\le$: add slack $s_1$.`). A label
+const INLINE_CODE_RE = /(`+)[\s\S]*?\1/g;
+
+// Bans `- Label: description`. A label is exempt when it overlaps a math
+// span from the shared mask pass (glossary bullets like
+// `- $L$: unit lower triangular`, including a label that's only partly math
+// like `- $(1)$ is $\le$: add slack $s_1$.`). An inline-code label such as
+// `` - `INNER JOIN`: … `` is NOT exempt. A label
 // containing a URL is NOT exempt — `- [text](https://x): Description` is
 // still a violation in substance, only the URL's own colon is incidental.
 export function checkLabelDescription(f: ScannedFile): Violation[] {
@@ -53,14 +56,22 @@ export function checkLabelDescription(f: ScannedFile): Violation[] {
     const labelStart = m[1].length + m[2].length + m[3].length;
     const labelLen = m[4].length;
 
-    // Label overlaps a math/code span from scan.ts's masking -> exempt.
+    const originalLabel = f.lines[i].slice(labelStart, labelStart + labelLen);
+
+    // Label overlaps a math span from scan.ts's masking -> exempt. A label
+    // that is only inline code has no `$` outside its backticks, so it is
+    // still flagged.
     const labelInCodeMath = codeMathMasked.slice(
       labelStart,
       labelStart + labelLen,
     );
-    if (labelInCodeMath.includes(MASK_CHAR)) continue;
+    if (
+      labelInCodeMath.includes(MASK_CHAR) &&
+      originalLabel.replace(INLINE_CODE_RE, "").includes("$")
+    ) {
+      continue;
+    }
 
-    const originalLabel = f.lines[i].slice(labelStart, labelStart + labelLen);
     if (wordCount(originalLabel) > MAX_LABEL_WORDS) continue;
 
     violations.push({

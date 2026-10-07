@@ -19,9 +19,14 @@ test("exempts a bullet whose label is partly math", () => {
   expect(checkLabelDescription(f)).toHaveLength(0);
 });
 
-test("exempts an inline-code label", () => {
-  const f = scanOne("- `IN`: $I(2,3)$ and $N(0,2)$ form a rectangle.");
-  expect(checkLabelDescription(f)).toHaveLength(0);
+test("flags an inline-code label", () => {
+  const f = scanOne("- `INNER JOIN`: Returns records with matching values.");
+  expect(checkLabelDescription(f)).toHaveLength(1);
+});
+
+test("flags an inline-code label containing a dollar sign", () => {
+  const f = scanOne("- `$HOME`: The user's home directory.");
+  expect(checkLabelDescription(f)).toHaveLength(1);
 });
 
 test("flags a markdown link label with a URL, not exempting it", () => {
