@@ -7,6 +7,7 @@ import { checkTitleLength } from "./title-length.ts";
 import { checkDash } from "./dash.ts";
 import { checkMathDelimiters } from "./math-delimiters.ts";
 import { checkAdjacentNote } from "./adjacent-note.ts";
+import { checkAdjacentList } from "./adjacent-list.ts";
 import { checkLabelDescription } from "./label-description.ts";
 import { checkCollapsedLabel } from "./collapsed-label.ts";
 import { checkPrereqScope } from "./prereq-scope.ts";
@@ -19,7 +20,8 @@ import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 
 export { checkBrokenLinks, checkSubmoduleNumbering };
 
-// Every rule except broken-link runs per file, independent of the rest of
+// Every rule except the corpus-wide ones (broken-link, submodule-numbering,
+// forward-link) runs per file, independent of the rest of
 // the corpus. broken-link needs every file's slug/headings up front to know
 // what a valid target even is, so it's handled separately (see validate.ts).
 const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
@@ -30,6 +32,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkDash,
   checkMathDelimiters,
   checkAdjacentNote,
+  checkAdjacentList,
   checkLabelDescription,
   checkCollapsedLabel,
   checkPrereqScope,

@@ -10,6 +10,7 @@ export type RuleId =
   | "dash"
   | "math-delimiters"
   | "adjacent-note"
+  | "adjacent-list"
   | "label-description"
   | "collapsed-label"
   | "prereq-scope"
