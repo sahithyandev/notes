@@ -1,10 +1,10 @@
 ---
 title: RC4
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:14:18.777Z
+lastUpdatedOn: 2026-10-07T05:27:10.080Z
 ---
 
-RC4, designed by Ron Rivest in 1987, is a byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an [LFSR](/s5/computer-security/linear-feedback-shift-registers).
+RC4, designed by Ron Rivest in 1987, is a byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an LFSR.
 
 $$
 S: \{0, \ldots, 255\} \to \{0, \ldots, 255\}
@@ -61,4 +61,4 @@ RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, b
 - Keystream bias  
   Beyond the first bytes, the PRGA output is not perfectly uniform either. Digraph biases such as Mantin's ABSAB bias let an attacker who sees the same plaintext encrypted under many unrelated keys, as in a broadcast setting, recover it by majority vote across sessions, without recovering any key.
 
-Dropping the first 256 or more output bytes and never deriving a key by concatenating it with a public IV patches the specific attacks above, but does not restore RC4 to a currently recommended cipher. Modern protocols use [AES](/s5/computer-security/aes) or other authenticated stream ciphers instead.
+Dropping the first 256 or more output bytes and never deriving a key by concatenating it with a public IV patches the specific attacks above, but does not restore RC4 to a currently recommended cipher. Modern protocols use AES or other authenticated stream ciphers instead.

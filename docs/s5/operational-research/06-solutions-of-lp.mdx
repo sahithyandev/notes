@@ -1,7 +1,7 @@
 ---
 title: Solutions of a Linear Program
 dateCreated: 2026-08-26T11:53:03.283Z
-lastUpdatedOn: 2026-09-28T04:57:33.675Z
+lastUpdatedOn: 2026-10-07T05:27:10.649Z
 ---
 
 Consider a linear program in standard form: maximize $c^T x$ subject to $Ax = b$, $x \ge 0$, where $A$ is $m \times n$ with $n \ge m$ and rank $m$. Here $m$ is the number of constraints and $n$ is the number of variables.
@@ -69,6 +69,6 @@ A degenerate basic feasible solution can come from more than one basic set: diff
 
 A basic feasible solution has at most $m$ nonzero variables and is an extreme point (corner) of the feasible region.
 
-Basic feasible solutions are finite in number, at most $\binom{n}{m}$, one per choice of which $m$ variables may be nonzero. An optimum can therefore be found by checking finitely many corners instead of the whole continuous feasible region, and the [simplex algorithm](/s5/operational-research/simplex-algorithm) does exactly this, walking from corner to corner.
+Basic feasible solutions are finite in number, at most $\binom{n}{m}$, one per choice of which $m$ variables may be nonzero. An optimum can therefore be found by checking finitely many corners instead of the whole continuous feasible region, and the simplex algorithm does exactly this, walking from corner to corner.
 
 To see why it holds, start at any feasible $x$. If it is not basic, the columns of $A$ for its nonzero entries are linearly dependent, so there is a direction $d$ with $Ad = 0$. Moving to $x \pm t d$ keeps $Ax = b$ satisfied; increase $t$ until some variable hits $0$, leaving fewer nonzeros. Repeating drives the point to a basic one. For the second statement, pick the sign of $d$ so $c^T x$ does not decrease, so the basic point reached is at least as good as the original optimum.

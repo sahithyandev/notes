@@ -1,7 +1,7 @@
 ---
 title: Meltdown and Spectre
 dateCreated: 2026-09-03T05:28:35.093Z
-lastUpdatedOn: 2026-09-30T15:28:09.389Z
+lastUpdatedOn: 2026-10-07T05:27:11.045Z
 ---
 
 Meltdown and Spectre are 3 CPU vulnerabilities disclosed in 2018 that leak memory through microarchitectural side channels.
@@ -97,6 +97,6 @@ Mitigation: retpoline replaces indirect branches with a construct that steers sp
 ### Other Mitigations
 
 - Microcode features (IBRS, IBPB, STIBP) restrict or flush the BTB across contexts.
-- Chrome [site isolation](/s5/secure-app-dev/web-browsers#site-isolation) puts one site per process, so a speculative leak only reaches same-site data.
+- Chrome site isolation puts one site per process, so a speculative leak only reaches same-site data.
 
 Check a Linux system with `speed47/spectre-meltdown-checker`.

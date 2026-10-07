@@ -1,7 +1,7 @@
 ---
 title: UDP
 dateCreated: 2026-05-14T12:24:44.126Z
-lastUpdatedOn: 2026-09-29T03:57:48.547Z
+lastUpdatedOn: 2026-10-07T05:27:08.133Z
 ---
 
 Aka. User Datagram Protocol or Unreliable Datagram Protocol. Connectionless. Defined in RFC 768. Minimal overhead. No handshake. No delivery guarantee. Unacknowledged at the transport layer. Unicast or multicast.
@@ -204,14 +204,14 @@ Ignores network congestion signals. Might contribute to network congestions.
 
 ## Applications
 
-| Scenario                           | Reason                                               |
-| ---------------------------------- | ---------------------------------------------------- |
-| DNS queries                        | Single request-response; handshake overhead wasteful |
-| VoIP / video streaming             | Latency tolerance > reliability                      |
-| DHCP                               | Broadcast-based; no prior connection possible        |
-| [SNMP](/s4/computer-networks/snmp) | Simple management queries; loss acceptable           |
-| Gaming                             | Low latency critical; application handles loss       |
-| Multicast/broadcast                | TCP is unicast-only                                  |
+| Scenario               | Reason                                               |
+| ---------------------- | ---------------------------------------------------- |
+| DNS queries            | Single request-response; handshake overhead wasteful |
+| VoIP / video streaming | Latency tolerance > reliability                      |
+| DHCP                   | Broadcast-based; no prior connection possible        |
+| SNMP                   | Simple management queries; loss acceptable           |
+| Gaming                 | Low latency critical; application handles loss       |
+| Multicast/broadcast    | TCP is unicast-only                                  |
 
 ### QUIC
 

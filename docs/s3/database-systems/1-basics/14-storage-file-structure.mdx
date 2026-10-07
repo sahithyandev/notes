@@ -1,7 +1,7 @@
 ---
 title: Storage File Structure
 dateCreated: 2026-04-22T07:09:10.696Z
-lastUpdatedOn: 2026-09-29T03:56:56.847Z
+lastUpdatedOn: 2026-10-07T05:27:07.338Z
 ---
 
 Explains how data is stored and managed at the physical level in a DBMS. It introduces the types of storage media, performance measures, disk organization, and techniques for efficient data access.
@@ -75,7 +75,6 @@ Each page has two main parts:
   - Number of records.
   - Pointer to end of free space.
   - A table of _slots_, where each slot stores the _offset and length_ of a record.
-
 - Data area, where actual records are stored, packed from the end of the page backward.
 
 New records are added at the end of free space; a new slot entry is created in the header.

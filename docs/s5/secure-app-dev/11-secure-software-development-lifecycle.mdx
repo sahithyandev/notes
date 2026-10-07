@@ -3,7 +3,7 @@ title: Secure Software Development Lifecycle
 sidebar:
   label: SSDL
 dateCreated: 2026-09-03T05:24:45.100Z
-lastUpdatedOn: 2026-09-30T15:28:09.215Z
+lastUpdatedOn: 2026-10-07T05:27:10.936Z
 ---
 
 Security must be built into every phase of the SDLC, not bolted on as a final checklist. Fixing vulnerabilities early cuts remediation cost and deployment delay.
@@ -16,19 +16,19 @@ An application is one finished program that users or clients interact with, such
 
 ### Threat Modeling
 
-Finds attack vectors and design flaws during architecture, before code is written. Maps assets, [trust boundaries](/s5/secure-app-dev/threat-modeling#trust-boundary), and [data flows](/s5/secure-app-dev/threat-modeling#data-flow-diagram), often with a method like [STRIDE](/s5/secure-app-dev/threat-modeling#stride), then ranks the threats and assigns mitigations. A flaw fixed here costs far less than one fixed after release.
+Finds attack vectors and design flaws during architecture, before code is written. Maps assets, trust boundaries, and data flows, often with a method like STRIDE, then ranks the threats and assigns mitigations. A flaw fixed here costs far less than one fixed after release.
 
 ### Secure Coding
 
-Applies defensive standards against common flaws like [SQL injection](/s5/secure-app-dev/owasp-top-10#injection-flaws), [XSS](/s5/secure-app-dev/owasp-top-10#cross-site-scripting), and [buffer overflows](/s5/computer-security/buffer-overflow). Core practices are [input validation](/s5/computer-security/incomplete-mediation), output encoding, [parameterized queries](/s3/database-systems/sql/prepared-statements), and [safe memory handling](/s5/secure-app-dev/memory-safety), enforced through coding standards and code review.
+Applies defensive standards against common flaws like SQL injection, XSS, and [buffer overflows](/s5/computer-security/buffer-overflow). Core practices are [input validation](/s5/computer-security/incomplete-mediation), output encoding, [parameterized queries](/s3/database-systems/sql/prepared-statements), and [safe memory handling](/s5/secure-app-dev/memory-safety), enforced through coding standards and code review.
 
 ### Dependency Management
 
-Scans and updates third-party components against [supply chain attacks](/s5/secure-app-dev/software-supply-chain-security). [Software composition analysis](/s5/secure-app-dev/static-analysis#software-composition-analysis) (SCA) tools flag known vulnerable versions, while lockfiles and an [SBOM](#software-bill-of-materials) record exactly what ships.
+Scans and updates third-party components against supply chain attacks. Software composition analysis (SCA) tools flag known vulnerable versions, while lockfiles and an [SBOM](#software-bill-of-materials) record exactly what ships.
 
 ### Automated Testing
 
-Runs SAST and DAST in the CI/CD pipeline. [SAST](/s5/secure-app-dev/static-analysis) analyzes source code without running it and catches flaws early. [DAST](/s5/secure-app-dev/dynamic-analysis) probes the running application from outside and catches runtime and configuration issues. A failed scan can block the merge or deployment.
+Runs SAST and DAST in the CI/CD pipeline. SAST analyzes source code without running it and catches flaws early. DAST probes the running application from outside and catches runtime and configuration issues. A failed scan can block the merge or deployment.
 
 ### Identity Management
 
@@ -74,4 +74,4 @@ Foundational guidelines that hold across all languages and architectures. They s
 - Psychological acceptability  
   Keeps security intuitive so users do not bypass it.
 
-The [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework) formalizes these into 4 pillars. The [Principles of Secure System Design](/s5/computer-security/secure-system-design) note covers compartmentalization, defense in depth, and worked examples of these principles applied to real systems.
+The Secure Software Development Framework formalizes these into 4 pillars. The [Principles of Secure System Design](/s5/computer-security/secure-system-design) note covers compartmentalization, defense in depth, and worked examples of these principles applied to real systems.

@@ -1,7 +1,7 @@
 ---
 title: Authentication Protocols
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:16.997Z
+lastUpdatedOn: 2026-10-07T05:27:10.309Z
 ---
 
 An authentication protocol lets a User and a Server verify each other and set up a shared session key.
@@ -189,4 +189,4 @@ An interleaving attack succeeds when:
 
 With the identical $k$, the attacker swaps the encrypted privilege tokens returned by $S_1$ and $S_2$ in transit. The User ends up holding the token $S_1$ meant to keep for itself. Deriving $k$ from $pwd$ and $nonce$ alone makes it predictable across servers when both inputs repeat. Including $S_{id}$ in the hash, or generating $k$ from fresh randomness instead of a hash of reused values, closes this gap.
 
-A single login granting access to multiple servers without repeating these 2-party protocols per server is covered in [Kerberos](/s5/computer-security/kerberos).
+A single login granting access to multiple servers without repeating these 2-party protocols per server is covered in Kerberos.

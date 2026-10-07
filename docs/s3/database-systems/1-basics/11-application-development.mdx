@@ -1,7 +1,7 @@
 ---
 title: Application Development
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-29T03:56:56.807Z
+lastUpdatedOn: 2026-10-07T05:27:07.300Z
 ---
 
 Applications, as the intermediary between the user and database is discussed here. Can be split into 3:
@@ -65,7 +65,6 @@ Mechanisms used by web applications to maintain state and track user interaction
 
 - Cookies
   small pieces of data stored on the user's browser. The server sends cookies to the client, which are then included in subsequent requests. Cookies can be used for authentication, storing preferences, or tracking user activity. Have attributes such as expiration, domain, and path, which control their scope and lifetime. Visible to and managed by the client.
-
 - Sessions
   server-side storage of user data. When a user logs in or interacts with the application, the server creates a session and assigns a unique session ID, which is typically stored in a cookie on the client. The session ID allows the server to retrieve user-specific data for each request. Sessions are commonly used for authentication and storing temporary data. Managed securely on the server.
 
@@ -97,17 +96,14 @@ Refers to the technique where executable code or SQL queries are embedded direct
 This makes it easier to connect a web interface to a database because:
 
 - Input values from HTML forms can be used directly in the embedded server-side code or SQL queries.
-
 - The document returned to the client is dynamically created based on the processing and data retrieval performed on the server.
 
 Various server-side scripting languages are used today, including:
 
 - JSP (Java Server Pages)  
   Compiled into Java and Servlets, and allows new tags to be defined in tag libraries.
-
 - PHP  
   Widely used for Web server scripting.
-
 - General-purpose scripting languages like VBScript, Perl, and Python
 
 ### Client-Side Scripting
@@ -233,10 +229,8 @@ There are different types of XSS attacks:
 
 - Reflected XSS  
   Malicious script is reflected off a web server in response to a user request.
-
 - Stored XSS  
   The malicious script is permanently stored on the server and executed when users view infected content.
-
 - DOM-based XSS  
   The vulnerability exists in client-side code, manipulating the Document Object Model in the browser.
 
@@ -348,13 +342,11 @@ Alternatively, encryption/decryption can be done in the application layer before
 ### Encryption and Authentication
 
 - Password-based authentication is common but vulnerable to network sniffing.
-
 - Challenge-response systems enhance security by avoiding password transmission:
   - Database sends a random challenge.
   - User encrypts and returns it.
   - Database verifies by decrypting the response.
   - Can use public-key encryption where DB encrypts with user’s public key, and user decrypts and returns it.
-
 - Digital signatures verify data authenticity:
   - Created by encrypting data with a private key.
   - Verified by decrypting with the corresponding public key.

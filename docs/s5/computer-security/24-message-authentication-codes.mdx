@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Codes
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:16.937Z
+lastUpdatedOn: 2026-10-07T05:27:10.269Z
 ---
 
 A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
@@ -17,7 +17,7 @@ The sender transmits $(m, t)$. The receiver recomputes $\text{MAC}_k(m)$ and acc
 - Authenticity  
   Only a holder of the shared key $k$ can produce a valid tag.
 - No non-repudiation  
-  Both parties hold $k$, so a tag cannot prove which of them created it. [Digital signatures](/s5/computer-security/digital-signatures) provide non-repudiation.
+  Both parties hold $k$, so a tag cannot prove which of them created it. Digital signatures provide non-repudiation.
 
 A [hash function](/s5/computer-security/hash-functions) alone gives no authenticity, since an attacker can alter $m$ and recompute the public digest.
 
@@ -116,7 +116,7 @@ The outer hash hides the inner digest, which defeats length extension.
 
 Bellare, Canetti and Krawczyk proved HMAC secure if the compression function of $H$ is a pseudorandom function. Collision resistance of $H$ is not required. HMAC-MD5 and HMAC-SHA-1 therefore stayed unbroken after collisions were found in MD5 and SHA-1, though new designs use HMAC-SHA-256.
 
-HMAC is used in TLS, IPsec, JWT and as the core of HKDF in [key derivation functions](/s5/computer-security/key-derivation-functions).
+HMAC is used in TLS, IPsec, JWT and as the core of HKDF in key derivation functions.
 
 ## Universal Hash MACs
 

@@ -1,7 +1,7 @@
 ---
 title: Moore Machine
 dateCreated: 2026-04-23T17:39:39.633Z
-lastUpdatedOn: 2026-09-29T03:57:50.208Z
+lastUpdatedOn: 2026-10-07T05:27:09.054Z
 ---
 
 A finite state transducer where output depends only on the current state. A 6-tuple.
@@ -36,6 +36,6 @@ For FA $M = (Q, \Sigma, q_0, A, \delta)$, construct Moore machine $M' = (Q, \Sig
 
 ## Conversion to Mealy Machine
 
-Every Moore machine has an equivalent [Mealy machine](/s4/theory-of-computing/mealy-machine). For each transition $\delta(q, a) = p$, create a Mealy output $\lambda_M(q, a) = \lambda(p)$ (copy the Moore output of the destination state onto the transition).
+Every Moore machine has an equivalent Mealy machine. For each transition $\delta(q, a) = p$, create a Mealy output $\lambda_M(q, a) = \lambda(p)$ (copy the Moore output of the destination state onto the transition).
 
 The resulting Mealy machine has the same states but produces output on transitions instead of states.
