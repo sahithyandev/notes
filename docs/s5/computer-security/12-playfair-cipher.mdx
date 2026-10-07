@@ -1,7 +1,7 @@
 ---
 title: Playfair Cipher
 dateCreated: 2026-07-29T05:53:47.519Z
-lastUpdatedOn: 2026-09-29T03:14:18.865Z
+lastUpdatedOn: 2026-10-07T05:44:47.302Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [polygraphic](/s5/computer-security/ciphers#polygraphic-cipher) cipher. Invented by Sir Charles Wheatstone in 1854. Named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
@@ -94,25 +94,29 @@ WA KA ND AF OR EV ER
 
 Encrypt each bigram by its rule.
 
-- `WA`: $W(4,1)$ and $A(0,1)$ share column $1$. $W \to (0,1) = A$. $A \to (1,1) = R$. Gives `AR`.
-- `KA`: $K(2,3)$ and $A(0,1)$ form a rectangle. $K \to (2,1) = G$. $A \to (0,3) = T$. Gives `GT`.
-- `ND`: $N(0,2)$ and $D(1,4)$ form a rectangle. $N \to (0,4) = H$. $D \to (1,2) = B$. Gives `HB`.
-- `AF`: $A(0,1)$ and $F(2,0)$ form a rectangle. $A \to (0,0) = P$. $F \to (2,1) = G$. Gives `PG`.
-- `OR`: $O(3,1)$ and $R(1,1)$ share column $1$. $O \to (4,1) = W$. $R \to (2,1) = G$. Gives `WG`.
-- `EV`: $E(1,0)$ and $V(4,0)$ share column $0$. $E \to (2,0) = F$. $V \to (0,0) = P$. Gives `FP`.
-- `ER`: $E(1,0)$ and $R(1,1)$ share row $1$. $E \to (1,1) = R$. $R \to (1,2) = B$. Gives `RB`.
+| Bigram | Positions          | Rule        | Mapping                              | Result |
+| ------ | ------------------ | ----------- | ------------------------------------ | ------ |
+| `WA`   | $W(4,1)$, $A(0,1)$ | Same column | $W \to (0,1) = A$, $A \to (1,1) = R$ | `AR`   |
+| `KA`   | $K(2,3)$, $A(0,1)$ | Rectangle   | $K \to (2,1) = G$, $A \to (0,3) = T$ | `GT`   |
+| `ND`   | $N(0,2)$, $D(1,4)$ | Rectangle   | $N \to (0,4) = H$, $D \to (1,2) = B$ | `HB`   |
+| `AF`   | $A(0,1)$, $F(2,0)$ | Rectangle   | $A \to (0,0) = P$, $F \to (2,1) = G$ | `PG`   |
+| `OR`   | $O(3,1)$, $R(1,1)$ | Same column | $O \to (4,1) = W$, $R \to (2,1) = G$ | `WG`   |
+| `EV`   | $E(1,0)$, $V(4,0)$ | Same column | $E \to (2,0) = F$, $V \to (0,0) = P$ | `FP`   |
+| `ER`   | $E(1,0)$, $R(1,1)$ | Same row    | $E \to (1,1) = R$, $R \to (1,2) = B$ | `RB`   |
 
 Ciphertext is `ARGTHBPGWGFPRB`.
 
 Decryption reverses each rule under the same grid.
 
-- `AR`: column $1$, shift up. $A(0,1) \to (4,1) = W$. $R(1,1) \to (0,1) = A$. Gives `WA`.
-- `GT`: rectangle. $G(2,1) \to (2,3) = K$. $T(0,3) \to (0,1) = A$. Gives `KA`.
-- `HB`: rectangle. $H(0,4) \to (0,2) = N$. $B(1,2) \to (1,4) = D$. Gives `ND`.
-- `PG`: rectangle. $P(0,0) \to (0,1) = A$. $G(2,1) \to (2,0) = F$. Gives `AF`.
-- `WG`: column $1$, shift up. $W(4,1) \to (3,1) = O$. $G(2,1) \to (1,1) = R$. Gives `OR`.
-- `FP`: column $0$, shift up. $F(2,0) \to (1,0) = E$. $P(0,0) \to (4,0) = V$. Gives `EV`.
-- `RB`: row $1$, shift left. $R(1,1) \to (1,0) = E$. $B(1,2) \to (1,1) = R$. Gives `ER`.
+| Bigram | Positions          | Rule                  | Mapping                              | Result |
+| ------ | ------------------ | --------------------- | ------------------------------------ | ------ |
+| `AR`   | $A(0,1)$, $R(1,1)$ | Same column, shift up | $A \to (4,1) = W$, $R \to (0,1) = A$ | `WA`   |
+| `GT`   | $G(2,1)$, $T(0,3)$ | Rectangle             | $G \to (2,3) = K$, $T \to (0,1) = A$ | `KA`   |
+| `HB`   | $H(0,4)$, $B(1,2)$ | Rectangle             | $H \to (0,2) = N$, $B \to (1,4) = D$ | `ND`   |
+| `PG`   | $P(0,0)$, $G(2,1)$ | Rectangle             | $P \to (0,1) = A$, $G \to (2,0) = F$ | `AF`   |
+| `WG`   | $W(4,1)$, $G(2,1)$ | Same column, shift up | $W \to (3,1) = O$, $G \to (1,1) = R$ | `OR`   |
+| `FP`   | $F(2,0)$, $P(0,0)$ | Same column, shift up | $F \to (1,0) = E$, $P \to (4,0) = V$ | `EV`   |
+| `RB`   | $R(1,1)$, $B(1,2)$ | Same row, shift left  | $R \to (1,0) = E$, $B \to (1,1) = R$ | `ER`   |
 
 Recovered text is `wakandaforever`.
 

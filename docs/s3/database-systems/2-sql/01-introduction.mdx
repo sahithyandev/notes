@@ -3,7 +3,7 @@ title: Introduction to SQL
 sidebar:
   label: Introduction
 dateCreated: 2026-04-22T07:09:10.697Z
-lastUpdatedOn: 2026-10-07T05:27:07.395Z
+lastUpdatedOn: 2026-10-07T05:44:46.337Z
 ---
 
 A declarative [DML](/s3/database-systems/basics/introduction#dml) and [DDL](/s3/database-systems/basics/introduction#ddl). Case insensitive. Became the industry standard in the 1980s.
@@ -33,25 +33,22 @@ Each SQL flavor implements the ANSI SQL standard but adds proprietary extensions
 
 SQL supports several built-in data types as well as user-defined data types.
 
-- Numeric Types:
-  - `INTEGER` / `INT`: Whole numbers without decimal places
-  - `DECIMAL(p,s)` / `NUMERIC(p,s)`: Exact numeric values with specified precision
-  - `FLOAT` / `REAL`: Approximate numeric values
-  - `SMALLINT` / `BIGINT`: Smaller and larger integer values
-- String Types:
-  - `CHAR(n)`: Fixed-length character strings
-  - `VARCHAR(n)`: Variable-length character strings
-  - `TEXT`: Large variable-length character strings
-- Date and Time Types:
-  - `DATE`: Stores date values (YYYY-MM-DD)
-  - `TIME`: Stores time values (HH:MM:SS)
-  - `TIMESTAMP`: Stores date and time values
-  - `DATETIME`: Similar to TIMESTAMP
-- Boolean Type:
-  - `BOOLEAN`: Stores TRUE, FALSE, or NULL values
-- Binary Types:
-  - `BLOB`: Binary Large Object for storing binary data
-  - `BINARY` / `VARBINARY`: Fixed and variable-length binary data
+| Category      | Type                            | Description                                   |
+| ------------- | ------------------------------- | --------------------------------------------- |
+| Numeric       | `INTEGER` / `INT`               | Whole numbers without decimal places          |
+| Numeric       | `DECIMAL(p,s)` / `NUMERIC(p,s)` | Exact numeric values with specified precision |
+| Numeric       | `FLOAT` / `REAL`                | Approximate numeric values                    |
+| Numeric       | `SMALLINT` / `BIGINT`           | Smaller and larger integer values             |
+| String        | `CHAR(n)`                       | Fixed-length character strings                |
+| String        | `VARCHAR(n)`                    | Variable-length character strings             |
+| String        | `TEXT`                          | Large variable-length character strings       |
+| Date and Time | `DATE`                          | Stores date values (YYYY-MM-DD)               |
+| Date and Time | `TIME`                          | Stores time values (HH:MM:SS)                 |
+| Date and Time | `TIMESTAMP`                     | Stores date and time values                   |
+| Date and Time | `DATETIME`                      | Similar to TIMESTAMP                          |
+| Boolean       | `BOOLEAN`                       | Stores TRUE, FALSE, or NULL values            |
+| Binary        | `BLOB`                          | Binary Large Object for storing binary data   |
+| Binary        | `BINARY` / `VARBINARY`          | Fixed and variable-length binary data         |
 
 Users can define additional data types using `CREATE TYPE`.
 
@@ -90,12 +87,18 @@ Modern engines maintain system catalogs that track all dependencies. To ensure a
 
 To combine columns from more than 1 relations based on related columns.
 
-- `INNER JOIN`: Returns records that have matching values in both tables.
-- `LEFT (OUTER) JOIN`: Returns all records from the left table and matched records from the right table.
-- `RIGHT (OUTER) JOIN`: Returns all records from the right table and matched records from the left table.
-- `FULL (OUTER) JOIN`: Returns all records when there's a match in either the left or right table.
-- `CROSS JOIN`: Returns the Cartesian product of two tables.
-- `NATURAL JOIN`: Returns the intersection of two tables based on common column names. Not recommended due to ambiguity and potential performance issues.
+- `INNER JOIN`  
+  Returns records that have matching values in both tables.
+- `LEFT (OUTER) JOIN`  
+  Returns all records from the left table and matched records from the right table.
+- `RIGHT (OUTER) JOIN`  
+  Returns all records from the right table and matched records from the left table.
+- `FULL (OUTER) JOIN`  
+  Returns all records when there's a match in either the left or right table.
+- `CROSS JOIN`  
+  Returns the Cartesian product of two tables.
+- `NATURAL JOIN`  
+  Returns the intersection of two tables based on common column names. Not recommended due to ambiguity and potential performance issues.
 
 ## SQL Queries
 

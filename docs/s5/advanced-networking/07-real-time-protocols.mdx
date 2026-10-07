@@ -7,7 +7,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-09-25T06:53:39.970Z
+lastUpdatedOn: 2026-10-07T05:44:47.114Z
 ---
 
 Real-time multimedia applications rely on RTP, RTCP, and SIP for transport, feedback, and signalling.
@@ -122,17 +122,22 @@ The fixed 12-byte RTP header:
   </table>
 </div>
 
-- **Payload Type (7 bits):** Identifies the audio/video encoding format.
-  - `0`: PCM $\mu$-law ($64\text{ kbps}$)
-  - `3`: GSM ($13\text{ kbps}$)
-  - `7`: LPC ($2.4\text{ kbps}$)
-  - `26`: Motion JPEG
-  - `31`: H.261
-  - `33`: MPEG2 Video
+- **Payload Type (7 bits):** Identifies the audio/video encoding format. Common codes are listed below.
 - **Sequence Number (16 bits):** Increments by $1$ for each RTP packet sent. Detects loss and restores order.
 - **Timestamp (32 bits):** Sampling instant of the first RTP payload byte. Supports jitter removal and playout synchronisation.
   - For $8\text{ kHz}$ audio, the timestamp clock increments by $1$ every $125\mu\text{s}$. A $20\text{ms}$ chunk increases the timestamp by $160$.
 - **SSRC (32 bits):** Identifies the RTP source within a session. Each stream in RTP session has distinct SSRC.
+
+Common payload type codes:
+
+| Code | Encoding      | Bitrate           |
+| ---- | ------------- | ----------------- |
+| `0`  | PCM $\mu$-law | $64\text{ kbps}$  |
+| `3`  | GSM           | $13\text{ kbps}$  |
+| `7`  | LPC           | $2.4\text{ kbps}$ |
+| `26` | Motion JPEG   | -                 |
+| `31` | H.261         | -                 |
+| `33` | MPEG2 Video   | -                 |
 
 <Note>
   RTP and QoS: RTP is an end-system protocol. Routers treat it as best-effort

@@ -1,7 +1,7 @@
 ---
 title: Behaviour Diagram
 dateCreated: 2026-06-07T23:49:09.227Z
-lastUpdatedOn: 2026-09-29T03:57:49.900Z
+lastUpdatedOn: 2026-10-07T05:44:46.833Z
 ---
 
 Describe how a system behaves in response to stimuli or events over time.
@@ -65,9 +65,12 @@ A directed arrow from a source state to a target state.
 
 Transition label syntax: `event [guard] / action`
 
-- `event`: the trigger that fires the transition.
-- `[guard]`: optional boolean condition that must hold.
-- `/action`: optional behavior executed during the transition.
+- `event`  
+  The trigger that fires the transition.
+- `[guard]`  
+  Optional boolean condition that must hold.
+- `/action`  
+  Optional behavior executed during the transition.
 
 All three parts are optional. A transition with no label fires automatically when the source state's `do` activity completes.
 
@@ -83,9 +86,12 @@ A solid filled circle surrounded by a thin ring. Represents the end of the objec
 
 Written inside the state box below the state name, separated by a thin line:
 
-- `entry / action`: runs once when the state is entered.
-- `exit / action`: runs once when the state is exited.
-- `do / activity`: runs continuously while the object remains in the state. Interruptible by transitions.
+- `entry / action`  
+  Runs once when the state is entered.
+- `exit / action`  
+  Runs once when the state is exited.
+- `do / activity`  
+  Runs continuously while the object remains in the state. Interruptible by transitions.
 
 ### Composite State
 
