@@ -1,0 +1,72 @@
+---
+title: Compression
+dateCreated: 2026-08-18T07:19:11.017Z
+lastUpdatedOn: 2026-10-07T05:23:38.381Z
+---
+
+Compression reduces the volume of data required to represent an image, without necessarily reducing its information content. It works by removing [data redundancy](/s5/image-processing/redundancy).
+
+- Lossless compression  
+  Source and reconstructed image match pixel to pixel.
+- Lossy compression  
+  Source and reconstructed image may not match pixel to pixel.
+
+## Compression Ratio
+
+For the same information encoded with $n_1$ units of data under scheme $C_1$ and $n_2$ units under scheme $C_2$:
+
+$$
+CR = \frac{n_1}{n_2}
+$$
+
+Relative data redundancy of $C_2$ compared to $C_1$:
+
+$$
+RD = 1 - \frac{1}{CR}
+$$
+
+## Compression Pipeline
+
+$$
+\text{Mapper} \to \text{Quantizer} \to \text{Symbol encoder} \to \text{Channel encoder}
+$$
+
+- Mapper  
+  Transform to reduce [interpixel redundancy](/s5/image-processing/redundancy#interpixel-redundancy).
+- Quantizer  
+  Resample to reduce bit depth, removing [psychovisual redundancy](/s5/image-processing/redundancy#psychovisual-redundancy). Lossy, and optional.
+- Symbol encoder  
+  Entropy coding for optimal symbol allocation, removing [coding redundancy](/s5/image-processing/redundancy#coding-redundancy).
+- Channel encoder  
+  Add controlled redundancy for error recovery.
+
+Decompression reverses each stage in order, except quantization, which is non-recoverable.
+
+## JPEG Compression
+
+Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
+
+- Compression ratios up to about 20:1 without noticeable artefacts, up to about 100:1 with minor artefacts
+- Supports both lossless and lossy modes
+- User selectable compression to file size tradeoff
+
+Pipeline:
+
+$$
+\text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
+$$
+
+- Forward DCT  
+  Convert to YCrCb, divide into 8x8 tiles, apply the discrete cosine transform to each tile.
+- Quantization  
+  Optional. Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality.
+- Entropy coding  
+  Code coefficients in zig-zag order for optimal coding efficiency.
+
+### Discrete Cosine Transform
+
+Decomposes the image into a set of cosine waveforms at different frequencies, ordered from DC (average intensity) to high frequency (sharp, minor variation).
+
+- Coefficients are uncorrelated, giving better entropy than raw pixel values
+- Zeroing a coefficient removes its corresponding frequency from the reconstructed image
+- Inverse DCT reconstructs the image from its coefficients

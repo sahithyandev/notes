@@ -1,0 +1,162 @@
+---
+title: Data Redundancy
+dateCreated: 2026-10-07T00:00:00.000Z
+lastUpdatedOn: 2026-10-07T05:23:38.367Z
+---
+
+Information is the meaning conveyed by a message. Data is the container used to store or transmit it.
+
+- Information is not compressible, since its meaning doesn't change with the medium
+- Data is compressible, since data capacity can exceed the information it carries
+
+Image compression exploits 3 types of redundancy.
+
+- Coding redundancy  
+  The coding scheme uses more space than the information requires, e.g. an 8bpp image stored in 16bpp format.
+- Interpixel redundancy  
+  Pixel values are correlated locally, e.g. a monotonous background or a repeating texture.
+- Psychovisual redundancy  
+  Image detail that isn't visually perceivable.
+
+<Note>
+
+Redundancy also gives resilience against data corruption. Practical schemes retain controlled redundancy, e.g. chunked delta coding or parity bits and checksums, to limit error propagation.
+
+</Note>
+
+## Coding Redundancy
+
+Reduced by assigning shorter codewords to more probable grey levels. The lower bound on the average bits per pixel is the [entropy](/s5/image-processing/entropy) of the image. Codeword allocation schemes are covered in [image encoding](/s5/image-processing/image-encoding).
+
+## Interpixel Redundancy
+
+Correlated or repeating pixel patterns, such as texture or constant regions, can be represented more compactly than as independent pixel values.
+
+### Delta Coding
+
+Transforms pixels into differences from a neighbour:
+
+$$
+D(x,y) = I(x+1,y) - I(x,y)
+$$
+
+Here:
+
+- $I(x,y)$: grey level at column $x$ and row $y$
+- $D(x,y)$: difference between a pixel and its right neighbour
+
+The first pixel of each row has no left neighbour, so it is stored unchanged. The decoder rebuilds the row by accumulating the differences:
+
+$$
+I(x,y) = I(0,y) + \sum_{i=0}^{x-1} D(i,y)
+$$
+
+- Differences are typically small integers, since local pixels are correlated
+- The difference histogram peaks sharply at 0, so its [entropy](/s5/image-processing/entropy) is lower than the entropy of the raw grey levels
+- Reduces correlation among pixel values, increasing coding efficiency
+- Lossless, since the accumulation recovers every pixel exactly
+
+Example:
+
+- Row $100, 102, 101, 101, 105$ is stored as $100, 2, -1, 0, 4$
+
+### Image Pyramid Coding
+
+Each layer stores the difference from the layer above, upscaled to match resolution. Removes correlation relative to the previous layer.
+
+The image is repeatedly smoothed and downsampled to build layers of decreasing resolution:
+
+$$
+G_0 = I, \qquad G_{k+1} = \text{reduce}(G_k)
+$$
+
+Each layer is predicted by upscaling the next coarser layer. Only the prediction error is stored:
+
+$$
+L_k = G_k - \text{expand}(G_{k+1})
+$$
+
+The coarsest layer $G_K$ is stored as is. The decoder starts there and works down to full resolution:
+
+$$
+G_k = L_k + \text{expand}(G_{k+1})
+$$
+
+Here:
+
+- $I$: original image
+- $G_k$: image at level $k$, with $G_0$ the full-resolution image
+- $K$: index of the coarsest level
+- $\text{reduce}$: smoothing followed by downsampling by 2 in each dimension
+- $\text{expand}$: upsampling by 2 in each dimension with interpolation
+- $L_k$: difference layer at level $k$
+
+Difference layers are mostly near 0 in smooth regions, so they have low entropy. The total number of samples is about $\frac{4}{3}$ of the image size, since each level has $\frac{1}{4}$ the samples of the one below. Compression comes from the lower entropy per sample.
+
+Used for progressive image transmission, updating the receiver incrementally. The receiver shows $G_K$ first, then sharpens it as each $L_k$ arrives.
+
+### Run-Length Coding
+
+Encodes a run of identical pixel values as $(\text{value}, \#\text{times to repeat})$ pairs rather than storing each pixel separately. Pixels are scanned row by row, and a run normally ends at the end of a row.
+
+A run of $r$ pixels, with $b_v$ bits per value and $b_c$ bits per count, saves space **iff**:
+
+$$
+r\, b_v > b_v + b_c \iff r > 1 + \frac{b_c}{b_v}
+$$
+
+- Short runs can take more space than the raw pixels, so isolated pixels are a worst case
+- More effective on binary images, which more often contain large regions of constant value
+- In a binary image, runs alternate between 0 and 1. Only the first value and the run lengths need to be stored.
+
+Example:
+
+- Row $0001111001$ is stored as $(0,3), (1,4), (0,2), (1,1)$
+
+### Bit-Plane Coding
+
+Separates an $m$-bit grey level image into $m$ binary bit-planes:
+
+$$
+I(x,y) = \sum_{k=0}^{m-1} a_k(x,y)\, 2^k
+$$
+
+Here:
+
+- $a_k(x,y)$: bit $k$ of the pixel at $(x,y)$, with $k = 0$ the least significant bit
+
+Plane $k$ is the binary image formed by $a_k$ over all pixels.
+
+- Lower order planes capture minor grey level changes
+- Higher order planes capture larger changes, and hold larger regions of constant value
+- Higher order planes compress better with schemes such as run-length coding
+
+A small grey level change can flip many bits in the natural binary code, e.g. $127 = 01111111$ and $128 = 10000000$ differ in all 8 bits. This breaks runs in every plane. Gray code representation avoids it, since consecutive grey levels differ in exactly 1 bit:
+
+$$
+g_{m-1} = a_{m-1}, \qquad g_k = a_k \oplus a_{k+1} \quad (0 \le k < m-1)
+$$
+
+The decoder recovers the original bits from the top plane downwards:
+
+$$
+a_{m-1} = g_{m-1}, \qquad a_k = g_k \oplus a_{k+1}
+$$
+
+Here:
+
+- $g_k$: bit $k$ of the Gray coded pixel
+- $\oplus$: exclusive OR
+
+## Psychovisual Redundancy
+
+Not all image detail is equally perceivable. Removing imperceptible detail doesn't affect apparent quality, but always loses information.
+
+- Re-quantizing with lower grey level depth
+- Smoothing to remove noise and minor variations before coding
+
+<Note>
+
+Always results in a lossy compression scheme.
+
+</Note>

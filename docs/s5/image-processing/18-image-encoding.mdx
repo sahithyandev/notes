@@ -1,7 +1,7 @@
 ---
 title: Image Encoding
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-09-30T07:23:57.735Z
+lastUpdatedOn: 2026-10-07T05:23:38.348Z
 ---
 
 Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
@@ -42,7 +42,6 @@ Here:
 
 - $L$: number of grey levels
 - $l(k)$: codeword length of grey level $k$
-
 - $L_{ave} = l(k)$ for every image, regardless of the grey level probabilities
 - $L_{ave} = B_{ave}$ only when all grey levels are equiprobable and $L$ is a power of 2
 - Simple to encode and decode, and allows random access to any pixel
@@ -187,6 +186,6 @@ For the variable code in the table above, the stream `010110` splits as `0`, `10
 
 <Note>
 
-A flipped bit shifts every later codeword boundary, so decoding errors propagate through the rest of the stream. The channel encoder in the [compression](/s5/image-processing/compression) pipeline adds controlled redundancy to limit this.
+A flipped bit shifts every later codeword boundary, so decoding errors propagate through the rest of the stream. The channel encoder in the compression pipeline adds controlled redundancy to limit this.
 
 </Note>
