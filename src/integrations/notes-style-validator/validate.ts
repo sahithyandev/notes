@@ -3,6 +3,7 @@ import {
   runPerFileRules,
   checkBrokenLinks,
   checkSubmoduleNumbering,
+  checkForwardLinks,
 } from "./rules/index.ts";
 import { matchesFilter } from "./filter.ts";
 import {
@@ -36,6 +37,7 @@ function collectViolations(
   }
   flat.push(...checkBrokenLinks(files, extraValidUrls));
   flat.push(...checkSubmoduleNumbering(files));
+  flat.push(...checkForwardLinks(files));
   return flat;
 }
 

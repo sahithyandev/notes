@@ -17,8 +17,9 @@ import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 import { checkDuplicateHeading } from "./duplicate-heading.ts";
 
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
+import { checkForwardLinks } from "./forward-link.ts";
 
-export { checkBrokenLinks, checkSubmoduleNumbering };
+export { checkBrokenLinks, checkSubmoduleNumbering, checkForwardLinks };
 
 // Every rule except the corpus-wide ones (broken-link, submodule-numbering,
 // forward-link) runs per file, independent of the rest of
