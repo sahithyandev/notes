@@ -39,10 +39,11 @@ const ABBREVIATIONS: Record<string, string> = {
 
 export function stripMdxSyntax(content: string): string {
   return content
+    .replace(/\$\$[\s\S]*?\$\$/g, "")
+    .replace(/\$[^$\n]+\$/g, "x")
     .replace(/^import .*$/gm, "")
     .replace(/^export .*$/gm, "")
-    .replace(/\{[^}]*\}/g, " ")
-    .replace(/<[^>]*>/g, " ")
+    .replace(/<\/?[A-Za-z][^>]*>/g, " ")
     .replace(/^#{1,6}\s+/gm, "");
 }
 

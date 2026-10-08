@@ -42,6 +42,13 @@ export const foo = 1;`;
   expect(calculateWordCount(content)).toBe(6);
 });
 
+test("calculateWordCount counts inline math as one word and ignores block math and comparisons", () => {
+  const content =
+    "Let $a < b$ and $f(x) = \\frac{1}{2}$ hold.\n\n$$\nx < y > z\n$$\n\nDone.";
+  // "Let" "x" "and" "x" "hold." "Done." = 6
+  expect(calculateWordCount(content)).toBe(6);
+});
+
 test("calculateWordCount strips heading markers but keeps heading text", () => {
   const content = "## Section Title\n\n### Subsection\n\nBody text.";
   // "Section Title" (2) + "Subsection" (1) + "Body text." (2) = 5
