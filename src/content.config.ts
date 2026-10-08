@@ -41,8 +41,8 @@ const notes = defineCollection({
       // than kept as optional fields, since notes still carrying them from
       // before this change don't need those values to validate, only to be
       // ignored.
-      dateCreated: z.date().optional(),
-      lastUpdatedOn: z.date().optional(),
+      dateCreated: z.date(),
+      lastUpdatedOn: z.date(),
       keywords: z.optional(z.array(z.string())),
       prereqs: z.optional(z.array(z.string())),
       authors: z
