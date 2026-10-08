@@ -22,12 +22,7 @@ import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
 import ImageZoom from "../components/note/image-zoom.astro";
 import LinkPreview from "../components/note/link-preview.astro";
-import {
-  titleize,
-  calculateReadTime,
-  calculateWordCount,
-  generateDescription,
-} from "../utils";
+import { titleize, calculateWordCount, generateDescription } from "../utils";
 
 export const prerender = true;
 
@@ -47,6 +42,7 @@ if (slug === undefined) {
 
 const notesEntry = await getEntry("notes", slug);
 const slugParts = slug.split("/");
+const semNum = slugParts[0].match(/^s(\d)$/)?.[1] || "1";
 
 if (!notesEntry) {
   return new Response(null, {
@@ -146,7 +142,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     data-pagefind-body
     data-note-file-path={notesEntry.filePath}
     class="grid grid-cols-[auto_1fr_auto]"
-    style={`--sem: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-bg: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg); --sem-border: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-border); --sem-text: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}); --sem-dim: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"}-bg); --link: var(--s${slugParts[0].match(/^s(\d)$/)?.[1] || "1"});`}
+    style={`--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --sem-border: var(--s${semNum}-border); --sem-text: var(--s${semNum}); --sem-dim: var(--s${semNum}-bg); --link: var(--s${semNum});`}
   >
     <NoteSidebar sidebarData={sidebarData} slug={slug} slugParts={slugParts} />
 
