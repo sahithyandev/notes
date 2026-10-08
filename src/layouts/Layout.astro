@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { generateBreadcrumb } from "../utils/breadcrumb";
 import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
 
 interface Author {
@@ -35,7 +36,7 @@ const {
 
 const isArticle = Boolean(authors && authors.length > 0);
 
-const jsonLd = isArticle
+const articleLd = isArticle
   ? {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -52,6 +53,40 @@ const jsonLd = isArticle
       })),
     }
   : null;
+
+const isHome = canonical === SITE_HOST_URL && !noindex;
+
+const websiteLd = isHome
+  ? {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_HOST_URL,
+      description: SITE_DESCRIPTION,
+    }
+  : null;
+
+const pageTitle = title.endsWith(` | ${SITE_NAME}`)
+  ? title.slice(0, -` | ${SITE_NAME}`.length)
+  : title;
+
+const breadcrumbLd =
+  slug && !noindex
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: generateBreadcrumb(slug, pageTitle).map(
+          (item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.label,
+            item: item.href ? `${SITE_HOST_URL}${item.href}` : canonical,
+          }),
+        ),
+      }
+    : null;
+
+const jsonLdBlocks = [articleLd, websiteLd, breadcrumbLd].filter(Boolean);
 
 const finalizedKeywords: Array<string> = [SITE_NAME];
 
@@ -146,12 +181,9 @@ if (keywords && keywords.length > 0) {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
 
-    {jsonLd && (
-      <script
-        type="application/ld+json"
-        set:html={JSON.stringify(jsonLd)}
-      ></script>
-    )}
+    {jsonLdBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
 
     <!-- Canonical -->
     {noindex && <meta name="robots" content="noindex" />}
