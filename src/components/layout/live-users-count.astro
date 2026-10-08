@@ -7,6 +7,19 @@
   <span class="live-count">1</span>
 </div>
 
+<script is:inline>
+  // Restore the last known count before first paint so the badge does not
+  // vanish and pop back in on every page navigation.
+  try {
+    var cached = sessionStorage.getItem("sn-live-count");
+    var box = document.getElementById("live-users-count-container");
+    if (box && cached !== null && Number.parseInt(cached) >= 0) {
+      box.querySelector(".live-count").textContent = cached;
+      box.classList.remove("hide");
+    }
+  } catch (_) {}
+</script>
+
 <script>
   import { SITE_DOMAIN } from "../../utils/values";
   (() => {
@@ -20,6 +33,9 @@
     }
     const hideCountDisplay = () => {
       container.classList.add("hide");
+      try {
+        sessionStorage.removeItem("sn-live-count");
+      } catch {}
     };
     const showCountDisplay = () => {
       container.classList.remove("hide");
@@ -31,7 +47,10 @@
     eventSource.addEventListener("message", function (event) {
       try {
         if (Number.parseInt(event.data) >= 0) {
-          countDisplay.innerHTML = event.data;
+          countDisplay.textContent = event.data;
+          try {
+            sessionStorage.setItem("sn-live-count", event.data);
+          } catch {}
           showCountDisplay();
         } else {
           hideCountDisplay();
