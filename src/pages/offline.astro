@@ -1,0 +1,226 @@
+---
+export const prerender = true;
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/layout/nav.astro";
+import Footer from "../components/layout/footer.astro";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+---
+
+<Layout
+  title={`You're offline | ${SITE_NAME}`}
+  description="You're offline. Notes you opened before are still available on this device."
+  image={`${SITE_HOST_URL}/og/default.jpg`}
+  noindex
+>
+  <Nav />
+
+  <main id="main-content" class="offline-page">
+    <section class="offline-content">
+      <p class="offline-code">Offline</p>
+      <h1>You're not connected.</h1>
+      <p class="description">
+        This page isn't saved on your device. Notes you opened before stay
+        available offline for 30 days.
+      </p>
+      <div class="offline-actions">
+        <button type="button" id="offline-retry" class="offline-btn">
+          Try again
+        </button>
+        <a href="/" class="offline-btn offline-btn--ghost">
+          Home
+        </a>
+      </div>
+
+      <div id="offline-saved" hidden>
+        <h2>Saved on this device</h2>
+        <div id="offline-groups"></div>
+      </div>
+      <p id="offline-empty" class="description" hidden>
+        Nothing is saved yet. Notes become available offline after you open them
+        once while connected.
+      </p>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { titleize } from "../utils";
+  import {
+    PAGE_CACHE_PREFIX,
+    isFresh,
+    normalizePath,
+  } from "../scripts/offline";
+
+  document
+    .getElementById("offline-retry")
+    ?.addEventListener("click", () => location.reload());
+  window.addEventListener("online", () => location.reload());
+
+  type Saved = { path: string; title: string; cachedAt: number };
+
+  async function loadSaved(): Promise<Saved[]> {
+    const byPath = new Map<string, Saved>();
+    for (const name of await caches.keys()) {
+      if (!name.startsWith(PAGE_CACHE_PREFIX)) continue;
+      const cache = await caches.open(name);
+      for (const request of await cache.keys()) {
+        const path = normalizePath(new URL(request.url).pathname);
+        if (path === "/" || path === "/offline") continue;
+        const response = await cache.match(request);
+        if (!response || !isFresh(response)) continue;
+        const html = await response.text();
+        const heading = new DOMParser()
+          .parseFromString(html, "text/html")
+          .querySelector("h1")
+          ?.textContent?.trim();
+        byPath.set(path, {
+          path,
+          title: heading || titleize(path.split("/").pop() ?? path),
+          cachedAt: Number(response.headers.get("sn-cached-at")),
+        });
+      }
+    }
+    return [...byPath.values()].sort((a, b) => b.cachedAt - a.cachedAt);
+  }
+
+  function render(saved: Saved[]) {
+    const groups = new Map<string, Saved[]>();
+    for (const item of saved) {
+      const sem = item.path.split("/")[1] ?? "";
+      if (!groups.has(sem)) groups.set(sem, []);
+      groups.get(sem)!.push(item);
+    }
+    const container = document.getElementById("offline-groups")!;
+    for (const sem of [...groups.keys()].sort()) {
+      const match = sem.match(/^s(\d+)$/);
+      const section = document.createElement("section");
+      section.className = "offline-group";
+      if (match) section.style.setProperty("--group", `var(--s${match[1]})`);
+      const label = document.createElement("h3");
+      label.textContent = match ? `Semester ${match[1]}` : titleize(sem);
+      const list = document.createElement("ul");
+      for (const item of groups.get(sem)!) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = item.path;
+        a.textContent = item.title;
+        li.append(a);
+        list.append(li);
+      }
+      section.append(label, list);
+      container.append(section);
+    }
+  }
+
+  loadSaved()
+    .then((saved) => {
+      if (saved.length === 0) {
+        document.getElementById("offline-empty")!.hidden = false;
+        return;
+      }
+      render(saved);
+      document.getElementById("offline-saved")!.hidden = false;
+    })
+    .catch(() => {
+      document.getElementById("offline-empty")!.hidden = false;
+    });
+</script>
+
+<style>
+  :root {
+    --nav-h: 54px;
+  }
+
+  .offline-page {
+    min-height: calc(100dvh - var(--nav-h) - 60px);
+    width: var(--body-width);
+    margin: 0 auto;
+    padding: calc(8 * var(--spacing)) 0;
+  }
+
+  .offline-content {
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .offline-code {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+  }
+
+  h1 {
+    font-family: var(--font-ui);
+    margin: 0 0 12px;
+  }
+
+  .description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .offline-actions {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0 36px;
+  }
+
+  .offline-btn {
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    color: var(--text-primary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .offline-btn:hover {
+    background: var(--border);
+  }
+
+  h2 {
+    font-family: var(--font-ui);
+    font-size: 1.125rem;
+    margin: 0 0 12px;
+  }
+
+  .offline-group {
+    margin-bottom: 20px;
+  }
+
+  .offline-group h3 {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--group, var(--text-muted));
+  }
+
+  .offline-group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 10px;
+    border-left: 2px solid var(--group, var(--border));
+  }
+
+  .offline-group li {
+    padding: 3px 0;
+  }
+
+  .offline-group a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .offline-group a:hover {
+    text-decoration: underline;
+  }
+</style>
