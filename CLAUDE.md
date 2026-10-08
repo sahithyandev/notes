@@ -33,6 +33,12 @@ On top of that, the plugin exposes `POST /__reload-lock/pause` and `POST /__relo
 
 Regardless of the above, still make all edits to a given note in one pass (draft the full content, then a single `Write`/`Edit`) rather than several incremental `Edit` calls, since that's fewer filesystem writes and keeps intermediate diffs cleaner.
 
+## Soft navigation (production)
+
+`src/scripts/note-swap.ts` (production and dev) turns prev/next buttons, sidebar note links and the left/right arrow shortcut into in-place content swaps inside a view transition. It falls back to a normal page load, decided before the DOM is touched, whenever the target isn't a note, has a different sidebar, or needs a script this page doesn't already run.
+
+Illustration component scripts are what make a swap non-trivial: they sweep the document once when they load. The `illustration-script-marker` Vite plugin in `astro.config.mjs` appends a global assignment to every script under `src/components/illustrations/`, and `note-swap.ts` re-runs the marked scripts after a swap (it builds the marker text from parts so its own bundle isn't tagged). A new page-level script that must keep working after a swap should export an `init...()` function and be called from `applyDocument` in `note-swap.ts`, like `initNoteFeedback`. In dev, `live-update.ts` still handles edits to the open note and reads the note's file path per event, since a swap changes it.
+
 ## Writing notes
 
 Use the `write-notes` skill whenever writing a new note or editing an existing one, so the content matches Sahithyan's style. For math-heavy or interactive learning content, use `math-teacher`.
