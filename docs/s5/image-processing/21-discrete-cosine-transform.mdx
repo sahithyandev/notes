@@ -1,0 +1,149 @@
+---
+title: Discrete Cosine Transform
+dateCreated: 2026-10-08T12:14:32.170Z
+lastUpdatedOn: 2026-10-08T13:09:53.911Z
+---
+
+The discrete cosine transform (DCT) writes a sequence of $N$ samples as a weighted sum of $N$ cosines of increasing frequency.
+
+### Properties
+
+- The coefficients are real
+- The transform is orthonormal
+- Energy of smooth signals concentrates in the first few coefficients
+- The inverse transform reconstructs the samples exactly, up to rounding
+
+## One-Dimensional DCT
+
+For samples $x(n)$, $n = 0, \dots, N-1$:
+
+$$
+X(k) = \alpha(k) \sum_{n=0}^{N-1} x(n) \cos\frac{(2n+1)k\pi}{2N}
+\qquad
+x(n) = \sum_{k=0}^{N-1} \alpha(k) X(k) \cos\frac{(2n+1)k\pi}{2N}
+$$
+
+Here:
+
+- $k$: frequency index
+- $\alpha(0)$: $\sqrt{1/N}$
+- $\alpha(k)$ for $k \geq 1$: $\sqrt{2/N}$
+- $X(0)$: DC coefficient, equal to $\sqrt{N}$ times the sample mean
+- $X(k)$ for $k \geq 1$: AC coefficients
+
+The term $\cos\frac{(2n+1)k\pi}{2N}$ completes $k/2$ cycles across the $N$ samples.
+
+## Two-Dimensional DCT
+
+For an $N \times N$ block $f(x, y)$ with $x$ the column and $y$ the row:
+
+$$
+F(u, v) = \alpha(u)\,\alpha(v) \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} f(x, y) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
+$$
+
+$$
+f(x, y) = \sum_{u=0}^{N-1} \sum_{v=0}^{N-1} \alpha(u)\,\alpha(v)\, F(u, v) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
+$$
+
+Here:
+
+- $u, v$: horizontal and vertical frequency indices
+- $F(0, 0)$: DC coefficient, equal to $N$ times the block mean
+- $F(u, v)$ for $(u, v) \neq (0, 0)$: AC coefficients
+
+For $N = 8$, $\alpha(k) = \frac{C(k)}{2}$ with $C(0) = \frac{1}{\sqrt{2}}$ and $C(k) = 1$ otherwise. The 2D transform then has the form
+
+$$
+F(u, v) = \frac{1}{4} C(u) C(v) \sum_{x=0}^{7} \sum_{y=0}^{7} f(x, y) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
+$$
+
+A constant block of value $c$ gives $F(0, 0) = Nc$ and all AC coefficients 0.
+
+### Matrix Form
+
+The kernel is separable, so the 2D transform is a 1D transform on every row followed by a 1D transform on every column.
+
+$$
+\mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top
+\qquad
+\mathbf{f} = \mathbf{T}^\top \mathbf{F}\, \mathbf{T}
+\qquad
+T(k, n) = \alpha(k) \cos\frac{(2n+1)k\pi}{2N}
+$$
+
+- $\mathbf{f}$ is stored with the row index $y$ first, so $\mathbf{f}[y][x] = f(x, y)$
+- $\mathbf{F}$ is stored with the vertical frequency $v$ first, so $\mathbf{F}[v][u] = F(u, v)$
+- $\mathbf{T}$ is orthogonal, so $\mathbf{T}^{-1} = \mathbf{T}^\top$
+- $\mathbf{T}$ depends only on $N$ and is computed once
+
+## Basis Functions
+
+The inverse DCT writes each block as a weighted sum of $N^2$ fixed patterns:
+
+$$
+f(x, y) = \sum_{u=0}^{N-1} \sum_{v=0}^{N-1} F(u, v)\, b_{u,v}(x, y)
+\qquad
+b_{u,v}(x, y) = \alpha(u)\,\alpha(v) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
+$$
+
+- $b_{0,0}$ is constant
+- $b_{u,v}$ completes $u/2$ cycles horizontally and $v/2$ cycles vertically across the block
+- Frequency grows from the top-left to the bottom-right of $\mathbf{F}$
+
+Because $\mathbf{T}$ is orthogonal, the patterns are orthonormal and the transform preserves energy.
+
+$$
+\sum_{x,y} f(x, y)^2 = \sum_{u,v} F(u, v)^2
+$$
+
+Squared error in the coefficient domain therefore equals squared error in the sample domain.
+
+## Choice of Transform
+
+- Compaction  
+  For highly correlated neighbouring samples, the DCT approaches the Karhunen–Loève transform in energy compaction, without needing signal-dependent basis vectors.
+- Boundary behaviour  
+  The DCT is the DFT of an even-symmetric extension of the block. The extension has no jump at the block border, so it avoids the leakage that the DFT produces from wrap-around discontinuities.
+- Real arithmetic  
+  All coefficients are real. The DFT of a real block is complex.
+
+## Fast Computation
+
+- Direct evaluation of the 2D sum costs $N^4$ multiplications per block, which is 4096 for $N = 8$
+- Row-column evaluation costs $2N^3$ multiplications, which is 1024 for $N = 8$
+- Fast 1D factorisations cost $O(N \log N)$ per transform. The AAN algorithm needs 5 multiplications for $N = 8$, since it leaves out the scale factors and expects the caller to fold them in later, for example into the divisors of a quantizer
+
+## Implementation
+
+Row-column evaluation with a precomputed matrix:
+
+```python
+from math import cos, pi, sqrt
+
+def dct_matrix(N):
+    T = [[0.0] * N for _ in range(N)]
+    for k in range(N):
+        a = sqrt(1 / N) if k == 0 else sqrt(2 / N)
+        for n in range(N):
+            T[k][n] = a * cos((2 * n + 1) * k * pi / (2 * N))
+    return T
+
+def matmul(A, B):
+    return [[sum(A[i][k] * B[k][j] for k in range(len(B))) for j in range(len(B[0]))]
+            for i in range(len(A))]
+
+def transpose(A):
+    return [list(row) for row in zip(*A)]
+
+def dct2(f, T):    # F = T f T^t, f[y][x] -> F[v][u]
+    return matmul(matmul(T, f), transpose(T))
+
+def idct2(F, T):   # f = T^t F T
+    return matmul(matmul(transpose(T), F), T)
+```
+
+Checks for a correct implementation:
+
+- A block of all 5s with $N = 8$ gives $F[0][0] = 40$ and every other coefficient 0
+- `idct2(dct2(f, T), T)` returns `f` up to floating point error
+- The sum of squares of `f` equals the sum of squares of `dct2(f, T)`

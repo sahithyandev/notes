@@ -53,3 +53,4 @@ export { default as PerfectSubstitutesDiagram } from "./perfect-substitutes-diag
 export { default as PerfectComplementsDiagram } from "./perfect-complements-diagram.astro";
 export { default as CostMinimizationDiagram } from "./cost-minimization-diagram.astro";
 export { default as MRTSDiagram } from "./mrts-diagram.astro";
+export { default as ZigZagScan } from "./zig-zag-scan.astro";

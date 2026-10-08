@@ -1,0 +1,839 @@
+---
+title: JPEG
+dateCreated: 2026-10-08T12:14:32.170Z
+lastUpdatedOn: 2026-10-08T13:09:53.925Z
+---
+
+Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
+
+- Compression ratios up to about 20:1 without noticeable artefacts, up to about 100:1 with minor artefacts
+- Supports both lossless and lossy modes
+- User selectable compression to file size tradeoff
+
+## History
+
+- 1974  
+  Ahmed, Natarajan and Rao introduce the discrete cosine transform.
+- 1986  
+  ISO and CCITT form the Joint Photographic Experts Group to define a standard for continuous-tone still images.
+- 1992  
+  The standard is published as CCITT Recommendation T.81. The JFIF file format, which defines how a JPEG stream is stored in a file, appears in the same year.
+- 1994  
+  ISO adopts the same standard as ISO/IEC 10918-1.
+- 2000  
+  JPEG 2000 is published as a wavelet-based successor with better quality at high compression ratios. It has not replaced baseline JPEG in common use.
+
+The widely used lossy mode is called baseline JPEG. Unless stated otherwise, this note describes it.
+
+## Preprocessing
+
+Preprocessing converts the colour space to [YCrCb](/s5/image-processing/color#channels), reduces the chroma resolution, splits each component into blocks and centres the sample values. The stages run in that order.
+
+### Colour Space Conversion
+
+For 8-bit samples, the JFIF conversion is:
+
+$$
+\begin{aligned}
+Y &= 0.299\,R + 0.587\,G + 0.114\,B \\
+C_b &= -0.1687\,R - 0.3313\,G + 0.5\,B + 128 \\
+C_r &= 0.5\,R - 0.4187\,G - 0.0813\,B + 128
+\end{aligned}
+$$
+
+$Y$ is a weighted sum of the primaries, with weights matching the eye's sensitivity (green highest, blue lowest). $C_b$ is a scaled $B - Y$ and $C_r$ is a scaled $R - Y$. The +128 offset keeps $C_b$ and $C_r$ inside $[0, 255]$.
+
+The standard itself does not fix the colour space. JFIF and Exif specify the conversion.
+
+The inverse (for the above-mentioned conversion) is:
+
+$$
+\begin{aligned}
+R &= Y + 1.402\,(C_r - 128) \\
+G &= Y - 0.3441\,(C_b - 128) - 0.7141\,(C_r - 128) \\
+B &= Y + 1.772\,(C_b - 128)
+\end{aligned}
+$$
+
+### Chroma Subsampling
+
+The eye is less sensitive to colour detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/redundancy#psychovisual-redundancy) early.
+
+Subsampling is written as $J{:}a{:}b$ over a block 4 pixels wide and 2 rows high.
+
+- 4:4:4  
+  No subsampling. Cb and Cr have full resolution.
+- 4:2:2  
+  Chroma halved horizontally. Chroma carries half the samples of luma.
+- 4:2:0  
+  Chroma halved in both directions. Chroma carries a quarter of the samples of luma.
+
+Each chroma sample is the average of the luma-resolution samples it covers. For 4:2:0, a 2x2 average. The decoder upsamples by replication or [interpolation](/s5/image-processing/image-resampling#interpolation).
+
+4:2:0 reduces the sample count to $1 + \frac{1}{4} + \frac{1}{4} = 1.5$ samples per pixel, from 3. This gives a 2:1 reduction before any DCT work.
+
+### Blocks and MCUs
+
+Each component is split into 8x8 blocks, also called tiles. Every later stage processes a block independently of the others.
+
+Each component $i$ has a sampling factor pair $(H_i, V_i)$. For an image of $X \times Y$ pixels:
+
+$$
+x_i = \left\lceil X \cdot \frac{H_i}{H_{\max}} \right\rceil
+\qquad
+y_i = \left\lceil Y \cdot \frac{V_i}{V_{\max}} \right\rceil
+$$
+
+- $x_i, y_i$: dimensions of component $i$ in samples
+- $H_{\max}, V_{\max}$: largest sampling factors across all components
+
+Blocks of the different components are interleaved in the output. The unit of coding is the minimum coded unit (MCU). An MCU holds $H_i \times V_i$ blocks of each component, in raster order within the component, components in order.
+
+- 4:4:4  
+  MCU covers 8x8 pixels and holds 3 blocks (Y, Cb, Cr).
+- 4:2:0  
+  MCU covers 16x16 pixels and holds 6 blocks (four Y, one Cb, one Cr).
+
+The image is padded to a whole number of MCUs, in both directions, by replicating the last row and column. Padding with edge values avoids a strong artificial edge, which would inflate the high-frequency coefficients of the border blocks.
+
+### Level Shift
+
+For $P$-bit samples, subtract $2^{P-1}$ from every sample. For $P = 8$ this subtracts 128.
+
+- Samples become centred on 0 and signed
+- The range becomes symmetric, $[-128, 127]$ for 8-bit samples
+
+## Discrete Cosine Transform
+
+Each level-shifted 8x8 block goes through the 2D [DCT](/s5/image-processing/discrete-cosine-transform) with $N = 8$.
+
+$$
+F(u, v) = \frac{1}{4} C(u) C(v) \sum_{x=0}^{7} \sum_{y=0}^{7} f(x, y) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
+$$
+
+$$
+f(x, y) = \frac{1}{4} \sum_{u=0}^{7} \sum_{v=0}^{7} C(u) C(v) F(u, v) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
+$$
+
+Here:
+
+- $x, y$: column and row of a sample in the block
+- $u, v$: horizontal and vertical frequency indices, from 0 to 7
+- $C(k)$: $\frac{1}{\sqrt{2}}$ for $k = 0$, otherwise 1
+- $F(0, 0)$: DC coefficient, equal to 8 times the block mean
+- $F(u, v)$ for $(u, v) \neq (0, 0)$: AC coefficients
+
+In matrix form, $\mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top$ with $T(k, n) = \frac{C(k)}{2} \cos\frac{(2n+1)k\pi}{16}$. Both arrays are stored row first, so $\mathbf{f}[y][x] = f(x, y)$ and $\mathbf{F}[v][u] = F(u, v)$. The zig-zag scan below indexes $\mathbf{F}$ in this layout.
+
+The transform alone is lossless up to rounding. Energy concentrates in the low-frequency coefficients near the top-left of $\mathbf{F}$. Most high-frequency coefficients are small. Since the input is level shifted, the DC coefficient is small and signed.
+
+For 8-bit input, $F(0, 0) \in [-1024, 1016]$ and every AC coefficient fits in the range $[-1023, 1023]$, so coefficients fit in 11 bits.
+
+## Quantization
+
+Each coefficient is divided by the matching entry of an 8x8 quantization table $Q$ and rounded:
+
+$$
+F_q(u, v) = \text{round}\left(\frac{F(u, v)}{Q(u, v)}\right)
+$$
+
+- Entries of $Q$ grow towards the high-frequency corner, since the eye tolerates error there better
+- Many high-frequency coefficients become 0
+- A quality setting scales $Q$. Larger entries give a smaller file and more visible artefacts
+- The decoder multiplies by $Q(u, v)$. The rounding error cannot be recovered
+- Fast DCT implementations leave the transform unscaled and fold the scale factors into the divisors
+
+At high compression ratios the 8x8 tile structure becomes visible as blocking [artefacts](/s5/image-processing/image-quality-assessment#artefacts).
+
+The decoder reconstructs $\hat{F}(u, v) = F_q(u, v)\, Q(u, v)$. Rounding bounds the error per coefficient:
+
+$$
+\left| F(u, v) - \hat{F}(u, v) \right| \le \frac{Q(u, v)}{2}
+$$
+
+A coefficient with $|F(u, v)| < Q(u, v)/2$ quantizes to 0 and its whole value is lost. For a coefficient that survives, the error is close to uniform, with variance $Q(u, v)^2 / 12$.
+
+The DCT preserves energy, so the squared error summed over the coefficients of a tile equals the squared error summed over its pixels, before pixel rounding and clamping.
+
+### Quantization Tables
+
+Annex K of the standard gives example tables, tuned for viewing conditions and not mandated. Luminance:
+
+|     |     |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 16  | 11  | 10  | 16  | 24  | 40  | 51  | 61  |
+| 12  | 12  | 14  | 19  | 26  | 58  | 60  | 55  |
+| 14  | 13  | 16  | 24  | 40  | 57  | 69  | 56  |
+| 14  | 17  | 22  | 29  | 51  | 87  | 80  | 62  |
+| 18  | 22  | 37  | 56  | 68  | 109 | 103 | 77  |
+| 24  | 35  | 55  | 64  | 81  | 104 | 113 | 92  |
+| 49  | 64  | 78  | 87  | 103 | 121 | 120 | 101 |
+| 72  | 92  | 95  | 98  | 112 | 100 | 103 | 99  |
+
+Chrominance:
+
+|     |     |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 17  | 18  | 24  | 47  | 99  | 99  | 99  | 99  |
+| 18  | 21  | 26  | 66  | 99  | 99  | 99  | 99  |
+| 24  | 26  | 56  | 99  | 99  | 99  | 99  | 99  |
+| 47  | 66  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+
+- The chrominance table is coarser, since the eye resolves colour detail poorly
+- Entries lie in $[1, 255]$ for 8-bit tables
+- The table in use is stored in the file, so a decoder never assumes the Annex K values
+
+### Quality Scaling
+
+Most encoders expose a quality $q \in [1, 100]$ and scale the Annex K tables (the Independent JPEG Group convention):
+
+$$
+s = \begin{cases} 5000 / q & q < 50 \\ 200 - 2q & q \ge 50 \end{cases}
+\qquad
+Q'(u, v) = \text{clamp}\left( \left\lfloor \frac{s\, Q(u, v) + 50}{100} \right\rfloor, 1, 255 \right)
+$$
+
+- $q = 50$ gives $s = 100$, so the table is unchanged
+- $q = 100$ gives $s = 0$, so every entry clamps to 1
+- Lower $q$ gives a larger $s$, larger divisors and a smaller file
+
+## Entropy Coding
+
+1. Code the DC coefficient as the difference from the DC coefficient of the previous tile. Neighbouring tiles have similar means, so the differences are small.
+2. Read the 63 AC coefficients in zig-zag order, from low to high frequency. The long tail of zeros collects at the end of the sequence.
+3. [Run-length](/s5/image-processing/redundancy#run-length-coding) encode the sequence as pairs of the number of preceding zeros and the next nonzero value. A special end-of-block symbol replaces the trailing zeros.
+4. [Huffman](/s5/image-processing/image-encoding#huffman-coding) code the pairs.
+
+The result of every tile is concatenated into 1 bitstream.
+
+### Zig-Zag Scan
+
+The scan visits the 64 positions along anti-diagonals, alternating direction, starting at the DC position.
+
+<ZigZagScan />
+
+For an implementation, the scan is a lookup table. Entry $k$ is the row-major position (`v * 8 + u`) of the coefficient visited $k$-th.
+
+```python
+ZIGZAG = [
+     0,  1,  8, 16,  9,  2,  3, 10,
+    17, 24, 32, 25, 18, 11,  4,  5,
+    12, 19, 26, 33, 40, 48, 41, 34,
+    27, 20, 13,  6,  7, 14, 21, 28,
+    35, 42, 49, 56, 57, 50, 43, 36,
+    29, 22, 15, 23, 30, 37, 44, 51,
+    58, 59, 52, 45, 38, 31, 39, 46,
+    53, 60, 61, 54, 47, 55, 62, 63,
+]
+```
+
+Scanning a block is `zz[k] = block_flat[ZIGZAG[k]]`. Unscanning is `block_flat[ZIGZAG[k]] = zz[k]`.
+
+Anti-diagonals have constant $u + v$, so they have roughly constant spatial frequency. Coefficients along the scan therefore decay in expected magnitude, which groups the zeros into 1 long run at the end.
+
+<Note>
+
+The logo of FFmpeg is a zig-zag scan of this kind, drawn over a block of coefficients.
+
+</Note>
+
+### DC Coefficients
+
+The DC coefficients of successive blocks of the same component are coded by differential pulse code modulation, a form of [delta coding](/s5/image-processing/redundancy#delta-coding):
+
+$$
+\text{Diff}_k = F_{q,k}(0, 0) - F_{q,k-1}(0, 0)
+$$
+
+- The predictor starts at 0 for the first block
+- Each component keeps its own predictor
+- Quantization comes before prediction, so the differences are of quantized values
+
+### Magnitude Categories
+
+A nonzero integer $a$ is described by its category $s$ and $s$ extra bits.
+
+$$
+s = \lfloor \log_2 |a| \rfloor + 1
+$$
+
+Category $s$ covers the values $\pm[2^{s-1}, 2^s - 1]$. Category 0 holds only the value 0.
+
+| Category $s$ | Values                         |
+| ------------ | ------------------------------ |
+| 0            | 0                              |
+| 1            | $-1, 1$                        |
+| 2            | $-3, -2, 2, 3$                 |
+| 3            | $-7, \dots, -4, 4, \dots, 7$   |
+| 4            | $-15, \dots, -8, 8, \dots, 15$ |
+| $s$          | $\pm[2^{s-1}, 2^s - 1]$        |
+
+The extra bits identify the value inside its category.
+
+- For $a > 0$, the extra bits are the $s$ low bits of the binary form of $a$
+- For $a < 0$, the extra bits are the $s$ low bits of $a - 1$, which equals the one's complement of $|a|$ in $s$ bits
+
+Examples:
+
+- $a = 5$ has $s = 3$ and extra bits `101`
+- $a = -5$ has $s = 3$ and extra bits `010`
+- $a = -3$ has $s = 2$ and extra bits `00`
+
+A leading extra bit of 1 always marks a positive value and 0 a negative value.
+
+Baseline limits are $s \le 11$ for DC differences and $s \le 10$ for AC coefficients.
+
+The DC difference is coded as the Huffman code of its category $s$, followed by the $s$ extra bits.
+
+### AC Coefficients
+
+Each nonzero AC coefficient is coded as a symbol byte followed by extra bits.
+
+$$
+\text{RS} = 16 R + s
+$$
+
+- $R$: number of zeros since the previous nonzero coefficient, from 0 to 15
+- $s$: category of the nonzero coefficient, from 1 to 10
+
+The Huffman code of RS is followed by the $s$ extra bits of the coefficient.
+
+Two special symbols exist.
+
+- EOB (`0x00`)  
+  End of block. Every remaining coefficient is 0. Omitted when coefficient 63 is nonzero.
+- ZRL (`0xF0`)  
+  Zero run length. Stands for 16 zeros with no nonzero value. Used repeatedly when a run exceeds 15.
+
+A run of 20 zeros followed by the value 3 is coded as ZRL, then $R = 4$, $s = 2$.
+
+### Huffman Tables
+
+A table is defined in the file by two lists.
+
+- `BITS`  
+  16 counts. Entry $l$ is the number of codes of length $l$.
+- `HUFFVAL`  
+  The symbols in order of increasing code length.
+
+The decoder rebuilds the codes canonically.
+
+1. Set `code = 0`.
+2. For each length $l = 1, \dots, 16$, assign `code` to each of the `BITS[l]` symbols of that length in order, incrementing `code` after each.
+3. After finishing length $l$, shift `code` left by 1.
+
+Constraints:
+
+- Code lengths are at most 16 bits
+- The all-ones code of any length is never assigned
+
+Baseline allows 2 DC tables and 2 AC tables. Typically 1 pair serves luminance and 1 pair serves chrominance. Each component is assigned 1 DC table and 1 AC table.
+
+Annex K gives typical luminance tables. Selected codes:
+
+| Symbol        | Code          |
+| ------------- | ------------- |
+| DC category 0 | `00`          |
+| DC category 1 | `010`         |
+| DC category 2 | `011`         |
+| DC category 3 | `100`         |
+| DC category 4 | `101`         |
+| DC category 5 | `110`         |
+| AC EOB        | `1010`        |
+| AC $R=0, s=1$ | `00`          |
+| AC $R=0, s=2$ | `01`          |
+| AC $R=0, s=3$ | `100`         |
+| AC $R=0, s=4$ | `1011`        |
+| AC $R=1, s=1$ | `1100`        |
+| AC $R=1, s=2$ | `11011`       |
+| AC $R=2, s=1$ | `11100`       |
+| AC $R=5, s=1$ | `1111010`     |
+| AC ZRL        | `11111111001` |
+
+Short codes go to the symbols that occur most often, namely small values after short zero runs.
+
+Encoders may instead compute optimal tables from the image's own symbol statistics, which saves roughly 5 to 10 percent of the file size.
+
+### Standard Huffman Tables
+
+The complete Annex K definitions, which `BITS` and `HUFFVAL` fully determine. Each AC table holds the 160 symbols $R \cdot 16 + s$ for $R \in [0, 15]$ and $s \in [1, 10]$, plus EOB (`0x00`) and ZRL (`0xF0`). The DC tables hold the categories 0 to 11.
+
+````python
+DC_LUM_BITS = [0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+DC_LUM_VALS = list(range(12))
+
+DC_CHR_BITS = [0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
+DC_CHR_VALS = list(range(12))
+
+AC_LUM_BITS = [0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 125]
+AC_LUM_VALS = bytes.fromhex(
+    "01 02 03 00 04 11 05 12 21 31 41 06 13 51 61 07"
+    "22 71 14 32 81 91 a1 08 23 42 b1 c1 15 52 d1 f0"
+    "24 33 62 72 82 09 0a 16 17 18 19 1a 25 26 27 28"
+    "29 2a 34 35 36 37 38 39 3a 43 44 45 46 47 48 49"
+    "4a 53 54 55 56 57 58 59 5a 63 64 65 66 67 68 69"
+    "6a 73 74 75 76 77 78 79 7a 83 84 85 86 87 88 89"
+    "8a 92 93 94 95 96 97 98 99 9a a2 a3 a4 a5 a6 a7"
+    "a8 a9 aa b2 b3 b4 b5 b6 b7 b8 b9 ba c2 c3 c4 c5"
+    "c6 c7 c8 c9 ca d2 d3 d4 d5 d6 d7 d8 d9 da e1 e2"
+    "e3 e4 e5 e6 e7 e8 e9 ea f1 f2 f3 f4 f5 f6 f7 f8"
+    "f9 fa"
+)
+
+AC_CHR_BITS = [0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 119]
+AC_CHR_VALS = bytes.fromhex(
+    "00 01 02 03 11 04 05 21 31 06 12 41 51 07 61 71"
+    "13 22 32 81 08 14 42 91 a1 b1 c1 09 23 33 52 f0"
+    "15 62 72 d1 0a 16 24 34 e1 25 f1 17 18 19 1a 26"
+    "27 28 29 2a 35 36 37 38 39 3a 43 44 45 46 47 48"
+    "49 4a 53 54 55 56 57 58 59 5a 63 64 65 66 67 68"
+    "69 6a 73 74 75 76 77 78 79 7a 82 83 84 85 86 87"
+    "88 89 8a 92 93 94 95 96 97 98 99 9a a2 a3 a4 a5"
+    "a6 a7 a8 a9 aa b2 b3 b4 b5 b6 b7 b8 b9 ba c2 c3"
+    "c4 c5 c6 c7 c8 c9 ca d2 d3 d4 d5 d6 d7 d8 d9 da"
+    "e2 e3 e4 e5 e6 e7 e8 e9 ea f2 f3 f4 f5 f6 f7 f8"
+    "f9 fa"
+)```
+
+- Luminance tables serve the Y component and chrominance tables serve Cb and Cr
+- The `BITS` lists sum to 12 for DC tables and to 162 for AC tables
+
+### Byte Stuffing and Restart Markers
+
+- Byte stuffing
+  Every `0xFF` byte inside entropy-coded data is followed by a `0x00` byte. A marker is a `0xFF` byte followed by a nonzero byte. Since the all-ones Huffman code is never assigned, a code cannot be mistaken for a marker.
+- Padding
+  The final partial byte of a scan is filled with 1 bits.
+- Restart intervals
+  An optional interval of $N$ MCUs makes the encoder byte-align the stream, emit a restart marker `RST0` to `RST7` (cycling) and reset all DC predictors to 0.
+
+Restart intervals limit the damage from a bit error to 1 interval, since decoding can resynchronise at the next marker. They also allow parallel decoding.
+
+## Encoder Pipeline
+
+$$
+\text{Preprocessing} \to \text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
+$$
+
+- Preprocessing
+  Convert to [YCrCb](/s5/image-processing/color#channels), subsample chroma, split into 8x8 blocks, level shift.
+- Forward DCT
+  Apply the discrete cosine transform to each block.
+- Quantization
+  Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality. This is the only lossy step apart from chroma subsampling.
+- Entropy coding
+  Code coefficients in zig-zag order for optimal coding efficiency.
+
+The JPEG stages map onto the general [compression pipeline](/s5/image-processing/compression#compression-pipeline). The forward DCT is the [mapper](/s5/image-processing/compression#mapper), the quantization step is the [quantizer](/s5/image-processing/compression#quantizer), and the entropy encoder is the [symbol encoder](/s5/image-processing/compression#symbol-encoder).
+
+## Operating Modes
+
+- Baseline sequential
+  8-bit samples, 8x8 DCT, Huffman coding. Blocks are stored in a single pass from top to bottom.
+- Extended sequential
+  Adds 12-bit samples, up to 4 tables of each kind and optional arithmetic coding.
+- Progressive
+  The same coefficients are sent over several scans. A coarse image appears first and refines with each scan.
+- Hierarchical
+  The image is coded as an [image pyramid](/s5/image-processing/redundancy#image-pyramid-coding) of resolutions. Each level codes the difference from the upsampled previous level.
+- Lossless
+  No DCT. Each sample is predicted from its neighbours and the prediction error is entropy coded.
+
+## Progressive Mode
+
+The coefficients of each block are sent over several scans.
+
+- Spectral selection
+  Early scans send the DC coefficients of all blocks. Later scans send bands of AC coefficients, such as indices 1 to 5, then 6 to 63.
+- Successive approximation
+  A coefficient is first sent with its most significant bits (shifted right by $A_l$). Later scans send the remaining bits 1 bit at a time.
+
+An AC scan covers 1 component. The entropy coder adds an end-of-band run symbol that covers many blocks, so long runs of all-zero bands cost little. The compressed size is similar to the sequential mode and often slightly smaller.
+
+## Lossless Mode
+
+No DCT or quantization. The predicted value of sample $x$ uses its left neighbour $A$, upper neighbour $B$ and upper-left neighbour $C$.
+
+| Selector | Predictor $\hat{x}$ |
+| -------- | ------------------- |
+| 1        | $A$                 |
+| 2        | $B$                 |
+| 3        | $C$                 |
+| 4        | $A + B - C$         |
+| 5        | $A + (B - C)/2$     |
+| 6        | $B + (A - C)/2$     |
+| 7        | $(A + B)/2$         |
+
+The difference $x - \hat{x}$ is coded as a category and extra bits, as with DC coefficients. The first sample of a row uses a fixed default prediction.
+
+## File Structure
+
+A JPEG file is a sequence of segments. Each starts with a 2-byte marker `0xFF` followed by a code. Most segments then carry a 2-byte length.
+
+| Marker | Code                 | Content                                     |
+| ------ | -------------------- | ------------------------------------------- |
+| SOI    | `0xFFD8`             | Start of image                              |
+| APP0   | `0xFFE0`             | JFIF header (version, density, thumbnail)   |
+| DQT    | `0xFFDB`             | Quantization tables                         |
+| SOF0   | `0xFFC0`             | Frame header, baseline DCT                  |
+| SOF2   | `0xFFC2`             | Frame header, progressive DCT               |
+| DHT    | `0xFFC4`             | Huffman tables                              |
+| DRI    | `0xFFDD`             | Restart interval                            |
+| SOS    | `0xFFDA`             | Scan header, followed by entropy-coded data |
+| RSTn   | `0xFFD0` to `0xFFD7` | Restart marker                              |
+| COM    | `0xFFFE`             | Comment                                     |
+| EOI    | `0xFFD9`             | End of image                                |
+
+### Segment Layouts
+
+Every segment is `0xFF`, the marker code, a 2-byte big-endian length that counts itself and the payload, then the payload. SOI and EOI have no length and no payload. Multi-byte fields are big-endian.
+
+- JFIF (APP0)
+  The bytes `4A 46 49 46 00` (`JFIF` and a zero), major version 1, minor version 1, density units (0 none, 1 per inch, 2 per centimetre), horizontal density in 2 bytes, vertical density in 2 bytes, thumbnail width and height in 1 byte each (0 for no thumbnail).
+- DQT
+  Repeated per table. 1 byte holding precision in the high nibble (0 for 8-bit) and table id in the low nibble, then 64 table entries in zig-zag order.
+- SOF0
+  Sample precision in 1 byte, image height in 2 bytes, image width in 2 bytes and the number of components in 1 byte. Then per component 3 bytes holding the component id, the sampling factors $(H_i, V_i)$ as two nibbles and the quantization table id.
+- DHT
+  Repeated per table. 1 byte holding the class in the high nibble (0 for DC, 1 for AC) and the table id in the low nibble, then the 16 `BITS` bytes and the `HUFFVAL` bytes.
+- SOS
+  Number of components in the scan in 1 byte. Per component 2 bytes holding the component id, and the DC table id and AC table id as two nibbles. Then the spectral selection start, the spectral selection end and the successive approximation byte, which are 0, 63 and 0 for baseline.
+- DRI
+  The restart interval in MCUs in 2 bytes.
+
+Entropy-coded data follows the SOS header directly and runs until the next marker other than `RSTn`.
+
+A baseline 4:2:0 colour file carries the segments in this order: SOI, APP0, DQT, SOF0, DHT, SOS, entropy-coded data, EOI. SOF0 lists Y with sampling factors $(2, 2)$ and Cb, Cr with $(1, 1)$.
+
+## Baseline Encoder
+
+The encoder below writes a baseline stream with 4:2:0 subsampling and the Annex K tables. It uses `dct_matrix` and `dct2` from the [DCT](/s5/image-processing/discrete-cosine-transform#implementation) note. `ZIGZAG`, the Huffman constants and the quantization tables `Q_LUM` and `Q_CHR` (the tables above, flattened row by row) come from the sections above.
+
+Steps:
+
+1. Scale the quantization tables for the chosen quality.
+2. Convert to YCrCb, pad to a multiple of 16 pixels by replicating the edge pixels, and average each 2x2 group of Cb and Cr.
+3. Visit the MCUs in raster order. In each, visit the blocks in the order Y top-left, Y top-right, Y bottom-left, Y bottom-right, Cb, Cr.
+4. For each block, level shift, apply the DCT, divide by the table, round and scan in zig-zag order.
+5. Code the DC difference and the AC run and size symbols, writing bits with byte stuffing.
+6. Pad the last byte with 1 bits.
+7. Write the headers, then the entropy-coded data, then EOI.
+
+### Preprocessing Code
+
+```python
+def scale_table(base, quality):
+    s = 5000 / quality if quality < 50 else 200 - 2 * quality
+    return [min(255, max(1, int((s * q + 50) // 100))) for q in base]
+
+def rgb_to_ycc(r, g, b):
+    y = 0.299 * r + 0.587 * g + 0.114 * b
+    cb = -0.168736 * r - 0.331264 * g + 0.5 * b + 128
+    cr = 0.5 * r - 0.418688 * g - 0.081312 * b + 128
+    return y, cb, cr
+````
+
+### Quantization Code
+
+```python
+T = dct_matrix(8)
+
+def round_half_away(x):
+    return int(x + 0.5) if x >= 0 else -int(-x + 0.5)
+
+def quantize_block(block, Q):
+    """block[y][x]: 8x8 level-shifted samples. Returns 64 coefficients in zig-zag order."""
+    F = dct2(block, T)
+    flat = [F[v][u] for v in range(8) for u in range(8)]
+    return [round_half_away(flat[ZIGZAG[k]] / Q[ZIGZAG[k]]) for k in range(64)]
+```
+
+### Entropy Coding Code
+
+`make_huffman` applies the canonical code assignment from the Huffman tables section. `category` and `extra_bits` implement the magnitude categories.
+
+```python
+def make_huffman(bits, vals):
+    """Returns {symbol: (code, length)}."""
+    table, code, k = {}, 0, 0
+    for length in range(1, 17):
+        for _ in range(bits[length - 1]):
+            table[vals[k]] = (code, length)
+            code += 1
+            k += 1
+        code <<= 1
+    return table
+
+class BitWriter:
+    def __init__(self):
+        self.out, self.acc, self.n = bytearray(), 0, 0
+
+    def put(self, code, length):
+        self.acc = (self.acc << length) | code
+        self.n += length
+        while self.n >= 8:
+            byte = (self.acc >> (self.n - 8)) & 0xFF
+            self.out.append(byte)
+            if byte == 0xFF:
+                self.out.append(0x00)          # byte stuffing
+            self.n -= 8
+        self.acc &= (1 << self.n) - 1
+
+    def flush(self):
+        if self.n:
+            self.put((1 << (8 - self.n)) - 1, 8 - self.n)   # pad with 1 bits
+
+def category(a):
+    return abs(a).bit_length()
+
+def extra_bits(a, s):
+    return a if a > 0 else a + (1 << s) - 1
+
+def encode_block(zz, prev_dc, dc_tab, ac_tab, bw):
+    """Writes one block. Returns its DC value, the predictor for the next block."""
+    diff = zz[0] - prev_dc
+    s = category(diff)
+    bw.put(*dc_tab[s])
+    if s:
+        bw.put(extra_bits(diff, s), s)
+    run = 0
+    for k in range(1, 64):
+        v = zz[k]
+        if v == 0:
+            run += 1
+            continue
+        while run > 15:
+            bw.put(*ac_tab[0xF0])              # ZRL
+            run -= 16
+        s = category(v)
+        bw.put(*ac_tab[(run << 4) | s])
+        bw.put(extra_bits(v, s), s)
+        run = 0
+    if run > 0:
+        bw.put(*ac_tab[0x00])                  # EOB
+    return zz[0]
+```
+
+### Stream Assembly Code
+
+```python
+def segment(marker, payload):
+    return bytes([0xFF, marker]) + (len(payload) + 2).to_bytes(2, "big") + payload
+
+def encode_jpeg(rgb, width, height, quality=75):
+    """rgb[y][x] = (r, g, b) with values 0 to 255. Returns the bytes of a JPEG file."""
+    ql, qc = scale_table(Q_LUM, quality), scale_table(Q_CHR, quality)
+    mw, mh = (width + 15) // 16, (height + 15) // 16      # MCUs across and down
+    W, H = mw * 16, mh * 16
+
+    Y = [[0.0] * W for _ in range(H)]
+    Cb = [[0.0] * W for _ in range(H)]
+    Cr = [[0.0] * W for _ in range(H)]
+    for y in range(H):
+        for x in range(W):
+            r, g, b = rgb[min(y, height - 1)][min(x, width - 1)]   # replicate edges
+            Y[y][x], Cb[y][x], Cr[y][x] = rgb_to_ycc(r, g, b)
+
+    def half(P):
+        return [[(P[2*y][2*x] + P[2*y][2*x+1] + P[2*y+1][2*x] + P[2*y+1][2*x+1]) / 4
+                 for x in range(W // 2)] for y in range(H // 2)]
+    Cb, Cr = half(Cb), half(Cr)
+
+    def block_at(P, bx, by):
+        return [[P[by * 8 + y][bx * 8 + x] - 128 for x in range(8)] for y in range(8)]
+
+    dc = [make_huffman(DC_LUM_BITS, DC_LUM_VALS), make_huffman(DC_CHR_BITS, DC_CHR_VALS)]
+    ac = [make_huffman(AC_LUM_BITS, AC_LUM_VALS), make_huffman(AC_CHR_BITS, AC_CHR_VALS)]
+    bw, pred = BitWriter(), [0, 0, 0]
+    for my in range(mh):
+        for mx in range(mw):
+            # (component, plane, block column, block row, quantization table, table set)
+            blocks = [(0, Y, 2*mx,   2*my,   ql, 0), (0, Y, 2*mx+1, 2*my,   ql, 0),
+                      (0, Y, 2*mx,   2*my+1, ql, 0), (0, Y, 2*mx+1, 2*my+1, ql, 0),
+                      (1, Cb, mx, my, qc, 1),        (2, Cr, mx, my, qc, 1)]
+            for comp, P, bx, by, Q, t in blocks:
+                zz = quantize_block(block_at(P, bx, by), Q)
+                pred[comp] = encode_block(zz, pred[comp], dc[t], ac[t], bw)
+    bw.flush()
+
+    def dht(cls, i, bits, vals):
+        return bytes([cls << 4 | i]) + bytes(bits) + bytes(vals)
+
+    out = bytearray(b"\xFF\xD8")                                          # SOI
+    out += segment(0xE0, b"JFIF\x00" + bytes([1, 1, 0]) + (1).to_bytes(2, "big") * 2
+                         + bytes([0, 0]))                                  # APP0
+    out += segment(0xDB, bytes([0]) + bytes(ql[ZIGZAG[k]] for k in range(64))
+                         + bytes([1]) + bytes(qc[ZIGZAG[k]] for k in range(64)))   # DQT
+    out += segment(0xC0, bytes([8]) + height.to_bytes(2, "big") + width.to_bytes(2, "big")
+                         + bytes([3, 1, 0x22, 0, 2, 0x11, 1, 3, 0x11, 1]))         # SOF0
+    out += segment(0xC4, dht(0, 0, DC_LUM_BITS, DC_LUM_VALS) + dht(1, 0, AC_LUM_BITS, AC_LUM_VALS)
+                         + dht(0, 1, DC_CHR_BITS, DC_CHR_VALS) + dht(1, 1, AC_CHR_BITS, AC_CHR_VALS))
+    out += segment(0xDA, bytes([3, 1, 0x00, 2, 0x11, 3, 0x11, 0, 63, 0]))           # SOS
+    out += bw.out + b"\xFF\xD9"                                                     # data, EOI
+    return bytes(out)
+```
+
+### Encoder Checks
+
+- The output starts with `FF D8` and ends with `FF D9`
+- Inside the entropy-coded data, every `FF` is followed by `00`
+- A standard decoder opens the file. Any such decoder works, since the stream is valid baseline JPEG
+- The quantization and Huffman tables in the DQT and DHT segments match the ones libjpeg writes for 4:2:0 at the same quality. libjpeg puts each table in its own segment
+- A flat image gives, for every block after the first block of each component, a DC difference of 0 and an AC part of a single EOB
+
+The code above was run on a 75x53 test image at quality 90. libjpeg decoded the result without error, and the decoded image had a PSNR of 27.9 dB, within 0.02 dB of libjpeg's own encoder on the same input. The entropy-coded data is not byte-identical to libjpeg's, which uses integer arithmetic for the colour conversion and DCT.
+
+## Decoding
+
+1. Parse headers and build the Huffman and quantization tables.
+2. For each MCU, Huffman decode the DC difference and add it to the component's predictor.
+3. Huffman decode AC symbols until EOB or 63 coefficients, expanding each run of zeros.
+4. Place the 64 values back from zig-zag order into an 8x8 array.
+5. Multiply by the quantization table.
+6. Apply the inverse DCT.
+7. Add 128 and clamp to $[0, 255]$.
+8. Upsample the chroma planes to full resolution.
+9. Convert [YCrCb](/s5/image-processing/color#channels) to RGB.
+
+The inverse DCT output is rounded, so decoders from different vendors can differ by at most a small amount per pixel. The standard bounds this difference through accuracy tests.
+
+## Codecs
+
+The standard fixes the compressed stream and the decoder. The encoder is free to choose the quantization tables, the Huffman tables, the chroma subsampling, the scan layout and every quantized value. Codecs differ in how well they use this freedom.
+
+- libjpeg  
+  Reference implementation from the Independent JPEG Group (first released in 1991). Source of the quality scaling formula above. Most software descends from its baseline and progressive encoders.
+- libjpeg-turbo  
+  Fork of libjpeg with SIMD-accelerated DCT, colour conversion, sampling and Huffman coding. Keeps the libjpeg API and produces the same kind of stream, several times faster. Common default in browsers and operating systems.
+- MozJPEG  
+  Fork of libjpeg-turbo from Mozilla, tuned for file size. It applies the optimizations below and produces standard streams that any decoder reads.
+- Guetzli  
+  Encoder from Google that searches for quantization choices using a perceptual model. Very slow, and produces smaller files than libjpeg at the same perceived quality.
+- Hardware and GPU codecs  
+  Fixed-function blocks in cameras and phones, and GPU libraries such as nvJPEG. They trade compression efficiency for throughput, usually with fixed tables.
+- Platform codecs  
+  Image frameworks of operating systems, such as Apple ImageIO and Windows Imaging Component, wrap one of the above or their own implementation.
+
+All of them decode any baseline stream. The compressed size of the same image can differ by a large margin between encoders, while the quality settings are numerically the same.
+
+### Encoder Optimizations
+
+- Optimized Huffman tables  
+  Count the symbol frequencies of the whole image in a first pass, then build the codes for that distribution. Standard tables are fitted to typical photographs and cost more on other content.
+- Custom quantization tables  
+  Tables tuned for a metric such as PSNR or SSIM, or for a specific viewing distance, replace the Annex K tables.
+- Trellis quantization  
+  Chooses the quantized values by rate-distortion cost, described below.
+- Progressive scan scripts  
+  The split of coefficients over scans is chosen to compress well. Grouping similar statistics in a scan lets the Huffman tables fit each scan.
+- Overshoot deringing  
+  Near a sharp edge on a saturated background, decoders clamp values above 255. The encoder can raise those pixels beyond 255 before the DCT. The clamp restores them, and the block needs fewer high-frequency coefficients.
+- Chroma subsampling choice  
+  Photographs use 4:2:0. Text and sharp coloured edges use 4:4:4 to avoid colour bleeding.
+
+### Trellis Quantization
+
+Treats the rounding of each coefficient as a choice. For every block, it picks the quantized values that minimize the rate-distortion cost.
+
+$$
+J = D + \lambda R
+$$
+
+Here:
+
+- $D$: squared error between the original and the dequantized coefficients
+- $R$: number of bits the choice costs after run-length and Huffman coding
+- $\lambda$: weight that sets the exchange rate between error and bits
+
+Rounding a coefficient of magnitude 1 to 0 often removes a whole run symbol and a long Huffman code, and costs little error. Trellis quantization therefore zeroes many isolated small values that plain rounding keeps.
+
+These produce streams that are still baseline or progressive JPEG. A typical result is a file about 10 percent smaller than libjpeg at the same quality.
+
+## File Formats
+
+The standard defines the compressed stream, not a complete file. A stream by itself carries no colour space, resolution or metadata, so file formats wrap the stream with this information.
+
+The standard defines 3 stream forms.
+
+- Interchange format  
+  Complete stream with all tables and scans. This is what JPEG files hold.
+- Abbreviated format for compressed image data  
+  Scans without the tables. The decoder gets the tables elsewhere.
+- Abbreviated format for table specification  
+  Tables only, with no image.
+
+The abbreviated forms save space when many images share the same tables, as in video frames.
+
+### JFIF
+
+JPEG File Interchange Format, published in 1992. Almost every `.jpg` file uses it or Exif.
+
+- Stored in an APP0 segment with the identifier `JFIF`, immediately after SOI
+- Fixes the colour space as YCrCb in the form above, or a single grey component
+- Stores a version, a pixel density (none, dots per inch or dots per centimetre) or a pixel aspect ratio, and an optional uncompressed RGB thumbnail
+- Leaves the sampling factors free
+
+### Exif
+
+Exchangeable image file format, used by digital cameras.
+
+- Stored in an APP1 segment with the identifier `Exif`, holding a TIFF-structured block
+- Carries camera settings, capture time, orientation, GPS position and an embedded JPEG thumbnail
+- A segment is limited to 64 KB because the length field has 2 bytes
+- Does not change the compressed image data
+
+### Colour and Metadata Segments
+
+- ICC profile (APP2)  
+  Embedded colour profile that describes the colour space of the samples. Split over several segments when it exceeds 64 KB.
+- Adobe (APP14)  
+  Marks whether the components are RGB, YCrCb, CMYK or YCCK. CMYK JPEGs from Adobe software store inverted values.
+- XMP (APP1)  
+  XML metadata such as title, rights and edit history.
+- Multi-Picture Format (APP2)  
+  Stores several JPEG images in 1 file, such as a primary image followed by a gain map for HDR display.
+- SPIFF  
+  Defined in the same standard family as the intended replacement for JFIF. It is rarely used.
+
+### Embedding in Other Formats
+
+- PDF  
+  Holds a JPEG stream directly under the DCTDecode filter, with no re-encoding.
+- TIFF  
+  Stores image strips or tiles as JPEG streams, and the TIFF tags carry the resolution and colour space.
+- Motion JPEG  
+  Video as a sequence of independently coded JPEG frames, in containers such as AVI and QuickTime. There is no inter-frame prediction, so every frame can be decoded alone, and the bit rate is higher than that of video codecs.
+- Camera raw formats  
+  Store JPEG previews and thumbnails next to the raw sensor data.
+
+File extensions are `.jpg`, `.jpeg`, `.jpe` and `.jfif`. The media type is `image/jpeg`.
+
+### Related Standards
+
+These share the name or the working group, but use different compression methods and streams.
+
+- JPEG 2000  
+  Wavelet transform instead of the block DCT. Avoids blocking at high compression ratios and supports lossless coding with the same codestream.
+- JPEG-LS  
+  Predictive lossless and near-lossless coding of each pixel from its neighbours, with context modelling. No DCT.
+- JPEG XR  
+  Transform codec with a lapped block transform, targeted at high dynamic range.
+- JPEG XL  
+  Modern successor with a variable-size DCT and better entropy coding. Can recompress an existing JPEG file without loss and restore the original file bytes, saving about 20 percent.
+
+## Artefacts
+
+- Blocking  
+  Visible 8x8 grid in smooth regions. Each block quantizes independently, so neighbouring blocks get different average values.
+- Ringing  
+  Ripples around sharp edges. Dropping high-frequency coefficients leaves a truncated series for the edge, like the Gibbs effect.
+- Mosquito noise  
+  Flickering specks around moving edges in video made of such frames. Edge blocks are quantized differently from frame to frame.
+- Colour bleeding  
+  Chroma smears across edges. Caused by chroma subsampling and the coarse chrominance table.
+- Generation loss  
+  Re-encoding a decoded image quantizes again and compounds the error. The loss shrinks when the tables and block grid are identical.

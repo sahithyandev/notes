@@ -1,7 +1,7 @@
 ---
 title: Compression
 dateCreated: 2026-08-18T07:19:11.017Z
-lastUpdatedOn: 2026-10-07T05:23:38.381Z
+lastUpdatedOn: 2026-10-08T13:09:53.900Z
 ---
 
 Compression reduces the volume of data required to represent an image, without necessarily reducing its information content. It works by removing [data redundancy](/s5/image-processing/redundancy).
@@ -27,46 +27,50 @@ $$
 
 ## Compression Pipeline
 
+A compression system has an encoder and a decoder. The encoder is a chain of 4 stages. Each stage targets 1 kind of redundancy.
+
 $$
 \text{Mapper} \to \text{Quantizer} \to \text{Symbol encoder} \to \text{Channel encoder}
 $$
 
-- Mapper  
-  Transform to reduce [interpixel redundancy](/s5/image-processing/redundancy#interpixel-redundancy).
-- Quantizer  
-  Resample to reduce bit depth, removing [psychovisual redundancy](/s5/image-processing/redundancy#psychovisual-redundancy). Lossy, and optional.
-- Symbol encoder  
-  Entropy coding for optimal symbol allocation, removing [coding redundancy](/s5/image-processing/redundancy#coding-redundancy).
-- Channel encoder  
-  Add controlled redundancy for error recovery.
+Decompression runs the inverse of each stage in reverse order. The quantizer has no inverse, so a pipeline containing it is lossy.
 
-Decompression reverses each stage in order, except quantization, which is non-recoverable.
+### Mapper
 
-## JPEG Compression
+Transforms the pixel array into a representation where [interpixel redundancy](/s5/image-processing/redundancy#interpixel-redundancy) is exposed. The mapping is reversible and loses no information.
 
-Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
+Examples:
 
-- Compression ratios up to about 20:1 without noticeable artefacts, up to about 100:1 with minor artefacts
-- Supports both lossless and lossy modes
-- User selectable compression to file size tradeoff
+- Run-length encoding, which replaces a run of equal pixels by the pixel value and the run length
+- Predictive coding, which stores the difference between each pixel and its prediction from neighbours
+- Transform coding, which stores coefficients of a transform such as the DCT
 
-Pipeline:
+### Quantizer
 
-$$
-\text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
-$$
+Reduces the number of distinct values the mapper output can take, so fewer bits per value are needed. It removes [psychovisual redundancy](/s5/image-processing/redundancy#psychovisual-redundancy) by discarding detail the eye barely perceives.
 
-- Forward DCT  
-  Convert to YCrCb, divide into 8x8 tiles, apply the discrete cosine transform to each tile.
-- Quantization  
-  Optional. Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality.
-- Entropy coding  
-  Code coefficients in zig-zag order for optimal coding efficiency.
+- Irreversible, so it is the only stage that makes the pipeline lossy
+- Optional, and omitted in lossless compression
+- Coarser quantization gives a higher $CR$ and a lower reconstruction quality
 
-### Discrete Cosine Transform
+### Symbol Encoder
 
-Decomposes the image into a set of cosine waveforms at different frequencies, ordered from DC (average intensity) to high frequency (sharp, minor variation).
+Assigns a code to each quantized value. Short codes go to frequent values and long codes to rare values. It removes [coding redundancy](/s5/image-processing/redundancy#coding-redundancy).
 
-- Coefficients are uncorrelated, giving better entropy than raw pixel values
-- Zeroing a coefficient removes its corresponding frequency from the reconstructed image
-- Inverse DCT reconstructs the image from its coefficients
+- Reversible
+- The average code length approaches the entropy of the source
+
+Examples:
+
+- Huffman coding
+- Arithmetic coding
+- LZW coding
+
+### Channel Encoder
+
+Adds controlled redundancy to the compressed bitstream. The decoder uses it to detect and correct errors from storage or transmission, since a compressed stream has little natural redundancy left to survive a bit error.
+
+Examples:
+
+- Parity bit
+- Hamming code
