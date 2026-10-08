@@ -51,7 +51,7 @@ export function initNoteFeedback(): void {
 
   btns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (inflight) return;
+      if (inflight || !navigator.onLine) return;
       voted = true;
       const vote = Number(btn.dataset.vote) as 1 | -1;
       const prevVote = localStorage.getItem(storageKey);

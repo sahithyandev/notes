@@ -104,7 +104,10 @@
     modal.showModal();
     input.value = "";
     selectedIndex = -1;
-    resultsEl.innerHTML = `<div class="sr-idle"><span class="sr-idle-prompt">$&nbsp;<span class="sr-idle-cursor">_</span></span><span class="sr-idle-hint">All notes indexed. Awaiting query.</span></div>`;
+    const hint = navigator.onLine
+      ? "All notes indexed. Awaiting query."
+      : "Search isn't available offline.";
+    resultsEl.innerHTML = `<div class="sr-idle"><span class="sr-idle-prompt">$&nbsp;<span class="sr-idle-cursor">_</span></span><span class="sr-idle-hint">${hint}</span></div>`;
     requestAnimationFrame(() => input.focus());
   }
 
@@ -176,6 +179,10 @@
   async function doSearch(query: string) {
     if (!query) {
       renderResults(null, "");
+      return;
+    }
+    if (!navigator.onLine) {
+      resultsEl.innerHTML = `<div class="sr-empty">Search isn't available offline.</div>`;
       return;
     }
     const ready = await ensurePagefind();

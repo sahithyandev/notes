@@ -13,7 +13,12 @@
   try {
     var cached = sessionStorage.getItem("sn-live-count");
     var box = document.getElementById("live-users-count-container");
-    if (box && cached !== null && Number.parseInt(cached) >= 0) {
+    if (
+      box &&
+      navigator.onLine &&
+      cached !== null &&
+      Number.parseInt(cached) >= 0
+    ) {
       box.querySelector(".live-count").textContent = cached;
       box.classList.remove("hide");
     }
@@ -60,6 +65,7 @@
     eventSource.addEventListener("error", function () {
       hideCountDisplay();
     });
+    window.addEventListener("offline", hideCountDisplay);
   })();
 </script>
 
