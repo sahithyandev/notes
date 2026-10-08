@@ -84,6 +84,28 @@ const wordCountLabel = `${wordCount} words`;
       {formattedDate && <span>{formattedDate}</span>}
       {formattedDate && <span aria-hidden="true"> · </span>}
       <span title={wordCountLabel}>{readTimeLabel}</span>
+      <span
+        class="offline-badge"
+        data-offline-badge
+        hidden
+        title="Saved for offline reading"
+      >
+        <span aria-hidden="true"> · </span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+        Available offline
+      </span>
     </span>
   </div>
 )}
@@ -161,6 +183,14 @@ const wordCountLabel = `${wordCount} words`;
   .note-authors-link:hover {
     color: var(--author-color);
     text-decoration: underline;
+  }
+
+  .offline-badge[hidden] {
+    display: none;
+  }
+
+  .offline-badge svg {
+    vertical-align: -1px;
   }
 
   .note-authors-meta {
