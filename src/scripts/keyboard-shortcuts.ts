@@ -56,7 +56,7 @@ export function run(action: Action): void {
       const link = document.querySelector<HTMLAnchorElement>(
         `.note-nav-btn.${side}`,
       );
-      if (link) window.location.href = link.href;
+      if (link) link.click();
       break;
     }
   }

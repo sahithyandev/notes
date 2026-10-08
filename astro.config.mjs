@@ -96,6 +96,22 @@ export function remarkKatexMhchem() {
   };
 }
 
+// Tags every illustration component script with a global assignment that
+// survives minification, so src/scripts/note-swap.ts can tell (by looking at
+// the built script's text) which scripts must run again after a soft
+// navigation. Keep the marker in sync with SCRIPT_MARKER there.
+function illustrationScriptMarker() {
+  return {
+    name: "illustration-script-marker",
+    /** @param {string} code @param {string} id */
+    transform(code, id) {
+      if (!id.includes("/src/components/illustrations/")) return null;
+      if (!id.includes("type=script")) return null;
+      return { code: code + "\n;globalThis.__sn_illus = 1;\n", map: null };
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
@@ -130,7 +146,12 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [tailwindcss(), servePagefindDev(), devReloadLock()],
+    plugins: [
+      tailwindcss(),
+      servePagefindDev(),
+      devReloadLock(),
+      illustrationScriptMarker(),
+    ],
     build: {
       // ponytail: lightningcss fails with Tailwind v4 CSS under Vite 8/rolldown; esbuild works fine
       cssMinify: "esbuild",
