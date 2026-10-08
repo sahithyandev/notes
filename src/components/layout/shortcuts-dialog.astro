@@ -1,0 +1,114 @@
+<dialog id="shortcuts-dialog" aria-label="Keyboard shortcuts">
+  <div class="kd-head">Keyboard Shortcuts</div>
+  <ul class="kd-list">
+    <li>
+      <span>
+        <kbd>⌘</kbd>
+        <kbd>K</kbd> or <kbd>/</kbd>
+      </span>
+      <span>Search</span>
+    </li>
+    <li>
+      <span>
+        <kbd>←</kbd>
+        <kbd>→</kbd>
+      </span>
+      <span>Previous / next note</span>
+    </li>
+    <li>
+      <span>
+        <kbd>t</kbd>
+      </span>
+      <span>Toggle theme</span>
+    </li>
+    <li>
+      <span>
+        <kbd>?</kbd>
+      </span>
+      <span>Show this list</span>
+    </li>
+    <li>
+      <span>
+        <kbd>Esc</kbd>
+      </span>
+      <span>Close</span>
+    </li>
+  </ul>
+</dialog>
+
+<script>
+  const dialog = document.getElementById(
+    "shortcuts-dialog",
+  ) as HTMLDialogElement;
+  dialog.addEventListener("click", (e: MouseEvent) => {
+    const rect = dialog.getBoundingClientRect();
+    const inside =
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  });
+</script>
+
+<style>
+  #shortcuts-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+  }
+
+  :global([data-theme="dark"]) #shortcuts-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  #shortcuts-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    width: min(380px, 92vw);
+    padding: 0;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    overflow: hidden;
+  }
+
+  .kd-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .kd-list {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+  }
+
+  .kd-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  kbd {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-right: 3px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+</style>

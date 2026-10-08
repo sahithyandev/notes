@@ -1,7 +1,8 @@
 ---
-import { Monitor, Sun, Moon } from "@lucide/astro";
+import { Monitor, Sun, Moon, Keyboard } from "@lucide/astro";
 import SearchModal from "./search-modal.astro";
 import LiveUsersCount from "./live-users-count.astro";
+import ShortcutsDialog from "./shortcuts-dialog.astro";
 import Logo from "../icons/logo.astro";
 
 const shouldStretchFull = Astro.url.pathname.startsWith("/s");
@@ -32,6 +33,7 @@ const logoRule = semMatch
   <LiveUsersCount />
 
   <SearchModal />
+  <ShortcutsDialog />
 
   <div class="nav-right">
     <span class="nav-drawer-slot nav-drawer-slot-end">
@@ -60,6 +62,15 @@ const logoRule = semMatch
       <kbd>⌘K</kbd>
     </button>
     <button
+      class="theme-toggle shortcuts-btn"
+      type="button"
+      title="Keyboard shortcuts (?)"
+      aria-label="Keyboard shortcuts"
+      data-open-shortcuts
+    >
+      <Keyboard size={15} />
+    </button>
+    <button
       class="theme-toggle"
       id="themeToggle"
       title="Theme: auto"
@@ -77,6 +88,10 @@ const logoRule = semMatch
     </button>
   </div>
 </nav>
+
+<script>
+  import "../../scripts/keyboard-shortcuts";
+</script>
 
 <script>
   const root = document.documentElement;
@@ -295,6 +310,12 @@ const logoRule = semMatch
     background: var(--surface);
     color: var(--text-primary);
     border-color: var(--border-strong);
+  }
+
+  @media (hover: none) {
+    .shortcuts-btn {
+      display: none;
+    }
   }
 
   .theme-icon {

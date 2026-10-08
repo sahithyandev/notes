@@ -9,6 +9,9 @@
     <nav class="footer-links" aria-label="Footer">
       <a href="/license">License</a>
       <a href="/security">Security</a>
+      <button type="button" class="footer-shortcuts" data-open-shortcuts>
+        Shortcuts (?)
+      </button>
     </nav>
   </div>
 </footer>
@@ -41,5 +44,24 @@
     display: flex;
     align-items: center;
     gap: 16px;
+  }
+
+  .footer-shortcuts {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .footer-shortcuts:hover {
+    text-decoration: underline;
+  }
+
+  @media (hover: none) {
+    .footer-shortcuts {
+      display: none;
+    }
   }
 </style>
