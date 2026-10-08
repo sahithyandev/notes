@@ -25,6 +25,8 @@ const { prevNote, nextNote } = Astro.props;
 
 {(prevNote || nextNote) && (
   <div class="note-nav">
+    {prevNote && <link rel="prefetch" href={`/${prevNote.slug}`} />}
+    {nextNote && <link rel="prefetch" href={`/${nextNote.slug}`} />}
     {prevNote && (
       <a
         href={`/${prevNote.slug}`}

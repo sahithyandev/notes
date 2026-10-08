@@ -180,3 +180,15 @@ body {
   outline-offset: 2px;
   border-radius: 2px;
 }
+
+/* Cross-document view transitions: page-to-page navigation cross-fades instead of flashing. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.18s;
+}
