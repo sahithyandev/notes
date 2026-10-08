@@ -225,11 +225,27 @@ if (keywords && keywords.length > 0) {
     ></script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">
+      Skip to content
+    </a>
     <slot />
   </body>
 </html>
 
 <style>
+  .skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    background: var(--bg, #fff);
+    color: var(--text-primary, #000);
+    transform: translateY(-100%);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
   html,
   body {
     margin: 0;
