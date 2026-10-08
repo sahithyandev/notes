@@ -1,0 +1,93 @@
+---
+// Static diagram for the deformation invariance theorem: a positively
+// oriented contour C₂ inside C₁, with f analytic on the shaded region
+// between them and its singular points enclosed by C₂.
+import FigureCaption from "./primitives/figure-caption.astro";
+
+const c1 = "M 25 95 A 125 80 0 1 1 275 95 A 125 80 0 1 1 25 95 Z";
+const c2 =
+  "M 116 95 C 116 73, 135 59, 154 62 C 176 65, 187 79, 184 98 C 182 120, 165 131, 146 128 C 124 125, 116 114, 116 95 Z";
+---
+
+<figure>
+  <svg viewBox="0 0 300 190" width="270" aria-hidden="true">
+    <path class="region" fill-rule="evenodd" d={`${c1} ${c2}`}></path>
+    <path class="c1" d={c1}></path>
+    <path class="c2" d={c2}></path>
+    <path
+      class="head c1"
+      d="M 4 0 L -3.5 -3 L -3.5 3 Z"
+      transform="translate(150 15) rotate(180)"
+    ></path>
+    <path
+      class="head c2"
+      d="M 4 0 L -3.5 -3 L -3.5 3 Z"
+      transform="translate(154 62) rotate(188)"
+    ></path>
+    <text class="c1" x="245" y="38">
+      C&#8321;
+    </text>
+    <text class="c2" x="192" y="60">
+      C&#8322;
+    </text>
+  </svg>
+  <FigureCaption hidden>
+    The contour C₁ encloses the contour C₂, both positively oriented. The
+    function f is analytic on the shaded region between them, and its singular
+    points (×) lie inside C₂.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 270px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+  path {
+    fill: none;
+    stroke-width: 1.3;
+  }
+  path.head {
+    stroke: none;
+  }
+  path.head.c1 {
+    fill: var(--dia-ct);
+  }
+  path.head.c2 {
+    fill: var(--dia-pt);
+  }
+  .region {
+    fill: var(--dia-ct);
+    fill-opacity: 0.13;
+    stroke: none;
+  }
+  path.c1 {
+    stroke: var(--dia-ct);
+    color: var(--dia-ct);
+  }
+  path.c2 {
+    stroke: var(--dia-pt);
+    color: var(--dia-pt);
+  }
+  .sing {
+    stroke: var(--dia-key);
+    stroke-linecap: round;
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  text.c1 {
+    fill: var(--dia-ct);
+  }
+  text.c2 {
+    fill: var(--dia-pt);
+  }
+</style>

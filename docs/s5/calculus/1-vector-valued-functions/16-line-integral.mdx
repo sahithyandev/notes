@@ -1,7 +1,7 @@
 ---
 title: Line Integral
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T19:55:29.930Z
+lastUpdatedOn: 2026-10-08T09:02:34.733Z
 ---
 
 Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
@@ -40,7 +40,7 @@ If $C$ lies in the $xy$-plane and $z = f(x,y)$ is a non-negative continuous func
 
 ## Line Integral of a Vector Field
 
-Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-values-functions/vector-field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
+Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-valued-functions/vector-field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_a^b \boldsymbol{F}(\boldsymbol{r}(t)) \cdot \boldsymbol{r}'(t)\,\text{d}t
@@ -58,4 +58,14 @@ For a particle moving along a smooth curve $C$, oriented in the direction of mot
 
 $$
 W = \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}
+$$
+
+## Fundamental Theorem of Line Integrals
+
+Suppose $C$ be a piecewise smooth curve parametrized by $\boldsymbol{r}(t)$, $a \le t \le b$.
+
+If $\boldsymbol{F} = \nabla \phi$ on a region containing $C$,
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C \nabla \phi \cdot \text{d}\boldsymbol{r} = \phi(\boldsymbol{r}(b)) - \phi(\boldsymbol{r}(a))
 $$

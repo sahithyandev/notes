@@ -1,0 +1,134 @@
+---
+title: Conservative Field
+dateCreated: 2026-10-08T00:00:00.000Z
+lastUpdatedOn: 2026-10-08T09:02:34.744Z
+---
+
+A [vector field](/s5/calculus/vector-valued-functions/vector-field) $\boldsymbol{F}$ in 2-space or 3-space is conservative on a region $D$ **iff** it is the [gradient](/s5/calculus/vector-valued-functions/field) field of some scalar function $\phi$ defined on $D$,
+
+$$
+\boldsymbol{F} = \nabla \phi
+$$
+
+$\phi$ is a potential function, or scalar potential, of $\boldsymbol{F}$.
+
+## Curl Condition
+
+If $\boldsymbol{F}$ is conservative on $D$ and $\phi$ has continuous second-order partial derivatives, then
+
+$$
+\text{curl}\,\boldsymbol{F} = \nabla \times (\nabla \phi) = \boldsymbol{0}
+$$
+
+<Note title="Proof Hint">
+
+- Write $\boldsymbol{F} = \phi_x\hat{i} + \phi_y\hat{j} + \phi_z\hat{k}$
+- Expand each component of the curl determinant
+- Cancel the mixed partials, using $\phi_{xy} = \phi_{yx}$ and so on
+
+</Note>
+
+The converse needs a condition on $D$. If $D$ is [simply connected](/s5/calculus/vector-valued-functions/connectedness#simply-connected-region) and $\text{curl}\,\boldsymbol{F} = \boldsymbol{0}$ on $D$, then $\boldsymbol{F}$ is conservative on $D$.
+
+<Note>
+
+$\text{curl}\,\boldsymbol{F} = \boldsymbol{0}$ alone does not make $\boldsymbol{F}$ conservative. On a region with a hole, the curl can vanish everywhere while $\boldsymbol{F}$ has no potential function.
+
+</Note>
+
+## Conservative Field Test
+
+Let $P(x,y)$ and $Q(x,y)$ have continuous first-order partial derivatives on an open, simply connected region $D$ in the plane. The vector field
+
+$$
+\boldsymbol{F}(x,y) = P(x,y)\hat{i} + Q(x,y)\hat{j}
+$$
+
+is conservative on $D$ **iff**, for each point in $D$,
+
+$$
+\frac{\partial P}{\partial y} = \frac{\partial Q}{\partial x}
+$$
+
+The region must be simply connected. On a region with a hole, $\partial P/\partial y = \partial Q/\partial x$ can hold everywhere without $\boldsymbol{F}$ being conservative.
+
+## Integral over a Closed Curve
+
+Let $\boldsymbol{F}$ be conservative on $D$ and $C$ a piecewise smooth closed curve in $D$. Then
+
+$$
+\oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0
+$$
+
+<Note title="Proof Hint">
+
+- Apply the [fundamental theorem of line integrals](/s5/calculus/vector-valued-functions/line-integral#fundamental-theorem-of-line-integrals)
+- Use $\boldsymbol{r}(b) = \boldsymbol{r}(a)$ for a closed curve
+- Subtract equal values of $\phi$
+
+</Note>
+
+## Equivalence of Conservative Fields
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
+
+- $\boldsymbol{F}$ is conservative on $D$
+- $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0$ for every piecewise smooth closed curve $C$ in $D$
+- For any 2 points $P$, $Q$ in $D$, $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ is independent of the piecewise smooth curve $C$ in $D$ from $P$ to $Q$
+
+## Finding the Potential Function
+
+Let $\boldsymbol{F} = f\hat{i} + g\hat{j} + h\hat{k}$ be conservative on $D$. A potential function $\phi$ satisfies
+
+$$
+\phi_x = f, \quad \phi_y = g, \quad \phi_z = h
+$$
+
+Steps:
+
+1. Integrate $f$ with respect to $x$ to get $\phi = \int f\,\text{d}x + a(y,z)$.
+2. Differentiate $\phi$ with respect to $y$ and equate to $g$. Solve for $a_y$, then integrate to get $a(y,z) = \int a_y\,\text{d}y + b(z)$.
+3. Differentiate $\phi$ with respect to $z$ and equate to $h$. Solve for $b'(z)$, then integrate to get $b(z)$.
+4. Substitute back. $\phi$ is unique up to an additive constant.
+
+In the plane, drop $z$ and stop after step 2.
+
+## Worked Example
+
+Find a potential function of
+
+$$
+\boldsymbol{F} = (2xy + z)\hat{i} + (x^2 + 2y)\hat{j} + x\hat{k}
+$$
+
+Check the curl.
+
+- $\partial h/\partial y = 0 = \partial g/\partial z$
+- $\partial f/\partial z = 1 = \partial h/\partial x$
+- $\partial g/\partial x = 2x = \partial f/\partial y$
+
+So $\text{curl}\,\boldsymbol{F} = \boldsymbol{0}$ on $\mathbb{R}^3$, which is simply connected, and $\boldsymbol{F}$ is conservative.
+
+Step 1.
+
+$$
+\phi = \int (2xy + z)\,\text{d}x = x^2 y + xz + a(y,z)
+$$
+
+Step 2.
+
+$$
+\phi_y = x^2 + a_y = x^2 + 2y \implies a_y = 2y \implies a = y^2 + b(z)
+$$
+
+Step 3.
+
+$$
+\phi_z = x + b'(z) = x \implies b'(z) = 0 \implies b = C
+$$
+
+Result.
+
+$$
+\phi(x,y,z) = x^2 y + xz + y^2 + C
+$$
