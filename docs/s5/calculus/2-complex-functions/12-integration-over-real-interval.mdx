@@ -1,7 +1,7 @@
 ---
 title: Integration over a Real Interval
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-10-05T17:24:31.617Z
+lastUpdatedOn: 2026-10-08T12:03:47.140Z
 ---
 
 Let $f(t) = u(t) + iv(t)$ for $a \le t \le b$, where $u$ and $v$ are real-valued continuous functions of the real variable $t$.
@@ -105,7 +105,9 @@ $$
 
 </Note>
 
-## Worked Example
+## Worked Examples
+
+### Squared Binomial
 
 Evaluate $\displaystyle\int_0^1 (1 + it)^2\,\text{d}t$.
 
@@ -133,4 +135,54 @@ Combine using the definition.
 
 $$
 \int_0^1 (1 + it)^2\,\text{d}t = \frac{2}{3} + i
+$$
+
+### Cubic Integrand
+
+Evaluate $\displaystyle\int_0^1 (t - i)^3\,\text{d}t$.
+
+Expand the integrand.
+
+$$
+(t - i)^3 = t^3 - 3it^2 + 3i^2 t - i^3 = (t^3 - 3t) + i(1 - 3t^2)
+$$
+
+Integrate the real part.
+
+$$
+\int_0^1 (t^3 - 3t)\,\text{d}t = \left[\frac{t^4}{4} - \frac{3t^2}{2}\right]_0^1 = \frac{1}{4} - \frac{3}{2} = -\frac{5}{4}
+$$
+
+Integrate the imaginary part.
+
+$$
+\int_0^1 (1 - 3t^2)\,\text{d}t = \left[t - t^3\right]_0^1 = 0
+$$
+
+Combine using the definition.
+
+$$
+\int_0^1 (t - i)^3\,\text{d}t = -\frac{5}{4}
+$$
+
+### Exponential Integrand
+
+Evaluate $\displaystyle\int_0^{\pi/2} e^{t + it}\,\text{d}t$.
+
+Write the integrand as $e^{(1+i)t}$. An antiderivative is
+
+$$
+\frac{e^{(1+i)t}}{1+i} = \frac{(1-i)\,e^{(1+i)t}}{2}
+$$
+
+Evaluate at the limits, using $e^{(1+i)\pi/2} = ie^{\pi/2}$.
+
+$$
+\frac{(1-i)\,ie^{\pi/2}}{2} - \frac{1-i}{2} = \frac{(1+i)\,e^{\pi/2}}{2} - \frac{1-i}{2}
+$$
+
+Separate the real and imaginary parts.
+
+$$
+\int_0^{\pi/2} e^{t + it}\,\text{d}t = \frac{1}{2}\left(e^{\pi/2} - 1\right) + \frac{i}{2}\left(e^{\pi/2} + 1\right)
 $$

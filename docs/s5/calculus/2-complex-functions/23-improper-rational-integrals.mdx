@@ -1,7 +1,7 @@
 ---
 title: Improper Rational Integrals
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-10-06T22:30:16.535Z
+lastUpdatedOn: 2026-10-08T12:03:47.244Z
 ---
 
 ## Improper Integrals
@@ -83,7 +83,25 @@ $$
 \text{P.V.} \int_{-\infty}^{\infty} x\,\text{d}x = \lim_{R \to \infty} \left(\frac{R^2}{2} - \frac{R^2}{2}\right) = 0
 $$
 
-For the improper integral, $\int_0^b x\,\text{d}x = \frac{b^2}{2} \to \infty$, so the limit at $+\infty$ does not exist.
+The improper integral needs both limits to exist independently.
+
+$$
+\lim_{b \to \infty} \int_0^b x\,\text{d}x = \lim_{b \to \infty} \frac{b^2}{2} = \infty
+$$
+
+$$
+\lim_{a \to -\infty} \int_a^0 x\,\text{d}x = \lim_{a \to -\infty} \left(-\frac{a^2}{2}\right) = -\infty
+$$
+
+Neither limit is finite, so the improper integral does not exist.
+
+The principal value ties both ends to the same $R$, so the areas on either side of $0$ cancel. Letting the ends move independently gives a different result. For the interval $[-R, 2R]$:
+
+$$
+\lim_{R \to \infty} \int_{-R}^{2R} x\,\text{d}x = \lim_{R \to \infty} \frac{4R^2 - R^2}{2} = \lim_{R \to \infty} \frac{3R^2}{2} = \infty
+$$
+
+The value depends on how the ends approach $\pm\infty$, so no single value can be assigned to the integral.
 
 ### Simple Poles
 

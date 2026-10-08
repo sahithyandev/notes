@@ -1,10 +1,14 @@
 ---
 title: Power Series
+prereqs:
+  - s1/mathematics/real-analysis/power-series
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-10-06T22:30:16.443Z
+lastUpdatedOn: 2026-10-08T12:03:47.179Z
 ---
 
-A power series centered at $\alpha$ is a series of the form
+[Power series for real numbers](/s1/mathematics/real-analysis/power-series) was covered in semester 1. This note explains the complex numbers version.
+
+A complex power series centered at $\alpha$ is a series of the form
 
 $$
 \sum_{n=0}^{\infty} c_n (z-\alpha)^n
@@ -14,15 +18,16 @@ Here:
 
 - $\alpha$: center, a fixed complex number
 - $c_n$: coefficients, fixed complex numbers
+- $z$: a complex variable
 
 ## Radius of Convergence
+
+The radius of convergence $\rho$ is defined as in the [real case](/s1/mathematics/real-analysis/power-series#radius-of-convergence). For complex $z$, the interval of convergence becomes a disk.
 
 There exists $\rho$ with $0 \le \rho \le \infty$ such that the series
 
 - converges for $|z-\alpha| < \rho$
 - diverges for $|z-\alpha| > \rho$
-
-$\rho$ is called the radius of convergence.
 
 Ignoring boundary points, the convergence region is 1 of the following.
 
@@ -35,7 +40,7 @@ Ignoring boundary points, the convergence region is 1 of the following.
 
 <Note>
 
-Convergence on the boundary $|z-\alpha| = \rho$, when $0 < \rho < \infty$, must be checked separately.
+Convergence on the boundary circle $|z-\alpha| = \rho$, when $0 < \rho < \infty$, must be checked separately at each point.
 
 </Note>
 
@@ -74,7 +79,7 @@ This is the Cauchy product of the series.
 
 Examples:
 
-- The first 4 non-zero terms of the Maclaurin series of $e^z \sin z$ are $z + z^2 + \frac{z^3}{3} - \frac{z^5}{30}$
+- The first 4 non-zero terms of the [Maclaurin series](/s1/mathematics/real-analysis/taylor-series#examples) of $e^z \sin z$ are $z + z^2 + \frac{z^3}{3} - \frac{z^5}{30}$
 
 ## Worked Examples
 
@@ -82,15 +87,31 @@ Examples:
 
 Find the disk of convergence of $\sum_{n=0}^{\infty} \frac{(n+1)(z-2)^n}{3^n}$.
 
-Apply the ratio test.
+Apply the [ratio test](/s1/mathematics/real-analysis/convergence-tests#ratio-test).
 
 $$
-\left|\frac{a_{n+1}}{a_n}\right| = \frac{n+2}{n+1} \cdot \frac{|z-2|}{3} \to \frac{|z-2|}{3}
+\lim_{n\to \infty} \left|\frac{u_{n+1}}{u_n}\right| =
+\lim_{n\to \infty} \frac{(n+2)\,\lvert z-2 \rvert}{3(n+1)} =
+\frac{|z-2|}{3}
 $$
 
 The series converges for $\frac{|z-2|}{3} < 1$, so $\rho = 3$ and the disk is $D_3(2)$.
 
-On the boundary $|z-2| = 3$, the terms have modulus $n+1 \to \infty$, so the series diverges at every boundary point.
+The ratio test is inconclusive on the boundary $|z-2| = 3$, since the limit equals $1$. Check the terms directly.
+
+The $n$-th term is $u_n = \frac{(n+1)(z-2)^n}{3^n}$. Taking the modulus gives
+
+$$
+|u_n| = (n+1)\frac{|z-2|^n}{3^n} = (n+1)\left(\frac{|z-2|}{3}\right)^n
+$$
+
+On the boundary $|z-2| = 3$, so $\frac{|z-2|}{3} = 1$ and
+
+$$
+|u_n| = n+1 \to \infty
+$$
+
+A convergent series needs $u_n \to 0$. Here $|u_n|$ grows without bound, so the series diverges at every boundary point, regardless of which point on the circle $z$ is.
 
 ### All 3 Regions
 
