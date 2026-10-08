@@ -189,6 +189,16 @@ Notes inside a submodule (`docs/<sem>/<module>/<submodule>/`) are numbered from 
 
 A note must not link to a later note in the same directory (a higher numeric prefix), since the reader hasn't covered that material yet. Links to earlier notes, to notes in other modules, and across submodules are fine. Enforced by the `forward-link` rule (`src/integrations/notes-style-validator/rules/forward-link.ts`), a corpus-wide pass like `broken-link`.
 
+## Offline support (production)
+
+`public/sw.js` is a hand-written service worker, registered by `src/scripts/offline.ts` (imported once from `Layout.astro`, production only, so it never interferes with `bun dev` or HMR). It caches visited pages with stale-while-revalidate: the cached copy is served at once, a background fetch refreshes it, and a changed `ETag` makes the worker message the page, which shows `update-toast.astro`. Every entry carries an `sn-cached-at` header and expires after 30 days. Expired entries are purged on activate, when the browser comes back online and at most every 6 hours on fetches. `/api`, `/og`, `/pagefind` and third-party hosts other than the font/KaTeX CDNs are never cached.
+
+- Bump `VERSION` in `public/sw.js` whenever the caching logic changes, since it names the caches and old ones are deleted on activate.
+- `offline.ts` reads the page cache directly, so its `PAGE_CACHE_PREFIX`, `AT_HEADER` and `MAX_AGE_MS` must match the worker.
+- Pages shown through soft navigation are stored when `initOfflineStatus()` (called from `applyDocument` in `note-swap.ts`) asks the worker to cache them. Hover previews only refresh pages that are already cached.
+- A feature that needs the network should react to `html[data-offline]` (set from `navigator.onLine`). Add its disabling logic to `syncOfflineUi()` or a scoped `:global(html[data-offline])` rule.
+- `src/pages/offline.astro` is the fallback for uncached navigations. The worker precaches it together with the assets it references.
+
 ## Routing
 
 - `src/pages/index.astro` — homepage, notes grouped by semester.
