@@ -15,7 +15,7 @@ function formatRelativeTime(isoDate: string): string {
   return `${months} month${months > 1 ? "s" : ""} ago`;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+export function initRelativeTime(): void {
   const metaElement = document.querySelector(".note-meta-item[data-date]");
   if (!metaElement) return;
 
@@ -28,4 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     metaElement.textContent = "Updated " + formatRelativeTime(isoDate);
   }
-});
+}
+
+document.addEventListener("DOMContentLoaded", initRelativeTime);

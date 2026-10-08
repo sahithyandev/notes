@@ -144,15 +144,13 @@ function init(): void {
   if (!import.meta.hot) return;
   // Set on <main> by [...slug].astro from the note's own content-collection
   // filePath, in the same docs/**/*.{md,mdx}-relative form dev-reload-lock
-  // sends in CONTENT_CHANGED_EVENT's `files` - never touched by the DOM
-  // swap above, so it stays correct across repeated content updates.
-  const filePath = document
-    .querySelector("main")
-    ?.getAttribute("data-note-file-path");
-  if (!filePath) return;
-
+  // sends in CONTENT_CHANGED_EVENT's `files`. Read per event, not once: a
+  // soft navigation (note-swap.ts) replaces it with the new note's path.
   import.meta.hot.on(CONTENT_CHANGED_EVENT, (data: ContentChangedData) => {
-    if (!data.files.includes(filePath)) return;
+    const filePath = document
+      .querySelector("main")
+      ?.getAttribute("data-note-file-path");
+    if (!filePath || !data.files.includes(filePath)) return;
     handleContentChangedEvent();
   });
 }

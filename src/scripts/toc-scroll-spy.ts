@@ -8,7 +8,7 @@
 // `section`), so simply calling it again would double (then triple, ...)
 // every scroll/resize handler and ResizeObserver. initTocScrollSpy() returns
 // a cleanup function for exactly that reason - call it before re-invoking.
-export function initTocScrollSpy(): () => void {
+function startTocScrollSpy(): () => void {
   const wrapper = document.querySelector<HTMLElement>(".toc-wrapper");
   const pathTrack = document.querySelector<SVGPathElement>(".toc-path-track");
   const pathProgress =
@@ -333,4 +333,20 @@ export function initTocScrollSpy(): () => void {
   );
 
   return () => teardownFns.forEach((fn) => fn());
+}
+
+let activeCleanup: (() => void) | null = null;
+
+// Only one scroll-spy may be live at a time: the first call comes from
+// toc-rail.astro's own script, later ones from a content swap, and none of
+// them can know about each other's cleanup handle. Starting a new run
+// tears down the previous one first.
+export function initTocScrollSpy(): () => void {
+  activeCleanup?.();
+  const cleanup = startTocScrollSpy();
+  activeCleanup = cleanup;
+  return () => {
+    cleanup();
+    if (activeCleanup === cleanup) activeCleanup = null;
+  };
 }

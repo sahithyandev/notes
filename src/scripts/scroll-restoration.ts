@@ -58,7 +58,9 @@ function initScrollRestoration() {
     { key: "toc", el: document.querySelector(".right-sidebar") },
   ];
 
-  const pathKey = STORAGE_PREFIX + location.pathname;
+  // A soft navigation (note-swap.ts) changes location without reloading, so
+  // the key is read fresh instead of fixed at init.
+  const getPathKey = () => STORAGE_PREFIX + location.pathname;
 
   const navEntry = performance.getEntriesByType("navigation")[0] as
     PerformanceNavigationTiming | undefined;
@@ -71,7 +73,7 @@ function initScrollRestoration() {
     for (const s of scrollers) {
       if (s.el) positions[s.key] = s.el.scrollTop;
     }
-    writeJson(pathKey, positions);
+    writeJson(getPathKey(), positions);
     if (typeof positions.sidebar === "number") {
       writeRaw(SIDEBAR_SHARED_KEY, String(positions.sidebar));
     }
@@ -96,7 +98,7 @@ function initScrollRestoration() {
   }
 
   function restoreExact() {
-    const saved = readJson<Record<string, number>>(pathKey);
+    const saved = readJson<Record<string, number>>(getPathKey());
     if (!saved) return false;
     let applied = false;
     for (const s of scrollers) {
@@ -167,7 +169,7 @@ function initScrollRestoration() {
 
     const reapply = () => {
       if (userScrolled) return;
-      const saved = readJson<Record<string, number>>(pathKey);
+      const saved = readJson<Record<string, number>>(getPathKey());
       const top = saved?.main;
       if (typeof top === "number") applyInstant(mainScroller, top);
     };
