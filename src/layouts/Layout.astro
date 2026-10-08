@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { generateBreadcrumb } from "../utils/breadcrumb";
+import UpdateToast from "../components/layout/update-toast.astro";
 import { SITE_NAME, SITE_HOST_URL, SITE_DESCRIPTION } from "../utils/values";
 
 interface Author {
@@ -132,6 +133,9 @@ if (keywords && keywords.length > 0) {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#2338c0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Notes" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={finalizedKeywords.join(", ")} />
@@ -229,8 +233,14 @@ if (keywords && keywords.length > 0) {
       Skip to content
     </a>
     <slot />
+    <UpdateToast />
   </body>
 </html>
+
+<script>
+  import { initOffline } from "../scripts/offline";
+  initOffline();
+</script>
 
 <style>
   .skip-link {
