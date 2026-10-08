@@ -56,16 +56,53 @@ export function calculateReadTime(wordCount: number): number {
   return Math.ceil(wordCount / 200);
 }
 
-export function generateDescription(content: string): string {
-  const firstParagraph = content.split("\n\n")[0];
-  const cleanText = firstParagraph
-    .replace(/[#*`_\[\]]/g, "")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
+const DESCRIPTION_MAX_LENGTH = 160;
+
+// Blocks that aren't prose: headings, lists, tables, quotes, rules, images, raw HTML/JSX.
+const NON_PROSE_BLOCK =
+  /^(#{1,6}\s|[-*+]\s|\d+[.)]\s|\||>|---|\*\*\*|!\[|<|(import|export)\s)/;
+
+// Reduces inline TeX to readable plain text (`\\mathbb{R}^n` becomes `R n`).
+function flattenMath(_match: string, tex: string): string {
+  return tex
+    .replace(/\\(?:mathbb|mathbf|boldsymbol|mathrm|text)\s*\{([^}]*)\}/g, "$1")
+    .replace(/\\[a-zA-Z]+/g, " ")
+    .replace(/[{}^_\\]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
-  return cleanText.length > 160
-    ? cleanText.substring(0, 157) + "..."
-    : cleanText;
+}
+
+function truncateDescription(text: string): string {
+  return text.length > DESCRIPTION_MAX_LENGTH
+    ? text.substring(0, DESCRIPTION_MAX_LENGTH - 3) + "..."
+    : text;
+}
+
+export function generateDescription(
+  content: string,
+  override?: string,
+): string {
+  const explicit = override?.trim();
+  if (explicit) return truncateDescription(explicit);
+
+  const withoutBlocks = content
+    .replace(/^(```|~~~)[\s\S]*?^\1.*$/gm, "")
+    .replace(/\$\$[\s\S]*?\$\$/g, "")
+    .replace(/^<([A-Z][\w.]*)\b[^>]*[^/]>[\s\S]*?^<\/\1>\s*$/gm, "")
+    .replace(/^<[A-Z][\w.]*\b[^>]*\/>\s*$/gm, "");
+  const prose = withoutBlocks
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .find((block) => block && !NON_PROSE_BLOCK.test(block));
+  if (!prose) return "";
+
+  const cleanText = stripMdxSyntax(prose.replace(/\$([^$]+)\$/g, flattenMath))
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*`_\[\]]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return truncateDescription(cleanText);
 }
 
 export function titleize(s: string): string {

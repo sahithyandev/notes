@@ -53,9 +53,9 @@ test("calculateReadTime rounds up to the nearest minute", () => {
   expect(calculateReadTime(201)).toBe(2);
 });
 
-test("generateDescription only looks at the first paragraph", () => {
-  const content = "# Title\n\nSecond paragraph ignored.";
-  expect(generateDescription(content)).toBe("Title"); // "#" stripped, rest of content untouched
+test("generateDescription skips headings and uses the first prose paragraph", () => {
+  const content = "# Title\n\nFirst paragraph.\n\nSecond paragraph ignored.";
+  expect(generateDescription(content)).toBe("First paragraph.");
 });
 
 test("generateDescription strips bold, code, and underscore markers", () => {
@@ -65,22 +65,37 @@ test("generateDescription strips bold, code, and underscore markers", () => {
   );
 });
 
-// generateDescription strips `[`/`]` globally before running its link/image
-// regexes, so those regexes (which require brackets) never actually match.
-// These tests document the current behavior rather than the apparently
-// intended one.
-test("generateDescription does not actually strip link syntax (brackets are stripped first)", () => {
-  const content = "See the [link](https://x.com) for details.";
-  expect(generateDescription(content)).toBe(
-    "See the link(https://x.com) for details.",
-  );
+test("generateDescription keeps link text and drops image syntax", () => {
+  const content = "See the [link](https://x.com) for details ![alt](./i.png).";
+  expect(generateDescription(content)).toBe("See the link for details .");
 });
 
-test("generateDescription does not actually strip image syntax (brackets are stripped first)", () => {
-  const content = "Some text ![alt](./img.png) more text.";
-  expect(generateDescription(content)).toBe(
-    "Some text !alt(./img.png) more text.",
-  );
+test("generateDescription skips imports, components, math blocks, and lists", () => {
+  const content = [
+    'import Foo from "../foo.astro";',
+    "",
+    "<Note>",
+    "Aside text.",
+    "</Note>",
+    "",
+    "$$",
+    "x^2 + y^2 = z^2",
+    "$$",
+    "",
+    "- item one",
+    "- item two",
+    "",
+    "Actual **prose** with $x$ inline.",
+  ].join("\n");
+  expect(generateDescription(content)).toBe("Actual prose with x inline.");
+});
+
+test("generateDescription prefers an explicit override", () => {
+  expect(generateDescription("Body text.", "  Custom. ")).toBe("Custom.");
+});
+
+test("generateDescription returns an empty string when there is no prose", () => {
+  expect(generateDescription("# Only a heading\n\n- a list")).toBe("");
 });
 
 test("generateDescription truncates long paragraphs to 160 chars with an ellipsis", () => {

@@ -27,6 +27,8 @@ const notes = defineCollection({
   schema: z
     .object({
       title: z.string(),
+      // Optional override for the <meta> description; otherwise derived from the body.
+      description: z.string().optional(),
       sidebar: z.optional(
         z.object({
           label: z.optional(z.string()),
