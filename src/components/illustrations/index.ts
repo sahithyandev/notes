@@ -36,6 +36,7 @@ export { default as SensitivityRhsSlider } from "./sensitivity-rhs-slider.astro"
 export { default as SequenceDiagram } from "./sequence-diagram.astro";
 export { default as SimplexStep } from "./simplex-step.astro";
 export { default as SupplyCurveDiagram } from "./supply-curve-diagram.astro";
+export { default as TnbFrame } from "./tnb-frame.astro";
 export { default as TransportationStep } from "./transportation-step.astro";
 export { default as TransportationTable } from "./transportation-table.astro";
 export { default as TreePropertiesProofs } from "./tree-properties-proofs.astro";

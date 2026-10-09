@@ -1,7 +1,7 @@
 ---
 title: Tangent and Normal Vectors
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-10-08T09:02:34.639Z
+lastUpdatedOn: 2026-10-09T08:40:37.497Z
 ---
 
 Let $C$ be a curve traced by a differentiable vector-valued function $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, where $t$ is the parameter. $s$ denotes the arc-length parameter of $C$.
@@ -84,3 +84,63 @@ At each point on $C$, $T(t)$, $N(t)$, $B(t)$ determine 3 mutually perpendicular 
   Osculating plane. The plane that best approximates $C$ near the point.
 - $NB$-plane  
   Normal plane. Perpendicular to $T$. Contains all normals to $C$ at the point.
+
+<TnbFrame />
+
+## Worked Example
+
+Find the TNB frame of $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j} + t\,\boldsymbol{k}$ at $t = \pi/2$.
+
+Differentiate and compute the speed.
+
+$$
+\boldsymbol{r}'(t) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}, \quad \lVert \boldsymbol{r}'(t) \rVert = \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}
+$$
+
+Compute $T(t)$.
+
+$$
+T(t) = \frac{1}{\sqrt{2}}\left(-\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
+$$
+
+Differentiate $T(t)$ and compute its length.
+
+$$
+T'(t) = \frac{1}{\sqrt{2}}\left(-\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}\right), \quad \lVert T'(t) \rVert = \frac{1}{\sqrt{2}}
+$$
+
+Compute $N(t)$.
+
+$$
+N(t) = \frac{T'(t)}{\lVert T'(t) \rVert} = -\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}
+$$
+
+Differentiate $\boldsymbol{r}'(t)$ and compute the cross product.
+
+$$
+\boldsymbol{r}''(t) = -\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}
+$$
+
+$$
+\boldsymbol{r}'(t) \times \boldsymbol{r}''(t) = \sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}, \quad \lVert \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \rVert = \sqrt{2}
+$$
+
+Compute $B(t)$.
+
+$$
+B(t) = \frac{1}{\sqrt{2}}\left(\sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
+$$
+
+Evaluate at $t = \pi/2$, where $\sin t = 1$ and $\cos t = 0$. The point on $C$ is $\boldsymbol{r}(\pi/2) = (0, 1, \pi/2)$.
+
+$$
+T = \frac{1}{\sqrt{2}}(-1, 0, 1), \quad N = (0, -1, 0), \quad B = \frac{1}{\sqrt{2}}(1, 0, 1)
+$$
+
+Verify orthogonality.
+
+$$
+T \cdot N = 0, \quad T \cdot B = \frac{-1 + 1}{2} = 0, \quad N \cdot B = 0
+$$
+
+At $t = \pi/2$, the TNB frame at $(0, 1, \pi/2)$ is $T = \frac{1}{\sqrt{2}}(-1, 0, 1)$, $N = (0, -1, 0)$, $B = \frac{1}{\sqrt{2}}(1, 0, 1)$.

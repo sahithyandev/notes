@@ -1,0 +1,581 @@
+---
+// Interactive 3D view of the TNB frame on a helix. The helix is projected
+// orthographically by hand (no 3D library). Drag the scene or use the arrow
+// keys to rotate it, slide t to move the frame along the curve, and toggle the
+// osculating, rectifying and normal planes.
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import Panel from "./primitives/panel.astro";
+import SliderControl from "./primitives/slider-control.astro";
+
+const uid = makeUid("tnb");
+const sliderId = `${uid}-t`;
+
+const VECTORS = [
+  { key: "T", color: "var(--accent)", name: "Tangent" },
+  { key: "N", color: "var(--dia-ct)", name: "Normal" },
+  { key: "B", color: "var(--dia-pt)", name: "Binormal" },
+] as const;
+
+const PLANES = [
+  { key: "osc", label: "Osculating (TN)", color: "var(--dia-key)" },
+  { key: "rect", label: "Rectifying (TB)", color: "var(--dia-out)" },
+  { key: "norm", label: "Normal (NB)", color: "var(--text-muted)" },
+] as const;
+
+const AXES = ["x", "y", "z"] as const;
+
+const INITIAL_T = Math.PI / 2;
+---
+
+<Panel
+  class="tnb"
+  data-tnb
+  caption="Interactive 3D view of the TNB frame moving along the helix r(t) = (cos t, sin t, 0.4t). Drag the scene to rotate it and use the slider to move the frame along the curve."
+  hideCaption
+>
+  <div class="wrap">
+    <div class="layout">
+      <svg
+        class="scene"
+        viewBox="0 0 360 320"
+        data-scene
+        tabindex="0"
+        role="group"
+        aria-label="3D scene of a helix with its TNB frame. Drag or use arrow keys to rotate the view."
+      >
+        <defs>
+          {VECTORS.map((v) => (
+            <ArrowMarker id={`${uid}-${v.key}`} fill={v.color} size={6} />
+          ))}
+        </defs>
+
+        {AXES.map((a) => (
+          <line class="axis" data-axis={a}></line>
+        ))}
+        {AXES.map((a) => (
+          <text class="axlabel" data-axlabel={a}>
+            {a}
+          </text>
+        ))}
+
+        <path class="ground" data-ground></path>
+        <path class="rest" data-rest></path>
+
+        {PLANES.map((p) => (
+          <polygon
+            class="plane"
+            style={`--plane:${p.color}`}
+            data-plane={p.key}
+            hidden
+          ></polygon>
+        ))}
+
+        <line class="drop" data-drop></line>
+        <path class="done" data-done></path>
+
+        {VECTORS.map((v) => (
+          <line
+            class="vec"
+            style={`--vec:${v.color}`}
+            data-vec={v.key}
+            marker-end={`url(#${uid}-${v.key})`}
+          ></line>
+        ))}
+        <circle class="point" r="3.5" data-point></circle>
+        {VECTORS.map((v) => (
+          <text class="vlabel" style={`--vec:${v.color}`} data-label={v.key}>
+            {v.key}
+          </text>
+        ))}
+      </svg>
+
+      <div class="controls">
+        <SliderControl
+          id={sliderId}
+          min={0}
+          max={Math.PI * 3}
+          step={0.01}
+          value={INITIAL_T}
+        >
+          <i>t</i>
+        </SliderControl>
+
+        <div class="toggles">
+          {PLANES.map((p) => (
+            <label class="toggle">
+              <input type="checkbox" data-toggle={p.key} />
+              <span class="swatch" style={`--plane:${p.color}`}></span>
+              {p.label}
+            </label>
+          ))}
+          <button type="button" class="reset" data-reset>
+            Reset view
+          </button>
+        </div>
+
+        <dl class="readout">
+          {VECTORS.map((v) => (
+            <div class="pair" style={`--vec:${v.color}`}>
+              <dt title={v.name}>{v.key}</dt>
+              <dd data-readout={v.key}></dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <p class="live" aria-live="polite" data-live></p>
+</Panel>
+
+<style>
+  .wrap {
+    container-type: inline-size;
+  }
+  .layout {
+    display: grid;
+    gap: 0;
+  }
+  .controls {
+    min-width: 0;
+  }
+  .scene {
+    display: block;
+    /* the article's "svg:not(.katex svg)" rule is more specific, so !important */
+    width: auto !important;
+    max-width: 100% !important;
+    height: clamp(300px, calc(70vh - 230px), 420px) !important;
+    aspect-ratio: 360 / 320;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    cursor: grab;
+    border-radius: 6px;
+    background: var(--bg);
+  }
+  .scene:active {
+    cursor: grabbing;
+  }
+  .scene:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .axis {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+  .axlabel {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-style: italic;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .ground {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .rest {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+  .done {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .drop {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .plane {
+    fill: var(--plane);
+    fill-opacity: 0.16;
+    stroke: var(--plane);
+    stroke-width: 1;
+    stroke-opacity: 0.6;
+    stroke-linejoin: round;
+  }
+  .vec {
+    stroke: var(--vec);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .point {
+    fill: var(--surface);
+    stroke: var(--text-primary);
+    stroke-width: 1.5;
+  }
+  .vlabel {
+    fill: var(--vec);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+
+  .toggles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .toggle input {
+    accent-color: var(--s5);
+  }
+  .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--plane);
+    opacity: 0.7;
+  }
+  .reset {
+    margin-left: auto;
+    padding: 3px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font: inherit;
+    cursor: pointer;
+  }
+  .reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .reset:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 10px 0 0;
+    font-size: 13px;
+  }
+  .readout .pair {
+    display: flex;
+    gap: 8px;
+  }
+  .readout dt {
+    color: var(--vec);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+  .readout dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @container (min-width: 34rem) {
+    .layout {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 24px;
+    }
+    .scene {
+      height: clamp(300px, 70vh, 560px) !important;
+      margin: 0;
+    }
+    .controls :global(.control) {
+      margin-top: 0;
+    }
+    .toggles {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .reset {
+      margin-left: 0;
+    }
+    .readout {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  type Vec = [number, number, number];
+
+  const W = 360;
+  const H = 320;
+  const SCALE = 56;
+  // Helix r(t) = (cos t, sin t, K t), t in [0, T_MAX].
+  const K = 0.4;
+  const T_MAX = Math.PI * 3;
+  const SAMPLES = 120;
+  const SPEED = Math.hypot(1, K);
+  // Recentres the helix vertically around the origin.
+  const Z0 = (K * T_MAX) / 2;
+  const VEC_LEN = 1.15;
+  const LABEL_LEN = 1.45;
+  const AXIS_HALF: Record<"x" | "y" | "z", number> = {
+    x: 1.5,
+    y: 1.5,
+    z: Z0 + 0.3,
+  };
+  const PLANE_HALF = 0.8;
+  const DEFAULT_YAW = -0.75;
+  const DEFAULT_PITCH = 0.4;
+  const PITCH_LIMIT = 1.45;
+
+  const r = (t: number): Vec => [Math.cos(t), Math.sin(t), K * t - Z0];
+  const tangent = (t: number): Vec => [
+    -Math.sin(t) / SPEED,
+    Math.cos(t) / SPEED,
+    K / SPEED,
+  ];
+  const normal = (t: number): Vec => [-Math.cos(t), -Math.sin(t), 0];
+  const binormal = (t: number): Vec => [
+    (K * Math.sin(t)) / SPEED,
+    (-K * Math.cos(t)) / SPEED,
+    1 / SPEED,
+  ];
+
+  const add = (a: Vec, b: Vec, s = 1): Vec => [
+    a[0] + s * b[0],
+    a[1] + s * b[1],
+    a[2] + s * b[2],
+  ];
+  const fmt = (n: number) => (Math.abs(n) < 0.005 ? 0 : n).toFixed(2);
+  const fmtVec = (v: Vec) => `(${v.map(fmt).join(", ")})`;
+
+  function initTnb(root: HTMLElement) {
+    if (root.dataset.tnbInit) return;
+    root.dataset.tnbInit = "1";
+
+    const q = <E extends Element>(sel: string) => root.querySelector<E>(sel)!;
+    const scene = q<SVGSVGElement>("[data-scene]");
+    const slider = q<HTMLInputElement>('input[type="range"]');
+    const output = q<HTMLOutputElement>("output");
+    const live = q<HTMLElement>("[data-live]");
+    const ground = q<SVGPathElement>("[data-ground]");
+    const axes = (["x", "y", "z"] as const).map((a, i) => ({
+      line: q<SVGLineElement>(`[data-axis="${a}"]`),
+      label: q<SVGTextElement>(`[data-axlabel="${a}"]`),
+      half: AXIS_HALF[a],
+      dir: [i === 0 ? 1 : 0, i === 1 ? 1 : 0, i === 2 ? 1 : 0] as Vec,
+    }));
+    const rest = q<SVGPathElement>("[data-rest]");
+    const done = q<SVGPathElement>("[data-done]");
+    const drop = q<SVGLineElement>("[data-drop]");
+    const point = q<SVGCircleElement>("[data-point]");
+    const vecs = {
+      T: q<SVGLineElement>('[data-vec="T"]'),
+      N: q<SVGLineElement>('[data-vec="N"]'),
+      B: q<SVGLineElement>('[data-vec="B"]'),
+    };
+    const labels = {
+      T: q<SVGTextElement>('[data-label="T"]'),
+      N: q<SVGTextElement>('[data-label="N"]'),
+      B: q<SVGTextElement>('[data-label="B"]'),
+    };
+    const readouts = {
+      T: q<HTMLElement>('[data-readout="T"]'),
+      N: q<HTMLElement>('[data-readout="N"]'),
+      B: q<HTMLElement>('[data-readout="B"]'),
+    };
+    const planes = {
+      osc: q<SVGPolygonElement>('[data-plane="osc"]'),
+      rect: q<SVGPolygonElement>('[data-plane="rect"]'),
+      norm: q<SVGPolygonElement>('[data-plane="norm"]'),
+    };
+
+    let yaw = DEFAULT_YAW;
+    let pitch = DEFAULT_PITCH;
+    let t = Number(slider.value);
+
+    // Rotate about z by yaw, then about x by pitch, then drop the depth axis.
+    function project(p: Vec): [number, number] {
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const x1 = p[0] * cy - p[1] * sy;
+      const y1 = p[0] * sy + p[1] * cy;
+      const z2 = y1 * sp + p[2] * cp;
+      return [W / 2 + SCALE * x1, H / 2 - SCALE * z2];
+    }
+
+    const pts = (list: Vec[]) =>
+      list
+        .map((p) => project(p))
+        .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
+        .join(" ");
+    const pathOf = (list: Vec[], close = false) =>
+      `M${pts(list).replace(/ /g, "L")}${close ? "Z" : ""}`;
+
+    const curve = (tEnd: number) => {
+      const n = Math.max(2, Math.ceil((SAMPLES * tEnd) / T_MAX));
+      return Array.from({ length: n + 1 }, (_, i) => r((tEnd * i) / n));
+    };
+    const groundRing = Array.from({ length: 49 }, (_, i): Vec => {
+      const a = (2 * Math.PI * i) / 48;
+      return [Math.cos(a), Math.sin(a), -Z0];
+    });
+
+    function setLine(el: SVGLineElement, a: Vec, b: Vec) {
+      const [x1, y1] = project(a);
+      const [x2, y2] = project(b);
+      el.setAttribute("x1", x1.toFixed(1));
+      el.setAttribute("y1", y1.toFixed(1));
+      el.setAttribute("x2", x2.toFixed(1));
+      el.setAttribute("y2", y2.toFixed(1));
+    }
+
+    function render() {
+      const p = r(t);
+      const frame = { T: tangent(t), N: normal(t), B: binormal(t) };
+
+      for (const { line, label, half, dir } of axes) {
+        setLine(line, add([0, 0, 0], dir, -half), add([0, 0, 0], dir, half));
+        const [ax, ay] = project(add([0, 0, 0], dir, half + 0.25));
+        label.setAttribute("x", ax.toFixed(1));
+        label.setAttribute("y", ay.toFixed(1));
+      }
+      ground.setAttribute("d", pathOf(groundRing, true));
+      rest.setAttribute("d", pathOf(curve(T_MAX)));
+      done.setAttribute("d", pathOf(curve(Math.max(t, 0.001))));
+      setLine(drop, p, [p[0], p[1], -Z0]);
+
+      const [px, py] = project(p);
+      point.setAttribute("cx", px.toFixed(1));
+      point.setAttribute("cy", py.toFixed(1));
+
+      for (const k of ["T", "N", "B"] as const) {
+        setLine(vecs[k], p, add(p, frame[k], VEC_LEN));
+        const [lx, ly] = project(add(p, frame[k], LABEL_LEN));
+        labels[k].setAttribute("x", lx.toFixed(1));
+        labels[k].setAttribute("y", ly.toFixed(1));
+        readouts[k].textContent = fmtVec(frame[k]);
+      }
+
+      const quad = (a: Vec, b: Vec) =>
+        pts([
+          add(add(p, a, PLANE_HALF), b, PLANE_HALF),
+          add(add(p, a, PLANE_HALF), b, -PLANE_HALF),
+          add(add(p, a, -PLANE_HALF), b, -PLANE_HALF),
+          add(add(p, a, -PLANE_HALF), b, PLANE_HALF),
+        ]);
+      planes.osc.setAttribute("points", quad(frame.T, frame.N));
+      planes.rect.setAttribute("points", quad(frame.T, frame.B));
+      planes.norm.setAttribute("points", quad(frame.N, frame.B));
+
+      output.textContent = `${(t / Math.PI).toFixed(2)}π`;
+      live.textContent = `t = ${(t / Math.PI).toFixed(2)}π. T = ${fmtVec(frame.T)}, N = ${fmtVec(frame.N)}, B = ${fmtVec(frame.B)}.`;
+    }
+
+    slider.addEventListener("input", () => {
+      t = Number(slider.value);
+      render();
+    });
+
+    for (const key of ["osc", "rect", "norm"] as const) {
+      const box = q<HTMLInputElement>(`[data-toggle="${key}"]`);
+      box.addEventListener("change", () => {
+        planes[key].toggleAttribute("hidden", !box.checked);
+      });
+    }
+
+    q<HTMLButtonElement>("[data-reset]").addEventListener("click", () => {
+      yaw = DEFAULT_YAW;
+      pitch = DEFAULT_PITCH;
+      render();
+    });
+
+    const rotate = (dYaw: number, dPitch: number) => {
+      yaw += dYaw;
+      pitch = Math.max(-PITCH_LIMIT, Math.min(PITCH_LIMIT, pitch + dPitch));
+      render();
+    };
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    scene.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      scene.setPointerCapture(e.pointerId);
+    });
+    scene.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      rotate((e.clientX - lastX) * 0.01, (e.clientY - lastY) * 0.01);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    const endDrag = (e: PointerEvent) => {
+      dragging = false;
+      if (scene.hasPointerCapture(e.pointerId)) {
+        scene.releasePointerCapture(e.pointerId);
+      }
+    };
+    scene.addEventListener("pointerup", endDrag);
+    scene.addEventListener("pointercancel", endDrag);
+
+    scene.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.25 : 0.08;
+      switch (e.key) {
+        case "ArrowLeft":
+          rotate(-step, 0);
+          break;
+        case "ArrowRight":
+          rotate(step, 0);
+          break;
+        case "ArrowUp":
+          rotate(0, -step);
+          break;
+        case "ArrowDown":
+          rotate(0, step);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-tnb]")
+    .forEach((el) => initTnb(el));
+</script>

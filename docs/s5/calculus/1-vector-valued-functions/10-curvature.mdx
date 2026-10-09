@@ -1,7 +1,7 @@
 ---
 title: Curvature
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-10-08T09:02:34.652Z
+lastUpdatedOn: 2026-10-09T08:40:37.509Z
 ---
 
 Let $C$ be a graph of a $C^1$ vector-valued function $\boldsymbol{r}$, parametrized by arc length $s$, with $T'(s)$ existing. The curvature of $C$ at $s$ is
@@ -49,9 +49,7 @@ $$
 
 that shares a common tangent with $C$ at $P$ and is centered on the concave side of the curve at $P$ is the osculating circle, or circle of curvature, at $P$.
 
-- $\rho$: radius of curvature at $P$
-
-## Center of Curvature
+### Center of Curvature
 
 The center of curvature of $C$ at a point $P = \boldsymbol{r}(s)$ with $\kappa(s) \ne 0$ is the center of the osculating circle at $P$:
 
@@ -60,3 +58,67 @@ $$
 $$
 
 Since $N(s)$ points toward the concave side of $C$, the center of curvature lies at distance $\rho$ from $P$ on that side.
+
+## Worked Examples
+
+### Helix
+
+Find the curvature and radius of curvature of $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j} + t\,\boldsymbol{k}$.
+
+Differentiate twice.
+
+$$
+\boldsymbol{r}'(t) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}, \quad \boldsymbol{r}''(t) = -\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}
+$$
+
+Compute the cross product.
+
+$$
+\boldsymbol{r}'(t) \times \boldsymbol{r}''(t) = \sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}
+$$
+
+Compute the norms.
+
+$$
+\lVert \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \rVert = \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}, \quad \lVert \boldsymbol{r}'(t) \rVert^3 = (\sqrt{2})^3 = 2\sqrt{2}
+$$
+
+Apply the formula.
+
+$$
+\kappa(t) = \frac{\sqrt{2}}{2\sqrt{2}} = \frac{1}{2}
+$$
+
+The radius of curvature is $\rho = 2$ at every point.
+
+### Parabola
+
+Find the curvature of $y = x^2$, and the osculating circle at the origin.
+
+Parametrize as $\boldsymbol{r}(t) = t\,\boldsymbol{i} + t^2\,\boldsymbol{j}$ and differentiate twice.
+
+$$
+\boldsymbol{r}'(t) = \boldsymbol{i} + 2t\,\boldsymbol{j}, \quad \boldsymbol{r}''(t) = 2\,\boldsymbol{j}
+$$
+
+Compute the cross product.
+
+$$
+\boldsymbol{r}'(t) \times \boldsymbol{r}''(t) = 2\,\boldsymbol{k}
+$$
+
+Apply the formula.
+
+$$
+\kappa(t) = \frac{2}{(1 + 4t^2)^{3/2}}
+$$
+
+At $t = 0$, $\kappa = 2$ and $\rho = \frac{1}{2}$.
+
+The tangent at the origin is $\boldsymbol{i}$, so $N(0) = \boldsymbol{j}$ points toward the concave side. The center of curvature is
+
+$$
+\boldsymbol{r}(0) + \rho\, N(0) = \tfrac{1}{2}\,\boldsymbol{j}
+$$
+
+The osculating circle is $x^2 + \left(y - \frac{1}{2}\right)^2 = \frac{1}{4}$.
