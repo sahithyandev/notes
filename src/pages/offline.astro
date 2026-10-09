@@ -16,23 +16,31 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 
   <main id="main-content" class="offline-page">
     <section class="offline-content">
-      <p class="offline-code">Offline</p>
+      <p class="error-code">Offline</p>
       <h1>You're not connected.</h1>
       <p class="description">
         This page isn't saved on your device. Notes you opened before stay
         available offline for 30 days.
       </p>
-      <div class="offline-actions">
-        <button type="button" id="offline-retry" class="offline-btn">
-          Try again
+      <nav class="links-grid" aria-label="Actions">
+        <button
+          type="button"
+          id="offline-retry"
+          class="link-card link-card--primary"
+        >
+          <span class="link-label">Try again</span>
+          <span class="link-desc">
+            Reload this page once you're back online
+          </span>
         </button>
-        <a href="/" class="offline-btn offline-btn--ghost">
-          Home
+        <a href="/" class="link-card link-card--primary">
+          <span class="link-label">Home</span>
+          <span class="link-desc">All semesters and notes</span>
         </a>
-      </div>
+      </nav>
 
       <div id="offline-saved" hidden>
-        <h2>Saved on this device</h2>
+        <h2 class="saved-heading">Saved on this device</h2>
         <div id="offline-groups"></div>
       </div>
       <p id="offline-empty" class="description" hidden>
@@ -100,14 +108,20 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
       if (match) section.style.setProperty("--group", `var(--s${match[1]})`);
       const label = document.createElement("h3");
       label.textContent = match ? `Semester ${match[1]}` : titleize(sem);
-      const list = document.createElement("ul");
+      const list = document.createElement("div");
+      list.className = "links-grid";
       for (const item of groups.get(sem)!) {
-        const li = document.createElement("li");
         const a = document.createElement("a");
         a.href = item.path;
-        a.textContent = item.title;
-        li.append(a);
-        list.append(li);
+        a.className = "link-card";
+        const name = document.createElement("span");
+        name.className = "link-label";
+        name.textContent = item.title;
+        const module = document.createElement("span");
+        module.className = "link-desc";
+        module.textContent = titleize(item.path.split("/")[2] ?? "");
+        a.append(name, module);
+        list.append(a);
       }
       section.append(label, list);
       container.append(section);
@@ -145,82 +159,102 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
     width: 100%;
   }
 
-  .offline-code {
+  .error-code {
     font-family: var(--font-ui);
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-muted);
-    margin: 0 0 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
   }
 
-  h1 {
+  .offline-content h1 {
     font-family: var(--font-ui);
-    margin: 0 0 12px;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin: 0 0 20px;
   }
 
   .description {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
     color: var(--text-secondary);
-    line-height: 1.6;
+    margin: 0 0 36px;
   }
 
-  .offline-actions {
-    display: flex;
-    gap: 10px;
-    margin: 20px 0 36px;
-  }
-
-  .offline-btn {
-    font-family: var(--font-ui);
-    font-size: 0.875rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    color: var(--text-primary);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  .offline-btn:hover {
-    background: var(--border);
-  }
-
-  h2 {
+  .saved-heading {
     font-family: var(--font-ui);
     font-size: 1.125rem;
-    margin: 0 0 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 48px 0 16px;
   }
 
-  .offline-group {
-    margin-bottom: 20px;
+  .links-grid,
+  :global(#offline-groups .links-grid) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
   }
 
-  .offline-group h3 {
+  .link-card,
+  :global(#offline-groups .link-card) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
+  }
+
+  .link-card:hover,
+  :global(#offline-groups .link-card:hover) {
+    border-color: var(--group, var(--accent));
+  }
+
+  .link-card--primary {
+    grid-column: auto;
+  }
+
+  .link-label,
+  :global(#offline-groups .link-label) {
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .link-desc,
+  :global(#offline-groups .link-desc) {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  :global(#offline-groups .offline-group) {
+    margin-bottom: 28px;
+  }
+
+  :global(#offline-groups .offline-group h3) {
     font-family: var(--font-ui);
     font-size: 0.8125rem;
     font-weight: 700;
-    margin: 0 0 6px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 10px;
     color: var(--group, var(--text-muted));
-  }
-
-  .offline-group ul {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 0 10px;
-    border-left: 2px solid var(--group, var(--border));
-  }
-
-  .offline-group li {
-    padding: 3px 0;
-  }
-
-  .offline-group a {
-    color: var(--text-primary);
-    text-decoration: none;
-  }
-
-  .offline-group a:hover {
-    text-decoration: underline;
   }
 </style>

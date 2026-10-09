@@ -45,10 +45,13 @@ async function reExecuteScripts(root: ParentNode): Promise<void> {
       old.replaceWith(fresh);
       continue;
     }
-    const url = new URL(src, location.href);
-    url.searchParams.set("t", Date.now().toString());
+    // Appended as a string: URLSearchParams would rewrite Vite's valueless
+    // `?astro&type=script` params as `astro=&type=script`, which Vite no
+    // longer serves as the component script (same as note-swap.ts).
+    const href = new URL(src, location.href).href;
+    const bust = (href.includes("?") ? "&" : "?") + "t=" + Date.now();
     try {
-      await import(/* @vite-ignore */ url.href);
+      await import(/* @vite-ignore */ href + bust);
     } catch (err) {
       console.error("[live-update] failed to re-run script", src, err);
     }
