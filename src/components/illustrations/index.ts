@@ -15,6 +15,7 @@ export { default as ElasticityAlongDemandCurveDiagram } from "./elasticity-along
 export { default as ExcelSheet } from "./excel-sheet.astro";
 export { default as ExponentialMapping } from "./exponential-mapping.astro";
 export { default as FlowDiagram } from "./flow-diagram.astro";
+export { default as FubiniSlicing } from "./fubini-slicing.astro";
 export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.astro";
 export { default as HuffmanTable } from "./huffman-table.astro";
 export { default as KerberosDiagram } from "./kerberos-diagram.astro";
@@ -26,6 +27,7 @@ export { default as PermissionBreakdown } from "./permission-breakdown.astro";
 export { default as PermutationTable } from "./permutation-table.astro";
 export { default as PpfDiagram } from "./ppf-diagram.astro";
 export { default as ProcessStateDiagram } from "./process-state-diagram.astro";
+export { default as RegionSolid } from "./region-solid.astro";
 export { default as RgbCmykConverter } from "./rgb-cmyk-converter.astro";
 export { default as RotationSchedule } from "./rotation-schedule.astro";
 export { default as SensitivityCostRowOp } from "./sensitivity-cost-row-op.astro";
@@ -35,6 +37,8 @@ export { default as SensitivityNewVariableSlider } from "./sensitivity-new-varia
 export { default as SensitivityRhsSlider } from "./sensitivity-rhs-slider.astro";
 export { default as SequenceDiagram } from "./sequence-diagram.astro";
 export { default as SimplexStep } from "./simplex-step.astro";
+export { default as SphericalRegion } from "./spherical-region.astro";
+export { default as SphericalRegionGrid } from "./spherical-region-grid.astro";
 export { default as SupplyCurveDiagram } from "./supply-curve-diagram.astro";
 export { default as TnbFrame } from "./tnb-frame.astro";
 export { default as TransportationStep } from "./transportation-step.astro";

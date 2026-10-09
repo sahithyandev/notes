@@ -1,0 +1,625 @@
+---
+// Interactive 3D pictures of the solid regions used for triple integrals. All
+// 3 variants share 1 solid: the cap z = v(x, y) over an elliptical region R in
+// the xy-plane. "xy-solid" shows the bounding surfaces and a vertical line,
+// "type-1" show the slices of R and the cross-section above 1 of
+// them. The solid is projected orthographically by hand (no 3D library) and
+// its faces are shaded by how squarely they face the viewer. Drag the scene or
+// use the arrow keys to rotate it. The solid is for looks, not to scale.
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import FigureCaption from "./primitives/figure-caption.astro";
+
+interface Props {
+  variant: "xy-solid" | "type-1";
+}
+
+const { variant } = Astro.props;
+const uid = makeUid("region");
+
+const LABELS = {
+  "xy-solid":
+    "3D view of a solid between a lower surface and an upper surface over a region R in the xy-plane, with a vertical line through R. Drag or use arrow keys to rotate the view.",
+  "type-1":
+    "3D view of a region R in the xy-plane sliced by lines parallel to the y-axis, with the cross-section of the solid above 1 slice. Drag or use arrow keys to rotate the view.",
+};
+---
+
+<figure class="region" data-region data-variant={variant} data-uid={uid}>
+  <div class="stage">
+    <svg
+      class="scene"
+      viewBox="-225 -190 450 380"
+      data-scene
+      tabindex="0"
+      role="group"
+      aria-label={LABELS[variant]}
+    >
+      <defs>
+        <ArrowMarker id={`${uid}-ax`} fill="var(--text-muted)" size={6} />
+        <ArrowMarker id={`${uid}-hl`} fill="var(--dia-key)" size={6} />
+      </defs>
+      <g data-layer></g>
+    </svg>
+    <button type="button" class="reset" data-reset hidden>
+      Reset view
+    </button>
+  </div>
+
+  <FigureCaption>
+    {variant === "xy-solid" && (
+      <>
+        A solid bounded{" "}
+        <span class="c-top">
+          above by <i>z</i> = <i>v</i>(<i>x</i>, <i>y</i>)
+        </span>{" "}
+        and{" "}
+        <span class="c-bottom">
+          below by <i>z</i> = <i>u</i>(<i>x</i>, <i>y</i>)
+        </span>{" "}
+        over its projection{" "}
+        <span class="c-r">
+          <i>R</i>
+        </span>{" "}
+        onto the <i>xy</i>-plane. Each <span class="c-line">vertical line</span>{" "}
+        through <i>R</i> enters at <i>u</i> and leaves at <i>v</i>. Drag to
+        rotate.
+      </>
+    )}
+    {variant === "type-1" && (
+      <>
+        A Type I region{" "}
+        <span class="c-r">
+          <i>R</i>
+        </span>
+        . Each <span class="c-line">slice</span> at a fixed <i>x</i> runs in{" "}
+        <i>y</i> from <i>g</i>₁(<i>x</i>) to <i>g</i>₂(<i>x</i>). The solid
+        above the slice forms a <span class="c-top">cross-section</span>. Drag
+        to rotate.
+      </>
+    )}
+  </FigureCaption>
+</figure>
+
+<style>
+  .region {
+    margin: 24px 0;
+  }
+  .stage {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .scene {
+    display: block;
+    /* the article's "svg:not(.katex svg)" rule is more specific, so !important */
+    width: 100% !important;
+    height: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    cursor: grab;
+    border-radius: 6px;
+  }
+  .scene:active {
+    cursor: grabbing;
+  }
+  .scene:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .reset {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .reset[hidden] {
+    display: none;
+  }
+  .reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .reset:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* the layer is filled by the script, so its classes need :global */
+  .region :global(.axis) {
+    stroke: var(--text-muted);
+    stroke-width: 1.2;
+  }
+  .region :global(.axlabel) {
+    fill: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-style: italic;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .region :global(.ground) {
+    fill: var(--dia-pt);
+    fill-opacity: 0.22;
+    stroke: var(--dia-pt);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+  .region :global(.guide) {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .region :global(.slice) {
+    stroke: var(--dia-key);
+    stroke-width: 1.2;
+    stroke-opacity: 0.55;
+  }
+  .region :global(.pick) {
+    stroke: var(--dia-key);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .region :global(.wall) {
+    fill: var(--accent);
+    stroke: var(--accent);
+    stroke-opacity: 0.25;
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+  }
+  .region :global(.cap) {
+    fill: var(--dia-ct);
+    stroke: var(--dia-ct);
+    stroke-opacity: 0.35;
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+  }
+  .region :global(.rim) {
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+  .region :global(.rim.top) {
+    stroke: var(--dia-ct);
+  }
+  .region :global(.rim.bottom) {
+    stroke: var(--accent);
+  }
+  .region :global(.section) {
+    fill: var(--dia-key);
+    fill-opacity: 0.3;
+    stroke: var(--dia-key);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+  .region :global(.column) {
+    stroke: var(--dia-key);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .region :global(.dot) {
+    fill: var(--surface);
+    stroke: var(--dia-key);
+    stroke-width: 2;
+  }
+  .region :global(.tag),
+  .region :global(.curve) {
+    font-size: 13px;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+  .region :global(.tag) {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-anchor: middle;
+  }
+  .region :global(.tag.r) {
+    fill: var(--dia-pt);
+    font-size: 16px;
+  }
+  .region :global(.tag.top) {
+    fill: var(--dia-ct);
+  }
+  .region :global(.tag.bottom) {
+    fill: var(--accent);
+  }
+  .region :global(.curve) {
+    fill: var(--text-secondary);
+    font-family: var(--font-mono);
+    text-anchor: middle;
+  }
+  .c-top {
+    color: var(--dia-ct);
+    font-weight: 600;
+  }
+  .c-bottom {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .c-r {
+    color: var(--dia-pt);
+    font-weight: 600;
+  }
+  .c-line {
+    color: var(--dia-key);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  type Vec = [number, number, number];
+  type Variant = "xy-solid" | "type-1";
+
+  const SCALE = 54;
+  const DEFAULT_YAW = -0.75;
+  const DEFAULT_PITCH = 0.5;
+  const MIN_PITCH = 0.05;
+  const MAX_PITCH = 1.45;
+  // Centre of the scene, so the drawing stays in the middle while rotating.
+  const MID: Vec = [2.1, 1.8, 1];
+
+  // Ellipse R with centre (CX, CY) and semi-axes RX, RY.
+  const CX = 2;
+  const CY = 1.8;
+  const RX = 1.6;
+  const RY = 1.2;
+
+  const norm = (x: number, y: number) =>
+    ((x - CX) / RX) ** 2 + ((y - CY) / RY) ** 2;
+  const top = (x: number, y: number) => 2.1 - 0.9 * norm(x, y);
+  const bottom = (x: number, y: number) => 0.35 + 0.25 * norm(x, y);
+  // Bounds of R along 1 axis at a fixed value of the other.
+  const yBounds = (x: number): [number, number] => {
+    const h = RY * Math.sqrt(Math.max(0, 1 - ((x - CX) / RX) ** 2));
+    return [CY - h, CY + h];
+  };
+  const xBounds = (y: number): [number, number] => {
+    const h = RX * Math.sqrt(Math.max(0, 1 - ((y - CY) / RY) ** 2));
+    return [CX - h, CX + h];
+  };
+
+  const NR = 6;
+  const NT = 36;
+  const angle = (j: number) => (2 * Math.PI * j) / NT;
+  const at = (r: number, t: number, z?: number): Vec => {
+    const x = CX + RX * r * Math.cos(t);
+    const y = CY + RY * r * Math.sin(t);
+    return [x, y, z ?? top(x, y)];
+  };
+  const low = (p: Vec): Vec => [p[0], p[1], bottom(p[0], p[1])];
+  const flat = (p: Vec): Vec => [p[0], p[1], 0];
+
+  const FRACS = [-0.75, -0.5, -0.25, 0.25, 0.5, 0.75];
+  const SAMPLES = 24;
+
+  const sub = (a: Vec, b: Vec): Vec => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a: Vec, b: Vec): Vec => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+
+  function initRegion(root: HTMLElement) {
+    if (root.dataset.regionInit) return;
+    root.dataset.regionInit = "1";
+
+    const variant = root.dataset.variant as Variant;
+    const uid = root.dataset.uid!;
+    const scene = root.querySelector<SVGSVGElement>("[data-scene]")!;
+    const layer = root.querySelector<SVGGElement>("[data-layer]")!;
+
+    let yaw = DEFAULT_YAW;
+    let pitch = DEFAULT_PITCH;
+
+    // Rotate about z by yaw, then about x by pitch. Returns the screen point
+    // and `far`, which is larger the farther the point is from the viewer.
+    function project(p: Vec): { x: number; y: number; far: number } {
+      const x = p[0] - MID[0];
+      const y = p[1] - MID[1];
+      const z = p[2] - MID[2];
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const x1 = x * cy - y * sy;
+      const y1 = x * sy + y * cy;
+      return {
+        x: SCALE * x1,
+        y: -SCALE * (y1 * sp + z * cp),
+        far: y1 * cp - z * sp,
+      };
+    }
+
+    const xy = (p: Vec) => {
+      const { x, y } = project(p);
+      return { x: +x.toFixed(1), y: +y.toFixed(1) };
+    };
+    const pt = (p: Vec) => {
+      const { x, y } = xy(p);
+      return `${x},${y}`;
+    };
+    const poly = (ps: Vec[]) => ps.map(pt).join(" ");
+    const line = (cls: string, a: Vec, b: Vec, extra = "") => {
+      const p = xy(a);
+      const q = xy(b);
+      return `<line class="${cls}" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" ${extra}/>`;
+    };
+    const text = (cls: string, p: { x: number; y: number }, s: string) =>
+      `<text class="${cls}" x="${p.x}" y="${p.y}">${s}</text>`;
+
+    // Shade from how squarely the face points at the viewer, 0 (edge-on) to 1.
+    function facing(a: Vec, b: Vec, c: Vec): number {
+      const n = cross(sub(b, a), sub(c, a));
+      const len = Math.hypot(n[0], n[1], n[2]) || 1;
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const y1 = n[0] * sy + n[1] * cy;
+      return Math.abs(y1 * cp - n[2] * sp) / len;
+    }
+
+    const rim = Array.from({ length: NT + 1 }, (_, j) => angle(j));
+
+    function render() {
+      const out: string[] = [];
+
+      // Axes from the origin corner.
+      const tips: [string, Vec][] = [
+        ["x", [4, 0, 0]],
+        ["y", [0, 3.5, 0]],
+        ["z", [0, 0, 2.6]],
+      ];
+      for (const [key, tip] of tips) {
+        out.push(
+          line("axis", [0, 0, 0], tip, `marker-end="url(#${uid}-ax)"`),
+          text(
+            "axlabel",
+            xy([
+              tip[0] * 1.06,
+              tip[1] * 1.06,
+              tip[2] + (key === "z" ? 0.25 : 0),
+            ]),
+            key,
+          ),
+        );
+      }
+
+      // Region R on the ground.
+      out.push(
+        `<polygon class="ground" points="${poly(rim.map((t) => at(1, t, 0)))}"/>`,
+      );
+
+      // Limits of R and the labels of its boundary curves.
+      if (variant === "type-1") {
+        for (const [s, x] of [
+          ["a", CX - RX],
+          ["b", CX + RX],
+        ] as const) {
+          out.push(
+            line("guide", [x, CY, 0], [x, 0, 0]),
+            text("axlabel", xy([x, -0.3, 0]), s),
+          );
+        }
+      }
+
+      // Slices of R.
+      const alongY = variant === "type-1";
+      const sliceAt = (s: number): [Vec, Vec] => {
+        if (alongY) {
+          const [lo, hi] = yBounds(s);
+          return [
+            [s, lo, 0],
+            [s, hi, 0],
+          ];
+        }
+        const [lo, hi] = xBounds(s);
+        return [
+          [lo, s, 0],
+          [hi, s, 0],
+        ];
+      };
+      const centre = alongY ? CX : CY;
+      const half = alongY ? RX : RY;
+      if (variant !== "xy-solid") {
+        for (const f of FRACS) {
+          const [a, b] = sliceAt(centre + f * half);
+          out.push(line("slice", a, b));
+        }
+      }
+
+      // The solid, painted from the farthest face to the nearest.
+      const faces: { far: number; html: string }[] = [];
+      const faint = variant !== "xy-solid";
+      for (let j = 0; j < NT; j++) {
+        const a = at(1, angle(j));
+        const b = at(1, angle(j + 1));
+        const ps = [low(a), a, b, low(b)];
+        const o = (0.08 + 0.32 * facing(ps[0], ps[1], ps[2])).toFixed(2);
+        faces.push({
+          far: ps.reduce((s, p) => s + project(p).far, 0) / 4,
+          html: `<polygon class="wall" style="fill-opacity:${o}" points="${poly(ps)}"/>`,
+        });
+      }
+      for (let i = 0; i < NR; i++) {
+        for (let j = 0; j < NT; j++) {
+          const ps = [
+            at(i / NR, angle(j)),
+            at((i + 1) / NR, angle(j)),
+            at((i + 1) / NR, angle(j + 1)),
+            at(i / NR, angle(j + 1)),
+          ];
+          const k = 0.1 + 0.34 * facing(ps[0], ps[1], ps[3]);
+          faces.push({
+            far: ps.reduce((s, p) => s + project(p).far, 0) / 4,
+            html: `<polygon class="cap" style="fill-opacity:${(faint ? k * 0.55 : k).toFixed(2)}" points="${poly(ps)}"/>`,
+          });
+        }
+      }
+      faces.sort((p, q) => q.far - p.far);
+      for (const f of faces) out.push(f.html);
+
+      out.push(
+        `<polyline class="rim bottom" points="${poly(rim.map((t) => low(at(1, t))))}"/>`,
+        `<polyline class="rim top" points="${poly(rim.map((t) => at(1, t)))}"/>`,
+      );
+
+      if (variant === "xy-solid") {
+        const px = 2.35;
+        const py = 1.7;
+        const base: Vec = [px, py, 0];
+        const lo: Vec = [px, py, bottom(px, py)];
+        const hi: Vec = [px, py, top(px, py)];
+        const dot = xy(base);
+        out.push(
+          line("guide", base, lo),
+          line("column", lo, hi, `marker-end="url(#${uid}-hl)"`),
+          `<circle class="dot" cx="${dot.x}" cy="${dot.y}" r="4"/>`,
+        );
+        const tl = xy([CX - 0.4, CY + 0.9, top(CX - 0.4, CY + 0.9) + 0.35]);
+        const bl = xy([CX + RX + 0.15, CY - 0.1, bottom(CX + RX, CY)]);
+        out.push(
+          text("tag top", tl, "z = v(x, y)"),
+          text("tag bottom", { x: bl.x + 38, y: bl.y }, "z = u(x, y)"),
+        );
+      } else {
+        const pickedS = centre + 0.1 * half;
+        const [a, b] = sliceAt(pickedS);
+        const pts = Array.from({ length: SAMPLES + 1 }, (_, i): Vec => {
+          const u = i / SAMPLES;
+          return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, 0];
+        });
+        const lower = pts.map(low);
+        const upper = pts.map((p): Vec => [p[0], p[1], top(p[0], p[1])]);
+        out.push(
+          `<polygon class="section" points="${poly([...lower, ...upper.reverse()])}"/>`,
+          line("pick", a, b, `marker-end="url(#${uid}-hl)"`),
+        );
+
+        const lowT = alongY ? -Math.PI / 2 - 0.5 : Math.PI + 0.5;
+        const upT = alongY ? Math.PI / 2 + 0.5 : -0.5;
+        const lowP = at(1, lowT, 0);
+        const upP = at(1, upT, 0);
+        if (alongY) {
+          out.push(
+            text("curve", xy([lowP[0] + 0.1, lowP[1] - 0.3, 0]), "y = g₁(x)"),
+            text("curve", xy([upP[0] + 0.1, upP[1] + 0.3, 0]), "y = g₂(x)"),
+          );
+        } else {
+          out.push(
+            text("curve", xy([lowP[0] - 0.3, lowP[1] + 0.05, 0]), "x = h₁(y)"),
+            text("curve", xy([upP[0] + 0.3, upP[1] - 0.05, 0]), "x = h₂(y)"),
+          );
+        }
+      }
+
+      out.push(text("tag r", xy([CX - 0.7, CY - 0.6, 0]), "R"));
+      layer.innerHTML = out.join("");
+      resetButton.hidden = yaw === DEFAULT_YAW && pitch === DEFAULT_PITCH;
+    }
+
+    const resetButton = root.querySelector<HTMLButtonElement>("[data-reset]")!;
+    let frame = 0;
+    const stopTween = () => cancelAnimationFrame(frame);
+    resetButton.addEventListener("click", () => {
+      stopTween();
+      const TAU = 2 * Math.PI;
+      const fromYaw = yaw;
+      const fromPitch = pitch;
+      // Turn the short way round to the default yaw.
+      const dYaw =
+        ((((DEFAULT_YAW - yaw) % TAU) + 3 * Math.PI) % TAU) - Math.PI;
+      const dPitch = DEFAULT_PITCH - pitch;
+      const start = performance.now();
+      const DURATION = 400;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        yaw = DEFAULT_YAW;
+        pitch = DEFAULT_PITCH;
+        render();
+        return;
+      }
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / DURATION);
+        const e = 1 - (1 - t) ** 3;
+        if (t < 1) {
+          yaw = fromYaw + dYaw * e;
+          pitch = fromPitch + dPitch * e;
+          frame = requestAnimationFrame(step);
+        } else {
+          yaw = DEFAULT_YAW;
+          pitch = DEFAULT_PITCH;
+        }
+        render();
+      };
+      frame = requestAnimationFrame(step);
+    });
+
+    const rotate = (dYaw: number, dPitch: number) => {
+      stopTween();
+      yaw += dYaw;
+      pitch = Math.max(MIN_PITCH, Math.min(MAX_PITCH, pitch + dPitch));
+      render();
+    };
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    scene.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      scene.setPointerCapture(e.pointerId);
+    });
+    scene.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      rotate((e.clientX - lastX) * 0.01, (e.clientY - lastY) * 0.01);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    const endDrag = (e: PointerEvent) => {
+      dragging = false;
+      if (scene.hasPointerCapture(e.pointerId)) {
+        scene.releasePointerCapture(e.pointerId);
+      }
+    };
+    scene.addEventListener("pointerup", endDrag);
+    scene.addEventListener("pointercancel", endDrag);
+
+    scene.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.25 : 0.08;
+      switch (e.key) {
+        case "ArrowLeft":
+          rotate(-step, 0);
+          break;
+        case "ArrowRight":
+          rotate(step, 0);
+          break;
+        case "ArrowUp":
+          rotate(0, -step);
+          break;
+        case "ArrowDown":
+          rotate(0, step);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-region]")
+    .forEach((el) => initRegion(el));
+</script>

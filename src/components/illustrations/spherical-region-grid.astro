@@ -1,0 +1,46 @@
+---
+// All 5 common spherical regions in an auto-fitting grid: 2 or 3 per row,
+// depending on the width available.
+import SphericalRegion from "./spherical-region.astro";
+
+const variants = ["shell", "octant", "cap", "band", "cone"] as const;
+---
+
+<div class="wrap">
+  <div class="grid">
+    {variants.map((variant) => (
+      <SphericalRegion variant={variant} />
+    ))}
+  </div>
+</div>
+
+<style>
+  .wrap {
+    container-type: inline-size;
+    margin: 24px 0;
+  }
+  .grid {
+    --cols: 1;
+    --gap: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px var(--gap);
+  }
+  /* an incomplete last row is centred, so 5 items read as 3 + 2 or 2 + 2 + 1 */
+  .grid :global(.sphreg) {
+    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    min-width: 0;
+    margin: 0;
+  }
+  @container (min-width: 360px) {
+    .grid {
+      --cols: 2;
+    }
+  }
+  @container (min-width: 520px) {
+    .grid {
+      --cols: 3;
+    }
+  }
+</style>

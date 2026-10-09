@@ -1,0 +1,694 @@
+---
+// Interactive 3D pictures of the common regions in spherical coordinates. Every
+// region is a box in (ρ, φ, θ): it is bounded by up to 2 spheres, 2 cones and
+// 2 half-planes, which are drawn as translucent patches painted from the
+// farthest to the nearest. The cone variant is capped by the plane z = a
+// instead of a sphere. The scene is projected orthographically by hand and
+// redrawn by the script below. Drag the scene or use the arrow keys to rotate
+// it. The proportions are for looks, not to scale.
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import FigureCaption from "./primitives/figure-caption.astro";
+
+interface Props {
+  variant: "shell" | "octant" | "cap" | "band" | "cone";
+}
+
+const { variant } = Astro.props;
+const uid = makeUid("sphreg");
+
+const LABELS = {
+  shell:
+    "A spherical shell between the spheres of radius ρ₁ and ρ₂, with a quarter cut away to show the hollow.",
+  octant:
+    "The part of a ball of radius ρ₀ in the first octant, where all of x, y and z are non-negative.",
+  cap: "A ball of radius ρ₀ cut by the cone φ = φ₀, shaped like an ice cream cone with its tip at the origin.",
+  band: "A ball of radius ρ₀ between the cones φ = φ₁ and φ = φ₂, with a conical hole through the top and bottom.",
+  cone: "A solid cone with its tip at the origin, bounded by the cone φ = φ₀ and the plane z = a.",
+};
+---
+
+<figure class="sphreg" data-sphreg data-variant={variant} data-uid={uid}>
+  <div class="stage">
+    <svg
+      class="scene"
+      viewBox="-210 -170 420 340"
+      data-scene
+      tabindex="0"
+      role="group"
+      aria-label={`${LABELS[variant]} Drag or use arrow keys to rotate the view.`}
+    >
+      <defs>
+        <ArrowMarker id={`${uid}-ax`} fill="var(--text-muted)" size={6} />
+      </defs>
+      <g data-layer></g>
+    </svg>
+    <button type="button" class="reset" data-reset hidden>
+      Reset view
+    </button>
+  </div>
+  <FigureCaption>
+    {variant === "shell" && (
+      <>
+        The region between the <span class="c-outer">outer sphere</span> and the{" "}
+        <span class="c-inner">inner sphere</span>. A quarter is cut away to show
+        the hollow.
+      </>
+    )}
+    {variant === "octant" && (
+      <>
+        The part of a ball of radius ρ<sub>0</sub> in the first octant. Its flat
+        faces are the <span class="c-cut">coordinate planes</span>, and it is
+        bounded above by the <span class="c-outer">sphere</span>.
+      </>
+    )}
+    {variant === "cap" && (
+      <>
+        A ball cut by the <span class="c-cone">cone</span> φ = φ<sub>0</sub>.
+        The <span class="c-outer">sphere</span> caps the cone, which has its tip
+        at the origin.
+      </>
+    )}
+    {variant === "band" && (
+      <>
+        A ball between 2 <span class="c-cone">cones</span> φ = φ<sub>1</sub> and
+        φ = φ<sub>2</sub>, capped by the <span class="c-outer">sphere</span>.
+        The cones cut a hole through the top and bottom.
+      </>
+    )}
+    {variant === "cone" && (
+      <>
+        A solid enclosed laterally by the <span class="c-cone">cone</span> φ = φ
+        <sub>0</sub> and above by the <span class="c-outer">plane</span> z = a.
+      </>
+    )}
+  </FigureCaption>
+</figure>
+
+<style>
+  .sphreg {
+    margin: 24px 0;
+  }
+  .stage {
+    position: relative;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .scene {
+    display: block;
+    /* the article's "svg:not(.katex svg)" rule is more specific, so !important */
+    width: 100% !important;
+    height: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    cursor: grab;
+    border-radius: 6px;
+  }
+  .scene:active {
+    cursor: grabbing;
+  }
+  .scene:focus-visible,
+  .reset:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .reset {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .sphreg :global(polygon) {
+    stroke-width: 0.5;
+    stroke-opacity: 0.25;
+    stroke-linejoin: round;
+  }
+  .sphreg :global(polygon.outer) {
+    fill: var(--dia-pt);
+    stroke: var(--dia-pt);
+  }
+  .sphreg :global(polygon.inner) {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+  .sphreg :global(polygon.cone) {
+    fill: var(--dia-ct);
+    stroke: var(--dia-ct);
+  }
+  .sphreg :global(polygon.cut) {
+    fill: var(--dia-key);
+    stroke: var(--dia-key);
+  }
+  .sphreg :global(polygon.rim) {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-opacity: 0.9;
+  }
+  .sphreg :global(.axis) {
+    stroke: var(--text-muted);
+    stroke-width: 1.2;
+  }
+  .sphreg :global(.axlabel) {
+    fill: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-style: italic;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .sphreg :global(.tag) {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+  .sphreg :global(text.outer) {
+    fill: var(--dia-pt);
+  }
+  .sphreg :global(text.inner) {
+    fill: var(--accent);
+  }
+  .sphreg :global(text.cone) {
+    fill: var(--dia-ct);
+  }
+  .sphreg :global(text.cut) {
+    fill: var(--dia-key);
+  }
+  .c-outer {
+    color: var(--dia-pt);
+    font-weight: 600;
+  }
+  .c-inner {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .c-cone {
+    color: var(--dia-ct);
+    font-weight: 600;
+  }
+  .c-cut {
+    color: var(--dia-key);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  type Vec = [number, number, number];
+  type Variant = "shell" | "octant" | "cap" | "band" | "cone";
+  type Tone = "outer" | "inner" | "cone" | "cut";
+  type Tag = {
+    at: Vec;
+    dx: number;
+    dy: number;
+    text: string;
+    tone: Tone;
+    anchor?: "start" | "end" | "middle";
+  };
+
+  const SCALE = 58;
+  const DEFAULT_YAW = -0.75;
+  const DEFAULT_PITCH = 0.42;
+  const MIN_PITCH = -1.45;
+  const MAX_PITCH = 1.45;
+
+  const PI = Math.PI;
+  const R = 1.8;
+  const A = 1.6;
+
+  const sph = (rho: number, phi: number, theta: number): Vec => [
+    rho * Math.sin(phi) * Math.cos(theta),
+    rho * Math.sin(phi) * Math.sin(theta),
+    rho * Math.cos(phi),
+  ];
+
+  interface Region {
+    r1: number;
+    r2: (phi: number) => number;
+    p1: number;
+    p2: number;
+    t1: number;
+    t2: number;
+    tags: Tag[];
+  }
+
+  const REGIONS: Record<Variant, Region> = {
+    shell: {
+      r1: 1,
+      r2: () => R,
+      p1: 0,
+      p2: PI,
+      t1: 0,
+      t2: 1.5 * PI,
+      tags: [
+        {
+          at: sph(R, 0.55 * PI, 1.25 * PI),
+          dx: -6,
+          dy: 0,
+          text: "ρ = ρ_2",
+          tone: "outer",
+          anchor: "end",
+        },
+        {
+          at: sph(1, 0.5 * PI, 0.75 * PI),
+          dx: 0,
+          dy: 4,
+          text: "ρ = ρ_1",
+          tone: "inner",
+          anchor: "middle",
+        },
+      ],
+    },
+    octant: {
+      r1: 0,
+      r2: () => R,
+      p1: 0,
+      p2: PI / 2,
+      t1: 0,
+      t2: PI / 2,
+      tags: [
+        {
+          at: sph(R, 0.3 * PI, 0.25 * PI),
+          dx: 10,
+          dy: -6,
+          text: "ρ = ρ_0",
+          tone: "outer",
+          anchor: "start",
+        },
+      ],
+    },
+    cap: {
+      r1: 0,
+      r2: () => R,
+      p1: 0,
+      p2: PI / 3,
+      t1: 0,
+      t2: 2 * PI,
+      tags: [
+        {
+          at: sph(R, 0.17 * PI, 0.1 * PI),
+          dx: 12,
+          dy: -8,
+          text: "ρ = ρ_0",
+          tone: "outer",
+          anchor: "start",
+        },
+        {
+          at: sph(R, PI / 3, 1.25 * PI),
+          dx: -8,
+          dy: 8,
+          text: "φ = φ_0",
+          tone: "cone",
+          anchor: "end",
+        },
+      ],
+    },
+    band: {
+      r1: 0,
+      r2: () => R,
+      p1: PI / 6,
+      p2: (2 * PI) / 3,
+      t1: 0,
+      t2: 2 * PI,
+      tags: [
+        {
+          at: sph(R, 0.42 * PI, 0.15 * PI),
+          dx: 6,
+          dy: -4,
+          text: "ρ = ρ_0",
+          tone: "outer",
+          anchor: "start",
+        },
+        {
+          at: sph(R, PI / 6, 1.25 * PI),
+          dx: -8,
+          dy: 0,
+          text: "φ = φ_1",
+          tone: "cone",
+          anchor: "end",
+        },
+        {
+          at: sph(R, (2 * PI) / 3, 1.25 * PI),
+          dx: -8,
+          dy: 8,
+          text: "φ = φ_2",
+          tone: "cone",
+          anchor: "end",
+        },
+      ],
+    },
+    cone: {
+      r1: 0,
+      r2: (phi) => A / Math.cos(phi),
+      p1: 0,
+      p2: PI / 4,
+      t1: 0,
+      t2: 2 * PI,
+      tags: [
+        {
+          at: [0, 0, A],
+          dx: 12,
+          dy: -16,
+          text: "z = a",
+          tone: "outer",
+          anchor: "start",
+        },
+        {
+          at: sph(A * Math.SQRT2, PI / 4, 1.25 * PI),
+          dx: -8,
+          dy: 8,
+          text: "φ = φ_0",
+          tone: "cone",
+          anchor: "end",
+        },
+      ],
+    },
+  };
+
+  const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
+
+  type Grid = Vec[][];
+  interface Patch {
+    tone: Tone;
+    grid: Grid;
+    // True when the grid's 2nd index runs once around the z-axis.
+    turns?: boolean;
+  }
+
+  // grid[i][j] with i over (0..nu) and j over (0..nv).
+  function build(
+    nu: number,
+    nv: number,
+    fn: (u: number, v: number) => Vec,
+  ): Grid {
+    return Array.from({ length: nu + 1 }, (_, i) =>
+      Array.from({ length: nv + 1 }, (_, j) => fn(i / nu, j / nv)),
+    );
+  }
+
+  function patchesOf(cfg: Region): Patch[] {
+    const { r1, r2, p1, p2, t1, t2 } = cfg;
+    const dT = t2 - t1;
+    const fullTurn = dT >= 2 * PI - 1e-9;
+    const nT = Math.max(4, Math.ceil((26 * dT) / (2 * PI)));
+    const nP = Math.max(4, Math.ceil((18 * (p2 - p1)) / PI));
+    const nS = 5;
+    const patches: Patch[] = [];
+
+    // Outer boundary: a sphere, or the plane z = a for the cone.
+    patches.push({
+      tone: "outer",
+      turns: fullTurn,
+      grid: build(nP, nT, (u, v) => {
+        const phi = lerp(p1, p2, u);
+        return sph(r2(phi), phi, lerp(t1, t2, v));
+      }),
+    });
+    if (r1 > 0) {
+      patches.push({
+        tone: "inner",
+        turns: fullTurn,
+        grid: build(nP, nT, (u, v) =>
+          sph(r1, lerp(p1, p2, u), lerp(t1, t2, v)),
+        ),
+      });
+    }
+    for (const phi of [p1, p2]) {
+      if (phi <= 0 || phi >= PI) continue;
+      patches.push({
+        tone: Math.abs(phi - PI / 2) < 1e-9 ? "cut" : "cone",
+        turns: fullTurn,
+        grid: build(nS, nT, (u, v) =>
+          sph(lerp(r1, r2(phi), u), phi, lerp(t1, t2, v)),
+        ),
+      });
+    }
+    if (!fullTurn) {
+      for (const theta of [t1, t2]) {
+        patches.push({
+          tone: "cut",
+          grid: build(nS, nP, (u, v) => {
+            const phi = lerp(p1, p2, v);
+            return sph(lerp(r1, r2(phi), u), phi, theta);
+          }),
+        });
+      }
+    }
+    return patches;
+  }
+
+  const sub = (a: Vec, b: Vec): Vec => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a: Vec, b: Vec): Vec => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+
+  function initSphreg(root: HTMLElement) {
+    if (root.dataset.sphregInit) return;
+    root.dataset.sphregInit = "1";
+
+    const cfg = REGIONS[root.dataset.variant as Variant];
+    const uid = root.dataset.uid!;
+    const scene = root.querySelector<SVGSVGElement>("[data-scene]")!;
+    const layer = root.querySelector<SVGGElement>("[data-layer]")!;
+    const patches = patchesOf(cfg);
+
+    // Rotate about the middle of the solid so it stays centred.
+    const all = patches.flatMap((p) => p.grid.flat());
+    const mid = [0, 1, 2].map((k) => {
+      const v = all.map((p) => p[k]);
+      return (Math.min(...v) + Math.max(...v)) / 2;
+    }) as Vec;
+    const axisLen = Math.max(R, A * Math.SQRT2 * 0.72) + 0.7;
+
+    let yaw = DEFAULT_YAW;
+    let pitch = DEFAULT_PITCH;
+
+    // Rotate about z by yaw, then about x by pitch. Returns the screen point
+    // and `far`, which is larger the farther the point is from the viewer.
+    function project(p: Vec) {
+      const x = p[0] - mid[0];
+      const y = p[1] - mid[1];
+      const z = p[2] - mid[2];
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const x1 = x * cy - y * sy;
+      const y1 = x * sy + y * cy;
+      return {
+        x: SCALE * x1,
+        y: -SCALE * (y1 * sp + z * cp),
+        far: y1 * cp - z * sp,
+      };
+    }
+    const xy = (p: Vec) => {
+      const { x, y } = project(p);
+      return { x: +x.toFixed(1), y: +y.toFixed(1) };
+    };
+    const pt = (p: Vec) => {
+      const { x, y } = xy(p);
+      return `${x},${y}`;
+    };
+
+    // Shade from how squarely the patch faces the viewer, 0 (edge-on) to 1.
+    function facing(a: Vec, b: Vec, c: Vec): number {
+      const n = cross(sub(b, a), sub(c, a));
+      const len = Math.hypot(n[0], n[1], n[2]);
+      if (len < 1e-9) return 0.5;
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const y1 = n[0] * sy + n[1] * cy;
+      return Math.abs(y1 * cp - n[2] * sp) / len;
+    }
+
+    function render() {
+      const out: string[] = [];
+
+      const faces: { far: number; html: string }[] = [];
+      for (const { tone, grid } of patches) {
+        for (let i = 0; i < grid.length - 1; i++) {
+          for (let j = 0; j < grid[0].length - 1; j++) {
+            const q = [
+              grid[i][j],
+              grid[i + 1][j],
+              grid[i + 1][j + 1],
+              grid[i][j + 1],
+            ];
+            const o = (0.1 + 0.34 * facing(q[0], q[1], q[3])).toFixed(2);
+            faces.push({
+              far: q.reduce((s, p) => s + project(p).far, 0) / 4,
+              html: `<polygon class="${tone}" style="fill-opacity:${o}" points="${q.map(pt).join(" ")}"/>`,
+            });
+          }
+        }
+      }
+      faces.sort((a, b) => b.far - a.far);
+      for (const f of faces) out.push(f.html);
+
+      // Outline of each patch: the border of its grid. A full turn has no
+      // seam, so only its 2 end rows are drawn.
+      for (const { tone, grid, turns } of patches) {
+        const last = grid.length - 1;
+        const lastJ = grid[0].length - 1;
+        const rings: Vec[][] = turns
+          ? [grid[0], grid[last]]
+          : [
+              [
+                ...grid.map((row) => row[0]),
+                ...grid[last].slice(1),
+                ...grid
+                  .map((row) => row[lastJ])
+                  .reverse()
+                  .slice(1),
+                ...grid[0].slice(0, -1).reverse(),
+              ],
+            ];
+        for (const ring of rings) {
+          out.push(
+            `<polygon class="rim ${tone}" points="${ring.map(pt).join(" ")}"/>`,
+          );
+        }
+      }
+
+      const o = xy([0, 0, 0]);
+      for (const [key, tip, label] of [
+        ["x", [axisLen, 0, 0], [axisLen + 0.35, 0, 0]],
+        ["y", [0, axisLen, 0], [0, axisLen + 0.35, 0]],
+        ["z", [0, 0, axisLen], [0, 0, axisLen + 0.35]],
+      ] as [string, Vec, Vec][]) {
+        const t = xy(tip);
+        const l = xy(label);
+        out.push(
+          `<line class="axis" x1="${o.x}" y1="${o.y}" x2="${t.x}" y2="${t.y}" marker-end="url(#${uid}-ax)"/>`,
+          `<text class="axlabel" x="${l.x}" y="${l.y}">${key}</text>`,
+        );
+      }
+
+      for (const t of cfg.tags) {
+        const p = xy(t.at);
+        const [main, subText] = t.text.split("_");
+        const html = subText
+          ? `${main}<tspan dy="3" font-size="11">${subText}</tspan>`
+          : main;
+        out.push(
+          `<text class="tag ${t.tone}" x="${p.x + t.dx}" y="${p.y + t.dy}" text-anchor="${t.anchor ?? "middle"}">${html}</text>`,
+        );
+      }
+
+      layer.innerHTML = out.join("");
+      reset.hidden = yaw === DEFAULT_YAW && pitch === DEFAULT_PITCH;
+    }
+
+    const reset = root.querySelector<HTMLButtonElement>("[data-reset]")!;
+    let frame = 0;
+    const stopTween = () => cancelAnimationFrame(frame);
+    reset.addEventListener("click", () => {
+      stopTween();
+      const TAU = 2 * Math.PI;
+      const fromYaw = yaw;
+      const fromPitch = pitch;
+      // Turn the short way round to the default yaw.
+      const dYaw =
+        ((((DEFAULT_YAW - yaw) % TAU) + 3 * Math.PI) % TAU) - Math.PI;
+      const dPitch = DEFAULT_PITCH - pitch;
+      const start = performance.now();
+      const DURATION = 400;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        yaw = DEFAULT_YAW;
+        pitch = DEFAULT_PITCH;
+        render();
+        return;
+      }
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / DURATION);
+        const e = 1 - (1 - t) ** 3;
+        if (t < 1) {
+          yaw = fromYaw + dYaw * e;
+          pitch = fromPitch + dPitch * e;
+          frame = requestAnimationFrame(step);
+        } else {
+          yaw = DEFAULT_YAW;
+          pitch = DEFAULT_PITCH;
+        }
+        render();
+      };
+      frame = requestAnimationFrame(step);
+    });
+
+    const rotate = (dYaw: number, dPitch: number) => {
+      stopTween();
+      yaw += dYaw;
+      pitch = Math.max(MIN_PITCH, Math.min(MAX_PITCH, pitch + dPitch));
+      render();
+    };
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    scene.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      scene.setPointerCapture(e.pointerId);
+    });
+    scene.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      rotate((e.clientX - lastX) * 0.01, (e.clientY - lastY) * 0.01);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    const endDrag = (e: PointerEvent) => {
+      dragging = false;
+      if (scene.hasPointerCapture(e.pointerId)) {
+        scene.releasePointerCapture(e.pointerId);
+      }
+    };
+    scene.addEventListener("pointerup", endDrag);
+    scene.addEventListener("pointercancel", endDrag);
+
+    scene.addEventListener("keydown", (e) => {
+      const step = e.shiftKey ? 0.25 : 0.08;
+      switch (e.key) {
+        case "ArrowLeft":
+          rotate(-step, 0);
+          break;
+        case "ArrowRight":
+          rotate(step, 0);
+          break;
+        case "ArrowUp":
+          rotate(0, -step);
+          break;
+        case "ArrowDown":
+          rotate(0, step);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    });
+
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-sphreg]")
+    .forEach((el) => initSphreg(el));
+</script>

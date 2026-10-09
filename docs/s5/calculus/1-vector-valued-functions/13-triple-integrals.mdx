@@ -1,0 +1,259 @@
+---
+title: Triple Integrals
+dateCreated: 2026-07-24T02:50:13.245Z
+lastUpdatedOn: 2026-10-09T14:17:08.067Z
+---
+
+Let $G$ be a bounded solid region and $f$ a real-valued function defined on $G$. Partition a rectangular box containing $G$ into sub-boxes by planes parallel to the coordinate planes, and choose a sample point $(x_k^*, y_k^*, z_k^*)$ in each resulting subregion of volume $\Delta V_k$. The triple integral of $f$ over $G$ is
+
+$$
+\iiint_G f\,\text{d}V = \lim_{n \to \infty} \sum_{k=1}^{n} f(x_k^*, y_k^*, z_k^*)\,\Delta V_k
+$$
+
+provided the limit exists.
+
+## Properties
+
+Suppose $f$ and $g$ integrable over $G$, and $c \in \mathbb{R}$:
+
+- $\displaystyle \iiint_G 1\,\text{d}V$: volume of $G$
+- $\displaystyle\iiint_G f\,\text{d}V$: mass of $G$ with $f$ density
+- $\displaystyle\iiint_G cf\,\text{d}V = c\iiint_G f\,\text{d}V$
+- $\displaystyle\iiint_G (f+g)\,\text{d}V = \iiint_G f\,\text{d}V + \iiint_G g\,\text{d}V$
+- If $G = G_1 \cup G_2$ with $G_1$, $G_2$ having disjoint interiors,  
+  $\displaystyle\iiint_G f\,\text{d}V = \iiint_{G_1} f\,\text{d}V + \iiint_{G_2} f\,\text{d}V$
+
+## Fubini's Theorem
+
+Let $G$ be the rectangular box $a \le x \le b$, $c \le y \le d$, $k \le z \le l$.
+
+If $f$ is continuous on $G$:
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \int_a^b \int_c^d \int_k^l f(x,y,z)\,\text{d}z\,\text{d}y\,\text{d}x
+$$
+
+<Note>
+
+The iterated integral can be written in any of the 5 other orders obtained by permuting the order of integrations (limits and $\text{d}x$, $\text{d}y$, $\text{d}z$).
+
+</Note>
+
+The box is cut into thin slabs perpendicular to the $x$-axis. Each slab is cut into columns parallel to the $z$-axis. The inner integral adds up $f$ along 1 column. The middle integral adds up the columns across 1 slab. The outer integral adds up the slabs from $x = a$ to $x = b$.
+
+<FubiniSlicing />
+
+If $f(x,y,z) = p(x)\,q(y)\,r(z)$ is a product of single-variable continuous functions, the iterated integral splits into 3 single integrals. Each inner integral pulls the factors that don't depend on its variable outside, and the limits are constants because $G$ is a box.
+
+$$
+\iiint_G p(x)\,q(y)\,r(z)\,\text{d}V = \int_a^b p(x)\,\text{d}x \cdot \int_c^d q(y)\,\text{d}y \cdot \int_k^l r(z)\,\text{d}z
+$$
+
+## Regions of Integration
+
+A solid region $G$ is a simple $xy$-solid region **iff**:
+
+- Bounded above by $z = v(x,y)$ and below by $z = u(x,y)$
+- $u$, $v$ continuous on the projection $R$ of $G$ onto the $xy$-plane
+- $u(x,y) \le v(x,y)$ for all $(x,y) \in R$
+
+<RegionSolid variant="xy-solid" />
+
+For $f$ continuous on $G$,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \iint_R \left( \int_{u(x,y)}^{v(x,y)} f(x,y,z)\,\text{d}z \right) \text{d}A
+$$
+
+The projection $R$ can be:
+
+- Type I, or vertically simple  
+  $R = \{(x,y) : a \le x \le b,\ g_1(x) \le y \le g_2(x)\}$
+- Type II, or horizontally simple  
+  $R = \{(x,y) : c \le y \le d,\ h_1(y) \le x \le h_2(y)\}$
+
+If $R$ is Type I,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \int_a^b \int_{g_1(x)}^{g_2(x)} \int_{u(x,y)}^{v(x,y)} f(x,y,z)\,\text{d}z\,\text{d}y\,\text{d}x
+$$
+
+<RegionSolid variant="type-1" />
+
+If $R$ is Type II,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \int_c^d \int_{h_1(y)}^{h_2(y)} \int_{u(x,y)}^{v(x,y)} f(x,y,z)\,\text{d}z\,\text{d}x\,\text{d}y
+$$
+
+The region is similar to type 1 but the axes switched.
+
+<Note>
+
+Analogous iterated integrals hold if $G$ is projected onto the $yz$-plane or $zx$-plane instead.
+
+</Note>
+
+## Change of Variables
+
+Let $T$ be a transformation from $uvw$-space to $xyz$-space mapping a region $S$ onto a region $R$. If:
+
+- $T$ is one-to-one on $S$
+- $T$ has continuous first partial derivatives
+- The [Jacobian](/s5/calculus/vector-valued-functions/jacobian) $\dfrac{\partial(x,y,z)}{\partial(u,v,w)}$ is non-zero and does not change sign on $S$
+
+then
+
+$$
+\iiint_R f(x,y,z)\,\text{d}V = \iiint_S f(x(u,v,w), y(u,v,w), z(u,v,w)) \left| \frac{\partial(x,y,z)}{\partial(u,v,w)} \right| \text{d}V
+$$
+
+## Cylindrical Coordinates
+
+In [cylindrical coordinates](/s5/calculus/vector-valued-functions/coordinate-systems#cylindrical-coordinates), the volume element is
+
+$$
+\text{d}V = r\,\text{d}z\,\text{d}r\,\text{d}\theta
+$$
+
+Here $r$ is the Jacobian $\dfrac{\partial(x,y,z)}{\partial(r,\theta,z)}$ of the [change of variables](#change-of-variables).
+
+Let $G$ have upper surface $z = v(r,\theta)$ and lower surface $z = u(r,\theta)$, with projection onto the $xy$-plane a simple polar region $R'$ in the $r\theta$-plane. For $f$ continuous on $G$,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \iint_{R'} \left( \int_{u(r,\theta)}^{v(r,\theta)} f(r\cos\theta, r\sin\theta, z)\,\text{d}z \right) r\,\text{d}A
+$$
+
+If for each fixed $\theta \in [\alpha, \beta]$, $r$ varies from $r_1(\theta)$ to $r_2(\theta)$,
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \int_\alpha^\beta \int_{r_1(\theta)}^{r_2(\theta)} \int_{u(r,\theta)}^{v(r,\theta)} f(r\cos\theta, r\sin\theta, z)\,r\,\text{d}z\,\text{d}r\,\text{d}\theta
+$$
+
+## Spherical Coordinates
+
+In [spherical coordinates](/s5/calculus/vector-valued-functions/coordinate-systems#spherical-coordinates), the volume element is
+
+$$
+\text{d}V = \rho^2 \sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta
+$$
+
+Here $\rho^2\sin\phi$ is the Jacobian $\dfrac{\partial(x,y,z)}{\partial(\rho,\phi,\theta)}$ of the [change of variables](#change-of-variables).
+
+For $f$ continuous on $G$, with appropriate limits (see [common spherical regions](/s5/calculus/vector-valued-functions/coordinate-systems#common-spherical-regions)),
+
+$$
+\iiint_G f(x,y,z)\,\text{d}V = \iiint f(\rho\sin\phi\cos\theta, \rho\sin\phi\sin\theta, \rho\cos\phi)\,\rho^2\sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta
+$$
+
+## Worked Examples
+
+### Box
+
+Evaluate $\iiint_G xyz\,\text{d}V$ over $G: 0 \le x \le 1,\ 0 \le y \le 2,\ 0 \le z \le 3$.
+
+The integrand $xyz$ is a product of single-variable functions and $G$ is a box, so the integral separates into 3 single integrals.
+
+$$
+\int_0^1 x\,\text{d}x \cdot \int_0^2 y\,\text{d}y \cdot \int_0^3 z\,\text{d}z = \frac{1}{2} \cdot 2 \cdot \frac{9}{2} = \frac{9}{2}
+$$
+
+### Tetrahedron
+
+Find the volume of the solid bounded by the planes $x = 0$, $y = 0$, $z = 0$ and $x + y + z = 1$.
+
+The solid lies between $z = 0$ and $z = 1 - x - y$. The projection onto the $xy$-plane is the triangle $0 \le x \le 1$, $0 \le y \le 1 - x$.
+
+$$
+V = \int_0^1 \int_0^{1-x} \int_0^{1-x-y} \text{d}z\,\text{d}y\,\text{d}x
+$$
+
+Integrate with respect to $z$.
+
+$$
+V = \int_0^1 \int_0^{1-x} (1 - x - y)\,\text{d}y\,\text{d}x
+$$
+
+Integrate with respect to $y$.
+
+$$
+V = \int_0^1 \left[ (1-x)y - \frac{y^2}{2} \right]_0^{1-x} \text{d}x = \int_0^1 \frac{(1-x)^2}{2}\,\text{d}x
+$$
+
+Integrate with respect to $x$.
+
+$$
+V = \left[ -\frac{(1-x)^3}{6} \right]_0^1 = \frac{1}{6}
+$$
+
+### Paraboloid
+
+Find the volume of the solid between the plane $z = 0$ and the paraboloid $z = 4 - x^2 - y^2$.
+
+The paraboloid meets $z = 0$ on the circle $x^2 + y^2 = 4$, so the projection of the solid onto the $xy$-plane is a disk. In Cartesian coordinates, the disk gives limits with square roots.
+
+$$
+V = \int_{-2}^{2} \int_{-\sqrt{4-x^2}}^{\sqrt{4-x^2}} \int_0^{4 - x^2 - y^2} \text{d}z\,\text{d}y\,\text{d}x
+$$
+
+The surface and the disk both depend on $x$ and $y$ only through $x^2 + y^2$, which is $r^2$ in cylindrical coordinates. Cylindrical coordinates turn the disk into the rectangle $0 \le r \le 2$, $0 \le \theta \le 2\pi$ and the height into $z = 4 - r^2$, so every limit is simple. The volume element is $\text{d}V = r\,\text{d}z\,\text{d}r\,\text{d}\theta$.
+
+$$
+V = \int_0^{2\pi} \int_0^2 \int_0^{4 - r^2} r\,\text{d}z\,\text{d}r\,\text{d}\theta
+$$
+
+Integrate with respect to $z$.
+
+$$
+V = \int_0^{2\pi} \int_0^2 (4r - r^3)\,\text{d}r\,\text{d}\theta
+$$
+
+Integrate with respect to $r$.
+
+$$
+V = \int_0^{2\pi} \left[ 2r^2 - \frac{r^4}{4} \right]_0^2 \text{d}\theta = \int_0^{2\pi} 4\,\text{d}\theta = 8\pi
+$$
+
+### Ball
+
+Evaluate $\iiint_G (x^2 + y^2 + z^2)\,\text{d}V$ over the unit ball $x^2 + y^2 + z^2 \le 1$.
+
+In Cartesian coordinates, the ball gives limits with nested square roots.
+
+$$
+\int_{-1}^{1} \int_{-\sqrt{1-x^2}}^{\sqrt{1-x^2}} \int_{-\sqrt{1-x^2-y^2}}^{\sqrt{1-x^2-y^2}} (x^2 + y^2 + z^2)\,\text{d}z\,\text{d}y\,\text{d}x
+$$
+
+The region and the integrand both depend on $x$, $y$ and $z$ only through $x^2 + y^2 + z^2 = \rho^2$, the squared distance from the origin. Spherical coordinates turn the ball into the box $0 \le \rho \le 1$, $0 \le \phi \le \pi$, $0 \le \theta \le 2\pi$ and the integrand into $\rho^2$, so every limit is constant. The volume element is $\text{d}V = \rho^2 \sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta$.
+
+$$
+\iiint_G (x^2 + y^2 + z^2)\,\text{d}V = \int_0^{2\pi} \int_0^\pi \int_0^1 \rho^2 \cdot \rho^2 \sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta
+$$
+
+The integral separates.
+
+$$
+\int_0^{2\pi} \text{d}\theta \cdot \int_0^\pi \sin\phi\,\text{d}\phi \cdot \int_0^1 \rho^4\,\text{d}\rho = 2\pi \cdot 2 \cdot \frac{1}{5} = \frac{4\pi}{5}
+$$
+
+### Cone
+
+Find the volume of the solid enclosed laterally by the cone $\phi = \frac{\pi}{4}$ and above by the plane $z = 1$.
+
+From the last region in [common spherical regions](/s5/calculus/vector-valued-functions/coordinate-systems#common-spherical-regions) with $a = 1$, the limits are $0 \le \rho \le \sec\phi$, $0 \le \phi \le \frac{\pi}{4}$, $0 \le \theta \le 2\pi$.
+
+$$
+V = \int_0^{2\pi} \int_0^{\pi/4} \int_0^{\sec\phi} \rho^2 \sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta
+$$
+
+Integrate with respect to $\rho$.
+
+$$
+V = \int_0^{2\pi} \int_0^{\pi/4} \frac{\sec^3\phi \sin\phi}{3}\,\text{d}\phi\,\text{d}\theta = \frac{2\pi}{3} \int_0^{\pi/4} \tan\phi \sec^2\phi\,\text{d}\phi
+$$
+
+Integrate with respect to $\phi$.
+
+$$
+V = \frac{2\pi}{3} \left[ \frac{\tan^2\phi}{2} \right]_0^{\pi/4} = \frac{2\pi}{3} \cdot \frac{1}{2} = \frac{\pi}{3}
+$$
