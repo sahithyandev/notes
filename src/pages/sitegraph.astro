@@ -1,0 +1,1175 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+import { NoteGraph } from "../utils/note-graph";
+
+// The whole graph is computed here, before anything is rendered
+const notes = await getCollection("notes");
+const graph = NoteGraph.build(
+  notes.map((n) => ({
+    id: n.id,
+    title: n.data.title,
+    filePath: n.filePath,
+    prereqs: n.data.prereqs,
+  })),
+);
+---
+
+<Layout
+  title={`Site Graph | ${SITE_NAME}`}
+  description="All notes as a graph"
+  canonical={`${SITE_HOST_URL}/sitegraph`}
+  noindex
+>
+  <main id="graph-root">
+    <canvas id="graph-canvas" aria-label="Graph of all notes"></canvas>
+    <header class="hud">
+      <a href="/" class="back">
+        ← Home
+      </a>
+      <h1>Site Graph</h1>
+      <p class="stats">
+        {graph.nodes.length} notes, {graph.edges.length} links
+      </p>
+      <div class="search">
+        <input
+          id="q"
+          type="search"
+          placeholder="Find a note"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Find a note"
+        />
+        <kbd>/</kbd>
+      </div>
+      <ul id="results" hidden></ul>
+      <ul id="legend"></ul>
+      <p class="hint">
+        Drag space to pan, drag a note to tug it, scroll to zoom, click a note
+        to open it. Arrows point from a prerequisite to the note that needs it.
+      </p>
+      <div class="actions">
+        <button id="longest" type="button" aria-pressed="false">
+          Longest path
+        </button>
+        <button id="reset" type="button">
+          Reset view
+        </button>
+      </div>
+      <div id="path-info" hidden>
+        <p id="path-summary"></p>
+      </div>
+    </header>
+    <div id="tip" role="tooltip" hidden></div>
+    <script
+      id="graph-data"
+      type="application/json"
+      set:html={JSON.stringify(graph.toJSON())}
+    />
+  </main>
+</Layout>
+
+<style is:global>
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+</style>
+
+<style>
+  #graph-root {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+  }
+
+  #graph-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  #graph-canvas.dragging {
+    cursor: grabbing;
+  }
+
+  .hud {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 280px;
+    max-width: calc(100vw - 32px);
+    padding: 14px 16px 16px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .hud h1 {
+    margin: 6px 0 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .stats {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .back {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .search {
+    position: relative;
+  }
+
+  .search input {
+    width: 100%;
+    padding: 7px 30px 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+    color: var(--text-primary);
+    font: inherit;
+    outline: none;
+  }
+
+  .search input:focus {
+    border-color: var(--accent);
+  }
+
+  .search kbd {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  #results {
+    margin: 6px 0 0;
+    padding: 4px;
+    list-style: none;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  #results :global(button) {
+    display: block;
+    width: 100%;
+    padding: 5px 8px;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  #results :global(button:hover),
+  #results :global(button.active) {
+    background: var(--surface);
+  }
+
+  #results :global(small) {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+
+  #legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #legend :global(button) {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px 2px 6px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  #legend :global(button[aria-pressed="false"]) {
+    opacity: 0.4;
+  }
+
+  #legend :global(i) {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .hint {
+    margin: 12px 0 8px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  #path-info {
+    margin: 10px 0 0;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+  }
+
+  #path-info p {
+    margin: 0;
+  }
+
+  #path-info :global(b) {
+    color: var(--text-primary);
+  }
+
+  #path-info details {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 11.5px;
+  }
+
+  #path-info summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  #path-info details p {
+    margin-top: 6px;
+  }
+
+  #longest[aria-pressed="true"] {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  #longest:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  #reset,
+  #longest {
+    padding: 4px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border-strong);
+    background: none;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 11.5px;
+    cursor: pointer;
+  }
+
+  #reset:hover,
+  #longest:not(:disabled):hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  #tip {
+    position: fixed;
+    pointer-events: none;
+    max-width: 300px;
+    padding: 8px 11px;
+    border-radius: 9px;
+    background: var(--surface);
+    border: 1px solid var(--tone, var(--border-strong));
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  #tip :global(strong) {
+    display: block;
+    color: var(--tone, var(--text-primary));
+    font-size: 13px;
+  }
+
+  #tip :global(small) {
+    display: block;
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+
+  #tip :global(p) {
+    margin: 6px 0 0;
+  }
+
+  #tip :global(b) {
+    margin-right: 6px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+</style>
+
+<script>
+  import { NoteGraph } from "../utils/note-graph";
+  import {
+    forceSimulation,
+    forceManyBody,
+    forceCollide,
+    forceX,
+    forceY,
+    forceLink,
+    type SimulationNodeDatum,
+  } from "d3-force";
+
+  // Kind 0 joins consecutive notes of a module, kind 1 is a prerequisite
+  type Link = [GNode, GNode, number];
+
+  interface GNode extends SimulationNodeDatum {
+    id: string;
+    title: string;
+    sem: number;
+    module: string;
+    group: string;
+    ax: number;
+    ay: number;
+    r: number;
+    delay: number;
+    ins: GNode[];
+    outs: GNode[];
+  }
+
+  interface Blob {
+    members: GNode[];
+    sem: number;
+    label: string;
+    x: number;
+    y: number;
+    r: number;
+  }
+
+  // The graph arrives already computed, this script only lays it out and draws it
+  const graph = NoteGraph.fromJSON(
+    JSON.parse(document.getElementById("graph-data")!.textContent ?? "{}"),
+  );
+  const data = { nodes: graph.nodes };
+
+  const canvas = document.getElementById("graph-canvas") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+  const tip = document.getElementById("tip")!;
+  const legend = document.getElementById("legend")!;
+  const input = document.getElementById("q") as HTMLInputElement;
+  const results = document.getElementById("results")!;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------------------------------------------------------------- layout
+  // Three nested levels: semesters on a ring, modules inside a semester and
+  // groups (a module's own notes, or one submodule) inside a module. Each
+  // level places its children on a circle just big enough to keep them apart.
+  const GAP = 60;
+  const groupCounts = new Map<string, number>();
+  const groupsByModule = new Map<string, string[]>();
+  const modulesBySem = new Map<number, string[]>();
+  for (const n of data.nodes) {
+    const c = groupCounts.get(n.group) ?? 0;
+    groupCounts.set(n.group, c + 1);
+    if (c) continue;
+    if (!groupsByModule.has(n.module)) {
+      groupsByModule.set(n.module, []);
+      (modulesBySem.get(n.sem) ?? modulesBySem.set(n.sem, []).get(n.sem)!).push(
+        n.module,
+      );
+    }
+    groupsByModule.get(n.module)!.push(n.group);
+  }
+  const groupR = (g: string) => 18 * Math.sqrt(groupCounts.get(g)!) + 16;
+
+  // Returns the radius that encloses the whole ring of children
+  function ringLayout(
+    items: string[],
+    radius: (k: string) => number,
+    offsets: Map<string, [number, number]>,
+  ) {
+    items.sort();
+    const radii = items.map(radius).sort((a, b) => b - a);
+    let ring = 0;
+    if (items.length > 1) {
+      const byCircumference =
+        radii.reduce((sum, r) => sum + 2 * r + GAP, 0) / (2 * Math.PI);
+      // The 2 biggest children must clear each other even when adjacent
+      const byPair =
+        (radii[0] + radii[1] + GAP) / (2 * Math.sin(Math.PI / items.length));
+      ring = Math.max(byCircumference, byPair);
+    }
+    items.forEach((k, i) => {
+      const a = (i / items.length) * Math.PI * 2;
+      offsets.set(k, [Math.cos(a) * ring, Math.sin(a) * ring]);
+    });
+    return ring + radii[0];
+  }
+
+  const groupOffsets = new Map<string, [number, number]>();
+  const moduleOffsets = new Map<string, [number, number]>();
+  const moduleRadius = new Map<string, number>();
+  for (const [m, groups] of groupsByModule) {
+    moduleRadius.set(m, ringLayout(groups, groupR, groupOffsets));
+  }
+  const semRadius = new Map<number, number>();
+  for (const [sem, mods] of modulesBySem) {
+    semRadius.set(
+      sem,
+      ringLayout(mods, (m) => moduleRadius.get(m)!, moduleOffsets),
+    );
+  }
+  const semList = [...modulesBySem.keys()].sort();
+  const ringR =
+    semList.length > 1
+      ? (2 * Math.max(...semRadius.values()) + GAP * 2) /
+        (2 * Math.sin(Math.PI / semList.length))
+      : 0;
+  const semAnchors = new Map(
+    semList.map((sem, i) => {
+      const a = (i / semList.length) * Math.PI * 2;
+      return [sem, [Math.cos(a) * ringR, Math.sin(a) * ringR]] as const;
+    }),
+  );
+
+  const placed = new Map<string, number>();
+  const nodes: GNode[] = data.nodes.map((n, i) => {
+    const k = placed.get(n.group) ?? 0;
+    placed.set(n.group, k + 1);
+    const [sx, sy] = semAnchors.get(n.sem)!;
+    const [mx, my] = moduleOffsets.get(n.module)!;
+    const [gx, gy] = groupOffsets.get(n.group)!;
+    const ax = sx + mx + gx;
+    const ay = sy + my + gy;
+    const radius = 18 * Math.sqrt(k + 0.5);
+    const angle = k * Math.PI * (3 - Math.sqrt(5));
+    return {
+      ...n,
+      ax,
+      ay,
+      x: ax + Math.cos(angle) * radius,
+      y: ay + Math.sin(angle) * radius,
+      r: 5,
+      delay: (i * 37) % 500,
+      ins: [],
+      outs: [],
+    };
+  });
+
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links: Link[] = [];
+  for (const e of graph.edges) {
+    const s = byId.get(e.from);
+    const t = byId.get(e.to);
+    if (!s || !t) continue;
+    links.push([s, t, e.kind === "prereq" ? 1 : 0]);
+    s.outs.push(t);
+    t.ins.push(s);
+  }
+
+  // Groups as blobs, for halos and labels
+  const prettify = (slug: string) =>
+    (slug.split("/").pop() ?? slug)
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  const blobs = new Map<string, Blob>();
+  for (const n of nodes) {
+    let b = blobs.get(n.group);
+    if (!b) {
+      b = {
+        members: [],
+        sem: n.sem,
+        label: prettify(n.group),
+        x: 0,
+        y: 0,
+        r: 0,
+      };
+      blobs.set(n.group, b);
+    }
+    b.members.push(n);
+  }
+  const labelOrder = [...blobs.values()].sort(
+    (a, b) => b.members.length - a.members.length,
+  );
+  const semBlobs = new Map<number, { x: number; y: number; n: number }>(
+    semList.map((s) => [s, { x: 0, y: 0, n: 0 }]),
+  );
+
+  function measure() {
+    for (const s of semBlobs.values()) s.x = s.y = s.n = 0;
+    for (const b of blobs.values()) {
+      let x = 0;
+      let y = 0;
+      for (const n of b.members) {
+        x += n.x!;
+        y += n.y!;
+      }
+      b.x = x / b.members.length;
+      b.y = y / b.members.length;
+      b.r = 0;
+      for (const n of b.members) {
+        b.r = Math.max(b.r, Math.hypot(n.x! - b.x, n.y! - b.y));
+      }
+      const s = semBlobs.get(b.sem)!;
+      s.x += x;
+      s.y += y;
+      s.n += b.members.length;
+    }
+    for (const s of semBlobs.values()) {
+      s.x /= s.n;
+      s.y /= s.n;
+    }
+  }
+
+  // ------------------------------------------------------------ simulation
+  const sim = forceSimulation(nodes)
+    .alphaDecay(0.03)
+    .force(
+      "link",
+      forceLink(
+        links.map(([source, target, kind]) => ({ source, target, kind })),
+      )
+        .distance(34)
+        .strength((l: { kind: number }) => (l.kind ? 0.006 : 1)),
+    )
+    .force("charge", forceManyBody().strength(-30).distanceMax(140))
+    .force("collide", forceCollide<GNode>((d) => d.r + 4).iterations(2))
+    .force("x", forceX<GNode>((d) => d.ax).strength(0.1))
+    .force("y", forceY<GNode>((d) => d.ay).strength(0.1))
+    .stop();
+  // Settle fully before the first draw, the live ticks only polish it
+  const settleTicks = Math.ceil(
+    Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay()),
+  );
+  for (let i = 0; i < settleTicks; i++) sim.tick();
+
+  // ---------------------------------------------------------------- state
+  let scale = 1;
+  let ox = 0;
+  let oy = 0;
+  let dpr = 1;
+  let hover: GNode | null = null;
+  let pinned: GNode | null = null;
+  const hiddenSems = new Set<number>();
+  // The longest path, as the notes on it and the edges between them
+  let showPath = false;
+  let pathNodes = new Set<GNode>();
+  let pathPairs = new Set<string>();
+  let dirty = true;
+  const t0 = performance.now();
+
+  type View = { scale: number; ox: number; oy: number };
+  let fly: { from: View; to: View; start: number } | null = null;
+
+  function fitView(list: GNode[] = nodes): View {
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (const n of list) {
+      minX = Math.min(minX, n.x!);
+      maxX = Math.max(maxX, n.x!);
+      minY = Math.min(minY, n.y!);
+      maxY = Math.max(maxY, n.y!);
+    }
+    // Leave room above the top row for the group names
+    minY -= 80;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    const sc = Math.min(w / (maxX - minX + 300), h / (maxY - minY + 300));
+    return {
+      scale: sc,
+      ox: w / 2 - ((minX + maxX) / 2) * sc,
+      oy: h / 2 - ((minY + maxY) / 2) * sc,
+    };
+  }
+
+  function flyTo(to: View) {
+    if (reduceMotion) {
+      ({ scale, ox, oy } = to);
+      dirty = true;
+      return;
+    }
+    fly = { from: { scale, ox, oy }, to, start: performance.now() };
+  }
+
+  function focusOn(n: GNode) {
+    // Aim right of the panel on wide screens so the note isn't hidden by it
+    const w = canvas.clientWidth;
+    const cx = w > 900 ? (w + 320) / 2 : w / 2;
+    const sc = Math.max(scale, 1.8);
+    flyTo({
+      scale: sc,
+      ox: cx - n.x! * sc,
+      oy: canvas.clientHeight / 2 - n.y! * sc,
+    });
+  }
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+    dirty = true;
+  }
+
+  // ---------------------------------------------------------------- theme
+  let semColors: string[] = [];
+  let semRgb: number[][] = [];
+  let textPrimary = "";
+  let textSecondary = "";
+  let accent = "";
+  let bgColor = "";
+  const toRgb = (c: string) => {
+    const m = /^#([0-9a-f]{6})$/i.exec(c.trim());
+    if (!m) return [136, 136, 136];
+    const v = parseInt(m[1], 16);
+    return [v >> 16, (v >> 8) & 255, v & 255];
+  };
+  function readTheme() {
+    const css = getComputedStyle(document.documentElement);
+    const get = (name: string, fallback: string) =>
+      css.getPropertyValue(name).trim() || fallback;
+    semColors = Array.from({ length: 9 }, (_, i) =>
+      i === 0 ? get("--text-muted", "#888") : get(`--s${i}`, "#888"),
+    );
+    semRgb = semColors.map(toRgb);
+    textPrimary = get("--text-primary", "#fff");
+    textSecondary = get("--text-secondary", "#aaa");
+    accent = get("--accent", "#8aa0ff");
+    bgColor = get("--bg", "#111");
+    legend
+      .querySelectorAll<HTMLElement>("i")
+      .forEach((el) => (el.style.background = semColors[+el.dataset.sem!]));
+    dirty = true;
+  }
+  legend.innerHTML = semList
+    .map(
+      (s) =>
+        `<li><button type="button" data-sem="${s}" aria-pressed="true"><i data-sem="${s}"></i>${s ? `S${s}` : "General"}</button></li>`,
+    )
+    .join("");
+  readTheme();
+  new MutationObserver(readTheme).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+
+  // ----------------------------------------------------------------- draw
+  // easeOutBack, notes pop in with a small overshoot
+  const ease = (x: number) => {
+    const c = x - 1;
+    return 1 + 2.7 * c * c * c + 1.7 * c * c;
+  };
+  const visible = (n: GNode) => !hiddenSems.has(n.sem);
+
+  // Cross-module prerequisites bow sideways so they don't pile on one line
+  function controlPoint(s: GNode, t: GNode): [number, number] {
+    const mx = (s.x! + t.x!) / 2;
+    const my = (s.y! + t.y!) / 2;
+    return [mx - (t.y! - s.y!) * 0.16, my + (t.x! - s.x!) * 0.16];
+  }
+
+  function draw(now: number) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.translate(ox, oy);
+    ctx.scale(scale, scale);
+    measure();
+
+    const focus = hover ?? pinned;
+    const near = focus
+      ? new Set<GNode>([focus, ...focus.ins, ...focus.outs])
+      : showPath
+        ? pathNodes
+        : null;
+    const dark = document.documentElement.dataset.theme === "dark";
+
+    // Semester names, huge and faint behind everything
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `800 260px "Sagittaire Display", serif`;
+    for (const [sem, s] of semBlobs) {
+      if (hiddenSems.has(sem)) continue;
+      const [r, g, b] = semRgb[sem];
+      ctx.fillStyle = `rgba(${r},${g},${b},${dark ? 0.08 : 0.1})`;
+      ctx.fillText(sem ? `S${sem}` : "General", s.x, s.y);
+    }
+
+    // Soft halo per group
+    for (const b of blobs.values()) {
+      if (hiddenSems.has(b.sem)) continue;
+      const rad = b.r + 40;
+      const [r, g, bl] = semRgb[b.sem];
+      const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, rad);
+      grad.addColorStop(0, `rgba(${r},${g},${bl},${dark ? 0.16 : 0.14})`);
+      grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Arrowheads sit on the target node's rim, at a constant on-screen size
+    const arrow = (fx: number, fy: number, t: GNode, size: number) => {
+      const a = Math.atan2(t.y! - fy, t.x! - fx);
+      const tx = t.x! - Math.cos(a) * (t.r + 1);
+      const ty = t.y! - Math.sin(a) * (t.r + 1);
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - Math.cos(a - 0.4) * size, ty - Math.sin(a - 0.4) * size);
+      ctx.lineTo(tx - Math.cos(a + 0.4) * size, ty - Math.sin(a + 0.4) * size);
+      ctx.closePath();
+    };
+    const drawEdges = (pick: (l: Link) => boolean) => {
+      const size = 8 / scale;
+      ctx.beginPath();
+      for (const l of links) {
+        if (!pick(l)) continue;
+        const [s, t, kind] = l;
+        ctx.moveTo(s.x!, s.y!);
+        if (kind) {
+          const [cx, cy] = controlPoint(s, t);
+          ctx.quadraticCurveTo(cx, cy, t.x!, t.y!);
+        } else {
+          ctx.lineTo(t.x!, t.y!);
+        }
+      }
+      ctx.stroke();
+      ctx.beginPath();
+      for (const l of links) {
+        if (!pick(l)) continue;
+        const [s, t, kind] = l;
+        const [cx, cy] = kind ? controlPoint(s, t) : [s.x!, s.y!];
+        arrow(cx, cy, t, size);
+      }
+      ctx.fill();
+    };
+
+    const shown = (l: Link) => visible(l[0]) && visible(l[1]);
+    const touches = (l: Link) => l[0] === focus || l[1] === focus;
+    ctx.strokeStyle = textPrimary;
+    ctx.fillStyle = textPrimary;
+    for (const kind of [0, 1]) {
+      ctx.lineWidth = (kind ? 1.2 : 1.8) / scale;
+      ctx.globalAlpha = near ? 0.04 : kind ? 0.16 : 0.55;
+      drawEdges((l) => l[2] === kind && shown(l) && !touches(l));
+    }
+
+    // Edges of the focused note, or of the longest path, flow along their direction
+    const onPath = (l: Link) => pathPairs.has(`${l[0].id}>${l[1].id}`);
+    const highlight = focus ? touches : showPath ? onPath : null;
+    if (highlight) {
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = focus ? semColors[focus.sem] : accent;
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.lineWidth = (focus ? 3 : 3.5) / scale;
+      if (!reduceMotion) {
+        ctx.setLineDash([10 / scale, 7 / scale]);
+        ctx.lineDashOffset = -(now * 0.03) / scale;
+      }
+      drawEdges((l) => shown(l) && highlight(l));
+      ctx.setLineDash([]);
+    }
+
+    // Notes
+    for (const n of nodes) {
+      const lit = visible(n) && (!near || near.has(n));
+      const pop = reduceMotion
+        ? 1
+        : Math.min(1, Math.max(0, (now - t0 - n.delay) / 450));
+      if (pop <= 0) continue;
+      const rad = n.r * ease(pop) * (n === focus ? 1.5 : 1);
+      const [r, g, b] = semRgb[n.sem];
+      ctx.globalAlpha = lit ? 1 : visible(n) ? 0.12 : 0.05;
+      if (lit) {
+        ctx.fillStyle = `rgba(${r},${g},${b},0.18)`;
+        ctx.beginPath();
+        ctx.arc(n.x!, n.y!, rad * 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = semColors[n.sem];
+      ctx.beginPath();
+      ctx.arc(n.x!, n.y!, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (focus) {
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = textPrimary;
+      ctx.lineWidth = 2 / scale;
+      ctx.beginPath();
+      ctx.arc(focus.x!, focus.y!, focus.r * 2, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Group names, kept at a constant on-screen size. Bigger groups claim
+    // their spot first and a name that would overlap one already drawn is skipped.
+    ctx.globalAlpha = 1;
+    ctx.font = `700 ${11.5 / scale}px "DM Sans", sans-serif`;
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 4 / scale;
+    const focusBlob = focus ? blobs.get(focus.group) : null;
+    const taken: [number, number, number, number][] = [];
+    for (const b of labelOrder) {
+      if (hiddenSems.has(b.sem)) continue;
+      const mine = b === focusBlob;
+      const tw = ctx.measureText(b.label).width;
+      const th = 14 / scale;
+      const y = b.y - b.r - 14 / scale;
+      const box: [number, number, number, number] = [
+        b.x - tw / 2 - 3 / scale,
+        y - th / 2,
+        b.x + tw / 2 + 3 / scale,
+        y + th / 2,
+      ];
+      const clash = taken.some(
+        (t) => box[0] < t[2] && box[2] > t[0] && box[1] < t[3] && box[3] > t[1],
+      );
+      if (clash && !mine) continue;
+      taken.push(box);
+      ctx.globalAlpha = !focus || mine ? 1 : 0.25;
+      ctx.strokeStyle = bgColor;
+      ctx.strokeText(b.label, b.x, y);
+      ctx.fillStyle = mine ? textPrimary : textSecondary;
+      ctx.fillText(b.label, b.x, y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function frame(now: number) {
+    if (sim.alpha() > sim.alphaMin()) {
+      sim.tick();
+      dirty = true;
+    }
+    if (fly) {
+      const k = Math.min(1, (now - fly.start) / 700);
+      const e = 1 - Math.pow(1 - k, 3);
+      scale = fly.from.scale + (fly.to.scale - fly.from.scale) * e;
+      ox = fly.from.ox + (fly.to.ox - fly.from.ox) * e;
+      oy = fly.from.oy + (fly.to.oy - fly.from.oy) * e;
+      if (k >= 1) fly = null;
+      dirty = true;
+    }
+    // Keep redrawing while the intro plays or flowing edges animate
+    if (!reduceMotion && (now - t0 < 1200 || hover || pinned || showPath))
+      dirty = true;
+    if (dirty) {
+      draw(now);
+      dirty = false;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------- interaction
+  function pick(px: number, py: number): GNode | null {
+    const wx = (px - ox) / scale;
+    const wy = (py - oy) / scale;
+    let best: GNode | null = null;
+    let bestD = Infinity;
+    for (const n of nodes) {
+      if (!visible(n)) continue;
+      const d = Math.hypot(n.x! - wx, n.y! - wy);
+      if (d < Math.max(n.r * 1.3, 7 / scale) && d < bestD) {
+        best = n;
+        bestD = d;
+      }
+    }
+    return best;
+  }
+
+  function showTip(n: GNode, e: PointerEvent) {
+    tip.hidden = false;
+    tip.style.setProperty("--tone", semColors[n.sem]);
+    tip.replaceChildren();
+    const title = document.createElement("strong");
+    title.textContent = n.title;
+    const slug = document.createElement("small");
+    slug.textContent = n.id;
+    tip.append(title, slug);
+    const list = (label: string, arr: GNode[]) => {
+      if (!arr.length) return;
+      const p = document.createElement("p");
+      const b = document.createElement("b");
+      b.textContent = label;
+      const more = arr.length > 3 ? ` +${arr.length - 3} more` : "";
+      p.append(
+        b,
+        arr
+          .slice(0, 3)
+          .map((x) => x.title)
+          .join(", ") + more,
+      );
+      tip.append(p);
+    };
+    list("Builds on", n.ins);
+    list("Leads to", n.outs);
+    tip.style.left = `${Math.min(e.clientX + 16, window.innerWidth - 320)}px`;
+    tip.style.top = `${Math.min(e.clientY + 16, window.innerHeight - 140)}px`;
+  }
+
+  canvas.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      fly = null;
+      const next = Math.min(
+        12,
+        Math.max(0.05, scale * Math.exp(-e.deltaY * 0.0015)),
+      );
+      const k = next / scale;
+      ox = e.offsetX - (e.offsetX - ox) * k;
+      oy = e.offsetY - (e.offsetY - oy) * k;
+      scale = next;
+      dirty = true;
+    },
+    { passive: false },
+  );
+
+  // Dragging a note tugs it and reheats the simulation, dragging space pans
+  let drag: {
+    x: number;
+    y: number;
+    moved: boolean;
+    node: GNode | null;
+  } | null = null;
+  canvas.addEventListener("pointerdown", (e) => {
+    fly = null;
+    drag = {
+      x: e.clientX,
+      y: e.clientY,
+      moved: false,
+      node: pick(e.offsetX, e.offsetY),
+    };
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (drag) {
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+      if (drag.moved && drag.node) {
+        tip.hidden = true;
+        drag.node.fx = (e.offsetX - ox) / scale;
+        drag.node.fy = (e.offsetY - oy) / scale;
+        sim.alphaTarget(0.3).alpha(Math.max(sim.alpha(), 0.3));
+        dirty = true;
+      } else if (drag.moved) {
+        canvas.classList.add("dragging");
+        ox += dx;
+        oy += dy;
+        drag.x = e.clientX;
+        drag.y = e.clientY;
+        dirty = true;
+      }
+      return;
+    }
+    const n = pick(e.offsetX, e.offsetY);
+    if (n !== hover) {
+      hover = n;
+      dirty = true;
+    }
+    if (n) {
+      showTip(n, e);
+      canvas.style.cursor = "pointer";
+    } else {
+      tip.hidden = true;
+      canvas.style.cursor = "";
+    }
+  });
+  canvas.addEventListener("pointerup", (e) => {
+    const wasClick = drag && !drag.moved;
+    if (drag?.node) {
+      // Let the simulation cool again and release the note
+      sim.alphaTarget(0);
+      drag.node.fx = null;
+      drag.node.fy = null;
+    }
+    drag = null;
+    canvas.classList.remove("dragging");
+    if (wasClick) {
+      const n = pick(e.offsetX, e.offsetY);
+      if (n) window.location.href = `/${n.id}`;
+      else if (pinned) {
+        pinned = null;
+        dirty = true;
+      }
+    }
+  });
+  canvas.addEventListener("pointerleave", () => {
+    hover = null;
+    tip.hidden = true;
+    dirty = true;
+  });
+
+  // Legend chips hide and show a semester
+  legend.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>("button");
+    if (!btn) return;
+    const sem = +btn.dataset.sem!;
+    const off = hiddenSems.delete(sem) ? false : true;
+    if (off) hiddenSems.add(sem);
+    btn.setAttribute("aria-pressed", String(!off));
+    dirty = true;
+  });
+
+  // Longest path: computed on the graph, then only highlighted here
+  const longestBtn = document.getElementById("longest") as HTMLButtonElement;
+  const pathInfo = document.getElementById("path-info")!;
+  const longest = graph.longestPath();
+  if (!longest) longestBtn.disabled = true;
+  function setPath(on: boolean) {
+    showPath = on && !!longest;
+    longestBtn.setAttribute("aria-pressed", String(showPath));
+    pathInfo.hidden = !showPath;
+    pathNodes = new Set();
+    pathPairs = new Set();
+    if (showPath && longest) {
+      pinned = null;
+      for (const sem of hiddenSems) hiddenSems.delete(sem);
+      legend
+        .querySelectorAll("button")
+        .forEach((b) => b.setAttribute("aria-pressed", "true"));
+      longest.forEach((id, i) => {
+        pathNodes.add(byId.get(id)!);
+        if (i) pathPairs.add(`${longest[i - 1]}>${id}`);
+      });
+      const first = byId.get(longest[0])!;
+      const last = byId.get(longest[longest.length - 1])!;
+      const summary = document.getElementById("path-summary")!;
+      summary.replaceChildren();
+      const b = document.createElement("b");
+      b.textContent = `${longest.length - 1} steps`;
+      summary.append(b, ` from ${first.title} to ${last.title}`);
+      flyTo(fitView([...pathNodes]));
+    } else {
+      flyTo(fitView());
+    }
+    dirty = true;
+  }
+  longestBtn.addEventListener("click", () => setPath(!showPath));
+
+  document.getElementById("reset")!.addEventListener("click", () => {
+    if (showPath) setPath(false);
+    pinned = null;
+    input.value = "";
+    results.hidden = true;
+    flyTo(fitView());
+  });
+
+  // Search: type to find a note, pick one to fly to it
+  let matches: GNode[] = [];
+  let active = 0;
+  function renderResults() {
+    results.replaceChildren();
+    results.hidden = matches.length === 0;
+    matches.forEach((n, i) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = i === active ? "active" : "";
+      btn.textContent = n.title;
+      const small = document.createElement("small");
+      small.textContent = n.id;
+      btn.append(small);
+      btn.addEventListener("click", () => choose(n));
+      li.append(btn);
+      results.append(li);
+    });
+  }
+  function choose(n: GNode) {
+    pinned = n;
+    hiddenSems.delete(n.sem);
+    legend
+      .querySelector(`button[data-sem="${n.sem}"]`)
+      ?.setAttribute("aria-pressed", "true");
+    input.value = n.title;
+    matches = [];
+    renderResults();
+    focusOn(n);
+    dirty = true;
+  }
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    active = 0;
+    if (!q) {
+      matches = [];
+    } else {
+      const starts: GNode[] = [];
+      const rest: GNode[] = [];
+      for (const n of nodes) {
+        const t = n.title.toLowerCase();
+        if (t.startsWith(q)) starts.push(n);
+        else if (t.includes(q) || n.id.includes(q)) rest.push(n);
+      }
+      matches = [...starts, ...rest].slice(0, 6);
+    }
+    renderResults();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!matches.length) return;
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      active = (active + step + matches.length) % matches.length;
+      renderResults();
+    } else if (e.key === "Enter" && matches[active]) {
+      choose(matches[active]);
+    } else if (e.key === "Escape") {
+      input.value = "";
+      matches = [];
+      pinned = null;
+      renderResults();
+      input.blur();
+      dirty = true;
+    }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== input) {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+
+  window.addEventListener("resize", resize);
+  resize();
+  ({ scale, ox, oy } = fitView());
+  requestAnimationFrame(frame);
+</script>
