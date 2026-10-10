@@ -1,7 +1,7 @@
 ---
 title: Line Integral
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-10-09T14:17:08.131Z
+lastUpdatedOn: 2026-10-10T18:33:18.228Z
 ---
 
 Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
@@ -68,4 +68,72 @@ If $\boldsymbol{F} = \nabla \phi$ on a region containing $C$,
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C \nabla \phi \cdot \text{d}\boldsymbol{r} = \phi(\boldsymbol{r}(b)) - \phi(\boldsymbol{r}(a))
+$$
+
+## Worked Examples
+
+### Line Integral with Respect to Arc Length
+
+Evaluate $\int_C xy\,\text{d}s$, where $C$ is the quarter circle $\boldsymbol{r}(t) = \cos t\,\hat{i} + \sin t\,\hat{j}$, $0 \le t \le \dfrac{\pi}{2}$.
+
+Speed:
+
+$$
+\boldsymbol{r}'(t) = -\sin t\,\hat{i} + \cos t\,\hat{j}, \quad \lVert \boldsymbol{r}'(t) \rVert = \sqrt{\sin^2 t + \cos^2 t} = 1
+$$
+
+Integral:
+
+$$
+\int_C xy\,\text{d}s = \int_0^{\pi/2} \cos t \sin t \cdot 1\,\text{d}t = \left[\frac{\sin^2 t}{2}\right]_0^{\pi/2} = \frac{1}{2}
+$$
+
+### Integral Along a Parabola
+
+Evaluate $\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ for $\boldsymbol{F} = x^2\,\hat{i} + xy\,\hat{j}$, where $C$ is $\boldsymbol{r}(t) = t\,\hat{i} + t^2\,\hat{j}$, $0 \le t \le 1$.
+
+Field along the curve:
+
+$$
+\boldsymbol{F}(\boldsymbol{r}(t)) = t^2\,\hat{i} + t^3\,\hat{j}, \quad \boldsymbol{r}'(t) = \hat{i} + 2t\,\hat{j}
+$$
+
+Dot product:
+
+$$
+\boldsymbol{F}(\boldsymbol{r}(t)) \cdot \boldsymbol{r}'(t) = t^2 + 2t^4
+$$
+
+Integral:
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_0^1 (t^2 + 2t^4)\,\text{d}t = \frac{1}{3} + \frac{2}{5} = \frac{11}{15}
+$$
+
+### Work Along a Circle
+
+Find the work done by $\boldsymbol{F} = -y\,\hat{i} + x\,\hat{j}$ on a particle moving once counterclockwise around the unit circle $\boldsymbol{r}(t) = \cos t\,\hat{i} + \sin t\,\hat{j}$, $0 \le t \le 2\pi$.
+
+$$
+\boldsymbol{F}(\boldsymbol{r}(t)) = -\sin t\,\hat{i} + \cos t\,\hat{j}, \quad \boldsymbol{r}'(t) = -\sin t\,\hat{i} + \cos t\,\hat{j}
+$$
+
+$$
+W = \int_0^{2\pi} (\sin^2 t + \cos^2 t)\,\text{d}t = \int_0^{2\pi} 1\,\text{d}t = 2\pi
+$$
+
+### Path-Independent Integral
+
+Evaluate $\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ for $\boldsymbol{F} = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k}$, where $C$ is any piecewise smooth curve from $(1,1,1)$ to $(2,3,4)$.
+
+Potential function:
+
+$$
+\phi = xyz, \quad \nabla \phi = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k} = \boldsymbol{F}
+$$
+
+Integral:
+
+$$
+\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \phi(2,3,4) - \phi(1,1,1) = 24 - 1 = 23
 $$

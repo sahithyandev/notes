@@ -1,7 +1,7 @@
 ---
 title: Field
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-10-09T14:17:08.104Z
+lastUpdatedOn: 2026-10-10T18:33:18.205Z
 ---
 
 A field is a function that assigns a mathematical object, a scalar, vector, or tensor, to each point in its domain $D \subseteq \mathbb{R}^n$.
@@ -24,6 +24,19 @@ $$
 \nabla = \frac{\partial}{\partial x}\hat{i} + \frac{\partial}{\partial y}\hat{j} + \frac{\partial}{\partial z}\hat{k}
 $$
 
+Where $\nabla \phi \neq \vec{0}$:
+
+- $\nabla \phi$ points in the direction of the steepest increase of $\phi$.
+- $|\nabla \phi|$ is the rate of increase of $\phi$ in that direction.
+- $\nabla \phi$ is perpendicular to the level surface $\phi = c$ through that point.
+
+The rate of change of $\phi$ along a unit vector $\hat{u}$ is $\nabla \phi \cdot \hat{u}$.
+
+Examples:
+
+- For a temperature field, $-\nabla \phi$ gives the direction of heat flow.
+- For a height field of a hill, $\nabla \phi$ points up the steepest slope.
+
 ## Laplacian
 
 The Laplacian operator is
@@ -36,4 +49,98 @@ For $\phi$ a field, the Laplacian of $\phi$ is
 
 $$
 \nabla^2 \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}
+$$
+
+Physical meaning of $\nabla^2 \phi$:
+
+- Compares the value of $\phi$ at a point with its average over a small sphere around that point.
+- $\nabla^2 \phi > 0$ means $\phi$ is lower than the average of its surroundings.
+- $\nabla^2 \phi < 0$ means $\phi$ is higher than the average of its surroundings.
+- $\nabla^2 \phi = 0$ means $\phi$ equals the average of its surroundings. Such a $\phi$ is harmonic.
+
+Examples:
+
+- In the heat equation $\dfrac{\partial T}{\partial t} = \alpha \nabla^2 T$, a point warms up when its neighbours are hotter on average.
+- In electrostatics, the potential $\phi$ satisfies $\nabla^2 \phi = 0$ in a charge-free region.
+
+## Worked Examples
+
+### Gradient at a Point
+
+Find $\nabla \phi$ at $(1, 2, 1)$ for $\phi = x^2 y + y z^3$.
+
+Partial derivatives:
+
+$$
+\frac{\partial \phi}{\partial x} = 2xy, \quad \frac{\partial \phi}{\partial y} = x^2 + z^3, \quad \frac{\partial \phi}{\partial z} = 3yz^2
+$$
+
+Gradient field:
+
+$$
+\nabla \phi = 2xy\,\hat{i} + (x^2 + z^3)\,\hat{j} + 3yz^2\,\hat{k}
+$$
+
+At $(1, 2, 1)$:
+
+$$
+\nabla \phi = 2(1)(2)\,\hat{i} + (1 + 1)\,\hat{j} + 3(2)(1)\,\hat{k} = 4\hat{i} + 2\hat{j} + 6\hat{k}
+$$
+
+### Gradient of the Squared Distance
+
+Find $\nabla \phi$ for $\phi = x^2 + y^2 + z^2$.
+
+$$
+\nabla \phi = 2x\,\hat{i} + 2y\,\hat{j} + 2z\,\hat{k} = 2\vec{r}
+$$
+
+Here $\vec{r} = x\hat{i} + y\hat{j} + z\hat{k}$ is the position vector.
+
+### Laplacian at a Point
+
+Find $\nabla^2 \phi$ at $(1, 2, 1)$ for $\phi = x^2 y + y z^3$.
+
+Second partial derivatives:
+
+$$
+\frac{\partial^2 \phi}{\partial x^2} = 2y, \quad \frac{\partial^2 \phi}{\partial y^2} = 0, \quad \frac{\partial^2 \phi}{\partial z^2} = 6yz
+$$
+
+Sum:
+
+$$
+\nabla^2 \phi = 2y + 6yz
+$$
+
+At $(1, 2, 1)$:
+
+$$
+\nabla^2 \phi = 2(2) + 6(2)(1) = 16
+$$
+
+### Harmonic Field
+
+Show that $\phi = \dfrac{1}{r}$ satisfies $\nabla^2 \phi = 0$ for $r \neq 0$, where $r = \sqrt{x^2 + y^2 + z^2}$.
+
+Since $\dfrac{\partial r}{\partial x} = \dfrac{x}{r}$:
+
+$$
+\frac{\partial \phi}{\partial x} = -\frac{x}{r^3}
+$$
+
+$$
+\frac{\partial^2 \phi}{\partial x^2} = -\frac{1}{r^3} + \frac{3x^2}{r^5}
+$$
+
+By symmetry, the $y$ and $z$ terms are
+
+$$
+\frac{\partial^2 \phi}{\partial y^2} = -\frac{1}{r^3} + \frac{3y^2}{r^5}, \quad \frac{\partial^2 \phi}{\partial z^2} = -\frac{1}{r^3} + \frac{3z^2}{r^5}
+$$
+
+Sum:
+
+$$
+\nabla^2 \phi = -\frac{3}{r^3} + \frac{3(x^2 + y^2 + z^2)}{r^5} = -\frac{3}{r^3} + \frac{3r^2}{r^5} = 0
 $$

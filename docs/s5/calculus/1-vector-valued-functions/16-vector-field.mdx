@@ -1,7 +1,7 @@
 ---
 title: Vector Field
 dateCreated: 2026-07-31T02:57:02.410Z
-lastUpdatedOn: 2026-10-09T14:17:08.117Z
+lastUpdatedOn: 2026-10-10T18:33:18.216Z
 ---
 
 A [field](/s5/calculus/vector-valued-functions/field) that assigns a vector to each point in its domain $D \subseteq \mathbb{R}^n$,
@@ -49,3 +49,73 @@ $$
 $$
 
 $\text{curl}\,\boldsymbol{F}$ is a vector field.
+
+## Worked Examples
+
+### Divergence and Curl
+
+Find $\text{div}\,\boldsymbol{F}$ and $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = xy\,\hat{i} + yz\,\hat{j} + zx\,\hat{k}$.
+
+Components are $f = xy$, $g = yz$, $h = zx$.
+
+Divergence:
+
+$$
+\text{div}\,\boldsymbol{F} = \frac{\partial (xy)}{\partial x} + \frac{\partial (yz)}{\partial y} + \frac{\partial (zx)}{\partial z} = y + z + x
+$$
+
+Curl:
+
+$$
+\text{curl}\,\boldsymbol{F} = \left(\frac{\partial h}{\partial y} - \frac{\partial g}{\partial z}\right)\hat{i} + \left(\frac{\partial f}{\partial z} - \frac{\partial h}{\partial x}\right)\hat{j} + \left(\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}\right)\hat{k}
+$$
+
+$$
+= (0 - y)\,\hat{i} + (0 - z)\,\hat{j} + (0 - x)\,\hat{k} = -y\,\hat{i} - z\,\hat{j} - x\,\hat{k}
+$$
+
+### Curl of a Rotation Field
+
+Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = -y\,\hat{i} + x\,\hat{j}$.
+
+Components are $f = -y$, $g = x$, $h = 0$.
+
+$$
+\text{curl}\,\boldsymbol{F} = (0 - 0)\,\hat{i} + (0 - 0)\,\hat{j} + \left(\frac{\partial x}{\partial x} - \frac{\partial (-y)}{\partial y}\right)\hat{k} = 2\hat{k}
+$$
+
+### Curl of a Gradient Field
+
+Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = \nabla (xyz)$.
+
+$$
+\boldsymbol{F} = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k}
+$$
+
+$$
+\text{curl}\,\boldsymbol{F} = (x - x)\,\hat{i} + (y - y)\,\hat{j} + (z - z)\,\hat{k} = \boldsymbol{0}
+$$
+
+### Divergence of an Inverse-Square Field
+
+Show that $\text{div}\,\boldsymbol{F} = 0$ for $\boldsymbol{F} = \dfrac{c}{r^3}\boldsymbol{r}$, where $r = \lVert \boldsymbol{r} \rVert \ne 0$.
+
+The components are $f = \dfrac{cx}{r^3}$, $g = \dfrac{cy}{r^3}$, $h = \dfrac{cz}{r^3}$.
+
+Since $\dfrac{\partial r}{\partial x} = \dfrac{x}{r}$:
+
+$$
+\frac{\partial f}{\partial x} = c\left(\frac{1}{r^3} - \frac{3x^2}{r^5}\right)
+$$
+
+By symmetry:
+
+$$
+\frac{\partial g}{\partial y} = c\left(\frac{1}{r^3} - \frac{3y^2}{r^5}\right), \quad \frac{\partial h}{\partial z} = c\left(\frac{1}{r^3} - \frac{3z^2}{r^5}\right)
+$$
+
+Sum:
+
+$$
+\text{div}\,\boldsymbol{F} = c\left(\frac{3}{r^3} - \frac{3(x^2 + y^2 + z^2)}{r^5}\right) = c\left(\frac{3}{r^3} - \frac{3}{r^3}\right) = 0
+$$
