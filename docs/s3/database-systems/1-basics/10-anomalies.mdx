@@ -1,0 +1,34 @@
+---
+title: Anomalies
+dateCreated: 2026-10-10T17:21:27.739Z
+lastUpdatedOn: 2026-10-10T18:32:22.286Z
+---
+
+A situation where a change in data causes inconsistency or lose information.
+
+## Insertion Anomaly
+
+Occurs when certain data cannot be inserted into a database without the presence of other, unrelated data.
+
+Example:  
+Cannot add a new student unless they are enrolled in a course, because student and course details are stored in the same table.
+
+<AnomalyExample kind="insertion" />
+
+## Update Anomaly
+
+Happens when data redundancy causes inconsistent updates across records.
+
+Example:  
+If an instructor's department name changes, it must be updated in multiple rows; missing one row leads to inconsistent data.
+
+<AnomalyExample kind="update" />
+
+## Deletion Anomaly
+
+Occurs when deleting a record unintentionally removes valuable related information.
+
+Example:  
+Deleting the last student enrolled in a course also deletes the course information itself.
+
+<AnomalyExample kind="deletion" />

@@ -1,0 +1,266 @@
+---
+// Shows a table before and after one operation that triggers an anomaly,
+// with the affected rows or cells highlighted. The data for each anomaly is
+// fixed here so every note renders the same worked example.
+import Panel from "./primitives/panel.astro";
+
+type Kind = "insertion" | "update" | "deletion";
+type State = "new" | "bad" | "gone";
+
+interface Props {
+  kind: Kind;
+  caption?: string;
+}
+
+interface Row {
+  cells: string[];
+  state?: State;
+  hl?: number[];
+}
+
+interface Table {
+  name: string;
+  cols: string[];
+  keys: string[];
+  rows: Row[];
+}
+
+interface Example {
+  before: Table;
+  operation: string;
+  after: Table;
+  result: string;
+  caption: string;
+}
+
+const ENROLLMENT = {
+  name: "Enrollment",
+  cols: ["StudentID", "Student", "CourseID", "Course"],
+  keys: ["StudentID", "CourseID"],
+};
+const TEACHING = {
+  name: "Teaching",
+  cols: ["CourseID", "Instructor", "Dept"],
+  keys: ["CourseID"],
+};
+
+const EXAMPLES: Record<Kind, Example> = {
+  insertion: {
+    before: {
+      ...ENROLLMENT,
+      rows: [
+        { cells: ["1", "Ann", "DB", "Databases"] },
+        { cells: ["2", "Bob", "OS", "Operating Systems"] },
+      ],
+    },
+    operation: "Add student Cathy, who has no course yet",
+    after: {
+      ...ENROLLMENT,
+      rows: [
+        { cells: ["1", "Ann", "DB", "Databases"] },
+        { cells: ["2", "Bob", "OS", "Operating Systems"] },
+        { cells: ["3", "Cathy", "NULL", "NULL"], state: "bad" },
+      ],
+    },
+    result:
+      "CourseID is part of the key, so it cannot be NULL. Cathy cannot be stored.",
+    caption:
+      "Inserting a student without a course is rejected because CourseID is part of the key",
+  },
+  update: {
+    before: {
+      ...TEACHING,
+      rows: [
+        { cells: ["DB", "Lee", "CS"] },
+        { cells: ["OS", "Lee", "CS"] },
+        { cells: ["NW", "Kim", "EE"] },
+      ],
+    },
+    operation: "Rename department CS to Computing",
+    after: {
+      ...TEACHING,
+      rows: [
+        { cells: ["DB", "Lee", "Computing"], state: "new", hl: [2] },
+        { cells: ["OS", "Lee", "CS"], state: "bad", hl: [2] },
+        { cells: ["NW", "Kim", "EE"] },
+      ],
+    },
+    result: "1 row was missed. Lee now belongs to 2 departments.",
+    caption:
+      "Renaming a department updates only one of the rows that repeat it, leaving inconsistent data",
+  },
+  deletion: {
+    before: {
+      ...ENROLLMENT,
+      rows: [
+        { cells: ["1", "Ann", "DB", "Databases"] },
+        { cells: ["2", "Bob", "OS", "Operating Systems"] },
+      ],
+    },
+    operation: "Delete Ann's enrollment",
+    after: {
+      ...ENROLLMENT,
+      rows: [
+        { cells: ["1", "Ann", "DB", "Databases"], state: "gone" },
+        { cells: ["2", "Bob", "OS", "Operating Systems"] },
+      ],
+    },
+    result: "Ann was the last student in DB, so the course Databases is lost.",
+    caption:
+      "Deleting the last enrollment of a course also deletes the only record of that course",
+  },
+};
+
+const { kind, caption } = Astro.props;
+const ex = EXAMPLES[kind];
+
+function cellState(row: Row, i: number): State | undefined {
+  return row.hl ? (row.hl.includes(i) ? row.state : undefined) : row.state;
+}
+---
+
+<Panel class="anomaly" caption={caption ?? ex.caption}>
+  <div class="layout">
+    <div class="side">
+      <p class="tag">Before</p>
+      <table class="rel">
+        <caption>{ex.before.name}</caption>
+        <thead>
+          <tr>
+            {ex.before.cols.map((c) => (
+              <th class:list={[{ key: ex.before.keys.includes(c) }]}>{c}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ex.before.rows.map((r) => (
+            <tr>
+              {r.cells.map((v) => (
+                <td>{v}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="arrow">
+      <span class="op">{ex.operation}</span>
+      <span aria-hidden="true">→</span>
+    </div>
+    <div class="side">
+      <p class="tag">After</p>
+      <table class="rel">
+        <caption>{ex.after.name}</caption>
+        <thead>
+          <tr>
+            {ex.after.cols.map((c) => (
+              <th class:list={[{ key: ex.after.keys.includes(c) }]}>{c}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ex.after.rows.map((r) => (
+            <tr class:list={[{ gone: r.state === "gone" }]}>
+              {r.cells.map((v, i) => (
+                <td class:list={[cellState(r, i)]}>{v}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="result">{ex.result}</p>
+  <p class="legend">
+    <span class="key-sample">Underlined</span> columns form the primary key.
+  </p>
+</Panel>
+
+<style>
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+  .side {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    max-width: 110px;
+    text-align: center;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+  }
+  .op {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+  .tag {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .rel {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    width: 100%;
+  }
+  .rel caption {
+    caption-side: top;
+    text-align: left;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding-bottom: 3px;
+  }
+  .rel th,
+  .rel td {
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .rel th {
+    background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+  }
+  .rel th.key,
+  .key-sample {
+    text-decoration: underline;
+  }
+  .rel td.new {
+    background: color-mix(in srgb, var(--dia-out) 20%, transparent);
+  }
+  .rel td.bad {
+    background: color-mix(in srgb, var(--dia-key) 20%, transparent);
+  }
+  .rel tr.gone td {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    background: color-mix(in srgb, var(--dia-key) 20%, transparent);
+  }
+  .result {
+    margin: 12px 0 0;
+    font-size: 0.8rem;
+  }
+  .legend {
+    margin: 6px 0 0;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+  @media (max-width: 520px) {
+    .arrow {
+      flex-direction: row;
+      max-width: none;
+    }
+  }
+</style>

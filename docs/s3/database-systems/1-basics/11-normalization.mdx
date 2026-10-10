@@ -1,7 +1,7 @@
 ---
 title: Normalization
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-29T03:56:56.798Z
+lastUpdatedOn: 2026-10-10T18:32:22.311Z
 ---
 
 A systematic approach to decide whether a particular relation is in good form. Helps ensure correctness and maintainability. But might degrade query performance.
@@ -22,57 +22,15 @@ A database is in a _good_ form when all of its relations are in _good_ form.
 
 ### Normal Forms
 
+Normal forms prevent [anomalies](/s3/database-systems/basics/anomalies).
+
 Several normal forms are defined, each builds on the previous one and defines a set of rules. Consecutive normal forms ensure the relations are in a better form.
 
 Each normal form defines a set of conditions. If one of the conditions are violated, the relation is said to be violate the normal form.
 
 If a relation violates $n$th normal form, it is violating $i$th normal forms where $i \gt n$.
 
-### Extraneous Attributes
-
-Unnecessary attributes in a functional dependency (FD) that can be removed without affecting the closure. Can either be in LHS or RHS.
-
-Removing extraneous attributes:
-
-- Simplifies functional dependency sets
-- Helps compute minimal covers
-- Avoids redundant checks during normalization
-
-#### Testing
-
-Consider a set of functional dependencies $F$, and $\alpha \rightarrow \beta \in F$.
-
-The attribute $A \in \alpha$ is extraneous in $\alpha$ **if** $(\alpha - A)^+$ contains $\beta$.
-
-The attribute $A \in \beta$ is extraneous in $\beta$ **if**:
-
-- Compute $\alpha^+$ using only the dependencies in $F' = (F - \set{\alpha - \beta}) \cup (\alpha \rightarrow (\beta - A))$
-- Check if $\alpha^+$ contains $A$; if it does, $A$ is extraneous in $\beta$
-
-## Anomalies
-
-A situation where a change in data causes inconsistency or lose information.
-
-### Insertion Anomaly
-
-Occurs when certain data cannot be inserted into a database without the presence of other, unrelated data.
-
-Example:  
-Cannot add a new student unless they are enrolled in a course, because student and course details are stored in the same table.
-
-### Update Anomaly
-
-Happens when data redundancy causes inconsistent updates across records.
-
-Example:  
-If an instructor's department name changes, it must be updated in multiple rows; missing one row leads to inconsistent data.
-
-### Deletion Anomaly
-
-Occurs when deleting a record unintentionally removes valuable related information.
-
-Example:  
-Deleting the last student enrolled in a course also deletes the course information itself.
+<NormalFormsNesting />
 
 ## 1st Normal Form (1NF)
 
@@ -84,6 +42,8 @@ If all the below conditions are met, the relation is in 1NF:
 - It has a primary key.
 - It has no repeating groups.
 
+<NormalizationExample form="1nf" />
+
 ## 2nd Normal Form (2NF)
 
 If all the below conditions are met, the relation is in 2NF:
@@ -93,16 +53,20 @@ If all the below conditions are met, the relation is in 2NF:
 
 If not, the relation must be decomposed into smaller relations.
 
+<NormalizationExample form="2nf" />
+
 ## 3rd Normal Form (3NF)
 
 If all the below conditions are met, the relation is in 3NF:
 
 - It's in 2NF
-- All non-key attributes must dependent only on the entire primary key.
+- All non-key attributes must depend only on the entire primary key.
 
 Allows key attributes to depend on non-key attributes.
 
 Aims to remove data redundancy.
+
+<NormalizationExample form="3nf" />
 
 ## Boyce-Codd Normal Form (BCNF)
 
@@ -111,7 +75,9 @@ Slightly stronger than 3NF. Can be thought of as 3.5NF.
 If all the below conditions are met, the relation is in BCNF:
 
 - It's in 3NF
-- All key attributes must dependent on and only on the entire primary key.
+- All key attributes must depend on and only on the entire primary key.
+
+<NormalizationExample form="bcnf" />
 
 <Note>
 
@@ -140,14 +106,31 @@ If that's not achievable, either dependency preservation is left or 3NF is used.
 
 </Note>
 
+### Why BCNF Is the Usual Target
+
+Most designs stop at BCNF, or 3NF when dependency preservation is needed, even though 4NF and 5NF exist.
+
+- Functional dependencies are the most common constraint.  
+  BCNF removes the redundancy they cause.
+- Multivalued and join dependencies are rare.  
+  They appear only when independent facts are stored together in 1 relation.
+- A careful [ER model](/s3/database-systems/basics/entity-relationship-model) already avoids them.  
+  Each independent multivalued fact becomes its own entity or relationship, so the resulting tables are usually in 4NF already.
+- Join dependencies are hard to spot.  
+  They are not visible from the real-world constraints the way functional dependencies are.
+- Every extra decomposition adds joins.  
+  Queries get slower for a small gain in redundancy.
+
 ## 4th Normal Form (4NF)
 
 If all the below conditions are met, the relation is in 4NF:
 
 - It's in BCNF
-- All multivalued dependencies must be multivalued dependencies on the key.
+- All [multivalued dependencies](/s3/database-systems/basics/functional-dependencies#multivalued-dependencies) must be multivalued dependencies on the key.
 
 If not, the relation must be decomposed into smaller relations.
+
+<NormalizationExample form="4nf" />
 
 ## 5th Normal Form (5NF)
 
@@ -155,3 +138,5 @@ If all the below conditions are met, the relation is in 5NF:
 
 - It's in 4NF
 - It cannot be describable as the logical result of joining some other tables together.
+
+<NormalizationExample form="5nf" />

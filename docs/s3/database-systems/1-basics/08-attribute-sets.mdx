@@ -1,7 +1,7 @@
 ---
 title: Attribute Sets
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-29T03:56:56.785Z
+lastUpdatedOn: 2026-10-10T18:32:22.265Z
 ---
 
 A set of attributes.
@@ -45,3 +45,45 @@ def attribute_closure(attributes, fds):
                 changed = True
     return closure
 ```
+
+## Extraneous Attributes
+
+Unnecessary attributes in a functional dependency (FD) that can be removed without affecting the closure. Can either be in LHS or RHS.
+
+Removing extraneous attributes:
+
+- Simplifies functional dependency sets
+- Helps compute minimal covers
+- Avoids redundant checks during normalization
+
+### Testing
+
+Consider a set of functional dependencies $F$, and $\alpha \rightarrow \beta \in F$.
+
+The attribute $A \in \alpha$ is extraneous in $\alpha$ **if** $(\alpha - A)^+$ contains $\beta$.
+
+The attribute $A \in \beta$ is extraneous in $\beta$ **if**:
+
+- Compute $\alpha^+$ using only the dependencies in $F' = (F - \set{\alpha \rightarrow \beta}) \cup (\alpha \rightarrow (\beta - A))$
+- Check if $\alpha^+$ contains $A$. If it does, $A$ is extraneous in $\beta$
+
+### Examples
+
+Attribute in the LHS.
+
+Given $F = \set{A \rightarrow C, AB \rightarrow C}$. Test $B$ in $AB \rightarrow C$.
+
+- $\alpha = AB$ and $\beta = C$
+- $(\alpha - B)^+ = A^+ = \set{A, C}$ using $A \rightarrow C$
+- $A^+$ contains $\beta = C$, so $B$ is extraneous
+- $AB \rightarrow C$ reduces to $A \rightarrow C$
+
+Attribute in the RHS.
+
+Given $F = \set{A \rightarrow B, B \rightarrow C, A \rightarrow BC}$. Test $C$ in $A \rightarrow BC$.
+
+- $\alpha = A$ and $\beta = BC$
+- $F' = \set{A \rightarrow B, B \rightarrow C, A \rightarrow B}$
+- $A^+ = \set{A, B, C}$ in $F'$, using $A \rightarrow B$ then $B \rightarrow C$
+- $A^+$ contains $C$, so $C$ is extraneous
+- $A \rightarrow BC$ reduces to $A \rightarrow B$

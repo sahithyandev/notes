@@ -1,0 +1,428 @@
+---
+// Shows a relation that violates one normal form (offending columns
+// highlighted) next to the relations it decomposes into. The data for each
+// form is fixed here so every note renders the same worked example.
+import Panel from "./primitives/panel.astro";
+
+type Form = "1nf" | "2nf" | "3nf" | "bcnf" | "4nf" | "5nf";
+
+interface Props {
+  form: Form;
+  caption?: string;
+}
+
+interface Table {
+  name: string;
+  cols: string[];
+  keys: string[];
+  rows: string[][];
+  hl?: string[];
+}
+
+interface Example {
+  before: Table;
+  after: Table[];
+  problem: string;
+  caption: string;
+}
+
+const EXAMPLES: Record<Form, Example> = {
+  "1nf": {
+    before: {
+      name: "Student",
+      cols: ["StudentID", "Name", "Phones"],
+      keys: ["StudentID"],
+      hl: ["Phones"],
+      rows: [
+        ["1", "Ann", "071, 077"],
+        ["2", "Bob", "070"],
+      ],
+    },
+    after: [
+      {
+        name: "Student",
+        cols: ["StudentID", "Name"],
+        keys: ["StudentID"],
+        rows: [
+          ["1", "Ann"],
+          ["2", "Bob"],
+        ],
+      },
+      {
+        name: "StudentPhone",
+        cols: ["StudentID", "Phone"],
+        keys: ["StudentID", "Phone"],
+        rows: [
+          ["1", "071"],
+          ["1", "077"],
+          ["2", "070"],
+        ],
+      },
+    ],
+    problem: "Phones holds a repeating group",
+    caption:
+      "A relation with a multi-valued Phones attribute decomposed into 2 relations in 1NF",
+  },
+  "2nf": {
+    before: {
+      name: "Enrollment",
+      cols: ["StudentID", "CourseID", "StudentName", "Grade"],
+      keys: ["StudentID", "CourseID"],
+      hl: ["StudentName"],
+      rows: [
+        ["1", "DB", "Ann", "A"],
+        ["1", "OS", "Ann", "B"],
+        ["2", "DB", "Bob", "C"],
+      ],
+    },
+    after: [
+      {
+        name: "Student",
+        cols: ["StudentID", "StudentName"],
+        keys: ["StudentID"],
+        rows: [
+          ["1", "Ann"],
+          ["2", "Bob"],
+        ],
+      },
+      {
+        name: "Enrollment",
+        cols: ["StudentID", "CourseID", "Grade"],
+        keys: ["StudentID", "CourseID"],
+        rows: [
+          ["1", "DB", "A"],
+          ["1", "OS", "B"],
+          ["2", "DB", "C"],
+        ],
+      },
+    ],
+    problem: "StudentName depends on StudentID only (partial dependency)",
+    caption:
+      "A partial dependency on part of the key removed by moving StudentName into its own relation",
+  },
+  "3nf": {
+    before: {
+      name: "Student",
+      cols: ["StudentID", "Dept", "DeptHead"],
+      keys: ["StudentID"],
+      hl: ["Dept", "DeptHead"],
+      rows: [
+        ["1", "CS", "Dr. Lee"],
+        ["2", "CS", "Dr. Lee"],
+        ["3", "EE", "Dr. Kim"],
+      ],
+    },
+    after: [
+      {
+        name: "Student",
+        cols: ["StudentID", "Dept"],
+        keys: ["StudentID"],
+        rows: [
+          ["1", "CS"],
+          ["2", "CS"],
+          ["3", "EE"],
+        ],
+      },
+      {
+        name: "Department",
+        cols: ["Dept", "DeptHead"],
+        keys: ["Dept"],
+        rows: [
+          ["CS", "Dr. Lee"],
+          ["EE", "Dr. Kim"],
+        ],
+      },
+    ],
+    problem: "StudentID → Dept → DeptHead (transitive dependency)",
+    caption:
+      "A transitive dependency removed by moving DeptHead into a Department relation",
+  },
+  bcnf: {
+    before: {
+      name: "Teaching",
+      cols: ["Student", "Course", "Instructor"],
+      keys: ["Student", "Course"],
+      hl: ["Course", "Instructor"],
+      rows: [
+        ["Ann", "DB", "Lee"],
+        ["Bob", "DB", "Lee"],
+        ["Ann", "OS", "Kim"],
+        ["Cathy", "DB", "Park"],
+      ],
+    },
+    after: [
+      {
+        name: "Takes",
+        cols: ["Student", "Instructor"],
+        keys: ["Student", "Instructor"],
+        rows: [
+          ["Ann", "Lee"],
+          ["Bob", "Lee"],
+          ["Ann", "Kim"],
+          ["Cathy", "Park"],
+        ],
+      },
+      {
+        name: "Assigned",
+        cols: ["Instructor", "Course"],
+        keys: ["Instructor"],
+        rows: [
+          ["Lee", "DB"],
+          ["Kim", "OS"],
+          ["Park", "DB"],
+        ],
+      },
+    ],
+    problem:
+      "Instructor → Course, but Instructor is not a key. A course can have several instructors, so Course does not determine Instructor",
+    caption:
+      "A relation in 3NF but not BCNF, decomposed along the dependency Instructor → Course",
+  },
+  "4nf": {
+    before: {
+      name: "Employee",
+      cols: ["Employee", "Skill", "Language"],
+      keys: ["Employee", "Skill", "Language"],
+      hl: ["Skill", "Language"],
+      rows: [
+        ["Ann", "SQL", "EN"],
+        ["Ann", "SQL", "FR"],
+        ["Ann", "Java", "EN"],
+        ["Ann", "Java", "FR"],
+      ],
+    },
+    after: [
+      {
+        name: "EmployeeSkill",
+        cols: ["Employee", "Skill"],
+        keys: ["Employee", "Skill"],
+        rows: [
+          ["Ann", "SQL"],
+          ["Ann", "Java"],
+        ],
+      },
+      {
+        name: "EmployeeLanguage",
+        cols: ["Employee", "Language"],
+        keys: ["Employee", "Language"],
+        rows: [
+          ["Ann", "EN"],
+          ["Ann", "FR"],
+        ],
+      },
+    ],
+    problem: "Employee ↠ Skill and Employee ↠ Language are independent",
+    caption:
+      "Two independent multivalued facts about an employee stored separately instead of as every combination",
+  },
+  "5nf": {
+    before: {
+      name: "SupplierPartProject",
+      cols: ["Supplier", "Part", "Project"],
+      keys: ["Supplier", "Part", "Project"],
+      rows: [
+        ["S1", "P1", "J2"],
+        ["S1", "P2", "J1"],
+        ["S2", "P1", "J1"],
+        ["S1", "P1", "J1"],
+      ],
+    },
+    after: [
+      {
+        name: "SupplierPart",
+        cols: ["Supplier", "Part"],
+        keys: ["Supplier", "Part"],
+        rows: [
+          ["S1", "P1"],
+          ["S1", "P2"],
+          ["S2", "P1"],
+        ],
+      },
+      {
+        name: "PartProject",
+        cols: ["Part", "Project"],
+        keys: ["Part", "Project"],
+        rows: [
+          ["P1", "J2"],
+          ["P2", "J1"],
+          ["P1", "J1"],
+        ],
+      },
+      {
+        name: "ProjectSupplier",
+        cols: ["Project", "Supplier"],
+        keys: ["Project", "Supplier"],
+        rows: [
+          ["J2", "S1"],
+          ["J1", "S1"],
+          ["J1", "S2"],
+        ],
+      },
+    ],
+    problem: "Equals the join of its 3 projections",
+    caption:
+      "A relation that is exactly the join of its 3 binary projections, split into those projections",
+  },
+};
+
+const { form, caption } = Astro.props;
+const ex = EXAMPLES[form];
+---
+
+<Panel class="norm-example" caption={caption ?? ex.caption}>
+  <div class="layout">
+    <div class="side">
+      <p class="tag violates">
+        Violates {form === "bcnf" ? "BCNF" : form.toUpperCase()}
+      </p>
+      <table class="rel">
+        <caption>{ex.before.name}</caption>
+        <thead>
+          <tr>
+            {ex.before.cols.map((c) => (
+              <th
+                class:list={[
+                  {
+                    key: ex.before.keys.includes(c),
+                    bad: ex.before.hl?.includes(c),
+                  },
+                ]}
+              >
+                {c}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ex.before.rows.map((r) => (
+            <tr>
+              {r.map((v, i) => (
+                <td
+                  class:list={[
+                    { bad: ex.before.hl?.includes(ex.before.cols[i]) },
+                  ]}
+                >
+                  {v}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="problem">{ex.problem}</p>
+    </div>
+    <div class="arrow" aria-hidden="true">
+      →
+    </div>
+    <div class="side">
+      <p class="tag ok">Decomposed</p>
+      <div class="tables">
+        {ex.after.map((t) => (
+          <table class="rel">
+            <caption>{t.name}</caption>
+            <thead>
+              <tr>
+                {t.cols.map((c) => (
+                  <th class:list={[{ key: t.keys.includes(c) }]}>{c}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {t.rows.map((r) => (
+                <tr>
+                  {r.map((v) => (
+                    <td>{v}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
+    </div>
+  </div>
+  <p class="legend">
+    <span class="key-sample">Underlined</span> columns form the primary key.
+  </p>
+</Panel>
+
+<style>
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+  .side {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+  .arrow {
+    font-size: 1.4rem;
+    color: var(--text-muted);
+  }
+  .tag {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .tag.violates {
+    color: var(--dia-key);
+  }
+  .tag.ok {
+    color: var(--dia-out);
+  }
+  .tables {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rel {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    width: 100%;
+  }
+  .rel caption {
+    caption-side: top;
+    text-align: left;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding-bottom: 3px;
+  }
+  .rel th,
+  .rel td {
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .rel th {
+    background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+  }
+  .rel th.key,
+  .key-sample {
+    text-decoration: underline;
+  }
+  .rel .bad {
+    background: color-mix(in srgb, var(--dia-key) 18%, transparent);
+  }
+  .problem {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .legend {
+    margin: 12px 0 0;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+  @media (max-width: 520px) {
+    .arrow {
+      transform: rotate(90deg);
+    }
+  }
+</style>

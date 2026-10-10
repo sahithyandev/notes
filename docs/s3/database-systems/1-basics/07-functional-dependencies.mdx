@@ -1,7 +1,7 @@
 ---
 title: Functional Dependencies
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-09-29T03:56:56.777Z
+lastUpdatedOn: 2026-10-10T18:32:22.254Z
 ---
 
 Describes a relationship between attributes in a relation. Defines if one set of attributes can determine another.
@@ -85,3 +85,20 @@ Takes exponential time to compute.
 ## Canonical Cover
 
 For a set of functional dependencies $F$, its canonical cover is the minimal set of functional dependencies equivalent to $F$, having no redundant dependencies or redundant parts of dependencies.
+
+## Multivalued Dependencies
+
+A multivalued dependency (MVD) $\alpha \twoheadrightarrow \beta$ holds on a relation $R$ **iff** for any 2 tuples $t_1$ and $t_2$ with $t_1[\alpha] = t_2[\alpha]$, the relation also has tuples $t_3$ and $t_4$ such that:
+
+- $t_3[\alpha] = t_4[\alpha] = t_1[\alpha]$
+- $t_3[\beta] = t_1[\beta]$ and $t_3[R - \alpha - \beta] = t_2[R - \alpha - \beta]$
+- $t_4[\beta] = t_2[\beta]$ and $t_4[R - \alpha - \beta] = t_1[R - \alpha - \beta]$
+
+The $\beta$ values of an $\alpha$ value are independent of the remaining attributes. Every combination of them appears in the relation.
+
+An MVD is trivial **if** $\beta \subseteq \alpha$ or $\alpha \cup \beta = R$.
+
+Every functional dependency is also a multivalued dependency.
+
+Example:  
+In $R(\text{Employee}, \text{Skill}, \text{Language})$, $\text{Employee} \twoheadrightarrow \text{Skill}$ and $\text{Employee} \twoheadrightarrow \text{Language}$ hold. If Ann has the skills SQL and Java and the languages EN and FR, all 4 combinations of skill and language appear in $R$.

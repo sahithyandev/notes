@@ -1,6 +1,7 @@
 // Barrel of every illustration component, so [...slug].astro can spread one
 // import into its MDX components map instead of hand-listing all of them
 // twice (once as an import, once in the map).
+export { default as AnomalyExample } from "./anomaly-example.astro";
 export { default as AssignmentStep } from "./assignment-step.astro";
 export { default as AssignmentTable } from "./assignment-table.astro";
 export { default as BranchAndBoundTree } from "./branch-and-bound-tree.astro";
@@ -22,6 +23,8 @@ export { default as KerberosDiagram } from "./kerberos-diagram.astro";
 export { default as KerberosDataFlow } from "./kerberos-data-flow.astro";
 export { default as MarketEquilibriumDiagram } from "./market-equilibrium-diagram.astro";
 export { default as NetworkDiagram } from "./network-diagram.astro";
+export { default as NormalFormsNesting } from "./normal-forms-nesting.astro";
+export { default as NormalizationExample } from "./normalization-example.astro";
 export { default as Packet } from "./packet.astro";
 export { default as PermissionBreakdown } from "./permission-breakdown.astro";
 export { default as PermutationTable } from "./permutation-table.astro";

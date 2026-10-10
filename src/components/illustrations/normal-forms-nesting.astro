@@ -1,0 +1,73 @@
+---
+// Concentric regions showing that each normal form is a subset of the
+// previous one.
+import Panel from "./primitives/panel.astro";
+import { makeUid } from "./lib/uid";
+
+interface Props {
+  caption?: string;
+}
+
+const {
+  caption = "Nested regions: every 5NF relation is also in 4NF, BCNF, 3NF, 2NF and 1NF",
+} = Astro.props;
+
+const uid = makeUid("nf-nest");
+const FORMS = ["1NF", "2NF", "3NF", "BCNF", "4NF", "5NF"];
+const CX = 120;
+const BOTTOM = 128;
+const rings = FORMS.map((label, i) => {
+  const ry = 64 - i * 10.5;
+  const rx = 116 - i * 17;
+  const cy = BOTTOM - ry;
+  return { label, rx, ry, cy, labelY: cy - ry + 9 };
+});
+---
+
+<Panel class="nf-nest" caption={caption}>
+  <svg viewBox="0 0 240 130" role="img" aria-labelledby={`${uid}-t`}>
+    <title id={`${uid}-t`}>Normal forms as nested regions</title>
+    {rings.map((r, i) => (
+      <>
+        <ellipse
+          cx={CX}
+          cy={r.cy}
+          rx={r.rx}
+          ry={r.ry}
+          class="ring"
+          style={`--mix:${8 + i * 7}%`}
+        />
+        <text
+          x={CX}
+          y={i === rings.length - 1 ? r.cy + 3 : r.labelY}
+          class="lbl"
+        >
+          {r.label}
+        </text>
+      </>
+    ))}
+  </svg>
+</Panel>
+
+<style>
+  :global(figure.panel.nf-nest) {
+    max-width: 460px;
+    margin-inline: auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+  }
+  .ring {
+    fill: color-mix(in srgb, var(--accent) var(--mix), transparent);
+    stroke: var(--accent);
+    stroke-width: 0.8;
+  }
+  .lbl {
+    text-anchor: middle;
+    font-size: 8.5px;
+    font-weight: 700;
+    fill: currentColor;
+    font-family: var(--font-ui);
+  }
+</style>
