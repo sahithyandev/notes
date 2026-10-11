@@ -1,0 +1,95 @@
+---
+title: Storage Virtualization
+prereqs:
+  - s3/operating-systems/disk-attachment
+  - s4/software-engineering/virtual-server
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:30:43.646Z
+lastUpdatedOn: 2026-10-11T08:51:56.050Z
+---
+
+**Storage virtualization** maps logical storage to physical storage through an abstraction layer.
+
+S3 covers [SAN, NAS, storage arrays, and LUNs](/s3/operating-systems/disk-attachment). Virtualization pools these resources and presents logical volumes independently of individual storage devices.
+
+## Storage Pools
+
+- Multiple supported storage arrays contribute capacity to a pool.
+- Logical volumes are created from the pool and assigned to compute systems.
+- Mapping hides the physical location of stored blocks or files.
+- Central management simplifies allocation across heterogeneous devices.
+- Supported implementations can migrate data or change capacity without interrupting client access.
+
+Pooling can increase utilization and reduce total cost of ownership. Non-disruptive operation depends on the implementation and available capacity.
+
+## Storage for VMs
+
+A VM commonly consists of configuration files, virtual disk files, and optional saved-state files.
+
+- A virtual disk presents a block device to the guest OS.
+- The hypervisor maps guest disk operations to the backing storage.
+- The guest sees its assigned disk capacity rather than the entire storage pool.
+- A virtual disk can be backed by local storage, SAN storage, or a NAS datastore.
+- Provisioned virtual capacity can differ from physical space consumed.
+
+## Shared Datastores
+
+### VMFS
+
+**Virtual Machine File System (VMFS)** is VMware's clustered filesystem for storing VM files on block storage.
+
+- Multiple ESXi hosts can access a shared VMFS datastore.
+- Locking coordinates access to VM files.
+- A datastore can hold virtual disks belonging to many VMs.
+
+Shared datastore access does not permit arbitrary concurrent writes to the same virtual disk. [VMware's locking behaviour](https://knowledge.broadcom.com/external/article/313527/enabling-or-disabling-simultaneous-write.html) protects disks from conflicting access.
+
+### NFS
+
+**Network File System (NFS)** provides remote file access over a network. A hypervisor can store VM files in an NFS export supplied by a NAS system.
+
+- The NAS system manages the underlying filesystem.
+- Multiple authorized hosts can access the export.
+- Network availability and storage performance affect VM I/O.
+
+VMFS and NFS are the lecture's datastore examples. VMFS is not a generic filesystem used by every hypervisor.
+
+## Block and File Virtualization
+
+| Property           | Block-Level Virtualization                          | File-Level Virtualization                             |
+| ------------------ | --------------------------------------------------- | ----------------------------------------------------- |
+| Environment        | SAN and block storage.                              | NAS and file servers.                                 |
+| Presented Resource | Logical block volume.                               | Files under a logical namespace.                      |
+| Mapping            | Logical blocks to physical storage locations.       | Logical file paths to actual file locations.          |
+| Client View        | A disk on which the client can create a filesystem. | A stable file path independent of the hosting server. |
+
+A network-based virtualization appliance can perform the mapping between clients and multiple storage systems. A global file namespace allows files to move between NAS systems while retaining client-visible paths.
+
+## Thick and Thin Provisioning
+
+- Thick provisioning  
+  Reserves backing capacity for the provisioned volume in advance.
+- Thin provisioning  
+  Allocates backing capacity as data is written.
+
+Thin provisioning leaves unwritten capacity available in the shared pool. It does not create physical capacity. Pool exhaustion can cause allocation or write failures, so growth requires monitoring.
+
+## Worked Example
+
+The lecture uses a 2 TB storage pool and 3 LUNs. Use decimal units, with 2 TB equal to 2000 GB. Ignore metadata and redundancy overhead.
+
+| LUN   | Provisioned Capacity | Actual Data | Reserved but Unused with Thick Provisioning |
+| ----- | -------------------- | ----------- | ------------------------------------------- |
+| 1     | 500 GB               | 100 GB      | 400 GB                                      |
+| 2     | 550 GB               | 50 GB       | 500 GB                                      |
+| 3     | 800 GB               | 200 GB      | 600 GB                                      |
+| Total | 1850 GB              | 350 GB      | 1500 GB                                     |
+
+1. Total provisioned capacity is $500 + 550 + 800 = 1850$ GB.
+2. Actual data occupies $100 + 50 + 200 = 350$ GB.
+3. Thick provisioning leaves $2000 - 1850 = 150$ GB unallocated in the pool.
+4. Thick provisioning reserves $1850 - 350 = 1500$ GB that contains no data.
+5. Thin provisioning initially consumes 350 GB, leaving $2000 - 350 = 1650$ GB available in the pool.
+
+Both arrangements present the same 1850 GB of logical capacity. Thin provisioning makes the 1500 GB of unwritten capacity available for allocation elsewhere until writes consume it.

@@ -1,0 +1,105 @@
+---
+title: Virtualization
+prereqs:
+  - s4/software-engineering/virtual-server
+  - s4/operating-systems-security/virtualization
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:30:43.059Z
+lastUpdatedOn: 2026-10-11T08:51:55.984Z
+---
+
+**Virtualization** presents logical resources through an abstraction layer that maps them to underlying physical resources.
+
+S4 introduces [VMs, hypervisor types, and containers](/s4/software-engineering/virtual-server) and their [security uses](/s4/operating-systems-security/virtualization). The system virtualization techniques below extend that coverage from `L10 - Virtualization.pdf`.
+
+## Benefits and Costs
+
+- Compatibility  
+  A virtual interface separates software from particular hardware or operating-system details.
+- Management  
+  VMs can be created, suspended, resumed, and checkpointed through software.
+- Consolidation  
+  Multiple workloads share a physical server, improving utilization.
+- Isolation  
+  Separate guest environments restrict access to each other's resources.
+- Overhead  
+  Instruction handling, virtual I/O, and resource contention can reduce application performance.
+
+Higher utilization does not imply that an individual program runs faster. Isolation also depends on the hypervisor and its configuration.
+
+## Hypervisor Placement
+
+A **hypervisor**, or virtual machine monitor (VMM), controls the virtual hardware presented to guest operating systems.
+
+| Type               | Software Stack                                            | Examples                            |
+| ------------------ | --------------------------------------------------------- | ----------------------------------- |
+| Bare metal, Type 1 | Hardware → hypervisor → guest OS → applications           | Xen, VMware ESXi, Microsoft Hyper-V |
+| Hosted, Type 2     | Hardware → host OS → hypervisor → guest OS → applications | VMware Workstation, VirtualBox      |
+
+<Note>
+
+The slides classify KVM as hosted. KVM integrates virtualization into the Linux kernel, allowing Linux itself to act as a hypervisor. It is commonly classified as Type 1. Hypervisors still need scheduling, memory management, and device support. See [Red Hat's KVM overview](https://www.redhat.com/en/topics/virtualization/what-is-KVM).
+
+</Note>
+
+## Full Virtualization
+
+**Full virtualization** presents a sufficiently complete hardware interface for an unmodified guest OS to run.
+
+- Different supported guest operating systems can run concurrently.
+- The VMM handles operations that must not directly control the physical machine.
+- Software implementations can translate sensitive instruction sequences into safe sequences.
+- Ordinary instructions can execute directly when the guest and host instruction sets permit it.
+
+**Binary translation** replaces instruction sequences with sequences that preserve their effects on the virtual machine.
+
+- Translation adds execution and management overhead.
+- Virtual device emulation can add I/O overhead.
+- Guest compatibility depends on the virtual hardware and available drivers.
+- Migration to physical hardware still requires compatible devices and drivers.
+
+Full virtualization describes the guest-visible interface. Binary translation is 1 implementation technique, not a requirement of every fully virtualized system.
+
+## Paravirtualization
+
+**Paravirtualization** makes the guest aware of the hypervisor. The guest uses **hypercalls** to request operations from it.
+
+- Guest changes replace selected sensitive operations with explicit hypervisor requests.
+- Hypercalls avoid binary translation for those operations.
+- The guest depends on the hypervisor interface it supports.
+- Porting and maintaining guest modifications adds cost.
+- Guest portability depends on supported interfaces and alternative execution paths.
+
+A hypercall crosses from guest software to the hypervisor. A normal system call crosses from an application to its OS kernel.
+
+Paravirtualized drivers can also improve I/O in an otherwise fully virtualized guest. Full virtualization and paravirtualization can coexist in 1 VM.
+
+## Hardware-Assisted Virtualization
+
+**Hardware-assisted virtualization** uses processor extensions to control guest execution and transfer selected operations to the hypervisor.
+
+- CPU control structures hold guest state and execution controls.
+- Selected instructions and events cause a VM exit to the hypervisor.
+- The hypervisor handles the event and resumes the guest through a VM entry.
+- CPU assistance reduces the need for software binary translation.
+- An unmodified guest OS can run when the remaining virtual platform is supported.
+
+Examples:
+
+- Intel VT-x
+- AMD-V
+
+<Note>
+
+VMX root and non-root modes are separate from the usual x86 privilege rings. A guest kernel and its applications retain different privileges within non-root mode. They do not gain equal privilege merely by running in a VM. See [Intel's execution-mode description](https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/hardware-behavior-related-to-speculative-execution.html).
+
+</Note>
+
+## Technique Comparison
+
+| Technique                        | Guest Changes                                     | Main Mechanism                                        | Main Cost                                         |
+| -------------------------------- | ------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| Software full virtualization     | No guest OS changes required.                     | Direct execution with trapping or binary translation. | Translation and device-emulation overhead.        |
+| Paravirtualization               | Hypervisor-aware kernel or drivers.               | Hypercalls and cooperative interfaces.                | Guest integration and interface dependence.       |
+| Hardware-assisted virtualization | No guest OS changes required for basic execution. | CPU virtualization extensions.                        | VM exits, virtual I/O, and hardware requirements. |

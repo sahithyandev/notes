@@ -1,0 +1,73 @@
+---
+title: IPv6 Neighbor Discovery
+prereqs:
+  - s3/data-communication-and-networking/ip
+  - s4/computer-networks/ipv6
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:21:08.828Z
+lastUpdatedOn: 2026-10-11T08:51:55.895Z
+---
+
+**Neighbor Discovery Protocol (NDP)** uses ICMPv6 messages to discover routers, resolve neighbors' link-layer addresses, and check neighbor reachability. Defined in [RFC 4861](https://www.rfc-editor.org/rfc/rfc4861).
+
+S3 introduces [ARP](/s3/data-communication-and-networking/ip#arp). S4 covers the basic [SLAAC exchange](/s4/computer-networks/ipv6#slaac) and [Duplicate Address Detection](/s4/computer-networks/ipv6#privacy-address). NDP supplies IPv6 address resolution and the messages used by these configuration procedures.
+
+## ICMPv6 Messages
+
+| Type | Message                | Purpose                                                                         |
+| ---- | ---------------------- | ------------------------------------------------------------------------------- |
+| 133  | Router Solicitation    | Request a Router Advertisement.                                                 |
+| 134  | Router Advertisement   | Announce router availability, prefixes, and link parameters.                    |
+| 135  | Neighbor Solicitation  | Resolve a link-layer address, probe reachability, or check a tentative address. |
+| 136  | Neighbor Advertisement | Respond to a solicitation or announce a changed link-layer address.             |
+| 137  | Redirect               | Inform a host of a better first hop for a destination.                          |
+
+## Solicited-Node Multicast
+
+A solicited-node multicast address combines `ff02::1:ff00:0/104` with the low-order 24 bits of a unicast or anycast address.
+
+- An interface joins the group associated with each assigned address.
+- Address-resolution solicitations target this group instead of all nodes.
+- Different addresses can share a group when their low-order 24 bits match.
+- The solicitation's Target Address identifies the full address being queried.
+
+Examples:
+
+- Target address `2001:db8::1234:5678`
+- Low-order 24 bits `34:56:78`
+- Solicited-node multicast address `ff02::1:ff34:5678`
+
+## Duplicate Address Detection Details
+
+DAD checks a tentative unicast address before normal use. It also applies to link-local addresses, not only privacy addresses. [RFC 4862](https://www.rfc-editor.org/rfc/rfc4862#section-5.4) defines the procedure.
+
+1. Join the all-nodes and candidate address's solicited-node multicast groups.
+2. Send a Neighbor Solicitation with source `::`, destination equal to the solicited-node multicast address, and Target Address equal to the candidate.
+3. Reject the candidate if a valid Neighbor Advertisement claims it or another node's DAD solicitation reveals a collision.
+4. Use the address after the configured probes and waiting period complete without detecting a duplicate.
+
+The unspecified source prevents the tentative address from being used as an assigned source address. A DAD solicitation omits the Source Link-Layer Address option.
+
+## Router Advertisement Flags
+
+Router Advertisements can supply a prefix, link MTU, and suggested hop limit. Their router lifetime indicates eligibility as a default router.
+
+| Flag | Location                  | Effect When Set                                                            |
+| ---- | ------------------------- | -------------------------------------------------------------------------- |
+| M    | Router Advertisement      | Addresses are available through DHCPv6.                                    |
+| O    | Router Advertisement      | Other configuration, such as DNS information, is available through DHCPv6. |
+| L    | Prefix Information option | The prefix can be used for on-link determination.                          |
+| A    | Prefix Information option | The prefix can be used for SLAAC.                                          |
+
+- M and A can both be set, allowing DHCPv6 and SLAAC together.
+- O is redundant when M is set because DHCPv6 can return the other configuration too.
+- L and A are independent, separating on-link determination from address generation.
+- A clear L flag does not establish that a prefix is off-link.
+- Hosts learn default routers through Router Advertisements, separately from DHCPv6 address assignment.
+
+<Note>
+
+The lecture and S4 note describe SLAAC without DNS configuration. Router Advertisements can carry recursive DNS server and search-list options defined in [RFC 8106](https://www.rfc-editor.org/rfc/rfc8106). MAC-derived EUI-64 is also not required for SLAAC. [RFC 8064](https://www.rfc-editor.org/rfc/rfc8064.html) recommends stable interface identifiers that do not embed link-layer addresses.
+
+</Note>

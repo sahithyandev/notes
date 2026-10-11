@@ -1,0 +1,85 @@
+---
+title: Network Virtualization
+prereqs:
+  - s4/software-engineering/virtual-server
+  - s4/computer-networks/vlan
+  - s4/computer-networks/extended-vlan
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:30:43.930Z
+lastUpdatedOn: 2026-10-11T08:51:56.085Z
+---
+
+**Network virtualization** presents logical networks independently of the physical network that carries their traffic.
+
+S4 covers [VLAN isolation](/s4/computer-networks/vlan) and [network extension through tunnels](/s4/computer-networks/extended-vlan). Virtualized data centres apply these ideas to workloads spread across physical hosts.
+
+## Virtual Switches
+
+A **virtual switch** connects VM network interfaces within a host and forwards traffic through physical uplinks when required.
+
+- A physical host can contain many independently addressed VMs.
+- Same-host traffic can remain inside the virtual switch.
+- Traffic to other hosts uses the physical network or an overlay tunnel.
+- The lecture's physical hierarchy connects hosts through top-of-rack, aggregation, and core switches.
+
+## Isolation and Connectivity
+
+- Tenant isolation  
+  Workloads belonging to different users or departments need separate network policies.
+- Workload mobility  
+  Network connectivity and policy must follow a VM when its location changes.
+- Cross-host connectivity  
+  VMs in 1 logical network can reside on different hosts or in different data centres.
+- Configuration scale  
+  Manual changes across many physical and virtual switches become difficult to coordinate.
+
+Compute isolation alone does not enforce network isolation. Sharing a physical host or switch also does not require sharing a logical network.
+
+## Underlay and Overlay
+
+- Underlay  
+  The physical network supplies connectivity between tunnel endpoints.
+- Overlay  
+  The logical network carries workload traffic across that underlay.
+
+The lecture encapsulates an inner Ethernet frame using GRE over IP.
+
+| Outer Headers       | Inner Headers                          |
+| ------------------- | -------------------------------------- |
+| Ethernet → IP → GRE | Ethernet → IP → TCP → application data |
+
+- Outer IP addresses identify the tunnel endpoints.
+- Inner addresses identify the communicating workloads.
+- Underlay routers forward using the outer IP header.
+- The receiving endpoint removes the tunnel headers before delivering the inner frame.
+- Encapsulation adds overhead and reduces the available payload MTU.
+
+Tunnel endpoints need connectivity across the underlay. Every VM does not need a public IP address. GRE encapsulation alone does not provide encryption or tenant isolation.
+
+## Controller and Open vSwitch
+
+**Open vSwitch (OVS)** is a programmable virtual switch supporting network automation and tunneling. Its [documented capabilities](https://docs.openvswitch.org/en/latest/intro/what-is-ovs/) include GRE, VXLAN, and OpenFlow.
+
+The lecture places OVS on each host and connects the switches to a controller.
+
+- The controller distributes forwarding and network policy.
+- OVS applies installed rules to workload traffic.
+- Tunnels connect virtual switches across the physical network.
+- The controller's control messages are separate from the workload data path.
+
+[SDN](/s5/advanced-networking/intro-to-sdn) supplies programmable control. [OpenFlow](/s5/advanced-networking/openflow) is 1 interface for installing forwarding rules. Network virtualization supplies the logical networks being controlled.
+
+## Worked Example
+
+Finance VM A runs on Host 1 in Data Centre 1. Finance VM B runs on Host 2 in Data Centre 2. Engineering workloads share the physical infrastructure but use a separate logical network.
+
+1. The controller configures Finance membership and forwarding policy on both virtual switches.
+2. VM A sends an Ethernet frame addressed to VM B.
+3. Host 1's virtual switch classifies the frame into the Finance network.
+4. The switch encapsulates the frame in GRE over IP, addressed to Host 2's tunnel endpoint.
+5. Underlay routers forward the outer IP packet between data centres.
+6. Host 2's virtual switch decapsulates the packet and applies the Finance forwarding policy.
+7. The switch delivers the frame to VM B without delivering it to Engineering interfaces.
+
+Finance connectivity spans both hosts. Virtual network membership and forwarding policy enforce separation from Engineering.

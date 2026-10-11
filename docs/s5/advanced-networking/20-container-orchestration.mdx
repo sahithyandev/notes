@@ -1,0 +1,69 @@
+---
+title: Container Orchestration
+prereqs:
+  - s4/software-engineering/virtual-server
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:30:44.232Z
+lastUpdatedOn: 2026-10-11T08:51:56.139Z
+---
+
+**Container orchestration** automates the placement, replication, and recovery of containerized workloads across a cluster.
+
+S4 covers [containers, Docker images, and the Docker architecture](/s4/software-engineering/virtual-server#container-based-virtualization). The lecture extends these concepts to isolation and multi-host operation.
+
+## Process and Environment
+
+A container runs processes with an isolated view of their environment and configured resource controls.
+
+- Applications depend on binaries, libraries, configuration files, and runtime state.
+- Images package the application and its user-space dependencies.
+- Containers share the host kernel rather than booting a separate guest kernel.
+- A runtime creates and manages the container's execution environment.
+
+An image is a deployable package. A container is a running instance with runtime configuration and state. Docker's [container overview](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) describes this process-based model.
+
+## Containers and VMs
+
+| Property           | Container                                      | VM                                              |
+| ------------------ | ---------------------------------------------- | ----------------------------------------------- |
+| Kernel             | Shares the host kernel.                        | Runs a guest kernel.                            |
+| Startup            | Starts isolated processes.                     | Boots or resumes a guest system.                |
+| Footprint          | Application and user-space dependencies.       | Guest OS plus applications and dependencies.    |
+| Compatibility      | Requires a compatible kernel and architecture. | Requires a supported virtual hardware platform. |
+| Isolation Boundary | Shared-kernel controls.                        | Hypervisor-mediated virtual hardware.           |
+
+- Containers typically start faster and consume fewer resources than full VMs.
+- A shared-kernel vulnerability can affect multiple containers.
+- Privileged containers and exposed host resources weaken isolation.
+- Containers can run inside VMs to combine packaging with an additional isolation boundary.
+
+## Orchestrator Responsibilities
+
+- Scheduling  
+  Place workloads on machines with suitable capacity and constraints.
+- Replication  
+  Maintain the requested number of workload instances.
+- Failure recovery  
+  Restart failed containers or replace workloads after node failure.
+- Deployment  
+  Coordinate rollout of new application images.
+- Cluster state  
+  Track desired configuration and observed workload status.
+
+An orchestrator repeatedly reconciles observed state with desired state. The container runtime executes workloads on a node. The orchestrator coordinates workloads across nodes.
+
+## Distributed Control
+
+An available control plane can use replicated control services and a distributed key-value store. Worker nodes execute the scheduled workloads.
+
+[Kubernetes](https://kubernetes.io/docs/concepts/overview/components/) separates API access, scheduling, controllers, persistent cluster state, and node-level execution. Replication of application containers does not itself make the control plane highly available.
+
+Recreating a container also does not restore data stored only in its lost writable layer. Stateful applications need persistent storage and an appropriate recovery design.
+
+Examples mentioned in the lecture:
+
+- Kubernetes
+- Mesos with Marathon
+- Docker Swarm
+- Kelda

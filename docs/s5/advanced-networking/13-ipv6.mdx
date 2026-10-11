@@ -1,0 +1,91 @@
+---
+title: IPv6 Deployment
+prereqs:
+  - s3/data-communication-and-networking/ip
+  - s3/data-communication-and-networking/ip-addressing
+  - s4/computer-networks/ipv6
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:21:08.499Z
+lastUpdatedOn: 2026-10-11T08:51:55.858Z
+---
+
+IPv6 deployment introduces IPv6 addressing and connectivity while maintaining access to services that still use IPv4.
+
+<Note>
+
+S3 covers [IP, private addresses, and NAT](/s3/data-communication-and-networking/ip) and [CIDR and subnetting](/s3/data-communication-and-networking/ip-addressing). S4 covers [IPv6 address notation and types, EUI-64, SLAAC, DHCPv6, headers, and fragmentation](/s4/computer-networks/ipv6).
+
+</Note>
+
+## IPv4 Address Conservation
+
+Address conservation delays exhaustion without increasing the IPv4 address space.
+
+- NAT with private addresses  
+  Multiple hosts share public IPv4 addresses, requiring translation state and complicating incoming connections.
+- Proxy servers  
+  Private hosts access external services through an intermediary.
+- Name-based virtual hosting  
+  Multiple websites share an IP address, with the requested hostname selecting the site.
+- Address reclamation  
+  Renumbering networks can release unused portions of earlier allocations.
+
+## Deployment Planning
+
+- Define an organizational rollout schedule and coexistence strategy.
+- Agree on prefix allocation and IPv6 service levels with the ISP.
+- Check vendor support across routers, operating systems, applications, and monitoring tools.
+- Coordinate DNS, routing, firewall policies, and application testing.
+- Train network administrators, software teams, and support staff.
+
+IPv6 support does not automatically encrypt traffic. IPsec requires configuration and key management. [RFC 8504](https://www.rfc-editor.org/rfc/rfc8504.html#section-13) recommends IPsec support rather than requiring its use for every packet.
+
+## Readiness Checks
+
+Linux commands for checking individual parts of IPv6 connectivity:
+
+| Command                      | Check                                           |
+| ---------------------------- | ----------------------------------------------- |
+| `ip -6 addr`                 | Assigned addresses and interface state.         |
+| `ip -6 route`                | IPv6 routes and the default router.             |
+| `ping -6 <destination>`      | ICMPv6 reachability.                            |
+| `tracepath -6 <destination>` | Path and path MTU information.                  |
+| `tcpdump -n ip6`             | IPv6 packets visible on the selected interface. |
+| `dig <hostname> AAAA`        | Published IPv6 DNS records.                     |
+
+An AAAA record alone does not establish working IPv6 connectivity. Test the application service as well as its address and route.
+
+## Worked Example
+
+The lecture allocates `2401:df0:17::/48` in consecutive `/56` blocks. Treat the prefix as the exercise input.
+
+1. Count the available `/56` blocks. The extra 8 prefix bits give $2^8 = 256$ blocks.
+2. Each `/56` contains $2^8 = 256$ `/64` subnets.
+3. Assign 2 blocks to the backbone and the next 2 to servers.
+4. Assign the next 124 blocks to Engineering and the next 64 to Architecture.
+5. Assign the remaining $256 - 2 - 2 - 124 - 64 = 64$ blocks to IT.
+
+The first 3 hexadecimal groups remain `2401:df0:17`. The high byte of the 4th group selects the `/56` block. Consecutive block prefixes advance by hexadecimal `0100` in that group.
+
+| Allocation   | Block Indices | First `/56`             | Last `/56`              | Count |
+| ------------ | ------------- | ----------------------- | ----------------------- | ----- |
+| Backbone     | 0–1           | `2401:df0:17:0000::/56` | `2401:df0:17:0100::/56` | 2     |
+| Servers      | 2–3           | `2401:df0:17:0200::/56` | `2401:df0:17:0300::/56` | 2     |
+| Engineering  | 4–127         | `2401:df0:17:0400::/56` | `2401:df0:17:7f00::/56` | 124   |
+| Architecture | 128–191       | `2401:df0:17:8000::/56` | `2401:df0:17:bf00::/56` | 64    |
+| IT           | 192–255       | `2401:df0:17:c000::/56` | `2401:df0:17:ff00::/56` | 64    |
+
+For example, Engineering's first block contains `/64` subnets from `2401:df0:17:0400::/64` through `2401:df0:17:04ff::/64`.
+
+Contiguous allocations can be summarized where their size and alignment permit:
+
+| Allocation   | Aggregate Prefixes                                                                                                          |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Backbone     | `2401:df0:17::/55`                                                                                                          |
+| Servers      | `2401:df0:17:0200::/55`                                                                                                     |
+| Engineering  | `2401:df0:17:0400::/54`, `2401:df0:17:0800::/53`, `2401:df0:17:1000::/52`, `2401:df0:17:2000::/51`, `2401:df0:17:4000::/50` |
+| Architecture | `2401:df0:17:8000::/50`                                                                                                     |
+| IT           | `2401:df0:17:c000::/50`                                                                                                     |
+
+Engineering needs 5 aggregate prefixes because 124 is not a power of 2. The allocations cover all 256 `/56` blocks without overlap.

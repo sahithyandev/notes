@@ -1,0 +1,50 @@
+---
+title: High-Level Language Virtual Machines
+prereqs:
+  - s4/software-engineering/virtual-server
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:30:43.341Z
+lastUpdatedOn: 2026-10-11T08:51:56.020Z
+---
+
+A **high-level language virtual machine** executes portable intermediate code through a runtime implemented for the host platform.
+
+The Java Virtual Machine (JVM) is an example. Its bytecode defines a virtual instruction set rather than a particular physical CPU's instruction set.
+
+## Compilation and Distribution
+
+| Stage        | Conventional Native Compilation                                                               | Language VM                                                           |
+| ------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Input        | High-level source program.                                                                    | High-level source program.                                            |
+| Compilation  | Compiler front end produces intermediate code, then the back end produces target object code. | Compiler produces portable bytecode for a virtual instruction set.    |
+| Distribution | Distribute the target-specific binary.                                                        | Distribute the portable bytecode.                                     |
+| Loading      | The OS loader prepares the executable memory image.                                           | The VM loader prepares the program for the runtime.                   |
+| Execution    | The CPU executes native instructions.                                                         | An interpreter or compiler executes bytecode using host instructions. |
+
+The distribution point determines portability. Native binaries target a particular platform. Portable bytecode requires a compatible VM implementation on each target platform.
+
+## Interpretation and Compilation
+
+- Interpretation  
+  The runtime executes bytecode operations through its interpreter.
+- Just-in-time compilation  
+  The runtime translates code into native instructions during execution.
+- Runtime services  
+  The VM can supply memory management, checks, and other language services.
+
+## Portability Limits
+
+- A portable virtual instruction set reduces dependence on the physical ISA.
+- Native libraries and OS-specific interfaces can restrict portability.
+- Runtime availability and supported bytecode versions constrain deployment.
+- Translation and runtime services have costs, while runtime optimization can improve execution.
+
+## System and Language VMs
+
+| Property                | System VM                                          | Language VM                                      |
+| ----------------------- | -------------------------------------------------- | ------------------------------------------------ |
+| Interface               | Virtual hardware platform.                         | Virtual instruction set and runtime services.    |
+| Workload                | Guest OS and its applications.                     | Programs targeting the language runtime.         |
+| Portability Requirement | Compatible virtual hardware and guest environment. | Compatible runtime and application dependencies. |
+| Example                 | An OS running under a hypervisor.                  | Java bytecode running on a JVM.                  |

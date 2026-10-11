@@ -1,0 +1,106 @@
+---
+title: IPv6 Transition Mechanisms
+prereqs:
+  - s3/data-communication-and-networking/ip
+  - s4/computer-networks/ipv6
+  - s4/computer-networks/internetworking
+authors:
+  - rakeshan
+dateCreated: 2026-10-08T17:21:09.149Z
+lastUpdatedOn: 2026-10-11T08:51:55.942Z
+---
+
+IPv6 transition mechanisms maintain connectivity while IPv4 and IPv6 coexist.
+
+S4 introduces [transition issues](/s4/computer-networks/ipv6#transition-issues) and [tunneling](/s4/computer-networks/internetworking#tunneling). The lecture extends these with specific tunnel and translation mechanisms.
+
+| Mechanism   | Operation                                        | Requirement                                                  |
+| ----------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| Dual Stack  | Run IPv4 and IPv6 on the same device.            | Each connection uses a protocol supported by both endpoints. |
+| Tunneling   | Carry a packet inside another protocol's packet. | Tunnel endpoints support encapsulation and decapsulation.    |
+| Translation | Convert packets between IPv4 and IPv6.           | A translator connects endpoints using different IP versions. |
+
+## Dual Stack
+
+- DNS A and AAAA records provide IPv4 and IPv6 destinations.
+- Address-selection rules and application behaviour determine which connection is attempted.
+- A dual-stack service can accept either IPv4 or IPv6 clients.
+- IPv4 addressing and operational support remain necessary while IPv4 is used.
+- Routing, monitoring, and security policies must cover both versions.
+
+## Tunnel Endpoints
+
+| Arrangement      | Tunnel Span                                                          |
+| ---------------- | -------------------------------------------------------------------- |
+| Router-to-router | Between routers connecting IPv6 networks across IPv4 infrastructure. |
+| Host-to-router   | From a host across IPv4 infrastructure to an IPv6 router.            |
+| Host-to-host     | Between hosts separated by IPv4 infrastructure.                      |
+| Router-to-host   | From a router across IPv4 infrastructure to the destination host.    |
+
+Encapsulation adds overhead and reduces the effective MTU. Tunnel reliability depends on the underlying path and tunnel endpoints. Security controls must account for the encapsulated traffic.
+
+### ISATAP
+
+**Intra-Site Automatic Tunnel Addressing Protocol** carries IPv6 between dual-stack nodes across an IPv4 site. IPv4 acts as the underlying link. An ISATAP router connects these nodes to other IPv6 networks. Defined in [RFC 5214](https://www.rfc-editor.org/rfc/rfc5214.html).
+
+### 6to4
+
+6to4 connects IPv6 sites across IPv4 using a prefix containing the site's public IPv4 address. The prefix has the form `2002:<32-bit IPv4 address>::/48`. Relays connect 6to4 sites to native IPv6 networks. Defined in [RFC 3056](https://www.rfc-editor.org/rfc/rfc3056.html).
+
+The lecture's diagram uses relay anycast address `192.88.99.1`. [RFC 7526](https://www.rfc-editor.org/rfc/rfc7526) deprecated this anycast relay mechanism because of operational problems.
+
+### Teredo
+
+Teredo carries IPv6 in UDP over IPv4 to cross NAT devices. Servers assist initialization and NAT traversal. Relays connect clients to native IPv6 destinations. Defined in [RFC 4380](https://www.rfc-editor.org/rfc/rfc4380.html).
+
+### Dual-Stack Lite
+
+DS-Lite carries IPv4 traffic across an IPv6 provider network. A customer-side Basic Bridging BroadBand element (B4) tunnels IPv4 packets to an Address Family Transition Router (AFTR), which performs carrier-grade IPv4 NAT. Defined in [RFC 6333](https://www.rfc-editor.org/rfc/rfc6333).
+
+<Note>
+
+The lecture groups DS-Lite under IPv6-over-IPv4 tunneling. Its encapsulation direction is IPv4 over IPv6.
+
+</Note>
+
+## Translation
+
+Translation allows communication between IPv6-only and IPv4-only endpoints. A tunnel alone does not provide this interoperability.
+
+### NAT64 and DNS64
+
+**NAT64** translates IPv6 client traffic into IPv4 traffic and translates replies back. Stateful NAT64 maintains address and transport-port mappings. Defined in [RFC 6146](https://datatracker.ietf.org/doc/html/rfc6146).
+
+**DNS64** synthesizes an AAAA response from an A record when a usable AAAA record is unavailable. The synthesized IPv6 address directs the client to the NAT64 translator. Defined in [RFC 6147](https://www.rfc-editor.org/rfc/rfc6147).
+
+- DNS64 synthesizes DNS answers rather than translating data packets.
+- NAT64 uses an IPv6 translation prefix, such as `64:ff9b::/96`.
+- The IPv6-only client and IPv4-only server can retain their respective IP stacks.
+- IPv4 literals bypass DNS64 synthesis and need additional handling on an IPv6-only client.
+
+### Other Translators
+
+- NAT46  
+  Translation in the IPv4-to-IPv6 direction requires an appropriate address-mapping design.
+- NAT-PT  
+  An older translation mechanism moved to Historic status by [RFC 4966](https://www.rfc-editor.org/rfc/rfc4966).
+- IVI  
+  A translation design using mapped IPv4 and IPv6 addresses.
+- Dual-stack application proxy  
+  Accepts a connection using 1 IP version and opens a separate connection using the other.
+
+Applications carrying IP addresses inside their payload may need an Application Layer Gateway to interpret or rewrite those addresses. IP-header translation alone does not update application data.
+
+## Worked Example
+
+An IPv6-only client accesses `h2.example.com`. The server has only an A record containing `192.0.2.1`. The NAT64 deployment uses `64:ff9b::/96`.
+
+1. The client requests an AAAA record through DNS64.
+2. DNS64 finds no usable AAAA record and obtains the A record `192.0.2.1`.
+3. Convert the IPv4 octets to hexadecimal. `192.0.2.1` becomes `c0 00 02 01`, or `c000:0201`.
+4. DNS64 returns the synthesized address `64:ff9b::c000:201`.
+5. The client sends its IPv6 connection request to that address. Routing delivers it to NAT64.
+6. NAT64 translates the destination to `192.0.2.1` and maps the client's source address and port to an IPv4 source address and port.
+7. The server replies to that IPv4 mapping. NAT64 uses its saved state to translate the reply back to the IPv6 client.
+
+The client uses IPv6 throughout its side of the connection. The server uses IPv4 throughout its side.
