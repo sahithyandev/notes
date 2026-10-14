@@ -1,7 +1,7 @@
 ---
 title: Kerberos
 dateCreated: 2026-09-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-05T04:43:30.517Z
+lastUpdatedOn: 2026-10-14T05:30:02.447Z
 ---
 
 Kerberos is a distributed authentication and access control system giving a User single sign-on access to multiple Services in a Realm after 1 initial login.
@@ -192,3 +192,22 @@ Steps 3 to 5 repeat for every Service $C$ wants to reach, each time presenting a
 Only $\text{AS\_REQ}$ travels fully in the clear. Confidentiality is per-field, not per-channel: each field is encrypted under whichever key its sender shares with the intended reader, e.g. the TGT under $K_T$, an Authenticator under that step's session key, and the SGT under $K_V$.
 
 <KerberosDataFlow />
+
+## Origins
+
+Kerberos was developed at MIT in the 1980s, because passwords travelled in plaintext over open networks. It adapts the Needham-Schroeder protocol of 1978 into a practical system.
+
+## Clock Synchronisation
+
+Every Authenticator carries a timestamp, and the receiver rejects it outside an allowed time skew.
+
+- A captured ticket and Authenticator cannot be replayed once they fall outside the allowed window, which is a few minutes.
+- A client clock that drifts beyond the skew, such as 10 minutes ahead of the KDC, has its requests rejected.
+- The KDC does not adjust the client's clock. Clocks are synchronised separately, e.g. by NTP.
+
+Timestamps prevent replay. They do not synchronise clocks.
+
+## Requirements
+
+- The client needs software libraries for symmetric encryption such as AES. It needs no public-key support or certificates.
+- Standard Kerberos traffic between the client and the KDC uses both UDP and TCP, on port 88.

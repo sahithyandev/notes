@@ -1,0 +1,85 @@
+---
+title: Security Evaluation
+dateCreated: 2026-10-14T00:00:00.000Z
+lastUpdatedOn: 2026-10-14T05:30:02.559Z
+---
+
+Security evaluation frameworks give independent assurance about a product or the process that built it. The 3 frameworks cover different targets and do not replace each other.
+
+| Framework       | Evaluates                           |
+| --------------- | ----------------------------------- |
+| Common Criteria | Security of an IT product or system |
+| FIPS 140-3      | Cryptographic module                |
+| SSE-CMM         | Maturity of engineering processes   |
+
+A project needing both high cryptographic assurance and functional security validation combines FIPS 140-3 for the cryptographic module with a Common Criteria evaluation of the whole system.
+
+## Common Criteria
+
+Common Criteria (ISO/IEC 15408) evaluates the security functions of a product and the assurance gained in building it. An accredited third-party laboratory performs the evaluation, and results are recognized internationally under the CCRA.
+
+### Terminology
+
+- Target of Evaluation  
+  The product or system being evaluated. Aka. TOE.
+- Protection Profile  
+  An implementation-independent statement of security requirements for a category of products, such as next-generation firewalls or enterprise routers. Aka. PP.
+- Security Target  
+  An implementation-dependent statement of what a specific TOE claims to provide. Aka. ST.
+- Evaluation Assurance Level  
+  The depth and rigor of the evaluation. Aka. EAL.
+
+An ST that claims conformance to a PP must show strict compliance or demonstrable equivalence to it. A product that satisfies its own ST but whose ST omits requirements mandated by the applicable PP fails certification.
+
+### Evaluation Assurance Levels
+
+- EAL1  
+  Functionally tested.
+- EAL2  
+  Structurally tested.
+- EAL3  
+  Methodically tested and checked.
+- EAL4  
+  Methodically designed, tested, and reviewed. The limit of economically feasible security retrofitted onto an existing product.
+- EAL5  
+  Semi-formally designed and tested. Security must be designed in from the start.
+- EAL6  
+  Semi-formally verified design and tested.
+- EAL7  
+  Formally verified design and tested.
+
+A higher EAL means more assurance, not more security functions.
+
+### Criticism
+
+The process is slow and costly. A certified version is often obsolete by the time certification is granted.
+
+## FIPS 140-3
+
+FIPS 140-3 validates cryptographic modules. It checks that the algorithms are approved and correctly implemented, and that the module protects its keys. Common Criteria does not provide this.
+
+- Level 1  
+  Basic requirements. Approved algorithms and production-grade components. No physical security mechanisms.
+- Level 2  
+  Adds tamper evidence and role-based authentication.
+- Level 3  
+  Adds tamper resistance and response. The module detects physical tampering and zeroizes its keys. Identity-based authentication.
+- Level 4  
+  Adds a formal model of the module's state transitions and protection against environmental attacks and side-channel analysis such as differential power analysis.
+
+## SSE-CMM
+
+The Systems Security Engineering Capability Maturity Model (ISO/IEC 21827) rates the maturity of an organization's security engineering processes. It does not inspect the technical attributes of a specific product release.
+
+- Level 1  
+  Performed informally.
+- Level 2  
+  Planned and tracked.
+- Level 3  
+  Well defined.
+- Level 4  
+  Quantitatively controlled. The organization measures its processes against defined metrics.
+- Level 5  
+  Continuously improving.
+
+High maturity makes engineering predictable and lowers systemic risk. It does not guarantee defect-free output, so a Level 5 organization can still ship a design flaw.

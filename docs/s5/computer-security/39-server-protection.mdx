@@ -1,7 +1,7 @@
 ---
 title: Server Protection
 dateCreated: 2026-09-28T02:55:20.050Z
-lastUpdatedOn: 2026-09-29T03:42:17.167Z
+lastUpdatedOn: 2026-10-14T05:30:02.526Z
 ---
 
 Server protection secures the machines that host data and applications, since compromise from inside a network is at least as common as attack from outside it.
@@ -37,3 +37,16 @@ A central console updates virus definitions once, then deploys them to every ser
 
 - Preserves bandwidth relative to each server fetching its own update.
 - Lets mail servers run specialized mail-scanning software distinct from general server antivirus.
+
+## VirusWall
+
+A VirusWall sits right after the firewall at the Internet gateway. All SMTP, HTTP, and FTP traffic passes through it, and files are downloaded to the VirusWall server before being sent to clients. It stops viruses, worms, and spam at the entry point.
+
+## Desktop Protection
+
+A centralized solution is preferred over standalone installs on each PC.
+
+- All PCs follow the same policy.
+- Management and policy enforcement are easier.
+- Bandwidth is preserved.
+- It provides extensive logging, user state, and a consistent corporate image.

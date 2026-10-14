@@ -1,7 +1,9 @@
 ---
 title: Firewalls
+prereqs:
+  - s3/data-communication-and-networking/ip
 dateCreated: 2026-09-28T03:03:26.410Z
-lastUpdatedOn: 2026-09-29T03:42:17.156Z
+lastUpdatedOn: 2026-10-14T05:30:02.516Z
 ---
 
 A firewall is a device that protects a private network from outside intrusions by examining every packet that passes through it against a set of rules. A firewall is not a virus guard.
@@ -59,15 +61,6 @@ A security proxy intercepts each packet, strips its wrapping, inspects and proce
 
 A lower layer means less information is available to the filter, but less processing overhead per packet.
 
-## Network Address Translation
-
-Network address translation (NAT) rewrites the addresses of packets crossing a network boundary, translating between an address on one network and an address on another. It is also called IP masquerading or port forwarding.
-
-- Hides the internal hosts of one network from the other.
-- Static NAT maps each internal address to a fixed external address.
-- Dynamic NAT maps an internal address to an external address chosen from a pool.
-- 1-to-1 NAT maps each internal address to exactly 1 dedicated external address.
-
 ## Virtual Private Networks
 
 A virtual private network (VPN) gives 2 hosts an encrypted channel over a public network, using a protocol such as IPsec, L2TP, or PPTP.
@@ -77,3 +70,45 @@ A virtual private network (VPN) gives 2 hosts an encrypted channel over a public
 - This overhead can noticeably reduce throughput on a high-speed connection.
 
 A VPN server needs to be dedicated to the task, since a server shared with other services cannot sustain the added processing load.
+
+## Stateless and Stateful Inspection
+
+A stateless packet filter judges each packet independently, with no memory of the protocol context.
+
+A stateful firewall tracks the state of each connection. It permits inbound traffic only if it matches an established, legitimate outbound request, so unsolicited probes and forged replies are dropped.
+
+## Web Application Firewall
+
+A web application firewall (WAF) inspects Layer 7 traffic in depth. It mitigates application-specific attacks such as SQL injection and cross-site scripting. A traditional or next-generation firewall that works on lower-layer traffic does not specialize in these.
+
+## URL Filtering
+
+Web pages are filtered against a database controlled by a third party. The administrator can add sites or exceptions. Filtering can depend on the user, the user group, the time of day, and similar attributes.
+
+## Demilitarized Zone
+
+A demilitarized zone (DMZ) is a separate network segment behind the optional firewall interface. It hosts public servers such as web and mail, isolated from the internal network.
+
+## Proxy Advantages
+
+- Harder to hack  
+  Blocks entire categories of common attacks and conceals internal servers from the public Internet.
+- Bandwidth use  
+  Prevents unwanted or inappropriate traffic from entering the network.
+- Lower liability  
+  Prevents an attacker from using the network as a launch point for further attacks.
+- Easier management  
+  Administrators apply tools and defaults broadly instead of desktop by desktop.
+
+## Software and Hardware Firewalls
+
+- Server-based firewall  
+  Runs on a general-purpose server. The OS is less secure and not real-time. The deployment pays for unnecessary features, needs parts from several vendors, and needs frequent patches. Low initial cost, high total cost of ownership.
+- Hardware appliance  
+  A dedicated box with a hardened OS from a single vendor, often without a hard disk. Firmware updates are harder to apply. Higher initial cost, significantly lower total cost of ownership.
+
+Appliances beat software through ASICs (application specific integrated circuits), which hard-code functions such as packet classification, rule enforcement, [NAT](/s3/data-communication-and-networking/ip#network-address-translation), and encryption into chips.
+
+- On a CPU-centered design, every packet crosses the system bus, which becomes the bottleneck.
+- An intelligent ASIC sends the first packet of a flow to the CPU for classification and policy lookup.
+- The policy is cached in the ASIC. The remaining packets of the flow are cut through, bypassing the CPU.

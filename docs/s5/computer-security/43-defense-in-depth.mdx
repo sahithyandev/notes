@@ -1,0 +1,131 @@
+---
+title: Defense in Depth
+dateCreated: 2026-10-14T00:00:00.000Z
+lastUpdatedOn: 2026-10-14T05:30:02.570Z
+---
+
+Defense in depth deploys multiple, redundant layers of diverse security controls, so the failure of one layer does not compromise the whole system. No single product delivers all the protection a network needs.
+
+See [principles of secure system design](/s5/computer-security/secure-system-design#defense-in-depth) for the underlying principle.
+
+## Layers
+
+- Awareness and commitment
+- Perimeter security (firewall, intrusion detection, perimeter antivirus)
+- Network and system monitoring
+- Access control and authentication
+- Antivirus on hosts
+- Encryption
+- VPN
+- Server integrity
+- Auditing
+
+Each layer sits at a different point between the Internet and the data.
+
+- Perimeter  
+  Edge controls such as [firewalls](/s5/computer-security/firewalls) and DDoS mitigation stop attacks before they overwhelm internal infrastructure.
+- Network  
+  Segmentation and internal firewalls contain a breach.
+- Host  
+  OS security, host-based antivirus, and [server protection](/s5/computer-security/server-protection).
+- Application  
+  Secure coding and a web application firewall.
+- Data  
+  Encryption at rest and in transit.
+- Identity  
+  Authentication and least privilege.
+
+## Control Categories
+
+- Technical controls  
+  Software and hardware mechanisms, such as multi-factor authentication, end-to-end encryption, and endpoint detection and response.
+- Administrative controls  
+  Policies, procedures, and training.
+- Physical controls  
+  Locks, guards, and server room access control.
+
+## Network Segmentation
+
+Network segmentation splits the internal network into zones separated by firewalls, such as Finance and Engineering subnets.
+
+- It restricts lateral movement. An attacker who compromises a machine in 1 subnet cannot freely reach assets in another.
+- It does not remove the need for the perimeter firewall.
+
+### Demilitarized Zone
+
+A demilitarized zone (DMZ) holds the publicly available servers, such as web and mail. It is separated from the internal hosts and application servers by firewalls. A compromised public server then does not give direct access to the internal network.
+
+## Diversity of Defense
+
+Layers should come from different vendors and use different technologies. A single vulnerability or zero-day in one vendor's software then cannot neutralize all the layers.
+
+## Complementary Controls
+
+- Stateful firewall plus web application firewall  
+  A [web application firewall](/s5/computer-security/firewalls#web-application-firewall) inspects Layer 7 traffic for application-specific attacks. A next-generation firewall does not specialize in these.
+- SSL inspection  
+  A firewall decrypts and inspects TLS traffic, so attackers cannot hide malicious payloads, command-and-control traffic, or data exfiltration inside encrypted streams.
+- Least privilege at the identity layer  
+  Users and systems get only the minimum access needed for their job.
+
+## Security Policy
+
+A security policy is the compromise an organization adopts between absolute security and absolute access. It states:
+
+- Who can get in and out.
+- Where they can go.
+- When they can get in and out.
+- What they can bring in or carry out.
+- How physical access and the management station are protected.
+
+Users benefit from a published policy. They see that the organization protects their files, and they understand that access limits protect the organization from disaster.
+
+## Security as a Dynamic Process
+
+A policy, devices, and automatic antivirus updates do not finish the job. New attack styles keep appearing, so security needs continuous vigilance and maintenance.
+
+### Vulnerability Window
+
+The vulnerability window is the time between the first attack and the moment the organization is ready to face it. A larger window means higher exposure.
+
+Example:
+
+- First attack at 02:30 GMT.
+- Security partner notices it at 05:30.
+- Patch available at 11:45.
+- Patch applied and organization ready at 15:50.
+
+The vulnerability window is $15{:}50 - 02{:}30 = 13\text{h}\,20\text{m}$.
+
+## Intrusion Detection and Prevention
+
+- Intrusion detection  
+  Uses logs to check for vulnerabilities. It cannot prevent an attack, only detect it after or while it happens. Passive security.
+- Intrusion prevention  
+  Blocks an attack before it happens, and needs more processing power. Active security.
+
+Prevention methods:
+
+- Protocol anomaly detection
+- Signature based detection
+- Behavior based detection
+
+## Qualities of a Good Security System
+
+- Simplicity  
+  Complex designs and configurations are hard to manage and create holes. Simple designs are used consistently and correctly.
+- Scalability  
+  The system grows with the business.
+- High uptime and quick recovery  
+  High mean time between failures and failover recovery.
+- Distributed architecture  
+  Different tasks run on different machines.
+- Dynamic security  
+  Not a static, one-time product.
+- Economy of IP addresses  
+  Hide internal addresses and reduce the number of public ones.
+- Secure connections  
+  VPN, management station, and subcomponents, with authentication.
+- Logging and notification  
+  Summarized reports of network activity.
+- Physical security

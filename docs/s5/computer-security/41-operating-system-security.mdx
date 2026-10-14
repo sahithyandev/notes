@@ -1,0 +1,43 @@
+---
+title: Operating System Security
+dateCreated: 2026-10-14T00:00:00.000Z
+lastUpdatedOn: 2026-10-14T05:30:02.550Z
+---
+
+Operating system security protects the kernel and the resources it manages from the processes running above it. It applies the [principles of secure system design](/s5/computer-security/secure-system-design), especially separation of privileges and complete mediation.
+
+## Protection Rings
+
+Hardware protection rings separate user mode from kernel mode. Kernel code runs in the most privileged ring and user code runs in a less privileged one.
+
+- A user process cannot execute privileged instructions or touch kernel memory directly.
+- A user process enters the kernel only through defined entry points such as system calls.
+- A compromise of a user process does not give the attacker kernel privileges by default.
+
+This enforces the principle of separation of privileges. [Multics](/s5/computer-security/secure-system-design#worked-example-multics) introduced the ring structure.
+
+## Reference Monitor
+
+A reference monitor is the component that mediates every access by a subject to an object. The security kernel implements it, enforcing complete mediation.
+
+A reference monitor is secure **iff** it satisfies:
+
+- Tamper-resistant  
+  Processes it controls cannot alter or bypass it.
+- Always invoked  
+  Every access goes through it. No path skips the check.
+- Verifiable  
+  Small enough to be analyzed and tested rigorously.
+
+## Kernel Page Table Isolation
+
+Meltdown is a side-channel attack that uses speculative execution to read kernel memory from user mode. Kernel memory is mapped into every process's address space, so speculative loads can reach it and leave traces in the cache.
+
+Kernel page table isolation (KPTI) keeps 2 separate sets of page tables.
+
+- User-space page tables  
+  Used while running user code. They map almost no kernel memory, so kernel memory is invisible to user code.
+- Kernel-space page tables  
+  Used while running kernel code. They map both kernel and user memory.
+
+The processor switches page tables on every transition between user mode and kernel mode.
