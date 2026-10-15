@@ -1,7 +1,7 @@
 ---
 title: Line Integral
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-10-10T18:33:18.228Z
+lastUpdatedOn: 2026-10-15T17:34:25.543Z
 ---
 
 Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
@@ -40,7 +40,7 @@ If $C$ lies in the $xy$-plane and $z = f(x,y)$ is a non-negative continuous func
 
 ## Line Integral of a Vector Field
 
-Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-valued-functions/vector-field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
+Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-valued-functions/field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_a^b \boldsymbol{F}(\boldsymbol{r}(t)) \cdot \boldsymbol{r}'(t)\,\text{d}t
@@ -52,7 +52,19 @@ $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C P\,\text{d}x + Q\,\text{d}y + R\,\text{d}z
 $$
 
+To evaluate $\int_C P\,\text{d}x + Q\,\text{d}y + R\,\text{d}z$ when $C$ is given by $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$:
+
+1. Differentiate the parametric equations to get $\text{d}x = x'(t)\,\text{d}t$, $\text{d}y = y'(t)\,\text{d}t$, $\text{d}z = z'(t)\,\text{d}t$.
+2. Replace $x$, $y$, $z$, $\text{d}x$, $\text{d}y$, $\text{d}z$ in the integrand, which leaves an integral in $t$ only.
+3. Integrate from $t = a$ to $t = b$.
+
+$$
+\int_C P\,\text{d}x + Q\,\text{d}y + R\,\text{d}z = \int_a^b \left(P\,x'(t) + Q\,y'(t) + R\,z'(t)\right)\text{d}t
+$$
+
 ### Work
+
+A force field is a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) $\boldsymbol{F}$ whose value at each point is the force acting on a particle at that point.
 
 For a particle moving along a smooth curve $C$, oriented in the direction of motion, under a continuous force field $\boldsymbol{F}$, the work done by $\boldsymbol{F}$ on the particle is
 
@@ -60,15 +72,41 @@ $$
 W = \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}
 $$
 
+If $\boldsymbol{F}$ is a [conservative field](/s5/calculus/vector-valued-functions/conservative-field), the work depends only on the end points of $C$, as shown below.
+
 ## Fundamental Theorem of Line Integrals
 
 Suppose $C$ be a piecewise smooth curve parametrized by $\boldsymbol{r}(t)$, $a \le t \le b$.
 
-If $\boldsymbol{F} = \nabla \phi$ on a region containing $C$,
+If $\boldsymbol{F} = \nabla \phi$ on a region containing $C$, $\boldsymbol{F}$ is a [conservative field](/s5/calculus/vector-valued-functions/conservative-field) with potential function $\phi$, and
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C \nabla \phi \cdot \text{d}\boldsymbol{r} = \phi(\boldsymbol{r}(b)) - \phi(\boldsymbol{r}(a))
 $$
+
+### Integral over a Closed Curve
+
+Let $\boldsymbol{F}$ be conservative on $D$ and $C$ a piecewise smooth closed curve in $D$. Then
+
+$$
+\oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0
+$$
+
+<Note title="Proof Hint">
+
+- Apply the fundamental theorem of line integrals
+- Use $\boldsymbol{r}(b) = \boldsymbol{r}(a)$ for a closed curve
+- Subtract equal values of $\phi$
+
+</Note>
+
+### Equivalence of Conservative Fields
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
+
+- $\boldsymbol{F}$ is conservative on $D$
+- $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0$ for every piecewise smooth closed curve $C$ in $D$
+- For any 2 points $P$, $Q$ in $D$, $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ is independent of the piecewise smooth curve $C$ in $D$ from $P$ to $Q$
 
 ## Worked Examples
 
@@ -108,6 +146,40 @@ Integral:
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_0^1 (t^2 + 2t^4)\,\text{d}t = \frac{1}{3} + \frac{2}{5} = \frac{11}{15}
+$$
+
+### Integral in Differential Form
+
+Evaluate $\int_C (y\,\text{d}x - z\,\text{d}y + x\,\text{d}z)$, where $C$ is $x = t^2$, $y = e^{-t}$, $z = e^{t}$, $0 \le t \le 1$.
+
+Differentials:
+
+$$
+\text{d}x = 2t\,\text{d}t, \quad \text{d}y = -e^{-t}\,\text{d}t, \quad \text{d}z = e^{t}\,\text{d}t
+$$
+
+Each term in terms of $t$:
+
+$$
+y\,\text{d}x = 2t e^{-t}\,\text{d}t, \quad -z\,\text{d}y = e^{t} e^{-t}\,\text{d}t = \text{d}t, \quad x\,\text{d}z = t^2 e^{t}\,\text{d}t
+$$
+
+Integral:
+
+$$
+\int_C (y\,\text{d}x - z\,\text{d}y + x\,\text{d}z) = \int_0^1 \left(2t e^{-t} + 1 + t^2 e^{t}\right)\text{d}t
+$$
+
+Integrating by parts for the 1st and 3rd terms:
+
+$$
+\int_0^1 2t e^{-t}\,\text{d}t = \left[-2(t + 1)e^{-t}\right]_0^1 = 2 - \frac{4}{e}, \quad \int_0^1 t^2 e^{t}\,\text{d}t = \left[(t^2 - 2t + 2)e^{t}\right]_0^1 = e - 2
+$$
+
+Sum:
+
+$$
+\int_C (y\,\text{d}x - z\,\text{d}y + x\,\text{d}z) = \left(2 - \frac{4}{e}\right) + 1 + (e - 2) = 1 + e - \frac{4}{e}
 $$
 
 ### Work Along a Circle

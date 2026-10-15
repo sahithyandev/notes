@@ -1,18 +1,30 @@
 ---
 title: Field
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-10-10T18:33:18.205Z
+lastUpdatedOn: 2026-10-15T17:34:25.498Z
 ---
 
 A field is a function that assigns a mathematical object, a scalar, vector, or tensor, to each point in its domain $D \subseteq \mathbb{R}^n$.
 
-### Scalar Field
+## Scalar Field
 
 A real-valued function defined on each points in $D \subseteq \mathbb{R}^n$.
 
-## Gradient
+## Vector Field
 
-For $\phi$ a field of $x$, $y$, $z$, the gradient of $\phi$ is
+A vector field is a field that assigns a vector to each point in its domain $D \subseteq \mathbb{R}^n$,
+
+$$
+\boldsymbol{F}(x,y,z) = f(x,y,z)\hat{i} + g(x,y,z)\hat{j} + h(x,y,z)\hat{k}
+$$
+
+Here $f$, $g$, $h$ are real-valued component functions of $\boldsymbol{F}$ on $D$.
+
+$\boldsymbol{F}$ is continuous **iff** each component function is continuous. $\boldsymbol{F}$ is differentiable **iff** each component function is differentiable.
+
+### Gradient
+
+For $\phi$ a scalar field of $x$, $y$, $z$, the gradient of $\phi$ is
 
 $$
 \nabla \phi = \frac{\partial \phi}{\partial x}\hat{i} + \frac{\partial \phi}{\partial y}\hat{j} + \frac{\partial \phi}{\partial z}\hat{k}
@@ -37,7 +49,27 @@ Examples:
 - For a temperature field, $-\nabla \phi$ gives the direction of heat flow.
 - For a height field of a hill, $\nabla \phi$ points up the steepest slope.
 
-## Laplacian
+### Divergence
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The divergence of $\boldsymbol{F}$ is
+
+$$
+\text{div}\,\boldsymbol{F} = \nabla \cdot \boldsymbol{F} = \frac{\partial f}{\partial x} + \frac{\partial g}{\partial y} + \frac{\partial h}{\partial z}
+$$
+
+$\text{div}\,\boldsymbol{F}$ is a scalar field.
+
+### Curl
+
+Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The curl of $\boldsymbol{F}$ is
+
+$$
+\text{curl}\,\boldsymbol{F} = \nabla \times \boldsymbol{F} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] f & g & h \end{vmatrix}
+$$
+
+$\text{curl}\,\boldsymbol{F}$ is a vector field.
+
+### Laplacian
 
 The Laplacian operator is
 
@@ -45,11 +77,13 @@ $$
 \nabla^2 = \nabla \cdot \nabla = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2} + \frac{\partial^2}{\partial z^2}
 $$
 
-For $\phi$ a field, the Laplacian of $\phi$ is
+For $\phi$ a scalar field, the Laplacian of $\phi$ is
 
 $$
-\nabla^2 \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}
+\nabla^2 \phi = \text{div}(\nabla \phi) = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}
 $$
+
+The equation $\nabla^2 \phi = 0$ is Laplace's equation.
 
 Physical meaning of $\nabla^2 \phi$:
 
@@ -62,6 +96,52 @@ Examples:
 
 - In the heat equation $\dfrac{\partial T}{\partial t} = \alpha \nabla^2 T$, a point warms up when its neighbours are hotter on average.
 - In electrostatics, the potential $\phi$ satisfies $\nabla^2 \phi = 0$ in a charge-free region.
+
+## Inverse-Square Field
+
+Let $\boldsymbol{r} \ne \boldsymbol{0}$ be the position vector of a point and $c$ a constant. A vector field of the below form is an inverse-square field.
+
+$$
+\boldsymbol{F}(\boldsymbol{r}) = \frac{c}{\lVert \boldsymbol{r} \rVert^3}\boldsymbol{r}
+$$
+
+For example, the electric field given by Coulomb's law is an inverse-square field.
+
+An inverse-square field $\boldsymbol{F}$ has zero divergence wherever $\boldsymbol{r} \ne \boldsymbol{0}$.
+
+$$
+\text{div}\,\boldsymbol{F} = 0
+$$
+
+<Note title="Proof Hint">
+
+Let $r = \lVert \boldsymbol{r} \rVert = \sqrt{x^2 + y^2 + z^2}$. Then
+
+$$
+\frac{\partial r}{\partial x} = \frac{x}{r}
+$$
+
+The components of $\boldsymbol{F}$ are $f = \dfrac{cx}{r^3}$, $g = \dfrac{cy}{r^3}$, $h = \dfrac{cz}{r^3}$.
+
+Apply the product rule to $f = c\,x\,r^{-3}$:
+
+$$
+\frac{\partial f}{\partial x} = c\left(\frac{1}{r^3} - \frac{3x}{r^4}\cdot\frac{\partial r}{\partial x}\right) = c\left(\frac{1}{r^3} - \frac{3x^2}{r^5}\right)
+$$
+
+$g$ and $h$ follow the same steps with $y$ and $z$ in place of $x$.
+
+$$
+\frac{\partial g}{\partial y} = c\left(\frac{1}{r^3} - \frac{3y^2}{r^5}\right), \quad \frac{\partial h}{\partial z} = c\left(\frac{1}{r^3} - \frac{3z^2}{r^5}\right)
+$$
+
+Add the 3 terms and use $x^2 + y^2 + z^2 = r^2$:
+
+$$
+\text{div}\,\boldsymbol{F} = c\left(\frac{3}{r^3} - \frac{3(x^2 + y^2 + z^2)}{r^5}\right) = c\left(\frac{3}{r^3} - \frac{3r^2}{r^5}\right) = 0
+$$
+
+</Note>
 
 ## Worked Examples
 
@@ -96,6 +176,50 @@ $$
 $$
 
 Here $\vec{r} = x\hat{i} + y\hat{j} + z\hat{k}$ is the position vector.
+
+### Divergence and Curl
+
+Find $\text{div}\,\boldsymbol{F}$ and $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = xy\,\hat{i} + yz\,\hat{j} + zx\,\hat{k}$.
+
+Components are $f = xy$, $g = yz$, $h = zx$.
+
+Divergence:
+
+$$
+\text{div}\,\boldsymbol{F} = \frac{\partial (xy)}{\partial x} + \frac{\partial (yz)}{\partial y} + \frac{\partial (zx)}{\partial z} = y + z + x
+$$
+
+Curl:
+
+$$
+\text{curl}\,\boldsymbol{F} = \left(\frac{\partial h}{\partial y} - \frac{\partial g}{\partial z}\right)\hat{i} + \left(\frac{\partial f}{\partial z} - \frac{\partial h}{\partial x}\right)\hat{j} + \left(\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}\right)\hat{k}
+$$
+
+$$
+= (0 - y)\,\hat{i} + (0 - z)\,\hat{j} + (0 - x)\,\hat{k} = -y\,\hat{i} - z\,\hat{j} - x\,\hat{k}
+$$
+
+### Curl of a Rotation Field
+
+Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = -y\,\hat{i} + x\,\hat{j}$.
+
+Components are $f = -y$, $g = x$, $h = 0$.
+
+$$
+\text{curl}\,\boldsymbol{F} = (0 - 0)\,\hat{i} + (0 - 0)\,\hat{j} + \left(\frac{\partial x}{\partial x} - \frac{\partial (-y)}{\partial y}\right)\hat{k} = 2\hat{k}
+$$
+
+### Curl of a Gradient Field
+
+Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = \nabla (xyz)$.
+
+$$
+\boldsymbol{F} = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k}
+$$
+
+$$
+\text{curl}\,\boldsymbol{F} = (x - x)\,\hat{i} + (y - y)\,\hat{j} + (z - z)\,\hat{k} = \boldsymbol{0}
+$$
 
 ### Laplacian at a Point
 
