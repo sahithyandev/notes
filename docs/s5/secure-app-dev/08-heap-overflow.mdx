@@ -3,7 +3,7 @@ title: Heap Overflow
 prereqs:
   - s5/computer-security/buffer-overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.169Z
+lastUpdatedOn: 2026-10-15T17:35:15.805Z
 ---
 
 Refer to the [buffer overflow](/s5/computer-security/buffer-overflow) note before continuing on.
@@ -44,3 +44,12 @@ memcpy(bp, pl, payload);            // copy `payload` bytes from pl into the res
 ```
 
 `payload` is never checked against the actual size of the request. A request with 1 actual payload byte but a claimed `payload` of 65535, the maximum a 16-bit field can hold, makes `memcpy` read 65535 bytes starting at `pl`, running past the end of the request into adjacent heap memory, and echo all of it back in the response. This is a buffer over-read, allowing an attacker to read up to 64KB of server memory per request.
+
+## Common Causes
+
+- Unsafe C string functions  
+  `gets`, `strcpy`, and similar functions perform no bounds checking.
+- Off-by-one errors  
+  A wrong loop termination condition, or a null byte written 1 position past the buffer. Also caused by Unicode and ANSI characters having different sizes.
+- Arithmetic errors  
+  An integer overflow in a size computation.

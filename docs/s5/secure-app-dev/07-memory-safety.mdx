@@ -1,7 +1,7 @@
 ---
 title: Memory Safety
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.906Z
+lastUpdatedOn: 2026-10-15T17:35:15.797Z
 ---
 
 A program execution is memory safe **iff** none of the following occur:
@@ -57,6 +57,11 @@ Examples: Rust, Java, Python.
 C and C++ are not memory safe and still widely used. Because:
 
 - supported nearly everywhere
-- low-level code such as operating systems cannot easily be implemented in memory safe languages.
+- low-level code such as operating systems cannot easily be implemented in memory safe languages
+- memory safe languages are less mature, and their runtimes are themselves written in unsafe languages such as C or C++.
 
 Adopting a memory safe language costs runtime overhead and loses some direct, low-level memory access such as hardware-specific instructions needed by device drivers. C and related languages allow direct memory access without bounds checks.
+
+## Overflow Categories
+
+Overflows are the most common form of memory safety violation. They are mostly caused by missing bounds checks, can be abused to read and write memory, and can occur on buffers and integers.

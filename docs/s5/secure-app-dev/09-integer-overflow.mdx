@@ -1,7 +1,7 @@
 ---
 title: Integer Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.182Z
+lastUpdatedOn: 2026-10-15T17:35:15.813Z
 ---
 
 Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safety) violation. It leads to one when the overflowed value is used:
@@ -11,6 +11,51 @@ Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safet
 - As an array index
 
 An overflowed value used this way often leads to a buffer overflow, or directly to an out-of-bounds read or write.
+
+## Number Representation
+
+Unsigned integer  
+An $n$-bit unsigned integer $x = (x_{n-1}, \dots, x_0)$ is stored in binary.
+
+$$
+x = \sum_{i=0}^{n-1} 2^i x_i
+$$
+
+Signed integer  
+Stored in two's complement. The most significant bit has a negative weight.
+
+$$
+x = -2^{n-1} x_{n-1} + \sum_{i=0}^{n-2} 2^i x_i
+$$
+
+The range is $-2^{n-1} \leq x < 2^{n-1}$. Negation is $-x = 2^n - x$.
+
+Floating point  
+A single-precision IEEE 754 float uses 32 bits.
+
+- Sign  
+  1 bit, $x_{31}$.
+- Exponent  
+  8 bits, $x_{30}$ to $x_{23}$, stored with bias $127$.
+- Fraction  
+  23 bits, $x_{22}$ to $x_0$.
+
+$$
+x = (-1)^{x_{31}} \cdot \left(1 + \sum_{i=1}^{23} x_{23-i} 2^{-i}\right) \cdot 2^{[x_{30}:x_{23}] - 127}
+$$
+
+It encodes values up to about $3.4 \times 10^{38}$, all integers with at most 6 decimal digits, and all values $2^n$ for $-126 \leq n \leq 127$.
+
+Examples:
+
+- $3.3125$  
+  Binary $11.0101_2 = 1.10101_2 \times 2^1$. Sign bit is $0$. Exponent is $1 + 127 = 128 = 10000000_2$. Fraction is $10101$ padded with zeros. Result is `01000000010101000000000000000000`.
+
+<Note>
+
+Reinterpreting the bits of a float as an integer allows arithmetic tricks. Quake III Arena's fast inverse square root computes $\frac{1}{\sqrt{x}}$ with `i = 0x5f3759df - (i >> 1)` on the float's bit pattern, followed by a Newton iteration. It ran about 4 times faster than other algorithms.
+
+</Note>
 
 ## Unsigned Overflow
 
