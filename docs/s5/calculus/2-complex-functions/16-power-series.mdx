@@ -3,7 +3,7 @@ title: Power Series
 prereqs:
   - s1/mathematics/real-analysis/power-series
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-10-08T12:03:47.179Z
+lastUpdatedOn: 2026-10-16T07:31:35.844Z
 ---
 
 [Power series for real numbers](/s1/mathematics/real-analysis/power-series) was covered in semester 1. This note explains the complex numbers version.
@@ -87,6 +87,8 @@ Examples:
 
 Find the disk of convergence of $\sum_{n=0}^{\infty} \frac{(n+1)(z-2)^n}{3^n}$.
 
+<Solution>
+
 Apply the [ratio test](/s1/mathematics/real-analysis/convergence-tests#ratio-test).
 
 $$
@@ -113,6 +115,8 @@ $$
 
 A convergent series needs $u_n \to 0$. Here $|u_n|$ grows without bound, so the series diverges at every boundary point, regardless of which point on the circle $z$ is.
 
+</Solution>
+
 ### All 3 Regions
 
 - $\sum n!\, z^n$  
@@ -126,15 +130,21 @@ A convergent series needs $u_n \to 0$. Here $|u_n|$ grows without bound, so the 
 
 Let $f(z) = \frac{1}{1-z} = \sum z^n$ and $g(z) = \frac{1}{1+z} = \sum (-1)^n z^n$, both valid in $D_1(0)$.
 
+<Solution>
+
 $$
 f(z) + g(z) = \sum_{n=0}^{\infty} \left(1 + (-1)^n\right) z^n = 2\sum_{n=0}^{\infty} z^{2n} = \frac{2}{1-z^2}
 $$
 
 The odd coefficients cancel and the even coefficients equal $2$. The series is valid in $D_1(0)$.
 
+</Solution>
+
 ### Cauchy Product of Exponential and Sine
 
 Find the first 4 non-zero terms of the Maclaurin series of $e^z \sin z$.
+
+<Solution>
 
 The coefficients are
 
@@ -164,9 +174,13 @@ $$
 e^z \sin z = z + z^2 + \frac{z^3}{3} - \frac{z^5}{30} + \cdots
 $$
 
+</Solution>
+
 ### Cauchy Product with Geometric Series
 
 Find the first 5 non-zero terms of the Maclaurin series of $\frac{e^z}{1-z}$.
+
+<Solution>
 
 Here $a_n = \frac{1}{n!}$ and $b_n = 1$, so $c_n = \sum_{k=0}^{n} \frac{1}{k!}$.
 
@@ -179,3 +193,5 @@ $$
 $$
 
 The series is valid in $D_1(0)$.
+
+</Solution>

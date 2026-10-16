@@ -1,7 +1,7 @@
 ---
 title: Taylor Series
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-10-06T22:30:16.455Z
+lastUpdatedOn: 2026-10-16T07:31:35.856Z
 ---
 
 If $f(z)$ is [analytic](/s5/calculus/complex-functions/analytic-functions) at $z = \alpha$, the series
@@ -61,6 +61,8 @@ Examples:
 
 Find the Maclaurin series of $\sin z$.
 
+<Solution>
+
 The derivatives at $0$ cycle through $\sin z, \cos z, -\sin z, -\cos z$, so
 
 $$
@@ -75,9 +77,13 @@ $$
 
 $\sin z$ is entire, so the series is valid for all $z$.
 
+</Solution>
+
 ### Series by Differentiation
 
 Show that $\frac{1}{(1-z)^2} = \sum_{n=0}^{\infty} (n+1) z^n$ for $z \in D_1(0)$.
+
+<Solution>
 
 Start with the geometric series.
 
@@ -93,9 +99,13 @@ $$
 
 The only singular point is $z = 1$, so $R = 1$.
 
+</Solution>
+
 ### Series Centered at a Nonzero Point
 
 Find the Taylor series of $\frac{1}{z}$ centered at $\alpha = 1$ and its disk of validity.
+
+<Solution>
 
 Write $z = 1 + (z-1)$.
 
@@ -105,9 +115,13 @@ $$
 
 The geometric series converges for $|z-1| < 1$. The nearest singular point is $0$, so $R = |0 - 1| = 1$ and the disk is $D_1(1)$.
 
+</Solution>
+
 ### Series Valid in a Disk
 
 Find the Taylor series of $\frac{1}{z+2}$ centered at $0$ and its disk of validity.
+
+<Solution>
 
 $$
 \frac{1}{z+2} = \frac{1}{2} \cdot \frac{1}{1 + \frac{z}{2}} = \sum_{n=0}^{\infty} \frac{(-1)^n z^n}{2^{n+1}}
@@ -115,9 +129,13 @@ $$
 
 The nearest singular point is $-2$, so $R = 2$ and the disk is $D_2(0)$.
 
+</Solution>
+
 ### Coefficients from Uniqueness
 
 Find $a_0, \ldots, a_4$ if $\sum_{n=0}^{\infty} a_n z^n = e^z + z^2$ near $0$.
+
+<Solution>
 
 By uniqueness, the $a_n$ are the Taylor coefficients of $e^z + z^2$.
 
@@ -129,12 +147,18 @@ $$
 a_0 = 1, \quad a_1 = 1, \quad a_2 = \frac{3}{2}, \quad a_3 = \frac{1}{6}, \quad a_4 = \frac{1}{24}
 $$
 
+</Solution>
+
 ### Polynomial Times Cosine
 
 Find the Maclaurin series of $z^2 \cos z$ and its radius of convergence.
+
+<Solution>
 
 $$
 z^2 \cos z = z^2 \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n}}{(2n)!} = \sum_{n=0}^{\infty} \frac{(-1)^n z^{2n+2}}{(2n)!}
 $$
 
 $z^2 \cos z$ is entire, so $R = \infty$.
+
+</Solution>

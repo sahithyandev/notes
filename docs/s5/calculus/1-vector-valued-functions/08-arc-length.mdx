@@ -1,7 +1,7 @@
 ---
 title: Arc Length
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-10-09T08:40:37.485Z
+lastUpdatedOn: 2026-10-16T07:31:35.541Z
 ---
 
 Let $\boldsymbol{r}(t)$ be defined on $[a, b]$, and let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a, b]$. The polygonal length corresponding to $P$ is
@@ -111,13 +111,19 @@ Examples:
 
 Find the arc length of $\boldsymbol{r}(t) = 3\cos t\,\boldsymbol{i} + 3\sin t\,\boldsymbol{j} + 4t\,\boldsymbol{k}$ for $0 \le t \le 2\pi$, with reference point $\boldsymbol{r}(0) = (3, 0, 0)$. Then find its arc-length parametrization.
 
+<Solution>
+
 Differentiate each component.
 
 $$
 \frac{\text{d}x}{\text{d}t} = -3\sin t, \quad \frac{\text{d}y}{\text{d}t} = 3\cos t, \quad \frac{\text{d}z}{\text{d}t} = 4
 $$
 
+</Solution>
+
 Compute the speed.
+
+<Solution>
 
 $$
 \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = \sqrt{9\sin^2 t + 9\cos^2 t + 16} = \sqrt{25} = 5
@@ -129,7 +135,11 @@ $$
 L = \int_0^{2\pi} 5 \, \text{d}t = 10\pi
 $$
 
+</Solution>
+
 Compute the arc-length parameter with $t_0 = 0$.
+
+<Solution>
 
 $$
 s = \int_0^t 5 \, \text{d}u = 5t
@@ -141,10 +151,16 @@ $$
 \boldsymbol{r}(s) = 3\cos\left(\frac{s}{5}\right)\boldsymbol{i} + 3\sin\left(\frac{s}{5}\right)\boldsymbol{j} + \frac{4s}{5}\,\boldsymbol{k}
 $$
 
+</Solution>
+
 Verify the unit speed.
+
+<Solution>
 
 $$
 \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = \sqrt{\frac{9}{25}\sin^2\left(\frac{s}{5}\right) + \frac{9}{25}\cos^2\left(\frac{s}{5}\right) + \frac{16}{25}} = \sqrt{\frac{25}{25}} = 1
 $$
 
 The arc length is $L = 10\pi$, and the arc-length parametrization is $\boldsymbol{r}(s)$ for $0 \le s \le 10\pi$.
+
+</Solution>

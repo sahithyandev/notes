@@ -1,7 +1,7 @@
 ---
 title: Jacobian
 dateCreated: 2026-08-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-09T14:17:08.054Z
+lastUpdatedOn: 2026-10-16T07:31:35.593Z
 ---
 
 For a transformation $T$ from the $uv$-plane to the $xy$-plane defined by $x = x(u,v)$, $y = y(u,v)$, the Jacobian of $T$ is
@@ -47,6 +47,8 @@ Polar coordinates are a special case of this change of variables, with Jacobian 
 
 Evaluate $\iint_R (x^2 - y^2)\,\text{d}A$ over the parallelogram $R$ bounded by the lines $x + y = 1$, $x + y = 3$, $x - y = 0$ and $x - y = 2$.
 
+<Solution>
+
 The boundary lines are constant values of $x + y$ and $x - y$, and the integrand factors as $(x+y)(x-y)$. Let $u = x + y$ and $v = x - y$. Then $R$ becomes the rectangle $S: 1 \le u \le 3,\ 0 \le v \le 2$ and the integrand becomes $uv$.
 
 Solve for $x$ and $y$.
@@ -55,7 +57,11 @@ $$
 x = \frac{u+v}{2}, \quad y = \frac{u-v}{2}
 $$
 
+</Solution>
+
 Compute the Jacobian.
+
+<Solution>
 
 $$
 \frac{\partial(x,y)}{\partial(u,v)} =
@@ -77,3 +83,5 @@ The integral separates.
 $$
 \frac{1}{2} \int_1^3 u\,\text{d}u \cdot \int_0^2 v\,\text{d}v = \frac{1}{2} \cdot 4 \cdot 2 = 4
 $$
+
+</Solution>

@@ -1,7 +1,7 @@
 ---
 title: Laurent Series
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-10-06T22:30:16.466Z
+lastUpdatedOn: 2026-10-16T07:31:35.866Z
 ---
 
 For $0 \le r < R \le \infty$, the annulus $A(r, R, \alpha)$ is
@@ -79,6 +79,8 @@ The singular points are $z = 2$ and $z = -1$ with $|z| = 2$ and $|z| = 1$. The c
 
 Find $c_{-2}$ of $f(z) = \frac{1}{z^2}$ centered at $0$.
 
+<Solution>
+
 $$
 c_{-2} = \frac{1}{2\pi i}\int_{|\zeta|=s} \frac{\zeta^{-2}}{\zeta^{-2+1}}\,\text{d}\zeta = \frac{1}{2\pi i}\int_{|\zeta|=s} \zeta^{-1}\,\text{d}\zeta = \frac{1}{2\pi i} \cdot 2\pi i = 1
 $$
@@ -87,9 +89,13 @@ For general $n$, the integrand is $\zeta^{-n-3}$.
 
 The other coefficients vanish since $\int_{|\zeta|=s} \zeta^{k}\,\text{d}\zeta = 0$ for $k \neq -1$.
 
+</Solution>
+
 ### Cosine over a Power
 
 Find the Laurent series of $\frac{\cos z - 1}{z^4}$ centered at $0$.
+
+<Solution>
 
 $$
 \cos z - 1 = -\frac{z^2}{2} + \frac{z^4}{24} - \frac{z^6}{720} + \cdots
@@ -103,9 +109,13 @@ $$
 
 The series is valid for $0 < |z| < \infty$.
 
+</Solution>
+
 ### Exponential of a Reciprocal
 
 Find the Laurent series of $\exp\left(-\frac{1}{z^2}\right)$ centered at $0$.
+
+<Solution>
 
 Substitute $w = -\frac{1}{z^2}$ in $e^w = \sum \frac{w^n}{n!}$.
 
@@ -115,15 +125,23 @@ $$
 
 The series is valid for $0 < |z| < \infty$.
 
+</Solution>
+
 ### Simple Fractions
 
 Find the Laurent series of $\frac{1}{z(1-z)}$ centered at $0$ in $0 < |z| < 1$.
+
+<Solution>
 
 $$
 \frac{1}{z(1-z)} = \frac{1}{z} + \frac{1}{1-z} = \frac{1}{z} + \sum_{n=0}^{\infty} z^n
 $$
 
+</Solution>
+
 Find the Laurent series of $\frac{1}{(z-1)(z-3)}$ centered at $0$ in $1 < |z| < 3$.
+
+<Solution>
 
 $$
 \frac{1}{(z-1)(z-3)} = \frac{1}{2}\left(\frac{1}{z-3} - \frac{1}{z-1}\right)
@@ -145,9 +163,13 @@ $$
 \frac{1}{(z-1)(z-3)} = -\frac{1}{2}\sum_{n=0}^{\infty} \frac{z^n}{3^{n+1}} - \frac{1}{2}\sum_{n=0}^{\infty} z^{-n-1}
 $$
 
+</Solution>
+
 ### 3 Series for 1 Function
 
 Find all Laurent series of $f(z) = \frac{3}{2+z-z^2}$ centered at $0$.
+
+<Solution>
 
 Factor $2 + z - z^2 = (2-z)(1+z)$. Partial fractions give
 
@@ -186,3 +208,5 @@ Combine the matching pieces.
 - For $|z| < 1$, the series is $\sum_{n=0}^{\infty} \left(\frac{1}{2^{n+1}} + (-1)^n\right) z^n$.
 - For $1 < |z| < 2$, the series is $\sum_{n=0}^{\infty} \frac{z^n}{2^{n+1}} + \sum_{n=0}^{\infty} (-1)^n z^{-n-1}$.
 - For $|z| > 2$, the series is $\sum_{n=0}^{\infty} \left((-1)^n - 2^n\right) z^{-n-1}$.
+
+</Solution>
