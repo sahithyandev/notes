@@ -53,6 +53,81 @@ const { label = "Solution" } = Astro.props;
   </div>
 </details>
 
+<script>
+  // panels come from <Method>; the tab bar is built when a solution is revealed
+  let tabCount = 0;
+
+  function select(tabs: HTMLElement[], panels: HTMLElement[], index: number) {
+    tabs.forEach((tab, i) => {
+      tab.setAttribute("aria-selected", String(i === index));
+      tab.tabIndex = i === index ? 0 : -1;
+      panels[i].hidden = i !== index;
+    });
+  }
+
+  function buildTabs(body: HTMLElement) {
+    if (body.querySelector(":scope > .solution-tabs")) return;
+    const panels = [
+      ...body.querySelectorAll<HTMLElement>(":scope > .solution-method"),
+    ];
+    if (panels.length < 2) return;
+
+    const bar = document.createElement("div");
+    bar.className = "solution-tabs";
+    bar.setAttribute("role", "tablist");
+
+    const tabs: HTMLElement[] = panels.map((panel, i) => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "solution-tab";
+      tab.id = `solution-tab-${++tabCount}`;
+      tab.setAttribute("role", "tab");
+      tab.textContent = panel.dataset.label ?? `Method ${i + 1}`;
+      panel.setAttribute("role", "tabpanel");
+      panel.setAttribute("aria-labelledby", tab.id);
+      tab.addEventListener("click", () => select(tabs, panels, i));
+      tab.addEventListener("keydown", (event) => {
+        const last = tabs.length - 1;
+        const next =
+          event.key === "ArrowRight"
+            ? (i + 1) % tabs.length
+            : event.key === "ArrowLeft"
+              ? (i + last) % tabs.length
+              : event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? last
+                  : -1;
+        if (next < 0) return;
+        event.preventDefault();
+        select(tabs, panels, next);
+        tabs[next].focus();
+      });
+      return tab;
+    });
+
+    bar.append(...tabs);
+    panels[0].before(bar);
+    body.classList.add("solution-tabbed");
+    select(tabs, panels, 0);
+  }
+
+  // toggle does not bubble, so listen in the capture phase on the document
+  document.addEventListener(
+    "toggle",
+    (event) => {
+      const solution = event.target;
+      if (!(solution instanceof HTMLDetailsElement) || !solution.open) return;
+      if (!solution.classList.contains("solution")) return;
+      const body = solution.querySelector<HTMLElement>(
+        ":scope > .solution-body",
+      );
+      if (body) buildTabs(body);
+    },
+    true,
+  );
+</script>
+
 <style is:global>
   .solution {
     --solution-hatch: repeating-linear-gradient(
@@ -163,12 +238,12 @@ const { label = "Solution" } = Astro.props;
   }
 
   .solution-icon-revealed,
-  .solution[open] .solution-icon-covered {
+  .solution[open] > summary .solution-icon-covered {
     opacity: 0;
     transform: scale(0.7);
   }
 
-  .solution[open] .solution-icon-revealed {
+  .solution[open] > summary .solution-icon-revealed {
     opacity: 1;
     transform: none;
   }
@@ -186,11 +261,11 @@ const { label = "Solution" } = Astro.props;
   }
 
   .solution-when-open,
-  .solution[open] .solution-when-closed {
+  .solution[open] > summary .solution-when-closed {
     opacity: 0;
   }
 
-  .solution[open] .solution-when-open {
+  .solution[open] > summary .solution-when-open {
     opacity: 1;
   }
 
@@ -207,6 +282,60 @@ const { label = "Solution" } = Astro.props;
 
   .solution-body > :first-child {
     margin-top: 0;
+  }
+
+  .solution-method-label {
+    margin: 16px 0 8px;
+    color: var(--sem);
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .solution-method > :first-child {
+    margin-top: 0;
+  }
+
+  .solution-tabbed .solution-method-label {
+    display: none;
+  }
+
+  .solution-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 16px 0 12px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .solution-tab {
+    margin-bottom: -1px;
+    padding: 8px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .solution-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .solution-tab[aria-selected="true"] {
+    border-bottom-color: var(--sem);
+    color: var(--sem);
+  }
+
+  .solution-tab:focus-visible {
+    outline: 2px solid var(--sem);
+    outline-offset: -2px;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -242,12 +371,12 @@ const { label = "Solution" } = Astro.props;
         translate 0.18s ease;
     }
 
-    .solution:not([open]) .solution-body {
+    .solution:not([open]) > .solution-body {
       opacity: 0;
       translate: 0 -6px;
     }
 
-    .solution[open] .solution-body {
+    .solution[open] > .solution-body {
       transition:
         opacity 0.3s ease 0.06s,
         translate 0.35s var(--solution-ease) 0.06s;

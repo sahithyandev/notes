@@ -1,0 +1,12 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = "Method" } = Astro.props;
+---
+
+<div class="solution-method" data-label={label}>
+  <p class="solution-method-label">{label}</p>
+  <slot />
+</div>

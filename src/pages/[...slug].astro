@@ -7,6 +7,7 @@ import Breadcrumb from "../components/layout/breadcrumb.astro";
 import { SITE_NAME, SITE_HOST_URL, isWip } from "../utils/values";
 import Note from "../components/mdx/note.astro";
 import Solution from "../components/mdx/solution.astro";
+import Method from "../components/mdx/method.astro";
 import * as Illustrations from "../components/illustrations";
 import TocRail from "../components/note/toc-rail.astro";
 import NoteFeedback from "../components/note/note-feedback.astro";
@@ -170,6 +171,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
           components={{
             Note,
             Solution,
+            Method,
             ...Illustrations,
             table: ScrollableTable,
           }}
