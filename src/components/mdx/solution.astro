@@ -1,0 +1,278 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = "Solution" } = Astro.props;
+---
+
+<details class="solution">
+  <summary>
+    <span class="solution-label">
+      <span class="solution-icons" aria-hidden="true">
+        <svg
+          class="solution-icon solution-icon-covered"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+          <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+          <path d="m1 1 22 22"></path>
+        </svg>
+        <svg
+          class="solution-icon solution-icon-revealed"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </span>
+      {label}
+    </span>
+    <span class="solution-hint">
+      <span class="solution-when-closed">Reveal</span>
+      <span class="solution-when-open">Hide</span>
+    </span>
+  </summary>
+  <div class="solution-body">
+    <slot />
+  </div>
+</details>
+
+<style is:global>
+  .solution {
+    --solution-hatch: repeating-linear-gradient(
+      135deg,
+      transparent 0 7px,
+      color-mix(in oklab, var(--sem) 11%, transparent) 7px 8px
+    );
+    --solution-hatch-hover: repeating-linear-gradient(
+      135deg,
+      transparent 0 7px,
+      color-mix(in oklab, var(--sem) 22%, transparent) 7px 8px
+    );
+    --solution-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    position: relative;
+    margin: 16px 0 24px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    interpolate-size: allow-keywords;
+  }
+
+  .solution::before,
+  .solution::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: var(--solution-hatch);
+  }
+
+  .solution::after {
+    background: var(--solution-hatch-hover);
+    opacity: 0;
+  }
+
+  .solution:not([open]):hover {
+    border-color: var(--sem);
+  }
+
+  .solution:not([open]):hover::after {
+    opacity: 1;
+  }
+
+  .solution[open] {
+    border-style: solid;
+    border-color: var(--border);
+  }
+
+  .solution[open]::before {
+    opacity: 0;
+  }
+
+  .solution > summary {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid transparent;
+    border-radius: inherit;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    font-family: var(--font-ui);
+  }
+
+  .solution > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .solution > summary:focus-visible {
+    outline: 2px solid var(--sem);
+    outline-offset: 2px;
+  }
+
+  .solution[open] > summary {
+    border-bottom-color: var(--border);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .solution-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--sem);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .solution-icons {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+  .solution-icon {
+    position: absolute;
+    inset: 0;
+  }
+
+  .solution-icon-revealed,
+  .solution[open] .solution-icon-covered {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  .solution[open] .solution-icon-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  .solution-hint {
+    display: grid;
+    justify-items: end;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .solution-hint > span {
+    grid-area: 1 / 1;
+  }
+
+  .solution-when-open,
+  .solution[open] .solution-when-closed {
+    opacity: 0;
+  }
+
+  .solution[open] .solution-when-open {
+    opacity: 1;
+  }
+
+  .solution > summary:hover .solution-hint {
+    color: var(--text-primary);
+  }
+
+  .solution-body {
+    position: relative;
+    z-index: 1;
+    padding: 16px 20px 4px;
+    overflow-x: auto;
+  }
+
+  .solution-body > :first-child {
+    margin-top: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .solution {
+      transition: border-color 0.2s ease;
+    }
+
+    .solution::before,
+    .solution::after {
+      transition: opacity 0.25s ease;
+    }
+
+    .solution > summary {
+      transition:
+        border-bottom-color 0.25s ease,
+        border-radius 0.25s ease;
+    }
+
+    .solution-icon,
+    .solution-hint > span {
+      transition:
+        opacity 0.2s ease,
+        transform 0.3s var(--solution-ease);
+    }
+
+    .solution-hint {
+      transition: color 0.12s ease;
+    }
+
+    .solution-body {
+      transition:
+        opacity 0.18s ease,
+        translate 0.18s ease;
+    }
+
+    .solution:not([open]) .solution-body {
+      opacity: 0;
+      translate: 0 -6px;
+    }
+
+    .solution[open] .solution-body {
+      transition:
+        opacity 0.3s ease 0.06s,
+        translate 0.35s var(--solution-ease) 0.06s;
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 -6px;
+      }
+    }
+
+    @supports selector(::details-content) {
+      .solution::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size 0.2s var(--solution-ease),
+          content-visibility 0.2s allow-discrete;
+      }
+
+      .solution[open]::details-content {
+        block-size: auto;
+        transition:
+          block-size 0.35s var(--solution-ease),
+          content-visibility 0.35s allow-discrete;
+      }
+    }
+  }
+</style>

@@ -126,6 +126,8 @@ Don't retitle or rename a note only to change its number. The filename sets the 
 
 Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-note reminder. Ordinary content stays in the main prose.
 
+Worked examples hide their workings behind `<Solution>` (`src/components/mdx/solution.astro`, a native `<details>` with no script). Keep the heading and the question as plain prose, then wrap everything after it (workings and answer) in `<Solution>`, with a blank line after the opening tag and before the closing one. A heading with several questions gets one `<Solution>` after each question. Statements that are not problems (a fact, a list of cases) stay unwrapped. If the heading itself is the question (such as `### $\log i$`), wrap the whole body.
+
 Never place 2 `<Note>` components next to each other with the same `type` (default `"note"`). Merge them into 1, or move one back into the main text. Enforced by the `adjacent-note` rule (`src/integrations/notes-style-validator/rules/adjacent-note.ts`).
 
 ### Adjacent lists
