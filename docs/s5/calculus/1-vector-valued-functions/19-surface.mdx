@@ -1,0 +1,285 @@
+---
+title: Surface
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-10-16T15:32:48.862Z
+---
+
+### Normal Vector
+
+A normal vector to a surface at a point is a non-zero vector perpendicular to the surface at that point.
+
+## Different Forms of a Surface
+
+A surface can be defined in 3 different forms.
+
+### Parametric Form
+
+A surface $\sigma$ is the set of points traced by a vector-valued function of 2 parameters.
+
+$$
+\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}, \quad (u,v) \in R
+$$
+
+Here:
+
+- $R$: region in the $uv$-plane
+- $x, y, z$: component functions of $u$ and $v$
+
+A normal vector to $\sigma$ is
+
+$$
+\boldsymbol{N} = \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v}
+$$
+
+Examples:
+
+- Sphere of radius $a$ as $\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\hat{i} + a\sin\phi\sin\theta\,\hat{j} + a\cos\phi\,\hat{k}$
+- Plane through $\boldsymbol{r}_0$ as $\boldsymbol{r}(u,v) = \boldsymbol{r}_0 + u\boldsymbol{a} + v\boldsymbol{b}$
+
+### Implicit Form
+
+A surface $\sigma$ is the set of points $(x,y,z)$ satisfying a single equation.
+
+$$
+G(x,y,z) = 0
+$$
+
+A normal vector at $(x,y,z)$ on $\sigma$ is
+
+$$
+\boldsymbol{N} = \nabla G(x,y,z)
+$$
+
+Examples:
+
+- Sphere $x^2 + y^2 + z^2 - a^2 = 0$
+- Plane $x + y + z - 1 = 0$
+
+### Graph Form
+
+A surface $\sigma$ is the graph of a function of 2 variables.
+
+$$
+z = g(x,y), \quad (x,y) \in R
+$$
+
+Here $R$ is the projection of $\sigma$ onto the $xy$-plane.
+
+An upward-pointing normal vector is
+
+$$
+\boldsymbol{N} = \langle -g_x(x,y), -g_y(x,y), 1 \rangle
+$$
+
+A graph is a parametric surface with $\boldsymbol{r}(x,y) = x\hat{i} + y\hat{j} + g(x,y)\hat{k}$. An implicit surface $G(x,y,z) = 0$ is a graph if $G_z \neq 0$, by solving for $z$.
+
+Examples:
+
+- Paraboloid $z = x^2 + y^2$
+- Plane $z = 1 - x - y$
+
+## Smoothness
+
+A surface is smooth **iff** it has a non-zero normal vector at each point. A surface is piecewise smooth **iff** it is composed of finitely many smooth pieces.
+
+## Surface Integral
+
+Let $f$ be a continuous scalar function defined on a piecewise smooth surface $\sigma$. Partition $\sigma$ into $n$ subregions, where the $k$th subregion has area $\Delta S_k$. Choose a sample point $(x_k^*, y_k^*, z_k^*)$ in the $k$th subregion. The surface integral of $f$ over $\sigma$ is
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \lim_{n \to \infty} \sum_{k=1}^{n} f(x_k^*, y_k^*, z_k^*)\,\Delta S_k
+$$
+
+provided the limit exists and does not depend on the partition or the choice of sample points.
+
+The limit is evaluated through the parametric or graph form of $\sigma$.
+
+### For a Parametric Surface
+
+Let $\sigma$ be a smooth parametric surface given by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. If $f$ is continuous on $\sigma$,
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \iint_R f(x(u,v),y(u,v),z(u,v)) \left\lVert \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \right\rVert \text{d}A_{uv}
+$$
+
+### For a Graph
+
+Let $\sigma$ be a surface given by $z = g(x,y)$, and let $R$ be its projection onto the $xy$-plane. If $g$, $g_x$, $g_y$ are continuous on $R$ and $f$ is continuous on $\sigma$,
+
+$$
+\iint_\sigma f(x,y,z)\,\text{d}S = \iint_R f(x,y,g(x,y)) \sqrt{1 + (g_x(x,y))^2 + (g_y(x,y))^2}\,\text{d}A
+$$
+
+## Worked Examples
+
+### Part of a Plane
+
+Evaluate $\iint_\sigma z\,\text{d}S$, where $\sigma$ is the part of the plane $x + y + z = 1$ in the first octant.
+
+<Solution>
+
+Write $\sigma$ as a graph.
+
+$$
+z = g(x,y) = 1 - x - y
+$$
+
+Compute the area factor.
+
+$$
+g_x = -1, \quad g_y = -1, \quad \sqrt{1 + g_x^2 + g_y^2} = \sqrt{3}
+$$
+
+The projection $R$ onto the $xy$-plane is the triangle $0 \le x \le 1$, $0 \le y \le 1 - x$.
+
+$$
+\iint_\sigma z\,\text{d}S = \iint_R (1 - x - y)\sqrt{3}\,\text{d}A = \sqrt{3} \int_0^1 \int_0^{1-x} (1 - x - y)\,\text{d}y\,\text{d}x
+$$
+
+Integrate with respect to $y$.
+
+$$
+\int_0^{1-x} (1 - x - y)\,\text{d}y = \frac{(1-x)^2}{2}
+$$
+
+Integrate with respect to $x$.
+
+$$
+\iint_\sigma z\,\text{d}S = \sqrt{3} \int_0^1 \frac{(1-x)^2}{2}\,\text{d}x = \frac{\sqrt{3}}{6}
+$$
+
+</Solution>
+
+### Sphere
+
+Evaluate $\iint_\sigma z^2\,\text{d}S$, where $\sigma$ is the sphere $x^2 + y^2 + z^2 = a^2$ with $a > 0$.
+
+<Solution>
+
+Parametrize $\sigma$ with spherical coordinates.
+
+$$
+\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\hat{i} + a\sin\phi\sin\theta\,\hat{j} + a\cos\phi\,\hat{k}, \quad 0 \le \phi \le \pi, \ 0 \le \theta \le 2\pi
+$$
+
+Differentiate.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial \phi} = a\cos\phi\cos\theta\,\hat{i} + a\cos\phi\sin\theta\,\hat{j} - a\sin\phi\,\hat{k}
+$$
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial \theta} = -a\sin\phi\sin\theta\,\hat{i} + a\sin\phi\cos\theta\,\hat{j}
+$$
+
+Compute the cross product.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial \phi} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = a^2\sin\phi\left(\sin\phi\cos\theta\,\hat{i} + \sin\phi\sin\theta\,\hat{j} + \cos\phi\,\hat{k}\right)
+$$
+
+The vector in brackets is a unit vector and $\sin\phi \ge 0$, so the norm is $a^2\sin\phi$.
+
+<Note>
+
+Swapping the order of the cross product reverses the vector, but the norm stays $a^2\sin\phi$. A scalar surface integral is unchanged. A flux integral has no norm, so the swap negates the result.
+
+</Note>
+
+On $\sigma$, $z = a\cos\phi$.
+
+$$
+\iint_\sigma z^2\,\text{d}S = \int_0^{2\pi} \int_0^\pi a^2\cos^2\phi \cdot a^2\sin\phi\,\text{d}\phi\,\text{d}\theta
+$$
+
+Integrate with respect to $\phi$.
+
+$$
+\int_0^\pi \cos^2\phi\sin\phi\,\text{d}\phi = \left[ -\frac{\cos^3\phi}{3} \right]_0^\pi = \frac{2}{3}
+$$
+
+Integrate with respect to $\theta$.
+
+$$
+\iint_\sigma z^2\,\text{d}S = a^4 \cdot 2\pi \cdot \frac{2}{3} = \frac{4\pi a^4}{3}
+$$
+
+</Solution>
+
+### Area of a Paraboloid
+
+Find the area of the part of the paraboloid $z = x^2 + y^2$ below the plane $z = 1$.
+
+<Solution>
+
+The area is $\iint_\sigma 1\,\text{d}S$.
+
+<Method label="Graph Form">
+
+Write $\sigma$ as a graph.
+
+$$
+z = g(x,y) = x^2 + y^2, \quad g_x = 2x, \quad g_y = 2y
+$$
+
+The paraboloid meets $z = 1$ on $x^2 + y^2 = 1$, so $R$ is the unit disk.
+
+$$
+S = \iint_R \sqrt{1 + 4x^2 + 4y^2}\,\text{d}A
+$$
+
+The integrand depends only on $x^2 + y^2 = r^2$, so switch to polar coordinates with $\text{d}A = r\,\text{d}r\,\text{d}\theta$.
+
+$$
+S = \int_0^{2\pi} \int_0^1 \sqrt{1 + 4r^2}\,r\,\text{d}r\,\text{d}\theta
+$$
+
+Substitute $u = 1 + 4r^2$, so $r\,\text{d}r = \frac{1}{8}\text{d}u$ and $u$ runs from $1$ to $5$.
+
+$$
+\int_0^1 \sqrt{1 + 4r^2}\,r\,\text{d}r = \frac{1}{8} \int_1^5 u^{1/2}\,\text{d}u = \frac{1}{8} \cdot \frac{2}{3}\left(5\sqrt{5} - 1\right) = \frac{5\sqrt{5} - 1}{12}
+$$
+
+Integrate with respect to $\theta$.
+
+$$
+S = 2\pi \cdot \frac{5\sqrt{5} - 1}{12} = \frac{\pi\left(5\sqrt{5} - 1\right)}{6}
+$$
+
+</Method>
+
+<Method label="Parametric Form">
+
+Parametrize $\sigma$ with the radius $r$ and the angle $\theta$ as parameters.
+
+$$
+\boldsymbol{r}(r,\theta) = r\cos\theta\,\hat{i} + r\sin\theta\,\hat{j} + r^2\,\hat{k}, \quad 0 \le r \le 1, \ 0 \le \theta \le 2\pi
+$$
+
+Differentiate.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial r} = \cos\theta\,\hat{i} + \sin\theta\,\hat{j} + 2r\,\hat{k}, \quad \frac{\partial \boldsymbol{r}}{\partial \theta} = -r\sin\theta\,\hat{i} + r\cos\theta\,\hat{j}
+$$
+
+Compute the cross product.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial r} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = -2r^2\cos\theta\,\hat{i} - 2r^2\sin\theta\,\hat{j} + r\,\hat{k}
+$$
+
+Take the norm. Since $r \ge 0$,
+
+$$
+\left\lVert \frac{\partial \boldsymbol{r}}{\partial r} \times \frac{\partial \boldsymbol{r}}{\partial \theta} \right\rVert = \sqrt{4r^4 + r^2} = r\sqrt{1 + 4r^2}
+$$
+
+Integrate over the unit disk.
+
+$$
+S = \int_0^{2\pi} \int_0^1 r\sqrt{1 + 4r^2}\,\text{d}r\,\text{d}\theta = \frac{\pi\left(5\sqrt{5} - 1\right)}{6}
+$$
+
+</Method>
+
+</Solution>
