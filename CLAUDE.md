@@ -150,8 +150,6 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 
 - `<Aka>`
   An inline lead-in for a concept's aliases, written at the start of the paragraph that defines it: `<Aka>SNR, signal-to-noise ratio</Aka>. The ratio of signal power to noise power.` It renders "Also known as" in muted prose with the aliases in bold, and the full stop is written after the closing tag. Only the alias list goes inside, never the definition sentence.
-- `<Term def="...">`
-  An inline defined term, rendered as a `<dfn>` with a dotted underline and a CSS-only hover/focus tooltip showing `def` (plain text, no markup). Use it for a term whose full definition lives elsewhere. No script, so soft navigation needs nothing extra.
 
 Leave a blank line after each opening tag and before each closing tag, as with `<Note>`.
 
