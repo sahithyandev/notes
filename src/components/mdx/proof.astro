@@ -4,85 +4,74 @@ interface Props {
 }
 
 const { label = "Proof" } = Astro.props;
+const isHint = /hint/i.test(label);
 ---
 
-<details class="proof">
-  <summary>
-    <span class="proof-label">{label}</span>
-    <span class="proof-hint">
-      <span class="proof-when-closed">Show</span>
-      <span class="proof-when-open">Hide</span>
-    </span>
-  </summary>
-  <div class="proof-body">
-    <slot />
+<aside class="proof">
+  <div class="proof-sheet">
+    <p class="proof-label">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        {isHint ? (
+          <>
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+            <path d="M9 18h6" />
+            <path d="M10 22h4" />
+          </>
+        ) : (
+          <>
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </>
+        )}
+      </svg>
+      <span>{label}</span>
+    </p>
+    <div class="proof-body">
+      <slot />
+    </div>
   </div>
-</details>
+</aside>
 
 <style is:global>
   .proof {
-    --proof-ease: cubic-bezier(0.22, 1, 0.36, 1);
-
-    margin: 12px 0 24px;
-    interpolate-size: allow-keywords;
+    margin: 20px 0 24px;
   }
 
-  .proof > summary {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 4px 0;
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
-    font-family: var(--font-ui);
-  }
-
-  .proof > summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .proof > summary:focus-visible {
-    outline: 2px solid var(--sem);
-    outline-offset: 2px;
+  .proof-sheet {
+    padding: 14px 20px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
   }
 
   .proof-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
     color: var(--text-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.8px;
+    font-family: var(--font-ui);
+    font-size: 0.75rem !important;
+    font-weight: 500;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
   }
 
-  .proof-hint {
-    display: grid;
-    justify-items: end;
-    color: var(--text-muted);
-    font-size: 0.8125rem;
-    font-weight: 500;
-  }
-
-  .proof-hint > span {
-    grid-area: 1 / 1;
-  }
-
-  .proof-when-open,
-  .proof[open] > summary .proof-when-closed {
-    opacity: 0;
-  }
-
-  .proof[open] > summary .proof-when-open {
-    opacity: 1;
-  }
-
-  .proof > summary:hover .proof-hint {
-    color: var(--text-primary);
+  .proof-label svg {
+    flex-shrink: 0;
   }
 
   .proof-body {
-    padding: 4px 0 0 16px;
-    border-left: 2px solid var(--border);
     overflow-x: auto;
   }
 
@@ -90,44 +79,15 @@ const { label = "Proof" } = Astro.props;
     margin-top: 0;
   }
 
+  .proof-body > :last-child {
+    margin-bottom: 0;
+  }
+
   .proof-body::after {
     content: "\220E";
     display: block;
     text-align: right;
+    line-height: 1;
     color: var(--text-muted);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .proof-hint > span {
-      transition: opacity 0.2s ease;
-    }
-
-    .proof[open] > .proof-body {
-      animation: proof-in 0.3s var(--proof-ease);
-    }
-
-    @supports selector(::details-content) {
-      .proof::details-content {
-        block-size: 0;
-        overflow: clip;
-        transition:
-          block-size 0.2s var(--proof-ease),
-          content-visibility 0.2s allow-discrete;
-      }
-
-      .proof[open]::details-content {
-        block-size: auto;
-        transition:
-          block-size 0.35s var(--proof-ease),
-          content-visibility 0.35s allow-discrete;
-      }
-    }
-  }
-
-  @keyframes proof-in {
-    from {
-      opacity: 0;
-      translate: 0 -6px;
-    }
   }
 </style>
