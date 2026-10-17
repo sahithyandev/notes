@@ -1,7 +1,7 @@
 ---
 title: Driving Loads
 dateCreated: 2026-06-11T19:05:16.258Z
-lastUpdatedOn: 2026-09-29T03:57:49.245Z
+lastUpdatedOn: 2026-10-17T05:04:54.755Z
 ---
 
 ## Driving LEDs
@@ -27,9 +27,11 @@ $$
 
 Here:
 
-- $V_{CC}$: supply voltage
-- $V_f$: LED forward voltage
-- $I_f$: desired forward current
+<Symbols>
+  <Sym s="V_{CC}">supply voltage</Sym>
+  <Sym s="V_f">LED forward voltage</Sym>
+  <Sym s="I_f">desired forward current</Sym>
+</Symbols>
 
 Typical $I_f$ for indicator LEDs is $5\ \text{mA}$–$20\ \text{mA}$. MCU GPIO pins are rated for $8\ \text{mA}$–$25\ \text{mA}$ depending on the device. $I_f$ must stay within this limit.
 
@@ -228,8 +230,10 @@ $$
 
 Here:
 
-- $f_{pulse}$: pulse frequency in Hz
-- $N$: pulses per revolution
+<Symbols>
+  <Sym s="f_{pulse}">pulse frequency in Hz</Sym>
+  <Sym s="N">pulses per revolution</Sym>
+</Symbols>
 
 #### Closed-Loop Speed Control
 
@@ -251,10 +255,20 @@ $$
 
 Here:
 
-- $e(t)$: error (setpoint minus measured speed)
-- $K_p$: proportional gain (correction proportional to current error)
-- $K_i$: integral gain (correction for accumulated error, eliminates steady-state offset)
-- $K_d$: derivative gain (correction proportional to rate of error change, damps overshoot)
+<Symbols>
+  <Sym s="e(t)">error (setpoint minus measured speed)</Sym>
+  <Sym s="K_p">
+    proportional gain (correction proportional to current error)
+  </Sym>
+  <Sym s="K_i">
+    integral gain (correction for accumulated error, eliminates steady-state
+    offset)
+  </Sym>
+  <Sym s="K_d">
+    derivative gain (correction proportional to rate of error change, damps
+    overshoot)
+  </Sym>
+</Symbols>
 
 The controller output $u(t)$ maps to PWM duty cycle. On each control loop iteration (driven by a timer ISR), the MCU reads the tachometer, computes the error, updates the PID terms, and writes the new duty cycle to the PWM register.
 

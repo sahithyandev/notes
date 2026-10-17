@@ -1,7 +1,7 @@
 ---
 title: Turing Machine
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-09-29T03:57:50.352Z
+lastUpdatedOn: 2026-10-17T05:04:55.362Z
 ---
 
 Most powerful abstract model of computation. Can simulate any real computer (ignoring efficiency). Modelled by Alan Turing.
@@ -156,12 +156,16 @@ A Turing machine with multiple tapes. Each tape has its own tape head.
 
 An $n$-tape Turing machine is a 6-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, F)$ where:
 
-- $Q$: finite set of states
-- $\Sigma$: input alphabet
-- $\Gamma$: tape alphabet ($\Sigma \subseteq \Gamma$)
-- $q_0$: initial state
-- $F$: set of accepting states
-- $\delta: Q \times \Gamma^n \rightarrow Q \times \Gamma^n \times \{L, R, S\}^n$: transition function
+<Symbols>
+  <Sym s="Q">finite set of states</Sym>
+  <Sym s="\Sigma">input alphabet</Sym>
+  <Sym s="\Gamma">tape alphabet ($\Sigma \subseteq \Gamma$)</Sym>
+  <Sym s="q_0">initial state</Sym>
+  <Sym s="F">set of accepting states</Sym>
+  <Sym s="\delta: Q \times \Gamma^n \rightarrow Q \times \Gamma^n \times \{L, R, S\}^n">
+    transition function
+  </Sym>
+</Symbols>
 
 The machine reads $n$ symbols (one from each tape). Based on the current state and these symbols:
 

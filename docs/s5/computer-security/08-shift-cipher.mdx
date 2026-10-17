@@ -1,7 +1,7 @@
 ---
 title: Shift Cipher
 dateCreated: 2026-07-29T05:49:37.219Z
-lastUpdatedOn: 2026-09-29T03:14:18.803Z
+lastUpdatedOn: 2026-10-17T05:04:56.285Z
 ---
 
 A [classical cipher](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. Every letter is shifted by the same amount, so plaintext letter frequencies are preserved in the ciphertext.
@@ -18,8 +18,10 @@ $$
 
 Here:
 
-- $m$: plaintext letter, encoded as an integer 0 (a) to 25 (z)
-- $k$: the shift value, the secret key
+<Symbols>
+  <Sym s="m">plaintext letter, encoded as an integer 0 (a) to 25 (z)</Sym>
+  <Sym s="k">the shift value, the secret key</Sym>
+</Symbols>
 
 <Note>
 
@@ -55,9 +57,15 @@ $$
 
 Here:
 
-- $X$: random variable distributed according to the standard character frequency
-- $Y_k$: random variable distributed according to the shift $k$
-- $V$: the set of values which can occur for $X$ or $Y_k$ with non-zero probability
+<Symbols>
+  <Sym s="X">
+    random variable distributed according to the standard character frequency
+  </Sym>
+  <Sym s="Y_k">random variable distributed according to the shift $k$</Sym>
+  <Sym s="V">
+    the set of values which can occur for $X$ or $Y_k$ with non-zero probability
+  </Sym>
+</Symbols>
 
 Computing $\Delta[X, Y_k]$ for each of the 26 values of $k$ and taking the smallest value gives the secret key.
 

@@ -1,7 +1,7 @@
 ---
 title: Key Derivation Functions
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:16.982Z
+lastUpdatedOn: 2026-10-17T05:04:56.491Z
 ---
 
 A key derivation function (KDF) derives 1 or more cryptographic keys from a secret input value.
@@ -12,10 +12,15 @@ $$
 
 Here:
 
-- $S$: input secret, such as a password or a [Diffie-Hellman](/s5/computer-security/diffie-hellman) shared secret
-- $\text{salt}$: non-secret random value
-- $\text{info}$: context label binding the key to its purpose
-- $L$: required output length
+<Symbols>
+  <Sym s="S">
+    input secret, such as a password or a
+    [Diffie-Hellman](/s5/computer-security/diffie-hellman) shared secret
+  </Sym>
+  <Sym s="\text{salt}">non-secret random value</Sym>
+  <Sym s="\text{info}">context label binding the key to its purpose</Sym>
+  <Sym s="L">required output length</Sym>
+</Symbols>
 
 Raw secrets are unfit as keys directly.
 
@@ -68,7 +73,9 @@ $$
 K = \text{PBKDF2}(\text{HMAC}, \text{password}, \text{salt}, c, L)
 $$
 
-- $c$: iteration count
+<Symbols>
+  <Sym s="c">iteration count</Sym>
+</Symbols>
 
 PBKDF2 needs little memory, so GPUs and ASICs run many guesses in parallel. Memory-hard functions such as scrypt and Argon2 require a large amount of memory per guess, which limits this parallelism.
 

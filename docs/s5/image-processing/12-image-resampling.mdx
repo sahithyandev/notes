@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-09-28T05:07:14.416Z
+lastUpdatedOn: 2026-10-17T05:04:56.735Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -38,8 +38,10 @@ $$
 
 Here:
 
-- $k_x, k_y$: horizontal and vertical scale factors
-- $(s_x, s_y)$: source position, generally non-integer
+<Symbols>
+  <Sym s="k_x, k_y">horizontal and vertical scale factors</Sym>
+  <Sym s="(s_x, s_y)">source position, generally non-integer</Sym>
+</Symbols>
 
 A non-integer $(s_x, s_y)$ falls between source pixels, so no stored value sits there. The output value is built from the 2&times;2 block of source pixels enclosing it, with corners $(\lfloor s_x \rfloor, \lfloor s_y \rfloor)$ and $(\lceil s_x \rceil, \lceil s_y \rceil)$, using either nearest neighbour or interpolation. Corners outside the source are clipped to the border.
 
@@ -95,10 +97,18 @@ $$
 
 Here:
 
-- $f_x, f_y$: fractional distances from the top-left neighbour, in $[0, 1)$
-- $v_{00}$: top-left neighbour value, at $(\lfloor s_x \rfloor, \lfloor s_y \rfloor)$
-- $v_{10}$: top-right, $v_{01}$: bottom-left, $v_{11}$: bottom-right
-- $v$: interpolated value, rounded to an integer
+<Symbols>
+  <Sym s="f_x, f_y">
+    fractional distances from the top-left neighbour, in $[0, 1)$
+  </Sym>
+  <Sym s="v_{00}">
+    top-left neighbour value, at $(\lfloor s_x \rfloor, \lfloor s_y \rfloor)$
+  </Sym>
+  <Sym s="v_{10}">
+    top-right, $v_{01}$: bottom-left, $v_{11}$: bottom-right
+  </Sym>
+  <Sym s="v">interpolated value, rounded to an integer</Sym>
+</Symbols>
 
 Each colour channel is interpolated separately.
 
@@ -154,8 +164,12 @@ A series of progressively lower-resolution images derived from one source, each 
 
 The stack of smoothed, downsampled images.
 
-- $G_0$: the original image
-- $G_{n+1}$: $G_n$ smoothed with a low-pass kernel, then downsampled by 2
+<Symbols>
+  <Sym s="G_0">the original image</Sym>
+  <Sym s="G_{n+1}">
+    $G_n$ smoothed with a low-pass kernel, then downsampled by 2
+  </Sym>
+</Symbols>
 
 Each level halves the width and height. Smoothing before downsampling removes the high frequencies that would otherwise alias.
 

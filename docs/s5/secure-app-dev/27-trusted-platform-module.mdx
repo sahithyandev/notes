@@ -1,7 +1,7 @@
 ---
 title: Trusted Platform Module
 dateCreated: 2026-09-30T15:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.431Z
+lastUpdatedOn: 2026-10-17T05:04:57.475Z
 ---
 
 Aka. TPM. A tamper-resistant cryptographic coprocessor on the motherboard. It serves as the hardware [root of trust](/s5/secure-app-dev/chain-of-trust) of a platform.
@@ -29,9 +29,11 @@ $$
 
 Here:
 
-- $H$: hash function
-- $m$: hash of the component being measured
-- $\parallel$: concatenation
+<Symbols>
+  <Sym s="H">hash function</Sym>
+  <Sym s="m">hash of the component being measured</Sym>
+  <Sym s="\parallel">concatenation</Sym>
+</Symbols>
 
 The final value depends on every measurement and their order. A PCR cannot be set to an arbitrary value, so malware cannot erase an earlier measurement.
 

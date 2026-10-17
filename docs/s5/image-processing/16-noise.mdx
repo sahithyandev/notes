@@ -1,7 +1,7 @@
 ---
 title: Noise
 dateCreated: 2026-08-18T07:18:54.109Z
-lastUpdatedOn: 2026-09-28T05:07:14.468Z
+lastUpdatedOn: 2026-10-17T05:04:56.768Z
 ---
 
 Noise is an unwanted component added to the true image signal during acquisition, storage or transmission, usually random. Structured corruptions introduced by processing, such as compression blocking or aliasing, are normally called artefacts instead.
@@ -37,9 +37,13 @@ $$
 
 Here:
 
-- $z$: noise value added to a pixel
-- $\mu$: mean, taken as $0$ so the noise neither brightens nor darkens on average
-- $\sigma$: standard deviation, sets the noise strength
+<Symbols>
+  <Sym s="z">noise value added to a pixel</Sym>
+  <Sym s="\mu">
+    mean, taken as $0$ so the noise neither brightens nor darkens on average
+  </Sym>
+  <Sym s="\sigma">standard deviation, sets the noise strength</Sym>
+</Symbols>
 
 $p(z)$ only gives the probability of each noise value. The amount added to a pixel is an independent random draw following $p(z)$, so the equation fixes the odds, not the outcome.
 
@@ -67,8 +71,10 @@ $$
 
 Here:
 
-- $a$: lower bound of the noise range
-- $b$: upper bound of the noise range
+<Symbols>
+  <Sym s="a">lower bound of the noise range</Sym>
+  <Sym s="b">upper bound of the noise range</Sym>
+</Symbols>
 
 Flat with no peak. Mean is $\frac{a+b}{2}$. Hard to estimate because no noise value is more frequent than another. Rarely matches a real source. Quantisation error is close to uniform.
 
@@ -114,8 +120,10 @@ $$
 
 Here:
 
-- $F$: static source scene frame
-- $N_i$: noise in frame $i$
+<Symbols>
+  <Sym s="F">static source scene frame</Sym>
+  <Sym s="N_i">noise in frame $i$</Sym>
+</Symbols>
 
 <Note>
 

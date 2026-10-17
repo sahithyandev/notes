@@ -1,7 +1,7 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:17.026Z
+lastUpdatedOn: 2026-10-17T05:04:56.516Z
 ---
 
 A linear feedback shift register (LFSR) builds a [keystream](/s5/computer-security/stream-ciphers) from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
@@ -10,8 +10,14 @@ $$
 s_i = c_1 s_{i-1} \oplus c_2 s_{i-2} \oplus \cdots \oplus c_n s_{i-n}, \quad i \ge n
 $$
 
-- $c_1, \ldots, c_n \in \{0, 1\}$: the feedback taps, fixed for a given LFSR.
-- $s_0, \ldots, s_{n-1}$: the initial state, acting as the secret key or seed.
+<Symbols>
+  <Sym s="c_1, \ldots, c_n \in \{0, 1\}">
+    the feedback taps, fixed for a given LFSR.
+  </Sym>
+  <Sym s="s_0, \ldots, s_{n-1}">
+    the initial state, acting as the secret key or seed.
+  </Sym>
+</Symbols>
 
 Each step outputs 1 bit, usually $s_{i-n}$, then shifts the register and inserts the new feedback bit.
 
@@ -55,8 +61,10 @@ $$
 k_i = f\left(s_i^{(1)}, s_i^{(2)}, \ldots, s_i^{(m)}\right)
 $$
 
-- $s_i^{(j)}$: the output bit of the $j$-th LFSR at step $i$.
-- $f$: a fixed nonlinear function of the $m$ component outputs.
+<Symbols>
+  <Sym s="s_i^{(j)}">the output bit of the $j$-th LFSR at step $i$.</Sym>
+  <Sym s="f">a fixed nonlinear function of the $m$ component outputs.</Sym>
+</Symbols>
 
 For example, the Geffe generator combines 3 LFSRs through $f(x_1, x_2, x_3) = x_1 x_2 \oplus (1 \oplus x_1) x_3$, using $x_1$ to select between $x_2$ and $x_3$.
 

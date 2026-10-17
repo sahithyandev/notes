@@ -1,7 +1,7 @@
 ---
 title: RC4
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.080Z
+lastUpdatedOn: 2026-10-17T05:04:56.268Z
 ---
 
 RC4, designed by Ron Rivest in 1987, is a byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an LFSR.
@@ -26,8 +26,12 @@ $$
 \end{aligned}
 $$
 
-- $i$: iterates once over every index in order.
-- $j$: a running value seeded by the key, deciding which entry $i$ is swapped with.
+<Symbols>
+  <Sym s="i">iterates once over every index in order.</Sym>
+  <Sym s="j">
+    a running value seeded by the key, deciding which entry $i$ is swapped with.
+  </Sym>
+</Symbols>
 
 After 256 swaps, every byte value has moved to a key-dependent position, and $S$ passes unchanged into the PRGA.
 

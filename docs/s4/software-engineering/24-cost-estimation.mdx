@@ -1,7 +1,7 @@
 ---
 title: Cost Estimation
 dateCreated: 2026-06-07T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:57:50.033Z
+lastUpdatedOn: 2026-10-17T05:04:55.105Z
 ---
 
 Predicting the effort and schedule required to deliver a software project before development begins.
@@ -136,8 +136,10 @@ $$
 
 Here:
 
-- $\text{TDEV}$: time to develop, in months.
-- $c,d$: constants that vary by mode.
+<Symbols>
+  <Sym s="\text{TDEV}">time to develop, in months.</Sym>
+  <Sym s="c,d">constants that vary by mode.</Sym>
+</Symbols>
 
 | Mode          | $a$ | $b$  | $c$ | $d$  |
 | ------------- | --- | ---- | --- | ---- |
@@ -174,8 +176,12 @@ $$
 
 Here:
 
-- $\text{PM}_{base}$: effort from the COCOMO formula with standard mode parameters
-- $m$: productivity multiplier
+<Symbols>
+  <Sym s="\text{PM}_{base}">
+    effort from the COCOMO formula with standard mode parameters
+  </Sym>
+  <Sym s="m">productivity multiplier</Sym>
+</Symbols>
 
 Multiplier direction:
 
@@ -205,10 +211,20 @@ $$
 
 Here:
 
-- $A$: calibration constant. ≈2.94 in the standard model. Calibrated from the organization's historical project data.
-- $\text{Size}$: measured in KSLOC (thousands of source lines of code) or function points
-- $B$: scaling exponent. $B = 0.91 + 0.01 \times \sum \text{SF}_i$, where $\text{SF}_i$ is each [Scale Factor](#scale-factor)'s rating.
-- $\text{EM}_i$: effort multipliers (17 cost drivers)
+<Symbols>
+  <Sym s="A">
+    calibration constant. ≈2.94 in the standard model. Calibrated from the
+    organization's historical project data.
+  </Sym>
+  <Sym s="\text{Size}">
+    measured in KSLOC (thousands of source lines of code) or function points
+  </Sym>
+  <Sym s="B">
+    scaling exponent. $B = 0.91 + 0.01 \times \sum \text{SF}_i$, where $\text
+    {SF}_i$ is each [Scale Factor](#scale-factor)'s rating.
+  </Sym>
+  <Sym s="\text{EM}_i">effort multipliers (17 cost drivers)</Sym>
+</Symbols>
 
 Project duration:
 

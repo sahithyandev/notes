@@ -1,7 +1,7 @@
 ---
 title: JPEG
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-08T13:09:53.925Z
+lastUpdatedOn: 2026-10-17T05:04:56.823Z
 ---
 
 Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
@@ -84,8 +84,12 @@ x_i = \left\lceil X \cdot \frac{H_i}{H_{\max}} \right\rceil
 y_i = \left\lceil Y \cdot \frac{V_i}{V_{\max}} \right\rceil
 $$
 
-- $x_i, y_i$: dimensions of component $i$ in samples
-- $H_{\max}, V_{\max}$: largest sampling factors across all components
+<Symbols>
+  <Sym s="x_i, y_i">dimensions of component $i$ in samples</Sym>
+  <Sym s="H_{\max}, V_{\max}">
+    largest sampling factors across all components
+  </Sym>
+</Symbols>
 
 Blocks of the different components are interleaved in the output. The unit of coding is the minimum coded unit (MCU). An MCU holds $H_i \times V_i$ blocks of each component, in raster order within the component, components in order.
 
@@ -297,8 +301,12 @@ $$
 \text{RS} = 16 R + s
 $$
 
-- $R$: number of zeros since the previous nonzero coefficient, from 0 to 15
-- $s$: category of the nonzero coefficient, from 1 to 10
+<Symbols>
+  <Sym s="R">
+    number of zeros since the previous nonzero coefficient, from 0 to 15
+  </Sym>
+  <Sym s="s">category of the nonzero coefficient, from 1 to 10</Sym>
+</Symbols>
 
 The Huffman code of RS is followed by the $s$ extra bits of the coefficient.
 

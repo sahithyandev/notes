@@ -1,15 +1,19 @@
 ---
 title: Image Model
 dateCreated: 2026-07-26T04:58:54.491Z
-lastUpdatedOn: 2026-10-07T05:23:38.186Z
+lastUpdatedOn: 2026-10-17T05:04:56.662Z
 ---
 
 An image is modeled as a function $I(x,y)$ returning the light intensity at position $(x,y)$.
 
 Here:
 
-- $x, y$: spatial coordinates of a point in the image
-- $I(x,y)$: light intensity at that point, bounded between a minimum and maximum
+<Symbols>
+  <Sym s="x, y">spatial coordinates of a point in the image</Sym>
+  <Sym s="I(x,y)">
+    light intensity at that point, bounded between a minimum and maximum
+  </Sym>
+</Symbols>
 
 ## Analog Image Model
 
@@ -52,11 +56,15 @@ $$
 
 Here:
 
-- $m$: number of rows
-- $n$: number of columns
-- $i$: row index, $0 \le i \le m-1$
-- $j$: column index, $0 \le j \le n-1$
-- $L$: number of intensity levels, usually $L = 2^k$ for a bit depth $k$
+<Symbols>
+  <Sym s="m">number of rows</Sym>
+  <Sym s="n">number of columns</Sym>
+  <Sym s="i">row index, $0 \le i \le m-1$</Sym>
+  <Sym s="j">column index, $0 \le j \le n-1$</Sym>
+  <Sym s="L">
+    number of intensity levels, usually $L = 2^k$ for a bit depth $k$
+  </Sym>
+</Symbols>
 
 $m \times n$ is the spatial resolution. $k$ is the bit depth. An 8-bit grayscale image has $L = 256$ levels, $0$ for black and $255$ for white.
 

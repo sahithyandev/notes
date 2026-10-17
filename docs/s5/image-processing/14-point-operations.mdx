@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-09-28T05:07:14.439Z
+lastUpdatedOn: 2026-10-17T05:04:56.751Z
 ---
 
 Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
@@ -32,8 +32,10 @@ $$
 
 Here:
 
-- $N(k)$: number of pixels with intensity $k$
-- $n$: total number of pixels
+<Symbols>
+  <Sym s="N(k)">number of pixels with intensity $k$</Sym>
+  <Sym s="n">total number of pixels</Sym>
+</Symbols>
 
 Defines the probability of intensity level $k$ in the image.
 
@@ -56,10 +58,12 @@ Brightness and contrast are the position and the width of the same histogram. Bo
 
 Here:
 
-- $r$: input intensity
-- $s$: output intensity
-- $c$: shift constant, added to move brightness
-- $a$: gain constant, multiplied to change contrast
+<Symbols>
+  <Sym s="r">input intensity</Sym>
+  <Sym s="s">output intensity</Sym>
+  <Sym s="c">shift constant, added to move brightness</Sym>
+  <Sym s="a">gain constant, multiplied to change contrast</Sym>
+</Symbols>
 
 Shifting the histogram changes brightness only. Every pair of pixels keeps the same intensity gap, so contrast is unaffected.
 
@@ -113,8 +117,10 @@ $$
 
 Here:
 
-- $C_t(g)$: accumulated probability of test level $\le g$
-- $C_r(r)$: accumulated probability of reference level $\le r$
+<Symbols>
+  <Sym s="C_t(g)">accumulated probability of test level $\le g$</Sym>
+  <Sym s="C_r(r)">accumulated probability of reference level $\le r$</Sym>
+</Symbols>
 
 Histogram equalization is the special case where the reference CDF is linear. Matching 2 levels through equal CDF values preserves their relative ordering.
 

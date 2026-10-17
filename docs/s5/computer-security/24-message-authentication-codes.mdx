@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Codes
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T04:15:01.870Z
+lastUpdatedOn: 2026-10-17T05:04:56.460Z
 ---
 
 A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
@@ -108,9 +108,14 @@ $$
 
 Here:
 
-- $k'$: key $k$ padded with zeros to the hash block size, or hashed first if longer than a block
-- $\text{ipad}$: the byte 0x36 repeated to the block size
-- $\text{opad}$: the byte 0x5c repeated to the block size
+<Symbols>
+  <Sym s="k'">
+    key $k$ padded with zeros to the hash block size, or hashed first if longer
+    than a block
+  </Sym>
+  <Sym s="\text{ipad}">the byte 0x36 repeated to the block size</Sym>
+  <Sym s="\text{opad}">the byte 0x5c repeated to the block size</Sym>
+</Symbols>
 
 The outer hash hides the inner digest, which defeats length extension.
 

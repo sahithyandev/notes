@@ -1,7 +1,7 @@
 ---
 title: Markov Decision Process
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-09-29T03:56:56.052Z
+lastUpdatedOn: 2026-10-17T05:04:53.509Z
 ---
 
 Aka. MDP. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
@@ -29,17 +29,21 @@ Stochastic domains are commonly modeled using frameworks like MDPs.
 
 Describes the probability of moving from one state to another given an action. Denoted using $T(s,a,s')$. The probability is denoted as $P(s'|s,a)$. Here:
 
-- $s$: current state
-- $a$: action taken
-- $s'$: next state
+<Symbols>
+  <Sym s="s">current state</Sym>
+  <Sym s="a">action taken</Sym>
+  <Sym s="s'">next state</Sym>
+</Symbols>
 
 ## Reward Function
 
 Assigns a numerical value to each state-action pair, indicating the immediate reward received by the agent when transitioning from a state $s$ to a state $s'$ by taking action $a$. Denoted using $R(s,a,s')$. Here:
 
-- $s$: current state
-- $a$: action taken
-- $s'$: next state
+<Symbols>
+  <Sym s="s">current state</Sym>
+  <Sym s="a">action taken</Sym>
+  <Sym s="s'">next state</Sym>
+</Symbols>
 
 ## Policy
 
@@ -159,8 +163,10 @@ $$
 
 Here:
 
-- $\gamma$: [discount factor](#discounting-rewards)
-- $\theta$: small threshold for stopping
+<Symbols>
+  <Sym s="\gamma">[discount factor](#discounting-rewards)</Sym>
+  <Sym s="\theta">small threshold for stopping</Sym>
+</Symbols>
 
 Once the threshold is reached, the algorithm terminates. $\pi^*(s)$ can be found by the latest iteration's results.
 
@@ -277,10 +283,12 @@ $$
 
 Here:
 
-- $Q_k(s,a)$: estimate at iteration $k$,
-- $T(s,a,s')$: transition probability,
-- $R(s,a,s')$: immediate reward,
-- $\gamma$: discount factor.
+<Symbols>
+  <Sym s="Q_k(s,a)">estimate at iteration $k$,</Sym>
+  <Sym s="T(s,a,s')">transition probability,</Sym>
+  <Sym s="R(s,a,s')">immediate reward,</Sym>
+  <Sym s="\gamma">discount factor.</Sym>
+</Symbols>
 
 ### Policy Iteration
 

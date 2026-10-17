@@ -1,7 +1,7 @@
 ---
 title: Data Redundancy
 dateCreated: 2026-10-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:23:38.367Z
+lastUpdatedOn: 2026-10-17T05:04:56.795Z
 ---
 
 Information is the meaning conveyed by a message. Data is the container used to store or transmit it.
@@ -42,8 +42,10 @@ $$
 
 Here:
 
-- $I(x,y)$: grey level at column $x$ and row $y$
-- $D(x,y)$: difference between a pixel and its right neighbour
+<Symbols>
+  <Sym s="I(x,y)">grey level at column $x$ and row $y$</Sym>
+  <Sym s="D(x,y)">difference between a pixel and its right neighbour</Sym>
+</Symbols>
 
 The first pixel of each row has no left neighbour, so it is stored unchanged. The decoder rebuilds the row by accumulating the differences:
 
@@ -84,12 +86,18 @@ $$
 
 Here:
 
-- $I$: original image
-- $G_k$: image at level $k$, with $G_0$ the full-resolution image
-- $K$: index of the coarsest level
-- $\text{reduce}$: smoothing followed by downsampling by 2 in each dimension
-- $\text{expand}$: upsampling by 2 in each dimension with interpolation
-- $L_k$: difference layer at level $k$
+<Symbols>
+  <Sym s="I">original image</Sym>
+  <Sym s="G_k">image at level $k$, with $G_0$ the full-resolution image</Sym>
+  <Sym s="K">index of the coarsest level</Sym>
+  <Sym s="\text{reduce}">
+    smoothing followed by downsampling by 2 in each dimension
+  </Sym>
+  <Sym s="\text{expand}">
+    upsampling by 2 in each dimension with interpolation
+  </Sym>
+  <Sym s="L_k">difference layer at level $k$</Sym>
+</Symbols>
 
 Difference layers are mostly near 0 in smooth regions, so they have low entropy. The total number of samples is about $\frac{4}{3}$ of the image size, since each level has $\frac{1}{4}$ the samples of the one below. Compression comes from the lower entropy per sample.
 
@@ -123,7 +131,11 @@ $$
 
 Here:
 
-- $a_k(x,y)$: bit $k$ of the pixel at $(x,y)$, with $k = 0$ the least significant bit
+<Symbols>
+  <Sym s="a_k(x,y)">
+    bit $k$ of the pixel at $(x,y)$, with $k = 0$ the least significant bit
+  </Sym>
+</Symbols>
 
 Plane $k$ is the binary image formed by $a_k$ over all pixels.
 
@@ -145,8 +157,10 @@ $$
 
 Here:
 
-- $g_k$: bit $k$ of the Gray coded pixel
-- $\oplus$: exclusive OR
+<Symbols>
+  <Sym s="g_k">bit $k$ of the Gray coded pixel</Sym>
+  <Sym s="\oplus">exclusive OR</Sym>
+</Symbols>
 
 ## Psychovisual Redundancy
 
