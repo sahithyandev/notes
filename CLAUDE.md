@@ -139,7 +139,9 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 - `<Definition name="...">`
   Unstyled. A `name` becomes a plain heading through the same plugin, without it the block renders as ordinary content.
 - `<Proof label="...">`
-  A collapsed `<details>`, ending in a ∎. It follows the `<Theorem>` it proves, with at most a `<Note>` between them. It has no heading and never appears in the TOC.
+  A bordered note card (icon, label, body), always expanded, ending in a ∎. The icon is a lightbulb when `label` contains "hint", a pen otherwise. It follows the `<Theorem>` it proves, with at most a `<Note>` between them. It has no heading and never appears in the TOC.
+- `<Proof label="Proof Hint">`
+  The form for a proof hint, the terse scaffolding steps under a claim. Never write `<Note title="Proof Hint">`: the `proof-hint` rule flags it (case-insensitive). A hint follows a plain claim, so the `math-block` rule exempts this label from needing a preceding `<Theorem>`.
 - `<Formula name="...">`
   A standalone, centred equation with an optional small label. No box or fill.
 
@@ -165,7 +167,7 @@ Don't phrase a heading as "What Is X?" or "What Are X?". Use the bare noun phras
 
 `src/integrations/` has 2 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
 
-- `notes-style-validator`: a single shared file scan enforcing 16 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`, `math-block`. See the sections above and below. **The build fails on any violation.**
+- `notes-style-validator`: a single shared file scan enforcing 17 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`, `math-block`, `proof-hint`. See the sections above and below. **The build fails on any violation.**
 - `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
@@ -180,7 +182,7 @@ Don't run a full `bun build` just to check note style — it's slow (Vite, image
 bun run check-notes-style
 ```
 
-Same 16 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
+Same 17 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
 
 Scope the report with `--filter` when you're only working in one area — a semester (`s1`), a module (`s1/mathematics`), a submodule (`s1/mathematics/matrices`), or a single note by name (`diagonalization`). Numeric prefixes are optional either way; matching is case-insensitive and looks for the filter's segments anywhere in the path, not just as a root prefix:
 

@@ -83,18 +83,18 @@ Never collapse label+description into a single line with a colon:
 ## Notes / Callouts
 
 Use `<Note>` for: exceptions, clarifications, cross-note reminders.
-Use `<Note title="Proof Hint">` for proof scaffolding.
+Use `<Proof label="Proof Hint">` for proof scaffolding. Never `<Note title="Proof Hint">`, the `proof-hint` rule flags it.
 
 Proof hints are algorithmic: terse imperative steps, no explanation of why each step works.
 
 ```
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Start with $x = 1 \circ x$
 - Rewrite $1$ as $1+0$
 - Distribute over brackets
 
-</Note>
+</Proof>
 ```
 
 ## Definitions, Theorems, Proofs, Formulas
@@ -106,7 +106,7 @@ Use the structured components instead of hand-written `## Theorem 1` or `### Pro
 - `<Definition name="...">`
   A concept the note defines formally. Unstyled. `name` is optional and renders as a plain heading.
 - `<Proof label="...">`
-  The proof of the `<Theorem>` right before it. Collapsed by default. A `<Note>` may sit between the two. `label` defaults to "Proof" (use "Proof Sketch" when apt).
+  The proof of the `<Theorem>` right before it. Always expanded, rendered as a bordered note card. A `<Note>` may sit between the two. `label` defaults to "Proof" (use "Proof Sketch" when apt).
 - `<Formula name="...">`
   A standalone, centred equation with an optional small label. Never place 2 `<Formula>` blocks next to each other, merge them into 1 aligned `$$` block.
 
@@ -161,7 +161,7 @@ A note covers exactly one concept or tightly related concept cluster. The intern
 
 1. **Opening definition** — the most fundamental statement of the topic, no lead-up sentence.
 2. **Notation / alternate forms** — only if the main definition uses non-standard symbols or has a common shorthand. Goes immediately after the definition.
-3. **Properties** — each property is a standalone claim. Its `<Note title="Proof Hint">` follows directly below the claim, before the next property.
+3. **Properties** — each property is a standalone claim. Its `<Proof label="Proof Hint">` follows directly below the claim, before the next property.
 4. **Sub-concepts** — derived or related constructs that belong to this topic but are distinct enough for their own `##` or `###` header. Ordered from simpler to more complex.
 5. **Cross-references** — inline, wherever the linked concept is first mentioned. Never grouped into a "See also" section.
 
@@ -181,7 +181,7 @@ When a note describes a multi-step process (an algorithm, a numerical method, an
 - Goes at the very end of the note, after all sub-concepts.
 - Header: `## Worked Example`.
 - Show the actual numbers at each step, not just the formula.
-- No commentary between steps beyond what a `<Note title="Proof Hint">`-style label would carry.
+- No commentary between steps beyond what a `<Proof label="Proof Hint">` would carry.
 - State the final result clearly at the end.
 
 Applies especially to `docs/s5/numerical-methods` (or equivalent), where methods run many iterations or steps.
@@ -251,13 +251,13 @@ First, the set must be non-empty. Additionally, it must be closed under the oper
 **Do:**
 
 ```
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Start with $Av = \lambda v$
 - Multiply $A$ from the left repeatedly
 - Substitute $\lambda v$ for $Av$
 
-</Note>
+</Proof>
 ```
 
 **Don't:**
