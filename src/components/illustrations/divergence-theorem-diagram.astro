@@ -1,0 +1,124 @@
+---
+// Static diagram for the divergence theorem: the outward flux through the
+// closed surface σ (arrows along the boundary) equals the total divergence
+// inside the solid R (arrows spreading out from a source).
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+
+const uid = makeUid("div");
+const cx = 150;
+const cy = 105;
+const rx = 100;
+const ry = 62;
+
+const out = Array.from({ length: 12 }, (_, i) => {
+  const a = (i / 12) * 2 * Math.PI + 0.26;
+  const x = cx + rx * Math.cos(a);
+  const y = cy + ry * Math.sin(a);
+  const nx = Math.cos(a) / rx;
+  const ny = Math.sin(a) / ry;
+  const len = Math.hypot(nx, ny);
+  return { x, y, x2: x + (nx / len) * 26, y2: y + (ny / len) * 26 };
+});
+
+const src = Array.from({ length: 8 }, (_, i) => {
+  const a = (i / 8) * 2 * Math.PI;
+  return {
+    x: cx + 6 * Math.cos(a),
+    y: cy + 6 * Math.sin(a),
+    x2: cx + 24 * Math.cos(a),
+    y2: cy + 24 * Math.sin(a) * 0.8,
+  };
+});
+---
+
+<figure>
+  <svg viewBox="0 0 300 210" aria-hidden="true">
+    <defs>
+      <ArrowMarker id={`${uid}-out`} fill="var(--dia-ct)" size={5} />
+      <ArrowMarker id={`${uid}-in`} fill="var(--dia-pt)" size={5} />
+    </defs>
+    <ellipse class="solid" cx={cx} cy={cy} rx={rx} ry={ry}></ellipse>
+    {out.map((v) => (
+      <line
+        class="flux"
+        x1={v.x}
+        y1={v.y}
+        x2={v.x2}
+        y2={v.y2}
+        marker-end={`url(#${uid}-out)`}
+      />
+    ))}
+    {src.map((v) => (
+      <line
+        class="source"
+        x1={v.x}
+        y1={v.y}
+        x2={v.x2}
+        y2={v.y2}
+        marker-end={`url(#${uid}-in)`}
+      />
+    ))}
+    <circle class="dot" cx={cx} cy={cy} r="2.5"></circle>
+    <text class="r" x="82" y="80">
+      R
+    </text>
+    <text class="s" x="232" y="168">
+      σ
+    </text>
+    <text class="n" x="262" y="62">
+      n̂
+    </text>
+    <text class="d" x="150" y="143" text-anchor="middle">
+      div F
+    </text>
+  </svg>
+  <FigureCaption>
+    Flux of F out through the closed surface σ (orange arrows, along n̂) equals
+    the divergence summed over the solid R (green arrows spreading from a
+    source).
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 340px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .solid {
+    fill: var(--dia-pt);
+    fill-opacity: 0.1;
+    stroke: var(--text-primary);
+    stroke-width: 1.4;
+  }
+  .flux {
+    stroke: var(--dia-ct);
+    stroke-width: 1.5;
+  }
+  .source {
+    stroke: var(--dia-pt);
+    stroke-width: 1.4;
+  }
+  .dot {
+    fill: var(--dia-pt);
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .d {
+    fill: var(--dia-pt);
+    font-size: 12px;
+  }
+  .n {
+    fill: var(--dia-ct);
+  }
+</style>

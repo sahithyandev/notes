@@ -1,0 +1,167 @@
+---
+// Static diagram for Stokes' theorem: an open dome σ whose rim is the closed
+// curve C. Arrows along C give its direction, the normals n̂ on σ follow the
+// right-hand rule from that direction, and the rotation arrow shows curl F.
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+
+const uid = makeUid("stokes");
+
+const cx = 150;
+const cy = 150;
+const rx = 95;
+const ry = 28;
+
+// Dome: cubic Bézier from the left rim point to the right rim point.
+const P = [
+  [cx - rx, cy],
+  [cx - rx - 5, 40],
+  [cx + rx + 5, 40],
+  [cx + rx, cy],
+];
+const bez = (t: number) => {
+  const u = 1 - t;
+  const w = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+  const d = [3 * u * u, 6 * u * t, 3 * t * t];
+  const x = w.reduce((s, k, i) => s + k * P[i][0], 0);
+  const y = w.reduce((s, k, i) => s + k * P[i][1], 0);
+  const dx = [0, 1, 2].reduce((s, i) => s + d[i] * (P[i + 1][0] - P[i][0]), 0);
+  const dy = [0, 1, 2].reduce((s, i) => s + d[i] * (P[i + 1][1] - P[i][1]), 0);
+  const len = Math.hypot(dx, dy);
+  return { x, y, nx: dy / len, ny: -dx / len };
+};
+const normals = [0.22, 0.5, 0.78].map(bez).map((p) => ({
+  x1: p.x,
+  y1: p.y,
+  x2: p.x + p.nx * 38,
+  y2: p.y + p.ny * 38,
+}));
+const apex = bez(0.5);
+normals[1].y1 = apex.y + 16;
+
+const dome = `M ${P[0][0]} ${P[0][1]} C ${P[1][0]} ${P[1][1]}, ${P[2][0]} ${P[2][1]}, ${P[3][0]} ${P[3][1]} A ${rx} ${ry} 0 0 1 ${P[0][0]} ${P[0][1]} Z`;
+const front = `M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cy}`;
+const back = `M ${cx + rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx - rx} ${cy}`;
+
+// Rotation arrow around the apex normal, counterclockwise seen from above.
+const pts: [number, number][] = [];
+for (let deg = 120; deg >= -170; deg -= 10) {
+  const a = (deg * Math.PI) / 180;
+  pts.push([apex.x + 22 * Math.cos(a), apex.y + 16 + 7 * Math.sin(a)]);
+}
+const curl =
+  "M " + pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ");
+---
+
+<figure>
+  <svg viewBox="0 0 300 210" aria-hidden="true">
+    <defs>
+      <ArrowMarker id={`${uid}-k`} fill="var(--dia-pt)" size={5} />
+      <ArrowMarker id={`${uid}-n`} fill="var(--dia-key)" size={5} />
+    </defs>
+    <path class="back" d={back}></path>
+    <path class="patch" d={dome}></path>
+    <path class="dome" d={dome}></path>
+    {normals.map((n) => (
+      <line
+        class="normal"
+        x1={n.x1}
+        y1={n.y1}
+        x2={n.x2}
+        y2={n.y2}
+        marker-end={`url(#${uid}-n)`}
+      />
+    ))}
+    <path class="curl" d={curl} marker-end={`url(#${uid}-k)`}></path>
+    <path class="curve" d={front}></path>
+    <path
+      class="head"
+      d="M 5 0 L -4 -4 L -4 4 Z"
+      transform="translate(150 178)"
+    ></path>
+    <path
+      class="head"
+      d="M 5 0 L -4 -4 L -4 4 Z"
+      transform="translate(150 122) rotate(180)"
+    ></path>
+    <text class="n" x={normals[1].x2 + 6} y={normals[1].y2 + 4}>
+      n̂
+    </text>
+    <text class="k" x={apex.x + 28} y={apex.y + 20}>
+      curl F
+    </text>
+    <text class="s" x="88" y="110">
+      σ
+    </text>
+    <text class="c" x="250" y="172">
+      C
+    </text>
+  </svg>
+  <FigureCaption>
+    Circulation of F around the boundary curve C (orange) equals the flux of
+    curl F (green rotation) through the surface σ. The normals n̂ (purple) follow
+    the right-hand rule from the direction of C.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 340px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .patch {
+    fill: var(--dia-key);
+    fill-opacity: 0.1;
+    stroke: none;
+  }
+  .dome {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1.2;
+  }
+  .back {
+    fill: none;
+    stroke: var(--dia-ct);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 3;
+  }
+  .curve {
+    fill: none;
+    stroke: var(--dia-ct);
+    stroke-width: 2;
+  }
+  .head {
+    fill: var(--dia-ct);
+  }
+  .curl {
+    fill: none;
+    stroke: var(--dia-pt);
+    stroke-width: 1.5;
+  }
+  .normal {
+    stroke: var(--dia-key);
+    stroke-width: 1.6;
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .n {
+    fill: var(--dia-key);
+  }
+  .c {
+    fill: var(--dia-ct);
+  }
+  .k {
+    fill: var(--dia-pt);
+    font-size: 12px;
+  }
+</style>
