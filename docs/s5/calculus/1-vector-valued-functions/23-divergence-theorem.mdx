@@ -1,26 +1,20 @@
 ---
 title: Divergence Theorem
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T03:28:00.286Z
+lastUpdatedOn: 2026-10-17T12:15:38.159Z
 ---
-
-<Definition name="Closed Surface" level="3">
-
-A surface $\sigma$ is a closed surface **iff** it is the boundary of a solid region in $\mathbb{R}^3$.
-
-For a closed surface, the positive orientation is the outward orientation.
-
-</Definition>
 
 <Theorem>
 
-Let $\sigma$ be a closed, piecewise smooth, orientable surface that encloses a solid region $R$ in $\mathbb{R}^3$. Suppose $\boldsymbol{F}$ is a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) whose component functions have continuous first-order partial derivatives on an open set containing $R$ and its boundary $\sigma$. If $\hat{n}$ is the outward unit normal field for $\sigma$,
+Let $\sigma$ be a [closed](/s5/calculus/vector-valued-functions/surface#closed-surface), piecewise smooth, orientable surface that encloses a solid region $R$ in $\mathbb{R}^3$. Suppose $\boldsymbol{F}$ is a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) whose component functions have continuous first-order partial derivatives on an open set containing $R$ and its boundary $\sigma$. If $\hat{n}$ is the outward unit normal field for $\sigma$,
 
 $$
 \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iiint_R \text{div}\,\boldsymbol{F}\,\text{d}V
 $$
 
 </Theorem>
+
+<DivergenceTheoremDiagram />
 
 <Note>
 
@@ -43,3 +37,75 @@ $$
 $$
 
 If $\boldsymbol{F}$ is the velocity field of a fluid in steady-state flow, $\text{div}\,\boldsymbol{F}$ is the limiting outward flux per unit volume at a point.
+
+## Examples
+
+### Sphere
+
+Find the outward flux of $\boldsymbol{F} = x\hat{i} + y\hat{j} + z\hat{k}$ through the sphere $x^2 + y^2 + z^2 = a^2$.
+
+<Solution>
+
+$$
+\text{div}\,\boldsymbol{F} = 1 + 1 + 1 = 3
+$$
+
+Let $R$ be the solid ball of radius $a$, with volume $\dfrac{4}{3}\pi a^3$.
+
+$$
+\Phi = \iiint_R 3\,\text{d}V = 3 \cdot \frac{4}{3}\pi a^3 = 4\pi a^3
+$$
+
+</Solution>
+
+### Cube
+
+Find the outward flux of $\boldsymbol{F} = x^2\hat{i} + y^2\hat{j} + z^2\hat{k}$ through the surface of the cube $0 \le x, y, z \le 1$.
+
+<Solution>
+
+$$
+\text{div}\,\boldsymbol{F} = 2x + 2y + 2z
+$$
+
+$$
+\Phi = \int_0^1 \int_0^1 \int_0^1 2(x + y + z)\,\text{d}x\,\text{d}y\,\text{d}z
+$$
+
+Each term integrates to $\dfrac{1}{2}$ over the unit cube, so the 3 terms add to $2 \cdot 3 \cdot \dfrac{1}{2}$.
+
+$$
+\Phi = 3
+$$
+
+</Solution>
+
+### Hemisphere
+
+Find the upward flux of $\boldsymbol{F} = z\hat{k}$ through the hemisphere $x^2 + y^2 + z^2 = 1$, $z \ge 0$.
+
+<Solution>
+
+The hemisphere is not closed. Close it with the disk $D = \{x^2 + y^2 \le 1,\ z = 0\}$. The closed surface encloses the solid half-ball $R$.
+
+$$
+\text{div}\,\boldsymbol{F} = 1
+$$
+
+$$
+\iiint_R 1\,\text{d}V = \frac{1}{2} \cdot \frac{4}{3}\pi = \frac{2\pi}{3}
+$$
+
+The outward normal on $D$ is $-\hat{k}$. On $D$, $z = 0$, so
+
+$$
+\iint_D \boldsymbol{F} \cdot (-\hat{k})\,\text{d}S = \iint_D (-z)\,\text{d}S = 0
+$$
+
+The flux across the closed surface is the sum of the flux across the hemisphere and across $D$.
+
+$$
+\Phi = \frac{2\pi}{3} - 0 = \frac{2\pi}{3}
+$$
+
+</Solution>

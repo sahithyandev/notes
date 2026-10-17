@@ -1,0 +1,129 @@
+---
+title: Orientation of Surface
+dateCreated: 2026-08-07T00:00:00.000Z
+lastUpdatedOn: 2026-10-17T12:15:38.111Z
+---
+
+An orientation of a surface is a choice of which side is the positive side, given by a continuous unit normal field $\hat{n}$ over the whole surface.
+
+### Orientable Surface
+
+A surface is orientable **iff** a continuous choice of unit normal vector can be made over the entire surface.
+
+Two-sided surfaces are orientable. One-sided surfaces (such as [Möbius strip](https://en.wikipedia.org/wiki/M%C3%B6bius_strip)) are non-orientable.
+
+A smooth orientable surface has exactly 2 orientations, $\hat{n}$ and $-\hat{n}$. The orientation fixes the sign of a flux integral over the surface.
+
+If $\sigma$ is smooth and orientable with unit normal $\hat{n}$ at each point, the direction of $\hat{n}$ can be chosen so that $\hat{n} = \hat{n}(x,y,z)$ varies continuously over the surface. Such a choice of unit normal field is an orientation of $\sigma$.
+
+For a [closed surface](/s5/calculus/vector-valued-functions/surface#closed-surface), the positive orientation is the outward orientation.
+
+<Definition name="Positive Orientation of a Boundary Curve" level="3">
+
+Let $\sigma$ be an oriented surface with unit normal field $\hat{n}$, and let $C$ be the boundary curve of $\sigma$. The positive orientation of $C$ is the direction determined by the chosen orientation of $\sigma$.
+
+Equivalently, walking along $C$ with the head pointing in the direction of $\hat{n}$ keeps the surface on the left.
+
+</Definition>
+
+## Orientation of a Smooth Parametric Surface
+
+Let $\sigma$ be a smooth [parametric surface](/s5/calculus/vector-valued-functions/surface#parametric-form) given by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$. If
+
+$$
+\boldsymbol{N}(u,v) = \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \ne \boldsymbol{0}
+$$
+
+then
+
+$$
+\hat{n} = \frac{\boldsymbol{N}(u,v)}{\lVert \boldsymbol{N}(u,v) \rVert} = \frac{\dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v}}{\left\lVert \dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v} \right\rVert}
+$$
+
+defines one orientation of $\sigma$. The opposite orientation is $-\hat{n}$.
+
+## Orientation of Non-Parametric Surfaces
+
+Surfaces of the form $z = g(x,y)$, $y = g(x,z)$, $x = g(y,z)$ can be parametrized using their independent variables as parameters:
+
+- $\boldsymbol{r}(x,y) = x\hat{i} + y\hat{j} + g(x,y)\hat{k}$, for $z = g(x,y)$
+- $\boldsymbol{r}(x,z) = x\hat{i} + g(x,z)\hat{j} + z\hat{k}$, for $y = g(x,z)$
+- $\boldsymbol{r}(y,z) = g(y,z)\hat{i} + y\hat{j} + z\hat{k}$, for $x = g(y,z)$
+
+Each can be written as a level surface $G(x,y,z) = 0$ by moving all terms to one side. The vector
+
+$$
+\hat{n} = \frac{\nabla G}{\lVert \nabla G \rVert}
+$$
+
+is a unit normal vector to the surface, whenever $\nabla G \ne \boldsymbol{0}$.
+
+## Examples
+
+### Cylinder
+
+Find the orientation of the cylinder $x^2 + y^2 = 1$, $0 \le z \le 2$, given by $\boldsymbol{r}(\theta, z) = \cos\theta\,\hat{i} + \sin\theta\,\hat{j} + z\hat{k}$, and state which way it points.
+
+<Solution>
+
+The partial derivatives are
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial \theta} = -\sin\theta\,\hat{i} + \cos\theta\,\hat{j}, \qquad \frac{\partial \boldsymbol{r}}{\partial z} = \hat{k}
+$$
+
+$$
+\boldsymbol{N} = \frac{\partial \boldsymbol{r}}{\partial \theta} \times \frac{\partial \boldsymbol{r}}{\partial z} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\ -\sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{vmatrix} = \cos\theta\,\hat{i} + \sin\theta\,\hat{j}
+$$
+
+$\lVert \boldsymbol{N} \rVert = 1 \ne 0$, so
+
+$$
+\hat{n} = \cos\theta\,\hat{i} + \sin\theta\,\hat{j}
+$$
+
+At $(\cos\theta, \sin\theta, z)$, $\hat{n}$ equals the position vector's $x$ and $y$ parts, so it points away from the $z$-axis. This is the outward orientation. The inward orientation is $-\hat{n}$.
+
+</Solution>
+
+### Paraboloid
+
+Find the orientation of the paraboloid $z = x^2 + y^2$ that points upward.
+
+<Solution>
+
+Write the surface as $G(x,y,z) = z - x^2 - y^2 = 0$.
+
+$$
+\nabla G = -2x\,\hat{i} - 2y\,\hat{j} + \hat{k}, \qquad \lVert \nabla G \rVert = \sqrt{4x^2 + 4y^2 + 1}
+$$
+
+$\nabla G \ne \boldsymbol{0}$ everywhere since its $\hat{k}$ component is $1$.
+
+$$
+\hat{n} = \frac{-2x\,\hat{i} - 2y\,\hat{j} + \hat{k}}{\sqrt{4x^2 + 4y^2 + 1}}
+$$
+
+The $\hat{k}$ component is positive, so $\hat{n}$ points upward. The downward orientation is $-\hat{n}$.
+
+</Solution>
+
+### Sphere
+
+Find the outward orientation of the sphere $x^2 + y^2 + z^2 = a^2$, where $a > 0$.
+
+<Solution>
+
+Write the surface as $G(x,y,z) = x^2 + y^2 + z^2 - a^2 = 0$.
+
+$$
+\nabla G = 2x\,\hat{i} + 2y\,\hat{j} + 2z\,\hat{k}, \qquad \lVert \nabla G \rVert = 2\sqrt{x^2 + y^2 + z^2} = 2a
+$$
+
+$$
+\hat{n} = \frac{x\,\hat{i} + y\,\hat{j} + z\,\hat{k}}{a}
+$$
+
+$\hat{n}$ is the position vector scaled to unit length, so it points away from the origin. The inward orientation is $-\hat{n}$.
+
+</Solution>

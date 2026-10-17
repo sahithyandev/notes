@@ -1,10 +1,10 @@
 ---
 title: Flux
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-15T17:34:25.591Z
+lastUpdatedOn: 2026-10-17T12:15:38.129Z
 ---
 
-The flux of a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) through an [oriented surface](/s5/calculus/vector-valued-functions/orientation) measures the net amount of flow passing through the surface in the chosen normal direction, assuming a fluid in steady state and incompressible. The volume of fluid flowing through a portion of a surface depends on:
+The flux of a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) through an [oriented surface](/s5/calculus/vector-valued-functions/orientation-of-surface) measures the net amount of flow passing through the surface in the chosen normal direction, assuming a fluid in steady state and incompressible. The volume of fluid flowing through a portion of a surface depends on:
 
 - Speed of the fluid.
 - Orientation of the surface relative to the flow.
@@ -22,7 +22,7 @@ A positive flux means more flow passes through $\sigma$ in the positive normal d
 
 </Note>
 
-## Flux Through a Parametric Surface
+### Through a Parametric Surface
 
 Let $\sigma$ be a smooth parametric surface $\boldsymbol{r} = \boldsymbol{r}(u,v)$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. Suppose the component functions of $\boldsymbol{F}$ are continuous on $\sigma$ and that
 
@@ -36,9 +36,9 @@ $$
 \Phi = \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iint_R \boldsymbol{F}(\boldsymbol{r}(u,v)) \cdot \left(\frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v}\right) \text{d}A_{uv}
 $$
 
-## Flux Through a Graph
+### Through a Graph
 
-Let $\sigma$ be a smooth surface of the form $z = g(x,y)$, $y = g(x,z)$, or $x = g(y,z)$, written as $G(x,y,z) = 0$ by moving all terms to the left side, with [orientation](/s5/calculus/vector-valued-functions/orientation) determined by $\nabla G$. Let $R$ be the projection of $\sigma$ onto the coordinate plane determined by the independent variables of $g$. If $\boldsymbol{F}$ is continuous on $\sigma$,
+Let $\sigma$ be a smooth surface of the form $z = g(x,y)$, $y = g(x,z)$, or $x = g(y,z)$, written as $G(x,y,z) = 0$ by moving all terms to the left side, with [orientation](/s5/calculus/vector-valued-functions/orientation-of-surface) determined by $\nabla G$. Let $R$ be the projection of $\sigma$ onto the coordinate plane determined by the independent variables of $g$. If $\boldsymbol{F}$ is continuous on $\sigma$,
 
 $$
 \Phi = \iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iint_R \boldsymbol{F} \cdot \nabla G\,\text{d}A
@@ -51,3 +51,61 @@ For the opposite orientation, $\Phi = -\displaystyle\iint_R \boldsymbol{F} \cdot
 $\boldsymbol{F}$ and $\nabla G$ are evaluated on $\sigma$, and $\text{d}A$ is the area element in the corresponding projection plane.
 
 </Note>
+
+## Examples
+
+### Cylinder
+
+Find the outward flux of $\boldsymbol{F} = x\hat{i} + y\hat{j}$ through the cylinder $x^2 + y^2 = 1$, $0 \le z \le 2$.
+
+<Solution>
+
+Parametrize the surface as $\boldsymbol{r}(\theta, z) = \cos\theta\,\hat{i} + \sin\theta\,\hat{j} + z\hat{k}$ over $R = \{0 \le \theta \le 2\pi,\ 0 \le z \le 2\}$.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial \theta} \times \frac{\partial \boldsymbol{r}}{\partial z} = \cos\theta\,\hat{i} + \sin\theta\,\hat{j}
+$$
+
+This points away from the $z$-axis, so it gives the outward orientation.
+
+$$
+\boldsymbol{F}(\boldsymbol{r}(\theta, z)) = \cos\theta\,\hat{i} + \sin\theta\,\hat{j}
+$$
+
+$$
+\boldsymbol{F} \cdot \left(\frac{\partial \boldsymbol{r}}{\partial \theta} \times \frac{\partial \boldsymbol{r}}{\partial z}\right) = \cos^2\theta + \sin^2\theta = 1
+$$
+
+$$
+\Phi = \int_0^{2\pi} \int_0^2 1\,\text{d}z\,\text{d}\theta = 4\pi
+$$
+
+</Solution>
+
+### Paraboloid
+
+Find the upward flux of $\boldsymbol{F} = x\hat{i} + y\hat{j} + z\hat{k}$ through the surface $z = 1 - x^2 - y^2$, $z \ge 0$.
+
+<Solution>
+
+Write the surface as $G(x,y,z) = z - 1 + x^2 + y^2 = 0$.
+
+$$
+\nabla G = 2x\,\hat{i} + 2y\,\hat{j} + \hat{k}
+$$
+
+The $\hat{k}$ component is positive, so $\nabla G$ gives the upward orientation.
+
+The projection onto the $xy$-plane is the disk $R = \{x^2 + y^2 \le 1\}$. On the surface, $z = 1 - x^2 - y^2$.
+
+$$
+\boldsymbol{F} \cdot \nabla G = 2x^2 + 2y^2 + z = 2(x^2 + y^2) + 1 - (x^2 + y^2) = 1 + x^2 + y^2
+$$
+
+Switch to polar coordinates, with $x^2 + y^2 = r^2$.
+
+$$
+\Phi = \iint_R (1 + x^2 + y^2)\,\text{d}A = \int_0^{2\pi} \int_0^1 (1 + r^2)\,r\,\text{d}r\,\text{d}\theta = 2\pi \left(\frac{1}{2} + \frac{1}{4}\right) = \frac{3\pi}{2}
+$$
+
+</Solution>

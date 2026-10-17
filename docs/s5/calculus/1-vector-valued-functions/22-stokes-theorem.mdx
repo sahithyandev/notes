@@ -1,20 +1,12 @@
 ---
 title: Stokes' Theorem
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T03:28:00.279Z
+lastUpdatedOn: 2026-10-17T12:15:38.145Z
 ---
-
-<Definition name="Positive Orientation of a Boundary Curve" level="3">
-
-Let $\sigma$ be an [oriented surface](/s5/calculus/vector-valued-functions/orientation) with unit normal field $\hat{n}$, and let $C$ be the boundary curve of $\sigma$. The positive orientation of $C$ is the direction determined by the chosen orientation of $\sigma$.
-
-Equivalently, walking along $C$ with the head pointing in the direction of $\hat{n}$ keeps the surface on the left.
-
-</Definition>
 
 <Theorem>
 
-Let $\sigma$ be a piecewise smooth oriented surface bounded by a positively oriented, piecewise smooth, simple closed curve $C$. Suppose
+Let $\sigma$ be a piecewise smooth oriented surface bounded by a [positively oriented](/s5/calculus/vector-valued-functions/orientation-of-surface#positive-orientation-of-a-boundary-curve), piecewise smooth, simple closed curve $C$. Suppose
 
 $$
 \boldsymbol{F}(x,y,z) = f(x,y,z)\hat{i} + g(x,y,z)\hat{j} + h(x,y,z)\hat{k}
@@ -27,6 +19,8 @@ $$
 $$
 
 </Theorem>
+
+<StokesTheoremDiagram />
 
 <Note>
 
@@ -43,3 +37,73 @@ $$
 $$
 
 </Note>
+
+## Examples
+
+### Curve on a Cylinder
+
+Evaluate $\oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ for $\boldsymbol{F} = -y^2\hat{i} + x\hat{j} + z^2\hat{k}$, where $C$ is the intersection of the plane $y + z = 2$ and the cylinder $x^2 + y^2 = 1$, oriented counterclockwise when viewed from above.
+
+<Solution>
+
+Stokes' Theorem needs a surface bounded by $C$. Choose $\sigma$ as the part of the plane $y + z = 2$ inside the cylinder. Its boundary is $C$.
+
+The flux of $\text{curl}\,\boldsymbol{F}$ through $\sigma$ is computed with the [flux through a graph](/s5/calculus/vector-valued-functions/flux#through-a-graph) formula, which needs the surface written as $G(x,y,z) = 0$. Move all terms of the plane equation to the left side.
+
+$$
+G(x,y,z) = y + z - 2 = 0
+$$
+
+The formula replaces $\hat{n}\,\text{d}S$ by $\nabla G\,\text{d}A$, where $\text{d}A$ is the area element in the $xy$-plane. So $\nabla G$ is the normal vector that already includes the area scaling between $\sigma$ and its projection.
+
+$$
+\nabla G = \hat{j} + \hat{k}
+$$
+
+The $\hat{k}$ component is positive, so $\nabla G$ gives the upward orientation. This matches the counterclockwise orientation of $C$ viewed from above.
+
+By Stokes' Theorem, the line integral equals the flux of $\text{curl}\,\boldsymbol{F}$ through $\sigma$. So $\text{curl}\,\boldsymbol{F}$ takes the place of $\boldsymbol{F}$ in $\iint_R \boldsymbol{F} \cdot \nabla G\,\text{d}A$.
+
+$$
+\text{curl}\,\boldsymbol{F} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\ \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\ -y^2 & x & z^2 \end{vmatrix} = (1 + 2y)\hat{k}
+$$
+
+$$
+\text{curl}\,\boldsymbol{F} \cdot \nabla G = 1 + 2y
+$$
+
+The projection of $\sigma$ onto the $xy$-plane is the disk $R = \{x^2 + y^2 \le 1\}$. The term $2y$ integrates to 0 over $R$ by symmetry.
+
+$$
+\oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \iint_R (1 + 2y)\,\text{d}A = \pi
+$$
+
+</Solution>
+
+### Hemisphere
+
+Find the flux of $\text{curl}\,\boldsymbol{F}$ upward through the hemisphere $x^2 + y^2 + z^2 = 1$, $z \ge 0$, for $\boldsymbol{F} = z\hat{i} + x\hat{j} + y\hat{k}$.
+
+<Solution>
+
+The boundary of the hemisphere is the unit circle $C$ in the $xy$-plane, oriented counterclockwise. Stokes' Theorem converts the surface integral into a line integral over $C$.
+
+Parametrize $C$ as $\boldsymbol{r}(t) = \cos t\,\hat{i} + \sin t\,\hat{j}$ for $0 \le t \le 2\pi$.
+
+$$
+\boldsymbol{F}(\boldsymbol{r}(t)) = \cos t\,\hat{j} + \sin t\,\hat{k}
+$$
+
+$$
+\text{d}\boldsymbol{r} = (-\sin t\,\hat{i} + \cos t\,\hat{j})\,\text{d}t
+$$
+
+$$
+\boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \cos^2 t\,\text{d}t
+$$
+
+$$
+\iint_\sigma (\text{curl}\,\boldsymbol{F}) \cdot \hat{n}\,\text{d}S = \oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_0^{2\pi} \cos^2 t\,\text{d}t = \pi
+$$
+
+</Solution>
