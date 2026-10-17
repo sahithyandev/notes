@@ -148,6 +148,11 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
 - `<Symbols>` with `<Sym s="l">length</Sym>` rows
   A legend of the symbols in the equation above it, rendered as an aligned 2-column grid (`columns={2}` for a side-by-side layout when there are many symbols). `s` is TeX without `$`. It replaces the `- $x$: meaning` glossary bullets, which the `label-description` rule still exempts until they are migrated.
 
+- `<Aka>`
+  An inline lead-in for a concept's aliases, written at the start of the paragraph that defines it: `<Aka>SNR, signal-to-noise ratio</Aka>. The ratio of signal power to noise power.` It renders "Also known as" in muted prose with the aliases in bold, and the full stop is written after the closing tag. Only the alias list goes inside, never the definition sentence.
+- `<Term def="...">`
+  An inline defined term, rendered as a `<dfn>` with a dotted underline and a CSS-only hover/focus tooltip showing `def` (plain text, no markup). Use it for a term whose full definition lives elsewhere. No script, so soft navigation needs nothing extra.
+
 Leave a blank line after each opening tag and before each closing tag, as with `<Note>`.
 
 `scan.ts` synthesizes the same headings for named blocks, so `title-case`, `duplicate-heading` and `broken-link` cover them. The `math-block` rule (`src/integrations/notes-style-validator/rules/math-block.ts`) flags a `<Proof>` that does not follow a `<Theorem>`, 2 adjacent `<Formula>` blocks, and a `level` other than `2` or `3`. The block kinds and `level` handling live in `src/utils/math-blocks.ts`, shared by the plugin and the scanner, so change them together.
