@@ -1,0 +1,40 @@
+---
+// A `name` becomes the block's heading (see remarkMathBlocks), an unnamed
+// theorem gets a plain label instead so it stays out of the TOC
+interface Props {
+  name?: string;
+  level?: "2" | "3";
+}
+
+const { name } = Astro.props;
+---
+
+<section class="theorem" data-named={name ? "" : undefined}>
+  {!name && <p class="theorem-label">Theorem</p>}
+  <slot />
+</section>
+
+<style is:global>
+  .theorem > :is(h2, h3):first-child {
+    margin-top: 0;
+  }
+
+  .theorem-label {
+    margin: 0 0 6px;
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  .theorem > :last-child {
+    margin-bottom: 0;
+  }
+
+  .theorem .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>

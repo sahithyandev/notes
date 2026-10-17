@@ -8,6 +8,7 @@ import moduleRedirects from "./src/integrations/module-redirects/index.ts";
 import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
 import devReloadLock from "./src/integrations/dev-reload-lock/index.ts";
 import remarkGfm from "remark-gfm";
+import { remarkMathBlocks } from "./src/plugins/remark-math-blocks.ts";
 import katex from "katex";
 import { visit } from "unist-util-visit";
 import { toHast } from "mdast-util-to-hast";
@@ -135,7 +136,12 @@ export default defineConfig({
   ],
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkGfm, remarkMath, remarkKatexMhchem],
+      remarkPlugins: [
+        remarkGfm,
+        remarkMath,
+        remarkMathBlocks,
+        remarkKatexMhchem,
+      ],
     }),
     shikiConfig: {
       themes: {
