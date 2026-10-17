@@ -130,6 +130,23 @@ Worked examples hide their workings behind `<Solution>` (`src/components/mdx/sol
 
 Never place 2 `<Note>` components next to each other with the same `type` (default `"note"`). Merge them into 1, or move one back into the main text. Enforced by the `adjacent-note` rule (`src/integrations/notes-style-validator/rules/adjacent-note.ts`).
 
+### Math blocks
+
+`<Definition>`, `<Theorem>`, `<Proof>` and `<Formula>` (`src/components/mdx/`) structure theory notes.
+
+- `<Theorem name="...">`
+  A claim with a left rule. Nothing is numbered. A `name` is rendered as a normal, prominent heading by the `remarkMathBlocks` plugin (`src/plugins/remark-math-blocks.ts`), so the theorem gets an anchor and a TOC entry. An unnamed theorem shows a small "Theorem" label and stays out of the TOC. Skip the `name` when it would repeat the note's title. `level="3"` renders an `h3` (default `2`). The plugin must stay before `remarkKatexMhchem` in `astro.config.mjs`, since that plugin collects heading HTML by index. Never hand-write a heading next to a named theorem.
+- `<Definition name="...">`
+  Unstyled. A `name` becomes a plain heading through the same plugin, without it the block renders as ordinary content.
+- `<Proof label="...">`
+  A collapsed `<details>`, ending in a ∎. It follows the `<Theorem>` it proves, with at most a `<Note>` between them. It has no heading and never appears in the TOC.
+- `<Formula name="...">`
+  A standalone, centred equation with an optional small label. No box or fill.
+
+Leave a blank line after each opening tag and before each closing tag, as with `<Note>`.
+
+`scan.ts` synthesizes the same headings for named blocks, so `title-case`, `duplicate-heading` and `broken-link` cover them. The `math-block` rule (`src/integrations/notes-style-validator/rules/math-block.ts`) flags a `<Proof>` that does not follow a `<Theorem>`, 2 adjacent `<Formula>` blocks, and a `level` other than `2` or `3`. The block kinds and `level` handling live in `src/utils/math-blocks.ts`, shared by the plugin and the scanner, so change them together.
+
 ### Adjacent lists
 
 Never start an unordered list right after another one with only blank lines in between. Markdown merges them into 1 loose list, which renders with extra spacing around each item. Put prose, a block equation or a `<Note>` between 2 lists, or join them into 1 tight list. Enforced by the `adjacent-list` rule (`src/integrations/notes-style-validator/rules/adjacent-list.ts`). Only top-level lists are checked, and an indented continuation or nested list belongs to its item.
@@ -148,7 +165,7 @@ Don't phrase a heading as "What Is X?" or "What Are X?". Use the bare noun phras
 
 `src/integrations/` has 2 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
 
-- `notes-style-validator`: a single shared file scan enforcing 15 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`. See the sections above and below. **The build fails on any violation.**
+- `notes-style-validator`: a single shared file scan enforcing 16 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`, `math-block`. See the sections above and below. **The build fails on any violation.**
 - `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
@@ -163,7 +180,7 @@ Don't run a full `bun build` just to check note style — it's slow (Vite, image
 bun run check-notes-style
 ```
 
-Same 15 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
+Same 16 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
 
 Scope the report with `--filter` when you're only working in one area — a semester (`s1`), a module (`s1/mathematics`), a submodule (`s1/mathematics/matrices`), or a single note by name (`diagonalization`). Numeric prefixes are optional either way; matching is case-insensitive and looks for the filter's segments anywhere in the path, not just as a root prefix:
 

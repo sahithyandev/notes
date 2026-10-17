@@ -97,6 +97,35 @@ Proof hints are algorithmic: terse imperative steps, no explanation of why each 
 </Note>
 ```
 
+## Definitions, Theorems, Proofs, Formulas
+
+Use the structured components instead of hand-written `## Theorem 1` or `### Proof` headings.
+
+- `<Theorem name="...">`
+  A claim that is proved or stated as a result. Nothing is numbered. A `name` (title case) renders as a prominent heading with an anchor and a TOC entry, so never write the heading yourself. Omit `name` when it would repeat the note's title or when the claim has no proper title. An unnamed theorem shows a small "Theorem" label and stays out of the TOC. `level="3"` nests one under a `##` section, the default is `2`.
+- `<Definition name="...">`
+  A concept the note defines formally. Unstyled. `name` is optional and renders as a plain heading.
+- `<Proof label="...">`
+  The proof of the `<Theorem>` right before it. Collapsed by default. A `<Note>` may sit between the two. `label` defaults to "Proof" (use "Proof Sketch" when apt).
+- `<Formula name="...">`
+  A standalone, centred equation with an optional small label. Never place 2 `<Formula>` blocks next to each other, merge them into 1 aligned `$$` block.
+
+Leave a blank line after each opening tag and before each closing tag.
+
+```
+<Theorem>
+
+Statement of the claim.
+
+</Theorem>
+
+<Proof>
+
+Steps of the proof.
+
+</Proof>
+```
+
 ## Examples
 
 Listed at end of a section as a plain bullet list, no commentary.
