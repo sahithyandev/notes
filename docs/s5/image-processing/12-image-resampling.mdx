@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-10-17T05:04:56.735Z
+lastUpdatedOn: 2026-10-17T06:15:20.230Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -183,9 +183,11 @@ $$
 
 Here:
 
-- $G_n$, $G_{n+1}$: consecutive levels of the Gaussian pyramid above
-- $U(G_{n+1})$: $G_{n+1}$ upsampled back to level $n$'s resolution
-- $L_n$: band-pass detail at level $n$
+<Symbols>
+  <Sym s="G_n, G_{n+1}">consecutive levels of the Gaussian pyramid above</Sym>
+  <Sym s="U(G_{n+1})">$G_{n + 1}$ upsampled back to level $n$'s resolution</Sym>
+  <Sym s="L_n">band-pass detail at level $n$</Sym>
+</Symbols>
 
 $U(G_{n+1})$ is a blurred version of $G_n$, since it was smoothed and downsampled to make $G_{n+1}$ then interpolated back up. Subtracting it leaves only the high-frequency detail that step discarded.
 

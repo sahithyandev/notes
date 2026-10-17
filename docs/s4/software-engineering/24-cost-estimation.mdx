@@ -1,7 +1,7 @@
 ---
 title: Cost Estimation
 dateCreated: 2026-06-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:24.272Z
+lastUpdatedOn: 2026-10-17T06:15:18.552Z
 ---
 
 Predicting the effort and schedule required to deliver a software project before development begins.
@@ -125,9 +125,11 @@ $$
 
 Here:
 
-- $\text{PM}$: effort in person-months
-- $\text{KDSI}$: thousands of delivered source instructions
-- $a$, $b$: constants that vary by mode
+<Symbols>
+  <Sym s="\text{PM}">effort in person-months</Sym>
+  <Sym s="\text{KDSI}">thousands of delivered source instructions</Sym>
+  <Sym s="a, b">constants that vary by mode</Sym>
+</Symbols>
 
 Schedule formula:
 
@@ -186,8 +188,10 @@ Here:
 
 Multiplier direction:
 
-- $m > 1$: lower productivity (inexperienced team, constrained tooling)
-- $m < 1$: higher productivity (experienced team, AI-assisted or advanced CASE tooling)
+- $m > 1$  
+  lower productivity (inexperienced team, constrained tooling)
+- $m < 1$  
+  higher productivity (experienced team, AI-assisted or advanced CASE tooling)
 
 To compare two scenarios at a given size: compute $\text{PM}_{base}$ once, then apply each scenario's multiplier. To assess how the gap changes with scale: recompute $\text{PM}_{base}$ at the larger size and apply the same multipliers. The absolute gap grows because of the superlinear exponent.
 

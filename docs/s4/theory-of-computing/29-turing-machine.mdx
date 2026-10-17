@@ -1,7 +1,7 @@
 ---
 title: Turing Machine
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-10-17T06:00:24.517Z
+lastUpdatedOn: 2026-10-17T06:15:18.826Z
 ---
 
 Most powerful abstract model of computation. Can simulate any real computer (ignoring efficiency). Modelled by Alan Turing.
@@ -10,11 +10,15 @@ A 5-tuple $T = (Q, \Sigma, \Gamma, q_0, \delta)$.
 
 Where:
 
-- $Q$ = finite set of states
-- $\Sigma \supset \set{ h_a, h_r }$ = input alphabet
-- $\Gamma \supset \set{ \Lambda }$ = tape alphabet
-- $q_0$ = start state
-- $δ: Q \times \Sigma \rightarrow Q \times \Gamma \times \set{L,R,S}$ = transition function
+<Symbols>
+  <Sym s="Q">finite set of states</Sym>
+  <Sym s="\Sigma \supset \set{ h_a, h_r }">input alphabet</Sym>
+  <Sym s="\Gamma \supset \set{ \Lambda }">tape alphabet</Sym>
+  <Sym s="q_0">start state</Sym>
+  <Sym s="δ: Q \times \Sigma \rightarrow Q \times \Gamma \times \set{L,R,S}">
+    transition function
+  </Sym>
+</Symbols>
 
 ## Components
 
@@ -42,7 +46,8 @@ Has internal state (from an finite set of states). Decides whether to move the t
 
 State of the machine (or the CPU). Includes 2 halting states:
 
-- $h_a$: Accept
+- $h_a$  
+  Accept
 - $h_r$ → Reject
 
 ## Transition Function

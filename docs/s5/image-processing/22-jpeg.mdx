@@ -1,7 +1,7 @@
 ---
 title: JPEG
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-17T05:04:56.823Z
+lastUpdatedOn: 2026-10-17T06:15:20.323Z
 ---
 
 Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
@@ -121,11 +121,13 @@ $$
 
 Here:
 
-- $x, y$: column and row of a sample in the block
-- $u, v$: horizontal and vertical frequency indices, from 0 to 7
-- $C(k)$: $\frac{1}{\sqrt{2}}$ for $k = 0$, otherwise 1
-- $F(0, 0)$: DC coefficient, equal to 8 times the block mean
-- $F(u, v)$ for $(u, v) \neq (0, 0)$: AC coefficients
+<Symbols>
+  <Sym s="x, y">column and row of a sample in the block</Sym>
+  <Sym s="u, v">horizontal and vertical frequency indices, from 0 to 7</Sym>
+  <Sym s="C(k)">$\frac{1}{\sqrt{2}}$ for $k = 0$, otherwise 1</Sym>
+  <Sym s="F(0, 0)">DC coefficient, equal to 8 times the block mean</Sym>
+  <Sym s="F(u, v) \ \text{for} \ (u, v) \neq (0, 0)">AC coefficients</Sym>
+</Symbols>
 
 In matrix form, $\mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top$ with $T(k, n) = \frac{C(k)}{2} \cos\frac{(2n+1)k\pi}{16}$. Both arrays are stored row first, so $\mathbf{f}[y][x] = f(x, y)$ and $\mathbf{F}[v][u] = F(u, v)$. The zig-zag scan below indexes $\mathbf{F}$ in this layout.
 
@@ -753,9 +755,17 @@ $$
 
 Here:
 
-- $D$: squared error between the original and the dequantized coefficients
-- $R$: number of bits the choice costs after run-length and Huffman coding
-- $\lambda$: weight that sets the exchange rate between error and bits
+<Symbols>
+  <Sym s="D">
+    squared error between the original and the dequantized coefficients
+  </Sym>
+  <Sym s="R">
+    number of bits the choice costs after run-length and Huffman coding
+  </Sym>
+  <Sym s="\lambda">
+    weight that sets the exchange rate between error and bits
+  </Sym>
+</Symbols>
 
 Rounding a coefficient of magnitude 1 to 0 often removes a whole run symbol and a long Huffman code, and costs little error. Trellis quantization therefore zeroes many isolated small values that plain rounding keeps.
 

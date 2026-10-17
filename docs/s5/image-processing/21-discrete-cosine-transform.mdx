@@ -1,7 +1,7 @@
 ---
 title: Discrete Cosine Transform
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-08T13:09:53.911Z
+lastUpdatedOn: 2026-10-17T06:15:20.313Z
 ---
 
 The discrete cosine transform (DCT) writes a sequence of $N$ samples as a weighted sum of $N$ cosines of increasing frequency.
@@ -25,11 +25,13 @@ $$
 
 Here:
 
-- $k$: frequency index
-- $\alpha(0)$: $\sqrt{1/N}$
-- $\alpha(k)$ for $k \geq 1$: $\sqrt{2/N}$
-- $X(0)$: DC coefficient, equal to $\sqrt{N}$ times the sample mean
-- $X(k)$ for $k \geq 1$: AC coefficients
+<Symbols>
+  <Sym s="k">frequency index</Sym>
+  <Sym s="\alpha(0)">$\sqrt{1 / N}$</Sym>
+  <Sym s="\alpha(k) \ \text{for} \ k \geq 1">$\sqrt{2 / N}$</Sym>
+  <Sym s="X(0)">DC coefficient, equal to $\sqrt{N}$ times the sample mean</Sym>
+  <Sym s="X(k) \ \text{for} \ k \geq 1">AC coefficients</Sym>
+</Symbols>
 
 The term $\cos\frac{(2n+1)k\pi}{2N}$ completes $k/2$ cycles across the $N$ samples.
 
@@ -47,9 +49,11 @@ $$
 
 Here:
 
-- $u, v$: horizontal and vertical frequency indices
-- $F(0, 0)$: DC coefficient, equal to $N$ times the block mean
-- $F(u, v)$ for $(u, v) \neq (0, 0)$: AC coefficients
+<Symbols>
+  <Sym s="u, v">horizontal and vertical frequency indices</Sym>
+  <Sym s="F(0, 0)">DC coefficient, equal to $N$ times the block mean</Sym>
+  <Sym s="F(u, v) \ \text{for} \ (u, v) \neq (0, 0)">AC coefficients</Sym>
+</Symbols>
 
 For $N = 8$, $\alpha(k) = \frac{C(k)}{2}$ with $C(0) = \frac{1}{\sqrt{2}}$ and $C(k) = 1$ otherwise. The 2D transform then has the form
 

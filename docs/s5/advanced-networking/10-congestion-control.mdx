@@ -3,7 +3,7 @@ title: Congestion Control
 authors:
   - rakeshan
 dateCreated: 2026-09-05T21:01:18.122Z
-lastUpdatedOn: 2026-09-29T19:55:29.759Z
+lastUpdatedOn: 2026-10-17T06:15:18.993Z
 ---
 
 Congestion - offered traffic exceeds available router, link, or processing capacity.
@@ -106,11 +106,10 @@ import TcpLinearIncreaseThreshold from "./images/tcp-linear-increase-threshold.s
 
 <TcpLinearIncreaseThreshold />
 
-- Initial $ssthresh$: $64\text{KB}$.
-- Initial $CongestionWindow$: $1\text{ MSS}$.
-- While $CongestionWindow < ssthresh$: increase $CongestionWindow$ by $1\text{ MSS}$ for every ACK.
-- After each RTT below $ssthresh$: $CongestionWindow$ approximately doubles.
-- When $CongestionWindow \ge ssthresh$: increase $CongestionWindow$ by approximately $1\text{ MSS}$ per RTT.
+- Initially, $ssthresh$ is $64\text{KB}$ and $CongestionWindow$ is $1\text{ MSS}$.
+- While $CongestionWindow < ssthresh$, increase $CongestionWindow$ by $1\text{ MSS}$ for every ACK.
+- After each RTT below $ssthresh$, $CongestionWindow$ approximately doubles.
+- When $CongestionWindow \ge ssthresh$, increase $CongestionWindow$ by approximately $1\text{ MSS}$ per RTT.
 - After a timeout  
   Reset $CongestionWindow$ to $1\text{ MSS}$. Set $ssthresh$ to half the previous usable window.
 

@@ -1,7 +1,7 @@
 ---
 title: Solutions of a Linear Program
 dateCreated: 2026-08-26T11:53:03.283Z
-lastUpdatedOn: 2026-10-17T04:15:02.547Z
+lastUpdatedOn: 2026-10-17T06:15:20.381Z
 ---
 
 Consider a linear program in standard form: maximize $c^T x$ subject to $Ax = b$, $x \ge 0$, where $A$ is $m \times n$ with $n \ge m$ and rank $m$. Here $m$ is the number of constraints and $n$ is the number of variables.
@@ -18,9 +18,12 @@ A basic solution is determined by which $m$ variables are chosen as basic.
 
 Example: $x_1 + x_2 + x_3 = 4$, $x_1 + 2x_2 + x_4 = 6$ ($m = 2$, $n = 4$, so 2 variables are set to 0).
 
-- Non-basic $\{x_3, x_4\}$: solve $x_1 + x_2 = 4$, $x_1 + 2x_2 = 6$ to get $(2, 2, 0, 0)$.
-- Non-basic $\{x_2, x_3\}$: gives $(4, 0, 0, 2)$.
-- Non-basic $\{x_1, x_2\}$: gives $(0, 0, 4, 6)$.
+- Non-basic $\{x_3, x_4\}$  
+  solve $x_1 + x_2 = 4$, $x_1 + 2x_2 = 6$ to get $(2, 2, 0, 0)$.
+- Non-basic $\{x_2, x_3\}$  
+  gives $(4, 0, 0, 2)$.
+- Non-basic $\{x_1, x_2\}$  
+  gives $(0, 0, 4, 6)$.
 
 For a given LP, the maximum number of basic solutions is:
 
@@ -38,7 +41,8 @@ The basic feasible solutions of the LP are exactly the extreme points of its con
 
 By the [feasible-direction criterion](/s5/operational-research/convex#extreme-point), $x$ is extreme **iff** no nonzero $d$ keeps both $x + \epsilon d$ and $x - \epsilon d$ feasible for small $\epsilon > 0$. Such a $d$ must satisfy:
 
-- $Ad = 0$: from $A(x \pm \epsilon d) = b$ and $Ax = b$. The step stays on the constraint plane.
+- $Ad = 0$  
+  from $A(x \pm \epsilon d) = b$ and $Ax = b$. The step stays on the constraint plane.
 - $d_i = 0$ wherever $x_i = 0$: otherwise one of $x_i \pm \epsilon d_i$ is negative. Zero coordinates are pinned; positive ones have slack.
 
 So a valid step is exactly a nonzero $d$ supported on $\{i : x_i > 0\}$ with $\sum_{x_i > 0} d_i a_i = 0$. One exists **iff** those columns are dependent, so $x$ is extreme **iff** they are independent.
