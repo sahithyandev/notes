@@ -3,6 +3,7 @@ import { join, relative } from "node:path";
 import matter from "gray-matter";
 import { maskFile, maskWholeLine } from "./mask.ts";
 import { slugFromDocsPath } from "../../utils/note-path.ts";
+import { isMathBlockKind, mathBlockDepth } from "../../utils/math-blocks.ts";
 
 export interface ScannedHeading {
   level: number;
@@ -93,6 +94,52 @@ function sidebarLabelLineOf(raw: string): number {
   return 1;
 }
 
+const MATH_BLOCK_OPEN_RE = /^\s*<(Theorem|Definition)\b([^>]*)>/;
+
+function attrOf(attrs: string, name: string): string | undefined {
+  const m = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`).exec(
+    attrs,
+  );
+  return m ? (m[1] ?? m[2]) : undefined;
+}
+
+// A named <Theorem> or <Definition> renders its name as a heading at build
+// time (remark-math-blocks.ts); mirror it here so heading-based rules and
+// anchor checks see the same headings the page does. `line` is 0-based within
+// `content`.
+function mathBlockHeadings(
+  content: string,
+): Array<{ level: number; text: string; line: number }> {
+  const out: Array<{ level: number; text: string; line: number }> = [];
+  let inFence = false;
+  let fenceMarker = "";
+
+  content.split("\n").forEach((line, i) => {
+    const fence = /^\s*(```+|~~~+)/.exec(line);
+    if (fence) {
+      if (!inFence) {
+        inFence = true;
+        fenceMarker = fence[1][0];
+      } else if (fence[1][0] === fenceMarker) {
+        inFence = false;
+      }
+      return;
+    }
+    if (inFence) return;
+
+    const m = MATH_BLOCK_OPEN_RE.exec(line);
+    if (!m || !isMathBlockKind(m[1])) return;
+    const name = attrOf(m[2], "name");
+    if (!name) return;
+    out.push({
+      level: mathBlockDepth(attrOf(m[2], "level")) ?? 2,
+      text: name,
+      line: i,
+    });
+  });
+  return out;
+}
+
 function extractHeadings(
   content: string,
   lineOffset: number,
@@ -125,7 +172,14 @@ function extractHeadings(
       });
     }
   }
-  return headings;
+  for (const h of mathBlockHeadings(content)) {
+    headings.push({
+      level: h.level,
+      text: h.text,
+      line: h.line + 1 + lineOffset,
+    });
+  }
+  return headings.sort((a, b) => a.line - b.line);
 }
 
 // GitHub-style heading slugger matching @astrojs/markdown-remark behavior.
@@ -152,6 +206,9 @@ function extractHeadingSlugs(content: string): Set<string> {
   for (const line of content.split("\n")) {
     const m = /^#{1,6}\s+(.+)$/.exec(line);
     if (m) slugs.add(slugifyHeading(stripHeadingMarkdown(m[1])));
+  }
+  for (const h of mathBlockHeadings(content)) {
+    slugs.add(slugifyHeading(stripHeadingMarkdown(h.text)));
   }
   return slugs;
 }

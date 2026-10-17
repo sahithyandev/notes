@@ -16,6 +16,7 @@ import { checkFilename } from "./filename.ts";
 import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 import { checkDuplicateHeading } from "./duplicate-heading.ts";
 import { checkWhatIsHeading } from "./what-is-heading.ts";
+import { checkMathBlock } from "./math-block.ts";
 
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 import { checkForwardLinks } from "./forward-link.ts";
@@ -42,6 +43,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleHeadingDuplicate,
   checkDuplicateHeading,
   checkWhatIsHeading,
+  checkMathBlock,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {
