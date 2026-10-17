@@ -1,0 +1,16 @@
+---
+import { tex } from "../../utils/tex";
+
+interface Props {
+  s: string;
+}
+
+const { s } = Astro.props;
+---
+
+<div class="sym">
+  <dt class="sym-symbol" set:html={tex(s)} />
+  <dd class="sym-meaning">
+    <slot />
+  </dd>
+</div>

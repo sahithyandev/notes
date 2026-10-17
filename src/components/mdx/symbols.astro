@@ -1,0 +1,50 @@
+---
+interface Props {
+  columns?: 1 | 2;
+}
+
+const { columns = 1 } = Astro.props;
+---
+
+<dl class:list={["symbols", { "symbols-2": columns === 2 }]}>
+  <slot />
+</dl>
+
+<style is:global>
+  .symbols {
+    margin: 1em 0;
+    padding-left: 1.5em;
+  }
+
+  .symbols-2 {
+    column-count: 2;
+    column-gap: 2em;
+  }
+
+  @media (max-width: 640px) {
+    .symbols-2 {
+      column-count: 1;
+    }
+  }
+
+  .symbols .sym {
+    display: list-item;
+    list-style: disc;
+    break-inside: avoid;
+  }
+
+  .symbols .sym-symbol,
+  .symbols .sym-meaning {
+    display: inline;
+    margin: 0;
+  }
+
+  .symbols .sym-symbol::after {
+    content: ": ";
+  }
+
+  .symbols .sym-meaning > p {
+    display: inline;
+    margin: 0;
+  }
+</style>
