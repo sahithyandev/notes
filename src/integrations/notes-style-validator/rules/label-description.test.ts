@@ -7,16 +7,16 @@ test("flags a plain label:description bullet", () => {
   expect(checkLabelDescription(f)).toHaveLength(1);
 });
 
-test("exempts a math-glossary bullet", () => {
+test("flags a math-glossary bullet", () => {
   const f = scanOne(
     "- $L$: unit lower triangular, $n \\times n$ with all diagonal entries $1$",
   );
-  expect(checkLabelDescription(f)).toHaveLength(0);
+  expect(checkLabelDescription(f)).toHaveLength(1);
 });
 
-test("exempts a bullet whose label is partly math", () => {
+test("flags a bullet whose label is partly math", () => {
   const f = scanOne("- $(1)$ is $\\le$: add slack $s_1$.");
-  expect(checkLabelDescription(f)).toHaveLength(0);
+  expect(checkLabelDescription(f)).toHaveLength(1);
 });
 
 test("flags an inline-code label", () => {

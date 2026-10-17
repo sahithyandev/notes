@@ -66,7 +66,7 @@ If a label does not fit the 2-line form, rewrite it as a plain sentence. Never u
 
 When fixing a violation inside a list where the other bullets already use the 2-line form, convert it to 2-line format too rather than defaulting to a plain sentence, even for a short label. Only fall back to a plain sentence when the label genuinely has no natural split point, or the surrounding bullets are prose sentences themselves.
 
-Exception: `$symbol$: meaning` glossary bullets after a block equation or a `Here:` lead-in, such as `- $A$: cross-sectional area`.
+Glossaries of symbols use `<Symbols>` (see "Math blocks"), not `$symbol$: meaning` bullets. The rule flags those like any other label bullet.
 
 Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written _without_ the required 2 trailing spaces (or a trailing `\`): that's a rendering bug, not just a style nit, since the label and description silently run together on the published page.
 
@@ -146,7 +146,7 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
   A standalone, centred equation with an optional small label. No box or fill.
 
 - `<Symbols>` with `<Sym s="l">length</Sym>` rows
-  A legend of the symbols in the equation above it, rendered as an aligned 2-column grid (`columns={2}` for a side-by-side layout when there are many symbols). `s` is TeX without `$`. It replaces the `- $x$: meaning` glossary bullets, which the `label-description` rule still exempts until they are migrated.
+  A legend of the symbols in the equation above it, rendered as an aligned 2-column grid (`columns={2}` for a side-by-side layout when there are many symbols). `s` is TeX without `$`. It replaces `- $x$: meaning` glossary bullets, which the `label-description` rule now flags like any other `label: description` bullet.
 
 - `<Aka>`
   An inline lead-in for a concept's aliases, written at the start of the paragraph that defines it: `<Aka>SNR, signal-to-noise ratio</Aka>. The ratio of signal power to noise power.` It renders "Also known as" in muted prose with the aliases in bold, and the full stop is written after the closing tag. Only the alias list goes inside, never the definition sentence.
