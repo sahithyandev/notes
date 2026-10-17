@@ -1,7 +1,7 @@
 ---
 title: Kerberos
 dateCreated: 2026-09-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:25.650Z
+lastUpdatedOn: 2026-10-17T12:15:40.762Z
 ---
 
 Kerberos is a distributed authentication and access control system giving a User single sign-on access to multiple Services in a Realm after 1 initial login.
@@ -11,13 +11,17 @@ It solves 2 problems the [2-party authentication protocols](/s5/computer-securit
 - A small number of shared client workstations serve a much larger number of Users, so there is no secure local place to store long-term secrets. A compromised workstation must not break security for everyone.
 - A distributed system has many independent Services (file, print, mail, proxy), and a User should not have to authenticate separately to each one.
 
+<Note>
+
+A lot of the sections in this note are heavily interconnected. It is impossible for them to be ordered in the dependency order linearly.
+
+</Note>
+
 ## Realm
 
 An administrative domain. Has a shared identity database and a set of Services. A trust boundary. Everything inside shares 1 identity database and 1 set of keys.
 
 Example: `uom.lk`.
-
-A Realm has exactly 1 AS and 1 TGS, both hosted by its [KDC](#key-distribution-centre). The KDC may be replicated across machines for availability, but all replicas act as the same AS and TGS over 1 database.
 
 ## Principal
 
@@ -37,6 +41,8 @@ successful authentication.
 
 AS derives a key $K_C$ from the password, and encrypts its reply under it, so only someone who knows the password can read the reply. The reply includes the TGT and some other metadata.
 
+A Realm has a single Authentication Server.
+
 ### Ticket Granting Ticket
 
 <Aka>TGT</Aka>. The ticket issued by the AS, proving that $C$ has authenticated
@@ -49,9 +55,7 @@ Encrypted under $K_T$, the long-term key shared by the AS and TGS.
 <Aka>TGS</Aka>. Issues a ticket for a specific Service when presented with the
 ticket from the login.
 
-Its Principal is denoted as $T$, conventionally `krbtgt/REALM@REALM`.
-
-Each Realm has 1 TGS, so $T$ is fixed per Realm. A TGS of a different Realm is reached through cross-realm authentication. The client's own TGS issues a TGT for the remote TGS (`krbtgt/REMOTE@LOCAL`), which requires the 2 Realms to share a key.
+Each Realm has 1 TGS. Its Principal is denoted as $T$, conventionally `krbtgt/REALM@REALM`.
 
 The TGS lets a User reach many Services without retyping the password. The client repeats the request for every Service, reusing the login ticket until it expires.
 
@@ -59,7 +63,8 @@ Without the TGS, the client would need the password-derived key for every Servic
 
 ### Service Granting Ticket
 
-The ticket issued by the TGS, proving that $C$ has authenticated to the TGS for $V$. aka. SGT.
+<Aka>SGT</Aka>. The ticket issued by the TGS, proving that $C$ has authenticated
+to the TGS for $V$.
 
 Encrypted under $K_V$, the long-term key shared by the TGS and $V$. The client or other Services cannot tamper with it.
 
@@ -77,9 +82,12 @@ A server-maintained restriction on where a User may log in from is a separate po
 
 ## Key Distribution Centre
 
-Hosts the AS and the TGS, and holds the long-term secret key of every Principal in the Realm. aka. KDC.
+<Aka>KDC</Aka>. Hosts the AS and the TGS, and holds the long-term secret key of
+every Principal in the Realm.
 
 The KDC looks up which long-term key belongs to which Principal.
+
+KDC may be replicated across machines for availability, but all replicas act as the same AS and TGS over 1 database.
 
 ### $K_C$
 
@@ -145,7 +153,7 @@ The client prompts the User for $\text{pwd}$, computes $K_C$, and decrypts the r
 
 ### 3. Ticket Granting Server Request
 
-To reach $V$, $C$ requests an SGT from the TGS, presenting the TGT with a freshly built Authenticator, abbreviated as $\text{Auth}$. $\text{Auth}_1$ and $\text{Auth}_2$ are the Authenticators of step 3 and step 5, written as $\text{Authenticator}_1$ and $\text{Authenticator}_2$ in full.
+To reach $V$, $C$ requests an SGT from the TGS, presenting the TGT with a freshly built Authenticator.
 
 $$
 \text{Authenticator}_1 = \text{Enc}_{K_{C,T}}(C, \text{timestamp}_C)
@@ -215,3 +223,9 @@ Timestamps prevent replay. They do not synchronise clocks.
 
 - The client needs software libraries for symmetric encryption such as AES. It needs no public-key support or certificates.
 - Standard Kerberos traffic between the client and the KDC uses both UDP and TCP, on port 88.
+
+## Cross-Realm Authentication
+
+Lets a client in one Realm reach a Service in another. The 2 Realms must share an inter-realm key.
+
+The client asks its own TGS for a TGT for the remote TGS (`krbtgt/REMOTE@LOCAL`), encrypted under the inter-realm key. It then presents that TGT to the remote TGS, which issues an SGT for a Service in the remote Realm.
