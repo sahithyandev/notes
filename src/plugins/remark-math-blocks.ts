@@ -41,13 +41,29 @@ function inlineNodes(text: string) {
 // as the element's first child, so a named block gets an anchor and a TOC
 // entry from Astro's normal heading pass. An unnamed block gets no heading.
 // Must run before remarkKatexMhchem, which collects heading HTML by index.
+// An unnamed first <Theorem> in a note whose title already says "Theorem" gets
+// `titled`, so the component drops its redundant "Theorem" label.
 export function remarkMathBlocks() {
-  return (tree: unknown) => {
+  return (
+    tree: unknown,
+    file?: { data?: { astro?: { frontmatter?: { title?: unknown } } } },
+  ) => {
+    const title = file?.data?.astro?.frontmatter?.title;
+    let titleSaysTheorem =
+      typeof title === "string" && /\btheorem\b/i.test(title);
     visit(tree as never, "mdxJsxFlowElement", (raw) => {
       const node = raw as JsxElement;
       if (!node.name || !isMathBlockKind(node.name)) return;
 
       const name = stringAttr(node, "name");
+      if (node.name === "Theorem" && !name && titleSaysTheorem) {
+        node.attributes.push({
+          type: "mdxJsxAttribute",
+          name: "titled",
+          value: null,
+        });
+      }
+      if (node.name === "Theorem") titleSaysTheorem = false;
       if (!name) return;
 
       node.children.unshift({
