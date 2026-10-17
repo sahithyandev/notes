@@ -105,3 +105,12 @@ test("accepts level 3", () => {
   );
   expect(checkMathBlock(f)).toHaveLength(0);
 });
+
+test("accepts a Proof Hint without a preceding Theorem", () => {
+  const f = scanOne(
+    ["A plain claim.", "", '<Proof label="Proof Hint">', "x", "</Proof>"].join(
+      "\n",
+    ),
+  );
+  expect(checkMathBlock(f)).toHaveLength(0);
+});

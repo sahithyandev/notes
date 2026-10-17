@@ -1,7 +1,7 @@
 ---
 title: Solutions of a Linear Program
 dateCreated: 2026-08-26T11:53:03.283Z
-lastUpdatedOn: 2026-10-07T05:27:10.649Z
+lastUpdatedOn: 2026-10-17T04:15:02.547Z
 ---
 
 Consider a linear program in standard form: maximize $c^T x$ subject to $Ax = b$, $x \ge 0$, where $A$ is $m \times n$ with $n \ge m$ and rank $m$. Here $m$ is the number of constraints and $n$ is the number of variables.
@@ -34,7 +34,7 @@ A basic solution in which every variable is also $\ge 0$. Since the $n - m$ non-
 
 The basic feasible solutions of the LP are exactly the extreme points of its convex hull.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 By the [feasible-direction criterion](/s5/operational-research/convex#extreme-point), $x$ is extreme **iff** no nonzero $d$ keeps both $x + \epsilon d$ and $x - \epsilon d$ feasible for small $\epsilon > 0$. Such a $d$ must satisfy:
 
@@ -47,7 +47,7 @@ So a valid step is exactly a nonzero $d$ supported on $\{i : x_i > 0\}$ with $\s
 
 **Extreme $\Rightarrow$ BFS.** The positive-entry columns are independent, and there are at most $m$ of them. Since $A$ has rank $m$, extend them to $m$ independent columns; call these basic, the other $n - m$ non-basic. Every variable with $x_i > 0$ is already basic, so all non-basic variables are 0. Thus $x$ is the basic solution for this basis, and it is feasible, so it is a BFS.
 
-</Note>
+</Proof>
 
 ### Degeneracy
 

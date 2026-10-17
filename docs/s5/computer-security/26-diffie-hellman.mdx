@@ -1,7 +1,7 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:42:16.964Z
+lastUpdatedOn: 2026-10-17T04:15:01.894Z
 ---
 
 Diffie-Hellman (DH), invented in 1976 by Whitfield Diffie and Martin Hellman, lets 2 parties agree on a shared secret key using only publicly exchanged information. Security rests on the difficulty of computing discrete logarithms.
@@ -131,7 +131,7 @@ Why forward secrecy holds:
 
 The basic DH protocol has no authentication of public keys, so it is vulnerable to a man-in-the-middle attack.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Alice sends her public key $A$ toward Bob.
 - Mallory intercepts, and forwards her own public key $A'$ to Bob instead, claiming it is Alice's.
@@ -140,7 +140,7 @@ The basic DH protocol has no authentication of public keys, so it is vulnerable 
 - Mallory intercepts, and forwards her own public key $B'$ to Alice instead, claiming it is Bob's.
 - Alice computes a shared key $k_2$ with Mallory, believing it is shared with Bob.
 
-</Note>
+</Proof>
 
 Mallory now holds a separate shared key with each party, and can decrypt, inspect, modify, or inject messages in the supposedly secure channel between Alice and Bob.
 

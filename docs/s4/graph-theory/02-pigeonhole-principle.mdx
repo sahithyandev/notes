@@ -1,7 +1,7 @@
 ---
 title: Pigeonhole Principle
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-09-29T03:57:48.640Z
+lastUpdatedOn: 2026-10-17T04:15:00.484Z
 ---
 
 If $m$ objects are placed into $n$ containers where $m > n$, at least 1 container holds $\ge \lceil \frac{m}{n} \rceil$ objects.
@@ -10,14 +10,14 @@ If $m$ objects are placed into $n$ containers where $m > n$, at least 1 containe
 
 For any simple graph with $n \ge 2$ vertices, at least 2 vertices share the same degree.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Possible degree values range from $0$ to $n-1$ ($n$ values total)
 - Degrees $0$ and $n-1$ cannot both occur (a vertex connected to all others cannot coexist with an isolated vertex)
 - So at most $n-1$ distinct degree values exist for $n$ vertices
 - By pigeonhole, 2 vertices share a degree
 
-</Note>
+</Proof>
 
 ## Applications in Graph Theory
 
@@ -29,7 +29,7 @@ In any graph where every vertex has degree $\ge \lceil \frac{n}{2} \rceil$, a Ha
 
 Ramsey theory uses pigeonhole to prove monochromatic substructures must exist in large enough graphs. The classic result: in any 2-coloring of the edges of $K_6$, there is a monochromatic triangle.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Pick any vertex $v$ in $K_6$. It has $5$ edges.
 - By pigeonhole, at least $3$ edges from $v$ share the same color (say red).
@@ -37,4 +37,4 @@ Ramsey theory uses pigeonhole to prove monochromatic substructures must exist in
 - If any edge among $a, b, c$ is red, that edge plus 2 red edges from $v$ form a red triangle.
 - If no edge among $a, b, c$ is red, all 3 are blue, forming a blue triangle.
 
-</Note>
+</Proof>

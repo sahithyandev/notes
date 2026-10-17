@@ -7,7 +7,7 @@ prereqs:
   - s1/mathematics/matrices/trace
   - s1/mathematics/matrices/cayley-hamilton-theorem
 dateCreated: 2026-04-23T17:39:39.627Z
-lastUpdatedOn: 2026-09-29T03:57:49.489Z
+lastUpdatedOn: 2026-10-17T04:15:00.815Z
 ---
 
 Let $T: V\rightarrow V$ over $F$. $\lambda \in F$ and $v \in V$ satisfying $T(v)=\lambda v$ are called an eigenvalue and a corresponding eigenvector of $T$ respectively.
@@ -18,48 +18,48 @@ Here for any $\lambda$, $v=\underline{0}$ is a trivial solution. Usually only no
 
 **If** $\lambda$ is an eigenvalue of $A$ **then** $\lambda^{-1}$ is an eigenvalue of $A^{-1}$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Assume $A$ has an inverse
 - $\lvert A - \lambda I \rvert = 0$
 - Multiply both sides by $A^{-1}$ from left
 - Rearrange to get $\lvert A^{-1} - \lambda I \rvert = 0$
 
-</Note>
+</Proof>
 
 **If** $A^{-1} = P^{-1} A P$ for some matrix $P$ **then** $A$ and $A^{-1}$ has the same set of eigenvalues.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Assume $A$ has an inverse
 - $\lvert A^{-1} - \lambda I \rvert = 0$
 - Substitute for $A^{-1}$ and $I = P^{-1}P$
 - Simplify to get $\lvert A - \lambda I \rvert = 0$
 
-</Note>
+</Proof>
 
 Product of the eigenvalues is equal to the [determinant](/s1/mathematics/matrices/determinant).
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $f(\lambda) = \lvert \lambda I -  A \rvert = \prod_{i=1}^{n} (\lambda - \lambda_i) = \lambda^n + (-1)^n (\lambda_1+\lambda_2+\dots+\lambda_n)\lambda^{n-1} + O(\lambda^{n-2})$
 - $f(0) = \lvert - A \rvert = (-1)^{n} \lvert A \rvert = (-1)^{n}\big(\prod_{i=1}^{n} \lambda_i\big)$
 - $\lvert A \rvert = \prod_{i=1}^n \lambda_i$
 
-</Note>
+</Proof>
 
 Sum of the eigenvalues is the equal to the [trace](/s1/mathematics/matrices/trace) of the matrix.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Expand $\lvert \lambda I - A\rvert$ to $\prod_{i=1}^n (\lambda - a_{ii}) = \lambda^{n} + (a_11+a_22+\dots+a_nn)\lambda^{n-1} + O(\lambda^{n-2})$
 - Use the above prove's hint and compare the coefficients of $\lambda^{n-1}$
 
-</Note>
+</Proof>
 
 [Cayley Hamilton theorem](/s1/mathematics/matrices/cayley-hamilton-theorem) can be used to find the inverses and higher power matrices efficiently.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Suppose $ f(\lambda)=\sum\_{i=0}^{n} a_i\lambda^{i} $
 - Use [the below property of adjoint](/s1/mathematics/matrices/adjoint#properties) on $\lambda I - A$:  
@@ -69,11 +69,11 @@ Sum of the eigenvalues is the equal to the [trace](/s1/mathematics/matrices/trac
 - Multiple $i$th equation by $A^{n-i+1}$ (do this for all)
 - Sum all the equations
 
-</Note>
+</Proof>
 
 If $\lambda$ is an eigenvalue of $A$, then $\lambda^n$ is an eigenvalue of $A^n$ where $n \in \mathbb{Z} $.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 For $n \in \mathbb{Z}^+$:
 
@@ -83,15 +83,15 @@ For $n \in \mathbb{Z}^+$:
 
 Obvious for $n=0$. Already proven for $n=-1$. Use the above method and multiply from left.
 
-</Note>
+</Proof>
 
 If $\lambda$ is an eigenvalue of $A$, then $p(\lambda)$ is an eigenvalue of $p(A)$ where $p$ is any polynomial which takes in an number or a matrix.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 Use the above conclusion for a polynomial.
 
-</Note>
+</Proof>
 
 ## Eigenspace
 
@@ -103,13 +103,13 @@ $$
 
 An eigenspace is a subspace of $V$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $V_\lambda$ is non-empty (includes $\underline{0}$)
 - $V_\lambda \subseteq V$
 - $V_\lambda$ is closed under vector addition and scalar multiplication
 
-</Note>
+</Proof>
 
 Basis of an eigenspace is usually given as the eigenvectors.
 
@@ -119,12 +119,12 @@ $$
 V_{\lambda_1} \cap V_{\lambda_2} = \set { \underline{0} }
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Let $B_1$ and $B_2$ are bases of
 -
 
-</Note>
+</Proof>
 
 ### Geometric Multiplicity
 
@@ -140,17 +140,17 @@ For $A \in F^{nn\times n}$, $m(x)$ of $A$ is such that:
 
 **If** $f(\lambda)=0$ **then** $m(\lambda)=0$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $f(\lambda)=0$ implies $\lambda$ is an eigenvalue
 - $Av=\lambda v$
 - Use one of the above theorems to $m(A)v = m(\lambda)v$ which implies $0 = m(\lambda) v$ which implies $m(\lambda)=0$
 
-</Note>
+</Proof>
 
 $m(x)$ divides $f(x)$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - By [Cayley-Hamilton theorem](/s1/mathematics/matrices/cayley-hamilton-theorem), $f(A)=0$
 - Minimal polynomial $m$ has the least degree $\text{deg}(m) \lt \text{deg}(f)$
@@ -159,7 +159,7 @@ $m(x)$ divides $f(x)$.
 - The only possibility is $q(x) \equiv 0$
 - Which means $f(x) = p(x)m(x)$
 
-</Note>
+</Proof>
 
 **If** $m(\lambda)=0$ **then** $f(\lambda)=0$.
 

@@ -1,7 +1,7 @@
 ---
 title: Image Encoding
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-07T05:23:38.348Z
+lastUpdatedOn: 2026-10-17T04:15:02.231Z
 ---
 
 Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
@@ -92,7 +92,7 @@ The variable length $L_{ave}$ equals $B_{ave}$, so no coding redundancy remains.
 
 Produces the optimal variable length codeword allocation while preserving decodability. Reduces the source by merging the least probable grey levels, then assigns codes back through the reductions.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - List grey levels in descending order of probability
 - Add the 2 lowest probabilities into 1 and re-sort the list
@@ -100,7 +100,7 @@ Produces the optimal variable length codeword allocation while preserving decoda
 - Assign 0 and 1 to the last 2 probabilities
 - Working backwards, append 0 and 1 to the code of every merged probability, one bit for each of the 2 probabilities it came from
 
-</Note>
+</Proof>
 
 Example:
 

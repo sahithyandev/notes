@@ -3,18 +3,18 @@ title: Tree
 prereqs:
   - s2/data-structures-and-algorithms/data-structures/tree
 dateCreated: 2026-04-23T17:39:39.624Z
-lastUpdatedOn: 2026-09-29T03:57:48.830Z
+lastUpdatedOn: 2026-10-17T04:15:00.658Z
 ---
 
 A connected and acyclic graph. In this module, only undirected trees are discussed.
 
 Any tree $T$ satisfies: $|E(T)| = |V(T)| - 1$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 Use induction on the number of vertices. Each added vertex requires a new edge to be connected to tree. Multiple new edges causes cycles.
 
-</Note>
+</Proof>
 
 ### Forest
 
@@ -22,11 +22,11 @@ A graph where all of its connected components are trees. All acyclic graphs are 
 
 If a forest has $m$ number of trees, it satisfies: $|E(T)| = |V(T)| - m$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 Use $|E(T)| = |V(T)| - 1$ property for each trees inside. Sum them to get the number of edges and vertices on the forest.
 
-</Note>
+</Proof>
 
 ### Subtree
 
@@ -41,7 +41,7 @@ All 4 below statements are equivalent:
 3. $T$ is connected and $|E(T)|= |V(T)|-1$
 4. $T$ is acyclic and $|E(T)|= |V(T)|-1$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 <TreePropertiesProofs />
 
@@ -86,7 +86,7 @@ Then prove: $(4) => (1)$
 - Acyclic and not connected means it's a forest which is a composition of trees (say $m$).
 - $|E(T)| = |V(T)| - 1$ is given which means $m = 1$ which means $T$ is connected (contradiction and proven)
 
-</Note>
+</Proof>
 
 ## Leaf
 
@@ -94,7 +94,7 @@ A vertex with degree 1, in a tree.
 
 Any tree with 2 or more vertices, contains at least 2 leaves.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - There is only 1 tree with 2 vertices. And it contains 2 leaves.
 - Suppose a tree $T$ has more than 2 vertices. And assume $T$ has 0 or 1 leaves.
@@ -107,4 +107,4 @@ Any tree with 2 or more vertices, contains at least 2 leaves.
 - Case 2  
   Only 1 leaf. All other vertices have 2+ degree (0 degree not possible). Then $\sum \text{deg}(v) = 2 |E(T)| = 2|V(T)| - 2 \ge 2 (|V(T)| - 1) + 1$ (2+ degree for $|V|-1$ vertices and $1$ degree for the leaf vertex). Contradiction.
 
-</Note>
+</Proof>

@@ -1,7 +1,7 @@
 ---
 title: Complement
 dateCreated: 2026-05-25T14:17:18.438Z
-lastUpdatedOn: 2026-09-29T03:57:48.684Z
+lastUpdatedOn: 2026-10-17T04:15:00.513Z
 ---
 
 Aka. inverse. For a simple graph $G=(V,E)$, its complement is $G^c(V,E^c)$ where $E^c = \set{ \set{u,v}; \forall u,v \in V \land u \neq v \land \set{u,v} \not\in E } $. An edge between two vertices **iff** they are **not** adjacent in $G$.
@@ -10,7 +10,7 @@ Undefined for multigraphs.
 
 $(G^c)^c = G$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Suppose $G=(V,E)$
 - $G^c(V,E^c)$
@@ -23,11 +23,11 @@ OR:
 - Hence it must exist in $(E^c)^c$
 - Prove the other way as well
 
-</Note>
+</Proof>
 
 For any graph $G$ with $n$ vertices, when merged (unioned) with its complement graph $G^c$, it produces $K_n$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Suppose $G=(V,E)$ has $n$ vertices
 - $G^c(V,E^c)$ is its complement
@@ -36,7 +36,7 @@ For any graph $G$ with $n$ vertices, when merged (unioned) with its complement g
   - If not, it exists in $G^c$ and in $G\cup G^c$.
 - $G\cup G^c$ has edges between all pairs of vertices. Hence it is $K_n$.
 
-</Note>
+</Proof>
 
 ## Self-Complementary Graph
 
@@ -44,10 +44,10 @@ A graph satisfying $G = G^c$.
 
 Has $\frac{n(n-1)}{4}$ edges.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $G\cup G^c = K_n$ has $\frac{n(n-1)}{2}$ edges.
 - As $G = G^c$, they both have the same number of edges.
 - Hence $|E(G)| = \frac{n(n-1)}{4}$
 
-</Note>
+</Proof>

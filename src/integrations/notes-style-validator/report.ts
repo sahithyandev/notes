@@ -19,7 +19,9 @@ export type RuleId =
   | "title-heading-duplicate"
   | "duplicate-heading"
   | "submodule-numbering"
-  | "forward-link";
+  | "forward-link"
+  | "math-block"
+  | "proof-hint";
 
 export interface Violation {
   rule: RuleId;

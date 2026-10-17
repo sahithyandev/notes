@@ -1,7 +1,7 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:14:19.040Z
+lastUpdatedOn: 2026-10-17T04:15:01.838Z
 ---
 
 Named after Rivest, Shamir, Adleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures. Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
@@ -73,14 +73,14 @@ $$
 (m^e \bmod n)^d \bmod n = m
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Since $ed \equiv 1 \pmod{\phi(n)}$, write $ed = k\phi(n) + 1$ for some integer $k$.
 - $(m^e)^d \bmod n = m^{ed} \bmod n = m^{k\phi(n)} \cdot m \bmod n$.
 - By Euler's theorem, $m^{\phi(n)} \equiv 1 \pmod n$ when $m$ and $n$ are coprime, so $m^{k\phi(n)} \equiv 1$.
 - Result reduces to $m \bmod n = m$, since $m < n$.
 
-</Note>
+</Proof>
 
 ### Worked Example
 

@@ -4,6 +4,7 @@ import { mathBlockDepth } from "../../../utils/math-blocks.ts";
 
 const OPEN_RE = /<(Theorem|Definition|Proof|Formula|Note)\b([^>]*)>/;
 const CLOSE_RE = /<\/(Theorem|Definition|Proof|Formula|Note)>/;
+const PROOF_HINT_RE = /\blabel\s*=\s*(?:"Proof Hint"|'Proof Hint')/;
 const LEVEL_RE = /\blevel\s*=\s*(?:"([^"]*)"|'([^']*)')/;
 
 // Three checks on the structured math components:
@@ -11,6 +12,7 @@ const LEVEL_RE = /\blevel\s*=\s*(?:"([^"]*)"|'([^']*)')/;
 //   <Note> may sit between them), since it proves that theorem's statement.
 // - Two <Formula> blocks separated by only blank lines should be merged into
 //   one aligned $$ block.
+//   The exception is label="Proof Hint", which follows a plain claim.
 // - A <Theorem>/<Definition> `level` must be 2 or 3.
 export function checkMathBlock(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
@@ -59,7 +61,11 @@ export function checkMathBlock(f: ScannedFile): Violation[] {
       }
     }
 
-    if (tag === "Proof" && lastClosed?.tag !== "Theorem") {
+    if (
+      tag === "Proof" &&
+      lastClosed?.tag !== "Theorem" &&
+      !PROOF_HINT_RE.test(attrs)
+    ) {
       violations.push({
         rule: "math-block",
         line: i + 1,

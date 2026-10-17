@@ -1,7 +1,7 @@
 ---
 title: Convex
 dateCreated: 2026-08-26T11:47:32.345Z
-lastUpdatedOn: 2026-09-28T04:57:33.630Z
+lastUpdatedOn: 2026-10-17T04:15:02.518Z
 ---
 
 For all definitions in this note, whenever a set is mentioned, it is assumed to be a set of points in $\mathbb{R}^n$.
@@ -50,7 +50,7 @@ $$
 H = \left\{ \sum \lambda_i x_i \mid \lambda_i \ge 0, \sum \lambda_i = 1, x_i \in S\right\}
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $x, y \in H$
 - $x = \sum_i \lambda_i p_i$ for some points $p_i \in P$ with coefficients $\lambda_i$ with $\sum_i \lambda_i = 1$
@@ -58,7 +58,7 @@ $$
 - The segment point  
   $z = \alpha x + (1-\alpha)y = \sum_i \left(a\lambda_i + (1-a)\mu_i\right) p_i$ where $\sum_i \left(a\lambda_i + (1-a)\mu_i\right) = 1$
 
-</Note>
+</Proof>
 
 ### Extreme Point
 
@@ -92,7 +92,7 @@ The smallest convex set containing all the points of a set.
 
 Equivalently, the set of all convex combinations of the points.
 
-<Note title="Proof hint">
+<Proof label="Proof Hint">
 
 Let $P$ be a set of points and $H$ be the set of all convex combinations of points in $P$.
 
@@ -106,7 +106,7 @@ Let $P$ be a set of points and $H$ be the set of all convex combinations of poin
 
 Hence $H$ is the smallest convex set containing $P$, i.e. the convex hull.
 
-</Note>
+</Proof>
 
 ### Minkowski's Theorem
 
@@ -139,7 +139,7 @@ The feasible region of a linear program is a polytope.
 
 If the LP has an optimal solution, at least one extreme point attains it. This is why the optimal solution can always be found at a vertex, as used in the graphical method and the simplex algorithm.
 
-<Note title="Proof hint">
+<Proof label="Proof Hint">
 
 Let $v_1, \dots, v_k$ be the vertices of the feasible region, and let $v^*$ be the one with the largest objective value: $z(v^*) = \max_i z(v_i)$.
 
@@ -149,7 +149,7 @@ Let $v_1, \dots, v_k$ be the vertices of the feasible region, and let $v^*$ be t
 
 So $z(x) \le z(v^*)$ for every feasible $x$: no point, interior or on an edge, can beat the best vertex. Hence $v^*$ is optimal.
 
-</Note>
+</Proof>
 
 ### Simplex Algorithm
 

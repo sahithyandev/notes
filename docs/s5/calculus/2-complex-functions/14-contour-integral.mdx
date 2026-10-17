@@ -1,7 +1,7 @@
 ---
 title: Contour Integral
 dateCreated: 2026-09-11T00:00:00.000Z
-lastUpdatedOn: 2026-10-16T07:31:35.818Z
+lastUpdatedOn: 2026-10-17T04:15:01.503Z
 ---
 
 The contour integral of $f$ over a [contour](/s5/calculus/complex-functions/contour) $C$ is
@@ -72,7 +72,7 @@ $$
 \left|\int_a^b f(t)\,\text{d}t\right| \le \int_a^b |f(t)|\,\text{d}t
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Write $\int_a^b f(t)\,\text{d}t = re^{i\theta}$ for some $r \ge 0$
 - Then $r = e^{-i\theta}\int_a^b f(t)\,\text{d}t = \int_a^b e^{-i\theta}f(t)\,\text{d}t$
@@ -80,7 +80,7 @@ $$
 - $\text{Re}(e^{-i\theta}f(t)) \le |e^{-i\theta}f(t)| = |f(t)|$ for every $t$
 - Integrate this bound over $[a,b]$ to get $r \le \int_a^b |f(t)|\,\text{d}t$
 
-</Note>
+</Proof>
 
 ## ML Inequality
 
@@ -90,14 +90,14 @@ $$
 \left|\int_C f(z)\,\text{d}z\right| \le ML
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Parametrize $C$ by $z(t)$, $a \le t \le b$
 - Apply the integral triangle inequality to $\int_a^b f(z(t))z'(t)\,\text{d}t$
 - Bound $|f(z(t))|$ by $M$
 - Recognize $\int_a^b |z'(t)|\,\text{d}t$ as $L$
 
-</Note>
+</Proof>
 
 To bound $|f(z)|$ from above, bound the numerator from above and the denominator from below using the reverse triangle inequality.
 
@@ -123,13 +123,13 @@ $$
 
 <DeformationInvarianceDiagram />
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Split the region between $C_1$ and $C_2$ so its boundary is $C_1$ together with $C_2$ reversed
 - Apply the Cauchy-Goursat theorem to the whole boundary to get $0$
 - Rearrange
 
-</Note>
+</Proof>
 
 The integral over a closed contour depends only on which singularities the contour encloses, not on its shape.
 
@@ -153,14 +153,14 @@ $$
 \int_C \frac{1}{(z-z_0)^n}\,\text{d}z = 0, \qquad n \in \mathbb{Z}, n > 1
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Deform $C$ to a circle of radius $r$ centered at $z_0$, by the deformation invariance theorem
 - Parametrize the circle as $z = z_0 + re^{i\theta}$, $0 \le \theta \le 2\pi$
 - Substitute and simplify the integrand
 - Integrate directly over $\theta$
 
-</Note>
+</Proof>
 
 For $n \ge 2$, $\dfrac{-1}{(n-1)(z-z_0)^{n-1}}$ is a single-valued antiderivative on $\mathbb{C}\setminus\{z_0\}$. Every closed integral is $0$.
 

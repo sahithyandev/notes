@@ -1,7 +1,7 @@
 ---
 title: Public Key Cryptography
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:14:19.027Z
+lastUpdatedOn: 2026-10-17T04:15:01.827Z
 ---
 
 Public key cryptography (PKC) uses a key pair, a public key and a private key, rather than a single shared secret key. It is based on Number Theory, not substitution-permutation networks, and is asymmetric.
@@ -56,13 +56,13 @@ The number of positive integers less than $n$ relatively prime to $n$. Denoted b
 - $\phi(p) = p - 1$ for prime $p$.
 - $\phi(pq) = \phi(p)\phi(q) = (p-1)(q-1)$ for distinct primes $p, q$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - $\mathbb{Z}_n = \{0, 1, \dots, pq - 1\}$ for $n = pq$.
 - Residues not coprime to $n$ are the multiples of $p$ and $q$ below $n$: $\{p, 2p, \dots, (q-1)p\} \cup \{q, 2q, \dots, (p-1)q\}$.
 - $\phi(n) = pq - (q-1) - (p-1) - 1 = (p-1)(q-1)$.
 
-</Note>
+</Proof>
 
 ## Fermat's Theorem
 
@@ -72,13 +72,13 @@ $$
 a^{p-1} \equiv 1 \pmod p
 $$
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - The map $m \mapsto am \bmod p$ over $m \in \mathbb{Z}_p$ permutes $\{1, \dots, p-1\}$, since $a \cdot 0 \equiv 0$.
 - Multiply all $p - 1$ images together: $(p-1)! \, a^{p-1} \equiv (p-1)! \pmod p$.
 - $p$ and $(p-1)!$ are coprime, so cancel $(p-1)!$ from both sides.
 
-</Note>
+</Proof>
 
 ## Euler's Theorem
 

@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Codes
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.269Z
+lastUpdatedOn: 2026-10-17T04:15:01.870Z
 ---
 
 A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
@@ -69,14 +69,14 @@ It is secure only when all messages have the same fixed length. For variable len
 - Obtain $t_1 = \text{MAC}_k(m_1)$ and $t_2 = \text{MAC}_k(m_2)$ for single-block messages.
 - The message $m_1 \,\|\, (m_2 \oplus t_1)$ has tag $t_2$.
 
-<Note title="Proof Hint">
+<Proof label="Proof Hint">
 
 - Start with the CBC chain for $m_1 \,\|\, (m_2 \oplus t_1)$
 - Substitute $c_1 = t_1$
 - Cancel $t_1$ in the second block input
 - Compare with the chain for $m_2$
 
-</Note>
+</Proof>
 
 Fixes:
 
