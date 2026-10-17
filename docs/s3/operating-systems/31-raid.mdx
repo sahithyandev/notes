@@ -1,7 +1,7 @@
 ---
 title: RAID
 dateCreated: 2026-04-22T07:09:10.710Z
-lastUpdatedOn: 2026-09-28T13:22:28.461Z
+lastUpdatedOn: 2026-10-17T06:00:22.884Z
 ---
 
 Short for Redundant Array of Independent Disks. A setup of multiple disks, combined to form a single logical unit. Data is stored redundantly across disks to improve reliability. Increases mean time to failure.
@@ -12,15 +12,18 @@ Frequently combined NVRAM to improve write performance.
 
 ### Mean Time to Failure
 
-Aka. MTTF. Higher is better.
+<Aka>MTTF</Aka>. Higher is better.
 
 ### Mean Time to Repair
 
-Aka. MTTR. Refers to the average time required to detect, replace, and rebuild a failed disk in a RAID array so the system returns to full redundancy. During this time, the system is vulnerable to additional failures. Lower is better.
+<Aka>MTTR</Aka>. Refers to the average time required to detect, replace, and
+rebuild a failed disk in a RAID array so the system returns to full redundancy.
+During this time, the system is vulnerable to additional failures. Lower is
+better.
 
 ### Mean Time Between Failures
 
-Aka. MTBF. Average time between failures of a system. Higher is better.
+<Aka>MTBF</Aka>. Average time between failures of a system. Higher is better.
 
 $$
 \text{MTBF} = \text{MTTF} + \text{MTTR}
@@ -38,7 +41,8 @@ When data is divided into blocks and distributed across multiple disks. Improves
 
 ### Mirroring
 
-Aka. shadowing. Data is duplicated across multiple disks. If one disk fails, data can be retrieved from the other disk(s).
+<Aka>shadowing</Aka>. Data is duplicated across multiple disks. If one disk
+fails, data can be retrieved from the other disk(s).
 
 ## RAID Level
 
@@ -78,13 +82,15 @@ Used in large-capacity arrays where rebuild times are long.
 
 ### RAID 10
 
-Aka. RAID 1+0. Pairs disks for mirroring, then does striping. Can survive multiple disk fails as long as they are in different pairs. Very high read/write speed. Best mix of performance and reliability. Expensive.
+<Aka>RAID 1+0</Aka>. Pairs disks for mirroring, then does striping. Can survive
+multiple disk fails as long as they are in different pairs. Very high read/write
+speed. Best mix of performance and reliability. Expensive.
 
 Used in mission-critical systems.
 
 ### RAID 01
 
-Aka. RAID 0+1. Creates a stripe set, then mirrors the set.
+<Aka>RAID 0+1</Aka>. Creates a stripe set, then mirrors the set.
 
 <Note>
 
@@ -96,7 +102,7 @@ RAID 5 is preferred for applications with low update rate and large amounts of d
 
 ## Mean Time to Data Loss
 
-Aka. MTTDL. Depends on MTTF, MTTR and the RAID level.
+<Aka>MTTDL</Aka>. Depends on MTTF, MTTR and the RAID level.
 
 Suppose $n$ number of disks are used in a RAID array. $F$, $L$ and $R$ are used instead of $\text{MTTF}$, $\text{MTTDL}$ and $\text{MTTR}$ respectively for simplicity.
 

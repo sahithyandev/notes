@@ -3,10 +3,10 @@ title: Inter-Process Communication
 sidebar:
   label: IPC
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-09-13T14:55:23.472Z
+lastUpdatedOn: 2026-10-17T06:00:22.646Z
 ---
 
-Aka. IPC. Processes may be:
+<Aka>IPC</Aka>. Processes may be:
 
 - Independent (no shared state)
 - Cooperating (share data or communicate)
@@ -51,7 +51,11 @@ Processes refer to each other in the syscalls. Link established automatically. O
 
 #### Indirect
 
-Aka. mailbox/port based. Processes use shared mailboxes, which may be shared with many processes. The shared mailbox must be set up before communication. Multiple links possible within a pair of processes. OS resolves conflicts when they occur. Not secure as all processes sharing a mailbox can intercept the messages.
+<Aka>mailbox/port based</Aka>. Processes use shared mailboxes, which may be
+shared with many processes. The shared mailbox must be set up before
+communication. Multiple links possible within a pair of processes. OS resolves
+conflicts when they occur. Not secure as all processes sharing a mailbox can
+intercept the messages.
 
 ### Buffering
 
@@ -81,7 +85,8 @@ The pipe operator (`|`) in shells connects the stdout of one process to the stdi
 
 ### Ordinary Pipes
 
-Aka. anonymous pipes. Created using `pipe()` syscall. Unidirectional. Requires parent-child relationship. Used for simple producer-consumer scenarios.
+<Aka>anonymous pipes</Aka>. Created using `pipe()` syscall. Unidirectional.
+Requires parent-child relationship. Used for simple producer-consumer scenarios.
 
 ### Named Pipes
 

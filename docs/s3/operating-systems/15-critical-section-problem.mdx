@@ -1,7 +1,7 @@
 ---
 title: Critical Section Problem
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-10-07T05:27:07.765Z
+lastUpdatedOn: 2026-10-17T06:00:22.744Z
 ---
 
 Each process contains a critical section. From all the threads sharing some resource, only 1 thread must be allowed to run its critical section at a given point of time. If not achieved, data corruption and race conditions are possible.
@@ -54,7 +54,8 @@ Special atomic instructions used to implement locks, semaphores, etc.
 
 #### `test_and_set`
 
-Aka. TSL. A shared boolean variable `lock`. 0 means free, 1 means busy. Sets passed parameter to true and returns the old value.
+<Aka>TSL</Aka>. A shared boolean variable `lock`. 0 means free, 1 means busy.
+Sets passed parameter to true and returns the old value.
 
 Simple. Works on multiprocessors. Widely supported.
 
@@ -78,7 +79,8 @@ bool test_and_set(bool *target) {
 
 #### `compare_and_swap`
 
-Aka. CAS. Atomic. A shared word `addr`. Compares it with `expected`, if so, updates `addr` with `new`. Returns whether the update was performed.
+<Aka>CAS</Aka>. Atomic. A shared word `addr`. Compares it with `expected`, if
+so, updates `addr` with `new`. Returns whether the update was performed.
 
 ```c
 // Atomic hardware primitive
@@ -116,9 +118,8 @@ void increment(atomic_int *v){
 
 ### Bounded Buffer Problem
 
-Aka. Producer–Consumer Problem (with finite buffer).
-
-Models 2 types of processes with a shared buffer of fixed size:
+<Aka>Producer–Consumer Problem (with finite buffer)</Aka>. Models 2 types of
+processes with a shared buffer of fixed size:
 
 - producers - insert an item into the next free slot.
 - consumers - take an item from the next filled slot.

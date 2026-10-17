@@ -1,7 +1,7 @@
 ---
 title: Multiplexing
 dateCreated: 2026-04-22T07:09:10.693Z
-lastUpdatedOn: 2026-09-29T03:56:56.567Z
+lastUpdatedOn: 2026-10-17T06:00:21.858Z
 ---
 
 A technique used to send multiple signals over a single communication channel. Allows several data streams to share the same transmission medium. Increases efficiency and reduces costs.
@@ -20,7 +20,10 @@ Multiplexing is used because:
 
 ## Frequency Division Multiplexing
 
-Aka. FDM. Bandwidth is divided into multiple frequency ranges. Each frequency range is assigned to a signal. Minor gaps (aka. guard bands) are left in between to avoid interference. Idle signals cause a frequency range to be blank, which is wasted.
+<Aka>FDM</Aka>. Bandwidth is divided into multiple frequency ranges. Each
+frequency range is assigned to a signal. Minor gaps (aka. guard bands) are left
+in between to avoid interference. Idle signals cause a frequency range to be
+blank, which is wasted.
 
 Issues in FDM:
 
@@ -36,13 +39,16 @@ Each different signal is modulated onto a carrier, sent through band-limiting fi
 
 ## Wavelength Division Multiplexing
 
-Aka. WDM. Used in optical fiber. Similar to FDM.
+<Aka>WDM</Aka>. Used in optical fiber. Similar to FDM.
 
 Several sources generate a laser beam of different wavelengths. Optical amplifiers are used to amplify light signals of all wavelengths.
 
 ## Synchronous Time Division Multiplexing
 
-Aka. Synchronous TDM. Multiple signals can be carried on a single link by interleaving portions of each signal in time. The interleaving can be done at the bit level, or in blocks of bytes or larger quantities. Idle signals go blank, which is wasted.
+<Aka>Synchronous TDM</Aka>. Multiple signals can be carried on a single link by
+interleaving portions of each signal in time. The interleaving can be done at
+the bit level, or in blocks of bytes or larger quantities. Idle signals go
+blank, which is wasted.
 
 Assumes all sources run at the same data rate. But practical scenarios cause mismatched data rates, which breaks synchronization. Can handle sources of different data rates, by assigning multiple time slots to fast sources.
 
@@ -76,7 +82,9 @@ A solution to avoid breaking synchronization in TDM between the source and recei
 
 ## Statistical Time Division Multiplexing
 
-Aka. Statistical TDM. Dynamically allocates time slots on demand. Avoids wasting time slots because of idle sources. Supports more devices than synchronous TDM. Typically, uses HDLC protocol.
+<Aka>Statistical TDM</Aka>. Dynamically allocates time slots on demand. Avoids
+wasting time slots because of idle sources. Supports more devices than
+synchronous TDM. Typically, uses HDLC protocol.
 
 Input buffers are scanned repeatedly. Once a frame is filled, the frame is transmitted. Receiver distributes the slots of data on to appropriate destinations.
 

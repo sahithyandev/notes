@@ -1,7 +1,7 @@
 ---
 title: CPU Scheduling
 dateCreated: 2026-04-22T07:09:10.709Z
-lastUpdatedOn: 2026-09-28T13:22:28.372Z
+lastUpdatedOn: 2026-10-17T06:00:22.804Z
 ---
 
 Determines the order in which processes or threads are given access to the processor, aiming to optimize various aspects such as CPU utilization, throughput, turnaround time, waiting time, and response time.
@@ -33,17 +33,22 @@ The component of the operating system responsible for selecting which process ru
 
 ### Job Scheduler
 
-Aka. long-term scheduler. Decides which jobs are admitted to the system for processing. Runs very infrequently. Controls system load. Avoids memory and CPU overload.
+<Aka>long-term scheduler</Aka>. Decides which jobs are admitted to the system
+for processing. Runs very infrequently. Controls system load. Avoids memory and
+CPU overload.
 
 Jobs are kept in job pool, which is on disk.
 
 ### CPU Scheduler
 
-Aka. short-term schedular. Decides which of the ready, in-memory processes is to be executed next by the CPU. Runs per interrupt, per context switch (very frequently).
+<Aka>short-term schedular</Aka>. Decides which of the ready, in-memory processes
+is to be executed next by the CPU. Runs per interrupt, per context switch (very
+frequently).
 
 ### Medium-Term Scheduler
 
-Aka. swapper. Handles swapping processes in and out of memory to improve process mix. Manages RAM pressure and multiprogramming level.
+<Aka>swapper</Aka>. Handles swapping processes in and out of memory to improve
+process mix. Manages RAM pressure and multiprogramming level.
 
 ## Types of Scheduling
 
@@ -106,7 +111,8 @@ Chosen based on the specific goals and requirements of the system, such as fairn
 
 ### First-Come First-Served
 
-Aka. FCFS. Processes are scheduled in the order they arrive. Non-preemptive. Turnaround and waiting time depends on order of arrival.
+<Aka>FCFS</Aka>. Processes are scheduled in the order they arrive.
+Non-preemptive. Turnaround and waiting time depends on order of arrival.
 
 Simple. Might cause longer waiting times.
 
@@ -116,7 +122,8 @@ Short process behind long process. Causes high turnaround and waiting times.
 
 ### Shortest Job First
 
-Aka. SJF. The process with the shortest estimated CPU burst is scheduled next. Non-preemptive. Least average waiting time. Optimal. Can cause starvation.
+<Aka>SJF</Aka>. The process with the shortest estimated CPU burst is scheduled
+next. Non-preemptive. Least average waiting time. Optimal. Can cause starvation.
 
 Length of the next CPU burst must be estimated. Exponential averaging can be used for estimation.
 
@@ -132,7 +139,9 @@ Here:
 
 ### Shortest Remaining Time First
 
-Aka. SRTF. Preemptive version of SJF. At any time, the process with the smallest remaining CPU burst gets the CPU. If a new process arrives with a smaller remaining time than the current one, it preempts.
+<Aka>SRTF</Aka>. Preemptive version of SJF. At any time, the process with the
+smallest remaining CPU burst gets the CPU. If a new process arrives with a
+smaller remaining time than the current one, it preempts.
 
 ### Round Robin
 
@@ -164,11 +173,14 @@ High priority processes are run first. When 2 process has same priority, round r
 
 ### Multilevel Queue Scheduling
 
-Aka. MLQ. Ready queue is split into multiple separate queues. Each queue has a priority and its own scheduling policy. Processes are assigned to different queues based on priority or type.
+<Aka>MLQ</Aka>. Ready queue is split into multiple separate queues. Each queue
+has a priority and its own scheduling policy. Processes are assigned to
+different queues based on priority or type.
 
 ### Multilevel Feedback Queue Scheduling
 
-Aka. MLFQ. Similar to multilevel queue but allows processes to move between queues based on their behavior and requirements.
+<Aka>MLFQ</Aka>. Similar to multilevel queue but allows processes to move
+between queues based on their behavior and requirements.
 
 A new process starts in a high-priority, short-time-slice queue. If it uses too much CPU (acts CPU-bound), it gets pushed down to lower queues. If it waits too long, it may be moved back up (prevents starvation).
 
@@ -183,11 +195,16 @@ System Contention Scope (SCS):
 
 ### Process-Contention Scope
 
-Aka. PCS. Scheduling scope in which user-level threads compete only with other threads within the same process. Kernel does not schedule these threads individually. User-level thread library chooses which one runs on the process’s available LWPs.
+<Aka>PCS</Aka>. Scheduling scope in which user-level threads compete only with
+other threads within the same process. Kernel does not schedule these threads
+individually. User-level thread library chooses which one runs on the process’s
+available LWPs.
 
 ### System-Contention Scope
 
-Aka. SCS. Scheduling scope in which kernel-level threads compete with all other threads in the entire system. The kernel scheduler directly manages these threads as independent schedulable entities (kernel threads / LWPs).
+<Aka>SCS</Aka>. Scheduling scope in which kernel-level threads compete with all
+other threads in the entire system. The kernel scheduler directly manages these
+threads as independent schedulable entities (kernel threads / LWPs).
 
 Linux, macOS, Windows use only SCS.
 

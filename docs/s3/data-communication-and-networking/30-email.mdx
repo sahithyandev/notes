@@ -1,7 +1,7 @@
 ---
 title: Email
 dateCreated: 2026-04-22T07:09:10.693Z
-lastUpdatedOn: 2026-09-29T03:56:56.654Z
+lastUpdatedOn: 2026-10-17T06:00:21.914Z
 ---
 
 Used to send and receive messages over the network. Receiver can be one or more users. Reliable. Low-cost. Fast. Asynchronous. Bi-directional. Open standard. Can be encrypted. Can be signed.
@@ -53,7 +53,10 @@ An email address consists of two parts separated by an `@` symbol:
 
 ### Mail Client
 
-Aka. user agent, mail reader. A device/program that allows users to send and receive email messages. Provides a user interface for composing and sending emails, as well as for reading and managing received emails. Configured with an MTA, probably using email address and password.
+<Aka>user agent, mail reader</Aka>. A device/program that allows users to send
+and receive email messages. Provides a user interface for composing and sending
+emails, as well as for reading and managing received emails. Configured with an
+MTA, probably using email address and password.
 
 Uses SUBMIT protocol to send email to MTA.
 
@@ -61,7 +64,10 @@ User can access their emails by directly signing into the mail server or using a
 
 ### Mail Gateway
 
-Aka. MTA. Receives email from a mail client or another mail gateway. May store a temporary sending queue if destination MTA is unavailable. May include spam filtering and virus scanning. May handle mailing lists. Mostly authenticates users. May use TLS to secure data.
+<Aka>MTA</Aka>. Receives email from a mail client or another mail gateway. May
+store a temporary sending queue if destination MTA is unavailable. May include
+spam filtering and virus scanning. May handle mailing lists. Mostly
+authenticates users. May use TLS to secure data.
 
 The gateway looks up the domain name in the DNS. A MX record specifies the mail server responsible for handling email for a domain. Can have multiple MX records with different priorities, indicating the order in which mail servers should be tried.
 
@@ -101,7 +107,9 @@ More powerful than POP. Can store mail folders on the mail server. Can retrieve 
 
 ### MIME
 
-Aka. Multipurpose Internet Mail Extension. Extension to RFC 822. Designed to handle binary files as SMTP initially didn't. Most SMTP implementations now can.
+<Aka>Multipurpose Internet Mail Extension</Aka>. Extension to RFC 822. Designed
+to handle binary files as SMTP initially didn't. Most SMTP implementations now
+can.
 
 MIME defines a standard for encoding binary data into text format, allowing it to be transmitted over SMTP.
 
@@ -136,8 +144,12 @@ Introduces five new message header fields:
 
 ### SPF
 
-Aka. Sender Policy Framework. Special DNS records specify IP addresses of machines authorized to send mail for a particular domain (reverse MX). Designed to protect the envelope sender (return path). Receiver MTA checks SPF and may reject or mark as spam.
+<Aka>Sender Policy Framework</Aka>. Special DNS records specify IP addresses of
+machines authorized to send mail for a particular domain (reverse MX). Designed
+to protect the envelope sender (return path). Receiver MTA checks SPF and may
+reject or mark as spam.
 
 ### DKIM
 
-Aka. DomainKeys Identified Mail. Special DNS records specify public keys for a domain. Receiver MTA checks DKIM and may reject or mark as spam.
+<Aka>DomainKeys Identified Mail</Aka>. Special DNS records specify public keys
+for a domain. Receiver MTA checks DKIM and may reject or mark as spam.

@@ -1,7 +1,7 @@
 ---
 title: TCP
 dateCreated: 2026-05-14T12:24:50.329Z
-lastUpdatedOn: 2026-09-29T03:57:48.561Z
+lastUpdatedOn: 2026-10-17T06:00:23.121Z
 ---
 
 Transmission Control Protocol. Connection-oriented. Reliable. Unicast only. Defined in RFC 793. Operates end-to-end; routers do not participate. Provides byte-stream abstraction over an unreliable IP network.
@@ -303,7 +303,12 @@ As TCP is connection-oriented, there is an associated overhead for that. And tha
 
 ### Head-Of-Line Blocking
 
-Aka. HOL Blocking. Occurs because of in-order delivery guarantee. If a segment is lost in transit, TCP requires the receiver to wait for that missing segment to be retransmitted before passing any subsequent data up to the application, even if those later segments have already arrived and are sitting in the buffer. The receiver knows something is missing because sequence numbers have a gap, so it holds everything back until the hole is filled.
+<Aka>HOL Blocking</Aka>. Occurs because of in-order delivery guarantee. If a
+segment is lost in transit, TCP requires the receiver to wait for that missing
+segment to be retransmitted before passing any subsequent data up to the
+application, even if those later segments have already arrived and are sitting
+in the buffer. The receiver knows something is missing because sequence numbers
+have a gap, so it holds everything back until the hole is filled.
 
 This is a issue if multiple data streams are multiplexed over a TCP connection.
 

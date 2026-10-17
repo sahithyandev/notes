@@ -1,7 +1,7 @@
 ---
 title: Kerberos
 dateCreated: 2026-09-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-14T05:30:02.447Z
+lastUpdatedOn: 2026-10-17T06:00:25.650Z
 ---
 
 Kerberos is a distributed authentication and access control system giving a User single sign-on access to multiple Services in a Realm after 1 initial login.
@@ -31,19 +31,23 @@ A credential that a Principal presents to prove it was authenticated. Encrypted 
 
 ## Authentication Server
 
-Aka. AS. Verifies the User's password and issues a ticket proving the login. The only component that checks the User's password. Issues a ticket after successful authentication.
+<Aka>AS</Aka>. Verifies the User's password and issues a ticket proving the
+login. The only component that checks the User's password. Issues a ticket after
+successful authentication.
 
 AS derives a key $K_C$ from the password, and encrypts its reply under it, so only someone who knows the password can read the reply. The reply includes the TGT and some other metadata.
 
 ### Ticket Granting Ticket
 
-Aka. TGT. The ticket issued by the AS, proving that $C$ has authenticated to the AS.
+<Aka>TGT</Aka>. The ticket issued by the AS, proving that $C$ has authenticated
+to the AS.
 
 Encrypted under $K_T$, the long-term key shared by the AS and TGS.
 
 ## Ticket Granting Server
 
-Aka. TGS. Issues a ticket for a specific Service when presented with the ticket from the login.
+<Aka>TGS</Aka>. Issues a ticket for a specific Service when presented with the
+ticket from the login.
 
 Its Principal is denoted as $T$, conventionally `krbtgt/REALM@REALM`.
 

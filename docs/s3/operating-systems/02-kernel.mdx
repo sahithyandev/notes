@@ -1,7 +1,7 @@
 ---
 title: Kernel
 dateCreated: 2026-04-22T07:09:10.705Z
-lastUpdatedOn: 2026-09-28T13:22:28.127Z
+lastUpdatedOn: 2026-10-17T06:00:22.597Z
 ---
 
 The one program running at all times on the computer. Core of an OS.
@@ -128,7 +128,9 @@ Calling a procedure defined inside the current program. Handled entirely in user
 
 ### System Call
 
-Aka. syscall. An interface for user-level programs to request services from the kernel. Platform-specific. Runs in kernel mode. Required for maintaining security and stability of the system.
+<Aka>syscall</Aka>. An interface for user-level programs to request services
+from the kernel. Platform-specific. Runs in kernel mode. Required for
+maintaining security and stability of the system.
 
 When a user program performs a system call, it places the system call arguments in predefined registers (or sometimes the user stack), then executes a special instruction (like `syscall` or `int 0x80`) to switch to kernel mode. The kernel then copies the arguments to the kernel stack as needed.
 
@@ -179,7 +181,10 @@ Used in older systems. Not used nowadays due to security and performance concern
 
 ## Application Binary Interface
 
-Aka. ABI. Defines how a compiled code must look and interact with an OS and hardware at the binary level. A software-level contract on top of an [ISA](/s3/computer-architecture/instruction-set-architecture/). Specific for an OS and ISA.
+<Aka>ABI</Aka>. Defines how a compiled code must look and interact with an OS
+and hardware at the binary level. A software-level contract on top of an
+[ISA](/s3/computer-architecture/instruction-set-architecture/). Specific for an
+OS and ISA.
 
 Ensures that compiled programs can run correctly on a given system, regardless of the compiler used, as long as they target the same ABI.
 

@@ -1,7 +1,7 @@
 ---
 title: Pipeline Hazards
 dateCreated: 2026-04-22T07:09:10.688Z
-lastUpdatedOn: 2026-09-29T03:56:56.207Z
+lastUpdatedOn: 2026-10-17T06:00:21.595Z
 ---
 
 Situations preventing next instruction from executing in designated clock cycle. Causes the pipeline to [stall](/s3/computer-architecture/pipelining#pipeline-stall).
@@ -55,13 +55,17 @@ A solution to data hazards by reading from registers only in the first half of a
 
 ### Forwarding
 
-Aka. bypassing or short-circuiting. An alternate solution to data hazards. Sends a value directly from the pipeline stage that produces it (EX/MEM) to the stage that needs it, instead of waiting for the register write. This avoids many data-hazard stalls and keeps the pipeline moving.
+<Aka>bypassing or short-circuiting</Aka>. An alternate solution to data hazards.
+Sends a value directly from the pipeline stage that produces it (EX/MEM) to the
+stage that needs it, instead of waiting for the register write. This avoids many
+data-hazard stalls and keeps the pipeline moving.
 
 Solves most RAW hazards, but not all. Can't handle data hazards, because reading from memory is much slower.
 
 ## Control Hazard
 
-Aka. branch hazard. The next instruction depends on a branch/jump, and it's not known yet. Cannot fetch the next instruction branch resolves.
+<Aka>branch hazard</Aka>. The next instruction depends on a branch/jump, and
+it's not known yet. Cannot fetch the next instruction branch resolves.
 
 Causes more performance loss compared to data hazards. 4 solutions are commonly used.
 

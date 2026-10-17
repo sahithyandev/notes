@@ -1,7 +1,7 @@
 ---
 title: Uninformed Searching
 dateCreated: 2026-04-22T07:09:10.684Z
-lastUpdatedOn: 2026-09-29T03:56:55.908Z
+lastUpdatedOn: 2026-10-17T06:00:21.385Z
 ---
 
 Methods for exploring state spaces without using domain-specific knowledge about the problem. Aka. blind search.
@@ -22,13 +22,17 @@ Covered in detail in [DFS on Graphs](/s2/data-structures-and-algorithms/algorith
 
 ### Depth-Limited DFS
 
-Aka. DDFS. Depth-constrained DFS. Avoids wandering off into infinite paths.
+<Aka>DDFS</Aka>. Depth-constrained DFS. Avoids wandering off into infinite
+paths.
 
 Not complete. Causes a false-negative for nodes far apart. Not optimal. Returns the first solution it finds.
 
 ### Iterative Deepening DFS
 
-Aka. IDS. Repeatedly runs DDFS with increasing depth limits. Stops when a solution is found. Complete **iff** finite. Wanders off into infinite for infinite graphs. Optimal **iff** all action costs are equal. Time complexity comparable to BFS. Space complexity is linear.
+<Aka>IDS</Aka>. Repeatedly runs DDFS with increasing depth limits. Stops when a
+solution is found. Complete **iff** finite. Wanders off into infinite for
+infinite graphs. Optimal **iff** all action costs are equal. Time complexity
+comparable to BFS. Space complexity is linear.
 
 Works similar to BFS, but uses much less memory.
 
@@ -42,7 +46,9 @@ Expands 2 frontiers: around initial and goal states. BFS is used because it sear
 
 ### Uniform Cost Search
 
-Aka. [Dijkstra's algorithm](/s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm/). Fails for graphs with negative weights. Expands the node with the lowest path cost. Optimal for general action costs. Named _uniform_ because it expands nodes in increasing order of path cost.
+{/* prettier-ignore */}
+<Aka>[Dijkstra's algorithm](/s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm/)</Aka>. 
+Fails for graphs with negative weights. Expands the node with the lowest path cost. Optimal for general action costs. Named _uniform_ because it expands nodes in increasing order of path cost.
 
 ## Comparison
 

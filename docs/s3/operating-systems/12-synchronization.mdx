@@ -1,7 +1,7 @@
 ---
 title: Synchronization
 dateCreated: 2026-04-22T07:09:10.706Z
-lastUpdatedOn: 2026-09-28T13:22:28.259Z
+lastUpdatedOn: 2026-10-17T06:00:22.718Z
 ---
 
 A way to control how concurrently-running threads and processes access shared resources. To maintain correctness, the OS must enforce an ordered way for processes to execute code that accesses shared data.
@@ -18,11 +18,15 @@ Part of code that accesses or modifies shared resources.
 
 ### Entry Section
 
-Aka. pre-protocol. Part of the code executed before the critical section. Necessary synchronization steps are done by the thread to request permission to enter the critical section.
+<Aka>pre-protocol</Aka>. Part of the code executed before the critical section.
+Necessary synchronization steps are done by the thread to request permission to
+enter the critical section.
 
 ### Exit Section
 
-Aka. post-protocol. Part of the code executed immediately after the critical section. The thread releases locks and signals other threads waiting to enter their critical section.
+<Aka>post-protocol</Aka>. Part of the code executed immediately after the
+critical section. The thread releases locks and signals other threads waiting to
+enter their critical section.
 
 ### Remainder Section
 

@@ -1,7 +1,7 @@
 ---
 title: Dynamic Scheduling
 dateCreated: 2026-04-22T07:09:10.689Z
-lastUpdatedOn: 2026-09-29T03:56:56.256Z
+lastUpdatedOn: 2026-10-17T06:00:21.639Z
 ---
 
 Reordering instructions at runtime to avoid stalls and extract more ILP. Done by hardware. Allows out-of-order execution and completion of instructions.
@@ -14,7 +14,8 @@ Renames registers, buffers operands, and issues instructions out of order.
 
 ### Reservation Station
 
-Aka. RS. Hardware component. A waiting slot for instructions until their operands are ready. Each functional unit has a RS. Handles register renaming.
+<Aka>RS</Aka>. Hardware component. A waiting slot for instructions until their
+operands are ready. Each functional unit has a RS. Handles register renaming.
 
 Each RS entry holds:
 
@@ -30,7 +31,8 @@ Listens to CDB for when an operand becomes available.
 
 ### Common Data Bus
 
-Aka. CDB. Hardware component. A broadcast bus used to send computed results to every reservation station and the register file.
+<Aka>CDB</Aka>. Hardware component. A broadcast bus used to send computed
+results to every reservation station and the register file.
 
 When any functional unit finishes:
 
@@ -43,7 +45,9 @@ When any functional unit finishes:
 
 #### Issue
 
-Aka. dispatch. Instruction is sent to a free RS. If a source register already has its operand value, it is copied into RS. If not,the _tag_ of the producing instruction is stored.
+<Aka>dispatch</Aka>. Instruction is sent to a free RS. If a source register
+already has its operand value, it is copied into RS. If not,the _tag_ of the
+producing instruction is stored.
 
 Decouples issuing from executing.
 

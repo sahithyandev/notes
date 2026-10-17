@@ -1,7 +1,7 @@
 ---
 title: Semaphore
 dateCreated: 2026-04-22T07:09:10.707Z
-lastUpdatedOn: 2026-09-28T13:22:28.319Z
+lastUpdatedOn: 2026-10-17T06:00:22.767Z
 ---
 
 A shared integer variable. Can allow a 1 or certain number of threads to access a resource simultaneously. Name adapted from the railway flags.
@@ -18,11 +18,13 @@ Has 2 atomic operations.
 
 ### Wait
 
-Aka. P or down. Decreases the integer value. If the value is less than zero, the process waits.
+<Aka>P or down</Aka>. Decreases the integer value. If the value is less than
+zero, the process waits.
 
 ### Signal
 
-Aka. V or up. Increases the integer value. If there are waiting processes, one is allowed to proceed.
+<Aka>V or up</Aka>. Increases the integer value. If there are waiting processes,
+one is allowed to proceed.
 
 ## Types
 
@@ -30,7 +32,8 @@ Usually a semaphore can take any non-negative integer value.
 
 ### Binary Semaphore
 
-Aka. mutex semaphore. Can be 0 or 1. Similar to a lock. Can be used to implement mutual exclusion.
+<Aka>mutex semaphore</Aka>. Can be 0 or 1. Similar to a lock. Can be used to
+implement mutual exclusion.
 
 ```c
 semaphore mutex = 1
@@ -43,7 +46,9 @@ signal(mutex)
 
 ### Blocked–Set Semaphore
 
-Aka. Dijkstra semaphore. Holds waiting processes in a set. Not ordered. An arbitrarily chosen process is waked up on `signal()`. Simple. Low CPU usage. Weak fariness. Starvation possible.
+<Aka>Dijkstra semaphore</Aka>. Holds waiting processes in a set. Not ordered. An
+arbitrarily chosen process is waked up on `signal()`. Simple. Low CPU usage.
+Weak fariness. Starvation possible.
 
 Starvation not possible for 2 processes; possible for more than 2 processes.
 
