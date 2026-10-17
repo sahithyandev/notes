@@ -1,7 +1,7 @@
 ---
 title: Line Integral
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-10-16T08:25:31.161Z
+lastUpdatedOn: 2026-10-17T03:28:00.224Z
 ---
 
 Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
@@ -70,7 +70,7 @@ $$
 W = \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}
 $$
 
-## Fundamental Theorem of Line Integrals
+<Theorem name="Fundamental Theorem of Line Integrals">
 
 Suppose $C$ be a piecewise smooth curve parametrized by $\boldsymbol{r}(t)$, $a \le t \le b$.
 
@@ -82,13 +82,17 @@ $$
 
 For a [conservative field](/s5/calculus/vector-valued-functions/conservative-field), the work depends only on the end points of $C$.
 
-### Integral over a Closed Curve
+</Theorem>
+
+<Theorem name="Integral over a Closed Curve" level="3">
 
 Let $\boldsymbol{F}$ be conservative on $D$ and $C$ a piecewise smooth closed curve in $D$. Then
 
 $$
 \oint_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0
 $$
+
+</Theorem>
 
 <Note title="Proof Hint">
 
@@ -98,13 +102,15 @@ $$
 
 </Note>
 
-### Equivalence of Conservative Fields
+<Theorem name="Equivalence of Conservative Fields" level="3">
 
 Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
 
 - $\boldsymbol{F}$ is conservative on $D$
 - $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0$ for every piecewise smooth closed curve $C$ in $D$
 - For any 2 points $P$, $Q$ in $D$, $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ is independent of the piecewise smooth curve $C$ in $D$ from $P$ to $Q$
+
+</Theorem>
 
 ## Worked Examples
 

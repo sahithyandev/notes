@@ -1,12 +1,16 @@
 ---
 title: Jordan Curve
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-16T08:25:31.177Z
+lastUpdatedOn: 2026-10-17T03:28:00.243Z
 ---
+
+<Definition>
 
 A Jordan curve in the plane is a simple closed curve, a closed curve that does not intersect itself except that the initial and terminal points coincide.
 
-## Green's Theorem
+</Definition>
+
+<Theorem name="Green's Theorem">
 
 Let $C$ be a positively oriented, piecewise smooth Jordan curve in the plane, and let $D$ be the region bounded by $C$. Suppose
 
@@ -20,6 +24,8 @@ $$
 \oint_C M\,\text{d}x + N\,\text{d}y = \iint_D \left(\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y}\right)\text{d}A
 $$
 
+</Theorem>
+
 <Note>
 
 For a simple closed curve, positive orientation means counterclockwise. Equivalently, as $C$ is traversed, $D$ remains on the left.
@@ -30,9 +36,13 @@ For a simple closed curve, positive orientation means counterclockwise. Equivale
 
 The area of the region $D$ bounded by $C$ is a line integral over $C$.
 
+<Formula>
+
 $$
 A(D) = \frac{1}{2}\oint_C x\,\text{d}y - y\,\text{d}x
 $$
+
+</Formula>
 
 Take $M = -y/2$ and $N = x/2$. The integrand of Green's theorem becomes constant.
 
@@ -55,13 +65,15 @@ Any $M$ and $N$ with $\partial N/\partial x - \partial M/\partial y = 1$ gives a
 
 All 3 formulas give the same value. Their integrands differ by a multiple of $\text{d}(xy) = x\,\text{d}y + y\,\text{d}x$, which integrates to $0$ over a closed curve.
 
-## Green's Theorem for Doubly Connected Regions
+<Theorem name="Green's Theorem for Doubly Connected Regions">
 
 Let $R$ be a doubly connected region in the plane, with outer boundary $C_1$ oriented counterclockwise and inner boundary $C_2$ oriented clockwise. If $C_1$, $C_2$, and $\boldsymbol{F}(x,y) = M(x,y)\hat{i} + N(x,y)\hat{j}$ satisfy the hypotheses of Green's theorem, then
 
 $$
 \iint_R \left(\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y}\right)\text{d}A = \oint_{C_1} M\,\text{d}x + N\,\text{d}y + \oint_{C_2} M\,\text{d}x + N\,\text{d}y
 $$
+
+</Theorem>
 
 <Note>
 
