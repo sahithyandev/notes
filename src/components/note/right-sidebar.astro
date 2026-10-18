@@ -15,6 +15,20 @@
     position: relative;
   }
 
+  @media (min-width: 48rem) {
+    :global(html.study-mode) .right-sidebar {
+      visibility: hidden;
+    }
+
+    :global(html.drawers-ready) .right-sidebar {
+      transition: visibility 0s;
+    }
+
+    :global(html.drawers-ready.study-mode) .right-sidebar {
+      transition: visibility 0s var(--study-dur);
+    }
+  }
+
   @media (max-width: 48rem) {
     .right-sidebar {
       position: fixed;

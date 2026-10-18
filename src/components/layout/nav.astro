@@ -39,6 +39,9 @@ const logoRule = semMatch
     <span class="nav-drawer-slot nav-drawer-slot-end">
       <slot name="nav-end" />
     </span>
+    <span class="nav-tools-slot">
+      <slot name="nav-tools" />
+    </span>
     <button
       class="nav-search"
       id="search-trigger"
@@ -169,6 +172,43 @@ const logoRule = semMatch
 
   .nav-drawer-slot:not(:has(*)) {
     display: none;
+  }
+
+  .nav-tools-slot {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .nav-tools-slot:has(*) {
+      display: flex;
+      align-items: center;
+      margin-right: 8px;
+    }
+  }
+
+  .nav-tools-slot :global(button) {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    padding: 0;
+    transition:
+      background 0.12s,
+      color 0.12s,
+      border-color 0.12s;
+  }
+
+  .nav-tools-slot :global(button:hover),
+  .nav-tools-slot :global(button[aria-pressed="true"]) {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
   }
 
   @media (min-width: 48rem) {

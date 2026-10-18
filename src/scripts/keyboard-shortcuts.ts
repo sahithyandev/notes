@@ -1,7 +1,7 @@
 // Global single-key shortcuts. Each action reuses existing UI (clicks the
 // search/theme buttons, follows the prev/next links) instead of duplicating
 // its logic. Ctrl/Cmd+K is bound separately in search-modal.astro.
-export type Action = "search" | "theme" | "prev" | "next" | "help";
+export type Action = "search" | "theme" | "study" | "prev" | "next" | "help";
 
 const TYPING = "input, textarea, select, [contenteditable]";
 const ARROW_SENSITIVE = "[tabindex], pre, [role='slider'], button";
@@ -19,6 +19,8 @@ export function resolveShortcut(e: KeyboardEvent): Action | null {
       return "search";
     case "t":
       return "theme";
+    case "f":
+      return document.getElementById("study-toggle") ? "study" : null;
     case "?":
       return "help";
     case "ArrowLeft":
@@ -44,6 +46,9 @@ export function run(action: Action): void {
       break;
     case "theme":
       document.getElementById("themeToggle")?.click();
+      break;
+    case "study":
+      document.getElementById("study-toggle")?.click();
       break;
     case "help":
       document

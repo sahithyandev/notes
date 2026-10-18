@@ -26,6 +26,7 @@ import Prereqs from "../components/note/prereqs.astro";
 import AiLinks from "../components/note/ai-links.astro";
 import MenuIcon from "../components/icons/menu-icon.astro";
 import TocIcon from "../components/icons/toc-icon.astro";
+import { Maximize2 } from "@lucide/astro";
 import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
@@ -134,6 +135,16 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     >
       <MenuIcon />
     </button>
+    <button
+      slot="nav-tools"
+      id="study-toggle"
+      type="button"
+      title="Study mode (f)"
+      aria-label="Study mode"
+      aria-pressed="false"
+    >
+      <Maximize2 size={15} />
+    </button>
     {tocHeadings.length > 0 && (
       <button
         slot="nav-end"
@@ -151,7 +162,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     id="main-content"
     data-pagefind-body
     data-note-file-path={notesEntry.filePath}
-    class="grid grid-cols-[auto_1fr_auto]"
+    class="grid"
     style={`--sem: var(--s${semNum}); --sem-bg: var(--s${semNum}-bg); --sem-border: var(--s${semNum}-border); --sem-text: var(--s${semNum}); --sem-dim: var(--s${semNum}-bg); --link: var(--s${semNum});`}
   >
     <NoteSidebar sidebarData={sidebarData} slug={slug} slugParts={slugParts} />
@@ -252,6 +263,9 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   :root {
     --sidebar-w: 280px;
     --toc-w: 280px;
+    --study-dur: 0.28s;
+    --study-measure: 76rem;
+    --study-ease: cubic-bezier(0.32, 0.72, 0, 1);
     --nav-h: 54px;
     --pip-size: 16px;
     --stripe-fg: #f5b800;
@@ -269,6 +283,37 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
     scrollbar-width: none;
+  }
+
+  main {
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
+  }
+
+  @media (min-width: 48rem) {
+    :global(html.drawers-ready) main {
+      transition: grid-template-columns var(--study-dur) var(--study-ease);
+    }
+
+    :global(html.drawers-ready) section:has(article) {
+      transition: padding-inline var(--study-dur) var(--study-ease);
+    }
+
+    :global(html.study-mode) main {
+      grid-template-columns: 0 minmax(0, 1fr) 0;
+    }
+
+    :global(html.study-mode) section:has(article) {
+      padding-inline: max(
+        calc(5 * var(--spacing)),
+        calc((100vw - var(--study-measure)) / 2)
+      );
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --study-dur: 0s;
+    }
   }
 
   /* ── MAIN ─────────────────────────────────────────────────────── */

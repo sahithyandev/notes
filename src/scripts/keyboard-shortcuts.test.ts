@@ -16,6 +16,7 @@ beforeEach(() => {
   document.body.innerHTML = `
     <a class="note-nav-btn left" href="/a"></a>
     <a class="note-nav-btn right" href="/b"></a>
+    <button id="study-toggle"></button>
     <input id="field" />
     <div id="plain"></div>
     <pre id="code"></pre>`;
@@ -39,6 +40,12 @@ test("maps each key to its action", () => {
   expect(press("?", { shiftKey: true })).toBe("help");
   expect(press("ArrowLeft")).toBe("prev");
   expect(press("ArrowRight")).toBe("next");
+});
+
+test("f toggles study mode only when the toggle exists", () => {
+  expect(press("f")).toBe("study");
+  document.getElementById("study-toggle")!.remove();
+  expect(press("f")).toBeNull();
 });
 
 test("ignored while typing in an input", () => {

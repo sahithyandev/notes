@@ -283,6 +283,25 @@ const { sidebarData, slug, slugParts } = Astro.props;
     margin: 8px 0;
   }
 
+  @media (min-width: 48rem) {
+    :global(html.drawers-ready) .sidebar {
+      transition:
+        transform var(--study-dur) var(--study-ease),
+        visibility 0s;
+    }
+
+    :global(html.study-mode) .sidebar {
+      transform: translateX(-100%);
+      visibility: hidden;
+    }
+
+    :global(html.drawers-ready.study-mode) .sidebar {
+      transition:
+        transform var(--study-dur) var(--study-ease),
+        visibility 0s var(--study-dur);
+    }
+  }
+
   @media (max-width: 48rem) {
     .sb-item {
       padding: 10px 16px;

@@ -214,6 +214,9 @@ if (keywords && keywords.length > 0) {
           var root = document.documentElement;
           root.setAttribute("data-theme", resolved);
           root.dataset.themePref = pref;
+          if (localStorage.getItem("sn-study-mode") === "1") {
+            root.classList.add("study-mode");
+          }
           mql.addEventListener("change", function (e) {
             if (root.dataset.themePref === "auto") {
               root.setAttribute("data-theme", e.matches ? "dark" : "light");

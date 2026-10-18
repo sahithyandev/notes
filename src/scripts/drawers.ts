@@ -48,6 +48,20 @@ mqDesktop.addEventListener("change", (e) => {
   if (e.matches) closeDrawers();
 });
 
+const studyBtn = document.getElementById("study-toggle");
+studyBtn?.setAttribute(
+  "aria-pressed",
+  String(root.classList.contains("study-mode")),
+);
+studyBtn?.addEventListener("click", () => {
+  const on = root.classList.toggle("study-mode");
+  studyBtn.setAttribute("aria-pressed", String(on));
+  try {
+    if (on) localStorage.setItem("sn-study-mode", "1");
+    else localStorage.removeItem("sn-study-mode");
+  } catch {}
+});
+
 requestAnimationFrame(() => {
   requestAnimationFrame(() => root.classList.add("drawers-ready"));
 });
