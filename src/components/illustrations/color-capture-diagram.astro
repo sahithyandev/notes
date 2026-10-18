@@ -1,0 +1,147 @@
+---
+// Static comparison of the 2 ways to capture color. Beam splitting sends the
+// light through a dichroic prism to 3 sensors. A color filter array (Bayer
+// pattern) puts 1 filter over each pixel of a single sensor.
+import FigureCaption from "./primitives/figure-caption.astro";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("color");
+const bayer = [
+  ["G", "R", "G", "R"],
+  ["B", "G", "B", "G"],
+  ["G", "R", "G", "R"],
+  ["B", "G", "B", "G"],
+];
+const fills: Record<string, string> = {
+  R: "#d64545",
+  G: "#3f9d5a",
+  B: "#3f6fd6",
+};
+---
+
+<figure>
+  <svg viewBox="0 0 460 190" aria-hidden="true">
+    <defs>
+      <ArrowMarker id={`${uid}-a`} fill="var(--text-secondary)" size={5} />
+    </defs>
+
+    <text x="110" y="16" text-anchor="middle">
+      Beam Splitting
+    </text>
+    <line
+      class="ray"
+      x1="10"
+      y1="95"
+      x2="60"
+      y2="95"
+      marker-end={`url(#${uid}-a)`}
+    ></line>
+    <polygon class="prism" points="60,60 60,130 100,95"></polygon>
+    <polygon class="prism" points="100,95 60,60 130,60"></polygon>
+    <line class="ray r" x1="115" y1="78" x2="190" y2="40"></line>
+    <line class="ray g" x1="100" y1="95" x2="190" y2="95"></line>
+    <line class="ray b" x1="115" y1="112" x2="190" y2="150"></line>
+    <rect class="sensor r" x="190" y="26" width="10" height="28"></rect>
+    <rect class="sensor g" x="190" y="81" width="10" height="28"></rect>
+    <rect class="sensor b" x="190" y="136" width="10" height="28"></rect>
+    <text class="sub" x="110" y="184" text-anchor="middle">
+      3 sensors
+    </text>
+
+    <text x="340" y="16" text-anchor="middle">
+      Color Filter Array
+    </text>
+    {bayer.map((row, r) =>
+      row.map((k, c) => (
+        <rect
+          class="cfa"
+          x={280 + c * 30}
+          y={36 + r * 30}
+          width="30"
+          height="30"
+          fill={fills[k]}
+        ></rect>
+      )),
+    )}
+    {bayer.map((row, r) =>
+      row.map((k, c) => (
+        <text class="k" x={295 + c * 30} y={56 + r * 30} text-anchor="middle">
+          {k}
+        </text>
+      )),
+    )}
+    <text class="sub" x="340" y="184" text-anchor="middle">
+      1 sensor, 1 filter per pixel
+    </text>
+  </svg>
+  <FigureCaption>
+    Beam splitting (left) separates the light into 3 beams for 3 sensors. A
+    color filter array (right) lets each pixel of 1 sensor record only 1 color,
+    here in the Bayer pattern.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 520px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .ray {
+    stroke: var(--text-secondary);
+    stroke-width: 1.6;
+  }
+  .ray.r {
+    stroke: #d64545;
+  }
+  .ray.g {
+    stroke: #3f9d5a;
+  }
+  .ray.b {
+    stroke: #3f6fd6;
+  }
+  .prism {
+    fill: var(--dia-key);
+    fill-opacity: 0.15;
+    stroke: var(--text-primary);
+    stroke-width: 1.2;
+  }
+  .sensor {
+    stroke: var(--text-primary);
+    stroke-width: 1;
+  }
+  .sensor.r {
+    fill: #d64545;
+  }
+  .sensor.g {
+    fill: #3f9d5a;
+  }
+  .sensor.b {
+    fill: #3f6fd6;
+  }
+  .cfa {
+    stroke: var(--surface, #fff);
+    stroke-width: 1.5;
+    fill-opacity: 0.85;
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .k {
+    fill: #fff;
+    font-size: 12px;
+  }
+  .sub {
+    font-size: 11px;
+    font-weight: 400;
+    fill: var(--text-secondary);
+  }
+</style>

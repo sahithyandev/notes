@@ -64,3 +64,7 @@ export { default as PerfectComplementsDiagram } from "./perfect-complements-diag
 export { default as CostMinimizationDiagram } from "./cost-minimization-diagram.astro";
 export { default as MRTSDiagram } from "./mrts-diagram.astro";
 export { default as ZigZagScan } from "./zig-zag-scan.astro";
+export { default as SensorReadoutDiagram } from "./sensor-readout-diagram.astro";
+export { default as SensorResponseDiagram } from "./sensor-response-diagram.astro";
+export { default as ColorCaptureDiagram } from "./color-capture-diagram.astro";
+export { default as IndexedStorageComparison } from "./indexed-storage-comparison.astro";

@@ -1,0 +1,239 @@
+---
+// Interactive comparison of indexed and true color storage. Sliders set the
+// width, height and palette size (as log2 N). Two columns stand side by side
+// on a shared scale, with the palette table drawn as its own segment on top of
+// the pixel indices in the indexed column.
+import Panel from "./primitives/panel.astro";
+import SliderControl from "./primitives/slider-control.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("idx-storage");
+---
+
+<Panel
+  class="indexed-storage"
+  caption="Storage of an image in true color against indexed color, for a chosen width, height and palette size."
+  hideCaption
+>
+  <div class="controls">
+    <SliderControl id={`${uid}-w`} min={16} max={4096} step={16} value={1920}>
+      <span>W</span>
+    </SliderControl>
+    <SliderControl id={`${uid}-h`} min={16} max={4096} step={16} value={1024}>
+      <span>H</span>
+    </SliderControl>
+    <SliderControl id={`${uid}-n`} min={1} max={24} step={1} value={8}>
+      <span>log₂ N</span>
+    </SliderControl>
+
+    <p class="params" data-params></p>
+  </div>
+
+  <div class="view">
+    <div class="chart">
+      <div class="col">
+        <span class="value" data-value="true"></span>
+        <div class="plot">
+          <div class="stack">
+            <div class="seg true" data-bar="true"></div>
+          </div>
+        </div>
+        <span class="label">
+          S<sub>true</sub>
+        </span>
+      </div>
+      <div class="col">
+        <span class="value" data-value="indexed"></span>
+        <div class="plot">
+          <div class="stack">
+            <div class="seg table" data-bar="table"></div>
+            <div class="seg indexed" data-bar="index"></div>
+          </div>
+        </div>
+        <span class="label">
+          S<sub>indexed</sub>
+        </span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span>
+        <i class="sw indexed"></i>pixel indices
+      </span>
+      <span>
+        <i class="sw table"></i>palette table
+      </span>
+    </div>
+
+    <p class="result" data-result aria-live="polite"></p>
+  </div>
+</Panel>
+
+<style>
+  .indexed-storage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 16px 32px;
+  }
+  @media (max-width: 48rem) {
+    .indexed-storage {
+      grid-template-columns: 1fr;
+    }
+  }
+  .indexed-storage :global(.control) {
+    margin-top: 0;
+    margin-bottom: 14px;
+    flex-wrap: nowrap;
+  }
+  .indexed-storage :global(.control label) {
+    width: 3.5rem;
+    flex: none;
+  }
+  .indexed-storage :global(.control output) {
+    min-width: 5ch;
+  }
+  .params,
+  .result {
+    margin: 4px 0 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .result {
+    text-align: center;
+    color: var(--text-primary);
+  }
+  .chart {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 0;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 96px;
+  }
+  .plot {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    height: 160px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+    height: 100%;
+  }
+  .seg {
+    width: 100%;
+    height: 0;
+    min-height: 0;
+  }
+  .seg.true {
+    background: var(--dia-ct);
+  }
+  .seg.indexed {
+    background: var(--dia-pt);
+  }
+  .seg.table {
+    background: var(--dia-key);
+  }
+  .value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .sw {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+  }
+  .sw.indexed {
+    background: var(--dia-pt);
+  }
+  .sw.table {
+    background: var(--dia-key);
+  }
+</style>
+
+<script>
+  const fmtBits = (bits: number) => {
+    if (bits >= 1e9) return `${(bits / 1e9).toFixed(2)} Gbit`;
+    if (bits >= 1e6) return `${(bits / 1e6).toFixed(2)} Mbit`;
+    return `${(bits / 1e3).toFixed(2)} Kbit`;
+  };
+
+  function initIndexedStorage(root: HTMLElement) {
+    const [wIn, hIn, nIn] = Array.from(
+      root.querySelectorAll<HTMLInputElement>('input[type="range"]'),
+    );
+    const outs = Array.from(root.querySelectorAll<HTMLOutputElement>("output"));
+    const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const barTrue = q("[data-bar='true']");
+    const barIndex = q("[data-bar='index']");
+    const barTable = q("[data-bar='table']");
+    const valTrue = q("[data-value='true']");
+    const valIndexed = q("[data-value='indexed']");
+    const params = q("[data-params]");
+    const result = q("[data-result]");
+
+    function render() {
+      const W = Number(wIn.value);
+      const H = Number(hIn.value);
+      const k = Number(nIn.value);
+      const N = 2 ** k;
+      const b = k;
+      const sTrue = 24 * W * H;
+      const sIdx = W * H * b;
+      const sTab = 24 * N;
+      const sIndexed = sIdx + sTab;
+      const scale = Math.max(sTrue, sIndexed);
+
+      outs[0].textContent = String(W);
+      outs[1].textContent = String(H);
+      outs[2].textContent = String(k);
+      params.textContent = `N = ${N.toLocaleString()}, b = ${b} bits`;
+
+      barTrue.style.height = `${(sTrue / scale) * 100}%`;
+      barIndex.style.height = `${(sIdx / scale) * 100}%`;
+      barTable.style.height = `${(sTab / scale) * 100}%`;
+      barTable.style.minHeight = "2px";
+      valTrue.textContent = fmtBits(sTrue);
+      valIndexed.textContent = fmtBits(sIndexed);
+
+      result.textContent =
+        sIndexed < sTrue
+          ? `Indexed is ${((sIndexed / sTrue) * 100).toFixed(1)}% of true color.`
+          : `Indexed is ${(sIndexed / sTrue).toFixed(2)}x true color.`;
+    }
+
+    [wIn, hIn, nIn].forEach((el) => el.addEventListener("input", render));
+    render();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>(".indexed-storage")
+    .forEach((el) => initIndexedStorage(el));
+</script>

@@ -1,0 +1,157 @@
+---
+// Static comparison of CCD and CMOS readout. CCD shifts the charge of every
+// pixel along the array to 1 output amplifier. CMOS gives each pixel its own
+// amplifier and reads it through row and column addressing.
+import FigureCaption from "./primitives/figure-caption.astro";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("sensor");
+const idx = [0, 1, 2];
+const cell = 34;
+const gap = 10;
+const pos = (i: number) => 20 + i * (cell + gap);
+---
+
+<figure>
+  <svg viewBox="0 0 440 190" aria-hidden="true">
+    <defs>
+      <ArrowMarker id={`${uid}-ct`} fill="var(--dia-ct)" size={5} />
+      <ArrowMarker id={`${uid}-pt`} fill="var(--dia-pt)" size={5} />
+    </defs>
+
+    <g>
+      {idx.map((r) =>
+        idx.map((c) => (
+          <rect
+            class="pixel"
+            x={pos(c)}
+            y={pos(r) + 10}
+            width={cell}
+            height={cell}
+          ></rect>
+        )),
+      )}
+      {idx.map((r) =>
+        idx.map((c) =>
+          c < 2 ? (
+            <line
+              class="shift"
+              x1={pos(c) + cell}
+              y1={pos(r) + 10 + cell / 2}
+              x2={pos(c + 1)}
+              y2={pos(r) + 10 + cell / 2}
+              marker-end={`url(#${uid}-ct)`}
+            />
+          ) : null,
+        ),
+      )}
+      <line
+        class="shift"
+        x1={pos(2) + cell / 2}
+        y1={pos(2) + 10 + cell}
+        x2={pos(2) + cell / 2}
+        y2="172"
+        marker-end={`url(#${uid}-ct)`}
+      />
+      <text x="82" y="14" text-anchor="middle">
+        CCD
+      </text>
+      <text class="sub" x="125" y="184" text-anchor="end">
+        1 amplifier
+      </text>
+    </g>
+
+    <g transform="translate(230 0)">
+      {idx.map((r) =>
+        idx.map((c) => (
+          <>
+            <rect
+              class="pixel"
+              x={pos(c)}
+              y={pos(r) + 10}
+              width={cell}
+              height={cell}
+            ></rect>
+            <polygon
+              class="amp"
+              points={`${pos(c) + 20},${pos(r) + 17} ${pos(c) + 20},${pos(r) + 33} ${pos(c) + 30},${pos(r) + 25}`}
+            ></polygon>
+          </>
+        )),
+      )}
+      {idx.map((c) => (
+        <line
+          class="read"
+          x1={pos(c) + cell / 2}
+          y1={pos(2) + 10 + cell}
+          x2={pos(c) + cell / 2}
+          y2="165"
+          marker-end={`url(#${uid}-pt)`}
+        />
+      ))}
+      <line
+        class="bus"
+        x1={pos(0) + cell / 2}
+        y1="165"
+        x2={pos(2) + cell / 2}
+        y2="165"
+      ></line>
+      <text x="82" y="14" text-anchor="middle">
+        CMOS
+      </text>
+      <text class="sub" x="150" y="184" text-anchor="end">
+        1 amplifier per pixel
+      </text>
+    </g>
+  </svg>
+  <FigureCaption>
+    CCD (left) shifts charge from pixel to pixel to a single output amplifier.
+    CMOS (right) amplifies each pixel in place and reads it by row and column
+    addressing.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 480px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .pixel {
+    fill: var(--dia-key);
+    fill-opacity: 0.12;
+    stroke: var(--text-primary);
+    stroke-width: 1.2;
+  }
+  .shift {
+    stroke: var(--dia-ct);
+    stroke-width: 1.5;
+  }
+  .read {
+    stroke: var(--dia-pt);
+    stroke-width: 1.5;
+  }
+  .bus {
+    stroke: var(--dia-pt);
+    stroke-width: 1.5;
+  }
+  .amp {
+    fill: var(--dia-pt);
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .sub {
+    font-size: 11px;
+    font-weight: 400;
+    fill: var(--text-secondary);
+  }
+</style>
