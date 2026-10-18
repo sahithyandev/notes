@@ -1,7 +1,7 @@
 ---
 title: Image Sensors
 dateCreated: 2026-07-26T04:59:10.531Z
-lastUpdatedOn: 2026-10-17T06:00:25.798Z
+lastUpdatedOn: 2026-10-18T08:23:54.434Z
 ---
 
 A photo-sensor produces a weak electrical signal proportional to incident light.
@@ -12,6 +12,10 @@ A photo-sensor produces a weak electrical signal proportional to incident light.
 
 ## Image Sensor Types
 
+An image sensor is a 2D array of photo-sensors. The 2 main types differ in how the signal leaves the array.
+
+<SensorReadoutDiagram />
+
 ### CCD
 
 <Aka>charge coupled device</Aka>. Photons create charged particles, forming a
@@ -20,15 +24,36 @@ exposure increases the response. The charge is read by the amplifier as a
 voltage, and must be neutralized before the next frame. Sensitive to
 illumination, not color.
 
+- Charge is shifted pixel by pixel to a single output amplifier
+- Every pixel goes through the same amplifier, so the response is uniform
+- Requires a dedicated manufacturing process
+
 ### CMOS
 
 Provides a non-integrating dynamic response. Each element gives an addressable single output. Requires relatively larger circuitry than CCD.
+
+- Each pixel has its own amplifier
+- Pixels are read through row and column addressing
+- Built with the standard chip manufacturing process, so the ADC and processing logic can sit on the same chip
 
 <Note>
 
 Support circuitry takes up space on the sensor surface, blocking light in those areas. This is more significant on CMOS sensors, where the circuit is more complex. Modern sensors use micro-lenses to redirect light to each pixel's sensing element.
 
 </Note>
+
+### Comparison
+
+| Property             | CCD                           | CMOS                          |
+| -------------------- | ----------------------------- | ----------------------------- |
+| Response             | Integrating                   | Non-integrating               |
+| Readout              | Shifted to 1 amplifier        | Addressed per pixel           |
+| Noise                | Low and uniform               | Higher, varies between pixels |
+| Power use            | High                          | Low                           |
+| Readout speed        | Slower                        | Faster                        |
+| Cost                 | Higher                        | Lower                         |
+| Light-sensitive area | Larger                        | Smaller                       |
+| Shutter              | Can hold charge to read later | Rolling shutter is common     |
 
 ## Frame Capture
 
@@ -64,9 +89,13 @@ The response curve, output signal against incident light, has 3 regions.
 - Saturated region  
   Wells are full, so output stops responding to further light. Separating detail needs high-gain amplification, which also amplifies noise and gives a low signal to noise ratio.
 
+<SensorResponseDiagram />
+
 ## Capturing Color
 
-By default an image sensor captures only illumination, not color.
+By default an image sensor captures only illumination, not color. Color is recovered by separating the light into its primary colors before it is recorded. There are 2 approaches.
+
+<ColorCaptureDiagram />
 
 ### Beam Splitting
 
@@ -82,3 +111,5 @@ By default an image sensor captures only illumination, not color.
 - An optical filter allows only one color per sensing element
 - Other color components are estimated from nearby sensors
 - Color resolution is lower than illumination resolution
+
+The most common arrangement is the Bayer pattern. It has twice as many green filters as red or blue, since the human eye is most sensitive to green. The missing 2 color values at each pixel are interpolated from neighbouring pixels, a step called demosaicing.

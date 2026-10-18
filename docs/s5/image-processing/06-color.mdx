@@ -1,7 +1,7 @@
 ---
 title: Color
 dateCreated: 2026-07-26T04:59:00.680Z
-lastUpdatedOn: 2026-10-17T05:04:56.692Z
+lastUpdatedOn: 2026-10-18T08:23:54.457Z
 ---
 
 Color is a construct in the brain. It doesn't correspond to a physical phenomenon. Mixing light waves of different wavelengths produces the perception of different colors.
@@ -112,12 +112,11 @@ $$
 
 The weights follow from the RGB primaries and white point fixed by the chosen standard, defined by the ITU Radiocommunication Sector (ITU-R). Different versions define different weights.
 
-- ITU-R BT.601 (SD)  
-  $w_r = 0.299$, $w_g = 0.587$, $w_b = 0.114$
-- ITU-R BT.709 (HD)  
-  $w_r = 0.2126$, $w_g = 0.7152$, $w_b = 0.0722$
-- ITU-R BT.2020 (UHD)  
-  $w_r = 0.2627$, $w_g = 0.6780$, $w_b = 0.0593$
+| Standard            | $w_r$    | $w_g$    | $w_b$    |
+| ------------------- | -------- | -------- | -------- |
+| ITU-R BT.601 (SD)   | $0.299$  | $0.587$  | $0.114$  |
+| ITU-R BT.709 (HD)   | $0.2126$ | $0.7152$ | $0.0722$ |
+| ITU-R BT.2020 (UHD) | $0.2627$ | $0.6780$ | $0.0593$ |
 
 Discarding $C_r, C_b$ gives a monochrome image directly.
 
@@ -127,27 +126,61 @@ The human visual system is more sensitive to luminance than color, so YCrCb form
 
 How much color each pixel holds, independent of the channel layout.
 
-- Binary  
-  1 bit per pixel, black or white.
-- Grayscale  
-  A single intensity channel, usually 8-bit.
-- Indexed  
-  Each pixel is an index into a color table. Covered below as palette based representation.
-- True color  
-  Each pixel stores a full color value.
-- High color  
-  15 or 16-bit direct color. Largely historical.
+### Binary
+
+1 bit per pixel, black or white.
+
+### Grayscale
+
+A single intensity channel, usually 8-bit.
 
 ### True Color
 
-An image that stores a full color value in every pixel. RGB uses 24 bits per pixel, or 3 bytes. CMYK needs 4 bytes per pixel.
+Each pixel stores its color directly as one value per channel, typically 8 bits each.
 
-### Palette Based Representation
+RGB uses 3 bytes per pixel, so it supports $2^{24} = 16{,}777{,}216$ colors in total. CMYK needs 4 bytes per pixel, so it supports $2^{32} = 4{,}294{,}967{,}296$ colors in total.
 
-Most images use far fewer distinct colors than true color allows. A 1920x1024 image has under 2 million pixels, so at most 2 million distinct colors, against the $2^{24}$ an RGB pixel can encode.
+### Indexed
+
+Each pixel is an index into a color table.
+
+Most images use far fewer distinct colors than true color allows. A 1920x1024 image has under 2 million pixels, so at most 2 million distinct colors, against the $2^{24}$ (~16 million) an RGB pixel can encode.
 
 Storing a table of the colors actually used, then storing pointers into that table, is more storage-efficient than true color.
 
-- Palette length determines how many distinct colors can be used at once, out of the full $2^{24}$
+- Palette length determines how many distinct colors can be used at once
 - Bits per pixel in image memory depend on the palette table length
 - The palette table is usually stored with the image, allowing a custom color set per image
+
+For a palette of $N$ colors, each pixel index needs $b$ bits.
+
+$$
+b = \lceil \log_2 N \rceil
+$$
+
+The total storage is the index for every pixel plus the table, where each table entry holds a 24-bit RGB color.
+
+$$
+S_{\text{indexed}} = W H b + 24 N
+$$
+
+True color stores 24 bits for every pixel.
+
+$$
+S_{\text{true}} = 24 W H
+$$
+
+<Symbols>
+
+<Sym s="W, H">image width and height in pixels</Sym>
+<Sym s="S">total storage in bits</Sym>
+
+</Symbols>
+
+$S_{\text{indexed}} < S_{\text{true}}$ for any realistic $N$ since $b < 24$ and the $24N$ table cost is shared by all pixels.
+
+<IndexedStorageComparison />
+
+### High Color
+
+Each pixel stores its color directly in 15 or 16 bits, with fewer bits per channel than true color. 15 bits gives 5 bits per channel, allowing 32768 colors. 16 bits usually gives the extra bit to green, as 5-6-5, allowing 65536 colors. Largely historical.
