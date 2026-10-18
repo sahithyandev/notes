@@ -1,0 +1,169 @@
+---
+// Pixel-level view of ordered dithering on one block: a flat target intensity
+// is compared cell by cell against the dither thresholds, and each cell
+// becomes black or white. The block average of the output matches the target.
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+
+interface Props {
+  level?: number;
+  matrix?: number[][];
+  caption?: string;
+}
+
+const {
+  level = 0.5,
+  matrix = [
+    [0, 2],
+    [3, 1],
+  ],
+  caption = "A flat target intensity is compared with the threshold of each cell. A cell turns white where the target is above its threshold and black otherwise.",
+} = Astro.props;
+
+const n = matrix.length;
+const count = n * n;
+const cell = 56;
+const gap = 56;
+const top = 30;
+const panel = n * cell;
+const width = 3 * panel + 2 * gap;
+const height = top + panel;
+const id = makeUid("dither");
+
+const thresholds = matrix.map((row) => row.map((d) => (d + 0.5) / count));
+const output = thresholds.map((row) =>
+  row.map((t) => (level > t ? 1 : 0) as number),
+);
+const on = output.flat().reduce((a, b) => a + b, 0);
+
+const grey = Math.round(level * 255);
+const targetFill = `rgb(${grey}, ${grey}, ${grey})`;
+const targetInk = level > 0.5 ? "#111" : "#fff";
+const fmt = (x: number) => String(+x.toFixed(3));
+
+const panels = [
+  { x: 0, label: "Target" },
+  { x: panel + gap, label: "Threshold" },
+  { x: 2 * (panel + gap), label: "Output" },
+];
+const ops = [
+  { x: panel + gap / 2, text: ">" },
+  { x: 2 * panel + gap + gap / 2, text: "=" },
+];
+---
+
+<figure class="dither">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-labelledby={`${id}-t`}
+  >
+    <title id={`${id}-t`}>
+      Ordered dithering of a {n}x{n} block at intensity {fmt(level)}
+    </title>
+    {panels.map((p) => (
+      <text class="head" x={p.x + panel / 2} y="14" text-anchor="middle">
+        {p.label}
+      </text>
+    ))}
+    {ops.map((o) => (
+      <text class="op" x={o.x} y={top + panel / 2} text-anchor="middle">
+        {o.text}
+      </text>
+    ))}
+    {matrix.map((row, i) =>
+      row.map((_, j) => (
+        <g>
+          <rect
+            class="cell"
+            x={j * cell}
+            y={top + i * cell}
+            width={cell}
+            height={cell}
+            fill={targetFill}
+          />
+          <text
+            class="val"
+            x={j * cell + cell / 2}
+            y={top + i * cell + cell / 2}
+            fill={targetInk}
+            text-anchor="middle"
+          >
+            {fmt(level)}
+          </text>
+          <rect
+            class="cell thr"
+            x={panel + gap + j * cell}
+            y={top + i * cell}
+            width={cell}
+            height={cell}
+          />
+          <text
+            class="val"
+            x={panel + gap + j * cell + cell / 2}
+            y={top + i * cell + cell / 2}
+            text-anchor="middle"
+          >
+            {fmt(thresholds[i][j])}
+          </text>
+          <rect
+            class="cell"
+            x={2 * (panel + gap) + j * cell}
+            y={top + i * cell}
+            width={cell}
+            height={cell}
+            fill={output[i][j] ? "#fff" : "#111"}
+          />
+          <text
+            class="val"
+            x={2 * (panel + gap) + j * cell + cell / 2}
+            y={top + i * cell + cell / 2}
+            fill={output[i][j] ? "#111" : "#fff"}
+            text-anchor="middle"
+          >
+            {output[i][j]}
+          </text>
+        </g>
+      )),
+    )}
+  </svg>
+  <FigureCaption>
+    {caption} Here {on} of {count} cells are white, so the block averages{" "}
+    {fmt(on / count)}.
+  </FigureCaption>
+</figure>
+
+<style>
+  .dither {
+    margin: 24px auto;
+    max-width: 520px;
+    font-family: var(--font-ui);
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cell {
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+  .cell.thr {
+    fill: var(--surface);
+  }
+  .val {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    dominant-baseline: middle;
+    fill: var(--text);
+  }
+  .head {
+    font-size: 12px;
+    fill: var(--text-secondary);
+  }
+  .op {
+    font-size: 22px;
+    dominant-baseline: middle;
+    fill: var(--text-secondary);
+  }
+</style>

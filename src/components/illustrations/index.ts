@@ -68,3 +68,5 @@ export { default as SensorReadoutDiagram } from "./sensor-readout-diagram.astro"
 export { default as SensorResponseDiagram } from "./sensor-response-diagram.astro";
 export { default as ColorCaptureDiagram } from "./color-capture-diagram.astro";
 export { default as IndexedStorageComparison } from "./indexed-storage-comparison.astro";
+export { default as DitherBlockDiagram } from "./dither-block-diagram.astro";
+export { default as ErrorDiffusionDiagram } from "./error-diffusion-diagram.astro";

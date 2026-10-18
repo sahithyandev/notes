@@ -1,0 +1,186 @@
+---
+// Pixel-level view of Floyd-Steinberg error diffusion: the current pixel is
+// rounded to the nearest output level, and the rounding error is split over
+// the 4 unprocessed neighbours by the kernel weights.
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+
+interface Props {
+  value?: number;
+  caption?: string;
+}
+
+const {
+  value = 100,
+  caption = "The current pixel is rounded to the nearest output level. The rounding error is split over the right neighbour and the 3 neighbours below, with weights that sum to 1.",
+} = Astro.props;
+
+const levels = [0, 255];
+const out = levels.reduce((a, b) =>
+  Math.abs(b - value) < Math.abs(a - value) ? b : a,
+);
+const err = value - out;
+
+const cell = 78;
+const pad = 14;
+const top = 30;
+const cols = 3;
+const rows = 2;
+const width = pad * 2 + cols * cell;
+const height = top + rows * cell + pad;
+const id = makeUid("fs");
+const fmt = (x: number) => String(+x.toFixed(1));
+
+// [row, col, weight in sixteenths]
+const targets: [number, number, number][] = [
+  [0, 2, 7],
+  [1, 0, 3],
+  [1, 1, 5],
+  [1, 2, 1],
+];
+const origin = (r: number, c: number) => ({
+  x: pad + c * cell,
+  y: top + r * cell,
+});
+const centre = (r: number, c: number) => {
+  const o = origin(r, c);
+  return [o.x + cell / 2, o.y + cell / 2];
+};
+const [cx, cy] = centre(0, 1);
+const arrows = targets.map(([r, c]) => {
+  const [tx, ty] = centre(r, c);
+  const len = Math.hypot(tx - cx, ty - cy);
+  const ux = (tx - cx) / len;
+  const uy = (ty - cy) / len;
+  return [cx + ux * 22, cy + uy * 22, tx - ux * 26, ty - uy * 26];
+});
+---
+
+<figure class="fs">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-labelledby={`${id}-t`}
+  >
+    <title id={`${id}-t`}>
+      Floyd-Steinberg error diffusion of a pixel with value {value}
+    </title>
+    <defs>
+      <ArrowMarker id={id} variant="open" size={4} refX={7} />
+    </defs>
+    <text class="head" x={width / 2} y="14" text-anchor="middle">
+      Error = {value} − {out} = {err}
+    </text>
+    <g>
+      {[0, 1, 2].map((c) => (
+        <rect
+          class:list={["cell", { done: c === 0, cur: c === 1 }]}
+          x={origin(0, c).x}
+          y={origin(0, c).y}
+          width={cell}
+          height={cell}
+        />
+      ))}
+    </g>
+    <text
+      class="small"
+      x={origin(0, 0).x + cell / 2}
+      y={origin(0, 0).y + cell / 2}
+      text-anchor="middle"
+    >
+      done
+    </text>
+    <text class="val" x={cx} y={cy - 8} text-anchor="middle">
+      {value}
+    </text>
+    <text class="small" x={cx} y={cy + 12} text-anchor="middle">
+      → {out}
+    </text>
+    {arrows.map(([x1, y1, x2, y2]) => (
+      <line
+        class="arrow"
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        marker-end={`url(#${id})`}
+      />
+    ))}
+    {targets.map(([r, c, w]) => {
+      const o = origin(r, c);
+      return (
+        <g>
+          <rect class="cell tgt" x={o.x} y={o.y} width={cell} height={cell} />
+          <text
+            class="val"
+            x={o.x + cell / 2}
+            y={o.y + cell / 2 - 4}
+            text-anchor="middle"
+          >
+            {w}/16
+          </text>
+          <text
+            class="small"
+            x={o.x + cell / 2}
+            y={o.y + cell / 2 + 16}
+            text-anchor="middle"
+          >
+            {err >= 0 ? "+" : "−"}
+            {fmt(Math.abs((err * w) / 16))}
+          </text>
+        </g>
+      );
+    })}
+  </svg>
+  <FigureCaption>{caption}</FigureCaption>
+</figure>
+
+<style>
+  .fs {
+    margin: 24px auto;
+    max-width: 380px;
+    font-family: var(--font-ui);
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cell {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+  .cell.done {
+    fill: var(--border);
+    opacity: 0.5;
+  }
+  .cell.cur {
+    fill: color-mix(in oklab, var(--accent) 16%, var(--surface));
+    stroke: var(--accent);
+  }
+  .cell.tgt {
+    fill: color-mix(in oklab, var(--accent) 6%, var(--surface));
+  }
+  .val {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    fill: var(--text);
+  }
+  .small {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-secondary);
+  }
+  .head {
+    font-size: 13px;
+    fill: var(--text-secondary);
+  }
+  .arrow {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+</style>
