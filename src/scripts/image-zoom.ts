@@ -10,6 +10,7 @@ const dialog = document.getElementById(
 const zoomImg = document.getElementById(
   "image-zoom-img",
 ) as HTMLImageElement | null;
+const zoomBox = document.getElementById("image-zoom-svg") as HTMLElement | null;
 const caption = document.getElementById(
   "image-zoom-caption",
 ) as HTMLElement | null;
@@ -17,10 +18,37 @@ const closeBtn = document.getElementById("image-zoom-close");
 const root = document.documentElement;
 const doc = document as VTDocument;
 
-let activeImg: HTMLImageElement | null = null;
+type Zoomable = HTMLImageElement | SVGSVGElement;
 
-const figcaptionFor = (img: HTMLImageElement) =>
+let activeImg: Zoomable | null = null;
+
+const figcaptionFor = (img: Zoomable) =>
   img.closest("figure")?.querySelector<HTMLElement>("figcaption") ?? null;
+
+// An SVG is dimmed rather than hidden: its markers and gradients stay
+// referenced by the clone in the dialog, and `visibility` would inherit into
+// them and blank the arrowheads.
+const hideEl = (el: Zoomable) => {
+  if (el instanceof SVGElement) el.style.opacity = "0";
+  else el.style.visibility = "hidden";
+};
+
+const showEl = (el: Zoomable) => {
+  if (el instanceof SVGElement) el.style.opacity = "";
+  else el.style.visibility = "";
+};
+
+// The thing in the dialog that morphs with the original.
+const targetFor = (el: Zoomable): HTMLElement =>
+  el instanceof SVGElement ? zoomBox! : zoomImg!;
+
+// Clones the whole figure so the diagram's scoped, ancestor-based styles still
+// apply, minus the caption, which the dialog shows on its own.
+const fillBox = (svg: SVGSVGElement) => {
+  const copy = svg.closest("figure")!.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll("figcaption").forEach((c) => c.remove());
+  zoomBox!.replaceChildren(copy);
+};
 
 const showDialog = () => {
   dialog!.showModal();
@@ -34,13 +62,23 @@ const hideDialog = () => {
   root.classList.remove("zoom-open");
 };
 
-const open = (img: HTMLImageElement) => {
+// A drag that selects text still ends in a click, which must not zoom or close.
+const hasSelection = () => !!window.getSelection()?.toString();
+
+const open = (img: Zoomable) => {
   if (dialog!.open) return;
   track("image_zoom");
   activeImg = img;
 
-  zoomImg!.src = img.currentSrc || img.src;
-  zoomImg!.alt = img.alt;
+  const target = targetFor(img);
+  zoomImg!.hidden = img instanceof SVGElement;
+  zoomBox!.hidden = !(img instanceof SVGElement);
+  if (img instanceof SVGElement) {
+    fillBox(img);
+  } else {
+    zoomImg!.src = img.currentSrc || img.src;
+    zoomImg!.alt = img.alt;
+  }
 
   const fig = figcaptionFor(img);
   if (fig) {
@@ -52,7 +90,7 @@ const open = (img: HTMLImageElement) => {
   }
 
   if (!doc.startViewTransition) {
-    img.style.visibility = "hidden";
+    hideEl(img);
     if (fig) fig.style.visibility = "hidden";
     showDialog();
     return;
@@ -62,33 +100,35 @@ const open = (img: HTMLImageElement) => {
   if (fig) fig.style.viewTransitionName = "zoom-caption";
 
   const vt = doc.startViewTransition(() => {
-    img.style.visibility = "hidden";
+    hideEl(img);
     img.style.viewTransitionName = "";
     if (fig) {
       fig.style.visibility = "hidden";
       fig.style.viewTransitionName = "";
     }
-    zoomImg!.style.viewTransitionName = "zoom-image";
+    target.style.viewTransitionName = "zoom-image";
     if (fig) caption!.style.viewTransitionName = "zoom-caption";
     showDialog();
   });
 
   vt.finished.finally(() => {
-    zoomImg!.style.viewTransitionName = "";
+    target.style.viewTransitionName = "";
     caption!.style.viewTransitionName = "";
   });
 };
 
-const cleanup = (img: HTMLImageElement, fig: HTMLElement | null) => {
-  img.style.visibility = "";
+const cleanup = (img: Zoomable, fig: HTMLElement | null) => {
+  showEl(img);
   img.style.viewTransitionName = "";
   if (fig) {
     fig.style.visibility = "";
     fig.style.viewTransitionName = "";
   }
   zoomImg!.style.viewTransitionName = "";
+  zoomBox!.style.viewTransitionName = "";
   caption!.style.viewTransitionName = "";
   zoomImg!.removeAttribute("src");
+  zoomBox!.replaceChildren();
   activeImg = null;
 };
 
@@ -104,13 +144,14 @@ const close = () => {
     return;
   }
 
-  zoomImg!.style.viewTransitionName = "zoom-image";
+  const target = targetFor(img);
+  target.style.viewTransitionName = "zoom-image";
   if (hasCaption) caption!.style.viewTransitionName = "zoom-caption";
 
   const vt = doc.startViewTransition(() => {
-    zoomImg!.style.viewTransitionName = "";
+    target.style.viewTransitionName = "";
     caption!.style.viewTransitionName = "";
-    img.style.visibility = "";
+    showEl(img);
     img.style.viewTransitionName = "zoom-image";
     if (hasCaption && fig) {
       fig.style.visibility = "";
@@ -131,7 +172,7 @@ let globalBound = false;
 // any it already bound from a previous scope are long gone from the DOM
 // along with their listeners.
 function bindGlobalOnce(): void {
-  if (globalBound || !dialog || !zoomImg || !caption) return;
+  if (globalBound || !dialog || !zoomImg || !zoomBox || !caption) return;
   globalBound = true;
 
   closeBtn?.addEventListener("click", (e) => {
@@ -141,6 +182,7 @@ function bindGlobalOnce(): void {
 
   dialog.addEventListener("click", (e) => {
     if ((e.target as HTMLElement).closest("#image-zoom-close")) return;
+    if (hasSelection()) return;
     close();
   });
 
@@ -160,7 +202,8 @@ function bindGlobalOnce(): void {
 }
 
 export function bindImages(scope: ParentNode = document): void {
-  if (!dialog || !zoomImg || !caption) return;
+  if (!dialog || !zoomImg || !zoomBox || !caption) return;
+  bindDiagrams(scope);
   const images = Array.from(
     scope.querySelectorAll<HTMLImageElement>("img"),
   ).filter((img) => !img.hasAttribute("data-no-zoom"));
@@ -173,6 +216,32 @@ export function bindImages(scope: ParentNode = document): void {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         open(img);
+      }
+    });
+  }
+}
+
+// Static diagrams only: a figure with controls or a stage the page script
+// redraws would clone into a dead copy.
+const INTERACTIVE = "button, input, select, textarea, [data-stage]";
+
+function bindDiagrams(scope: ParentNode): void {
+  for (const fig of scope.querySelectorAll<HTMLElement>("figure")) {
+    if (fig.matches("[data-no-zoom]") || fig.querySelector(INTERACTIVE)) {
+      continue;
+    }
+    const svg = fig.querySelector<SVGSVGElement>("svg:not(.katex svg)");
+    if (!svg || svg.hasAttribute("data-no-zoom")) continue;
+    svg.setAttribute("role", svg.getAttribute("role") ?? "img");
+    svg.setAttribute("tabindex", "0");
+    svg.style.cursor = "zoom-in";
+    svg.addEventListener("click", () => {
+      if (!hasSelection()) open(svg);
+    });
+    svg.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(svg);
       }
     });
   }
