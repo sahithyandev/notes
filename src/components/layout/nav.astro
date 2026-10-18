@@ -97,6 +97,8 @@ const logoRule = semMatch
 </script>
 
 <script>
+  import { track } from "../../scripts/analytics";
+
   const root = document.documentElement;
   const btn = document.getElementById("themeToggle");
   const order = ["auto", "light", "dark"] as const;
@@ -135,7 +137,7 @@ const logoRule = semMatch
     const current = (root.dataset.themePref as Pref) || "auto";
     const next = order[(order.indexOf(current) + 1) % order.length];
     apply(next);
-    (window as any).stonks?.("event", "theme_change", { theme: next });
+    track("theme_change", { theme: next });
   });
 </script>
 

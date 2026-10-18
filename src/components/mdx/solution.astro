@@ -54,6 +54,8 @@ const { label = "Solution" } = Astro.props;
 </details>
 
 <script>
+  import { track } from "../../scripts/analytics";
+
   // panels come from <Method>; the tab bar is built when a solution is revealed
   let tabCount = 0;
 
@@ -85,7 +87,10 @@ const { label = "Solution" } = Astro.props;
       tab.textContent = panel.dataset.label ?? `Method ${i + 1}`;
       panel.setAttribute("role", "tabpanel");
       panel.setAttribute("aria-labelledby", tab.id);
-      tab.addEventListener("click", () => select(tabs, panels, i));
+      tab.addEventListener("click", () => {
+        track("solution_method_tab", { index: i });
+        select(tabs, panels, i);
+      });
       tab.addEventListener("keydown", (event) => {
         const last = tabs.length - 1;
         const next =
@@ -100,6 +105,7 @@ const { label = "Solution" } = Astro.props;
                   : -1;
         if (next < 0) return;
         event.preventDefault();
+        track("solution_method_tab", { index: next });
         select(tabs, panels, next);
         tabs[next].focus();
       });
@@ -119,6 +125,7 @@ const { label = "Solution" } = Astro.props;
       const solution = event.target;
       if (!(solution instanceof HTMLDetailsElement) || !solution.open) return;
       if (!solution.classList.contains("solution")) return;
+      track("solution_reveal");
       const body = solution.querySelector<HTMLElement>(
         ":scope > .solution-body",
       );

@@ -3,6 +3,7 @@
 // opening blocks (or the linked section's opening for a `#anchor` link) and
 // shows them in the single card rendered by components/note/link-preview.astro.
 import { titleize } from "../utils/index";
+import { trackOnce } from "./analytics.ts";
 
 export interface NoteHref {
   path: string;
@@ -185,6 +186,7 @@ function init(): void {
     bodyEl.replaceChildren(...preview.bodyNodes);
     cardLink.href = raw;
 
+    trackOnce(`lp:${parsed.path}${parsed.hash}`, "link_preview_shown");
     card!.hidden = false;
     card!.classList.remove("open");
     bodyEl.toggleAttribute(

@@ -1,3 +1,5 @@
+import { track } from "./analytics.ts";
+
 type VTDocument = Document & {
   startViewTransition?: (cb: () => void) => { finished: Promise<void> };
 };
@@ -34,6 +36,7 @@ const hideDialog = () => {
 
 const open = (img: HTMLImageElement) => {
   if (dialog!.open) return;
+  track("image_zoom");
   activeImg = img;
 
   zoomImg!.src = img.currentSrc || img.src;

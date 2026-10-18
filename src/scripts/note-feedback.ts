@@ -1,3 +1,5 @@
+import { track } from "./analytics.ts";
+
 // Wires up the helpful/not-helpful buttons of the .note-feedback block in
 // the current document. Exported so a soft navigation (note-swap.ts) can
 // re-run it against the freshly swapped-in block.
@@ -87,7 +89,7 @@ export function initNoteFeedback(): void {
         .then((data) => {
           if (data && typeof data.up === "number") {
             setCounts(data.up, data.down);
-            window.stonks?.event("vote", "/" + slug, { vote: sentVote });
+            track("vote", "/" + slug, { vote: sentVote });
           }
         })
         .catch(() => {})

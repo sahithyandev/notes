@@ -26,6 +26,7 @@ import { initTocScrollSpy } from "./toc-scroll-spy.ts";
 import { initNoteFeedback } from "./note-feedback.ts";
 import { initRelativeTime } from "./relative-time.ts";
 import { hideUpdateToast, initOfflineStatus } from "./offline.ts";
+import { initAnalytics, track } from "./analytics.ts";
 
 // Built from parts on purpose: a plain literal would be folded back into the
 // full marker text, which would then tag this file's own bundle as an
@@ -188,10 +189,11 @@ function applyDocument(nextDoc: Document, url: URL): void {
   initOfflineStatus();
   initRelativeTime();
   initTocScrollSpy();
+  initAnalytics();
 
   const slug = url.pathname.replace(/^\/|\/$/g, "");
   const parts = slug.split("/");
-  window.stonks?.event("note_view", "/" + slug, {
+  track("note_view", "/" + slug, {
     semester: parts[0] ?? "",
     module: parts[1] ?? "",
   });

@@ -1,3 +1,5 @@
+import { track } from "./analytics.ts";
+
 // Page side of public/sw.js: registers the worker, mirrors connectivity into
 // `html[data-offline]`, and reflects what the worker has cached (the
 // "available offline" badge, the update toast). Keep PAGE_CACHE_PREFIX,
@@ -58,6 +60,7 @@ export function hideUpdateToast(): void {
 }
 
 export function showUpdateToast(): void {
+  track("update_toast_shown");
   document.getElementById("sn-update-toast")?.removeAttribute("hidden");
 }
 
@@ -116,6 +119,7 @@ export async function initOfflineStatus(): Promise<void> {
     const registration = await navigator.serviceWorker.getRegistration();
     if (!registration) return;
     if (await requestCache(registration, { page: path })) {
+      track("page_saved_offline");
       if (location.pathname === path) badge.hidden = false;
     }
   } catch {}
@@ -130,8 +134,10 @@ function listenForUpdates(): void {
   document.addEventListener("click", (event) => {
     const target = event.target as HTMLElement | null;
     if (target?.closest("[data-update-reload]")) {
+      track("update_toast_reload");
       takeUpdate().then(() => location.reload());
     } else if (target?.closest("[data-update-dismiss]")) {
+      track("update_toast_dismiss");
       hideUpdateToast();
       takeUpdate();
     } else if (target?.closest(".note-action-btn[aria-disabled='true']")) {
@@ -162,6 +168,7 @@ export function initOffline(): void {
   syncOfflineUi();
   window.addEventListener("offline", syncOfflineUi);
   window.addEventListener("online", () => {
+    track("back_online");
     syncOfflineUi();
     navigator.serviceWorker?.controller?.postMessage({ type: "sn:online" });
   });

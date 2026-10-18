@@ -1,3 +1,5 @@
+import { track } from "./analytics.ts";
+
 const openSidebarBtn = document.getElementById("open-sidebar");
 const openTocBtn = document.getElementById("open-toc");
 const backdrop = document.getElementById("drawer-backdrop");
@@ -56,6 +58,7 @@ studyBtn?.setAttribute(
 studyBtn?.addEventListener("click", () => {
   const on = root.classList.toggle("study-mode");
   studyBtn.setAttribute("aria-pressed", String(on));
+  track("study_mode", { on });
   try {
     if (on) localStorage.setItem("sn-study-mode", "1");
     else localStorage.removeItem("sn-study-mode");

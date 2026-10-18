@@ -1,6 +1,8 @@
 // Global single-key shortcuts. Each action reuses existing UI (clicks the
 // search/theme buttons, follows the prev/next links) instead of duplicating
 // its logic. Ctrl/Cmd+K is bound separately in search-modal.astro.
+import { track } from "./analytics.ts";
+
 export type Action = "search" | "theme" | "study" | "prev" | "next" | "help";
 
 const TYPING = "input, textarea, select, [contenteditable]";
@@ -40,6 +42,7 @@ export function resolveShortcut(e: KeyboardEvent): Action | null {
 }
 
 export function run(action: Action): void {
+  track("shortcut_used", { action });
   switch (action) {
     case "search":
       document.getElementById("search-trigger")?.click();

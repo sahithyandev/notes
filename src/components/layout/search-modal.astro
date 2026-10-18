@@ -44,6 +44,8 @@
 </dialog>
 
 <script>
+  import { track } from "../../scripts/analytics";
+
   let pagefind: any = null;
   let pagefindReady = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -201,7 +203,7 @@
       groups.get(parsed.groupKey)!.push({ parsed, data });
     }
     renderResults(groups, query);
-    window.stonks?.event("search_query", { query, result_count: top5.length });
+    track("search_query", { query, result_count: top5.length });
   }
 
   input.addEventListener("input", () => {
@@ -223,7 +225,7 @@
       e.preventDefault();
       const href = items[selectedIndex].getAttribute("href");
       if (href) {
-        window.stonks?.event("search_result_click", href, {
+        track("search_result_click", href, {
           query: input.value.trim(),
           position: selectedIndex,
         });
@@ -240,7 +242,7 @@
     if (!item) return;
     const items = getItems();
     const position = items.indexOf(item);
-    window.stonks?.event("search_result_click", item.href, {
+    track("search_result_click", item.href, {
       query: input.value.trim(),
       position,
     });

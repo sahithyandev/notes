@@ -1,3 +1,5 @@
+import { track } from "./analytics.ts";
+
 // Exported (not just run on DOMContentLoaded) so a dev-only content swap
 // (src/scripts/live-update.ts) can re-run it against freshly-inserted <pre>
 // blocks without a full page reload - safe to call repeatedly since it only
@@ -16,6 +18,7 @@ export function initCopyButtons(scope: ParentNode = document): void {
       const text = (code as HTMLElement)?.innerText ?? "";
       navigator.clipboard.writeText(text).then(
         () => {
+          track("code_copy");
           btn.textContent = "Copied";
           setTimeout(() => (btn.textContent = "Copy"), 1500);
         },
