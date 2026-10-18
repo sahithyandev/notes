@@ -1,7 +1,7 @@
 ---
 title: Error Diffusion
 dateCreated: 2026-09-25T19:30:30.479Z
-lastUpdatedOn: 2026-09-28T05:07:14.386Z
+lastUpdatedOn: 2026-10-18T09:17:02.296Z
 ---
 
 Like dithering, error diffusion trades something else for grey-level depth on a device with few output levels. Each pixel is rounded to the nearest available level. The rounding error, the gap between the original value and the chosen level, is spread over neighbouring pixels not yet processed. Those neighbours are nudged toward the value the current pixel could not hold, so the error cancels over a small region instead of building up.
@@ -23,6 +23,8 @@ $$
 
 Serpentine scanning reverses direction every other row, so the error is not always pushed the same way and directional streaks are avoided.
 
+<ErrorDiffusionDiagram />
+
 ## Worked Example
 
 Bi-level device with levels $0$ and $255$. One row of 4 pixels, all at value $128$, using 1D diffusion that passes the whole error to the next pixel.
@@ -36,11 +38,12 @@ Output is $0, 255, 255, 0$, mean $127.5$, matching the target $128$ that no sing
 
 <figure>
 
-![False contouring and error diffusion](./images/dithering.png)
+![False contouring and error diffusion](./images/error-diffusion.jpg)
 
 <figcaption>
 
-Left: Original greyscale. Centre: Reduced to 4 levels, showing false contouring. Right: Reduced to 4 levels with Floyd-Steinberg error diffusion, trading the flat bands for high-frequency noise. Generated from a photo by [Hannes Röst](https://commons.wikimedia.org/wiki/File:Fronalpstock_big.jpg), CC BY-SA 3.0.
+Left: Original greyscale. Centre: Reduced to 2 levels with a Bayer dither matrix, which leaves a regular dot pattern. Right: Reduced to 2 levels with Floyd-Steinberg error diffusion, where the dots follow the image detail.  
+Generated from a photo by [Hannes Röst](https://commons.wikimedia.org/wiki/File:Fronalpstock_big.jpg), CC BY-SA 3.0.
 
 </figcaption>
 

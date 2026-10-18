@@ -1,7 +1,7 @@
 ---
 title: Dithering
 dateCreated: 2026-09-25T19:30:18.372Z
-lastUpdatedOn: 2026-09-28T05:07:14.373Z
+lastUpdatedOn: 2026-10-18T09:17:02.278Z
 ---
 
 Dithering trades spatial resolution for grey-level depth. A device with few output levels approximates an intermediate intensity by mixing the available levels over a small region, which the eye averages at normal viewing distance.
@@ -11,6 +11,19 @@ Dithering trades spatial resolution for grey-level depth. A device with few outp
 - A fixed dither matrix sets the order in which sub-pixels switch on, spreading them to avoid visible clumps
 
 Used in newspaper halftoning, laser printing, and exporting photos to a small fixed palette such as GIF.
+
+<figure>
+
+![Dithering](./images/ordered-dithering.jpg)
+
+<figcaption>
+
+Left: Original. Middle: Reduced to 2 levels by a single threshold, which loses most of the tones. Right: Reduced to 2 levels with an $8 \times 8$ Bayer dither matrix, where the density of white dots recovers the tones.  
+Generated from a photo by [Hannes Röst](https://commons.wikimedia.org/wiki/File:Fronalpstock_big.jpg), CC BY-SA 3.0.
+
+</figcaption>
+
+</figure>
 
 ## Worked Example
 
@@ -28,3 +41,5 @@ Sub-pixel $(i,j)$ is set to $1$ **iff** $v > \dfrac{D_{ij} + 0.5}{4}$.
 - $(1,1)$ has threshold $0.375$. Since $0.5 > 0.375$, set to $1$.
 
 2 of the 4 sub-pixels are on, so the block averages $0.5$, matching the target. The on sub-pixels form a checkerboard.
+
+<DitherBlockDiagram />

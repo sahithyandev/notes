@@ -1,16 +1,22 @@
 ---
 title: Sampling and Quantization
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-09-28T05:07:14.361Z
+lastUpdatedOn: 2026-10-18T09:17:02.256Z
 ---
 
-Converting an analog image to digital requires 2 independent choices: sampling and quantization. Both determine the memory required for image storage.
+Sampling and quantization are the 2 independent choices made when converting an analog image to a [digital image](/s5/image-processing/image-model). Sampling sets the grid size $m \times n$. Quantization sets the number of levels $L = 2^k$. Together they fix the storage size $m \times n \times k$ bits per channel.
+
+Coarse choices in either one cause visible artifacts.
 
 ## Sampling
 
 Sampling fixes the spatial resolution. Resolution is the number of samples per unit length, set by the size of the image sensor element.
 
-Coarse sampling has 3 visible effects: loss of information, pixelation, and aliasing.
+Coarse sampling means large grid cells, so a small $m \times n$. It has 3 visible effects: loss of information, pixelation, and aliasing.
+
+### Sampling Rate
+
+Number of samples per unit distance, one per grid cell.
 
 ### Loss of Information
 
@@ -22,7 +28,7 @@ Each grid cell becomes one flat square of intensity, so a smooth or diagonal edg
 
 <figure>
 
-![Pixelation from coarse sampling](./images/checkerboard-effect.png)
+![Pixelation from coarse sampling](./images/checkerboard-effect.jpg)
 
 <figcaption>
 
@@ -37,8 +43,7 @@ Generated from a photo by [Hannes Röst](https://commons.wikimedia.org/wiki/File
 
 Aliasing happens when a pattern in the scene repeats faster than the sampling grid can follow. The samples then fit a different, lower-frequency pattern that was never in the scene. That false pattern is the alias.
 
-- The sampling rate is the number of samples per unit distance, one per grid cell.
-- Capturing a repeating pattern needs at least 2 samples per cycle of that pattern. This is the Nyquist criterion.
+- Capturing a repeating pattern needs at least 2 samples per cycle of that pattern. This is the [Nyquist criterion](/s3/data-communication-and-networking/signals#nyquist-theorem).
 - A pattern with more than 1 cycle per 2 cells is undersampled.
 - The alias frequency is the true frequency folded about half the sampling rate. A higher scene frequency gives a lower alias frequency.
 - On fine repeating textures the alias shows up as broad curved bands, called moire fringes.
@@ -71,10 +76,25 @@ Two overlapping railings on a bridge. The beat between the two picket spacings s
 
 ## Quantization
 
-Quantization fixes the grey-level depth. Grey-level depth is the number of discrete intensity levels, set by the resolution of the analog to digital converter.
+Quantization fixes the grey-level depth. Grey-level depth is the number of discrete intensity levels $L$, set by the resolution of the analog to digital converter.
 
-Insufficient grey-level depth causes false contouring.
+Coarse quantization means a small $L$ and a low bit depth $k$. The gaps between levels are large, so nearby intensities collapse to the same level. This causes false contouring.
 
 ### False Contouring
 
-Across a smooth gradient, a band of neighbouring intensities collapses onto one level and renders as a flat region. The jump to the next level shows up as a sharp edge that is not in the scene. These false edges resemble contour lines, most visible in skies and other large smooth areas.
+<Aka>Banding</Aka>. Across a smooth gradient, a band of neighbouring intensities
+collapses onto one level and renders as a flat region. The jump to the next
+level shows up as a sharp edge that is not in the scene. These false edges
+resemble contour lines, most visible in skies and other large smooth areas.
+
+<figure>
+
+![Color banding](./images/color-banding.jpg)
+
+<figcaption>
+
+Color banding visible in sky. Image by [Steve F](https://commons.wikimedia.org/w/index.php?curid=13773379), CC BY-SA 2.0.
+
+</figcaption>
+
+</figure>

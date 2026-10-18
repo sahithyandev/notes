@@ -1,7 +1,7 @@
 ---
 title: Image Model
 dateCreated: 2026-07-26T04:58:54.491Z
-lastUpdatedOn: 2026-10-18T08:23:54.377Z
+lastUpdatedOn: 2026-10-18T09:17:02.149Z
 ---
 
 An image is modeled as a function $I(x,y)$ returning the light intensity at position $(x,y)$.
@@ -26,7 +26,7 @@ Properties:
 - Continuous intensity  
   No fixed set of allowed values.
 - Not directly computable  
-  Needs sampling and quantization before a computer can store or process it.
+  Needs a discrete representation before a computer can store or process it.
 
 Examples:
 
@@ -36,14 +36,14 @@ Examples:
 
 ## Digital Image Model
 
-A digital image is obtained from an analog image by 2 discretization steps.
+A digital image is a discrete representation of an image, with a finite number of positions and a fixed number of intensity values.
 
-- Sampling  
-  The spatial domain is divided into an $m \times n$ grid. Each cell $(i,j)$ covers a small finite region.
-- Quantization  
-  The intensity of each cell is mapped to one of $L$ discrete levels.
+- Finite grid of pixels  
+  The spatial domain is an $m \times n$ grid. Each cell $(i,j)$ covers a small finite region.
+- Fixed number of levels  
+  The intensity of each cell is one of $L$ discrete levels.
 
-$I(i,j)$ is the average intensity over cell $(i,j)$ after quantization. The digital image is the matrix of these values. Each element is a pixel.
+$I(i,j)$ is the intensity of cell $(i,j)$, one of the $L$ levels. The digital image is the matrix of these values. Each element is a pixel.
 
 $$
 \begin{bmatrix}
@@ -71,31 +71,3 @@ $m \times n$ is the spatial resolution. An 8-bit grayscale image has $L = 256$ l
 Storage size in bits is $m \times n \times k$ for a single channel. A color image repeats this per channel.
 
 In a computer program, an image is simply a matrix of integer values. Image processing means manipulating this matrix.
-
-### Coarse Sampling
-
-Large grid cells, so a small $m \times n$ and low spatial resolution. Too sparse to record fine spatial variation.
-
-- Small features fall between sample points and disappear.
-- Edges and text look blocky. This is pixelation.
-- Fast repeating patterns reappear as a false slower pattern. This is aliasing.
-
-### Coarse Quantization
-
-Few intensity levels, so a small $L$ and low bit depth. The gaps between levels are large.
-
-- Nearby intensities collapse to the same level.
-- A slow gradient becomes a set of flat steps with visible jumps between them. This is banding, also called contouring.
-- Most visible in skies and other large smooth regions.
-
-<figure>
-
-![Color Banding](./images/color-banding.jpg)
-
-<figcaption>
-
-Color banding visible in sky. Image by [By Steve F, CC BY-SA 2.0](https://commons.wikimedia.org/w/index.php?curid=13773379).
-
-</figcaption>
-
-</figure>
