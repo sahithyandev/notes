@@ -1,0 +1,137 @@
+---
+title: Architectural Perspectives
+sidebar:
+  label: Architectural Perspectives
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T00:00:00.000Z
+---
+
+## Architectural Perspective
+
+An **architectural perspective** is a collection of activities, tactics, and guidelines used to ensure that a system exhibits a particular set of related quality properties.
+
+These properties may need to be considered across several architectural views.
+
+Architectural perspectives address concerns often described as **non-functional requirements of the architecture**.
+
+## Examples of Architectural Perspectives
+
+Identifies several perspectives.
+
+- Security Perspective
+- Accessibility Perspective
+- Performance Perspective
+- Location Perspective
+- Availability Perspective
+- Modifiability Perspective
+- Usability Perspective
+
+Each perspective focuses on a particular quality-related concern.
+
+## Architectural Views
+
+Architectural views describe different aspects of a system.
+
+Identifies the following views:
+
+| Architectural View   | Focus                                                            |
+| -------------------- | ---------------------------------------------------------------- |
+| **Functional View**  | The system's functionality and functional responsibilities.      |
+| **Information View** | Information and data-related concerns.                           |
+| **Concurrency View** | Concurrent activities and their interactions.                    |
+| **Development View** | The system's development and organization.                       |
+| **Deployment View**  | The placement of software elements in the execution environment. |
+| **Operational View** | The system's operation and management.                           |
+
+## Applying Perspectives to Views
+
+A quality-related perspective may affect several architectural views.
+
+For example, security is not limited to one part of the architecture. Security requirements may affect functional behavior, information access, development decisions, concurrency, deployment, and operation.
+
+Applying a perspective to multiple views helps make quality requirements more specific and easier to address.
+
+## Security Perspective
+
+The **security perspective** considers security requirements across different aspects of the architecture.
+
+Security is important because it affects many architectural views.
+
+The security properties that matter most depend on the view being considered.
+
+### Functional Viewpoint
+
+The system must be able to identify and authenticate its users.
+
+Users may be:
+
+- Internal or external.
+- Human or mechanical.
+
+Security processes should be effective but unobtrusive. Processes exposed to the outside world must also be resilient to attacks.
+
+### Information Viewpoint
+
+The system must control different types of access to information.
+
+Examples include:
+
+- Read
+- Insert
+- Update
+- Delete
+
+Access controls may be applied at different levels of detail.
+
+For example, a database may enforce **object-level security**.
+
+### Operational Viewpoint
+
+The system must be able to maintain and distribute secret information.
+
+Examples include:
+
+- Keys
+- Passwords
+
+The system must also remain up to date with the latest security updates and patches.
+
+### Development, Concurrency, and Deployment Views
+
+Security requirements can affect architectural decisions related to:
+
+- Development
+- Concurrency
+- Deployment
+
+The relevant security requirements must be considered within each view.
+
+## Security Requirements Across Views
+
+The general requirement that a system must be secure can be divided into more specific requirements for individual views.
+
+| View                 | Security Considerations                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
+| **Functional View**  | User identification, authentication, and protection of externally exposed processes.                |
+| **Information View** | Access control, access classes, and object-level security.                                          |
+| **Concurrency View** | Security implications of shared resources and concurrent operations.                                |
+| **Development View** | Security requirements affecting development decisions.                                              |
+| **Deployment View**  | Security requirements affecting deployment decisions.                                               |
+| **Operational View** | Protection and distribution of secret information and installation of security updates and patches. |
+
+## Applying Multiple Perspectives to Views
+
+The lecture illustrates how different perspectives can be considered across architectural views.
+
+| Architectural View   | Security                                                   | Performance                                            | Availability                                         |
+| -------------------- | ---------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| **Functional View**  | Consider security requirements affecting functionality.    | Consider response-time requirements.                   | Consider the availability of required functionality. |
+| **Information View** | Access control, access classes, and object-level security. | Consider information-processing performance.           | Consider the availability of required information.   |
+| **Concurrency View** | Consider security implications of concurrent operations.   | Shared resources, blocking, queuing, and coordination. | Consider availability during concurrent operation.   |
+| **Development View** | Consider security requirements affecting development.      | Consider performance-related design decisions.         | Consider availability-related design decisions.      |
+| **Deployment View**  | Consider security requirements affecting deployment.       | Consider performance-related deployment decisions.     | Consider availability-related deployment decisions.  |
+| **Operational View** | Protect secrets and apply security updates and patches.    | Consider operational performance requirements.         | Consider operational availability requirements.      |
+
+The table provides a way to organize quality concerns across views. The specific requirements depend on the system being designed.

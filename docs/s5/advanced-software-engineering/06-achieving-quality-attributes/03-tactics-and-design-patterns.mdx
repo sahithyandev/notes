@@ -1,0 +1,92 @@
+---
+title: Tactics and Design Patterns
+sidebar:
+  label: Tactics and Design Patterns
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:34:14.611Z
+---
+
+## Architectural Tactics and Patterns
+
+An architect usually chooses an architectural pattern or a collection of patterns.
+
+However, each pattern implements several tactics, and these tactics may address different quality attributes.
+
+The implementation of a pattern also involves decisions about which tactics to use and how to apply them.
+
+Therefore, understanding a pattern requires understanding the tactics embedded in it.
+
+## Active Object Design Pattern
+
+The **Active Object design pattern** separates method execution from method invocation.
+
+It helps improve concurrency and simplifies access to objects that have their own thread of control.
+
+### Goal
+
+The pattern aims to improve **performance** through the **Introduce Concurrency** tactic.
+
+However, the pattern can also use tactics related to other quality attributes, such as modifiability and testability.
+
+## Elements of the Active Object Pattern
+
+It identifies six elements.
+
+| Element             | Responsibility                                                                |
+| ------------------- | ----------------------------------------------------------------------------- |
+| **Proxy**           | Provides an interface to clients through publicly accessible methods.         |
+| **Interface**       | Defines the method requests available on the active object.                   |
+| **Activation List** | Stores pending requests from clients.                                         |
+| **Scheduler**       | Determines which request should execute next.                                 |
+| **Servant**         | Defines the behavior and state of the active object.                          |
+| **Future**          | Allows the client to receive the result later through a callback or variable. |
+
+### How It Works
+
+1. A client submits a request through the proxy.
+2. The request is placed in the activation list.
+3. The scheduler selects a request for execution.
+4. The servant executes the requested behavior.
+5. The future allows the client to obtain the result.
+
+This design separates the act of requesting an operation from the execution of that operation.
+
+## Other Tactics Used by the Pattern
+
+The Active Object pattern may also use the following tactics.
+
+| Tactic                 | Quality Attribute |
+| ---------------------- | ----------------- |
+| **Information Hiding** | Modifiability     |
+| **Intermediary**       | Modifiability     |
+| **Scheduling Policy**  | Performance       |
+
+An implementation may also maintain a log of requests.
+
+Such a log may support:
+
+- Recovery
+- Maintaining an audit trail
+- Testability
+
+Therefore, the same design pattern can contribute to several quality attributes.
+
+## Analyzing Tactics in Patterns
+
+### Analysis Process
+
+The analysis process involves understanding all the tactics embedded in an existing pattern implementation.
+
+### Design Process
+
+The design process involves selecting an appropriate combination of tactics to achieve the system's desired goals.
+
+## Key Points
+
+- A design pattern implements a collection of tactics.
+- Different tactics may support different quality attributes.
+- The implementation of a pattern involves additional design decisions.
+- Architects must understand these decisions when evaluating a pattern.
+- The selected combination of tactics should support the system's required quality attributes.

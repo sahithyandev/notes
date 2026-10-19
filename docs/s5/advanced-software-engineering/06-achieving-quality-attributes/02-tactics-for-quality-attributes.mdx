@@ -1,0 +1,123 @@
+---
+title: Tactics for Quality Attributes
+sidebar:
+  label: Tactics for Quality Attributes
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T00:00:00.000Z
+---
+
+## Availability Tactics
+
+**Availability tactics** help a system remain operational or recover when faults occur.
+
+So it groups availability tactics into three categories:
+
+- Fault detection
+- Fault recovery
+- Fault prevention
+
+### Fault Detection
+
+Fault detection tactics identify faults that may affect system operation.
+
+| Tactic         | Description                                                                         |
+| -------------- | ----------------------------------------------------------------------------------- |
+| **Ping/Echo**  | One component sends a message to another and checks whether a response is received. |
+| **Heartbeat**  | A component periodically sends a signal indicating that it is operating.            |
+| **Exceptions** | Exceptional conditions are reported so they can be handled.                         |
+
+### Fault Recovery
+
+Fault recovery tactics help a system continue operating or restore operation after a fault.
+
+| Tactic                               | Description                                                                                              |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **Voting**                           | Multiple results are compared or voted on to determine the accepted result.                              |
+| **Active Redundancy(hot restart)**   | Redundant components operate actively.                                                                   |
+| **Passive Redundancy(warm restart)** | A backup component is maintained for recovery.                                                           |
+| **Spare**                            | A replacement resource is available when a component fails.                                              |
+| **Shadow Operation**                 | A secondary system operates alongside the primary system to support a controlled transition or recovery. |
+| **State Synchronization**            | Redundant components are kept consistent by synchronizing their state.                                   |
+| **Checkpoint/Rollback**              | The system records a recoverable state and returns to it when necessary.                                 |
+
+### Fault Prevention
+
+Fault prevention tactics help prevent faults from affecting normal system operation.
+
+| Tactic                   | Description                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| **Removal from Service** | A component is taken out of service when necessary to prevent further problems. |
+| **Transactions**         | Operations are managed as transactions to help preserve consistency.            |
+| **Process Monitor**      | A monitoring mechanism observes processes and helps manage their operation.     |
+
+## Modifiability Tactics
+
+**Modifiability tactics** make changes easier and help limit the impact of modifications on other parts of a system.
+
+Two main approaches:
+
+- Localize modifications.
+- Defer binding time.
+
+### Localize Modifications
+
+The goal is to reduce the number of system elements affected by a change.
+
+| Tactic                          | Description                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| **Maintain Semantic Coherence** | Keep related responsibilities together so changes to one concern are localized. |
+| **Anticipate Expected Changes** | Consider likely future changes when designing the system.                       |
+| **Generalize the Module**       | Design a module so it can support a suitable range of related requirements.     |
+| **Limit Possible Options**      | Restrict unnecessary choices to reduce the complexity of future changes.        |
+
+### Defer Binding Time
+
+**Binding time** is the point at which a design decision or association becomes fixed.
+
+Deferring binding time allows certain decisions to be changed later.
+
+| Tactic                             | Description                                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Runtime Registration**           | Register a component or service while the system is running.                                    |
+| **Configuration Files**            | Store configurable choices outside the main program code.                                       |
+| **Polymorphism**                   | Allow different implementations to be used through a common interface.                          |
+| **Component Replacement**          | Replace one component with another compatible component.                                        |
+| **Adherence to Defined Protocols** | Use established interaction rules so components can be changed while maintaining compatibility. |
+
+## Performance Tactics
+
+**Performance tactics** help a system generate responses within specified time constraints.
+
+**Events arrive → Performance tactics → Response within time constraints**
+
+The design must consider how events are handled and how the system responds within the required time.
+
+## Security Tactics
+
+It groups security tactics into three categories.
+
+| Category                    | Goal                                                      |
+| --------------------------- | --------------------------------------------------------- |
+| **Resisting Attacks**       | Prevent or withstand attacks against the system.          |
+| **Detecting Attacks**       | Identify attacks that affect the system.                  |
+| **Recovering from Attacks** | Restore or maintain acceptable operation after an attack. |
+
+## Testability Tactics
+
+**Testability tactics** help determine whether a system behaves as expected and make it easier to identify problems.
+
+It identifies two categories:
+
+- **Input/Output:** Supports testing by providing inputs and observing outputs.
+- **Internal Monitoring:** Provides information about internal system behavior to support testing.
+
+## Usability Tactics
+
+**Usability tactics** support the usability of a system.
+
+It identifies two categories:
+
+- **Runtime:** Tactics that support users while the system is running.
+- **Design-time:** Tactics that support usability through design decisions.
