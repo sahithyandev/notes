@@ -1,0 +1,78 @@
+---
+title: Quality Attribute Scenarios
+sidebar:
+  label: Quality Attribute Scenarios
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:33:34.805Z
+---
+
+A **quality attribute scenario** describes how a system should respond to a particular situation.
+
+It provides a structured way to specify quality requirements so that the expected response can be evaluated and tested.
+
+## Six Parts of a Quality Attribute Scenario
+
+A quality attribute scenario consists of six parts.
+
+| Part                   | Description                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| **Source of Stimulus** | The entity that generates the stimulus, such as a user, computer system, or another actor.  |
+| **Stimulus**           | The event or condition that needs to be handled by the system.                              |
+| **Environment**        | The condition of the system when the stimulus occurs, such as normal operation or overload. |
+| **Artifact**           | The part of the system being stimulated. It may be a component or the whole system.         |
+| **Response**           | The activity performed by the system after the stimulus arrives.                            |
+| **Response Measure**   | A measurable result used to evaluate whether the requirement has been satisfied.            |
+
+## General and Concrete Scenarios
+
+### General Quality Attribute Scenarios
+
+A **general scenario** is system-independent and can potentially apply to different systems.
+
+It describes a common quality-related situation without referring to one particular implementation.
+
+### Concrete Quality Attribute Scenarios
+
+A **concrete scenario** is specific to the system being considered.
+
+It defines how a particular system should respond to a specific situation.
+
+## Example: Availability Scenario
+
+An availability scenario describes how a system responds when a fault occurs.
+
+| Part                   | Example                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Source of Stimulus** | Internal or external source                                                                               |
+| **Stimulus**           | Omission, crash, timing fault, or incorrect response                                                      |
+| **Environment**        | Normal operation or degraded operation                                                                    |
+| **Artifact**           | Process, storage, processor, or communication component                                                   |
+| **Response**           | Record the fault, notify relevant parties, disable a component, continue operating, or become unavailable |
+| **Response Measure**   | Repair time, degraded-operation interval, or unavailability interval                                      |
+
+## Example: Modifiability Scenario
+
+A modifiability scenario describes how easily a system can be changed.
+
+| Part                   | Example                                            |
+| ---------------------- | -------------------------------------------------- |
+| **Source of Stimulus** | Developer                                          |
+| **Stimulus**           | Wishes to change the user interface                |
+| **Environment**        | Design time                                        |
+| **Artifact**           | Code                                               |
+| **Response**           | The modification is completed without side effects |
+| **Response Measure**   | The modification is completed within three hours   |
+
+## Why are Scenarios Useful?
+
+Quality attribute scenarios help to:
+
+- Clarify quality requirements.
+- Describe expected system behavior under specific conditions.
+- Identify measurable acceptance criteria.
+- Communicate requirements among stakeholders.
+- Evaluate whether an architecture supports the required qualities.
+
+A good scenario describes not only what should happen but also how the result will be measured.

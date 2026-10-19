@@ -1,0 +1,127 @@
+---
+title: Introduction to Quality Attributes
+sidebar:
+  label: Introduction to Quality Attributes
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:33:34.660Z
+---
+
+## Why Is Architecture Important?
+
+Software architecture is important for three fundamental reasons.
+
+- **Communication among stakeholders** Provides a basis for mutual understanding, negotiation, and consensus.
+- **Early design decisions** Allows important design decisions to be analyzed early.
+- **Transferable abstraction** Supports reuse of architectural knowledge and system structures.
+
+### Importance of Early Decisions
+
+Architecture:
+
+- Defines constraints on implementation.
+- Determines the organizational structure of the system.
+- Enables or limits quality attributes.
+- Helps predict system qualities.
+- Makes changes easier to understand and manage.
+- Supports evolutionary prototyping.
+- Helps estimate cost and schedule more accurately.
+
+## Quality Attributes
+
+A **Non-Functional Property (NFP)** is a constraint on how a system implements and delivers its functionality.
+
+Examples include:
+
+- Efficiency
+- Complexity
+- Scalability
+- Heterogeneity
+- Adaptability
+- Dependability
+
+### Common Quality Attributes
+
+| Quality Attribute        | Architectural Consideration                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| **Performance**          | Manage timing and the frequency and volume of communication between elements.          |
+| **Scalability**          | Localize resource usage so higher-capacity replacements can be introduced.             |
+| **Modifiability**        | Assign responsibilities to components so changes do not have far-reaching effects.     |
+| **Security**             | Protect communication and control which elements can access information.               |
+| **Incremental Delivery** | Carefully manage dependencies between components.                                      |
+| **Reusability**          | Restrict dependencies so components can be extracted and reused in other environments. |
+
+## Trade-Offs Between Quality Attributes
+
+Improving one quality attribute can affect another quality attribute.
+
+Examples of trade-offs include:
+
+- Performance versus Security
+- Maintainability versus Reliability
+- Current Cost versus Future Cost
+
+Architectural decisions must consider the system's priorities rather than optimizing every quality attribute independently.
+
+## Understanding Quality Attributes
+
+Business considerations determine which quality attributes must be supported by the architecture.
+
+Systems may need redesign even when their functionality is correct because they are:
+
+- Difficult to maintain.
+- Difficult to port to another environment.
+- Difficult to scale.
+- Too slow.
+- Vulnerable to network attacks.
+
+### Functionality and Quality Attributes
+
+- Functionality and quality attributes are **orthogonal**. A system can provide the required functionality but still fail to meet its quality requirements.
+- Quality attributes must be considered throughout design, implementation, and deployment.
+- Both the overall architecture and implementation details affect quality.
+- A good architecture is necessary for quality, but it is not sufficient by itself.
+
+### Key Architectural Message
+
+- Quality requirements should be considered during architectural design.
+- Quality attributes can be evaluated at the architectural level.
+- Implementation details must also support the intended qualities.
+- Quality attributes interact, so improving one can positively or negatively affect others.
+
+## Classes of Quality Attributes
+
+Quality attributes can be grouped into three classes.
+
+| Class                       | Examples                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **System Qualities**        | Availability, modifiability, performance, security, testability, reusability, integrability, usability |
+| **Business Qualities**      | Time to market, cost and benefit, projected life, target market, rollout schedule, legacy integration  |
+| **Architectural Qualities** | Conceptual integrity, correctness and completeness, buildability                                       |
+
+## Problems with Quality Attributes
+
+### Context-Dependent Definitions
+
+The meaning of a quality attribute depends on the system's context.
+
+For example, the meaning of **robustness** may differ depending on the system and its requirements.
+
+### Overlapping Quality Attributes
+
+It may be unclear which quality attribute describes a particular system problem.
+
+For example, a system failure could be considered an availability, performance, security, or usability issue.
+
+### Different Terminology
+
+Different quality attribute communities may use different terms to describe similar events.
+
+For example, the performance community refers to arriving **events**, while the security community may refer to arriving **attacks**.
+
+### Solution: Quality Attribute Scenarios
+
+**Quality attribute scenarios** provide a structured way to describe and characterize quality requirements.
+
+They make quality requirements clearer and help determine whether the system satisfies them.

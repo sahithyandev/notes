@@ -1,0 +1,94 @@
+---
+title: Quality Attribute Scenarios I
+sidebar:
+  label: Quality Attribute Scenarios I
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:33:34.831Z
+---
+
+## Performance
+
+**Performance** concerns the time required for a system to respond when an event occurs.
+
+Events may include:
+
+- Interrupts
+- Messages
+- User requests
+- The passage of time
+
+Performance also depends on the number of event sources and their arrival patterns, because many possible sequences and combinations may need to be handled.
+
+### Performance Scenarios
+
+A performance scenario begins when a request for service arrives at the system.
+
+Processing the request consumes resources. Multiple events are usually handled in parallel.
+
+### Event Arrival Patterns
+
+| Pattern        | Description                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| **Periodic**   | Events arrive at regular intervals. This is common in real-time systems.                   |
+| **Stochastic** | Events arrive according to a probability distribution.                                     |
+| **Sporadic**   | Events arrive according to a pattern that cannot be represented by the other two patterns. |
+
+### General Performance Scenario
+
+| Part                   | Description                                                              |
+| ---------------------- | ------------------------------------------------------------------------ |
+| **Source of Stimulus** | The origin of the event.                                                 |
+| **Stimulus**           | The arrival pattern, such as sporadic, simultaneous, or periodic events. |
+| **Environment**        | The current system mode.                                                 |
+| **Artifact**           | The system.                                                              |
+| **Response**           | Process the event or change the system mode.                             |
+| **Response Measure**   | Latency, deadline, throughput, miss rate, or data loss.                  |
+
+## Usability
+
+**Usability** concerns how easily users can accomplish their desired tasks and what support the system provides.
+
+Usability includes:
+
+- Learning system features.
+- Using the system efficiently.
+- Minimizing the impact of errors.
+- Adapting the system to user needs.
+- Increasing user confidence and satisfaction.
+
+### General Usability Scenario
+
+| Part                   | Description                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| **Source of Stimulus** | User                                                                                           |
+| **Stimulus**           | What the user wants to do.                                                                     |
+| **Environment**        | Runtime or configuration time.                                                                 |
+| **Artifact**           | The system.                                                                                    |
+| **Response**           | What the system does in response to the user's action.                                         |
+| **Response Measure**   | Time, number of attempts, number of errors, number of successful solutions, or learning curve. |
+
+## Security
+
+**Security** is the ability of a system to prevent unauthorized use while allowing authorized use.
+
+### Security Properties
+
+- **Nonrepudiation** Supports preventing a user from denying an action they performed.
+- **Confidentiality** Protects data from unauthorized access.
+- **Integrity** Ensures information is delivered as intended.
+- **Assurance of identity** Establishes the identity of an entity.
+- **Availability** Keeps the system available for authorized use.
+- **Auditing** Records activities for examination and accountability.
+
+### General Security Scenario
+
+| Part                   | Description                                                              |
+| ---------------------- | ------------------------------------------------------------------------ |
+| **Source of Stimulus** | A human or another system. Anticipated and actual sources are important. |
+| **Stimulus**           | An attack.                                                               |
+| **Environment**        | The system mode and firewall status.                                     |
+| **Artifact**           | System services or data.                                                 |
+| **Response**           | Grant or withdraw access.                                                |
+| **Response Measure**   | Difficulty of carrying out attacks and recovery from attacks.            |

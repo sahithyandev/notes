@@ -1,0 +1,95 @@
+---
+title: Quality Attribute Scenarios II
+sidebar:
+  label: Quality Attribute Scenarios II
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:33:34.861Z
+---
+
+## Testability
+
+**Testability** concerns how easily faults can be found in a system.
+
+Important questions include:
+
+- How can faults in the system be identified?
+- Is a test harness available?
+- Can system components be tested independently?
+- Can components be tested at different levels of integration?
+
+### General Testability Scenario
+
+| Part                   | Description                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| **Source of Stimulus** | The person or entity performing the test.                                             |
+| **Stimulus**           | The event that triggers testing.                                                      |
+| **Environment**        | The time at which testing occurs.                                                     |
+| **Artifact**           | The design, code, part of the system, or entire system.                               |
+| **Response**           | The system provides access to its state and test results.                             |
+| **Response Measure**   | Test coverage, effectiveness in finding errors, effort, or time required for testing. |
+
+## Availability
+
+**Availability** concerns whether a system is operational and accessible when required.
+
+### Fault and Failure
+
+- **Fault** Something has gone wrong or an unexpected condition has occurred.
+- **Failure** The system becomes unavailable.
+
+A system may also operate in a **degraded mode**, where some functionality remains available even though normal operation is affected.
+
+Availability considerations include the time until a failure occurs and the time required to recover from it.
+
+### General Availability Scenario
+
+| Part                   | Description                                                                |
+| ---------------------- | -------------------------------------------------------------------------- |
+| **Source of Stimulus** | Internal or external source.                                               |
+| **Stimulus**           | Omission, crash, timing fault, or incorrect response.                      |
+| **Environment**        | The current state or mode of the system.                                   |
+| **Artifact**           | The component or service that should remain available.                     |
+| **Response**           | The desired response, such as logging the fault or restarting a component. |
+| **Response Measure**   | Relevant time intervals or repair time.                                    |
+
+## Modifiability
+
+**Modifiability** concerns how easily a system can be changed.
+
+### Main Concerns
+
+When considering modifiability, determine:
+
+- What can change?
+- Who makes the change?
+- What mechanism is used to make the change?
+- At what time is the change applied?
+
+For example, a change may be made directly to the code or through a configuration file.
+
+### General Modifiability Scenario
+
+| Part                   | Description                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| **Source of Stimulus** | User, developer, or system administrator.                                                   |
+| **Stimulus**           | A request to add, delete, or modify functionality, a quality attribute, or system capacity. |
+| **Environment**        | Runtime, compilation, build time, or design time.                                           |
+| **Artifact**           | User interface, platform, environment, or another system element.                           |
+| **Response**           | Locate the relevant architectural part and make the modification.                           |
+| **Response Measure**   | Cost, effort, time, and the extent of changes affecting other parts of the system.          |
+
+## Communicating Quality Attribute Concepts
+
+Each quality attribute community may use its own vocabulary. Different terms can sometimes describe the same event.
+
+The architect must understand:
+
+- Which stimuli represent the same occurrence.
+- Which stimuli are aggregates of other stimuli.
+- Which stimuli are independent of one another.
+
+For example, a performance event may represent a single occurrence or an aggregate of several lower-level occurrences.
+
+Clear communication helps stakeholders understand quality requirements consistently.
