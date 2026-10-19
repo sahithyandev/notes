@@ -1,0 +1,160 @@
+---
+title: Architectural Scaling Techniques
+sidebar:
+  label: Architectural Scaling Techniques
+authors:
+  - nalina
+dateCreated: 2026-10-19T00:00:00.000Z
+lastUpdatedOn: 2026-10-19T12:34:25.858Z
+---
+
+## Sample Architecture
+
+Consider an application consisting of an application server and a database server.
+
+The servers use hardware resources such as CPUs and RAM to process requests and store data.
+
+As the workload increases, the architecture may need to be scaled to handle the additional demand.
+
+The lecture introduces three important approaches:
+
+- Vertical scaling
+- Vertical partitioning
+- Horizontal scaling
+
+## Vertical Scaling
+
+**Vertical scaling**, also called **scaling up**, increases the hardware resources of a server without changing the number of nodes.
+
+For example, a server may receive additional CPU capacity or RAM.
+
+### Advantages
+
+- Simple to implement.
+- Easier and quicker than redesigning the software.
+
+### Disadvantages
+
+- Has a finite limit.
+- Hardware does not scale linearly, resulting in diminishing returns for each additional unit.
+- Requires downtime.
+- Increases the impact of downtime.
+- Incremental costs increase exponentially.
+
+## Vertical Partitioning
+
+**Vertical partitioning** increases the number of nodes by distributing different tasks or functions across them.
+
+Each node or cluster performs separate tasks and may have a different configuration from the others.
+
+For example, an application server and a database server can be deployed on separate nodes.
+
+Vertical partitioning can be performed at different layers, including:
+
+- Application
+- Server
+- Data
+- Hardware
+
+### Vertical Partitioning Advantages
+
+- Increases availability for individual applications.
+- Allows task-based specialization, optimization, and tuning.
+- Reduces context switching.
+- May not require changes to the applications.
+- Increases flexibility.
+
+### Vertical Partitioning Disadvantages
+
+- May result in suboptimal resource utilization.
+- May not increase overall availability.
+- Has finite scalability.
+
+## Horizontal Scaling
+
+**Horizontal scaling**, also called **scaling out**, increases the number of nodes by replicating existing nodes.
+
+Each node performs the same tasks.
+A collection of nodes may be called a **cluster**.
+
+Horizontal scaling can be applied to different types of nodes, including application servers and database servers.
+
+### Load Balancing
+
+**Load balancing** distributes requests across multiple application server nodes.
+
+A load balancer sits between incoming requests and the application servers.
+
+Its purpose in the architecture is to distribute requests rather than direct every request to a single application server.
+
+Two types of load balancers:
+
+- **Hardware load balancer** Faster.
+- **Software load balancer** More customizable.
+
+## Load Balancing and Session Management
+
+When multiple application servers handle requests, the system must manage user sessions effectively.
+
+It describes three approaches:
+
+1. Sticky Sessions
+2. Central Session Store
+3. Clustered Session Management
+
+## Sticky Sessions
+
+**Sticky sessions** direct requests from a particular user to a fixed application server.
+
+The load balancer attempts to keep that user's requests associated with the same server.
+
+### Characteristics
+
+- Requests from a given user are sent to a fixed application server.
+- Load distribution may become asymmetrical.
+- If the associated server becomes unavailable, the user may lose session data.
+
+## Central Session Store
+
+A **central session store** keeps session data in a shared store that multiple application servers can access.
+
+It also calls this a **Shared Session Store Cluster**.
+
+### Central Session Store Characteristics
+
+- Multiple application servers use the same session store.
+- Session reads and writes generate disk and network I/O.
+- The central store introduces a **Single Point of Failure (SPOF)**.
+
+A SPOF is a component whose failure can cause the service that depends on it to fail.
+
+## Clustered Session Management
+
+**Clustered session management** distributes session management across application server nodes that communicate with one another.
+
+It also calls this a **Shared Nothing Cluster**.
+
+### Clustered Session Management Advantages
+
+- Easier to set up.
+- No Single Point of Failure.
+- Session reads are instantaneous.
+
+### Clustered Session Management Disadvantages
+
+- Session writes generate network I/O.
+- Network I/O increases exponentially as the number of nodes increases.
+- In rare circumstances, a request may receive stale session data.
+
+Stale session data may occur when:
+
+- A user's next request reaches another node faster than the intra-node message that updates session data.
+- Intra-node communication fails.
+
+## Comparison of Session Management Approaches
+
+| Approach                         | Main Idea                                                      | Advantages or Characteristics                                | Limitations                                                                          |
+| -------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| **Sticky Sessions**              | Send a user's requests to a fixed application server.          | Keeps requests associated with one server.                   | Asymmetrical load distribution and possible session-data loss when the server fails. |
+| **Central Session Store**        | Store session data centrally for access by multiple servers.   | Provides a shared location for session data.                 | Introduces a Single Point of Failure and generates disk and network I/O.             |
+| **Clustered Session Management** | Manage sessions across communicating application server nodes. | No Single Point of Failure; session reads are instantaneous. | Session writes generate network I/O, and stale session data is possible.             |
