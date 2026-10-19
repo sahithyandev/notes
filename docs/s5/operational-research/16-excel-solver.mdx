@@ -1,7 +1,7 @@
 ---
 title: Excel Solver
 dateCreated: 2026-09-16T16:54:07.618Z
-lastUpdatedOn: 2026-09-28T04:57:33.817Z
+lastUpdatedOn: 2026-10-19T12:09:03.898Z
 ---
 
 Excel Solver is an add-on that finds the optimal value of a target cell by changing a set of decision-variable cells, subject to constraints defined on other cells.
@@ -90,6 +90,8 @@ Subject to:
 - $x_1 + 2x_2 \le 50$
 - $x_1, x_2 \ge 0$
 
+<Solution>
+
 Coefficients are kept separate from the variables, so the same variable cells are reused by every `SUMPRODUCT` formula.
 
 Worksheet layout:
@@ -142,3 +144,5 @@ Solver Parameters:
 - Select a Solving Method is set to Simplex LP.
 
 Running Solver returns $x_1 = 10$, $x_2 = 20$, with `D4` showing $z = 1000$. Both `D6` and `D7` equal `E6` and `E7` exactly, so both constraints bind at the optimum.
+
+</Solution>

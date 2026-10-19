@@ -7,7 +7,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-10-08T17:21:09.149Z
-lastUpdatedOn: 2026-10-11T08:51:55.942Z
+lastUpdatedOn: 2026-10-19T12:09:01.442Z
 ---
 
 IPv6 transition mechanisms maintain connectivity while IPv4 and IPv6 coexist.
@@ -95,6 +95,8 @@ Applications carrying IP addresses inside their payload may need an Application 
 
 An IPv6-only client accesses `h2.example.com`. The server has only an A record containing `192.0.2.1`. The NAT64 deployment uses `64:ff9b::/96`.
 
+<Solution>
+
 1. The client requests an AAAA record through DNS64.
 2. DNS64 finds no usable AAAA record and obtains the A record `192.0.2.1`.
 3. Convert the IPv4 octets to hexadecimal. `192.0.2.1` becomes `c0 00 02 01`, or `c000:0201`.
@@ -104,3 +106,5 @@ An IPv6-only client accesses `h2.example.com`. The server has only an A record c
 7. The server replies to that IPv4 mapping. NAT64 uses its saved state to translate the reply back to the IPv6 client.
 
 The client uses IPv6 throughout its side of the connection. The server uses IPv4 throughout its side.
+
+</Solution>

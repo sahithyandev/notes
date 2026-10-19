@@ -1,7 +1,7 @@
 ---
 title: Permutation Cipher
 dateCreated: 2026-07-29T05:53:52.082Z
-lastUpdatedOn: 2026-10-17T05:04:56.331Z
+lastUpdatedOn: 2026-10-19T12:09:02.370Z
 ---
 
 One specific [classical](/s5/computer-security/ciphers#classical-cipher) cipher in the [transposition](/s5/computer-security/ciphers#transposition-cipher) category. The category as a whole is also called permutation ciphers. This note covers the concrete construction that carries the name, in the same way the [shift cipher](/s5/computer-security/shift-cipher) is one concrete cipher in the mono-alphabetic category.
@@ -65,6 +65,8 @@ Recovering the permutation $\sigma$:
 
 Key: $\sigma(1) = 2$, $\sigma(2) = 4$, $\sigma(3) = 1$, $\sigma(4) = 3$, $\sigma(5) = 5$. Plaintext `GETTOTHECHOPPER` splits into 3 blocks of 5: `GETTO`, `THECH`, `OPPER`.
 
+<Solution>
+
 Encryption places $m_i$ at position $\sigma(i)$ within each block. For the first block:
 
 - $m_1 = \text{G} \to$ position 2
@@ -91,3 +93,5 @@ The attack starts from ciphertext blocks with the block length unknown. With a l
 - Cut the ciphertext into blocks of 5.
 - Each of the $5! = 120$ candidate permutations is applied in inverse to every block.
 - The candidate $\sigma(1) = 2$, $\sigma(2) = 4$, $\sigma(3) = 1$, $\sigma(4) = 3$, $\sigma(5) = 5$ turns every block into readable text and is kept.
+
+</Solution>

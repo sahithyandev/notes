@@ -1,7 +1,7 @@
 ---
 title: Lorenz Cipher
 dateCreated: 2026-07-29T05:56:03.713Z
-lastUpdatedOn: 2026-09-29T03:14:18.897Z
+lastUpdatedOn: 2026-10-19T12:09:02.386Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher), [stream](/s5/computer-security/stream-ciphers) cipher. Encrypts a Baudot-coded plaintext bit stream into 5 ciphertext bit streams. Each bit is masked by a fresh keystream bit, so ciphertext symbol frequencies are flattened.
@@ -79,6 +79,8 @@ The keystream is fully determined once the register settings are fixed, so 2 mes
 
 One Baudot character `A`, code $11000$, with keystream bits $01101$ for this tick.
 
+<Solution>
+
 Encryption XORs the code with the keystream bit by bit.
 
 $$
@@ -102,3 +104,5 @@ $$
 $$
 
 The keystream $01101$ has cancelled, leaving the XOR of the 2 plaintext codes.
+
+</Solution>

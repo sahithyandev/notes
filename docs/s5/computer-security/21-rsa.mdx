@@ -1,7 +1,7 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:15:19.918Z
+lastUpdatedOn: 2026-10-19T12:09:02.528Z
 ---
 
 Named after Rivest, Shamir, Adleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures. Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
@@ -86,12 +86,16 @@ $$
 
 $p = 17$, $q = 11$.
 
+<Solution>
+
 - $n = 187$.
 - $\phi(n) = 16 \times 10 = 160$.
 - $e = 7$, since $\gcd(7, 160) = 1$.
 - $d = 23$, since $23 \times 7 = 161 = 160 + 1$.
 - Public key $\{7, 187\}$, private key $\{23\}$.
 - For $m = 88$, $c = 88^7 \bmod 187 = 11$, and $m = 11^{23} \bmod 187 = 88$.
+
+</Solution>
 
 <Note>
 

@@ -7,7 +7,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-10-08T17:30:43.930Z
-lastUpdatedOn: 2026-10-11T08:51:56.085Z
+lastUpdatedOn: 2026-10-19T12:09:01.510Z
 ---
 
 **Network virtualization** presents logical networks independently of the physical network that carries their traffic.
@@ -74,6 +74,8 @@ The lecture places OVS on each host and connects the switches to a controller.
 
 Finance VM A runs on Host 1 in Data Centre 1. Finance VM B runs on Host 2 in Data Centre 2. Engineering workloads share the physical infrastructure but use a separate logical network.
 
+<Solution>
+
 1. The controller configures Finance membership and forwarding policy on both virtual switches.
 2. VM A sends an Ethernet frame addressed to VM B.
 3. Host 1's virtual switch classifies the frame into the Finance network.
@@ -83,3 +85,5 @@ Finance VM A runs on Host 1 in Data Centre 1. Finance VM B runs on Host 2 in Dat
 7. The switch delivers the frame to VM B without delivering it to Engineering interfaces.
 
 Finance connectivity spans both hosts. Virtual network membership and forwarding policy enforce separation from Engineering.
+
+</Solution>

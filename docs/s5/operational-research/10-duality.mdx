@@ -1,7 +1,7 @@
 ---
 title: Duality
 dateCreated: 2026-08-26T11:53:59.790Z
-lastUpdatedOn: 2026-10-17T04:15:02.586Z
+lastUpdatedOn: 2026-10-19T12:09:03.800Z
 ---
 
 Every linear program (the primal) has an associated linear program (the dual) built from the same data.
@@ -84,13 +84,15 @@ The variable-to-constraint mapping mirrors this. A non-negative primal variable 
 
 ## Theorems
 
-### Weak Duality Theorem
+<Theorem name="Weak Duality Theorem" level="3">
 
 For a maximization primal and its minimization dual, every primal feasible objective value is $\le$ every dual feasible objective value.
 
 $$
 z_{\text{primal}} \le z_{\text{dual}}
 $$
+
+</Theorem>
 
 <Proof label="Proof Hint">
 
@@ -108,13 +110,15 @@ Consequences:
 - If a primal feasible $x$ and a dual feasible $y$ satisfy $c^T x = b^T y$, both are optimal.
 - Dual infeasible does not imply primal unbounded; both problems can be infeasible.
 
-### Strong Duality Theorem
+<Theorem name="Strong Duality Theorem" level="3">
 
 If the primal has an optimal solution, the dual also has an optimal solution, and their optimal objective values are equal.
 
 $$
 z_{\text{primal}}^* = z_{\text{dual}}^*
 $$
+
+</Theorem>
 
 <Proof label="Proof Hint">
 
@@ -167,6 +171,8 @@ $$
 \end{aligned}
 $$
 
+<Solution>
+
 3 constraints give 3 dual variables $y_1, y_2, y_3$; 2 primal variables give 2 dual constraints. All primal constraints are $\le$, so all $y_i \ge 0$. Transposing the constraint matrix and swapping RHS with objective coefficients:
 
 $$
@@ -185,3 +191,5 @@ Complementary slackness holds at $x^* = (2, 6)$, $y^* = (0, \tfrac{3}{2}, 1)$:
 - Primal constraint 1 has slack $4 - 2 = 2 > 0$, so $y_1 = 0$.
 - $y_2, y_3 > 0$, so primal constraints 2 and 3 are binding: $2(6) = 12$, $3(2) + 2(6) = 18$.
 - $x_1, x_2 > 0$, so both dual constraints are binding: $0 + 3(1) = 3$, $2(\tfrac{3}{2}) + 2(1) = 5$.
+
+</Solution>

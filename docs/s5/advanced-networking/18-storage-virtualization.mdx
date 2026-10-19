@@ -6,7 +6,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-10-08T17:30:43.646Z
-lastUpdatedOn: 2026-10-11T08:51:56.050Z
+lastUpdatedOn: 2026-10-19T12:09:01.494Z
 ---
 
 **Storage virtualization** maps logical storage to physical storage through an abstraction layer.
@@ -86,6 +86,8 @@ The lecture uses a 2 TB storage pool and 3 LUNs. Use decimal units, with 2 TB eq
 | 3     | 800 GB               | 200 GB      | 600 GB                                      |
 | Total | 1850 GB              | 350 GB      | 1500 GB                                     |
 
+<Solution>
+
 1. Total provisioned capacity is $500 + 550 + 800 = 1850$ GB.
 2. Actual data occupies $100 + 50 + 200 = 350$ GB.
 3. Thick provisioning leaves $2000 - 1850 = 150$ GB unallocated in the pool.
@@ -93,3 +95,5 @@ The lecture uses a 2 TB storage pool and 3 LUNs. Use decimal units, with 2 TB eq
 5. Thin provisioning initially consumes 350 GB, leaving $2000 - 350 = 1650$ GB available in the pool.
 
 Both arrangements present the same 1850 GB of logical capacity. Thin provisioning makes the 1500 GB of unwritten capacity available for allocation elsewhere until writes consume it.
+
+</Solution>

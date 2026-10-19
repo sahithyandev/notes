@@ -3,7 +3,7 @@ title: Initial Value Problems
 prereqs:
   - s5/operational-research/convex
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T05:04:56.974Z
+lastUpdatedOn: 2026-10-19T12:09:03.523Z
 ---
 
 An initial value problem (IVP) is a first-order ODE together with the solution value at the left endpoint.
@@ -77,6 +77,8 @@ A well-posed IVP may fail the Lipschitz condition. If Lipschitz fails, check the
 
 $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$.
 
+<Solution>
+
 $f(t, y) = y - t^2 + 1$ is continuous on $D = [0, 2] \times \mathbb{R}$, and $\left| \dfrac{\partial f}{\partial y} \right| = 1$. So $f$ is Lipschitz in $y$ with $L = 1$, and the IVP is well-posed.
 
 To see the stability bound directly, take a constant equation perturbation $\delta$ and an initial perturbation $\delta_0$
@@ -96,3 +98,5 @@ $$
 $$
 
 for $|\delta| < \varepsilon$ and $|\delta_0| < \varepsilon$, using $e^t \leq e^2$ on $[0, 2]$. The bound holds with $k = 2 e^2 + 1$ for every $\varepsilon > 0$.
+
+</Solution>

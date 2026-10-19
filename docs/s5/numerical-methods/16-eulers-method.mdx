@@ -1,7 +1,7 @@
 ---
 title: Euler's Method
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T05:04:56.983Z
+lastUpdatedOn: 2026-10-19T12:09:03.536Z
 ---
 
 Euler's method approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-value-problems) at equally spaced mesh points, using the first-order Taylor expansion.
@@ -83,6 +83,8 @@ $$
 
 IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$.
 
+<Solution>
+
 $$
 \begin{aligned}
 w_0 &= 0.5 \\
@@ -94,3 +96,5 @@ w_4 &= w_3 + 0.5\,(w_3 - 1.5^2 + 1) = 4.4375
 $$
 
 Hence $y(2) \approx w_4 = 4.4375$. The exact solution is $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
+
+</Solution>

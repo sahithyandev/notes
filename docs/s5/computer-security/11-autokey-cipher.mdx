@@ -1,7 +1,7 @@
 ---
 title: Autokey Cipher
 dateCreated: 2026-08-26T00:00:00.000Z
-lastUpdatedOn: 2026-09-29T03:14:18.852Z
+lastUpdatedOn: 2026-10-19T12:09:02.336Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Created by Blaise de Vigenère. Provides higher security than the [Bellaso variant](./vigenere-cipher). This was <b>NOT</b> covered in the class; only included here for the sake of completeness.
@@ -46,6 +46,8 @@ where $k_r$ is the one primer letter in residue class $r = i \bmod L$. Each of t
 
 Plaintext `imakemyownluck` under primer key `PATRIC`, with $A = 0$ to $Z = 25$.
 
+<Solution>
+
 The keystream is the primer key followed by the plaintext itself, truncated to the plaintext length.
 
 ```
@@ -78,3 +80,5 @@ For the attack, take ciphertext `UIHGTQANBLIGBBRBPRB` with $L = 3$. Class $r = 1
 $$20 - x, \quad 12 + x, \quad 14 - x, \quad 23 + x$$
 
 Only $x = 1$ (`B`) gives language: `t n n y`. The other 2 classes resolve the same way, giving primer `BUZ` and plaintext `toinfinityandbeyond`.
+
+</Solution>

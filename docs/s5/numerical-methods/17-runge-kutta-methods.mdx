@@ -1,7 +1,7 @@
 ---
 title: Runge-Kutta Methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:14.653Z
+lastUpdatedOn: 2026-10-19T12:09:03.549Z
 ---
 
 Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problems) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
@@ -83,6 +83,8 @@ All four have the form $w_{i+1} = w_i + h \times (\text{slope estimate})$. They 
 
 IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
 
+<Solution>
+
 ### Midpoint
 
 $$
@@ -123,3 +125,5 @@ Continuing, $w_2 = 2.6396$, $w_3 = 4.0068$, $w_4 = 5.3016$.
 | Midpoint            | $5.2149$           | $0.091$ |
 | Modified Euler      | $4.9163$           | $0.389$ |
 | Order 4 Runge-Kutta | $5.3016$           | $0.004$ |
+
+</Solution>

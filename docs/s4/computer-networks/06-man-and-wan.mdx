@@ -3,7 +3,7 @@ title: MAN & WAN
 prereqs:
   - s3/data-communication-and-networking/network
 dateCreated: 2026-05-03T07:56:35.318Z
-lastUpdatedOn: 2026-10-17T06:00:22.955Z
+lastUpdatedOn: 2026-10-19T12:08:58.845Z
 ---
 
 Different technologies are used for MAN and WAN networks.
@@ -42,10 +42,12 @@ Every intermediate switch checks each packet for errors and retransmits before f
 
 Supports both:
 
-- Permanent Virtual Circuits  
-  Aka. PVCs. The virtual circuit is configured once between 2 routers and stays up indefinitely.
-- Switched Virtual Circuits  
-  Aka. SVCs. The circuit is established on-demand. Used for the duration of a session, then torn down. More common in X.25
+- Permanent Virtual Circuits
+  <Aka>PVCs</Aka>. The virtual circuit is configured once between 2 routers and
+  stays up indefinitely.
+- Switched Virtual Circuits
+  <Aka>SVCs</Aka>. The circuit is established on-demand. Used for the duration
+  of a session, then torn down. More common in X.25
 
 Specs:
 
@@ -114,10 +116,13 @@ Fixed size cells enable faster processing at hardware level. This enables bounde
 
 Each cell carries:
 
-- Virtual Path Identifier  
-  Aka. VPI. Identifies a virtual path. A bundle of virtual circuits sharing the same physical route through the network. Switches route based on VPI alone at intermediate nodes.
-- Virtual Circuit Identifier  
-  Aka. VCI. Identifies a specific virtual circuit within a virtual path. Only meaningful in the context of a VPI.
+- Virtual Path Identifier
+  <Aka>VPI</Aka>. Identifies a virtual path. A bundle of virtual circuits
+  sharing the same physical route through the network. Switches route based on
+  VPI alone at intermediate nodes.
+- Virtual Circuit Identifier
+  <Aka>VCI</Aka>. Identifies a specific virtual circuit within a virtual path.
+  Only meaningful in the context of a VPI.
 
 At each switch, the VPI/VCI pair is replaced with a new pair on the outgoing link. Separating path-level from circuit-level routing lets intermediate nodes forward on VPI alone, without inspecting individual VCIs. Enables faster switching.
 

@@ -8,7 +8,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-10-07T05:27:09.257Z
+lastUpdatedOn: 2026-10-19T12:09:01.179Z
 ---
 
 Multimedia networking focuses on transmitting audio, video, and interactive data over packet-switched IP networks while coping with variable network delay, throughput fluctuations, and packet loss.
@@ -150,6 +150,8 @@ Assume a stored video has aligned 2-second segments at 1, 2, and 4 Mbps. Segment
 | 2 Mbps         | 4 Mbit.          | Approximately 1.33 seconds.      |
 | 4 Mbps         | 8 Mbit.          | Approximately 2.67 seconds.      |
 
+<Solution>
+
 1. The server publishes a manifest listing representations and segment URLs.
 2. The client fetches the manifest and estimates throughput from completed downloads.
 3. At an estimated 3 Mbps, the client selects the 2 Mbps representation to leave a capacity margin.
@@ -167,3 +169,5 @@ For live delivery:
 - Shorter segments allow earlier delivery and faster quality changes, with more request and packaging overhead.
 - Larger buffers reduce stalls but increase delay behind the live source.
 - Interactive conversation requires a tighter latency budget than watching a live broadcast.
+
+</Solution>

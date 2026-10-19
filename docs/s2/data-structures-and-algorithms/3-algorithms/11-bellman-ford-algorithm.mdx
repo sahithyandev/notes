@@ -1,7 +1,7 @@
 ---
 title: Bellman Ford Algorithm
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-09-29T03:51:34.714Z
+lastUpdatedOn: 2026-10-19T12:08:54.876Z
 ---
 
 A dynamic algorithm to find the shortest paths from a source node to all other node in a weighted graph. Can handle graphs with negative weight edges. Fails for graphs with negative weight cycle.
@@ -85,6 +85,8 @@ import BellmanFordAlgorithmExample from "./images/bellman-ford-algorithm-example
 
 <BellmanFordAlgorithmExample />
 
+<Solution>
+
 - Initialize  
   $d[0] = 0$, $d[1] = d[2] = d[3] = d[4] = \infty$, predecessors = null.
 - Relax Edges (4 iterations):
@@ -117,6 +119,8 @@ Final Results:
     $0\to4$ (1)
 
 Bellman-Ford works by relaxing all edges $|V|-1$ times, handling negative weights if present (none here).
+
+</Solution>
 
 ## Comparison from Dijkstra's Algorithm
 

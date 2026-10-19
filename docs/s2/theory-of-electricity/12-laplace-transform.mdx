@@ -1,7 +1,7 @@
 ---
 title: Laplace Transform
 dateCreated: 2026-04-22T07:07:02.603Z
-lastUpdatedOn: 2026-09-29T03:51:35.504Z
+lastUpdatedOn: 2026-10-19T12:08:55.718Z
 ---
 
 A mathematical operation that transforms a function of time $f(t)$, into a function of a complex variable, denoted as $F(s)$. Mathematically, the Laplace Transform of a function $f(t)$ is defined as:
@@ -12,9 +12,13 @@ $$
 
 Here:
 
-- $t$ represents time
-- $s = \sigma + j\omega$, where $\sigma, \omega \in \mathbb{R}$
-- $e^{-st}$ is the exponential decay factor that weights the function $f(t)$.
+<Symbols>
+  <Sym s="t">time</Sym>
+  <Sym s="s">$\sigma + j\omega$, where $\sigma, \omega \in \mathbb{R}$</Sym>
+  <Sym s="e^{-st}">
+    the exponential decay factor that weights the function $f(t)$
+  </Sym>
+</Symbols>
 
 Can only be applied to casual functions. Converts a differential equation (time domain) into a linear complex algebraic equation (frequency domain). After Laplace transformation is applied, the resulting functions are capitalized by convention.
 
@@ -168,7 +172,7 @@ $$
 
 ## Theorems
 
-### Initial Value Theorem
+<Theorem name="Initial Value Theorem" level="3">
 
 $$
 f(0^+) =
@@ -177,13 +181,17 @@ f(0^+) =
 \lim_{s \to \infty} sF(s)
 $$
 
-### Final Value Theorem
+</Theorem>
+
+<Theorem name="Final Value Theorem" level="3">
 
 $$
 f(\infty) =
 \lim_{t \to \infty} f(t)=
 \lim_{s \to 0} sF(s)
 $$
+
+</Theorem>
 
 ## Laplace Transform Table
 

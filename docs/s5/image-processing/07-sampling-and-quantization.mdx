@@ -1,7 +1,7 @@
 ---
 title: Sampling and Quantization
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-10-18T09:17:02.256Z
+lastUpdatedOn: 2026-10-19T12:09:03.013Z
 ---
 
 Sampling and quantization are the 2 independent choices made when converting an analog image to a [digital image](/s5/image-processing/image-model). Sampling sets the grid size $m \times n$. Quantization sets the number of levels $L = 2^k$. Together they fix the storage size $m \times n \times k$ bits per channel.
@@ -24,7 +24,10 @@ Each cell keeps only one value for the region it covers, so any variation finer 
 
 ### Pixelation
 
-Each grid cell becomes one flat square of intensity, so a smooth or diagonal edge is replaced by a staircase of these squares. Most visible on high-contrast boundaries such as text against a plain background. Also called the checkerboard effect or blocking.
+<Aka>the checkerboard effect or blocking</Aka>. Each grid cell becomes one flat
+square of intensity, so a smooth or diagonal edge is replaced by a staircase of
+these squares. Most visible on high-contrast boundaries such as text against a
+plain background.
 
 <figure>
 

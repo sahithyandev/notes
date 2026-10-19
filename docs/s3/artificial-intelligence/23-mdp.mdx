@@ -1,17 +1,23 @@
 ---
 title: Markov Decision Process
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-10-17T06:15:16.968Z
+lastUpdatedOn: 2026-10-19T12:08:56.484Z
 ---
 
 <Aka>MDP</Aka>. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
 
 Here:
 
-- $S$ is the set of states
-- $A$ is the set of actions
-- $T: S \times A \times S \rightarrow \mathbb{R}_{\ge 0}$ is the [transition function](#transition-function)
-- $R: S \times A \rightarrow \mathbb{R}_{\ge 0}$ is the [reward function](#reward-function)
+<Symbols>
+  <Sym s="S">the set of states</Sym>
+  <Sym s="A">the set of actions</Sym>
+  <Sym s="T: S \times A \times S \rightarrow \mathbb{R}_{\ge 0}">
+    the [transition function](#transition-function)
+  </Sym>
+  <Sym s="R: S \times A \rightarrow \mathbb{R}_{\ge 0}">
+    the [reward function](#reward-function)
+  </Sym>
+</Symbols>
 
 The objective is to maximize the sum of future rewards. A policy will be calculated to determine how to act.
 
@@ -75,8 +81,10 @@ $$
 
 Here:
 
-- $t$ is the current time step
-- $R_{t+k+1}$ is the reward received at time step $t+k+1$
+<Symbols>
+  <Sym s="t">the current time step</Sym>
+  <Sym s="R_{t+k+1}">the reward received at time step $t+k+1$</Sym>
+</Symbols>
 
 ## Solving MDPs
 
@@ -96,9 +104,13 @@ $$
 
 Here:
 
-- $V^*(s)$ is the optimal value of $s$.
-- $Q^*(s,a)$ is the optimal action-value of $a$ at $s$.  
-  Represents the maximum reward for taking an action $a$ in state $s$.
+<Symbols>
+  <Sym s="V^*(s)">the optimal value of $s$</Sym>
+  <Sym s="Q^*(s,a)">
+    the optimal action-value of $a$ at $s$, the maximum reward for taking an
+    action $a$ in state $s$
+  </Sym>
+</Symbols>
 
 ## Algorithms
 

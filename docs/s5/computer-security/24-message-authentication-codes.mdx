@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Codes
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T05:04:56.460Z
+lastUpdatedOn: 2026-10-19T12:09:02.575Z
 ---
 
 A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
@@ -82,8 +82,9 @@ Fixes:
 
 - Length prefix  
   Prepend the message length as the first block.
-- CMAC  
-  XOR a key derived subkey into the last block before the final encryption. Also called OMAC.
+- CMAC
+  <Aka>OMAC</Aka>. XOR a key derived subkey into the last block before the final
+  encryption.
 - ECBC-MAC  
   Encrypt the final tag again under a second key.
 

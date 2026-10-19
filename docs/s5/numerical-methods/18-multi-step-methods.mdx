@@ -1,7 +1,7 @@
 ---
 title: Multi-Step Methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:14.660Z
+lastUpdatedOn: 2026-10-19T12:09:03.562Z
 ---
 
 A multi-step method computes $w_{i+1}$ from several previous approximations, not just $w_i$. More accurate earlier approximations are then folded into the current step.
@@ -105,6 +105,8 @@ A standard choice uses Runge-Kutta for the starting values, Adams-Bashforth 4-st
 
 IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $h = 0.2$, by Adams-Bashforth 2-step. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, used only to check the result.
 
+<Solution>
+
 The 2-step method needs $w_0$ and $w_1$ before it can start. $w_0 = \alpha = 0.5$ is given; $w_1$ is computed with one step of [order 4 Runge-Kutta](/s5/numerical-methods/runge-kutta-methods).
 
 Starting value $w_1$ by Runge-Kutta, $t_0 = 0$, $w_0 = 0.5$
@@ -130,3 +132,5 @@ w_2 &= w_1 + \frac{0.2}{2}\left[ 3 f_1 - f_0 \right] = 0.829293 + 0.1\,(3.867879
 $$
 
 Exact $y(0.4) \approx 1.214088$.
+
+</Solution>

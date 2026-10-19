@@ -1,7 +1,7 @@
 ---
 title: Attribute Sets
 dateCreated: 2026-04-22T07:09:10.695Z
-lastUpdatedOn: 2026-10-10T18:32:22.265Z
+lastUpdatedOn: 2026-10-19T12:08:57.501Z
 ---
 
 A set of attributes.
@@ -73,17 +73,25 @@ Attribute in the LHS.
 
 Given $F = \set{A \rightarrow C, AB \rightarrow C}$. Test $B$ in $AB \rightarrow C$.
 
+<Solution>
+
 - $\alpha = AB$ and $\beta = C$
 - $(\alpha - B)^+ = A^+ = \set{A, C}$ using $A \rightarrow C$
 - $A^+$ contains $\beta = C$, so $B$ is extraneous
 - $AB \rightarrow C$ reduces to $A \rightarrow C$
 
+</Solution>
+
 Attribute in the RHS.
 
 Given $F = \set{A \rightarrow B, B \rightarrow C, A \rightarrow BC}$. Test $C$ in $A \rightarrow BC$.
+
+<Solution>
 
 - $\alpha = A$ and $\beta = BC$
 - $F' = \set{A \rightarrow B, B \rightarrow C, A \rightarrow B}$
 - $A^+ = \set{A, B, C}$ in $F'$, using $A \rightarrow B$ then $B \rightarrow C$
 - $A^+$ contains $C$, so $C$ is extraneous
 - $A \rightarrow BC$ reduces to $A \rightarrow B$
+
+</Solution>

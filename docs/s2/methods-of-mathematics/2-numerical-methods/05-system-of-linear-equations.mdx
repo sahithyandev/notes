@@ -1,7 +1,7 @@
 ---
 title: System of Linear Equations
 dateCreated: 2026-04-22T07:07:02.593Z
-lastUpdatedOn: 2026-09-29T03:51:34.996Z
+lastUpdatedOn: 2026-10-19T12:08:55.234Z
 ---
 
 A linear equation is an equation that may be put in the form:
@@ -128,9 +128,11 @@ $$
 
 Here:
 
-- $D$ is a diagonal matrix whose entries are of $A$.
-- $-L$ is the strictly lower-triangular part of $A$.
-- $-U$ is the strictly upper-triangular part of $A$.
+<Symbols>
+  <Sym s="D">a diagonal matrix whose entries are of $A$</Sym>
+  <Sym s="-L">the strictly lower-triangular part of $A$</Sym>
+  <Sym s="-U">the strictly upper-triangular part of $A$</Sym>
+</Symbols>
 
 </Note>
 
@@ -157,15 +159,17 @@ For $D-L$ to be non-singular, $\forall i \in \{1,2,\dots,n\}\;\; a_{ii} \neq 0$.
 
 Here:
 
-- $D$ is a diagonal matrix whose entries are of $A$.
-- $-L$ is the strictly lower-triangular part of $A$.
-- $-U$ is the strictly upper-triangular part of $A$.
+<Symbols>
+  <Sym s="D">a diagonal matrix whose entries are of $A$</Sym>
+  <Sym s="-L">the strictly lower-triangular part of $A$</Sym>
+  <Sym s="-U">the strictly upper-triangular part of $A$</Sym>
+</Symbols>
 
 </Note>
 
 ## Convergence of Iterative Methods
 
-### Theorem 1
+<Theorem>
 
 Suppose $\vec{X}^{(0)} \in R^n$. And $\vec{X}^{(k)} = T \vec{X}^{(k-1)} + \vec{C}, \quad \text{for each } k \geq 1$.
 
@@ -181,6 +185,10 @@ $$
 \lVert\vec{X} - \vec{X}^{(k)}\rVert \leq \frac{\lVert T\rVert^k}{1 - \lVert T\rVert} \lVert\vec{X}^{(1)} - \vec{X}^{(0)}\rVert
 $$
 
-### Theorem 2
+</Theorem>
+
+<Theorem>
 
 **If** $A$ is strictly diagonally dominant, **then** for any choice of $X^{(0)}$, both Jacobi and Gauss-Seidel methods gives sequences $(\vec{X}^{(k)})_{k=0}^\infty$ that converge to the unique solution of $A\vec{X} = \vec{B}$.
+
+</Theorem>

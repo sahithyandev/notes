@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-10-17T06:00:25.886Z
+lastUpdatedOn: 2026-10-19T12:09:03.116Z
 ---
 
 Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
@@ -182,6 +182,8 @@ Test CDF $C_t$: $[0.25, 0.75, 0.75, 1.0]$.
 
 Reference CDF $C_r$: $[0.1, 0.2, 0.7, 1.0]$.
 
+<Solution>
+
 Mapping:
 
 - $g = 0$, $C_t = 0.25$: closest is $C_r(1) = 0.2$, so $0 \mapsto 1$
@@ -190,3 +192,5 @@ Mapping:
 - $g = 3$, $C_t = 1.0$: $C_r(3) = 1.0$, so $3 \mapsto 3$
 
 Output pixels: $1, 2, 2, 3$.
+
+</Solution>

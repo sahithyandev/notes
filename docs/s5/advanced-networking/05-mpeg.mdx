@@ -3,7 +3,7 @@ title: MPEG
 authors:
   - rakeshan
 dateCreated: 2026-09-25T06:10:54.663Z
-lastUpdatedOn: 2026-09-29T19:55:29.679Z
+lastUpdatedOn: 2026-10-19T12:09:01.246Z
 ---
 
 MPEG stands for Moving Picture Experts Group, which develops standards for coded media and associated systems.
@@ -127,6 +127,8 @@ I0  B1  B2  P3  B4  B5  P6
 
 Assume each P-frame references the preceding I- or P-frame. Each B-frame uses both surrounding reference frames.
 
+<Solution>
+
 | Frame      | Required Reference Frames |
 | ---------- | ------------------------- |
 | `I0`       | None.                     |
@@ -156,3 +158,5 @@ To seek directly to `B4` with an empty decoder:
 - Losing `B4` does not invalidate the other frames in this example.
 - Longer GOPs can reduce I-frame overhead but increase the reference chain needed for seeking and recovery.
 - Only a closed GOP avoids references to pictures outside the group.
+
+</Solution>

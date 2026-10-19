@@ -1,7 +1,7 @@
 ---
 title: Substitution Cipher
 dateCreated: 2026-07-29T05:50:15.139Z
-lastUpdatedOn: 2026-09-29T03:14:18.821Z
+lastUpdatedOn: 2026-10-19T12:09:02.310Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher) and [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. The key is a proper permutation of the plaintext alphabet.
@@ -34,6 +34,8 @@ Steps:
 
 Key alphabet `LOBSTERACDFGHIJKMNPQUVWXYZ`, so plaintext `a` maps to `L`, `b` to `O`, `c` to `B`, and so on.
 
+<Solution>
+
 Each plaintext letter is looked up in the key alphabet.
 
 - `h` maps to `A`
@@ -58,3 +60,5 @@ For a longer ciphertext in this key, a frequency count leads the recovery.
 - The digram `QA` recurs, matched to `th`, which fixes `Q` to `t` and `A` to `h`.
 - `QAT` then reads `the`, fixing `T` to `e`.
 - Remaining letters are filled by trial, checking that partially decrypted words are valid.
+
+</Solution>

@@ -7,7 +7,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-10-08T17:21:08.499Z
-lastUpdatedOn: 2026-10-11T08:51:55.858Z
+lastUpdatedOn: 2026-10-19T12:09:01.411Z
 ---
 
 IPv6 deployment introduces IPv6 addressing and connectivity while maintaining access to services that still use IPv4.
@@ -60,6 +60,8 @@ An AAAA record alone does not establish working IPv6 connectivity. Test the appl
 
 The lecture allocates `2401:df0:17::/48` in consecutive `/56` blocks. Treat the prefix as the exercise input.
 
+<Solution>
+
 1. Count the available `/56` blocks. The extra 8 prefix bits give $2^8 = 256$ blocks.
 2. Each `/56` contains $2^8 = 256$ `/64` subnets.
 3. Assign 2 blocks to the backbone and the next 2 to servers.
@@ -89,3 +91,5 @@ Contiguous allocations can be summarized where their size and alignment permit:
 | IT           | `2401:df0:17:c000::/50`                                                                                                     |
 
 Engineering needs 5 aggregate prefixes because 124 is not a power of 2. The allocations cover all 256 `/56` blocks without overlap.
+
+</Solution>

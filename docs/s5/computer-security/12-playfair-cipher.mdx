@@ -1,7 +1,7 @@
 ---
 title: Playfair Cipher
 dateCreated: 2026-07-29T05:53:47.519Z
-lastUpdatedOn: 2026-10-07T05:44:47.302Z
+lastUpdatedOn: 2026-10-19T12:09:02.350Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [polygraphic](/s5/computer-security/ciphers#polygraphic-cipher) cipher. Invented by Sir Charles Wheatstone in 1854. Named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
@@ -74,6 +74,8 @@ Known-plaintext attacks are far stronger. A few matched bigrams pin enough lette
 
 Plaintext `wakandaforever` under keyword `PANTHER`.
 
+<Solution>
+
 The grid built from `PANTHER`:
 
 ```
@@ -132,3 +134,5 @@ ciphertext:  AR WG GT
 - `ka` to `GT`. Testing the same-row and same-column rules both fail, so the bigram is a rectangle: the cell sharing `k`'s row and `a`'s column is `g`, and the cell sharing `a`'s row and `k`'s column is `t`. Since `g` was already placed in the shared column above, this confirms `a`'s column is the same one.
 
 More matched bigrams pin the remaining letters the same way. Once most cells are known, the alphabetical order of the trailing letters exposes the keyword, and the full grid follows.
+
+</Solution>

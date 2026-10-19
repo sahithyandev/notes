@@ -1,7 +1,7 @@
 ---
 title: Pumping Lemma for CFL
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-09-29T03:57:50.319Z
+lastUpdatedOn: 2026-10-19T12:09:00.982Z
 ---
 
 Let $L$ be a CFL. Then $\exists n \in \mathbb{N}$ such that $\forall u \in L$ satisfying $|u| \ge n$, there exist strings $v, w, x, y, z$ satisfying:
@@ -27,6 +27,8 @@ Standard proof structure:
 
 Prove $L = \{a^n b^n c^n \mid n \ge 1\}$ is not a CFL.
 
+<Solution>
+
 Assume $L$ is a CFL with pumping length $p$. Choose $u = a^p b^p c^p$, so $|u| = 3p \ge p$.
 
 Any decomposition $u = vwxyz$ with $|wxy| \le p$ means $wxy$ spans at most 2 of the 3 symbol types (cannot reach from the $a$-block to the $c$-block in $p$ characters).
@@ -36,6 +38,8 @@ Case 1: $wxy$ lies entirely in $a^p b^p$. Pumping increases the count of $a$s or
 Case 2: $wxy$ lies entirely in $b^p c^p$. Pumping increases $b$s or $c$s but not $a$s. Unequal counts.
 
 In all cases, $vw^2xy^2z \notin L$. Contradiction. $L$ is not a CFL.
+
+</Solution>
 
 ## Ogden’s Lemma
 

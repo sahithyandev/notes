@@ -1,7 +1,7 @@
 ---
 title: Cubic Spline Interpolation
 dateCreated: 2026-08-11T05:00:40.584Z
-lastUpdatedOn: 2026-09-28T05:07:14.619Z
+lastUpdatedOn: 2026-10-19T12:09:03.506Z
 ---
 
 Given nodes $a = x_0 < x_1 < \cdots < x_n = b$ and $f$ defined on $[a, b]$, a cubic spline interpolant for $f$ is a function $S$ satisfying:
@@ -99,6 +99,8 @@ Unlike the natural spline, this requires knowing $f'(x_0)$ and $f'(x_n)$ directl
 
 Construct a natural cubic spline through $(1, 2), (2, 3), (3, 5)$.
 
+<Solution>
+
 Nodes $x_0 = 1, x_1 = 2, x_2 = 3$, so $n = 2$, $h_0 = h_1 = 1$, and $a_0 = 2, a_1 = 3, a_2 = 5$ directly from interpolation. Natural boundary conditions give $c_0 = c_2 = 0$. The system for $c_1$ (the single interior equation, $j = 1$) is
 
 $$
@@ -121,11 +123,15 @@ $$
 S(x) = \begin{cases} 2 + \tfrac{3}{4}(x-1) + \tfrac{1}{4}(x-1)^3, & x \in [1, 2] \\[4pt] 3 + \tfrac{3}{2}(x-2) + \tfrac{3}{4}(x-2)^2 - \tfrac{1}{4}(x-2)^3, & x \in [2, 3] \end{cases}
 $$
 
+</Solution>
+
 ### With Multiple Interior Nodes
 
 The 3-point example above has only 1 interior node, so its tridiagonal system is a single equation. With 4 nodes, there are 2 interior equations, and solving for $c_1, c_2$ requires actual elimination.
 
 Construct a natural cubic spline through $(0, 0), (1, 1), (2, 0), (3, 1)$.
+
+<Solution>
 
 Nodes give $n = 3$, $h_0 = h_1 = h_2 = 1$, and $a_0 = 0, a_1 = 1, a_2 = 0, a_3 = 1$. Natural boundary conditions give $c_0 = c_3 = 0$. The tridiagonal system for $j = 1, 2$ is
 
@@ -164,9 +170,13 @@ $$
 S(x) = \begin{cases} \tfrac{5}{3}x - \tfrac{2}{3}x^3, & x \in [0, 1] \\[4pt] 1 - \tfrac{1}{3}(x-1) - 2(x-1)^2 + \tfrac{4}{3}(x-1)^3, & x \in [1, 2] \\[4pt] -\tfrac{1}{3}(x-2) + 2(x-2)^2 - \tfrac{2}{3}(x-2)^3, & x \in [2, 3] \end{cases}
 $$
 
+</Solution>
+
 ### Clamped Boundary Example
 
 Construct a clamped cubic spline through $(0, 0), (1, 1), (2, 0)$ with $f'(0) = 1$, $f'(2) = -1$.
+
+<Solution>
 
 Nodes give $n = 2$, $h_0 = h_1 = 1$, and $a_0 = 0, a_1 = 1, a_2 = 0$. The interior equation ($j = 1$) plus the 2 clamp equations give 3 equations in $c_0, c_1, c_2$
 
@@ -197,6 +207,8 @@ S(x) = \begin{cases} x + x^2 - x^3, & x \in [0, 1] \\[4pt] 1 - 2(x-1)^2 + (x-1)^
 $$
 
 Checking the endpoints confirms the clamp held: $S_0'(0) = b_0 = 1 = f'(0)$, and $S_1'(2) = b_1 + 2c_1h_1 + 3d_1h_1^2 = 0 - 4 + 3 = -1 = f'(2)$.
+
+</Solution>
 
 ## Error
 

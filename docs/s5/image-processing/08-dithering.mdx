@@ -1,7 +1,7 @@
 ---
 title: Dithering
 dateCreated: 2026-09-25T19:30:18.372Z
-lastUpdatedOn: 2026-10-18T09:17:02.278Z
+lastUpdatedOn: 2026-10-19T12:09:03.032Z
 ---
 
 Dithering trades spatial resolution for grey-level depth. A device with few output levels approximates an intermediate intensity by mixing the available levels over a small region, which the eye averages at normal viewing distance.
@@ -33,6 +33,8 @@ $$
 D = \begin{bmatrix} 0 & 2 \\ 3 & 1 \end{bmatrix}
 $$
 
+<Solution>
+
 Sub-pixel $(i,j)$ is set to $1$ **iff** $v > \dfrac{D_{ij} + 0.5}{4}$.
 
 - $(0,0)$ has threshold $0.125$. Since $0.5 > 0.125$, set to $1$.
@@ -43,3 +45,5 @@ Sub-pixel $(i,j)$ is set to $1$ **iff** $v > \dfrac{D_{ij} + 0.5}{4}$.
 2 of the 4 sub-pixels are on, so the block averages $0.5$, matching the target. The on sub-pixels form a checkerboard.
 
 <DitherBlockDiagram />
+
+</Solution>

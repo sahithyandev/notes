@@ -1,7 +1,7 @@
 ---
 title: Error Diffusion
 dateCreated: 2026-09-25T19:30:30.479Z
-lastUpdatedOn: 2026-10-18T09:17:02.296Z
+lastUpdatedOn: 2026-10-19T12:09:03.044Z
 ---
 
 Like dithering, error diffusion trades something else for grey-level depth on a device with few output levels. Each pixel is rounded to the nearest available level. The rounding error, the gap between the original value and the chosen level, is spread over neighbouring pixels not yet processed. Those neighbours are nudged toward the value the current pixel could not hold, so the error cancels over a small region instead of building up.
@@ -29,12 +29,16 @@ Serpentine scanning reverses direction every other row, so the error is not alwa
 
 Bi-level device with levels $0$ and $255$. One row of 4 pixels, all at value $128$, using 1D diffusion that passes the whole error to the next pixel.
 
+<Solution>
+
 - Pixel 1's $128$ rounds to $0$, error $128$. Pixel 2 becomes $128 + 128 = 256$.
 - Pixel 2's $256$ rounds to $255$, error $1$. Pixel 3 becomes $128 + 1 = 129$.
 - Pixel 3's $129$ rounds to $255$, error $-126$. Pixel 4 becomes $128 - 126 = 2$.
 - Pixel 4's $2$ rounds to $0$.
 
 Output is $0, 255, 255, 0$, mean $127.5$, matching the target $128$ that no single pixel could represent.
+
+</Solution>
 
 <figure>
 
