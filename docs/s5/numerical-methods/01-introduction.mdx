@@ -3,7 +3,7 @@ title: Introduction to Numerical Methods
 sidebar:
   label: Introduction
 dateCreated: 2026-07-01T06:36:47.522Z
-lastUpdatedOn: 2026-09-13T14:55:24.522Z
+lastUpdatedOn: 2026-10-20T11:48:27.083Z
 ---
 
 Numerical methods are algorithms that produce approximate numerical solutions to mathematical problems, used when an exact analytical solution doesn't exist or is too costly to compute.
@@ -27,3 +27,41 @@ Arises when a method replaces an exact mathematical operation, such as a limit, 
 Round-off error grows with more computation steps. Truncation error shrinks as the approximation is refined. Choosing a method balances the 2.
 
 </Note>
+
+## Worked Example
+
+Approximate $e^{0.5}$ using the first 3 terms of its Maclaurin series. Then find the round-off error from storing $\sqrt{2}$ with 4 significant digits.
+
+<Solution>
+
+Truncation error
+
+$$
+e^{0.5} \approx 1 + 0.5 + \frac{0.5^2}{2!} = 1.625
+$$
+
+The exact value is $e^{0.5} = 1.64872$, so
+
+$$
+E_{\text{trunc}} = 1.64872 - 1.625 = 0.02372
+$$
+
+Adding the next term $\dfrac{0.5^3}{3!} = 0.02083$ shrinks the error to $0.00289$.
+
+Round-off error
+
+$\sqrt{2} = 1.41421\ldots$ is stored as $1.414$.
+
+$$
+E_{\text{round}} = |\sqrt{2} - 1.414| = 0.00021
+$$
+
+Squaring the stored value gives
+
+$$
+1.414^2 = 1.999396
+$$
+
+so the representation error of $0.00021$ becomes an error of $6.04 \times 10^{-4}$ in the result.
+
+</Solution>

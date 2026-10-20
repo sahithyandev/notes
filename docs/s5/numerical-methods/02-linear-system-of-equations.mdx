@@ -1,7 +1,9 @@
 ---
 title: Linear System of Equations
+prereqs:
+  - s1/mathematics/matrices/elementary-transformations
 dateCreated: 2026-07-19T13:26:27.865Z
-lastUpdatedOn: 2026-10-17T05:04:56.854Z
+lastUpdatedOn: 2026-10-20T11:48:27.156Z
 ---
 
 A linear system of $m$ equations in $n$ unknowns $x_1, x_2, \ldots, x_n$ is a set of equations of the form
@@ -54,14 +56,99 @@ The system is homogeneous **iff** $\vec{b} = \vec{0}$. Otherwise it's non-homoge
 
 For a system $A\vec{x} = \vec{b}$, the system $A\vec{x} = \vec{0}$ is its associated homogeneous system.
 
+## Equivalent Systems
+
+Equivalent systems are the systems with the same set of solutions.
+
+2 linear systems are equivalent **iff** one is obtained from the other by a finite number of [elementary operations](/s1/mathematics/matrices/elementary-transformations).
+
+<Proof label="Proof Hint">
+
+- Let $S$ be the solution set of the original system and $S'$ the solution set of the system after 1 elementary operation. Show $S \subseteq S'$ case by case on the 3 operation types.
+  - Swapping 2 equations leaves the set of equations unchanged, so every solution still satisfies all of them.
+  - Multiplying an equation by a nonzero scalar $c$ keeps it satisfied, since both sides are scaled by $c$.
+  - Adding $c$ times equation $j$ to equation $i$ keeps the new equation satisfied, since any $\vec{x} \in S$ satisfies equation $i$ and equation $j$ separately.
+- Each operation is undone by an operation of the same type (swap again, multiply by $1/c$, add $-c$ times equation $j$). So $S' \subseteq S$ holds too, giving $S = S'$.
+- Extend to a finite chain of elementary operations by induction on the number of operations.
+- For the converse direction, equivalent systems are connected by a finite chain of elementary operations. Reduce both to the same reduced echelon form, which is unique, and reverse one chain.
+
+</Proof>
+
+Applying elementary operations to the augmented matrix $[A \mid \vec{b}]$ instead of the equations gives row equivalence (see Elementary Transformations).
+
+### Row-Equivalent Matrix
+
+2 matrices are said to be row-equivalent **iff** one can be obtained from the other by a finite number of [elementary row operations](/s1/mathematics/matrices/elementary-transformations).
+
 ## Methods
 
 Numerical methods for solving linear systems split into 2 classes:
 
 ### Direct
 
-Yield the exact solution in a finite number of steps, in the absence of round-off error.
+Yield the exact solution in a finite number of steps, in the absence of round-off error. The cost is fixed by the size $n$ of the system, about $\tfrac{2}{3}n^3$ operations for a dense $n \times n$ matrix.
+
+The methods in this module are:
+
+- Gaussian elimination  
+  Reduces the system to echelon form, then solves by back substitution.
+- LU decomposition  
+  Factors $A = LU$ once, so each new $\vec{b}$ only needs 2 triangular solves.
+- LUP decomposition  
+  Factors $PA = LU$, adding row interchanges for matrices where plain LU breaks down.
+- Cholesky decomposition  
+  Factors $A = LL^T$ for a symmetric positive definite $A$, at about half the cost of LU.
 
 ### Iterative
 
-Useful for special, very large matrices.
+Start from an initial guess $\vec{x}^{(0)}$ and produce a sequence $\vec{x}^{(1)}, \vec{x}^{(2)}, \ldots$ that converges to the solution. The process stops when the change between successive guesses, or the residual $\|A\vec{x}^{(k)} - \vec{b}\|$, falls below a tolerance.
+
+Each step costs about $n^2$ operations for a dense matrix, and less for a sparse one since only the non-zero entries are used. So iterative methods suit very large, sparse matrices, where a direct method would be too slow or fill in the zeros. Convergence is not guaranteed, and depends on properties of $A$ such as diagonal dominance.
+
+## Worked Example
+
+Determine the number of solutions of each system.
+
+$$
+\text{(a)} \begin{cases} x + y = 3 \\ 2x - y = 0 \end{cases}
+\qquad
+\text{(b)} \begin{cases} x + y = 3 \\ 2x + 2y = 6 \end{cases}
+\qquad
+\text{(c)} \begin{cases} x + y = 3 \\ 2x + 2y = 7 \end{cases}
+$$
+
+<Solution>
+
+System (a)
+
+$$
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 2 & -1 & 0 \end{array}\right]
+\xrightarrow{R_2 - 2R_1}
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 0 & -3 & -6 \end{array}\right]
+$$
+
+Back substitution gives $y = 2$ and $x = 1$. A unique solution.
+
+System (b)
+
+$$
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 2 & 2 & 6 \end{array}\right]
+\xrightarrow{R_2 - 2R_1}
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 0 & 0 & 0 \end{array}\right]
+$$
+
+$y$ is free and $x = 3 - y$. Infinitely many solutions.
+
+System (c)
+
+$$
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 2 & 2 & 7 \end{array}\right]
+\xrightarrow{R_2 - 2R_1}
+\left[\begin{array}{cc|c} 1 & 1 & 3 \\ 0 & 0 & 1 \end{array}\right]
+$$
+
+The last row reads $0 = 1$. No solution.
+
+The associated homogeneous system of (a) is $A\vec{x} = \vec{0}$ with the same $A$. It has only the solution $\vec{x} = \vec{0}$, since $A$ reduces to the same triangular form.
+
+</Solution>

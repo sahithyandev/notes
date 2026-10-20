@@ -1,7 +1,7 @@
 ---
 title: Optimization
 dateCreated: 2026-09-23T08:07:54.091Z
-lastUpdatedOn: 2026-10-07T05:27:10.573Z
+lastUpdatedOn: 2026-10-20T11:48:27.408Z
 ---
 
 Optimization is the process of finding the input to a function that minimizes or maximizes it.
@@ -39,3 +39,39 @@ A function is unimodal **iff** it has a single optimum. A function with more tha
 The global optimum must not be mistaken for a local optimum found during a search.
 
 </Note>
+
+## Worked Example
+
+Find and classify the turning points of $f(x) = x^3 - 6x^2 + 9x + 1$.
+
+<Solution>
+
+$$
+f'(x) = 3x^2 - 12x + 9 = 3(x - 1)(x - 3)
+$$
+
+$f'(x) = 0$ at $x = 1$ and $x = 3$.
+
+$$
+f''(x) = 6x - 12
+$$
+
+At $x = 1$
+
+$$
+f''(1) = -6 < 0, \quad f(1) = 5
+$$
+
+A local maximum.
+
+At $x = 3$
+
+$$
+f''(3) = 6 > 0, \quad f(3) = 1
+$$
+
+A local minimum.
+
+$f$ has 2 local optima, so it's multimodal. It has no global optimum on $\mathbb{R}$, since $f(x) \to \pm\infty$ as $x \to \pm\infty$.
+
+</Solution>

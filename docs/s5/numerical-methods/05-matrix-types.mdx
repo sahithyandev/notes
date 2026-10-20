@@ -3,7 +3,7 @@ title: Matrix Types
 prereqs:
   - s4/linear-algebra/hermitian#positive-definite-matrix
 dateCreated: 2026-07-19T18:06:25.234Z
-lastUpdatedOn: 2026-09-28T05:07:14.545Z
+lastUpdatedOn: 2026-10-20T11:48:27.223Z
 ---
 
 ## Diagonally Dominant Matrix
@@ -57,3 +57,79 @@ For a square matrix $A$, the following are equivalent:
 - $A$ is convergent to $0$, i.e. $\lim_{k \to \infty} A^k = 0$
 - $\lim_{k \to \infty} \lVert A^k \rVert_m = 0$ for some matrix norm $\lVert \cdot \rVert_m$
 - $\rho(A) < 1$
+
+## Worked Example
+
+Check whether
+
+$$
+A = \begin{pmatrix} 7 & 2 & 0 \\ 3 & 5 & -1 \\ 0 & 5 & -6 \end{pmatrix}
+$$
+
+is strictly diagonally dominant.
+
+<Solution>
+
+$$
+|7| = 7 > 2 + 0 = 2
+$$
+
+$$
+|5| = 5 > 3 + 1 = 4
+$$
+
+$$
+|-6| = 6 > 0 + 5 = 5
+$$
+
+All 3 rows satisfy the strict inequality. $A$ is strictly diagonally dominant, hence non-singular.
+
+</Solution>
+
+Check whether
+
+$$
+B = \begin{pmatrix} 4 & -1 & 0 \\ -1 & 4 & -1 \\ 0 & -1 & 4 \end{pmatrix}
+$$
+
+is positive definite.
+
+<Solution>
+
+$B$ is symmetric. The leading principal submatrices have determinants
+
+$$
+\det B_1 = 4
+$$
+
+$$
+\det B_2 = 4 \cdot 4 - (-1)(-1) = 15
+$$
+
+$$
+\det B_3 = 4(16 - 1) + 1(-4 - 0) = 56
+$$
+
+All are positive. $B$ is positive definite.
+
+</Solution>
+
+Check whether
+
+$$
+C = \begin{pmatrix} 0.5 & 0 \\ 0.25 & 0.5 \end{pmatrix}
+$$
+
+is convergent.
+
+<Solution>
+
+$C$ is lower triangular, so its eigenvalues are the diagonal entries $0.5$ and $0.5$.
+
+$$
+\rho(C) = 0.5 < 1
+$$
+
+$C$ is convergent to $0$.
+
+</Solution>

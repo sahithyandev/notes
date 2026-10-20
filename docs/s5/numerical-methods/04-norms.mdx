@@ -5,7 +5,7 @@ prereqs:
   - s1/mathematics/matrices/matrix-norms#induced-norm
   - s4/linear-algebra/norm
 dateCreated: 2026-07-19T18:06:27.461Z
-lastUpdatedOn: 2026-10-19T12:09:03.342Z
+lastUpdatedOn: 2026-10-20T11:48:27.203Z
 ---
 
 A norm is a real-valued function measuring the size of a vector or a matrix.
@@ -111,3 +111,69 @@ $$
 For any matrix norm $\lVert \cdot \rVert_m$ induced by a vector norm, $\rho(A) \leq \lVert A \rVert_m$ for all $n \times n$ matrices $A$.
 
 </Note>
+
+## Worked Example
+
+For $\vec{x} = (3, -4, 12)^T$ and
+
+$$
+A = \begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix}
+$$
+
+find the vector norms of $\vec{x}$, the induced matrix norms of $A$, and verify $\rho(A) \leq \lVert A \rVert_2$.
+
+<Solution>
+
+Vector norms
+
+$$
+\lVert \vec{x} \rVert_1 = 3 + 4 + 12 = 19
+$$
+
+$$
+\lVert \vec{x} \rVert_2 = \sqrt{9 + 16 + 144} = 13
+$$
+
+$$
+\lVert \vec{x} \rVert_\infty = \max\{3, 4, 12\} = 12
+$$
+
+These satisfy $\lVert \vec{x} \rVert_\infty \leq \lVert \vec{x} \rVert_2 \leq \lVert \vec{x} \rVert_1$.
+
+Matrix norms
+
+$$
+\lVert A \rVert_\infty = \max\{1 + 2,\ 3 + 4\} = 7
+$$
+
+$$
+\lVert A \rVert_1 = \max\{1 + 3,\ 2 + 4\} = 6
+$$
+
+For $\lVert A \rVert_2$
+
+$$
+A^TA = \begin{pmatrix} 1 & 3 \\ -2 & 4 \end{pmatrix}\begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix} = \begin{pmatrix} 10 & 10 \\ 10 & 20 \end{pmatrix}
+$$
+
+$$
+\det(A^TA - \lambda I) = \lambda^2 - 30\lambda + 100 = 0 \implies \lambda = 15 \pm 5\sqrt{5}
+$$
+
+$$
+\rho(A^TA) = 15 + 5\sqrt{5} \approx 26.180, \quad \lVert A \rVert_2 = \sqrt{26.180} \approx 5.117
+$$
+
+Spectral radius of $A$
+
+$$
+\det(A - \lambda I) = \lambda^2 - 5\lambda + 10 = 0 \implies \lambda = \frac{5 \pm i\sqrt{15}}{2}
+$$
+
+$$
+\rho(A) = \sqrt{\frac{25 + 15}{4}} = \sqrt{10} \approx 3.162
+$$
+
+$3.162 \leq 5.117$, so $\rho(A) \leq \lVert A \rVert_2$ holds. It also holds for $\lVert A \rVert_1 = 6$ and $\lVert A \rVert_\infty = 7$.
+
+</Solution>

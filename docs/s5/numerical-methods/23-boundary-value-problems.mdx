@@ -1,7 +1,7 @@
 ---
 title: Boundary Value Problems
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-09-29T14:51:58.601Z
+lastUpdatedOn: 2026-10-20T11:48:27.451Z
 ---
 
 A boundary value problem (BVP) is a differential equation with conditions specified at 2 distinct points, called boundary conditions.
@@ -272,3 +272,76 @@ $$
 $$
 
 This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).
+
+## Worked Example
+
+Solve
+
+$$
+y'' = y, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
+$$
+
+with the linear shooting method and with the linear finite-difference method for $N = 3$.
+
+<Solution>
+
+Here $p(x) = 0$, $q(x) = 1 > 0$, $r(x) = 0$, so a unique solution exists.
+
+Linear shooting method
+
+$$
+y_1'' = y_1, \quad y_1(0) = 0,\ y_1'(0) = 0 \implies y_1(x) = 0
+$$
+
+$$
+y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1 \implies y_2(x) = \sinh x
+$$
+
+$$
+c = \frac{\beta - y_1(1)}{y_2(1)} = \frac{1 - 0}{\sinh 1} = 0.8509
+$$
+
+$$
+y(x) = \frac{\sinh x}{\sinh 1}
+$$
+
+Linear finite-difference method
+
+$$
+h = \frac{1 - 0}{3 + 1} = 0.25, \quad x_i = 0.25i
+$$
+
+With $p = r = 0$ and $q = 1$
+
+$$
+-w_{i-1} + (2 + h^2)w_i - w_{i+1} = 0, \quad 2 + h^2 = 2.0625
+$$
+
+Using $w_0 = 0$ and $w_4 = 1$
+
+$$
+\begin{pmatrix} 2.0625 & -1 & 0 \\ -1 & 2.0625 & -1 \\ 0 & -1 & 2.0625 \end{pmatrix}
+\begin{pmatrix} w_1 \\ w_2 \\ w_3 \end{pmatrix}
+=
+\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}
+$$
+
+Eliminating
+
+$$
+w_1 = \frac{w_2}{2.0625}, \quad w_3 = 1.5777\,w_2, \quad (2.0625 \times 1.5777 - 1)\,w_2 = 1
+$$
+
+$$
+w_2 = 0.4437, \quad w_1 = 0.2151, \quad w_3 = 0.6999
+$$
+
+Comparison with the exact solution
+
+| $x_i$  | $w_i$  | $\dfrac{\sinh x_i}{\sinh 1}$ | Error  |
+| ------ | ------ | ---------------------------- | ------ |
+| $0.25$ | 0.2151 | 0.2150                       | 0.0002 |
+| $0.50$ | 0.4437 | 0.4434                       | 0.0003 |
+| $0.75$ | 0.6999 | 0.6997                       | 0.0002 |
+
+</Solution>

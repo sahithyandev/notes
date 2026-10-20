@@ -1,0 +1,72 @@
+---
+title: Constrained Optimization
+dateCreated: 2026-09-23T08:07:54.136Z
+lastUpdatedOn: 2026-10-20T11:48:27.430Z
+---
+
+Constrained optimization minimizes or maximizes $f(x)$ subject to restrictions on the design variables $x$.
+
+## General Form
+
+$$
+\min_x f(x)
+$$
+
+subject to
+
+$$
+g_i(x) = c_i, \quad i = 1, \ldots, n
+$$
+
+$$
+h_j(x) \leq d_j, \quad j = 1, \ldots, m
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="g_i(x) = c_i">equality constraints</Sym>
+  <Sym s="h_j(x) \leq d_j">inequality constraints</Sym>
+</Symbols>
+
+<Note>
+
+When $f$ and every constraint are linear, the problem is a linear programming problem.
+
+</Note>
+
+## Worked Example
+
+Minimize $f(x, y) = x^2 + y^2$ subject to $x + y = 2$ and $x \leq 1.5$. Then repeat with $x \geq 1.5$ in place of $x \leq 1.5$.
+
+<Solution>
+
+In the general form, $g(x, y) = x + y$ with $c = 2$.
+
+The equality gives $y = 2 - x$.
+
+$$
+f = x^2 + (2 - x)^2 = 2x^2 - 4x + 4
+$$
+
+$$
+\frac{\text{d}f}{\text{d}x} = 4x - 4 = 0 \implies x = 1, \quad y = 1, \quad f = 2
+$$
+
+With $x \leq 1.5$
+
+$x = 1$ satisfies the inequality, so the constraint is inactive.
+
+$$
+(x, y) = (1, 1), \quad f_{\min} = 2
+$$
+
+With $x \geq 1.5$
+
+The unconstrained optimum $x = 1$ violates the inequality. $f = 2x^2 - 4x + 4$ increases for $x > 1$, so the optimum lies on the boundary and the constraint is active.
+
+$$
+x = 1.5, \quad y = 0.5, \quad f_{\min} = 2.25 + 0.25 = 2.5
+$$
+
+</Solution>

@@ -1,7 +1,7 @@
 ---
 title: LU Decomposition
 dateCreated: 2026-07-28T05:06:00.161Z
-lastUpdatedOn: 2026-09-28T05:07:14.553Z
+lastUpdatedOn: 2026-10-20T11:48:27.238Z
 ---
 
 The process of factorizing a square matrix into 2 [triangular matrices](/s1/mathematics/matrices/introduction#triangular-matrix): a lower triangular matrix ($L$) and an upper triangular matrix ($U$).
@@ -104,3 +104,82 @@ Suppose $A = LU$ and $A\vec{x} = LU\vec{x} = \vec{b}$ must be solved.
 - Solve $U\vec{x} = \vec{w}$ for $\vec{x}$ by back substitution, since $U$ is upper triangular. This $\vec{x}$ solves the original system.
 
 This uses $L$ to perform row operations on $U$ to solve the system.
+
+## Worked Example
+
+Find $L$ and $U$ for
+
+$$
+A = \begin{pmatrix} 2 & 1 & -1 \\ -3 & -1 & 2 \\ -2 & 1 & 2 \end{pmatrix}
+$$
+
+then solve $A\vec{x} = \vec{b}$ for $\vec{b} = (8, -11, -3)^T$.
+
+<Solution>
+
+Elimination on $A$
+
+$$
+m_{21} = \frac{-3}{2} = -1.5, \quad m_{31} = \frac{-2}{2} = -1
+$$
+
+$$
+\xrightarrow[R_3 + R_1]{R_2 + 1.5R_1}
+\begin{pmatrix} 2 & 1 & -1 \\ 0 & 0.5 & 0.5 \\ 0 & 2 & 1 \end{pmatrix}
+$$
+
+$$
+m_{32} = \frac{2}{0.5} = 4
+$$
+
+$$
+\xrightarrow{R_3 - 4R_2}
+\begin{pmatrix} 2 & 1 & -1 \\ 0 & 0.5 & 0.5 \\ 0 & 0 & -1 \end{pmatrix}
+$$
+
+Collecting the multipliers
+
+$$
+L = \begin{pmatrix} 1 & 0 & 0 \\ -1.5 & 1 & 0 \\ -1 & 4 & 1 \end{pmatrix}, \quad
+U = \begin{pmatrix} 2 & 1 & -1 \\ 0 & 0.5 & 0.5 \\ 0 & 0 & -1 \end{pmatrix}
+$$
+
+Check, row 3 of $LU$
+
+$$
+-1(2, 1, -1) + 4(0, 0.5, 0.5) + 1(0, 0, -1) = (-2, 1, 2)
+$$
+
+Forward substitution, $L\vec{w} = \vec{b}$
+
+$$
+w_1 = 8
+$$
+
+$$
+w_2 = -11 + 1.5(8) = 1
+$$
+
+$$
+w_3 = -3 + 1(8) - 4(1) = 1
+$$
+
+Back substitution, $U\vec{x} = \vec{w}$
+
+$$
+x_3 = \frac{1}{-1} = -1
+$$
+
+$$
+x_2 = \frac{1 - 0.5(-1)}{0.5} = 3
+$$
+
+$$
+x_1 = \frac{8 - 3 - 1}{2} = 2
+$$
+
+$$
+\vec{x} = (2, 3, -1)^T
+$$
+
+</Solution>
