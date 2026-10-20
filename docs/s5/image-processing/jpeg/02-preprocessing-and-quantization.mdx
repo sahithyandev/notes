@@ -1,0 +1,202 @@
+---
+title: Preprocessing and Quantization
+dateCreated: 2026-10-20T09:00:00.000Z
+lastUpdatedOn: 2026-10-20T08:58:52.121Z
+---
+
+Baseline JPEG first prepares the image, then transforms and quantizes each block. This note covers those stages and the artefacts they cause.
+
+## Preprocessing
+
+Preprocessing converts the colour space to [YCrCb](/s5/image-processing/color#channels), reduces the chroma resolution, splits each component into blocks and centres the sample values. The stages run in that order.
+
+### Colour Space Conversion
+
+For 8-bit samples, the JFIF conversion is:
+
+$$
+\begin{aligned}
+Y &= 0.299\,R + 0.587\,G + 0.114\,B \\
+C_b &= -0.1687\,R - 0.3313\,G + 0.5\,B + 128 \\
+C_r &= 0.5\,R - 0.4187\,G - 0.0813\,B + 128
+\end{aligned}
+$$
+
+$Y$ is a weighted sum of the primaries, with weights matching the eye's sensitivity (green highest, blue lowest). $C_b$ is a scaled $B - Y$ and $C_r$ is a scaled $R - Y$. The +128 offset keeps $C_b$ and $C_r$ inside $[0, 255]$.
+
+The standard itself does not fix the colour space. JFIF and Exif specify the conversion.
+
+The inverse (for the above-mentioned conversion) is:
+
+$$
+\begin{aligned}
+R &= Y + 1.402\,(C_r - 128) \\
+G &= Y - 0.3441\,(C_b - 128) - 0.7141\,(C_r - 128) \\
+B &= Y + 1.772\,(C_b - 128)
+\end{aligned}
+$$
+
+### Chroma Subsampling
+
+The eye is less sensitive to colour detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/image-encoding#psychovisual-redundancy) early.
+
+Subsampling is written as $J{:}a{:}b$ over a block 4 pixels wide and 2 rows high.
+
+- 4:4:4  
+  No subsampling. Cb and Cr have full resolution.
+- 4:2:2  
+  Chroma halved horizontally. Chroma carries half the samples of luma.
+- 4:2:0  
+  Chroma halved in both directions. Chroma carries a quarter of the samples of luma.
+
+Each chroma sample is the average of the luma-resolution samples it covers. For 4:2:0, a 2x2 average. The decoder upsamples by replication or [interpolation](/s5/image-processing/image-resampling#interpolation).
+
+4:2:0 reduces the sample count to $1 + \frac{1}{4} + \frac{1}{4} = 1.5$ samples per pixel, from 3. This gives a 2:1 reduction before any DCT work.
+
+### Blocks and MCUs
+
+Each component is split into 8x8 blocks, also called tiles. Every later stage processes a block independently of the others.
+
+Each component $i$ has a sampling factor pair $(H_i, V_i)$. For an image of $X \times Y$ pixels:
+
+$$
+x_i = \left\lceil X \cdot \frac{H_i}{H_{\max}} \right\rceil
+\qquad
+y_i = \left\lceil Y \cdot \frac{V_i}{V_{\max}} \right\rceil
+$$
+
+<Symbols>
+  <Sym s="x_i, y_i">dimensions of component $i$ in samples</Sym>
+  <Sym s="H_{\max}, V_{\max}">
+    largest sampling factors across all components
+  </Sym>
+</Symbols>
+
+Blocks of the different components are interleaved in the output. The unit of coding is the minimum coded unit (MCU). An MCU holds $H_i \times V_i$ blocks of each component, in raster order within the component, components in order.
+
+- 4:4:4  
+  MCU covers 8x8 pixels and holds 3 blocks (Y, Cb, Cr).
+- 4:2:0  
+  MCU covers 16x16 pixels and holds 6 blocks (four Y, one Cb, one Cr).
+
+The image is padded to a whole number of MCUs, in both directions, by replicating the last row and column. Padding with edge values avoids a strong artificial edge, which would inflate the high-frequency coefficients of the border blocks.
+
+### Level Shift
+
+For $P$-bit samples, subtract $2^{P-1}$ from every sample. For $P = 8$ this subtracts 128.
+
+- Samples become centred on 0 and signed
+- The range becomes symmetric, $[-128, 127]$ for 8-bit samples
+
+## Discrete Cosine Transform
+
+Each level-shifted 8x8 block goes through the 2D [DCT](/s5/image-processing/discrete-cosine-transform) with $N = 8$.
+
+$$
+F(u, v) = \frac{1}{4} C(u) C(v) \sum_{x=0}^{7} \sum_{y=0}^{7} f(x, y) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
+$$
+
+$$
+f(x, y) = \frac{1}{4} \sum_{u=0}^{7} \sum_{v=0}^{7} C(u) C(v) F(u, v) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="x, y">column and row of a sample in the block</Sym>
+  <Sym s="u, v">horizontal and vertical frequency indices, from 0 to 7</Sym>
+  <Sym s="C(k)">$\frac{1}{\sqrt{2}}$ for $k = 0$, otherwise 1</Sym>
+  <Sym s="F(0, 0)">DC coefficient, equal to 8 times the block mean</Sym>
+  <Sym s="F(u, v) \ \text{for} \ (u, v) \neq (0, 0)">AC coefficients</Sym>
+</Symbols>
+
+In matrix form, $\mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top$ with $T(k, n) = \frac{C(k)}{2} \cos\frac{(2n+1)k\pi}{16}$. Both arrays are stored row first, so $\mathbf{f}[y][x] = f(x, y)$ and $\mathbf{F}[v][u] = F(u, v)$. The zig-zag scan used in entropy coding indexes $\mathbf{F}$ in this layout.
+
+The transform alone is lossless up to rounding. Energy concentrates in the low-frequency coefficients near the top-left of $\mathbf{F}$. Most high-frequency coefficients are small. Since the input is level shifted, the DC coefficient is small and signed.
+
+For 8-bit input, $F(0, 0) \in [-1024, 1016]$ and every AC coefficient fits in the range $[-1023, 1023]$, so coefficients fit in 11 bits.
+
+## Quantization
+
+Each coefficient is divided by the matching entry of an 8x8 quantization table $Q$ and rounded:
+
+$$
+F_q(u, v) = \text{round}\left(\frac{F(u, v)}{Q(u, v)}\right)
+$$
+
+- Entries of $Q$ grow towards the high-frequency corner, since the eye tolerates error there better
+- Many high-frequency coefficients become 0
+- A quality setting scales $Q$. Larger entries give a smaller file and more visible artefacts
+- The decoder multiplies by $Q(u, v)$. The rounding error cannot be recovered
+- Fast DCT implementations leave the transform unscaled and fold the scale factors into the divisors
+
+At high compression ratios the 8x8 tile structure becomes visible as blocking [artefacts](/s5/image-processing/image-quality-assessment#artefacts).
+
+The decoder reconstructs $\hat{F}(u, v) = F_q(u, v)\, Q(u, v)$. Rounding bounds the error per coefficient:
+
+$$
+\left| F(u, v) - \hat{F}(u, v) \right| \le \frac{Q(u, v)}{2}
+$$
+
+A coefficient with $|F(u, v)| < Q(u, v)/2$ quantizes to 0 and its whole value is lost. For a coefficient that survives, the error is close to uniform, with variance $Q(u, v)^2 / 12$.
+
+The DCT preserves energy, so the squared error summed over the coefficients of a tile equals the squared error summed over its pixels, before pixel rounding and clamping.
+
+### Quantization Tables
+
+Annex K of the standard gives example tables, tuned for viewing conditions and not mandated. Luminance:
+
+|     |     |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 16  | 11  | 10  | 16  | 24  | 40  | 51  | 61  |
+| 12  | 12  | 14  | 19  | 26  | 58  | 60  | 55  |
+| 14  | 13  | 16  | 24  | 40  | 57  | 69  | 56  |
+| 14  | 17  | 22  | 29  | 51  | 87  | 80  | 62  |
+| 18  | 22  | 37  | 56  | 68  | 109 | 103 | 77  |
+| 24  | 35  | 55  | 64  | 81  | 104 | 113 | 92  |
+| 49  | 64  | 78  | 87  | 103 | 121 | 120 | 101 |
+| 72  | 92  | 95  | 98  | 112 | 100 | 103 | 99  |
+
+Chrominance:
+
+|     |     |     |     |     |     |     |     |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 17  | 18  | 24  | 47  | 99  | 99  | 99  | 99  |
+| 18  | 21  | 26  | 66  | 99  | 99  | 99  | 99  |
+| 24  | 26  | 56  | 99  | 99  | 99  | 99  | 99  |
+| 47  | 66  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+| 99  | 99  | 99  | 99  | 99  | 99  | 99  | 99  |
+
+- The chrominance table is coarser, since the eye resolves colour detail poorly
+- Entries lie in $[1, 255]$ for 8-bit tables
+- The table in use is stored in the file, so a decoder never assumes the Annex K values
+
+### Quality Scaling
+
+Most encoders expose a quality $q \in [1, 100]$ and scale the Annex K tables (the Independent JPEG Group convention):
+
+$$
+s = \begin{cases} 5000 / q & q < 50 \\ 200 - 2q & q \ge 50 \end{cases}
+\qquad
+Q'(u, v) = \text{clamp}\left( \left\lfloor \frac{s\, Q(u, v) + 50}{100} \right\rfloor, 1, 255 \right)
+$$
+
+- $q = 50$ gives $s = 100$, so the table is unchanged
+- $q = 100$ gives $s = 0$, so every entry clamps to 1
+- Lower $q$ gives a larger $s$, larger divisors and a smaller file
+
+## Artefacts
+
+- Blocking  
+  Visible 8x8 grid in smooth regions. Each block quantizes independently, so neighbouring blocks get different average values.
+- Ringing  
+  Ripples around sharp edges. Dropping high-frequency coefficients leaves a truncated series for the edge, like the Gibbs effect.
+- Mosquito noise  
+  Flickering specks around moving edges in video made of such frames. Edge blocks are quantized differently from frame to frame.
+- Colour bleeding  
+  Chroma smears across edges. Caused by chroma subsampling and the coarse chrominance table.
+- Generation loss  
+  Re-encoding a decoded image quantizes again and compounds the error. The loss shrinks when the tables and block grid are identical.

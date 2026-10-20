@@ -1,0 +1,145 @@
+---
+title: Modes and File Formats
+dateCreated: 2026-10-20T09:00:00.000Z
+lastUpdatedOn: 2026-10-20T08:58:52.195Z
+---
+
+Besides baseline sequential coding, the standard defines other modes. A JPEG file also wraps the compressed stream in segments and metadata. This note covers the progressive and lossless modes, the file structure and the file formats built on it.
+
+## Progressive Mode
+
+The coefficients of each block are sent over several scans.
+
+- Spectral selection  
+  Early scans send the DC coefficients of all blocks. Later scans send bands of AC coefficients, such as indices 1 to 5, then 6 to 63.
+- Successive approximation  
+  A coefficient is first sent with its most significant bits (shifted right by $A_l$). Later scans send the remaining bits 1 bit at a time.
+
+An AC scan covers 1 component. The entropy coder adds an end-of-band run symbol that covers many blocks, so long runs of all-zero bands cost little. The compressed size is similar to the sequential mode and often slightly smaller.
+
+## Lossless Mode
+
+No DCT or quantization. The predicted value of sample $x$ uses its left neighbour $A$, upper neighbour $B$ and upper-left neighbour $C$.
+
+| Selector | Predictor $\hat{x}$ |
+| -------- | ------------------- |
+| 1        | $A$                 |
+| 2        | $B$                 |
+| 3        | $C$                 |
+| 4        | $A + B - C$         |
+| 5        | $A + (B - C)/2$     |
+| 6        | $B + (A - C)/2$     |
+| 7        | $(A + B)/2$         |
+
+The difference $x - \hat{x}$ is coded as a category and extra bits, as with [DC coefficients](/s5/image-processing/jpeg/entropy-coding#magnitude-categories). The first sample of a row uses a fixed default prediction.
+
+## File Structure
+
+A JPEG file is a sequence of segments. Each starts with a 2-byte marker `0xFF` followed by a code. Most segments then carry a 2-byte length.
+
+| Marker | Code                 | Content                                     |
+| ------ | -------------------- | ------------------------------------------- |
+| SOI    | `0xFFD8`             | Start of image                              |
+| APP0   | `0xFFE0`             | JFIF header (version, density, thumbnail)   |
+| DQT    | `0xFFDB`             | Quantization tables                         |
+| SOF0   | `0xFFC0`             | Frame header, baseline DCT                  |
+| SOF2   | `0xFFC2`             | Frame header, progressive DCT               |
+| DHT    | `0xFFC4`             | Huffman tables                              |
+| DRI    | `0xFFDD`             | Restart interval                            |
+| SOS    | `0xFFDA`             | Scan header, followed by entropy-coded data |
+| RSTn   | `0xFFD0` to `0xFFD7` | Restart marker                              |
+| COM    | `0xFFFE`             | Comment                                     |
+| EOI    | `0xFFD9`             | End of image                                |
+
+### Segment Layouts
+
+Every segment is `0xFF`, the marker code, a 2-byte big-endian length that counts itself and the payload, then the payload. SOI and EOI have no length and no payload. Multi-byte fields are big-endian.
+
+- JFIF (APP0)  
+  The bytes `4A 46 49 46 00` (`JFIF` and a zero), major version 1, minor version 1, density units (0 none, 1 per inch, 2 per centimetre), horizontal density in 2 bytes, vertical density in 2 bytes, thumbnail width and height in 1 byte each (0 for no thumbnail).
+- DQT  
+  Repeated per table. 1 byte holding precision in the high nibble (0 for 8-bit) and table id in the low nibble, then 64 table entries in [zig-zag order](/s5/image-processing/jpeg/entropy-coding#zig-zag-scan).
+- SOF0  
+  Sample precision in 1 byte, image height in 2 bytes, image width in 2 bytes and the number of components in 1 byte. Then per component 3 bytes holding the component id, the sampling factors $(H_i, V_i)$ as two nibbles and the quantization table id.
+- DHT  
+  Repeated per table. 1 byte holding the class in the high nibble (0 for DC, 1 for AC) and the table id in the low nibble, then the 16 `BITS` bytes and the `HUFFVAL` bytes.
+- SOS  
+  Number of components in the scan in 1 byte. Per component 2 bytes holding the component id, and the DC table id and AC table id as two nibbles. Then the spectral selection start, the spectral selection end and the successive approximation byte, which are 0, 63 and 0 for baseline.
+- DRI  
+  The restart interval in MCUs in 2 bytes.
+
+Entropy-coded data follows the SOS header directly and runs until the next marker other than `RSTn`.
+
+A baseline 4:2:0 colour file carries the segments in this order: SOI, APP0, DQT, SOF0, DHT, SOS, entropy-coded data, EOI. SOF0 lists Y with sampling factors $(2, 2)$ and Cb, Cr with $(1, 1)$.
+
+## File Formats
+
+The standard defines the compressed stream, not a complete file. A stream by itself carries no colour space, resolution or metadata, so file formats wrap the stream with this information.
+
+The standard defines 3 stream forms.
+
+- Interchange format  
+  Complete stream with all tables and scans. This is what JPEG files hold.
+- Abbreviated format for compressed image data  
+  Scans without the tables. The decoder gets the tables elsewhere.
+- Abbreviated format for table specification  
+  Tables only, with no image.
+
+The abbreviated forms save space when many images share the same tables, as in video frames.
+
+### JFIF
+
+JPEG File Interchange Format, published in 1992. Almost every `.jpg` file uses it or Exif.
+
+- Stored in an APP0 segment with the identifier `JFIF`, immediately after SOI
+- Fixes the colour space as YCrCb in the [form given earlier](/s5/image-processing/jpeg/preprocessing-and-quantization#colour-space-conversion), or a single grey component
+- Stores a version, a pixel density (none, dots per inch or dots per centimetre) or a pixel aspect ratio, and an optional uncompressed RGB thumbnail
+- Leaves the sampling factors free
+
+### Exif
+
+Exchangeable image file format, used by digital cameras.
+
+- Stored in an APP1 segment with the identifier `Exif`, holding a TIFF-structured block
+- Carries camera settings, capture time, orientation, GPS position and an embedded JPEG thumbnail
+- A segment is limited to 64 KB because the length field has 2 bytes
+- Does not change the compressed image data
+
+### Colour and Metadata Segments
+
+- ICC profile (APP2)  
+  Embedded colour profile that describes the colour space of the samples. Split over several segments when it exceeds 64 KB.
+- Adobe (APP14)  
+  Marks whether the components are RGB, YCrCb, CMYK or YCCK. CMYK JPEGs from Adobe software store inverted values.
+- XMP (APP1)  
+  XML metadata such as title, rights and edit history.
+- Multi-Picture Format (APP2)  
+  Stores several JPEG images in 1 file, such as a primary image followed by a gain map for HDR display.
+- SPIFF  
+  Defined in the same standard family as the intended replacement for JFIF. It is rarely used.
+
+### Embedding in Other Formats
+
+- PDF  
+  Holds a JPEG stream directly under the DCTDecode filter, with no re-encoding.
+- TIFF  
+  Stores image strips or tiles as JPEG streams, and the TIFF tags carry the resolution and colour space.
+- Motion JPEG  
+  Video as a sequence of independently coded JPEG frames, in containers such as AVI and QuickTime. There is no inter-frame prediction, so every frame can be decoded alone, and the bit rate is higher than that of video codecs.
+- Camera raw formats  
+  Store JPEG previews and thumbnails next to the raw sensor data.
+
+File extensions are `.jpg`, `.jpeg`, `.jpe` and `.jfif`. The media type is `image/jpeg`.
+
+### Related Standards
+
+These share the name or the working group, but use different compression methods and streams.
+
+- JPEG 2000  
+  Wavelet transform instead of the block DCT. Avoids blocking at high compression ratios and supports lossless coding with the same codestream.
+- JPEG-LS  
+  Predictive lossless and near-lossless coding of each pixel from its neighbours, with context modelling. No DCT.
+- JPEG XR  
+  Transform codec with a lapped block transform, targeted at high dynamic range.
+- JPEG XL  
+  Modern successor with a variable-size DCT and better entropy coding. Can recompress an existing JPEG file without loss and restore the original file bytes, saving about 20 percent.

@@ -1,0 +1,74 @@
+---
+title: Introduction to JPEG
+dateCreated: 2026-10-08T12:14:32.170Z
+lastUpdatedOn: 2026-10-20T08:58:52.047Z
+---
+
+Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
+
+- Compression ratios up to about 20:1 without noticeable artefacts, up to about 100:1 with minor artefacts
+- Supports both lossless and lossy modes
+- User selectable compression to file size tradeoff
+
+## History
+
+- 1974  
+  Ahmed, Natarajan and Rao introduce the discrete cosine transform.
+- 1986  
+  ISO and CCITT form the Joint Photographic Experts Group to define a standard for continuous-tone still images.
+- 1992  
+  The standard is published as CCITT Recommendation T.81. The JFIF file format, which defines how a JPEG stream is stored in a file, appears in the same year.
+- 1994  
+  ISO adopts the same standard as ISO/IEC 10918-1.
+- 2000  
+  JPEG 2000 is published as a wavelet-based successor with better quality at high compression ratios. It has not replaced baseline JPEG in common use.
+
+The widely used lossy mode is called baseline JPEG. Unless stated otherwise, this note describes it.
+
+## Encoder Pipeline
+
+$$
+\text{Preprocessing} \to \text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
+$$
+
+- Preprocessing  
+  Convert to [YCrCb](/s5/image-processing/color#channels), subsample chroma, split into 8x8 blocks, level shift.
+- Forward DCT  
+  Apply the discrete cosine transform to each block.
+- Quantization  
+  Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality. This is the only lossy step apart from chroma subsampling.
+- Entropy coding  
+  Code coefficients in zig-zag order for optimal coding efficiency.
+
+The JPEG stages map onto the general [compression pipeline](/s5/image-processing/compression#compression-pipeline). The forward DCT is the [mapper](/s5/image-processing/compression#mapper), the quantization step is the [quantizer](/s5/image-processing/compression#quantizer), and the entropy encoder is the [symbol encoder](/s5/image-processing/compression#symbol-encoder).
+
+## Operating Modes
+
+- Baseline sequential  
+  8-bit samples, 8x8 DCT, Huffman coding. Blocks are stored in a single pass from top to bottom.
+- Extended sequential  
+  Adds 12-bit samples, up to 4 tables of each kind and optional arithmetic coding.
+- Progressive  
+  The same coefficients are sent over several scans. A coarse image appears first and refines with each scan.
+- Hierarchical  
+  The image is coded as an [image pyramid](/s5/image-processing/image-encoding#image-pyramid-coding) of resolutions. Each level codes the difference from the upsampled previous level.
+- Lossless  
+  No DCT. Each sample is predicted from its neighbours and the prediction error is entropy coded.
+
+## Compression Ratio
+
+For a $W \times H$ image with a JPEG file of $S$ bytes:
+
+$$
+\text{bpp} = \frac{8 S}{W H}
+\qquad
+CR = \frac{24\, W H}{8 S} = \frac{3\, W H}{S}
+$$
+
+The 24 is the bits per pixel of the raw RGB image. Header bytes count towards $S$. The saving from each stage multiplies.
+
+$$
+CR = CR_\text{subsampling} \times CR_\text{quantization and entropy coding}
+$$
+
+4:2:0 subsampling alone gives $CR_\text{subsampling} = \frac{3}{1.5} = 2$.
