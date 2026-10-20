@@ -1,0 +1,129 @@
+---
+// A restyled native range input: thin rounded track, accent fill up to the
+// thumb, round thumb with hover and focus halos. It stays a real
+// `<input type="range">`, so keyboard, screen readers and `input` events work
+// as usual. Colour comes from `--range-accent`, which a parent can override.
+// After setting `.value` in script, call `syncRange` from `../lib/range`.
+interface Props {
+  min: number;
+  max: number;
+  step?: number;
+  value?: number | string;
+  id?: string;
+  label?: string;
+  [attr: string]: unknown;
+}
+
+const { min, max, step = 1, value = min, label, ...rest } = Astro.props;
+const span = max - min;
+const p = span > 0 ? (Number(value) - min) / span : 0;
+---
+
+<input
+  type="range"
+  class="sn-range"
+  min={min}
+  max={max}
+  step={step}
+  value={value}
+  aria-label={label}
+  style={`--p:${Math.min(1, Math.max(0, p))}`}
+  {...rest}
+/>
+
+<style>
+  .sn-range {
+    --thumb: var(--range-thumb, 20px);
+    --h: var(--range-height, var(--thumb));
+    --accent-c: var(--range-accent, var(--sem, var(--accent)));
+    --track-c: var(--range-track, var(--border));
+    --fill: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p, 0));
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: calc(var(--thumb) + 8px);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .sn-range:focus {
+    outline: none;
+  }
+
+  .sn-range::-webkit-slider-runnable-track,
+  .sn-range::-moz-range-track {
+    height: var(--h);
+    border-radius: var(--h);
+    background: linear-gradient(
+      to right,
+      var(--accent-c) var(--fill),
+      var(--track-c) var(--fill)
+    );
+  }
+  .sn-range::-moz-range-progress {
+    background: transparent;
+  }
+
+  .sn-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: calc((var(--h) - var(--thumb)) / 2);
+    border: none;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  .sn-range::-moz-range-thumb {
+    box-sizing: border-box;
+    width: var(--thumb);
+    height: var(--thumb);
+    border: none;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .sn-range:hover::-webkit-slider-thumb {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 0 4px color-mix(in oklab, var(--accent-c) 18%, transparent);
+  }
+  .sn-range:hover::-moz-range-thumb {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 0 4px color-mix(in oklab, var(--accent-c) 18%, transparent);
+  }
+  .sn-range:focus-visible::-webkit-slider-thumb {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 0 4px color-mix(in oklab, var(--accent-c) 35%, transparent);
+  }
+  .sn-range:focus-visible::-moz-range-thumb {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 0 4px color-mix(in oklab, var(--accent-c) 35%, transparent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sn-range::-webkit-slider-thumb {
+      transition: box-shadow 0.15s ease;
+    }
+    .sn-range::-moz-range-thumb {
+      transition: box-shadow 0.15s ease;
+    }
+  }
+
+  .sn-range:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  import { initRanges } from "../lib/range";
+  initRanges();
+</script>

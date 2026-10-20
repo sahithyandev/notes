@@ -2,6 +2,8 @@
 // The label + range input + live output row shared by the sensitivity
 // sliders. Label content varies per slider (it often embeds inline KaTeX),
 // so it's a slot rather than a prop.
+import RangeInput from "./range-input.astro";
+
 interface Props {
   id: string;
   min: number;
@@ -17,7 +19,7 @@ const { id, min, max, step = 0.01, value = 0 } = Astro.props;
   <label for={id}>
     <slot />
   </label>
-  <input id={id} type="range" min={min} max={max} step={step} value={value} />
+  <RangeInput id={id} min={min} max={max} step={step} value={value} />
   <output for={id} data-delta>
     {value}
   </output>
@@ -40,9 +42,13 @@ const { id, min, max, step = 0.01, value = 0 } = Astro.props;
     color: var(--text-secondary);
   }
 
-  .control input[type="range"] {
+  .control {
+    --range-accent: var(--s5);
+  }
+
+  .control :global(.sn-range) {
     flex: 1 1 160px;
-    accent-color: var(--s5);
+    width: auto;
   }
 
   .control output {
