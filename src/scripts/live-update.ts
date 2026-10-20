@@ -12,6 +12,7 @@ import {
   type ContentChangedData,
 } from "../integrations/dev-reload-lock/protocol.ts";
 import { initCopyButtons } from "./copy-code.ts";
+import { parsePage } from "./parse-page.ts";
 import { bindImages } from "./image-zoom.ts";
 import { initTocScrollSpy } from "./toc-scroll-spy.ts";
 
@@ -77,7 +78,7 @@ export async function applyContentUpdate(): Promise<void> {
     throw new Error(`fetch ${location.pathname} failed: ${res.status}`);
   const html = await res.text();
   if (updateId !== latestUpdateId) return;
-  const nextDoc = new DOMParser().parseFromString(html, "text/html");
+  const nextDoc = parsePage(html);
 
   const oldArticle = document.querySelector("article");
   const newArticle = nextDoc.querySelector("article");

@@ -21,6 +21,7 @@
 //    run so far; an unknown one means the target needs something this page
 //    doesn't have, so it falls back.
 import { initCopyButtons } from "./copy-code.ts";
+import { parsePage } from "./parse-page.ts";
 import { bindImages } from "./image-zoom.ts";
 import { initTocScrollSpy } from "./toc-scroll-spy.ts";
 import { initNoteFeedback } from "./note-feedback.ts";
@@ -233,7 +234,7 @@ export async function softNavigate(url: URL, push: boolean): Promise<boolean> {
     const res = await fetch(url.pathname + url.search);
     if (!res.ok) return false;
     const html = await res.text();
-    const nextDoc = new DOMParser().parseFromString(html, "text/html");
+    const nextDoc = parsePage(html);
     if (!checkSwappable(nextDoc)) return false;
     const plan = await planScripts(nextDoc, seen, readExternal);
     if (!plan.supported) return false;
