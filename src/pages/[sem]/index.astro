@@ -1,15 +1,15 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../layouts/Layout.astro";
-import Nav from "../components/layout/nav.astro";
-import { SITE_NAME, SITE_HOST_URL, isElective } from "../utils/values";
-import { titleize } from "../utils";
-import NoteCard from "../components/home/note-card.astro";
-import TocRail from "../components/note/toc-rail.astro";
-import ModulesList from "../components/note/modules-list.astro";
-import RightSidebar from "../components/note/right-sidebar.astro";
-import type { ModuleItem } from "../utils/types";
-import { orderFromFilePath } from "../utils/note-path";
+import Layout from "../../layouts/Layout.astro";
+import Nav from "../../components/layout/nav.astro";
+import { SITE_NAME, SITE_HOST_URL, isElective } from "../../utils/values";
+import { titleize } from "../../utils";
+import NoteCard from "../../components/home/note-card.astro";
+import TocRail from "../../components/note/toc-rail.astro";
+import ModulesList from "../../components/note/modules-list.astro";
+import RightSidebar from "../../components/note/right-sidebar.astro";
+import type { ModuleItem } from "../../utils/types";
+import { orderFromFilePath } from "../../utils/note-path";
 
 export const prerender = true;
 
@@ -265,8 +265,12 @@ const subjectsList: Array<ModuleItem> = subjectTreesKeys.map((subject) => {
 
       <h1 class="sem-title">Semester {semNum}</h1>
       <p class="sem-subtitle">
-        {Object.keys(subjectTrees).length} subject
-        {Object.keys(subjectTrees).length !== 1 ? "s" : ""},
+        {Object.keys(subjectTrees)
+          .length.toString()
+          .concat(
+            " ",
+            Object.keys(subjectTrees).length !== 1 ? "modules" : "module",
+          )}
         {allNotes.filter((n) => n.id.startsWith(`${sem}/`)).length} notes
       </p>
 
