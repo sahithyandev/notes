@@ -21,7 +21,8 @@ export type RuleId =
   | "submodule-numbering"
   | "forward-link"
   | "math-block"
-  | "proof-hint";
+  | "proof-hint"
+  | "too-many-headings";
 
 export interface Violation {
   rule: RuleId;
