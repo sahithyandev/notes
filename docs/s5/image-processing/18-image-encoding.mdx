@@ -1,32 +1,81 @@
 ---
 title: Image Encoding
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-17T06:15:20.286Z
+lastUpdatedOn: 2026-10-20T08:45:41.108Z
 ---
 
 Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
 
-For grey level $k$ with probability $P(k) = r_k / N$ and codeword length $l(k)$:
+The average codeword length $L_\text{avg}$, its lower bound $B_\text{avg}$ and the coding redundancy $R_\text{coding}$ are defined in [entropy](/s5/image-processing/entropy#average-code-length). $L_\text{avg}$ is the average number of bits per pixel of the coded image.
 
-$$
-L_{ave} = \sum_{k=0}^{L-1} l(k) P(k)
-$$
-
-$L_{ave}$ is the average number of bits per pixel of the coded image. It is bounded below by the entropy $B_{ave}$.
-
-$$
-L_{ave} \geq B_{ave}
-$$
-
-$$
-\text{Coding redundancy} = L_{ave} - B_{ave}
-$$
-
-The smallest $L_{ave}$ is achieved by assigning the shortest codeword to the most probable grey level.
+The smallest $L_\text{avg}$ is achieved by assigning the shortest codeword to the most probable grey level.
 
 <Note>
 
 The mapping between grey levels and codewords is stored in a codebook.
+
+</Note>
+
+## Decodability
+
+### Code
+
+A code assigns a codeword to each grey level. A codeword is a finite sequence of bits.
+
+- Encoded stream  
+  Concatenation of the codewords of all pixels in order, with no separators.
+- Codebook  
+  The mapping between grey levels and codewords.
+
+### Unique Decodability
+
+A code is uniquely decodable **iff** every encoded stream corresponds to exactly 1 sequence of grey levels.
+
+- Two different sequences of grey levels never produce the same encoded stream
+- The decoder can split the stream into codewords in only 1 way
+
+A code that is not uniquely decodable has an ambiguous stream. With $a \to 0$, $b \to 01$ and $c \to 10$, the stream `010` decodes as $ac$ or as $ba$.
+
+A uniquely decodable code can still need lookahead. With $a \to 0$, $b \to 01$ and $c \to 011$, the codeword `0` is a prefix of `01`, so the decoder must read further bits before it knows where a codeword ends.
+
+#### Sardinas-Patterson Test
+
+If a codeword $u$ is a proper prefix of a codeword $v = uw$, the non-empty remainder $w$ is a dangling suffix.
+
+1. Let $S_0$ be the set of codewords
+2. Let $S_1$ be the dangling suffixes of all codeword pairs in $S_0$
+3. Let $S_{n+1}$ be the non-empty remainders when a codeword in $S_0$ is a prefix of some $w \in S_n$, or some $w \in S_n$ is a prefix of a codeword in $S_0$
+4. If any $S_n$ contains a codeword, the code is not uniquely decodable
+5. If $S_n$ is empty or repeats an earlier $S_k$ with $k \geq 1$, the code is uniquely decodable
+6. Otherwise repeat from step 3
+
+### Prefix Code
+
+A code is a prefix code **iff** no codeword is a prefix of another codeword.
+
+- Codewords sit only at the leaves of the code tree
+- A codeword is recognised as soon as its last bit is read, with no lookahead
+- Every prefix code is uniquely decodable
+- Huffman codes are prefix codes
+
+A prefix code with codeword lengths $l(0), \dots, l(L-1)$ exists **iff** the lengths satisfy the Kraft inequality:
+
+$$
+\sum_{k=0}^{L-1} 2^{-l(k)} \le 1
+$$
+
+- The sum equals 1 **iff** the code tree is full, with no unused leaf
+- Every uniquely decodable code satisfies the same inequality
+
+Decoding a prefix code:
+
+- Read bits until they match a codeword
+- Output the grey level and clear the bits read
+- Repeat from the next bit
+
+<Note>
+
+A flipped bit shifts every later codeword boundary, so decoding errors propagate through the rest of the stream. The channel encoder in the compression pipeline adds controlled redundancy to limit this.
 
 </Note>
 
@@ -45,27 +94,258 @@ Here:
   <Sym s="l(k)">codeword length of grey level $k$</Sym>
 </Symbols>
 
-- $L_{ave} = l(k)$ for every image, regardless of the grey level probabilities
-- $L_{ave} = B_{ave}$ only when all grey levels are equiprobable and $L$ is a power of 2
-- Simple to encode and decode, and allows random access to any pixel
-- Contains coding redundancy whenever the grey levels are not equiprobable
+Easy to encode and decode. Allows random access to any pixel. Always uniquely decodable.
 
-Examples:
+$$
+L_\text{avg} = \sum_{k=0}^{L-1} l(k)\, P(k) = \lceil \log_2 L \rceil \sum_{k=0}^{L-1} P(k) = \lceil \log_2 L \rceil
+$$
 
-- 8bpp image, $L = 256$, $l(k) = 8$ bits
-- 3 grey level image, $L = 3$, $l(k) = 2$ bits
+$L_\text{avg}$ is the same for every image, regardless of the grey level probabilities. For an $N$-pixel image, the coded size is $b = N \lceil \log_2 L \rceil$ bits.
+
+Coding redundancy shows up when gray levels are not equiprobable. Otherwise, when $L$ is a power of 2, $L_\text{avg} = B_\text{avg}$.
 
 ## Variable Length Coding
 
-Grey levels are assigned codewords of different lengths. More probable grey levels get shorter codewords.
+Grey levels are assigned codewords of different lengths. More probable grey levels get shorter codewords. Must remain uniquely decodable.
 
-- Achieves $L_{ave}$ close to the entropy $B_{ave}$, with $L_{ave} = B_{ave}$ only when every $P(k)$ is a power of $\frac{1}{2}$
-- Must remain uniquely decodable
-- A prefix code satisfies this, since no codeword is a prefix of another codeword
+Achieves $L_\text{avg}$ close to the entropy $B_\text{avg}$, with $L_\text{avg} = B_\text{avg}$ only when every $P(k)$ is a power of $\frac{1}{2}$.
 
-Example:
+Uniquely decodable **iff** every bit stream can be split into codewords in exactly 1 way.
 
-For the 3 grey level image in the [entropy](/s5/image-processing/entropy) example:
+The ideal length of grey level $k$ is its information content. Real codewords have integer lengths, so the ideal length is reached only when $P(k)$ is a power of $\frac{1}{2}$.
+
+$$
+l_\text{ideal}(k) = -\log_2 P(k)
+\qquad
+l(k) = \lceil -\log_2 P(k) \rceil \text{ satisfies the Kraft inequality}
+$$
+
+$$
+B_\text{avg} \le L_\text{avg} < B_\text{avg} + 1
+$$
+
+Compared with a fixed length code:
+
+$$
+CR = \frac{\lceil \log_2 L \rceil}{L_\text{avg}}
+$$
+
+### Huffman Coding
+
+Produces the optimal variable length codeword allocation while preserving decodability. Reduces the source by merging the least probable grey levels, then assigns codes back through the reductions.
+
+The code is optimal among prefix codes. Its average length satisfies:
+
+$$
+B_\text{avg} \le L_\text{avg}^\text{Huffman} < B_\text{avg} + 1
+$$
+
+Steps:
+
+1. List grey levels in descending order of probability
+2. Add the 2 lowest probabilities into 1 and re-sort the list
+3. Repeat until 2 probabilities remain
+4. Assign 0 and 1 to the last 2 probabilities
+5. Working backwards, append 0 and 1 to the code of every merged probability, one bit for each of the 2 probabilities it came from
+
+## Interpixel Redundancy
+
+Correlated or repeating pixel patterns, such as texture or constant regions, can be represented more compactly than as independent pixel values.
+
+### Delta Coding
+
+Transforms pixels into differences from a neighbour:
+
+$$
+D(x,y) = I(x+1,y) - I(x,y)
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="I(x,y)">grey level at column $x$ and row $y$</Sym>
+  <Sym s="D(x,y)">difference between a pixel and its right neighbour</Sym>
+</Symbols>
+
+The first pixel of each row has no left neighbour, so it is stored unchanged. The decoder rebuilds the row by accumulating the differences:
+
+$$
+I(x,y) = I(0,y) + \sum_{i=0}^{x-1} D(i,y)
+$$
+
+- Differences are typically small integers, since local pixels are correlated
+- The difference histogram peaks sharply at 0, so its [entropy](/s5/image-processing/entropy) is lower than the entropy of the raw grey levels
+- Reduces correlation among pixel values, increasing coding efficiency
+- Lossless, since the accumulation recovers every pixel exactly
+
+### Image Pyramid Coding
+
+Each layer stores the difference from the layer above, upscaled to match resolution. Removes correlation relative to the previous layer.
+
+The image is repeatedly smoothed and downsampled to build layers of decreasing resolution:
+
+$$
+G_0 = I, \qquad G_{k+1} = \text{reduce}(G_k)
+$$
+
+Each layer is predicted by upscaling the next coarser layer. Only the prediction error is stored:
+
+$$
+L_k = G_k - \text{expand}(G_{k+1})
+$$
+
+The coarsest layer $G_K$ is stored as is. The decoder starts there and works down to full resolution:
+
+$$
+G_k = L_k + \text{expand}(G_{k+1})
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="I">original image</Sym>
+  <Sym s="G_k">image at level $k$, with $G_0$ the full-resolution image</Sym>
+  <Sym s="K">index of the coarsest level</Sym>
+  <Sym s="\text{reduce}">
+    smoothing followed by downsampling by 2 in each dimension
+  </Sym>
+  <Sym s="\text{expand}">
+    upsampling by 2 in each dimension with interpolation
+  </Sym>
+  <Sym s="L_k">difference layer at level $k$</Sym>
+</Symbols>
+
+Difference layers are mostly near 0 in smooth regions, so they have low entropy. The total number of samples is about $\frac{4}{3}$ of the image size, since each level has $\frac{1}{4}$ the samples of the one below. Compression comes from the lower entropy per sample.
+
+Used for progressive image transmission, updating the receiver incrementally. The receiver shows $G_K$ first, then sharpens it as each $L_k$ arrives.
+
+### Run-Length Coding
+
+Encodes a run of identical pixel values as $(\text{value}, \#\text{times to repeat})$ pairs rather than storing each pixel separately. Pixels are scanned row by row, and a run normally ends at the end of a row.
+
+A run of $r$ pixels, with $b_v$ bits per value and $b_c$ bits per count, saves space **iff**:
+
+$$
+r\, b_v > b_v + b_c \iff r > 1 + \frac{b_c}{b_v}
+$$
+
+For a row with $n_\text{runs}$ runs and $n$ pixels:
+
+$$
+b_\text{RLE} = n_\text{runs}\,(b_v + b_c)
+\qquad
+CR = \frac{n\, b_v}{n_\text{runs}\,(b_v + b_c)}
+$$
+
+- Short runs can take more space than the raw pixels, so isolated pixels are a worst case
+- More effective on binary images, which more often contain large regions of constant value
+- In a binary image, runs alternate between 0 and 1. Only the first value and the run lengths need to be stored.
+
+### Bit-Plane Coding
+
+Separates an $m$-bit grey level image into $m$ binary bit-planes:
+
+$$
+I(x,y) = \sum_{k=0}^{m-1} a_k(x,y)\, 2^k
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="a_k(x,y)">
+    bit $k$ of the pixel at $(x,y)$, with $k = 0$ the least significant bit
+  </Sym>
+</Symbols>
+
+Plane $k$ is the binary image formed by $a_k$ over all pixels.
+
+- Lower order planes capture minor grey level changes
+- Higher order planes capture larger changes, and hold larger regions of constant value
+- Higher order planes compress better with schemes such as run-length coding
+
+A small grey level change can flip many bits in the natural binary code, e.g. $127 = 01111111$ and $128 = 10000000$ differ in all 8 bits. This breaks runs in every plane. Gray code representation avoids it, since consecutive grey levels differ in exactly 1 bit:
+
+$$
+g_{m-1} = a_{m-1}, \qquad g_k = a_k \oplus a_{k+1} \quad (0 \le k < m-1)
+$$
+
+The decoder recovers the original bits from the top plane downwards:
+
+$$
+a_{m-1} = g_{m-1}, \qquad a_k = g_k \oplus a_{k+1}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="g_k">bit $k$ of the Gray coded pixel</Sym>
+  <Sym s="\oplus">exclusive OR</Sym>
+</Symbols>
+
+## Psychovisual Redundancy
+
+Not all image detail is equally perceivable. Removing imperceptible detail doesn't affect apparent quality, but always loses information.
+
+- Re-quantizing with lower grey level depth
+- Smoothing to remove noise and minor variations before coding
+
+Re-quantizing an $m$-bit image to $m'$ bits keeps the top $m'$ bits of each pixel:
+
+$$
+I'(x,y) = \left\lfloor \frac{I(x,y)}{2^{m-m'}} \right\rfloor 2^{m-m'}
+\qquad
+0 \le I(x,y) - I'(x,y) < 2^{m-m'}
+$$
+
+$$
+CR = \frac{m}{m'}
+$$
+
+Smoothing replaces each pixel with a weighted average of its neighbourhood:
+
+$$
+I'(x,y) = \sum_{i,j} h(i,j)\, I(x+i, y+j)
+\qquad
+\sum_{i,j} h(i,j) = 1
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="m, m'">bits per pixel before and after re-quantizing</Sym>
+  <Sym s="I'(x,y)">pixel value after the operation</Sym>
+  <Sym s="h(i,j)">smoothing weight at offset $(i,j)$</Sym>
+</Symbols>
+
+<Note>
+
+Always results in a lossy compression scheme.
+
+</Note>
+
+## Worked Examples
+
+### Fixed Length Code Sizes
+
+Find the codeword length of a fixed length code for an 8bpp image ($L = 256$) and for an image with 3 grey levels.
+
+<Solution>
+
+$$
+l(k) = \lceil \log_2 256 \rceil = 8 \text{ bits}
+$$
+
+$$
+l(k) = \lceil \log_2 3 \rceil = 2 \text{ bits}
+$$
+
+For the 3 grey level image, $\log_2 3 \approx 1.58$, so the code wastes about $0.42$ bits per pixel.
+
+</Solution>
+
+### Fixed vs Variable Length Code
+
+For the 3 grey level image in the [entropy](/s5/image-processing/entropy) worked example, compare a fixed length code with a variable length code, using the codes below.
 
 | Grey level | $P(k)$ | Fixed code | Variable code |
 | ---------- | ------ | ---------- | ------------- |
@@ -73,41 +353,33 @@ For the 3 grey level image in the [entropy](/s5/image-processing/entropy) exampl
 | Grey       | 0.25   | 01         | 10            |
 | Black      | 0.25   | 10         | 11            |
 
+<Solution>
+
 Fixed length code:
 
 $$
-L_{ave} = 2 \text{ bits}
+L_\text{avg} = 2 \text{ bits}
 $$
 
 Variable length code:
 
 $$
-L_{ave} = 1(0.5) + 2(0.25) + 2(0.25) = 1.5 \text{ bits}
+L_\text{avg} = 1(0.5) + 2(0.25) + 2(0.25) = 1.5 \text{ bits}
 $$
 
 $$
 CR = \frac{2}{1.5} \approx 1.33
 $$
 
-The variable length $L_{ave}$ equals $B_{ave}$, so no coding redundancy remains.
+The variable length $L_\text{avg}$ equals $B_\text{avg}$, so no coding redundancy remains.
 
-### Huffman Coding
+</Solution>
 
-Produces the optimal variable length codeword allocation while preserving decodability. Reduces the source by merging the least probable grey levels, then assigns codes back through the reductions.
+### Huffman Code
 
-<Proof label="Proof Hint">
+An image has 4 grey levels with probabilities 0.4, 0.3, 0.2, 0.1. Build a Huffman code and find its $L_\text{avg}$.
 
-- List grey levels in descending order of probability
-- Add the 2 lowest probabilities into 1 and re-sort the list
-- Repeat until 2 probabilities remain
-- Assign 0 and 1 to the last 2 probabilities
-- Working backwards, append 0 and 1 to the code of every merged probability, one bit for each of the 2 probabilities it came from
-
-</Proof>
-
-Example:
-
-An image has 4 grey levels with probabilities 0.4, 0.3, 0.2, 0.1.
+<Solution>
 
 <HuffmanTable
   symbols={[
@@ -128,11 +400,19 @@ Codewords:
 | $a_4$      | 0.1 | 011      | 3   |
 
 $$
-L_{ave} = 0.4(1) + 0.3(2) + 0.2(3) + 0.1(3) = 1.9 \text{ bits}
+L_\text{avg} = 0.4(1) + 0.3(2) + 0.2(3) + 0.1(3) = 1.9 \text{ bits}
 $$
 
 $$
-B_{ave} \approx 1.85 \text{ bits}
+B_\text{avg} = -0.4\log_2 0.4 - 0.3\log_2 0.3 - 0.2\log_2 0.2 - 0.1\log_2 0.1 \approx 1.85 \text{ bits}
+$$
+
+$$
+\sum_k 2^{-l(k)} = 2^{-1} + 2^{-2} + 2^{-3} + 2^{-3} = 1
+$$
+
+$$
+R_\text{coding} = L_\text{avg} - B_\text{avg} \approx 1.9 - 1.85 = 0.05 \text{ bits}
 $$
 
 $$
@@ -141,54 +421,79 @@ $$
 
 A fixed length code needs 2 bits per pixel for 4 grey levels.
 
-## Decodability
+</Solution>
 
-### Code
+### Checking Unique Decodability
 
-A code assigns a codeword to each grey level. A codeword is a finite sequence of bits.
+Use the Sardinas-Patterson test on the code $\{1, 011, 01110, 1110, 10011\}$.
 
-- Encoded stream  
-  Concatenation of the codewords of all pixels in order, with no separators.
-- Codebook  
-  The mapping between grey levels and codewords.
+<Solution>
 
-Example:
+$S_0 = \{1, 011, 01110, 1110, 10011\}$
 
-For the variable code above, the pixels white, grey, black give the stream `01011`.
+$S_1$ comes from the codeword pairs where one is a prefix of the other.
 
-### Unique Decodability
+- $1$ is a prefix of $1110$, with remainder $110$
+- $1$ is a prefix of $10011$, with remainder $0011$
+- $011$ is a prefix of $01110$, with remainder $10$
 
-A fixed length code is always uniquely decodable.
+$$
+S_1 = \{10, 110, 0011\}
+$$
 
-A variable length code is uniquely decodable **iff** every bit stream can be split into codewords in exactly 1 way.
+No element of $S_1$ is a codeword. $S_2$ comes from $S_0$ and $S_1$.
 
-The stream has no fixed boundaries, so the decoder must find where each codeword ends. A codeword that is a prefix of another makes this ambiguous.
+- $1$ is a prefix of $10$, with remainder $0$
+- $1$ is a prefix of $110$, with remainder $10$
+- $10$ is a prefix of $10011$, with remainder $011$
+- No other pair has a prefix relation
 
-Example:
+$$
+S_2 = \{0, 10, 011\}
+$$
 
-For the code $a = 0$, $b = 01$, $c = 1$, the stream `01` decodes as $b$, or as $a$ followed by $c$.
+$011$ is a codeword, so the code is not uniquely decodable. The stream `1110011` decodes as $1110$ followed by $011$, or as $1$, $1$, $10011$.
 
-### Prefix Code
+</Solution>
 
-A code is a prefix code **iff** no codeword is a prefix of another codeword.
+### Delta Coding of a Row
 
-- Codewords sit only at the leaves of the code tree
-- A codeword is recognised as soon as its last bit is read, with no lookahead
-- Every prefix code is uniquely decodable
-- Huffman codes are prefix codes
+Delta code the row $100, 102, 101, 101, 105$, then decode it.
 
-Decoding a prefix code:
+<Solution>
 
-- Read bits until they match a codeword
-- Output the grey level and clear the bits read
-- Repeat from the next bit
+The first pixel is stored unchanged. Every other value is the difference from its predecessor.
 
-Example:
+$$
+100,\ 102 - 100,\ 101 - 102,\ 101 - 101,\ 105 - 101 = 100,\ 2,\ -1,\ 0,\ 4
+$$
 
-For the variable code in the table above, the stream `010110` splits as `0`, `10`, `11`, `0`. It decodes to white, grey, black, white.
+The decoder accumulates the differences.
 
-<Note>
+$$
+100,\ 100 + 2,\ 102 - 1,\ 101 + 0,\ 101 + 4 = 100,\ 102,\ 101,\ 101,\ 105
+$$
 
-A flipped bit shifts every later codeword boundary, so decoding errors propagate through the rest of the stream. The channel encoder in the compression pipeline adds controlled redundancy to limit this.
+</Solution>
 
-</Note>
+### Run-Length Coding of a Row
+
+Run-length code the binary row $0001111001$.
+
+<Solution>
+
+The row has 4 runs.
+
+$$
+(0,3),\ (1,4),\ (0,2),\ (1,1)
+$$
+
+With $b_v = 1$ and $b_c = 3$, the coded row takes $4 \times (1 + 3) = 16$ bits against $10$ bits raw.
+
+$$
+CR = \frac{10 \times 1}{4 \times (1 + 3)} = 0.625
+$$
+
+The runs are too short, so the coded row is larger than the raw row.
+
+</Solution>

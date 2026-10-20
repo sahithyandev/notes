@@ -1,7 +1,7 @@
 ---
 title: JPEG
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-17T06:15:20.323Z
+lastUpdatedOn: 2026-10-20T08:45:41.163Z
 ---
 
 Standard developed by the Joint Photographic Experts Group, adopted by ISO and CCITT.
@@ -57,7 +57,7 @@ $$
 
 ### Chroma Subsampling
 
-The eye is less sensitive to colour detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/redundancy#psychovisual-redundancy) early.
+The eye is less sensitive to colour detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/image-encoding#psychovisual-redundancy) early.
 
 Subsampling is written as $J{:}a{:}b$ over a block 4 pixels wide and 2 rows high.
 
@@ -211,7 +211,7 @@ $$
 
 1. Code the DC coefficient as the difference from the DC coefficient of the previous tile. Neighbouring tiles have similar means, so the differences are small.
 2. Read the 63 AC coefficients in zig-zag order, from low to high frequency. The long tail of zeros collects at the end of the sequence.
-3. [Run-length](/s5/image-processing/redundancy#run-length-coding) encode the sequence as pairs of the number of preceding zeros and the next nonzero value. A special end-of-block symbol replaces the trailing zeros.
+3. [Run-length](/s5/image-processing/image-encoding#run-length-coding) encode the sequence as pairs of the number of preceding zeros and the next nonzero value. A special end-of-block symbol replaces the trailing zeros.
 4. [Huffman](/s5/image-processing/image-encoding#huffman-coding) code the pairs.
 
 The result of every tile is concatenated into 1 bitstream.
@@ -249,7 +249,7 @@ The logo of FFmpeg is a zig-zag scan of this kind, drawn over a block of coeffic
 
 ### DC Coefficients
 
-The DC coefficients of successive blocks of the same component are coded by differential pulse code modulation, a form of [delta coding](/s5/image-processing/redundancy#delta-coding):
+The DC coefficients of successive blocks of the same component are coded by differential pulse code modulation, a form of [delta coding](/s5/image-processing/image-encoding#delta-coding):
 
 $$
 \text{Diff}_k = F_{q,k}(0, 0) - F_{q,k-1}(0, 0)
@@ -372,7 +372,7 @@ Encoders may instead compute optimal tables from the image's own symbol statisti
 
 The complete Annex K definitions, which `BITS` and `HUFFVAL` fully determine. Each AC table holds the 160 symbols $R \cdot 16 + s$ for $R \in [0, 15]$ and $s \in [1, 10]$, plus EOB (`0x00`) and ZRL (`0xF0`). The DC tables hold the categories 0 to 11.
 
-````python
+```python
 DC_LUM_BITS = [0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
 DC_LUM_VALS = list(range(12))
 
@@ -407,18 +407,19 @@ AC_CHR_VALS = bytes.fromhex(
     "c4 c5 c6 c7 c8 c9 ca d2 d3 d4 d5 d6 d7 d8 d9 da"
     "e2 e3 e4 e5 e6 e7 e8 e9 ea f2 f3 f4 f5 f6 f7 f8"
     "f9 fa"
-)```
+)
+```
 
 - Luminance tables serve the Y component and chrominance tables serve Cb and Cr
 - The `BITS` lists sum to 12 for DC tables and to 162 for AC tables
 
 ### Byte Stuffing and Restart Markers
 
-- Byte stuffing
+- Byte stuffing  
   Every `0xFF` byte inside entropy-coded data is followed by a `0x00` byte. A marker is a `0xFF` byte followed by a nonzero byte. Since the all-ones Huffman code is never assigned, a code cannot be mistaken for a marker.
-- Padding
+- Padding  
   The final partial byte of a scan is filled with 1 bits.
-- Restart intervals
+- Restart intervals  
   An optional interval of $N$ MCUs makes the encoder byte-align the stream, emit a restart marker `RST0` to `RST7` (cycling) and reset all DC predictors to 0.
 
 Restart intervals limit the damage from a bit error to 1 interval, since decoding can resynchronise at the next marker. They also allow parallel decoding.
@@ -429,37 +430,55 @@ $$
 \text{Preprocessing} \to \text{Forward DCT} \to \text{Quantizer} \to \text{Entropy encoder}
 $$
 
-- Preprocessing
+- Preprocessing  
   Convert to [YCrCb](/s5/image-processing/color#channels), subsample chroma, split into 8x8 blocks, level shift.
-- Forward DCT
+- Forward DCT  
   Apply the discrete cosine transform to each block.
-- Quantization
+- Quantization  
   Divide each DCT coefficient by a factor and round to the nearest integer, trading file size for quality. This is the only lossy step apart from chroma subsampling.
-- Entropy coding
+- Entropy coding  
   Code coefficients in zig-zag order for optimal coding efficiency.
 
 The JPEG stages map onto the general [compression pipeline](/s5/image-processing/compression#compression-pipeline). The forward DCT is the [mapper](/s5/image-processing/compression#mapper), the quantization step is the [quantizer](/s5/image-processing/compression#quantizer), and the entropy encoder is the [symbol encoder](/s5/image-processing/compression#symbol-encoder).
 
+## Compression Ratio
+
+For a $W \times H$ image with a JPEG file of $S$ bytes:
+
+$$
+\text{bpp} = \frac{8 S}{W H}
+\qquad
+CR = \frac{24\, W H}{8 S} = \frac{3\, W H}{S}
+$$
+
+The 24 is the bits per pixel of the raw RGB image. Header bytes count towards $S$. The saving from each stage multiplies.
+
+$$
+CR = CR_\text{subsampling} \times CR_\text{quantization and entropy coding}
+$$
+
+4:2:0 subsampling alone gives $CR_\text{subsampling} = \frac{3}{1.5} = 2$.
+
 ## Operating Modes
 
-- Baseline sequential
+- Baseline sequential  
   8-bit samples, 8x8 DCT, Huffman coding. Blocks are stored in a single pass from top to bottom.
-- Extended sequential
+- Extended sequential  
   Adds 12-bit samples, up to 4 tables of each kind and optional arithmetic coding.
-- Progressive
+- Progressive  
   The same coefficients are sent over several scans. A coarse image appears first and refines with each scan.
-- Hierarchical
-  The image is coded as an [image pyramid](/s5/image-processing/redundancy#image-pyramid-coding) of resolutions. Each level codes the difference from the upsampled previous level.
-- Lossless
+- Hierarchical  
+  The image is coded as an [image pyramid](/s5/image-processing/image-encoding#image-pyramid-coding) of resolutions. Each level codes the difference from the upsampled previous level.
+- Lossless  
   No DCT. Each sample is predicted from its neighbours and the prediction error is entropy coded.
 
 ## Progressive Mode
 
 The coefficients of each block are sent over several scans.
 
-- Spectral selection
+- Spectral selection  
   Early scans send the DC coefficients of all blocks. Later scans send bands of AC coefficients, such as indices 1 to 5, then 6 to 63.
-- Successive approximation
+- Successive approximation  
   A coefficient is first sent with its most significant bits (shifted right by $A_l$). Later scans send the remaining bits 1 bit at a time.
 
 An AC scan covers 1 component. The entropy coder adds an end-of-band run symbol that covers many blocks, so long runs of all-zero bands cost little. The compressed size is similar to the sequential mode and often slightly smaller.
@@ -502,17 +521,17 @@ A JPEG file is a sequence of segments. Each starts with a 2-byte marker `0xFF` f
 
 Every segment is `0xFF`, the marker code, a 2-byte big-endian length that counts itself and the payload, then the payload. SOI and EOI have no length and no payload. Multi-byte fields are big-endian.
 
-- JFIF (APP0)
+- JFIF (APP0)  
   The bytes `4A 46 49 46 00` (`JFIF` and a zero), major version 1, minor version 1, density units (0 none, 1 per inch, 2 per centimetre), horizontal density in 2 bytes, vertical density in 2 bytes, thumbnail width and height in 1 byte each (0 for no thumbnail).
-- DQT
+- DQT  
   Repeated per table. 1 byte holding precision in the high nibble (0 for 8-bit) and table id in the low nibble, then 64 table entries in zig-zag order.
-- SOF0
+- SOF0  
   Sample precision in 1 byte, image height in 2 bytes, image width in 2 bytes and the number of components in 1 byte. Then per component 3 bytes holding the component id, the sampling factors $(H_i, V_i)$ as two nibbles and the quantization table id.
-- DHT
+- DHT  
   Repeated per table. 1 byte holding the class in the high nibble (0 for DC, 1 for AC) and the table id in the low nibble, then the 16 `BITS` bytes and the `HUFFVAL` bytes.
-- SOS
+- SOS  
   Number of components in the scan in 1 byte. Per component 2 bytes holding the component id, and the DC table id and AC table id as two nibbles. Then the spectral selection start, the spectral selection end and the successive approximation byte, which are 0, 63 and 0 for baseline.
-- DRI
+- DRI  
   The restart interval in MCUs in 2 bytes.
 
 Entropy-coded data follows the SOS header directly and runs until the next marker other than `RSTn`.
@@ -545,7 +564,7 @@ def rgb_to_ycc(r, g, b):
     cb = -0.168736 * r - 0.331264 * g + 0.5 * b + 128
     cr = 0.5 * r - 0.418688 * g - 0.081312 * b + 128
     return y, cb, cr
-````
+```
 
 ### Quantization Code
 
@@ -709,6 +728,21 @@ The code above was run on a 75x53 test image at quality 90. libjpeg decoded the 
 8. Upsample the chroma planes to full resolution.
 9. Convert [YCrCb](/s5/image-processing/color#channels) to RGB.
 
+For one block, steps 5 to 7 combine into:
+
+$$
+\hat{f}(x, y) = \text{clamp}\left( \text{round}\left( \text{IDCT}\big(F_q(u, v)\, Q(u, v)\big) \right) + 128,\ 0,\ 255 \right)
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="F_q(u, v)">quantized coefficient from the entropy decoder</Sym>
+  <Sym s="Q(u, v)">quantization table entry</Sym>
+  <Sym s="\text{IDCT}">inverse 2D DCT of the block</Sym>
+  <Sym s="\text{clamp}(a, 0, 255)">$a$ limited to the range $[0, 255]$</Sym>
+</Symbols>
+
 The inverse DCT output is rounded, so decoders from different vendors can differ by at most a small amount per pixel. The standard bounds this difference through accuracy tests.
 
 ## Codecs
@@ -855,3 +889,145 @@ These share the name or the working group, but use different compression methods
   Chroma smears across edges. Caused by chroma subsampling and the coarse chrominance table.
 - Generation loss  
   Re-encoding a decoded image quantizes again and compounds the error. The loss shrinks when the tables and block grid are identical.
+
+## Worked Example
+
+### Subsampling Calculation
+
+A $4 \times 4$ region of $C_b$ values under 4:2:0 has 4 groups of $2 \times 2$ pixels.
+
+$$
+\begin{bmatrix}
+100 & 102 & 110 & 112 \\
+98 & 104 & 108 & 114 \\
+90 & 92 & 120 & 118 \\
+94 & 96 & 122 & 124
+\end{bmatrix}
+$$
+
+Subsample the region to 4:2:0, restore it and find the error.
+
+<Solution>
+
+The group averages are $101$, $111$, $93$ and $121$, so 16 values become 4.
+
+$$
+\begin{bmatrix}
+101 & 111 \\
+93 & 121
+\end{bmatrix}
+$$
+
+The decoder copies each value into its $2 \times 2$ group.
+
+$$
+\begin{bmatrix}
+101 & 101 & 111 & 111 \\
+101 & 101 & 111 & 111 \\
+93 & 93 & 121 & 121 \\
+93 & 93 & 121 & 121
+\end{bmatrix}
+$$
+
+The error (original minus restored) is:
+
+$$
+\begin{bmatrix}
+-1 & 1 & -1 & 1 \\
+-3 & 3 & -3 & 3 \\
+-3 & -1 & -1 & -3 \\
+1 & 3 & 1 & 3
+\end{bmatrix}
+$$
+
+The largest error is 3 on a scale of 255. The original values cannot be recovered.
+
+The same applies to $C_r$. The $4 \times 4$ pixels hold 48 samples ($Y$, $C_b$, $C_r$ with 16 each) before and $16 + 4 + 4 = 24$ after.
+
+</Solution>
+
+### First Block of an Image
+
+The test image is a $512 \times 768$ photo of a lighthouse, encoded at quality 50. The first block is the top-left $Y$ block of the first MCU. Encode it into JPEG symbols, starting from the pixel $(0, 0)$ with $(R, G, B) = (75, 93, 94)$.
+
+<Solution>
+
+Colour conversion of the pixel $(0, 0)$:
+
+$$
+\begin{aligned}
+Y &= 22.4 + 54.6 + 10.7 = 87.7 \\
+C_b &= 128 - 12.7 - 30.8 + 47.0 = 131.5 \\
+C_r &= 128 + 37.5 - 38.9 - 7.6 = 118.9
+\end{aligned}
+$$
+
+Level-shifted samples, rounded to 1 decimal place:
+
+$$
+f = \begin{bmatrix}
+-40.3 & -37.1 & -39.1 & -36.1 & -30.5 & -33.2 & -33.2 & -30.5 \\
+-40.3 & -39.1 & -41.2 & -40.1 & -37.2 & -34.5 & -30.5 & -33.2 \\
+-38.6 & -37.3 & -40.1 & -40.1 & -37.2 & -34.5 & -30.5 & -30.5 \\
+-30.6 & -37.3 & -41.4 & -40.1 & -37.2 & -36.1 & -31.5 & -31.5 \\
+-29.3 & -36.3 & -40.1 & -39.1 & -39.1 & -41.2 & -35.5 & -33.1 \\
+-27.9 & -34.7 & -39.1 & -43.1 & -40.4 & -38.7 & -35.8 & -34.7 \\
+-31.9 & -30.7 & -38.5 & -36.1 & -40.1 & -39.1 & -36.1 & -33.4 \\
+-29.1 & -31.9 & -34.7 & -33.5 & -34.5 & -39.1 & -40.1 & -39.1
+\end{bmatrix}
+$$
+
+DCT coefficients:
+
+$$
+F = \begin{bmatrix}
+-288.1 & -4.1 & 15.1 & 4.4 & 3.7 & -0.6 & -3.9 & 0.5 \\
+-0.3 & -18.1 & -4.3 & 0.8 & -2.8 & -1.5 & -0.7 & 1.2 \\
+2.9 & 1.2 & -10.0 & -2.5 & -0.8 & -3.2 & -0.8 & -1.6 \\
+-1.1 & 1.2 & 2.7 & 0.1 & 1.3 & -1.0 & 0.6 & 0.5 \\
+3.0 & 3.5 & -3.4 & 0.7 & 4.8 & -0.2 & 0.3 & 1.2 \\
+3.4 & -2.3 & 0.8 & -0.6 & 0.0 & -1.5 & -0.7 & -1.8 \\
+1.0 & 0.8 & -0.8 & 1.0 & -0.2 & -1.5 & 1.9 & 1.8 \\
+0.5 & -0.5 & -1.3 & -3.7 & 0.7 & -0.8 & -1.4 & -1.4
+\end{bmatrix}
+$$
+
+Quantization with the luminance table at quality 50, which is the Annex K table unchanged:
+
+$$
+F_q = \begin{bmatrix}
+-18 & 0 & 2 & 0 & 0 & 0 & 0 & 0 \\
+0 & -2 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+Only 4 of the 64 values are nonzero. The zig-zag scan gives:
+
+$$
+-18,\ 0,\ 0,\ 0,\ -2,\ 2,\ \underbrace{0, \dots, 0}_{6},\ -1,\ \underbrace{0, \dots, 0}_{51}
+$$
+
+Symbols, with the previous DC taken as 0:
+
+- DC  
+  Difference $-18$ with category $s = 5$.
+- AC  
+  $(R, s)$ pairs $(3, 2)$ for $-2$, $(0, 2)$ for $2$ and $(6, 1)$ for $-1$.
+- End  
+  EOB.
+
+The 64 values reduce to 1 DC difference, 3 AC pairs and 1 EOB. With Huffman codes built for this image, each symbol is followed by its extra bits:
+
+```
+11110|01101  11110101|01  011|10  111010|0  010
+```
+
+The block takes 35 bits, against $64 \times 8 = 512$ bits for the original samples.
+
+</Solution>

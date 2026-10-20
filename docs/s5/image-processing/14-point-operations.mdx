@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-10-19T12:09:03.116Z
+lastUpdatedOn: 2026-10-20T08:45:41.049Z
 ---
 
 Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
@@ -47,6 +47,42 @@ $$
 
 Defines the accumulated probability of pixels with intensity level $\le k$.
 
+### Characteristics
+
+- Position independent  
+  The histogram ignores where pixels are. Rearranging the pixels leaves it unchanged, so different images can share one histogram.
+- Size independent  
+  The normalized histogram holds proportions, so images of different sizes can be compared.
+- Sums to 1  
+  $\sum_k P(k) = 1$. The accumulated histogram never decreases and reaches 1 at the highest level.
+- Gives mean and spread  
+  Brightness is the mean and contrast is the standard deviation of the distribution.
+
+$$
+\mu = \sum_k k\,P(k) \qquad \sigma^2 = \sum_k (k - \mu)^2 P(k)
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="\mu">mean intensity</Sym>
+  <Sym s="\sigma^2">variance of intensity</Sym>
+</Symbols>
+
+| Shape                       | Meaning                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| Concentrated at low levels  | Dark image.                                                                                      |
+| Concentrated at high levels | Bright image.                                                                                    |
+| Narrow                      | Low contrast.                                                                                    |
+| Wide                        | High contrast.                                                                                   |
+| 2 separated peaks           | Objects and background with different intensities. A threshold between the peaks separates them. |
+
+Effect of a point operation on the histogram:
+
+- A one-to-one mapping moves bins without changing their heights.
+- A many-to-one mapping merges bins and adds their heights. The merged levels cannot be told apart afterwards.
+- No point operation splits a bin, since all pixels with the same input level get the same output level. So a histogram can only be approximated, and unused levels appear as gaps.
+
 ### Brightness and Contrast
 
 Brightness and contrast are the position and the width of the same histogram. Both are described as point operations mapping input intensity $r$ to output intensity $s$.
@@ -69,7 +105,14 @@ Shifting the histogram changes brightness only. Every pair of pixels keeps the s
 
 <Note>
 
-Auto-focus algorithms maximize the standard deviation of pixel intensities, a contrast measure insensitive to outliers. Sharp focus gives large jumps between neighbouring pixels and a wide spread. Blur averages each pixel toward its neighbours, narrowing the spread. Mean intensity barely changes, since blur redistributes light rather than adding or removing it.
+Auto-focus algorithms maximize the standard deviation of pixel intensities, which measures contrast.
+
+- Sharp image  
+  Neighbouring pixels differ a lot. Intensities spread widely, so the standard deviation is large.
+- Blurred image  
+  Each pixel is averaged with its neighbours. Intensities move closer together, so the standard deviation is small.
+
+Blur does not change the mean intensity. It moves light between pixels and does not add or remove any.
 
 </Note>
 
@@ -77,26 +120,35 @@ Auto-focus algorithms maximize the standard deviation of pixel intensities, a co
 
 Common transformations applied to each pixel, typically implemented as a LUT mapping input intensity $r$ to output intensity $s$.
 
-- Identity  
-  $s = r$.
-- Digital negative  
-  Inverts intensity: $s = (L-1) - r$, where $L$ is the number of grey levels.
-- Square root  
-  Compresses bright values and expands dark ones.
-- Contrast stretching  
-  Piecewise linear expansion of a chosen intensity range.
-- Normalizing  
-  Rescales intensities to use the full available range.
-- Clipping  
-  Forces values outside a chosen range to the range boundary.
-- Intensity level slicing  
-  Highlights a chosen intensity band, suppressing all others.
-- Bit slicing  
-  Extracts one bit-plane of the pixel value.
-- Range stretching or compression  
-  Maps a chosen input range onto a different output range.
-- Histogram equalization  
-  Redistributes intensities to make the histogram more uniform.
+| Function                                                                                                                                                                                            | Equation                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity<br />Output equals input.                                                                                                                                                                  | $s = r$                                                                                                                                                                                             |
+| Digital negative<br />Inverts intensity.                                                                                                                                                            | $s = (L-1) - r$                                                                                                                                                                                     |
+| Square root<br />Compresses bright values and expands dark ones. $c = \sqrt{L-1}$ maps the top level to itself.                                                                                     | $s = c\sqrt{r}$                                                                                                                                                                                     |
+| Contrast stretching<br />Piecewise linear expansion of a chosen intensity range.                                                                                                                    | $s = \begin{cases} \dfrac{s_1}{r_1}\,r & 0 \le r < r_1 \\ s_1 + \dfrac{s_2 - s_1}{r_2 - r_1}(r - r_1) & r_1 \le r \le r_2 \\ s_2 + \dfrac{L-1-s_2}{L-1-r_2}(r - r_2) & r_2 < r \le L-1 \end{cases}$ |
+| Normalizing<br />Rescales intensities to use the full available range.                                                                                                                              | $s = (L-1)\,\dfrac{r - r_{\min}}{r_{\max} - r_{\min}}$                                                                                                                                              |
+| Clipping<br />Forces values outside a chosen range to the range boundary.                                                                                                                           | $s = \begin{cases} a & r < a \\ r & a \le r \le b \\ b & r > b \end{cases}$                                                                                                                         |
+| Intensity level slicing<br />Highlights a chosen intensity band, suppressing all others.                                                                                                            | $s = \begin{cases} L-1 & a \le r \le b \\ 0 & \text{otherwise} \end{cases}$                                                                                                                         |
+| Bit slicing<br />Extracts bit-plane $k$ of the pixel value. The result is $0$ or $1$.                                                                                                               | $s = \left\lfloor \dfrac{r}{2^k} \right\rfloor \bmod 2$                                                                                                                                             |
+| Range stretching or compression<br />Maps a chosen input range onto a different output range. It stretches when the output range is wider than the input range, and compresses when it is narrower. | $s = s_{\min} + (s_{\max} - s_{\min})\,\dfrac{r - r_{\min}}{r_{\max} - r_{\min}}$                                                                                                                   |
+| Histogram equalization<br />Redistributes intensities to make the histogram more uniform.                                                                                                           | $s = \operatorname{round}\big((L-1)\,A(r)\big)$                                                                                                                                                     |
+
+Here:
+
+<Symbols>
+  <Sym s="L">number of grey levels</Sym>
+  <Sym s="a, b">lower and upper bounds of the chosen range</Sym>
+  <Sym s="c">scaling constant</Sym>
+  <Sym s="(r_1, s_1), (r_2, s_2)">
+    control points of the piecewise linear curve
+  </Sym>
+  <Sym s="r_{\min}, r_{\max}">limits of the input range</Sym>
+  <Sym s="s_{\min}, s_{\max}">limits of the output range</Sym>
+  <Sym s="k">bit-plane index, with $0$ the least significant bit</Sym>
+  <Sym s="A(r)">accumulated histogram</Sym>
+</Symbols>
+
+Normalizing is range stretching with the output range $[0, L-1]$ and the input range set to the image minimum and maximum.
 
 ## Histogram Matching
 
@@ -169,6 +221,36 @@ def match(test_pixels, ref_cdf):
 ```
 
 For a colour image, match each channel against that channel's reference CDF.
+
+### Multiple Images and Histograms
+
+Each image has its own $C_t$, so every image needs its own LUT. The reference CDF is the only input shared between images.
+
+- 1 reference for all images  
+  Compute the reference CDF once, then build and apply one LUT per image. All outputs follow the same distribution, so brightness and contrast are consistent across the set.
+- 1 reference per image  
+  Pair each image with its reference CDF, then match each pair separately.
+- References not paired with images  
+  Give each image the reference whose CDF is closest, then match.
+
+The distance between an image $i$ and a reference $j$ is the total absolute difference of their CDFs.
+
+$$
+d(i, j) = \sum_{g} \lvert C_{t,i}(g) - C_{r,j}(g) \rvert
+$$
+
+Image $i$ takes the reference $\arg\min_j d(i, j)$. When each reference may be used by only 1 image, solve an assignment problem on the matrix $d(i, j)$, for example with the Hungarian algorithm.
+
+```python
+def match_to_closest(images, ref_cdfs):
+    out = []
+    for pixels in images:
+        ct = cdf(pixels)
+        # pick the reference whose CDF differs least from the image CDF
+        best = min(ref_cdfs, key=lambda rc: sum(abs(a - b) for a, b in zip(ct, rc)))
+        out.append(match(pixels, best))
+    return out
+```
 
 ## Worked Example
 

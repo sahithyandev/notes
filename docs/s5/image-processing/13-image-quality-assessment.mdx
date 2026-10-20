@@ -1,7 +1,7 @@
 ---
 title: Image Quality Assessment
 dateCreated: 2026-07-26T04:59:41.428Z
-lastUpdatedOn: 2026-10-17T05:04:56.745Z
+lastUpdatedOn: 2026-10-20T08:45:41.036Z
 ---
 
 Image processing aims to reproduce a real-world scene at the same perceptual level as the original, not to judge artistic quality. Quality assessment measures how much an image has changed from its source state.
@@ -34,6 +34,37 @@ Here:
 
 A higher MSE means more change between the images, but this isn't necessarily aligned with subjective quality. A restoration process, for instance, deliberately changes pixel values to improve perceived quality.
 
+### Size Independence
+
+A sum of squared errors grows with the pixel count. MSE divides by $MN$, so it is a per-pixel value and is comparable across image sizes.
+
+$$
+\text{PSNR} = 10\log_{10}\frac{\text{MAX}^2}{\text{MSE}}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="\text{MAX}">maximum possible pixel value</Sym>
+</Symbols>
+
+PSNR is relative to the dynamic range, so 8-bit and 16-bit images share one scale. SSIM compares local windows and averages the results over the image, so it is also independent of size.
+
+### Aligning Different Sizes
+
+Full-reference metrics compare $p(x,y)$ with $r(x,y)$ pixel by pixel. Both images must have the same dimensions.
+
+- Resample to the reference size  
+  Interpolation adds its own error. Use the same interpolation method for every process being compared.
+- Crop to the overlap  
+  Register the images first when the geometry changed. Compare only the overlapping region.
+
+For downscaling or compression pipelines, resample the output back to the source size before comparing.
+
+### No-Reference Metrics
+
+Used when no source image exists. They score how far local patch statistics deviate from those of natural images, for example NIQE and BRISQUE. They work on any image size. They are less reliable than full-reference metrics.
+
 ## Subjective Assessment
 
 Based on human perception, expressed as a textual description of image quality.
@@ -42,7 +73,9 @@ Based on human perception, expressed as a textual description of image quality.
 - Requires multiple assessments, from multiple subjects and images, to avoid bias
 - Needs a normalized rating scale
 
-Goodness scale:
+Each observer rates an image with a value from a scale. The ratings of all observers are averaged into a mean opinion score.
+
+Goodness scale rates the overall quality of the image. A higher value is better.
 
 | Value | Description    |
 | ----- | -------------- |
@@ -52,7 +85,7 @@ Goodness scale:
 | 2     | Poor           |
 | 1     | Unsatisfactory |
 
-Impairment scale:
+Impairment scale rates how visible and how annoying the degradation is. A higher value is worse, so it runs opposite to the goodness scale.
 
 | Value | Description                       |
 | ----- | --------------------------------- |

@@ -1,52 +1,149 @@
 ---
 title: Entropy
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-19T12:09:03.168Z
+lastUpdatedOn: 2026-10-20T08:45:41.097Z
 ---
 
 Information conveyed by an event is negatively related to its probability.
 
 $$
-H(E) = \log \frac{1}{P(E)} = -\log P(E)
+H(E) = \log_2 \frac{1}{P(E)} = -\log_2 P(E) \text{ bits}
+$$
+
+The probability of a grey level comes from the histogram.
+
+$$
+P(l_i) = \frac{r_i}{N}
+\qquad
+\sum_{i=0}^{L-1} r_i = N
+\qquad
+\sum_{i=0}^{L-1} P(l_i) = 1
 $$
 
 For an image, entropy is the probability-weighted sum of the information carried by each grey level.
 
 $$
-B_{ave} = -\sum_{i=0}^{L-1} P(l_i) \log_2 P(l_i)
+B_\text{avg} = -\sum_{i=0}^{L-1} P(l_i) \log_2 P(l_i)
+$$
+
+$$
+B_\text{total} = B_\text{avg} \times N
 $$
 
 Here:
 
 <Symbols>
   <Sym s="L">number of grey levels</Sym>
+  <Sym s="N">number of pixels</Sym>
+  <Sym s="l_i">grey level $i$</Sym>
+  <Sym s="r_i">number of pixels with grey level $l_i$</Sym>
   <Sym s="P(l_i)">probability of grey level $l_i$</Sym>
 </Symbols>
 
-$B_{ave}$ is the minimum average number of bits per pixel required to represent the image.
+$B_\text{avg}$ is the minimum average number of bits per pixel required to represent the image.
 
-Example:
-
-An image has 100 pixels across 3 grey levels: white ($r_k = 50$, $P = 0.5$), grey ($r_k = 25$, $P = 0.25$), black ($r_k = 25$, $P = 0.25$).
+### Bounds
 
 $$
-B_{total} = -50\log_2 0.5 - 25\log_2 0.25 - 25\log_2 0.25 = 150 \text{ bits}
+0 \le B_\text{avg} \le \log_2 L
+$$
+
+- $B_\text{avg} = 0$ **iff** a single grey level has $P = 1$
+- $B_\text{avg} = \log_2 L$ **iff** every grey level has $P = \frac{1}{L}$
+- A grey level with $P = 0$ adds nothing, since $\lim_{P \to 0} P \log_2 P = 0$
+
+## Data Redundancy
+
+Information is the meaning conveyed by a message. Data is the container used to store or transmit it.
+
+- Information is not compressible, since its meaning doesn't change with the medium
+- Data is compressible, since data capacity can exceed the information it carries
+
+Image compression exploits 3 types of redundancy.
+
+- Coding redundancy  
+  The coding scheme uses more space than the information requires, e.g. an 8bpp image stored in 16bpp format.
+- Interpixel redundancy  
+  Pixel values are correlated locally, e.g. a monotonous background or a repeating texture.
+- Psychovisual redundancy  
+  Image detail that isn't visually perceivable.
+
+<Note>
+
+Redundancy also gives resilience against data corruption. Practical schemes retain controlled redundancy, e.g. chunked delta coding or parity bits and checksums, to limit error propagation.
+
+</Note>
+
+## Average Code Length
+
+A code assigns grey level $k$ a codeword of $l(k)$ bits. With $P(k) = r_k / N$ the probability of grey level $k$, the average codeword length and the size of the coded image are:
+
+$$
+L_\text{avg} = \sum_{k=0}^{L-1} l(k)\, P(k)
+\qquad
+b = N\, L_\text{avg}
+$$
+
+No code beats the entropy, and the gap is the coding redundancy per pixel.
+
+$$
+L_\text{avg} \ge B_\text{avg}
+\qquad
+R_\text{coding} = L_\text{avg} - B_\text{avg}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="l(k)">codeword length of grey level $k$ in bits</Sym>
+  <Sym s="L_\text{avg}">average codeword length in bits per pixel</Sym>
+  <Sym s="b">size of the coded image in bits</Sym>
+  <Sym s="R_\text{coding}">coding redundancy in bits per pixel</Sym>
+</Symbols>
+
+An 8bpp natural binary code has $l(k) = 8$ for every $k$, so $L_\text{avg} = 8$. Replacing it with a code of average length $L'_\text{avg}$ gives the compression ratio $CR$ and the relative data redundancy $RD$:
+
+$$
+CR = \frac{8}{L'_\text{avg}}
+\qquad
+RD = 1 - \frac{L'_\text{avg}}{8}
+$$
+
+The best possible compression ratio from removing coding redundancy alone is $8 / B_\text{avg}$.
+
+## Worked Examples
+
+### 3 Grey Levels
+
+An image has 100 pixels across 3 grey levels: white ($r_k = 50$, $P = 0.5$), grey ($r_k = 25$, $P = 0.25$), black ($r_k = 25$, $P = 0.25$). Find its entropy.
+
+<Solution>
+
+$$
+B_\text{avg}
+= -0.5\log_2 0.5 - 0.25\log_2 0.25 - 0.25\log_2 0.25
+= 1.5 \text{ bits per pixel}
 $$
 
 $$
-B_{ave} = 1.5 \text{ bits per pixel}
+B_\text{total}
+= B_\text{avg} \times N
+= 1.5 \times 100
+= 150 \text{ bits}
 $$
 
-## Worked Example
+</Solution>
+
+### 4x4 Image
 
 Entropy of the following 4x4 image with grey levels 0 to 3.
 
-```
-0 0 1 0
-0 2 0 1
-1 0 0 3
-0 1 2 3
-```
+|       | Col 1 | Col 2 | Col 3 | Col 4 |
+| ----- | ----- | ----- | ----- | ----- |
+| Row 1 | 0     | 0     | 1     | 0     |
+| Row 2 | 0     | 2     | 0     | 1     |
+| Row 3 | 1     | 0     | 0     | 3     |
+| Row 4 | 0     | 1     | 2     | 3     |
 
 <Solution>
 
@@ -62,11 +159,11 @@ Count the pixels of each grey level, with $N = 16$ and $P(l_i) = r_i / N$:
 Sum the last column.
 
 $$
-B_{ave} = 0.5 + 0.5 + 0.375 + 0.375 = 1.75 \text{ bits per pixel}
+B_\text{avg} = 0.5 + 0.5 + 0.375 + 0.375 = 1.75 \text{ bits per pixel}
 $$
 
 $$
-B_{total} = 1.75 \times 16 = 28 \text{ bits}
+B_\text{total} = 1.75 \times 16 = 28 \text{ bits}
 $$
 
 A fixed length code needs 2 bits per pixel, so 32 bits for the image. The gap of $2 - 1.75 = 0.25$ bits per pixel is the maximum saving from any encoding.
