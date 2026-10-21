@@ -1,0 +1,120 @@
+---
+title: Jacobian
+prereqs:
+  - s1/mathematics/matrices/determinant
+dateCreated: 2026-04-22T07:07:02.592Z
+lastUpdatedOn: 2026-10-21T14:43:04.074Z
+---
+
+The Jacobian generalizes the derivative of a scalar function to a vector-valued function. 2 objects carry the name.
+
+- The Jacobian matrix  
+  The matrix of first partial derivatives of a vector-valued function.
+- The Jacobian determinant  
+  The determinant of the Jacobian matrix of a transformation.
+
+## Jacobian Matrix
+
+For $f : \mathbb{R}^n \to \mathbb{R}^m$ with coordinate functions $f_1, f_2, \ldots, f_m$, the Jacobian matrix $\mathbf{J}_p f(\mathbf{x})$ is the $m \times n$ matrix of first partial derivatives
+
+$$
+\mathbf{J}_p f(\mathbf{x}) =
+\begin{pmatrix}
+\frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} & \cdots & \frac{\partial f_1}{\partial x_n} \\
+\frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} & \cdots & \frac{\partial f_2}{\partial x_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{\partial f_m}{\partial x_1} & \frac{\partial f_m}{\partial x_2} & \cdots & \frac{\partial f_m}{\partial x_n}
+\end{pmatrix}
+$$
+
+Row $i$ of $\mathbf{J}_p f(\mathbf{x})$ is the gradient of $f_i$.
+
+## Jacobian Determinant
+
+For a transformation $T$, the Jacobian determinant is the determinant of the Jacobian matrix of $T$.
+
+For $T$ from the $uv$-plane to the $xy$-plane, $x = x(u,v)$, $y = y(u,v)$:
+
+$$
+J(u,v) = \frac{\partial(x,y)}{\partial(u,v)} =
+\begin{vmatrix}
+\frac{\partial x}{\partial u} & \frac{\partial x}{\partial v} \\[6pt]
+\frac{\partial y}{\partial u} & \frac{\partial y}{\partial v}
+\end{vmatrix} =
+\frac{\partial x}{\partial u}\frac{\partial y}{\partial v} - \frac{\partial x}{\partial v}\frac{\partial y}{\partial u}
+$$
+
+For $T$ from $uvw$-space to $xyz$-space, $x = x(u,v,w)$, $y = y(u,v,w)$, $z = z(u,v,w)$:
+
+$$
+J(u,v,w) = \frac{\partial(x,y,z)}{\partial(u,v,w)} =
+\begin{vmatrix}
+\frac{\partial x}{\partial u} & \frac{\partial x}{\partial v} & \frac{\partial x}{\partial w} \\[6pt]
+\frac{\partial y}{\partial u} & \frac{\partial y}{\partial v} & \frac{\partial y}{\partial w} \\[6pt]
+\frac{\partial z}{\partial u} & \frac{\partial z}{\partial v} & \frac{\partial z}{\partial w}
+\end{vmatrix}
+$$
+
+Examples:
+
+- $\dfrac{\partial(x,y)}{\partial(r,\theta)} = r$, for polar coordinates $x = r\cos\theta$, $y = r\sin\theta$
+- $\dfrac{\partial(x,y,z)}{\partial(\rho,\phi,\theta)} = \rho^2\sin\phi$, for spherical coordinates
+
+## First-Order Approximation
+
+The Jacobian matrix gives the first-order approximation of $f$ around $\mathbf{x}_0$. See [Approximation](/s2/methods-of-mathematics/multivariable-calculus/approximation).
+
+$$
+f(\mathbf{x}) \approx f(\mathbf{x}_0) + \mathbf{J}_p f(\mathbf{x}_0)\,(\mathbf{x} - \mathbf{x}_0)
+$$
+
+For scalar $f$, the gradient form is
+
+$$
+f(\mathbf{x}) \approx f(\mathbf{x}_0) + \nabla f(\mathbf{x}_0)^T(\mathbf{x} - \mathbf{x}_0)
+$$
+
+## Worked Examples
+
+### Example 1
+
+Find the Jacobian matrix of the system
+
+$$
+\begin{aligned}
+f_1(\mathbf{x}) &= 3x_1 - \cos(x_2 x_3) - \tfrac{1}{2} \\
+f_2(\mathbf{x}) &= x_1^2 - 81(x_2 + 0.1)^2 + \sin x_3 + 1.06 \\
+f_3(\mathbf{x}) &= e^{-x_1 x_2} + 20x_3 + \tfrac{10\pi - 3}{3}
+\end{aligned}
+$$
+
+<Solution>
+
+The partial derivatives give
+
+$$
+J(\mathbf{x}) =
+\begin{pmatrix}
+3 & x_3 \sin(x_2 x_3) & x_2 \sin(x_2 x_3) \\
+2x_1 & -162(x_2 + 0.1) & \cos x_3 \\
+-x_2 e^{-x_1 x_2} & -x_1 e^{-x_1 x_2} & 20
+\end{pmatrix}
+$$
+
+</Solution>
+
+### Example 2
+
+Find the Jacobian matrix of $f_1 = x_1^2 + x_2^2$ and $f_2 = x_1 x_2$, then evaluate it at $\mathbf{x} = (1, 2)^T$.
+
+<Solution>
+
+$$
+J(\mathbf{x}) = \begin{pmatrix} 2x_1 & 2x_2 \\ x_2 & x_1 \end{pmatrix}
+$$
+
+$$
+J(1, 2) = \begin{pmatrix} 2 & 4 \\ 2 & 1 \end{pmatrix}
+$$
+
+</Solution>

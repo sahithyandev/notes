@@ -1,7 +1,7 @@
 ---
 title: Cholesky Decomposition
 dateCreated: 2026-07-28T05:09:34.810Z
-lastUpdatedOn: 2026-10-20T11:48:27.276Z
+lastUpdatedOn: 2026-10-21T14:43:04.706Z
 ---
 
 A symmetric matrix $A$ is positive definite **iff** $A$ can be factored as
@@ -14,15 +14,23 @@ where $L$ is lower triangular with non-zero diagonal entries. This factorization
 
 ## Computing $L$
 
-Multiplying out $A = LL^T$ and equating entries row by row gives, for row $k = 1, 2, \ldots, n$ in order
+Entry $(k, i)$ of $LL^T$ is the dot product of row $k$ and row $i$ of $L$, since column $i$ of $L^T$ is row $i$ of $L$. Equating entries with $A$ fills $L$ row by row, for $k = 1, 2, \ldots, n$ in order, and left to right within each row.
+
+- Off-diagonal entries ($i = 1, 2, \ldots, k-1$)  
+  Subtract the dot product of the first $i-1$ entries of row $k$ and row $i$ of $L$ from $a_{ki}$, then divide by the diagonal entry $l_{ii}$.
 
 $$
 l_{ki} = \frac{a_{ki} - \sum\limits_{j=1}^{i-1} l_{ij}l_{kj}}{l_{ii}}, \quad i = 1, 2, \ldots, k-1
 $$
 
+- Diagonal entry ($i = k$)  
+  Subtract the sum of squares of the earlier entries in row $k$ of $L$ from $a_{kk}$, then take the square root.
+
 $$
 l_{kk} = \sqrt{a_{kk} - \sum\limits_{j=1}^{k-1} l_{kj}^2}
 $$
+
+When $i = 1$ or $k = 1$, the sum has no terms, so the first column is $l_{k1} = a_{k1} / l_{11}$ and the top-left entry is $l_{11} = \sqrt{a_{11}}$.
 
 <Note>
 

@@ -1,7 +1,7 @@
 ---
 title: Non-Linear System of Equations
 dateCreated: 2026-07-28T05:12:36.350Z
-lastUpdatedOn: 2026-10-20T11:48:27.288Z
+lastUpdatedOn: 2026-10-21T14:43:04.714Z
 ---
 
 A nonlinear system of $n$ equations in $n$ unknowns $x_1, x_2, \ldots, x_n$ is a set of equations of the form
@@ -46,7 +46,21 @@ Then $f$ is continuous at $\vec{x}_0$.
 
 </Theorem>
 
-## Example
+## Methods
+
+Numerical methods for solving nonlinear systems generalize the single-variable case.
+
+### Fixed-Point Iteration
+
+Rewrites $F(\vec{x}) = \vec{0}$ as $\vec{x} = G(\vec{x})$, then iterates $\vec{x}^{(k)} = G(\vec{x}^{(k-1)})$. See fixed point.
+
+### Newton's Method
+
+Uses the [Jacobian matrix](/s2/methods-of-mathematics/multivariable-calculus/jacobian#jacobian-matrix) of $F$ to get quadratic convergence to a root of $F(\vec{x}) = \vec{0}$. See Newton's method.
+
+## Worked Examples
+
+### Example 1
 
 Place the system
 
@@ -58,7 +72,7 @@ e^{-x_1 x_2} + 20x_3 + \tfrac{10\pi - 3}{3} &= 0
 \end{aligned}
 $$
 
-in the form $F(\vec{x}) = \vec{0}$.
+in the form $F(\vec{x}) = \vec{0}$, and verify that $\vec{p} = \left(0.5, 0, -\tfrac{\pi}{6}\right)^T$ is a solution.
 
 <Solution>
 
@@ -72,18 +86,79 @@ f_3(x_1, x_2, x_3) &= e^{-x_1 x_2} + 20x_3 + \tfrac{10\pi - 3}{3}
 \end{aligned}
 $$
 
-so $F(\vec{x}) = \big(f_1(\vec{x}), f_2(\vec{x}), f_3(\vec{x})\big)^T$.
+so $F(\vec{x}) = \big(f_1(\vec{x}), f_2(\vec{x}), f_3(\vec{x})\big)^T$. Evaluating at $\vec{p} = \left(0.5, 0, -\tfrac{\pi}{6}\right)^T$ gives
+
+$$
+\begin{aligned}
+f_1(\vec{p}) &= 3(0.5) - \cos(0) - \tfrac{1}{2} = 1.5 - 1 - 0.5 = 0 \\
+f_2(\vec{p}) &= (0.5)^2 - 81(0.1)^2 + \sin\!\left(-\tfrac{\pi}{6}\right) + 1.06 = 0.25 - 0.81 - 0.5 + 1.06 = 0 \\
+f_3(\vec{p}) &= e^{0} + 20\!\left(-\tfrac{\pi}{6}\right) + \tfrac{10\pi - 3}{3} = 1 - \tfrac{10\pi}{3} + \tfrac{10\pi}{3} - 1 = 0
+\end{aligned}
+$$
+
+Thus $F(\vec{p}) = \vec{0}$.
 
 </Solution>
 
-## Methods
+### Example 2
 
-Numerical methods for solving nonlinear systems generalize the single-variable case.
+Place the system
 
-### Fixed-Point Iteration
+$$
+\begin{aligned}
+x_1^2 + x_2^2 &= 4 \\
+x_1^2 - x_2 &= 2
+\end{aligned}
+$$
 
-Rewrites $F(\vec{x}) = \vec{0}$ as $\vec{x} = G(\vec{x})$, then iterates $\vec{x}^{(k)} = G(\vec{x}^{(k-1)})$. See fixed point.
+in the form $F(\vec{x}) = \vec{0}$ and find all real solutions.
 
-### Newton's Method
+<Solution>
 
-Uses the Jacobian matrix of $F$ to get quadratic convergence to a root of $F(\vec{x}) = \vec{0}$. See Newton's method.
+Moving all terms to the left gives $F(\vec{x}) = \big(f_1(\vec{x}), f_2(\vec{x})\big)^T = \vec{0}$ with
+
+$$
+\begin{aligned}
+f_1(x_1, x_2) &= x_1^2 + x_2^2 - 4 \\
+f_2(x_1, x_2) &= x_1^2 - x_2 - 2
+\end{aligned}
+$$
+
+From $f_2(x_1, x_2) = 0$, $x_1^2 = x_2 + 2$. Substituting into $f_1(x_1, x_2) = 0$ gives
+
+$$
+x_2^2 + x_2 - 2 = (x_2 + 2)(x_2 - 1) = 0 \implies x_2 = -2 \text{ or } x_2 = 1
+$$
+
+- For $x_2 = -2$, $x_1^2 = 0 \implies x_1 = 0$, giving $(0, -2)^T$.
+- For $x_2 = 1$, $x_1^2 = 3 \implies x_1 = \pm\sqrt{3}$, giving $(\sqrt{3}, 1)^T$ and $(-\sqrt{3}, 1)^T$.
+
+The system has 3 real solutions, $(0, -2)^T$, $(\sqrt{3}, 1)^T$, and $(-\sqrt{3}, 1)^T$. Unlike a linear system, a nonlinear system can have any finite number of solutions.
+
+</Solution>
+
+### Example 3
+
+Show that $f(x_1, x_2) = x_1^2 + \cos(x_1 x_2)$ is continuous at $\vec{x}_0 = (1, 0)^T$ using the bounded-partials theorem.
+
+<Solution>
+
+The partial derivatives are
+
+$$
+\frac{\partial f}{\partial x_1} = 2x_1 - x_2 \sin(x_1 x_2), \quad \frac{\partial f}{\partial x_2} = -x_1 \sin(x_1 x_2)
+$$
+
+Take $\delta = 1$. Whenever $\|\vec{x} - \vec{x}_0\|_\infty < 1$, the coordinates satisfy $0 < x_1 < 2$ and $-1 < x_2 < 1$, so $|\sin(x_1 x_2)| \le 1$ gives
+
+$$
+\left|\frac{\partial f(\vec{x})}{\partial x_1}\right| \le 2|x_1| + |x_2||\sin(x_1 x_2)| < 2(2) + 1(1) = 5
+$$
+
+$$
+\left|\frac{\partial f(\vec{x})}{\partial x_2}\right| \le |x_1||\sin(x_1 x_2)| < 2(1) = 2
+$$
+
+Both partial derivatives are bounded by $K = 5$ on $\|\vec{x} - \vec{x}_0\|_\infty < 1$, so $f$ is continuous at $(1, 0)^T$.
+
+</Solution>
