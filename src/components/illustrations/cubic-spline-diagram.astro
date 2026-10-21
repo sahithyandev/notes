@@ -1,0 +1,84 @@
+---
+// Static illustration of the cubic spline conditions: the natural spline through
+// (0, 0), (1, 1), (2, 0), (3, 1) from Example 2 of the cubic spline note. Three
+// cubic pieces S0, S1, S2 meet at the interior knots x1 and x2 with matching
+// value, slope (the dashed tangent, -1/3 on both sides) and curvature, and the
+// natural end conditions give S'' = 0 at x0 and x3.
+import AxesFigure from "./primitives/axes-figure.astro";
+---
+
+<AxesFigure
+  captionSlot
+  size="lg"
+  viewBox="0 0 680 430"
+  x0={95}
+  right={640}
+  title="Cubic Spline Conditions"
+  desc="A natural cubic spline through the nodes (0, 0), (1, 1), (2, 0) and (3, 1), made of three cubic pieces. At the interior knots x1 and x2 the pieces share the same height, slope and curvature."
+  yLabel="y"
+  xLabel="x"
+>
+  <line class="guide" x1="255" y1="95" x2="255" y2="355"></line>
+  <line class="guide" x1="415" y1="295" x2="415" y2="355"></line>
+
+  <line class="guide" x1="191" y1="68.3" x2="319" y2="121.7"></line>
+
+  <path
+    class="curve round tone-s5"
+    d="M 95.0 295.0 L 98.2 288.3 L 101.4 281.7 L 104.6 275.0 L 107.8 268.4 L 111.0 261.8 L 114.2 255.2 L 117.4 248.7 L 120.6 242.2 L 123.8 235.8 L 127.0 229.4 L 130.2 223.1 L 133.4 216.8 L 136.6 210.7 L 139.8 204.6 L 143.0 198.6 L 146.2 192.7 L 149.4 186.9 L 152.6 181.2 L 155.8 175.6 L 159.0 170.2 L 162.2 164.9 L 165.4 159.7 L 168.6 154.6 L 171.8 149.7 L 175.0 145.0 L 178.2 140.4 L 181.4 136.0 L 184.6 131.7 L 187.8 127.7 L 191.0 123.8 L 194.2 120.1 L 197.4 116.6 L 200.6 113.3 L 203.8 110.3 L 207.0 107.4 L 210.2 104.8 L 213.4 102.4 L 216.6 100.2 L 219.8 98.3 L 223.0 96.6 L 226.2 95.2 L 229.4 94.0 L 232.6 93.1 L 235.8 92.5 L 239.0 92.2 L 242.2 92.2 L 245.4 92.4 L 248.6 93.0 L 251.8 93.8 L 255.0 95.0"
+  ></path>
+  <path
+    class="curve round tone-ct"
+    d="M 255.0 95.0 L 258.2 96.5 L 261.4 98.3 L 264.6 100.4 L 267.8 102.8 L 271.0 105.4 L 274.2 108.3 L 277.4 111.4 L 280.6 114.8 L 283.8 118.4 L 287.0 122.2 L 290.2 126.2 L 293.4 130.4 L 296.6 134.7 L 299.8 139.2 L 303.0 143.8 L 306.2 148.6 L 309.4 153.4 L 312.6 158.4 L 315.8 163.5 L 319.0 168.6 L 322.2 173.8 L 325.4 179.1 L 328.6 184.4 L 331.8 189.7 L 335.0 195.0 L 338.2 200.3 L 341.4 205.6 L 344.6 210.9 L 347.8 216.2 L 351.0 221.4 L 354.2 226.5 L 357.4 231.6 L 360.6 236.6 L 363.8 241.4 L 367.0 246.2 L 370.2 250.8 L 373.4 255.3 L 376.6 259.6 L 379.8 263.8 L 383.0 267.8 L 386.2 271.6 L 389.4 275.2 L 392.6 278.6 L 395.8 281.7 L 399.0 284.6 L 402.2 287.2 L 405.4 289.6 L 408.6 291.7 L 411.8 293.5 L 415.0 295.0"
+  ></path>
+  <path
+    class="curve round tone-pt"
+    d="M 415.0 295.0 L 418.2 296.2 L 421.4 297.0 L 424.6 297.6 L 427.8 297.8 L 431.0 297.8 L 434.2 297.5 L 437.4 296.9 L 440.6 296.0 L 443.8 294.8 L 447.0 293.4 L 450.2 291.7 L 453.4 289.8 L 456.6 287.6 L 459.8 285.2 L 463.0 282.6 L 466.2 279.7 L 469.4 276.7 L 472.6 273.4 L 475.8 269.9 L 479.0 266.2 L 482.2 262.3 L 485.4 258.3 L 488.6 254.0 L 491.8 249.6 L 495.0 245.0 L 498.2 240.3 L 501.4 235.4 L 504.6 230.3 L 507.8 225.1 L 511.0 219.8 L 514.2 214.4 L 517.4 208.8 L 520.6 203.1 L 523.8 197.3 L 527.0 191.4 L 530.2 185.4 L 533.4 179.3 L 536.6 173.2 L 539.8 166.9 L 543.0 160.6 L 546.2 154.2 L 549.4 147.8 L 552.6 141.3 L 555.8 134.8 L 559.0 128.2 L 562.2 121.6 L 565.4 115.0 L 568.6 108.3 L 571.8 101.7 L 575.0 95.0"
+  ></path>
+
+  <circle class="pt tone-ink" cx="95" cy="295" r="3.5"></circle>
+  <circle class="pt tone-ink" cx="255" cy="95" r="3.5"></circle>
+  <circle class="pt tone-ink" cx="415" cy="295" r="3.5"></circle>
+  <circle class="pt tone-ink" cx="575" cy="95" r="3.5"></circle>
+
+  <text class="axis-tick" x="95" y="374" text-anchor="middle">
+    x₀
+  </text>
+  <text class="axis-tick" x="255" y="374" text-anchor="middle">
+    x₁
+  </text>
+  <text class="axis-tick" x="415" y="374" text-anchor="middle">
+    x₂
+  </text>
+  <text class="axis-tick" x="575" y="374" text-anchor="middle">
+    x₃
+  </text>
+
+  <text class="axis-label" x="340" y="58" text-anchor="middle">
+    same slope
+  </text>
+  <text class="axis-label" x="110" y="330">
+    S″ = 0
+  </text>
+  <text class="axis-label" x="520" y="80" text-anchor="end">
+    S″ = 0
+  </text>
+
+  <text class="curve-label tone-s5" x="150" y="228">
+    S₀
+  </text>
+  <text class="curve-label tone-ct" x="300" y="178">
+    S₁
+  </text>
+  <text class="curve-label tone-pt" x="470" y="246">
+    S₂
+  </text>
+
+  <Fragment slot="caption">
+    <span class="tone-s5">S₀</span>, <span class="tone-ct">S₁</span> and
+    <span class="tone-pt">S₂</span> are the three cubic pieces, one on each
+    interval between nodes. At each interior knot x₁ and x₂ the two adjacent
+    pieces meet at the same height, have the same slope (dashed line) and the
+    same curvature. At the ends the natural condition sets S″ = 0.
+  </Fragment>
+</AxesFigure>
