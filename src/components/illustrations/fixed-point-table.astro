@@ -1,0 +1,191 @@
+---
+// Fixed-point iteration table: the iterates x^(k) of a map G, with the
+// change from the previous step computed for every component. The map comes
+// from the note, so the numbers shown are the ones the iteration produces
+// rather than a hand-copied table.
+import Panel from "./primitives/panel.astro";
+import { tex } from "../../utils/tex";
+import { computeFixedPointSteps, formatFixed } from "./lib/fixed-point";
+
+interface Props {
+  // The starting vector x^(0).
+  start: number[];
+  // The fixed-point map G, applied to the previous iterate.
+  iterate: (x: number[]) => number[];
+  // How many iterations to run after the starting vector.
+  steps?: number;
+  // Decimal places for the iterates.
+  digits?: number;
+  // Decimal places for the changes. More than `digits` by default, since the
+  // changes shrink fast and the column is about the shrinking.
+  deltaDigits?: number;
+  // TeX for the component symbols, e.g. ["x_1", "x_2", "x_3"].
+  labels?: string[];
+  caption?: string;
+}
+
+const {
+  start,
+  iterate,
+  steps = 3,
+  digits = 5,
+  deltaDigits = digits + 1,
+  labels,
+  caption,
+} = Astro.props;
+
+const n = start.length;
+const names = labels ?? Array.from({ length: n }, (_, i) => `x_${i + 1}`);
+const rows = computeFixedPointSteps(start, iterate, steps);
+const startTex = `\\vec{x}^{(0)} = (${start.join(", ")})^T`;
+---
+
+<Panel class="fp-table" captionSlot>
+  <div class="scroll">
+    <table aria-label="Fixed-point iterates and the change from each step">
+      <thead>
+        <tr>
+          <th class="k" rowspan="2" set:html={tex("k")} />
+          <th class="group" colspan={n}>
+            Iterate
+          </th>
+          <th class="group" colspan={n + 1}>
+            Change from the previous step
+          </th>
+        </tr>
+        <tr>
+          {names.map((l) => (
+            <th class="num" set:html={tex(`${l}^{(k)}`)} />
+          ))}
+          {names.map((l) => (
+            <th class="num" set:html={tex(`\\Delta ${l}`)} />
+          ))}
+          <th
+            class="num"
+            set:html={tex("\\lVert \\Delta \\vec{x} \\rVert_\\infty")}
+          />
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <th class="k">{row.k}</th>
+            {row.x.map((v) => (
+              <td class="num">{formatFixed(v, digits)}</td>
+            ))}
+            {names.map((_, i) => (
+              <td
+                class:list={[
+                  "num",
+                  "change",
+                  { "change-start": i === 0, blank: row.delta === null },
+                ]}
+              >
+                {row.delta ? formatFixed(row.delta[i], deltaDigits) : "·"}
+              </td>
+            ))}
+            <td
+              class:list={[
+                "num",
+                "change",
+                "norm",
+                { blank: row.norm === null },
+              ]}
+            >
+              {row.norm === null ? "·" : formatFixed(row.norm, deltaDigits)}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <Fragment slot="caption">
+    {caption ?? (
+      <>
+        Fixed-point iteration from <span set:html={tex(startTex)} />.
+      </>
+    )}
+  </Fragment>
+</Panel>
+
+<style>
+  .fp-table .scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fp-table table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    font-size: 0.85rem;
+    font-family: var(--font-ui);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The article styles every table inside it, so each property the note's
+     own tables set is restated here with a selector that outranks them. */
+  .fp-table th,
+  .fp-table td {
+    padding: 5px 8px;
+    text-align: right;
+    vertical-align: middle;
+    line-height: 1.4;
+    white-space: nowrap;
+    font-size: 1em;
+    letter-spacing: normal;
+  }
+
+  .fp-table thead tr {
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .fp-table thead th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .fp-table thead .group {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .fp-table tbody td {
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fp-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .fp-table .k {
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  /* The change columns are a second group, so they sit apart from the
+     iterates and read as a quieter aside to them. */
+  .fp-table .change {
+    color: var(--text-secondary);
+  }
+
+  .fp-table .change-start {
+    border-left: 1px solid var(--border);
+  }
+
+  .fp-table .norm {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .fp-table .blank {
+    color: var(--text-muted);
+  }
+</style>

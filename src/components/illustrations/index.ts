@@ -16,6 +16,7 @@ export { default as DivergenceTheoremDiagram } from "./divergence-theorem-diagra
 export { default as ElasticityAlongDemandCurveDiagram } from "./elasticity-along-demand-curve-diagram.astro";
 export { default as ExcelSheet } from "./excel-sheet.astro";
 export { default as ExponentialMapping } from "./exponential-mapping.astro";
+export { default as FixedPointTable } from "./fixed-point-table.astro";
 export { default as FlowDiagram } from "./flow-diagram.astro";
 export { default as FubiniSlicing } from "./fubini-slicing.astro";
 export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.astro";
