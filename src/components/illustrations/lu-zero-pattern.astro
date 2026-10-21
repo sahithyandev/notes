@@ -1,0 +1,205 @@
+---
+// L and U side by side in 1 figure, with their structural zeros marked. In L,
+// row i is highlighted, so the entries l_ik with k > i are the zeros to the
+// right of the diagonal. In U, column j is highlighted, so the entries u_kj
+// with k > j are the zeros below it.
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+
+interface Props {
+  index?: number;
+  caption?: string;
+}
+
+const n = 4;
+const {
+  index = 2,
+  caption = `Matrices L and U with row i = ${index} of L and column j = ${index} of U highlighted. Every entry l_ik with k > i lies above the diagonal of L and is 0. Every entry u_kj with k > j lies below the diagonal of U and is 0.`,
+} = Astro.props;
+
+const cell = 50;
+const padLeft = 44;
+const padTop = 44;
+const padRight = 70;
+const padBottom = 34;
+const blockWidth = padLeft + n * cell + padRight;
+const width = 2 * blockWidth;
+const height = padTop + n * cell + padBottom;
+const uid = makeUid("lu-zero");
+
+const block = (factor: "l" | "u", ox: number) => {
+  const isL = factor === "l";
+  const cells = Array.from({ length: n * n }, (_, idx) => {
+    const row = Math.floor(idx / n) + 1;
+    const col = (idx % n) + 1;
+    const zero = isL ? col > row : row > col;
+    const hot = isL ? row === index : col === index;
+    return {
+      row,
+      col,
+      zero,
+      unit: isL && row === col,
+      hot,
+      marked: zero && hot,
+      x: ox + padLeft + (col - 1) * cell,
+      y: padTop + (row - 1) * cell,
+    };
+    // Marked cells are drawn last so a neighbour's border never covers theirs.
+  }).sort((a, b) => Number(a.marked) - Number(b.marked));
+
+  const bx = ox + padLeft + n * cell + 8;
+  return {
+    factor,
+    cells,
+    name: { text: isL ? "L" : "U", x: ox + padLeft + (n * cell) / 2 },
+    index: isL
+      ? { text: "i", x: ox + padLeft - 18, y: padTop + (index - 0.5) * cell }
+      : { text: "j", x: ox + padLeft + (index - 0.5) * cell, y: padTop - 18 },
+    bracket: {
+      x: bx,
+      y1: padTop + (isL ? index - 1 : index) * cell + 6,
+      y2: padTop + (isL ? index : n) * cell - 6,
+      label: isL ? "k > i" : "k > j",
+    },
+  };
+};
+
+const blocks = [block("l", 0), block("u", blockWidth)];
+---
+
+<figure class="lu-zero">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-labelledby={`${uid}-t`}
+  >
+    <title id={`${uid}-t`}>
+      Zero patterns of L and U, entries with k greater than i in L and k greater
+      than j in U are 0
+    </title>
+    {blocks.map((b) => (
+      <g>
+        {b.cells.map((c) => (
+          <g>
+            <rect
+              class:list={[
+                "cell",
+                { hot: c.hot, zero: c.zero, marked: c.marked },
+              ]}
+              x={c.x}
+              y={c.y}
+              width={cell}
+              height={cell}
+            />
+            {c.zero || c.unit ? (
+              <text
+                class:list={["val", { marked: c.marked }]}
+                x={c.x + cell / 2}
+                y={c.y + cell / 2}
+              >
+                {c.zero ? "0" : "1"}
+              </text>
+            ) : (
+              <text class="val sym" x={c.x + cell / 2} y={c.y + cell / 2}>
+                <tspan>{b.factor}</tspan>
+                <tspan class="sub" dy="4">
+                  {c.row}
+                  {c.col}
+                </tspan>
+              </text>
+            )}
+          </g>
+        ))}
+        <text class="idx" x={b.index.x} y={b.index.y}>
+          {b.index.text}
+        </text>
+        <path
+          class="bracket"
+          d={`M${b.bracket.x} ${b.bracket.y1} h6 V${b.bracket.y2} h-6`}
+        ></path>
+        <text
+          class="idx end"
+          x={b.bracket.x + 14}
+          y={(b.bracket.y1 + b.bracket.y2) / 2}
+        >
+          {b.bracket.label}
+        </text>
+        <text class="name" x={b.name.x} y={height - 10}>
+          {b.name.text}
+        </text>
+      </g>
+    ))}
+  </svg>
+  <FigureCaption>{caption}</FigureCaption>
+</figure>
+
+<style>
+  .lu-zero {
+    margin: 24px auto;
+    max-width: 640px;
+    font-family: var(--font-ui);
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cell {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+  .cell.zero {
+    fill: color-mix(in oklab, var(--text-secondary) 8%, var(--surface));
+  }
+  .cell.hot {
+    fill: var(--accent-subtle);
+  }
+  .cell.marked {
+    fill: var(--accent-dim);
+    stroke: var(--accent);
+  }
+  .val {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    fill: var(--text-secondary);
+  }
+  .val.marked {
+    fill: var(--accent);
+    font-weight: 700;
+  }
+  .sym {
+    font-style: italic;
+    font-family: var(--font-ui);
+    fill: var(--text-primary);
+  }
+  .sub {
+    font-size: 10px;
+  }
+  .idx {
+    font-size: 13px;
+    font-style: italic;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    fill: var(--accent);
+  }
+  .idx.end {
+    text-anchor: start;
+  }
+  .name {
+    font-size: 15px;
+    font-style: italic;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    fill: var(--text-primary);
+  }
+  .bracket {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

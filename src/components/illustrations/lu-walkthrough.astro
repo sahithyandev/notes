@@ -1,0 +1,253 @@
+---
+// Step-through of the direct (Doolittle) LU computation. Every step fills in
+// 1 entry of L or U. The entry just computed, the entry of A it comes from
+// and the already known entries it uses are highlighted, with the equation
+// and the arithmetic shown underneath.
+import Panel from "./primitives/panel.astro";
+import StepBar from "./primitives/step-bar.astro";
+import StepNav from "./primitives/step-nav.astro";
+import StepNote from "./primitives/step-note.astro";
+import { tex } from "../../utils/tex";
+import { computeLuSteps, fracTex, type Cell } from "./lib/lu-steps";
+
+interface Props {
+  a: number[][];
+  caption?: string;
+}
+
+const {
+  a,
+  caption = "Step-by-step direct computation of L and U, one entry per step",
+} = Astro.props;
+
+const steps = computeLuSteps(a);
+const n = a.length;
+
+const show = (c: Cell) => (c ? tex(fracTex(c)) : "?");
+const aTex = a.map((row) => row.map((v) => tex(String(v))));
+
+const classes = (
+  step: (typeof steps)[number],
+  m: "a" | "l" | "u",
+  r: number,
+  c: number,
+  value: Cell,
+) => {
+  const isTarget =
+    step.kind !== "start" &&
+    step.r === r &&
+    step.c === c &&
+    (m === "a" || m === step.kind);
+  return {
+    target: isTarget,
+    used: step.used.some((u) => u.m === m && u.r === r && u.c === c),
+    unknown: m !== "a" && value === null,
+  };
+};
+---
+
+<Panel
+  class="lu-walk"
+  caption={caption}
+  hideCaption
+  tabindex="0"
+  aria-roledescription="carousel"
+  aria-label="Interactive LU decomposition walkthrough"
+  data-lu-walk
+>
+  <StepBar total={steps.length} />
+
+  <div class="stack">
+    {steps.map((step) => (
+      <div class="step" data-label={step.label}>
+        <div class="mats">
+          {(["a", "l", "u"] as const).map((m) => (
+            <div class="mat">
+              <span
+                class="name"
+                set:html={tex(m === "a" ? "A" : m.toUpperCase())}
+              />
+              <table aria-hidden="true">
+                <tbody>
+                  {Array.from({ length: n }, (_, r) => (
+                    <tr>
+                      {Array.from({ length: n }, (_, c) => {
+                        const value =
+                          m === "a" ? null : step[m === "l" ? "L" : "U"][r][c];
+                        return (
+                          <td
+                            class:list={classes(step, m, r, c, value)}
+                            set:html={m === "a" ? aTex[r][c] : show(value)}
+                          />
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+        <StepNote>
+          {step.kind === "start" ? (
+            <p
+              set:html={`Entries of ${tex("L")} and ${tex("U")} are filled 1 at a time, row ${tex("i")} of ${tex("U")} then column ${tex("i")} of ${tex("L")}. The zeros and the unit diagonal of ${tex("L")} are known from the start. ${tex("?")} marks an entry not yet computed.`}
+            />
+          ) : (
+            step.eq.map((e) => <p class="eq" set:html={tex(e)} />)
+          )}
+        </StepNote>
+      </div>
+    ))}
+  </div>
+
+  <StepNav />
+</Panel>
+
+<style>
+  .stack {
+    display: grid;
+  }
+  .stack > .step {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+  }
+  .stack > .step.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .mats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 26px;
+  }
+  .mat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .name {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+  table {
+    border-collapse: separate;
+    border-spacing: 3px;
+    border-left: 2px solid var(--text-secondary);
+    border-right: 2px solid var(--text-secondary);
+    border-radius: 6px;
+    padding: 2px 3px;
+  }
+  td {
+    min-width: 3.1em;
+    height: 2.4em;
+    padding: 0 6px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    border: 1px solid transparent;
+  }
+  td.unknown {
+    color: var(--text-muted);
+  }
+  td.used {
+    background: var(--accent-subtle);
+  }
+  td.target {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+  .eq {
+    overflow-x: auto;
+    padding: 2px 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stack > .step {
+      transition: none;
+    }
+  }
+</style>
+
+<noscript>
+  <style>
+    .lu-walk .stack > .step {
+      opacity: 1;
+      visibility: visible;
+      grid-area: auto;
+      margin-top: 16px;
+    }
+    .lu-walk .foot {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { createDot } from "./lib/dots";
+
+  function initLuWalk(root: HTMLElement) {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
+    if (!steps.length) return;
+
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]")!;
+    const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+    const label = root.querySelector<HTMLElement>("[data-label]")!;
+    const current = root.querySelector<HTMLElement>("[data-current]")!;
+    const dotWrap = root.querySelector<HTMLElement>(".dots")!;
+    const dotTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-dot-template]",
+    );
+    const live = root.querySelector<HTMLElement>(".live")!;
+
+    const dots = steps.map((s, idx) =>
+      createDot(
+        dotWrap,
+        dotTemplate,
+        s.dataset.label ?? `Step ${idx + 1}`,
+        () => show(idx),
+      ),
+    );
+
+    let i = 0;
+
+    function show(n: number) {
+      i = Math.max(0, Math.min(steps.length - 1, n));
+      steps.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      dots.forEach((d, idx) =>
+        d.setAttribute("aria-selected", idx === i ? "true" : "false"),
+      );
+      prev.disabled = i === 0;
+      next.disabled = i === steps.length - 1;
+      label.textContent = steps[i].dataset.label ?? "";
+      current.textContent = String(i + 1);
+      live.textContent = `${label.textContent}. ${
+        steps[i].querySelector(".step-note")?.textContent?.trim() ?? ""
+      }`;
+    }
+
+    show(0);
+
+    prev.addEventListener("click", () => show(i - 1));
+    next.addEventListener("click", () => show(i + 1));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        show(i - 1);
+        e.preventDefault();
+      } else if (e.key === "ArrowRight") {
+        show(i + 1);
+        e.preventDefault();
+      }
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-lu-walk]")
+    .forEach((el) => initLuWalk(el));
+</script>

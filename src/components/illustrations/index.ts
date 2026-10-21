@@ -22,6 +22,9 @@ export { default as GraphicalMethodDiagram } from "./graphical-method-diagram.as
 export { default as HuffmanTable } from "./huffman-table.astro";
 export { default as KerberosDiagram } from "./kerberos-diagram.astro";
 export { default as KerberosDataFlow } from "./kerberos-data-flow.astro";
+export { default as CroutWalkthrough } from "./crout-walkthrough.astro";
+export { default as LuWalkthrough } from "./lu-walkthrough.astro";
+export { default as LuZeroPattern } from "./lu-zero-pattern.astro";
 export { default as MarketEquilibriumDiagram } from "./market-equilibrium-diagram.astro";
 export { default as NetworkDiagram } from "./network-diagram.astro";
 export { default as NormalFormsNesting } from "./normal-forms-nesting.astro";
