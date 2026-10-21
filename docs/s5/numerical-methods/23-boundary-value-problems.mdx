@@ -1,7 +1,7 @@
 ---
 title: Boundary Value Problems
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-10-20T11:48:27.451Z
+lastUpdatedOn: 2026-10-21T10:09:28.694Z
 ---
 
 A boundary value problem (BVP) is a differential equation with conditions specified at 2 distinct points, called boundary conditions.
@@ -46,14 +46,14 @@ A linear BVP is solved by the [linear shooting method](#linear-shooting-method) 
 
 The linear shooting method solves a [linear BVP](#linear-and-nonlinear-bvps) by combining solutions to 2 initial value problems.
 
-Applying the [general existence and uniqueness theorem](#existence-and-uniqueness) to $f(x,y,y') = p(x)y' + q(x)y + r(x)$ gives $f_y = q(x)$ and $f_{y'} = p(x)$, so a unique solution exists **iff**
+A unique solution exists **iff**
 
 - $p$, $q$, $r$ are continuous on $[a,b]$
 - $q(x) > 0$ for $x \in [a,b]$
 
 ### Superposition Idea
 
-The ODE is linear, so if $y_1$ solves
+If $y_1$ solves
 
 $$
 y_1'' = p(x)y_1' + q(x)y_1 + r(x)
@@ -65,7 +65,7 @@ $$
 y_2'' = p(x)y_2' + q(x)y_2
 $$
 
-then $y = y_1 + c\,y_2$ solves the same ODE for any constant $c$.
+then $y = y_1 + c\,y_2$ solves the ODE for any constant $c$.
 
 ### Auxiliary IVPs
 
@@ -85,7 +85,7 @@ $$
 y_2'' = p(x)y_2' + q(x)y_2, \quad a \leq x \leq b, \quad y_2(a) = 0,\ y_2'(a) = 1
 $$
 
-by reducing each to a first-order system and applying [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps). $q(x) > 0$ guarantees $y_2(b) \neq 0$ whenever $y_2$ is non-constant.
+with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
 
 ### Combining Solutions
 
@@ -103,7 +103,7 @@ is the unique solution to the BVP.
 
 ## Nonlinear Shooting Method
 
-The nonlinear shooting method solves a nonlinear BVP by approximating the initial slope $y'(a)$ that makes an initial value problem's solution hit the far boundary condition.
+The nonlinear shooting method finds the initial slope $y'(a)$ that makes an IVP solution hit $y(b) = \beta$.
 
 ### Idea
 
@@ -121,7 +121,7 @@ $$
 t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{y'(b,t_{k-1})}
 $$
 
-$y'(b,t_{k-1})$ can't be obtained analytically since $y(b,t_{k-1})$ is only a point approximation. Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
+$y'(b,t_{k-1})$ is not available, so define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
 
 $$
 z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
@@ -163,7 +163,7 @@ Both IVPs are reduced to first-order systems and solved with [order 4 Runge-Kutt
 
 ## Linear Finite-Difference Method
 
-The finite-difference method approximates the solution of a linear BVP by replacing derivatives with centered difference formulas at mesh points and solving the resulting linear system.
+Replace derivatives with centered differences at mesh points and solve the resulting linear system.
 
 ### Mesh Points
 
@@ -237,7 +237,7 @@ If $p$, $q$, $r$ are continuous on $[a,b]$ and $q(x) \geq 0$ on $[a,b]$, the lin
 
 ## Nonlinear Finite-Difference Method
 
-The finite-difference method for a nonlinear BVP replaces derivatives with centered difference formulas and solves the resulting nonlinear system with Newton's method.
+Replace derivatives with centered differences and solve the resulting nonlinear system with Newton's method.
 
 A unique solution exists **iff**
 
@@ -273,7 +273,9 @@ $$
 
 This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).
 
-## Worked Example
+## Worked Examples
+
+### Example 1
 
 Solve
 
@@ -343,5 +345,39 @@ Comparison with the exact solution
 | $0.25$ | 0.2151 | 0.2150                       | 0.0002 |
 | $0.50$ | 0.4437 | 0.4434                       | 0.0003 |
 | $0.75$ | 0.6999 | 0.6997                       | 0.0002 |
+
+</Solution>
+
+### Example 2
+
+Solve
+
+$$
+y'' = 6x, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
+$$
+
+with the linear finite-difference method for $N = 1$.
+
+<Solution>
+
+$p = q = 0$ and $r(x) = 6x$.
+
+$$
+h = \frac{1 - 0}{1 + 1} = 0.5, \quad x_1 = 0.5
+$$
+
+The difference equation for $i = 1$
+
+$$
+-w_0 + 2w_1 - w_2 = -h^2 r(x_1) = -0.25(3) = -0.75
+$$
+
+Using $w_0 = 0$ and $w_2 = 1$
+
+$$
+2w_1 = -0.75 + 1 \implies w_1 = 0.125
+$$
+
+The exact solution is $y = x^3$, so $y(0.5) = 0.125$. The centered difference is exact for a cubic.
 
 </Solution>

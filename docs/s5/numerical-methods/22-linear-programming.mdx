@@ -1,7 +1,7 @@
 ---
 title: Linear Programming
 dateCreated: 2026-09-23T08:07:54.155Z
-lastUpdatedOn: 2026-10-20T11:48:27.441Z
+lastUpdatedOn: 2026-10-21T10:09:28.686Z
 ---
 
 Linear programming is [constrained optimization](/s5/numerical-methods/constrained-optimization) where the objective function and every constraint are linear.
@@ -31,7 +31,9 @@ For 2 design variables, the problem can be solved graphically
 - Move the objective function line, $z$ constant, across the feasible region
 - The optimum occurs at a vertex of the feasible region
 
-## Worked Example
+## Worked Examples
+
+### Example 1
 
 A factory produces heaters of types $S$ and $L$, sold wholesale at \$40 and \$88 respectively. Machine $M_1$ needs 2 minutes per $S$ heater and 8 minutes per $L$ heater. Machine $M_2$ needs 5 minutes per $S$ heater and 2 minutes per $L$ heater. Both machines run 60 minutes per hour. Find the hourly production rates $x_1$ ($S$) and $x_2$ ($L$) maximizing hourly revenue.
 
@@ -59,5 +61,24 @@ The optimum occurs at the vertex $(x_1, x_2) = (10, 5)$, the intersection of the
 $$
 z_{\max} = 40(10) + 88(5) = 840
 $$
+
+</Solution>
+
+### Example 2
+
+Maximize $z = 3x_1 + 2x_2$ subject to $x_1 + x_2 \leq 4$, $x_1 \leq 3$, $x_1, x_2 \geq 0$.
+
+<Solution>
+
+The feasible region has vertices $(0, 0)$, $(3, 0)$, $(3, 1)$ and $(0, 4)$.
+
+| Vertex   | $z = 3x_1 + 2x_2$ |
+| -------- | ----------------- |
+| $(0, 0)$ | $0$               |
+| $(3, 0)$ | $9$               |
+| $(3, 1)$ | $11$              |
+| $(0, 4)$ | $8$               |
+
+The maximum is $z = 11$ at $(3, 1)$.
 
 </Solution>

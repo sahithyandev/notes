@@ -1,7 +1,7 @@
 ---
 title: Systems of IVPs
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-20T11:48:27.395Z
+lastUpdatedOn: 2026-10-21T10:09:28.653Z
 ---
 
 An $m$th-order system of first-order [IVPs](/s5/numerical-methods/initial-value-problems) is
@@ -77,11 +77,17 @@ $$
 
 with $u_1(a) = \alpha_1, \ldots, u_m(a) = \alpha_m$. Solving the system by order 4 Runge-Kutta, $w_i^{(1)}$ approximates $y(t_i)$.
 
-## Worked Example
+## Worked Examples
+
+### Example 1
+
+Reduce
 
 $$
 y'' - 2y' + 2y = e^{2t}\sin t, \quad 0 \leq t \leq 1, \quad y(0) = -0.4,\ y'(0) = -0.6
 $$
+
+to a first-order system, then take 1 step of order 4 Runge-Kutta with $h = 0.5$.
 
 <Solution>
 
@@ -94,6 +100,64 @@ u_2' &= 2 u_2 - 2 u_1 + e^{2t}\sin t
 \end{aligned}
 $$
 
-with $u_1(0) = -0.4$, $u_2(0) = -0.6$. Apply order 4 Runge-Kutta with $f_1 = u_2$ and $f_2 = 2 u_2 - 2 u_1 + e^{2t}\sin t$. Then $w_i^{(1)}$ approximates $y(t_i)$.
+with $u_1(0) = -0.4$, $u_2(0) = -0.6$. So $f_1 = u_2$ and $f_2 = 2u_2 - 2u_1 + e^{2t}\sin t$.
+
+$$
+\begin{aligned}
+k_1^{(1)} &= 0.5(-0.6) = -0.3 \\
+k_1^{(2)} &= 0.5\, f_2(0, -0.4, -0.6) = -0.2
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+k_2^{(1)} &= 0.5(-0.6 - 0.1) = -0.35 \\
+k_2^{(2)} &= 0.5\, f_2(0.25, -0.55, -0.7) = 0.0540
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+k_3^{(1)} &= 0.5(-0.6 + 0.0270) = -0.2865 \\
+k_3^{(2)} &= 0.5\, f_2(0.25, -0.575, -0.5730) = 0.2059
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+k_4^{(1)} &= 0.5(-0.6 + 0.2059) = -0.1970 \\
+k_4^{(2)} &= 0.5\, f_2(0.5, -0.6865, -0.3941) = 0.9440
+\end{aligned}
+$$
+
+$$
+w_1^{(1)} = -0.4 + \tfrac{1}{6}(-0.3 - 0.7 - 0.5730 - 0.1970) = -0.6950
+$$
+
+$$
+w_1^{(2)} = -0.6 + \tfrac{1}{6}(-0.2 + 0.1080 + 0.4118 + 0.9440) = -0.3894
+$$
+
+$w_1^{(1)}$ approximates $y(0.5)$. The exact value is $-0.6936$.
+
+</Solution>
+
+### Example 2
+
+Write $y''' = y'' - 2y' + y + t$ with $y(0) = 1$, $y'(0) = 0$, $y''(0) = 2$ as a first-order system.
+
+<Solution>
+
+Set $u_1 = y$, $u_2 = y'$, $u_3 = y''$
+
+$$
+\begin{aligned}
+u_1' &= u_2 \\
+u_2' &= u_3 \\
+u_3' &= u_3 - 2u_2 + u_1 + t
+\end{aligned}
+$$
+
+with $u_1(0) = 1$, $u_2(0) = 0$, $u_3(0) = 2$.
 
 </Solution>

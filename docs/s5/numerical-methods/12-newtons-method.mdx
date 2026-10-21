@@ -1,16 +1,10 @@
 ---
 title: Newton's Method
 dateCreated: 2026-07-28T05:17:13.897Z
-lastUpdatedOn: 2026-10-20T11:48:27.325Z
+lastUpdatedOn: 2026-10-21T10:09:28.591Z
 ---
 
-Newton's method for nonlinear systems generalizes the single-variable iteration $g(x) = x - \phi(x)f(x)$, $\phi(x) = 1/f'(x)$, to $n$ dimensions by replacing $\phi(x)$ with the inverse of a matrix $A(\vec{x})$
-
-$$
-G(\vec{x}) = \vec{x} - A(\vec{x})^{-1}F(\vec{x})
-$$
-
-Quadratic convergence of this [fixed-point iteration](/s5/numerical-methods/fixed-point-method) to $\vec{p}$ requires $\dfrac{\partial g_i(\vec{p})}{\partial x_k} = 0$ for each $i, k$, which holds by choosing $A(\vec{x})$ to be the [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) $J(\vec{x})$ of $F$.
+Newton's method for nonlinear systems is a [fixed-point iteration](/s5/numerical-methods/fixed-point-method) that uses the [Jacobian matrix](/s5/numerical-methods/jacobian-matrix) $J(\vec{x})$ of $F$ to get quadratic convergence.
 
 ## Iteration
 
@@ -24,21 +18,23 @@ $$
 
 <Note>
 
-Inverting $J(\vec{x}^{(k-1)})$ explicitly is avoided in practice. Instead, solve the linear system
+In practice, solve the linear system
 
 $$
 J(\vec{x}^{(k-1)})\vec{y}^{(k-1)} = -F(\vec{x}^{(k-1)})
 $$
 
-for $\vec{y}^{(k-1)}$, for example by [Gaussian elimination](/s5/numerical-methods/gaussian-elimination), then set $\vec{x}^{(k)} = \vec{x}^{(k-1)} + \vec{y}^{(k-1)}$.
+by [Gaussian elimination](/s5/numerical-methods/gaussian-elimination) instead of inverting $J$, then set $\vec{x}^{(k)} = \vec{x}^{(k-1)} + \vec{y}^{(k-1)}$.
 
 </Note>
 
 Convergence is quadratic, provided a sufficiently accurate starting value $\vec{x}^{(0)}$ is known and $J(\vec{p})^{-1}$ exists.
 
-## Example
+## Worked Examples
 
-Apply Newton's method to the [nonlinear system](/s5/numerical-methods/non-linear-system-of-equations#example) with its [Jacobian](/s5/numerical-methods/jacobian-matrix#example), starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T$.
+### Example 1
+
+Apply Newton's method to the [nonlinear system](/s5/numerical-methods/non-linear-system-of-equations#example) with its [Jacobian](/s5/numerical-methods/jacobian-matrix#example-1), starting from $\vec{x}^{(0)} = (0.1, 0.1, -0.1)^T$.
 
 <Solution>
 
@@ -66,5 +62,53 @@ $$
 $$
 
 Repeating converges to $\vec{x}^{(5)} \approx (0.500000, 0.000000, -0.523599)^T$, matching the exact solution $\vec{p} = (0.5, 0, -\pi/6)$.
+
+</Solution>
+
+### Example 2
+
+Apply Newton's method to
+
+$$
+\begin{aligned}
+x_1^2 + x_2^2 - 4 &= 0 \\
+x_1 x_2 - 1 &= 0
+\end{aligned}
+$$
+
+starting from $\vec{x}^{(0)} = (2, 0.5)^T$.
+
+<Solution>
+
+$$
+J(\vec{x}) = \begin{pmatrix} 2x_1 & 2x_2 \\ x_2 & x_1 \end{pmatrix}
+$$
+
+Iteration 1
+
+$$
+F(\vec{x}^{(0)}) = \begin{pmatrix} 0.25 \\ 0 \end{pmatrix}, \quad
+J(\vec{x}^{(0)}) = \begin{pmatrix} 4 & 1 \\ 0.5 & 2 \end{pmatrix}
+$$
+
+Solving $J\vec{y} = -F$ gives $\vec{y}^{(0)} = (-0.066667, 0.016667)^T$.
+
+$$
+\vec{x}^{(1)} = (1.933333, 0.516667)^T
+$$
+
+Iteration 2
+
+$$
+F(\vec{x}^{(1)}) = \begin{pmatrix} 0.004722 \\ -0.001111 \end{pmatrix}, \quad
+J(\vec{x}^{(1)}) = \begin{pmatrix} 3.866667 & 1.033333 \\ 0.516667 & 1.933333 \end{pmatrix}
+$$
+
+$$
+\vec{y}^{(1)} = (-0.001481, 0.000970)^T, \quad
+\vec{x}^{(2)} = (1.931853, 0.517637)^T
+$$
+
+The exact root is $x_1 = \sqrt{2 + \sqrt{3}} = 1.931852$, $x_2 = 1/x_1 = 0.517638$.
 
 </Solution>

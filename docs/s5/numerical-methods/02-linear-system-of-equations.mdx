@@ -3,7 +3,7 @@ title: Linear System of Equations
 prereqs:
   - s1/mathematics/matrices/elementary-transformations
 dateCreated: 2026-07-19T13:26:27.865Z
-lastUpdatedOn: 2026-10-20T11:48:27.156Z
+lastUpdatedOn: 2026-10-21T10:09:28.454Z
 ---
 
 A linear system of $m$ equations in $n$ unknowns $x_1, x_2, \ldots, x_n$ is a set of equations of the form
@@ -64,13 +64,10 @@ Equivalent systems are the systems with the same set of solutions.
 
 <Proof label="Proof Hint">
 
-- Let $S$ be the solution set of the original system and $S'$ the solution set of the system after 1 elementary operation. Show $S \subseteq S'$ case by case on the 3 operation types.
-  - Swapping 2 equations leaves the set of equations unchanged, so every solution still satisfies all of them.
-  - Multiplying an equation by a nonzero scalar $c$ keeps it satisfied, since both sides are scaled by $c$.
-  - Adding $c$ times equation $j$ to equation $i$ keeps the new equation satisfied, since any $\vec{x} \in S$ satisfies equation $i$ and equation $j$ separately.
-- Each operation is undone by an operation of the same type (swap again, multiply by $1/c$, add $-c$ times equation $j$). So $S' \subseteq S$ holds too, giving $S = S'$.
-- Extend to a finite chain of elementary operations by induction on the number of operations.
-- For the converse direction, equivalent systems are connected by a finite chain of elementary operations. Reduce both to the same reduced echelon form, which is unique, and reverse one chain.
+- Show each operation type keeps every solution, so $S \subseteq S'$.
+- Each operation has an inverse operation of the same type, so $S' \subseteq S$.
+- Extend to a finite chain by induction.
+- For the converse, reduce both systems to the same reduced echelon form and reverse one chain.
 
 </Proof>
 
@@ -86,24 +83,24 @@ Numerical methods for solving linear systems split into 2 classes:
 
 ### Direct
 
-Yield the exact solution in a finite number of steps, in the absence of round-off error. The cost is fixed by the size $n$ of the system, about $\tfrac{2}{3}n^3$ operations for a dense $n \times n$ matrix.
-
-The methods in this module are:
+Yield the exact solution in a finite number of steps, ignoring round-off error. Cost is about $\tfrac{2}{3}n^3$ operations for a dense $n \times n$ matrix.
 
 - Gaussian elimination  
-  Reduces the system to echelon form, then solves by back substitution.
+  Reduces the system to echelon form, then back substitution.
 - LU decomposition  
-  Factors $A = LU$ once, so each new $\vec{b}$ only needs 2 triangular solves.
+  Factors $A = LU$ once, so each new $\vec{b}$ needs only 2 triangular solves.
 - LUP decomposition  
-  Factors $PA = LU$, adding row interchanges for matrices where plain LU breaks down.
+  Factors $PA = LU$, adding row interchanges.
 - Cholesky decomposition  
   Factors $A = LL^T$ for a symmetric positive definite $A$, at about half the cost of LU.
 
 ### Iterative
 
-Start from an initial guess $\vec{x}^{(0)}$ and produce a sequence $\vec{x}^{(1)}, \vec{x}^{(2)}, \ldots$ that converges to the solution. The process stops when the change between successive guesses, or the residual $\|A\vec{x}^{(k)} - \vec{b}\|$, falls below a tolerance.
+Start from a guess $\vec{x}^{(0)}$ and produce $\vec{x}^{(1)}, \vec{x}^{(2)}, \ldots$ until the residual $\|A\vec{x}^{(k)} - \vec{b}\|$ falls below a tolerance.
 
-Each step costs about $n^2$ operations for a dense matrix, and less for a sparse one since only the non-zero entries are used. So iterative methods suit very large, sparse matrices, where a direct method would be too slow or fill in the zeros. Convergence is not guaranteed, and depends on properties of $A$ such as diagonal dominance.
+- Cost per step is about $n^2$ operations, less for a sparse matrix.
+- Suits very large sparse matrices.
+- Convergence depends on properties of $A$ such as diagonal dominance.
 
 ## Worked Example
 

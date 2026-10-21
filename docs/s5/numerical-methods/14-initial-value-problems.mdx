@@ -3,7 +3,7 @@ title: Initial Value Problems
 prereqs:
   - s5/operational-research/convex
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-20T11:48:27.350Z
+lastUpdatedOn: 2026-10-21T10:09:28.616Z
 ---
 
 An initial value problem (IVP) is a first-order ODE together with the solution value at the left endpoint.
@@ -12,7 +12,7 @@ $$
 y'(t) = f(t, y), \quad a \leq t \leq b, \quad y(a) = \alpha
 $$
 
-Most IVPs have no analytical solution. Numerical methods approximate $y$ at discrete points of $[a, b]$.
+Numerical methods approximate $y$ at discrete points of $[a, b]$.
 
 ## Lipschitz Condition
 
@@ -56,8 +56,6 @@ Here:
   <Sym s="k">stability constant, independent of $\varepsilon$</Sym>
 </Symbols>
 
-The perturbed solution stays within $k\varepsilon$ of the original. The change in the solution is bounded proportionally to the size of the perturbations.
-
 ## Well-Posed Problem
 
 The IVP is well-posed **iff**:
@@ -65,17 +63,17 @@ The IVP is well-posed **iff**:
 - a unique solution $y(t)$ exists
 - the solution is stable
 
-Check well-posedness before applying any numerical method.
-
 ### Well-Posedness from Lipschitz
 
 Let $D = [a, b] \times \mathbb{R}$. If $f$ is continuous and satisfies a Lipschitz condition in $y$ on $D$, then the IVP is well-posed.
 
-A well-posed IVP may fail the Lipschitz condition. If Lipschitz fails, check the well-posed definition directly.
+If the Lipschitz condition fails, check the definition directly.
 
-## Worked Example
+## Worked Examples
 
-$y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$.
+### Example 1
+
+Show the IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$ is well-posed.
 
 <Solution>
 
@@ -98,5 +96,21 @@ $$
 $$
 
 for $|\delta| < \varepsilon$ and $|\delta_0| < \varepsilon$, using $e^t \leq e^2$ on $[0, 2]$. The bound holds with $k = 2 e^2 + 1$ for every $\varepsilon > 0$.
+
+</Solution>
+
+### Example 2
+
+Show the IVP $y'(t) = t e^{3t} - 2y$, $0 \leq t \leq 1$, $y(0) = 0$ is well-posed.
+
+<Solution>
+
+$f(t, y) = t e^{3t} - 2y$ is continuous on $D = [0, 1] \times \mathbb{R}$.
+
+$$
+\left| \frac{\partial f}{\partial y} \right| = |-2| = 2
+$$
+
+$f$ is Lipschitz in $y$ with $L = 2$, so the IVP is well-posed.
 
 </Solution>

@@ -1,7 +1,7 @@
 ---
 title: Euler's Method
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-20T11:48:27.362Z
+lastUpdatedOn: 2026-10-21T10:09:28.625Z
 ---
 
 Euler's method approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-value-problems) at equally spaced mesh points, using the first-order Taylor expansion.
@@ -15,8 +15,6 @@ t_i = a + ih, \quad i = 0, 1, \ldots, N
 $$
 
 with $t_0 = a$, $t_N = b$, and $t_{i+1} - t_i = h$.
-
-Approximations are produced only at the mesh points. Values between them come from interpolation.
 
 ## Difference Equation
 
@@ -52,7 +50,7 @@ The bound is proportional to $h$. Euler's method has order 1.
 
 <Note>
 
-The bound is often much larger than the actual error, and the gap widens as $i$ increases.
+The bound is often much larger than the actual error.
 
 </Note>
 
@@ -79,11 +77,15 @@ $$
 h = \sqrt{\frac{2\delta}{M}}
 $$
 
-## Worked Example
+## Worked Examples
 
-IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$.
+### Example 1
+
+Apply Euler's method to $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$.
 
 <Solution>
+
+$h = 0.5$ and $f(t, y) = y - t^2 + 1$.
 
 $$
 \begin{aligned}
@@ -96,5 +98,30 @@ w_4 &= w_3 + 0.5\,(w_3 - 1.5^2 + 1) = 4.4375
 $$
 
 Hence $y(2) \approx w_4 = 4.4375$. The exact solution is $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
+
+</Solution>
+
+### Example 2
+
+Apply Euler's method to $y'(t) = y$, $0 \leq t \leq 0.3$, $y(0) = 1$, with $h = 0.1$. Compare with the exact solution $y = e^t$.
+
+<Solution>
+
+$$
+\begin{aligned}
+w_0 &= 1 \\
+w_1 &= 1 + 0.1(1) = 1.1 \\
+w_2 &= 1.1 + 0.1(1.1) = 1.21 \\
+w_3 &= 1.21 + 0.1(1.21) = 1.331
+\end{aligned}
+$$
+
+| $t_i$ | $w_i$ | $y(t_i)$ | Error   |
+| ----- | ----- | -------- | ------- |
+| 0.1   | 1.1   | 1.10517  | 0.00517 |
+| 0.2   | 1.21  | 1.22140  | 0.01140 |
+| 0.3   | 1.331 | 1.34986  | 0.01886 |
+
+The error grows with $i$.
 
 </Solution>

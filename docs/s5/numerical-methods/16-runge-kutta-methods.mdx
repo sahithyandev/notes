@@ -1,12 +1,10 @@
 ---
 title: Runge-Kutta Methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-20T11:48:27.373Z
+lastUpdatedOn: 2026-10-21T10:09:28.634Z
 ---
 
 Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problems) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
-
-The order-$n$ Taylor expansion of $y$ needs derivatives of $f$ up to order $n-1$. These are costly to compute and may not exist everywhere. Runge-Kutta methods replace each derivative term with values of $f$ at selected $(t, y)$ points.
 
 Mesh points are $t_i = a + ih$ with $h = \dfrac{b - a}{N}$, as in [Euler's method](/s5/numerical-methods/eulers-method).
 
@@ -68,24 +66,28 @@ Higher order gives a better approximation for the same $h$.
 
 ## Memorization
 
-All four have the form $w_{i+1} = w_i + h \times (\text{slope estimate})$. They differ only in how the slope is estimated.
+All 4 have the form $w_{i+1} = w_i + h \times (\text{slope estimate})$.
 
-- **Euler**\
-  Slope at the left end, $f(t_i, w_i)$. Nothing else.
-- **Midpoint**\
-  Half-step to the middle with Euler, then take the slope there. One evaluation at $\left(t_i + \tfrac{h}{2},\ w_i + \tfrac{h}{2} f(t_i, w_i)\right)$.
-- **Modified Euler**\
-  Average of the two end slopes. Left slope $f(t_i, w_i)$, right slope at the full Euler-predicted point $\left(t_{i+1},\ w_i + h f(t_i, w_i)\right)$, weight $\tfrac{1}{2}$ each.
-- **Order 4 Runge-Kutta**\
-  Weighted average of four slopes with weights $1, 2, 2, 1$ over $6$ (Simpson's rule). Sample points step through $t_i,\ t_i + \tfrac{h}{2},\ t_i + \tfrac{h}{2},\ t_{i+1}$, and each $k_j$ feeds the $y$-argument of the next: $k_1$ into $k_2$, $k_2$ into $k_3$, $k_3$ into $k_4$, all with factor $\tfrac{1}{2}$ except $k_3 \to k_4$ which uses the full $k_3$.
+- Euler  
+  Slope at the left end.
+- Midpoint  
+  Slope at the middle, found with a half Euler step.
+- Modified Euler  
+  Average of the left slope and the slope at the Euler-predicted right end.
+- Order 4 Runge-Kutta  
+  Weights $1, 2, 2, 1$ over $6$ on the slopes at $t_i$, twice at $t_i + \tfrac{h}{2}$, and at $t_{i+1}$. Each $k_j$ feeds the next with factor $\tfrac{1}{2}$, except $k_3$ into $k_4$ with factor $1$.
 
-## Worked Example
+## Worked Examples
 
-IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$, so $h = 0.5$ and $f(t, y) = y - t^2 + 1$. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
+### Example 1
+
+Apply each method to $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$, with $N = 4$. Exact solution $y(t) = (t+1)^2 - 0.5 e^t$, giving $y(2) \approx 5.3055$.
 
 <Solution>
 
-### Midpoint
+$h = 0.5$ and $f(t, y) = y - t^2 + 1$.
+
+Midpoint
 
 $$
 \begin{aligned}
@@ -94,7 +96,7 @@ w_2 &= 2.5977, \quad w_3 = 3.9399, \quad w_4 = 5.2149
 \end{aligned}
 $$
 
-### Modified Euler
+Modified Euler
 
 $$
 \begin{aligned}
@@ -103,7 +105,7 @@ w_2 &= 2.5156, \quad w_3 = 3.7754, \quad w_4 = 4.9163
 \end{aligned}
 $$
 
-### Order 4
+Order 4
 
 First step, $t_0 = 0$, $w_0 = 0.5$
 
@@ -125,5 +127,25 @@ Continuing, $w_2 = 2.6396$, $w_3 = 4.0068$, $w_4 = 5.3016$.
 | Midpoint            | $5.2149$           | $0.091$ |
 | Modified Euler      | $4.9163$           | $0.389$ |
 | Order 4 Runge-Kutta | $5.3016$           | $0.004$ |
+
+</Solution>
+
+### Example 2
+
+Apply 1 step of order 4 Runge-Kutta to $y' = y$, $y(0) = 1$, with $h = 0.1$.
+
+<Solution>
+
+$$
+\begin{aligned}
+k_1 &= 0.1(1) = 0.1 \\
+k_2 &= 0.1(1 + 0.05) = 0.105 \\
+k_3 &= 0.1(1 + 0.0525) = 0.10525 \\
+k_4 &= 0.1(1 + 0.10525) = 0.110525 \\
+w_1 &= 1 + \tfrac{1}{6}(0.1 + 0.21 + 0.2105 + 0.110525) = 1.105171
+\end{aligned}
+$$
+
+The exact value is $e^{0.1} = 1.105171$. Euler gives $1.1$.
 
 </Solution>
