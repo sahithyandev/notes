@@ -52,7 +52,9 @@ function firstNote(dir: string): FirstNote | null {
   return best;
 }
 
-export function scanModuleRedirects(docsRoot: string): Record<string, string> {
+export function scanModuleRedirects(
+  docsRoot: string = join(process.cwd(), "docs"),
+): Record<string, string> {
   const redirects: Record<string, string> = {};
 
   for (const sem of subdirs(docsRoot)) {

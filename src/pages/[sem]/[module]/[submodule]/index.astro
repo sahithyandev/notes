@@ -1,0 +1,19 @@
+---
+import { scanModuleRedirects } from "../../../../integrations/module-redirects/scan";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  const redirects = scanModuleRedirects();
+  return Object.entries(redirects).flatMap(([from, to]) => {
+    const parts = from.slice(1).split("/");
+    if (parts.length !== 3) return [];
+    const [sem, module, submodule] = parts;
+    return [{ params: { sem, module, submodule }, props: { to } }];
+  });
+}
+
+const { to } = Astro.props;
+
+return Astro.redirect(to);
+---
