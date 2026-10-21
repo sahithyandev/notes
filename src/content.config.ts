@@ -45,6 +45,10 @@ const notes = defineCollection({
       lastUpdatedOn: z.date(),
       keywords: z.optional(z.array(z.string())),
       prereqs: z.optional(z.array(z.string())),
+      // Wolfram notebooks (.nb) offered as downloads at the end of the note.
+      // Each entry is a basename without the extension, resolving to
+      // /notebooks/<name>.nb (served from public/notebooks/).
+      notebooks: z.optional(z.array(z.string())),
       authors: z
         .array(reference("authors"))
         .default([{ collection: "authors", id: "sahithyan" }]),

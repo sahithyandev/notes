@@ -74,3 +74,4 @@ export { default as ColorCaptureDiagram } from "./color-capture-diagram.astro";
 export { default as IndexedStorageComparison } from "./indexed-storage-comparison.astro";
 export { default as DitherBlockDiagram } from "./dither-block-diagram.astro";
 export { default as ErrorDiffusionDiagram } from "./error-diffusion-diagram.astro";
+export { default as RungePhenomenonDiagram } from "./runge-phenomenon-diagram.astro";
