@@ -23,7 +23,7 @@ beforeAll(async () => {
 });
 
 const ORIGIN = "https://notes.example";
-const HERE = "/s5/numerical-methods/jacobian-matrix";
+const HERE = "/s5/numerical-methods/newtons-method";
 
 function parse(html: string): Document {
   return new DOMParser().parseFromString(html, "text/html");

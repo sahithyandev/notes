@@ -168,53 +168,55 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     <NoteSidebar sidebarData={sidebarData} slug={slug} slugParts={slugParts} />
 
     <section>
-      <Breadcrumb slug={slug} title={notesEntry.data.title} />
-      <h1 class="note-title">{notesEntry.data.title}</h1>
+      <div class="note-body">
+        <Breadcrumb slug={slug} title={notesEntry.data.title} />
+        <h1 class="note-title">{notesEntry.data.title}</h1>
 
-      {wip && (
-        <p class="wip-banner" role="note">
-          <span class="wip-dot" aria-hidden="true" />
-          Work in progress. This note is still being written and incomplete.
-        </p>
-      )}
+        {wip && (
+          <p class="wip-banner" role="note">
+            <span class="wip-dot" aria-hidden="true" />
+            Work in progress. This note is still being written and incomplete.
+          </p>
+        )}
 
-      <div class="note-meta">
-        <AiLinks slug={slug} topic={topic} sectionLabel={sectionLabel} />
-      </div>
+        <div class="note-meta">
+          <AiLinks slug={slug} topic={topic} sectionLabel={sectionLabel} />
+        </div>
 
-      <Prereqs entries={prereqEntries} />
+        <Prereqs entries={prereqEntries} />
 
-      <Article>
-        <Content
-          components={{
-            Note,
-            Solution,
-            Method,
-            Theorem,
-            Definition,
-            Proof,
-            Formula,
-            Symbols,
-            Sym,
-            Aka,
-            ...Illustrations,
-            table: ScrollableTable,
-          }}
+        <Article>
+          <Content
+            components={{
+              Note,
+              Solution,
+              Method,
+              Theorem,
+              Definition,
+              Proof,
+              Formula,
+              Symbols,
+              Sym,
+              Aka,
+              ...Illustrations,
+              table: ScrollableTable,
+            }}
+          />
+        </Article>
+
+        <NoteAuthors
+          authors={authorEntries}
+          lastUpdatedOn={lastUpdatedIso}
+          wordCount={wordCount}
         />
-      </Article>
 
-      <NoteAuthors
-        authors={authorEntries}
-        lastUpdatedOn={lastUpdatedIso}
-        wordCount={wordCount}
-      />
+        <NoteFeedback slug={slug} />
 
-      <NoteFeedback slug={slug} />
-
-      <NoteNav
-        prevNote={sidebarData.prevNote}
-        nextNote={sidebarData.nextNote}
-      />
+        <NoteNav
+          prevNote={sidebarData.prevNote}
+          nextNote={sidebarData.nextNote}
+        />
+      </div>
     </section>
 
     <RightSidebar>
@@ -264,7 +266,8 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     --sidebar-w: 280px;
     --toc-w: 280px;
     --study-dur: 0.28s;
-    --study-measure: 76rem;
+    --study-measure: 78vw;
+    --study-scale: 1.25;
     --study-ease: cubic-bezier(0.32, 0.72, 0, 1);
     --nav-h: 54px;
     --pip-size: 16px;
@@ -285,6 +288,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     scrollbar-width: none;
   }
 
+  .note-body {
+    transform-origin: top center;
+  }
+
   main {
     grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
   }
@@ -298,6 +305,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       transition: padding-inline var(--study-dur) var(--study-ease);
     }
 
+    :global(html.drawers-ready) .note-body {
+      transition: scale var(--study-dur) var(--study-ease);
+    }
+
     :global(html.study-mode) main {
       grid-template-columns: 0 minmax(0, 1fr) 0;
     }
@@ -305,8 +316,12 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     :global(html.study-mode) section:has(article) {
       padding-inline: max(
         calc(5 * var(--spacing)),
-        calc((100vw - var(--study-measure)) / 2)
+        calc((100vw - var(--study-measure) / var(--study-scale)) / 2)
       );
+    }
+
+    :global(html.study-mode) .note-body {
+      scale: var(--study-scale);
     }
   }
 
