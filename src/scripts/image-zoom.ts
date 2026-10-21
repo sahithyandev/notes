@@ -50,6 +50,16 @@ const fillBox = (svg: SVGSVGElement) => {
   zoomBox!.replaceChildren(copy);
 };
 
+// Tone colours are scoped to `.axes-figure`, which the dialog caption is not
+// inside, so the resolved colour is copied across from the in-page caption.
+const copyToneColors = (fig: HTMLElement, dest: HTMLElement) => {
+  const src = fig.querySelectorAll<HTMLElement>('[class*="tone-"]');
+  const copy = dest.querySelectorAll<HTMLElement>('[class*="tone-"]');
+  src.forEach((el, i) => {
+    copy[i].style.color = getComputedStyle(el).color;
+  });
+};
+
 const showDialog = () => {
   dialog!.showModal();
   dialog!.classList.add("is-open");
@@ -83,6 +93,7 @@ const open = (img: Zoomable) => {
   const fig = figcaptionFor(img);
   if (fig) {
     caption!.innerHTML = fig.innerHTML;
+    copyToneColors(fig, caption!);
     caption!.hidden = false;
   } else {
     caption!.innerHTML = "";
