@@ -1,0 +1,85 @@
+---
+title: Interpolation
+dateCreated: 2026-10-21T16:32:28.558Z
+lastUpdatedOn: 2026-10-21T16:35:22.507Z
+---
+
+Interpolation constructs a function $\phi$ that passes through a given set of data points.
+
+Given $n + 1$ data points $(x_i, y_i)$ with distinct nodes $x_0 < x_1 < \cdots < x_n$, find $\phi$ such that
+
+$$
+\phi(x_i) = y_i, \quad i = 0, 1, \ldots, n
+$$
+
+Evaluating $\phi$ inside $[x_0, x_n]$ is interpolation. Evaluating it outside is extrapolation, which is less reliable.
+
+## Types of Interpolation
+
+The form of $\phi$ determines the type.
+
+### Polynomial Interpolation
+
+<Theorem>
+
+For distinct nodes $x_0, \ldots, x_n$ and values $y_0, \ldots, y_n$, there is a unique polynomial $p_n$ of degree at most $n$ with $p_n(x_i) = y_i$.
+
+</Theorem>
+
+<Proof label="Proof Hint">
+
+- Write $p_n(x) = a_0 + a_1 x + \cdots + a_n x^n$
+- Apply $p_n(x_i) = y_i$ to get $n + 1$ linear equations
+- Show the coefficient matrix is nonsingular
+
+</Proof>
+
+The Lagrange form is
+
+$$
+p_n(x) = \sum_{i=0}^{n} y_i L_i(x), \qquad L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}
+$$
+
+<Note>
+
+High-degree polynomials on equally spaced nodes oscillate badly near the ends of the interval. This is the Runge phenomenon.
+
+</Note>
+
+### Piecewise Polynomial Interpolation
+
+Split $[x_0, x_n]$ into subintervals and fit a low-degree polynomial on each.
+
+- Piecewise linear  
+  Straight segments. Continuous, with corners at the nodes.
+- Piecewise quadratic  
+  Parabolic segments. The derivative may jump at the nodes.
+- Cubic spline  
+  Cubic segments with continuous first and second derivatives. Covered in the next note.
+
+### Trigonometric Interpolation
+
+For periodic data, $\phi$ is a sum of sines and cosines
+
+$$
+\phi(x) = \frac{a_0}{2} + \sum_{k=1}^{m} \left(a_k \cos kx + b_k \sin kx\right)
+$$
+
+### Rational Interpolation
+
+$\phi = p / q$ with polynomials $p$ and $q$. Suited to functions with poles or sharp changes, which polynomials approximate poorly.
+
+### Hermite Interpolation
+
+Matches both values $y_i$ and derivatives $y_i'$ at each node.
+
+## Comparison
+
+| Type             | Form of $\phi$                  | Continuity                 |
+| ---------------- | ------------------------------- | -------------------------- |
+| Polynomial       | Single polynomial               | $C^\infty$                 |
+| Piecewise linear | Line on each subinterval        | $C^0$                      |
+| Cubic spline     | Cubic on each subinterval       | $C^2$                      |
+| Trigonometric    | Sum of sines and cosines        | $C^\infty$                 |
+| Rational         | Ratio of polynomials            | $C^\infty$ away from poles |
+| Hermite          | Polynomial matching derivatives | $C^1$ piecewise            |
