@@ -287,6 +287,32 @@ const { label = "Solution" } = Astro.props;
     overflow-x: auto;
   }
 
+  /* A heading inside a solution is nested one level below the note's own
+     headings, so it sits a step under the article scale. The panel's chrome
+     (summary label, method label, tabs) is already sized for a nested
+     surface, and a full-size heading reads as a section break of the note
+     itself rather than a step within the workings.
+     The `details.solution` prefix keeps these rules above the article's
+     scoped `& h2`, `& h3`, `& h4`, which carry the same specificity. */
+  details.solution .solution-body h2 {
+    font-size: 1.125em;
+    margin: 18px 0 8px;
+  }
+
+  details.solution .solution-body h3 {
+    font-size: 1.0625em;
+    margin: 16px 0 8px;
+  }
+
+  details.solution .solution-body h4 {
+    font-size: 1em;
+    margin: 14px 0 6px;
+  }
+
+  details.solution .solution-body > :is(h2, h3, h4):first-child {
+    margin-top: 0;
+  }
+
   .solution-body > :first-child {
     margin-top: 0;
   }
