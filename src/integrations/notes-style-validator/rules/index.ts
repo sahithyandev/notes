@@ -19,11 +19,17 @@ import { checkWhatIsHeading } from "./what-is-heading.ts";
 import { checkMathBlock } from "./math-block.ts";
 import { checkProofHint } from "./proof-hint.ts";
 import { checkTooManyHeadings } from "./too-many-headings.ts";
+import { checkNotebookFile, checkNotebookFiles } from "./notebook-file.ts";
 
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 import { checkForwardLinks } from "./forward-link.ts";
 
-export { checkBrokenLinks, checkSubmoduleNumbering, checkForwardLinks };
+export {
+  checkBrokenLinks,
+  checkSubmoduleNumbering,
+  checkForwardLinks,
+  checkNotebookFiles,
+};
 
 // Every rule except the corpus-wide ones (broken-link, submodule-numbering,
 // forward-link) runs per file, independent of the rest of
@@ -48,6 +54,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkMathBlock,
   checkProofHint,
   checkTooManyHeadings,
+  checkNotebookFile,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {

@@ -57,6 +57,7 @@ const FRONTMATTER_FIELD_ORDER = [
   "sidebar",
   "keywords",
   "prereqs",
+  "notebooks",
   "authors",
 ];
 

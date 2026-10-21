@@ -3,7 +3,7 @@ title: Cubic Spline Interpolation
 notebooks:
   - cubic-spline-interpolation
 dateCreated: 2026-08-11T05:00:40.584Z
-lastUpdatedOn: 2026-10-21T16:49:23.460Z
+lastUpdatedOn: 2026-10-21T18:07:46.871Z
 ---
 
 <CubicSplineDiagram />
@@ -80,6 +80,59 @@ h_{n-1}c_{n-1} + 2h_{n-1}c_n = 3f'(x_n) - \frac{3}{h_{n-1}}(a_n - a_{n-1}) \quad
 $$
 
 This system is also strictly diagonally dominant, so the clamped spline is unique. It needs $f'(x_0)$ and $f'(x_n)$ in addition to the node values.
+
+### Shortcut Form and Recipe
+
+#### Slope Form of the System
+
+Define the slope of each interval as the divided difference
+
+$$
+\delta_j = \frac{a_{j+1} - a_j}{h_j}, \quad j = 0, 1, \ldots, n-1
+$$
+
+The tridiagonal system then becomes
+
+$$
+h_{j-1}c_{j-1} + 2(h_{j-1} + h_j)c_j + h_j c_{j+1} = 3(\delta_j - \delta_{j-1}), \quad j = 1, \ldots, n-1
+$$
+
+The right-hand side is 3 times the jump in slope between adjacent intervals.
+
+#### Re-Deriving the Back-Substitution
+
+Curvature continuity gives $c_{j+1} = c_j + 3d_jh_j$, so
+
+$$
+d_j = \frac{c_{j+1} - c_j}{3h_j}
+$$
+
+Substitute this into value continuity, $a_{j+1} = a_j + b_jh_j + c_jh_j^2 + d_jh_j^3$, and divide by $h_j$
+
+$$
+\delta_j = b_j + \frac{h_j}{3}(2c_j + c_{j+1})
+$$
+
+which gives $b_j = \delta_j - \frac{h_j}{3}(2c_j + c_{j+1})$. Substituting both into slope continuity, $b_{j+1} = b_j + 2c_jh_j + 3d_jh_j^2$, and simplifying gives the tridiagonal system above.
+
+#### Solving Recipe
+
+1. Compute $h_j$, $a_j = f(x_j)$ and $\delta_j$ for every interval.
+2. Write the interior equations with right-hand side $3(\delta_j - \delta_{j-1})$.
+3. For a natural spline, add $c_0 = c_n = 0$.
+4. For a clamped spline, add the left end equation $2h_0c_0 + h_0c_1 = 3(\delta_0 - f'(x_0))$, which comes from $f'(x_0) = \delta_0 - \frac{h_0}{3}(2c_0 + c_1)$.
+5. For a clamped spline, add the right end equation $h_{n-1}c_{n-1} + 2h_{n-1}c_n = 3(f'(x_n) - \delta_{n-1})$, which comes from $f'(x_n) = \delta_{n-1} + \frac{h_{n-1}}{3}(c_{n-1} + 2c_n)$.
+6. Solve the system for the $c_j$ values by elimination, as in Example 2.
+7. Get $b_j = \delta_j - \frac{h_j}{3}(2c_j + c_{j+1})$ and $d_j = \frac{c_{j+1} - c_j}{3h_j}$.
+8. Write each $S_j$ in the form $a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3$.
+
+Each clamped boundary row follows the same pattern as an interior row: 3 times the gap between a chord slope and an endpoint derivative.
+
+#### Checking the Answer
+
+- Confirm $S_j(x_{j+1}) = a_{j+1}$ for every $j$.
+- Confirm $S_0'(x_0) = f'(x_0)$ for a clamped spline, or $S_0''(x_0) = 0$ for a natural spline, as Example 3 does.
+- In Python, `scipy.interpolate.CubicSpline(x, y, bc_type='natural')` gives the natural spline. For clamped, pass `bc_type=((1, fp0), (1, fpn))`. Its coefficients are stored highest power first, so reverse them before comparing with $a_j, b_j, c_j, d_j$.
 
 ## Worked Examples
 

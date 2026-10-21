@@ -22,7 +22,8 @@ export type RuleId =
   | "forward-link"
   | "math-block"
   | "proof-hint"
-  | "too-many-headings";
+  | "too-many-headings"
+  | "notebook-file";
 
 export interface Violation {
   rule: RuleId;

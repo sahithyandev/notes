@@ -173,11 +173,27 @@ A note must have at most 40 headings (`##` to `####`, named math blocks included
 
 Don't phrase a heading as "What Is X?" or "What Are X?". Use the bare noun phrase at the same level (`## Market`, not `## What Is a Market?`). Enforced by the `what-is-heading` rule (`src/integrations/notes-style-validator/rules/what-is-heading.ts`).
 
+### Wolfram notebooks
+
+A note can offer Wolfram notebooks (`.nb`) as downloads at the end of its body. The `.nb` files live in `public/notebooks/`, served verbatim at `/notebooks/<name>.nb`, and a note opts into one or more of them through the `notebooks` frontmatter field:
+
+```yaml
+notebooks:
+  - runge-kutta-midpoint
+  - runge-kutta-modified-euler
+```
+
+Each entry is a basename _without_ the `.nb` extension, matching a file in `public/notebooks/`. The page renders a minimal download link per notebook at the end of the note body, with the Mathematica mark (`src/components/note/note-notebooks.astro`, icon in `src/components/icons/mathematica-icon.astro`).
+
+`notebook-file` (`src/integrations/notes-style-validator/rules/notebook-file.ts`) enforces both directions: a listed notebook must exist on disk, and a notebook sitting in `public/notebooks/` must be listed by some note, so neither a typo nor a forgotten wiring ships a dead or unreachable download. The orphan half is corpus-wide, like `broken-link`.
+
+Add a new notebook by dropping the `.nb` file into `public/notebooks/` and listing its basename in the note's frontmatter, in the same change. The rule fails the build otherwise.
+
 ## Astro integrations
 
 `src/integrations/` has 2 custom Astro integrations, wired up in `astro.config.mjs`. They run on `bun dev` and `bun build`:
 
-- `notes-style-validator`: a single shared file scan enforcing 18 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`, `math-block`, `proof-hint`, `too-many-headings`. See the sections above and below. **The build fails on any violation.**
+- `notes-style-validator`: a single shared file scan enforcing 19 rules over `docs/`: `title-case`, `dash`, `math-delimiters`, `adjacent-note`, `adjacent-list`, `label-description`, `collapsed-label`, `prereq-scope`, `broken-link`, `filename`, `title-heading-duplicate`, `duplicate-heading`, `what-is-heading`, `submodule-numbering`, `forward-link`, `math-block`, `proof-hint`, `too-many-headings`, `notebook-file`. See the sections above and below. **The build fails on any violation.**
 - `module-redirects`: generates redirects from `docs/` structure; not a content validator, warns only about stale redirects during dev.
 
 `prereq-scope` and `broken-link` were originally separate integrations (`prereq-scope`, `link-validator`) and were folded into `notes-style-validator` since they're validation rules over the same corpus, just like the other 5. `broken-link` is the one rule that can't run per-file: it needs every file's slug and headings collected up front to know what a valid link target even is, so it runs as a corpus-wide pass (`rules/broken-link.ts`'s `checkBrokenLinks`) rather than through the per-file rule registry (`rules/index.ts`'s `runPerFileRules`). It's also redirect-aware — links to a slug that now 301-redirects (via `module-redirects`) aren't flagged, which is why `notes-style-validator`'s `index.ts` captures `astro:routes:resolved` before running the checks.
@@ -192,7 +208,7 @@ Don't run a full `bun build` just to check note style — it's slow (Vite, image
 bun run check-notes-style
 ```
 
-Same 18 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
+Same 19 rules, same redirect-awareness, same pass/fail semantics as the build (exits 1 on any violation), but scans `docs/` in isolation in well under a second. Use this after editing notes, and save `bun build` for when you actually need to verify the site renders.
 
 Scope the report with `--filter` when you're only working in one area — a semester (`s1`), a module (`s1/mathematics`), a submodule (`s1/mathematics/matrices`), or a single note by name (`diagonalization`). Numeric prefixes are optional either way; matching is case-insensitive and looks for the filter's segments anywhere in the path, not just as a root prefix:
 
@@ -212,7 +228,7 @@ It's wired into the content collection as `generateId` in `src/content.config.ts
 
 `images/` and `summary/` subdirectories are skipped.
 
-Frontmatter: `title` is required; `sidebar.label`, `dateCreated`, `lastUpdatedOn`, `keywords` are optional.
+Frontmatter: `title` is required; `sidebar.label`, `dateCreated`, `lastUpdatedOn`, `keywords`, `notebooks` are optional.
 
 Do not put notes from the same module in `prereqs`. The sidebar order / prev-next navigation already conveys ordering within a module, and sibling notes are assumed read. `prereqs` is only for dependencies on notes in _other_ modules. A prereq also cannot point into a _later_ semester than the note's own (e.g. an `s2` note cannot list an `s5` note as a prereq), since that material hasn't been studied yet; a prereq in the _same_ semester but a different module is fine, since modules within a semester are often studied concurrently. Both enforced by the `prereq-scope` rule (`src/integrations/notes-style-validator/rules/prereq-scope.ts`).
 

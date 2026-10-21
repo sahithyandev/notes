@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
 import matter from "gray-matter";
 import { maskFile, maskWholeLine } from "./mask.ts";
 import { slugFromDocsPath } from "../../utils/note-path.ts";
@@ -12,6 +12,12 @@ export interface ScannedHeading {
 }
 
 export interface ScannedPrereq {
+  value: string;
+  line: number;
+}
+
+/** A `notebooks` frontmatter entry: a .nb basename without the extension. */
+export interface ScannedNotebook {
   value: string;
   line: number;
 }
@@ -46,6 +52,9 @@ export interface ScannedFile {
   /** GitHub-style anchor slugs for every heading (h1-h6), for in-page/cross-note anchor checks. */
   headingSlugs: Set<string>;
   prereqs: ScannedPrereq[];
+  notebooks: ScannedNotebook[];
+  /** Absolute path of the directory holding the downloadable .nb files (public/notebooks/). */
+  notebookDir: string;
   links: ExtractedLink[];
 }
 
@@ -213,35 +222,35 @@ function extractHeadingSlugs(content: string): Set<string> {
   return slugs;
 }
 
-// Locates each prereq entry's line number (1-based) within the raw
-// frontmatter block, covering both the block-sequence form
-// (`prereqs:\n  - a\n  - b`) and the inline form (`prereqs: [a, b]`).
-function prereqLinesOf(raw: string, prereqs: string[]): ScannedPrereq[] {
+// Locates each entry's line number (1-based) within the raw frontmatter
+// block of a list-valued key, covering both the block-sequence form
+// (`key:\n  - a\n  - b`) and the inline form (`key: [a, b]`).
+function frontmatterListLinesOf(
+  raw: string,
+  key: string,
+  values: string[],
+): Array<{ value: string; line: number }> {
   const lines = raw.split("\n");
-  let prereqsLine = -1;
+  let keyLine = -1;
   for (let i = 0; i < lines.length; i++) {
     if (i > 0 && lines[i].trim() === "---") break;
-    if (/^prereqs:\s*/.test(lines[i])) {
-      prereqsLine = i;
+    if (new RegExp(`^${key}:\\s*`).test(lines[i])) {
+      keyLine = i;
       break;
     }
   }
-  if (prereqsLine === -1) {
-    return prereqs.map((value) => ({ value, line: 1 }));
+  if (keyLine === -1) {
+    return values.map((value) => ({ value, line: 1 }));
   }
 
-  // Inline form: `prereqs: [a, b]` — report the `prereqs:` line itself.
-  if (/^prereqs:\s*\[/.test(lines[prereqsLine])) {
-    return prereqs.map((value) => ({ value, line: prereqsLine + 1 }));
+  // Inline form: `key: [a, b]` — report the `key:` line itself.
+  if (new RegExp(`^${key}:\\s*\\[`).test(lines[keyLine])) {
+    return values.map((value) => ({ value, line: keyLine + 1 }));
   }
 
-  // Block-sequence form: find each `- <value>` line following `prereqs:`.
-  const remaining = new Map<string, number>();
-  for (const value of prereqs) {
-    if (!remaining.has(value)) remaining.set(value, 0);
-  }
-  const result: ScannedPrereq[] = [];
-  for (let i = prereqsLine + 1; i < lines.length; i++) {
+  // Block-sequence form: find each `- <value>` line following `key:`.
+  const result: Array<{ value: string; line: number }> = [];
+  for (let i = keyLine + 1; i < lines.length; i++) {
     const line = lines[i];
     if (line.trim() === "---") break;
     const m = /^\s*-\s*(.+?)\s*$/.exec(line);
@@ -250,16 +259,16 @@ function prereqLinesOf(raw: string, prereqs: string[]): ScannedPrereq[] {
       continue;
     }
     const value = m[1].replace(/^["']|["']$/g, "");
-    if (remaining.has(value)) {
+    if (values.includes(value)) {
       result.push({ value, line: i + 1 });
     }
   }
 
-  // Fall back to the `prereqs:` line for any entry not matched above
+  // Fall back to the `key:` line for any entry not matched above
   // (e.g. quoting quirks the regex above didn't anticipate).
   const found = new Set(result.map((r) => r.value));
-  for (const value of prereqs) {
-    if (!found.has(value)) result.push({ value, line: prereqsLine + 1 });
+  for (const value of values) {
+    if (!found.has(value)) result.push({ value, line: keyLine + 1 });
   }
 
   return result;
@@ -336,6 +345,10 @@ function extractLinks(content: string, lineOffset: number): ExtractedLink[] {
 }
 
 export function scanFiles(docsRoot: string): ScannedFile[] {
+  // The downloadable .nb files live in public/notebooks/, next to the docs
+  // tree rather than inside it.
+  const notebookDir = join(dirname(docsRoot), "public", "notebooks");
+
   return walkDocs(docsRoot).map((file) => {
     const raw = readFileSync(file, "utf-8");
     const { data, content } = matter(raw);
@@ -353,6 +366,10 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       ? data.prereqs.filter((p): p is string => typeof p === "string")
       : [];
 
+    const notebooks = Array.isArray(data.notebooks)
+      ? data.notebooks.filter((n): n is string => typeof n === "string")
+      : [];
+
     return {
       file,
       lines,
@@ -366,7 +383,9 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       headings: extractHeadings(content, fmLines),
       slug: slugFromDocsPath(relative(docsRoot, file)),
       headingSlugs: extractHeadingSlugs(content),
-      prereqs: prereqLinesOf(raw, prereqs),
+      prereqs: frontmatterListLinesOf(raw, "prereqs", prereqs),
+      notebooks: frontmatterListLinesOf(raw, "notebooks", notebooks),
+      notebookDir,
       links: extractLinks(content, fmLines),
     };
   });
