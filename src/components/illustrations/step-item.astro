@@ -1,0 +1,13 @@
+---
+// One step of a <StepByStep> walkthrough. The parent reads data-label for the
+// step bar and shows the step that is active.
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="step" data-label={label}>
+  <slot />
+</div>

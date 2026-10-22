@@ -1,0 +1,135 @@
+---
+// A stepped walkthrough of a hand-worked procedure. Each <StepItem> child is
+// one step: its label fills the step bar and its body (math and short text)
+// shows one step at a time under the shared StepNav. Every step shares one
+// grid cell, so the box keeps its height as the steps change.
+import Panel from "./primitives/panel.astro";
+import StepBar from "./primitives/step-bar.astro";
+import StepNav from "./primitives/step-nav.astro";
+
+interface Props {
+  caption?: string;
+}
+
+const { caption = "Step-by-step working" } = Astro.props;
+---
+
+<Panel
+  class="step-by-step"
+  caption={caption}
+  hideCaption
+  tabindex="0"
+  aria-roledescription="carousel"
+  aria-label={caption}
+  data-step-by-step
+>
+  <StepBar />
+
+  <div class="stack">
+    <slot />
+  </div>
+
+  <StepNav />
+</Panel>
+
+<style>
+  .stack {
+    display: grid;
+  }
+  .stack > :global(.step) {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+  }
+  .stack > :global(.step.active) {
+    opacity: 1;
+    visibility: visible;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stack > :global(.step) {
+      transition: none;
+    }
+  }
+</style>
+
+<noscript>
+  <style>
+    .step-by-step .stack {
+      display: block;
+    }
+    .step-by-step .stack > .step {
+      opacity: 1;
+      visibility: visible;
+      margin-top: 16px;
+    }
+    .step-by-step .foot {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { createDot } from "./lib/dots";
+
+  function initStepByStep(root: HTMLElement) {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
+    if (!steps.length) return;
+
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]")!;
+    const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+    const label = root.querySelector<HTMLElement>("[data-label]")!;
+    const current = root.querySelector<HTMLElement>("[data-current]")!;
+    const total = root.querySelector<HTMLElement>("[data-total]")!;
+    const dotWrap = root.querySelector<HTMLElement>(".dots")!;
+    const dotTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-dot-template]",
+    );
+    const live = root.querySelector<HTMLElement>(".live")!;
+
+    total.textContent = String(steps.length);
+
+    const dots = steps.map((s, idx) =>
+      createDot(
+        dotWrap,
+        dotTemplate,
+        s.dataset.label ?? `Step ${idx + 1}`,
+        () => show(idx),
+      ),
+    );
+
+    let i = 0;
+
+    function show(n: number) {
+      i = Math.max(0, Math.min(steps.length - 1, n));
+      steps.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      dots.forEach((d, idx) =>
+        d.setAttribute("aria-selected", idx === i ? "true" : "false"),
+      );
+      prev.disabled = i === 0;
+      next.disabled = i === steps.length - 1;
+      label.textContent = steps[i].dataset.label ?? "";
+      current.textContent = String(i + 1);
+      live.textContent = label.textContent;
+    }
+
+    prev.addEventListener("click", () => show(i - 1));
+    next.addEventListener("click", () => show(i + 1));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        show(i - 1);
+        e.preventDefault();
+      } else if (e.key === "ArrowRight") {
+        show(i + 1);
+        e.preventDefault();
+      }
+    });
+
+    show(0);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-step-by-step]")
+    .forEach((el) => initStepByStep(el));
+</script>

@@ -48,6 +48,8 @@ export { default as SequenceDiagram } from "./sequence-diagram.astro";
 export { default as SimplexStep } from "./simplex-step.astro";
 export { default as SphericalRegion } from "./spherical-region.astro";
 export { default as SphericalRegionGrid } from "./spherical-region-grid.astro";
+export { default as StepByStep } from "./step-by-step.astro";
+export { default as StepItem } from "./step-item.astro";
 export { default as StokesTheoremDiagram } from "./stokes-theorem-diagram.astro";
 export { default as SupplyCurveDiagram } from "./supply-curve-diagram.astro";
 export { default as TnbFrame } from "./tnb-frame.astro";
