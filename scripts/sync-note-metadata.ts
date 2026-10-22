@@ -232,6 +232,12 @@ export async function syncNoteMetadata(
         unknown
       >;
       delete sidebar.order;
+
+      // Remove sidebar.label if it duplicates the title (redundant)
+      if (sidebar.label === currentFrontMatter.title) {
+        delete sidebar.label;
+      }
+
       if (Object.keys(sidebar).length > 0) {
         currentFrontMatter.sidebar = sidebar;
       } else {
@@ -289,9 +295,11 @@ if (require.main === module) {
 
   // Check for --dry-run flag
   const dryRun = process.argv.includes("--dry-run");
-  const argsToProcess = dryRun
-    ? process.argv.slice(2, -1)
-    : process.argv.slice(2);
+  // When --dry-run is used: [bun, script.ts, --dry-run, file1, file2, ...]
+  // We need to skip the first 3 elements (bun, script.ts, --dry-run)
+  // When not used: [bun, script.ts, file1, file2, ...]
+  // We need to skip the first 2 elements (bun, script.ts)
+  const argsToProcess = dryRun ? process.argv.slice(3) : process.argv.slice(2);
 
   for (const changedFile of argsToProcess) {
     const changedDirectory = dirname(changedFile);
