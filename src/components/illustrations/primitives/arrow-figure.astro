@@ -1,0 +1,115 @@
+---
+// Figure shell for box-and-arrow diagrams (circular flow, sector loops, ...):
+// the sized <figure>, the <svg> with its <title>, the arrowhead markers, and
+// the shared arrow / caption colouring. The default slot receives the SVG
+// content (boxes, paths); the `caption` slot receives the figcaption content.
+//
+// Colour is chosen with a tone class on any element: `tone-s5`, `tone-ct`,
+// `tone-pt`, `tone-key`. A `.arrow` path strokes in its tone, and a caption
+// `<span>` with the same class takes that tone too. Each tone has a matching
+// arrowhead marker, referenced as `url(#${uid}-<tone>)` (e.g. `-pt`, `-key`).
+//
+// `uid` comes from makeUid in the consuming diagram, so the marker ids are
+// known there. A caption is required by type (see lib/caption.ts).
+import ArrowMarker from "./arrow-marker.astro";
+import { assertCaption, type CaptionProps } from "../lib/caption";
+
+type Props = CaptionProps & {
+  uid: string;
+  title: string;
+  // Longer description, exposed to assistive tech alongside the title.
+  desc?: string;
+  viewBox: string;
+  // Caps the figure width; defaults to the viewBox width.
+  maxWidth?: number;
+};
+
+const {
+  uid,
+  title,
+  desc,
+  viewBox,
+  maxWidth: maxWidthProp,
+  caption,
+  captionSlot: _captionSlot,
+} = Astro.props;
+
+assertCaption("ArrowFigure", caption, Astro.slots.has("caption"));
+
+const maxWidth = maxWidthProp ?? Number(viewBox.split(/\s+/)[2]);
+const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
+---
+
+<figure class="arrow-figure" style={`max-width: ${maxWidth}px`}>
+  <svg
+    viewBox={viewBox}
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby={labelledBy}
+  >
+    <title id={`${uid}-title`}>{title}</title>
+    {desc && <desc id={`${uid}-desc`}>{desc}</desc>}
+
+    <defs>
+      <ArrowMarker id={`${uid}-s5`} fill="var(--s5)" />
+      <ArrowMarker id={`${uid}-ct`} fill="var(--dia-ct)" />
+      <ArrowMarker id={`${uid}-pt`} fill="var(--dia-pt)" />
+      <ArrowMarker id={`${uid}-key`} fill="var(--dia-key)" />
+    </defs>
+
+    <slot />
+  </svg>
+  <figcaption>
+    {caption}
+    <slot name="caption" />
+  </figcaption>
+</figure>
+
+<style>
+  .arrow-figure {
+    margin: 24px auto;
+  }
+
+  .arrow-figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .arrow-figure :global(.tone-s5) {
+    --tone: var(--s5);
+  }
+
+  .arrow-figure :global(.tone-ct) {
+    --tone: var(--dia-ct);
+  }
+
+  .arrow-figure :global(.tone-pt) {
+    --tone: var(--dia-pt);
+  }
+
+  .arrow-figure :global(.tone-key) {
+    --tone: var(--dia-key);
+  }
+
+  .arrow-figure :global(.arrow) {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .arrow-figure figcaption {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .arrow-figure figcaption :global([class*="tone-"]) {
+    font-weight: 600;
+    color: var(--tone);
+  }
+</style>
