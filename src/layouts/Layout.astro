@@ -217,6 +217,10 @@ if (keywords && keywords.length > 0) {
           if (localStorage.getItem("sn-study-mode") === "1") {
             root.classList.add("study-mode");
           }
+          var zoom = parseFloat(localStorage.getItem("sn-study-zoom"));
+          if (zoom >= 1 && zoom <= 1.6) {
+            root.style.setProperty("--study-scale", zoom);
+          }
           mql.addEventListener("change", function (e) {
             if (root.dataset.themePref === "auto") {
               root.setAttribute("data-theme", e.matches ? "dark" : "light");

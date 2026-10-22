@@ -27,7 +27,7 @@ import AiLinks from "../components/note/ai-links.astro";
 import NoteNotebooks from "../components/note/note-notebooks.astro";
 import MenuIcon from "../components/icons/menu-icon.astro";
 import TocIcon from "../components/icons/toc-icon.astro";
-import { Maximize2 } from "@lucide/astro";
+import { Maximize2, ZoomIn, ZoomOut } from "@lucide/astro";
 import NoteNav from "../components/note/note-nav.astro";
 import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
@@ -136,6 +136,27 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     >
       <MenuIcon />
     </button>
+    <div slot="nav-tools" class="study-zoom">
+      <button
+        id="study-zoom-out"
+        type="button"
+        title="Zoom out"
+        aria-label="Zoom out"
+      >
+        <ZoomOut size={15} />
+      </button>
+      <span id="study-zoom-level" class="study-zoom-level" aria-live="polite">
+        120%
+      </span>
+      <button
+        id="study-zoom-in"
+        type="button"
+        title="Zoom in"
+        aria-label="Zoom in"
+      >
+        <ZoomIn size={15} />
+      </button>
+    </div>
     <button
       slot="nav-tools"
       id="study-toggle"
@@ -232,6 +253,9 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
   <script>
     import "../scripts/drawers";
+  </script>
+  <script>
+    import "../scripts/study-zoom";
   </script>
   <script>
     import "../scripts/scroll-restoration";
@@ -488,6 +512,55 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       background 0.12s,
       color 0.12s,
       border-color 0.12s;
+  }
+
+  .study-zoom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 0;
+    margin-right: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+
+  :global(html.drawers-ready) .study-zoom {
+    transition:
+      max-width var(--study-dur) ease-in-out,
+      margin-right var(--study-dur) ease-in-out,
+      opacity var(--study-dur) ease-in-out,
+      visibility 0s var(--study-dur);
+  }
+
+  :global(html.study-mode) .study-zoom {
+    max-width: 200px;
+    margin-right: 6px;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  :global(html.drawers-ready.study-mode) .study-zoom {
+    transition:
+      max-width var(--study-dur) ease-in-out,
+      margin-right var(--study-dur) ease-in-out,
+      opacity var(--study-dur) ease-in-out,
+      visibility 0s;
+  }
+
+  .study-zoom button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .study-zoom-level {
+    min-width: 3.25em;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--text-secondary);
   }
 
   .nav-drawer-btn:hover,
