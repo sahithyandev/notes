@@ -3,60 +3,55 @@ title: Government Intervention
 authors:
   - nalina
 dateCreated: 2026-09-21T00:00:00.000Z
-lastUpdatedOn: 2026-10-22T12:28:45.590Z
+lastUpdatedOn: 2026-10-22T17:53:01.068Z
 ---
 
 Government intervention is action taken by the state to influence market outcomes and resource allocation, overriding the free interaction of supply and demand.
-
-The main forms of government intervention discussed are:
-
-- Taxation
-- Subsidies
-- Price controls
 
 ## Taxation
 
 An indirect tax increases production costs and shifts the supply curve
 upward by the amount of the tax.
 
-### Tax with Elastic Demand
+The tax burden splits between consumers and producers based on
+relative price elasticities.
 
-When demand is elastic:
+<Formula>
+
+$$
+\begin{aligned}
+\text{Consumer burden} &= \frac{E_s}{E_d + E_s} \times \text{tax} \\
+\text{Producer burden} &= \frac{E_d}{E_d + E_s} \times \text{tax}
+\end{aligned}
+$$
+
+</Formula>
+
+Here:
+
+- $E_d$  
+  Price elasticity of demand (absolute value).
+- $E_s$  
+  Price elasticity of supply.
+
+When demand is more elastic ($E_d > E_s$):
 
 - Quantity demanded falls significantly.
 - Government tax revenue is relatively lower.
 - Producers bear a larger share of the tax burden.
 - Consumers bear a smaller share of the tax burden.
 
-### Tax with Inelastic Demand
-
-When demand is inelastic:
-
-- Quantity demanded falls only slightly.
-- Government tax revenue is relatively higher.
-- Consumers bear a larger share of the tax burden.
-- Producers bear a smaller share of the tax burden.
-
 ## Subsidies
 
-A subsidy reduces the per-unit cost of production and shifts the
-supply curve downward.
+A subsidy is a government payment to producers (or consumers) that lowers the per-unit cost of production or the effective price paid. It shifts the supply curve downward (or to the right) by the amount of the subsidy. With a per-unit subsidy $s$, producers receive $P_p = P_c + s$ where $P_c$ is the price consumers pay.
 
-### Subsidy with Elastic Demand
+The subsidy benefit splits between consumers and producers based on relative price elasticities.
 
-When demand is elastic:
+When demand is more elastic ($E_d > E_s$):
 
 - Quantity demanded increases significantly.
 - Producers receive a larger share of the subsidy benefit.
 - Consumers receive a smaller share through a lower price.
-
-### Subsidy with Inelastic Demand
-
-When demand is inelastic:
-
-- Quantity demanded changes only slightly.
-- Consumers receive a larger share of the subsidy benefit.
-- Producers receive a smaller share of the benefit.
 
 ## Price Controls
 
@@ -64,9 +59,7 @@ Price controls are government restrictions on market prices.
 
 ### Price Floor
 
-A price floor is a **minimum price set above the equilibrium price**.
-
-Its purpose is to protect producers.
+A minimum price set above the equilibrium price. To protect producers.
 
 Examples:
 
@@ -78,17 +71,12 @@ Effects:
 - Price is kept above equilibrium.
 - Quantity supplied increases.
 - Quantity demanded decreases.
-- A **surplus** is created.
-
-$$
-Q_s > Q_d
-$$
+- A surplus is created.  
+  $Q_s > Q_d$
 
 ### Price Ceiling
 
-A price ceiling is a **maximum price set below the equilibrium price**.
-
-Its purpose is to protect consumers from high prices.
+A maximum price set below the equilibrium price. To protect consumers from high prices.
 
 Examples:
 
@@ -100,17 +88,346 @@ Effects:
 - Price is kept below equilibrium.
 - Quantity demanded increases.
 - Quantity supplied decreases.
-- A **shortage** is created.
+- A shortage is created.  
+  $ Q_d > Q_s $
+
+At a price ceiling, only $Q_s$ units are traded. The demand price $P_d$ is the highest price consumers are willing to pay for $Q_s$, read off the demand curve at that quantity.
+
+<Definition name="Deadweight Loss">
+
+The loss of total surplus from mutually beneficial trades that no longer take place. Under a price ceiling it is the triangle between the supply and demand curves, from $Q_s$ to $Q^*$:
 
 $$
-Q_d > Q_s
+\text{DWL} = \frac{1}{2} \times (Q^* - Q_s) \times (P_d - P_c)
 $$
 
-## Summary
+</Definition>
 
-| Intervention      | Elastic Demand                                  | Inelastic Demand                                |
-| ----------------- | ----------------------------------------------- | ----------------------------------------------- |
-| **Indirect Tax**  | Producers bear a larger share of the burden     | Consumers bear a larger share of the burden     |
-| **Subsidy**       | Producers receive a larger share of the benefit | Consumers receive a larger share of the benefit |
-| **Price Floor**   | Creates a surplus                               | Creates a surplus                               |
-| **Price Ceiling** | Creates a shortage                              | Creates a shortage                              |
+## Worked Examples
+
+### Taxation Example
+
+Market for cigarettes. Demand: $Q_d = 100 - 2P$. Supply: $Q_s = 20 + 3P$.
+Per-unit tax: $t = 10$.
+
+Find the equilibrium price and quantity before and after the tax, and how the tax burden splits between consumers and producers.
+
+<Solution>
+
+<StepByStep>
+
+<StepItem label="Equilibrium before tax">
+
+$$
+100 - 2P = 20 + 3P \implies 5P = 80 \implies P^* = 16,\quad Q^* = 68
+$$
+
+</StepItem>
+
+<StepItem label="Supply with tax">
+
+$$
+Q_s = 20 + 3(P - 10) = 3P - 10
+$$
+
+</StepItem>
+
+<StepItem label="New equilibrium">
+
+$$
+100 - 2P = 3P - 10 \implies 5P = 110 \implies P_c = 22
+$$
+
+Producer price: $P_p = P_c - t = 12$.
+
+Quantity: $Q = 100 - 2(22) = 56$.
+
+</StepItem>
+
+<StepItem label="Burden per unit">
+
+- Consumer burden  
+  $P_c - P^* = 22 - 16 = 6$.
+- Producer burden  
+  $P^* - P_p = 16 - 12 = 4$.
+
+</StepItem>
+
+<StepItem label="Elasticities at equilibrium">
+
+At equilibrium:
+
+$$
+\begin{aligned}
+E_d &= \left| \frac{dQ_d}{dP} \frac{P}{Q} \right| = 2 \cdot \frac{16}{68} \approx 0.47 \\
+E_s &= \frac{dQ_s}{dP} \frac{P}{Q} = 3 \cdot \frac{16}{68} \approx 0.71
+\end{aligned}
+$$
+
+</StepItem>
+
+<StepItem label="Verify burden split">
+
+Consumer share $= \frac{0.71}{0.47 + 0.71} \times 10 \approx 6$. Producer share $\approx 4$.
+
+Matches. Demand is inelastic relative to supply, so consumers bear more.
+
+</StepItem>
+
+</StepByStep>
+
+</Solution>
+
+### Subsidy Example: Elastic Demand
+
+Market for electric vehicles. Demand: $Q_d = 200 - 5P$. Supply: $Q_s = 50 + 2P$.
+Per-unit subsidy: $s = 20$.
+
+Find the equilibrium price and quantity before and after the subsidy, and how the subsidy benefit splits between consumers and producers.
+
+<Solution>
+
+<StepByStep>
+
+<StepItem label="Equilibrium before subsidy">
+
+$$
+200 - 5P = 50 + 2P \implies 7P = 150 \implies P^* = \frac{150}{7} \approx 21.43,\quad Q^* = \frac{700}{7} = 100
+$$
+
+</StepItem>
+
+<StepItem label="Supply with subsidy">
+
+$$
+Q_s = 50 + 2(P + 20) = 2P + 90
+$$
+
+</StepItem>
+
+<StepItem label="New equilibrium">
+
+$$
+200 - 5P = 2P + 90 \implies 7P = 110 \implies P_c = \frac{110}{7} \approx 15.71
+$$
+
+Producer price: $P_p = P_c + s = \frac{110}{7} + 20 = \frac{250}{7} \approx 35.71$.
+
+Quantity: $Q = 200 - 5(\frac{110}{7}) = \frac{850}{7} \approx 121.43$.
+
+</StepItem>
+
+<StepItem label="Benefit per unit">
+
+- Consumer benefit  
+  $P^* - P_c = \frac{150}{7} - \frac{110}{7} = \frac{40}{7} \approx 5.71$.
+- Producer benefit  
+  $P_p - P^* = \frac{250}{7} - \frac{150}{7} = \frac{100}{7} \approx 14.29$.
+
+</StepItem>
+
+<StepItem label="Verify with formula">
+
+At original equilibrium:
+
+$$
+E_d = \left| \frac{dQ_d}{dP} \frac{P}{Q} \right| = 5 \cdot \frac{150/7}{100} = \frac{750}{700} \approx 1.07
+$$
+
+$$
+E_s = \frac{dQ_s}{dP} \frac{P}{Q} = 2 \cdot \frac{150/7}{100} = \frac{300}{700} \approx 0.43
+$$
+
+Consumer share $= \frac{0.43}{1.07 + 0.43} \times 20 \approx 5.71$. Producer share $\approx 14.29$.
+
+Matches. Demand is elastic relative to supply, so producers receive more.
+
+</StepItem>
+
+</StepByStep>
+
+</Solution>
+
+### Subsidy Example: Inelastic Demand
+
+Market for insulin. Demand: $Q_d = 100 - P$. Supply: $Q_s = 20 + 4P$.
+Per-unit subsidy: $s = 10$.
+
+Find the equilibrium price and quantity before and after the subsidy, and how the subsidy benefit splits between consumers and producers.
+
+<Solution>
+
+<StepByStep>
+
+<StepItem label="Equilibrium before subsidy">
+
+$$
+100 - P = 20 + 4P \implies 5P = 80 \implies P^* = 16,\quad Q^* = 84
+$$
+
+</StepItem>
+
+<StepItem label="Supply with subsidy">
+
+$$
+Q_s = 20 + 4(P + 10) = 4P + 60
+$$
+
+</StepItem>
+
+<StepItem label="New equilibrium">
+
+$$
+100 - P = 4P + 60 \implies 5P = 40 \implies P_c = 8
+$$
+
+Producer price: $P_p = P_c + s = 18$.
+
+Quantity: $Q = 100 - 8 = 92$.
+
+</StepItem>
+
+<StepItem label="Benefit per unit">
+
+- Consumer benefit  
+  $P^* - P_c = 16 - 8 = 8$.
+- Producer benefit  
+  $P_p - P^* = 18 - 16 = 2$.
+
+</StepItem>
+
+<StepItem label="Verify with formula">
+
+At original equilibrium:
+
+$$
+E_d = \left| \frac{dQ_d}{dP} \frac{P}{Q} \right| = 1 \cdot \frac{16}{84} \approx 0.19
+$$
+
+$$
+E_s = \frac{dQ_s}{dP} \frac{P}{Q} = 4 \cdot \frac{16}{84} \approx 0.76
+$$
+
+Consumer share $= \frac{0.76}{0.19 + 0.76} \times 10 \approx 8$. Producer share $\approx 2$.
+
+Matches. Demand is inelastic relative to supply, so consumers receive more.
+
+</StepItem>
+
+</StepByStep>
+
+</Solution>
+
+### Price Floor Example
+
+Market for wheat. Demand: $Q_d = 100 - 2P$. Supply: $Q_s = 20 + 3P$.
+Price floor: $P_f = 25$ (above equilibrium).
+
+Find the quantity demanded and quantity supplied at the floor, the resulting surplus, and the cost to the government of buying the surplus.
+
+<Solution>
+
+<StepByStep>
+
+<StepItem label="Equilibrium without floor">
+
+$$
+100 - 2P = 20 + 3P \implies 5P = 80 \implies P^* = 16,\quad Q^* = 68
+$$
+
+</StepItem>
+
+<StepItem label="Quantity demanded at floor price">
+
+$$
+Q_d = 100 - 2(25) = 50
+$$
+
+</StepItem>
+
+<StepItem label="Quantity supplied at floor price">
+
+$$
+Q_s = 20 + 3(25) = 95
+$$
+
+</StepItem>
+
+<StepItem label="Surplus">
+
+$$
+\text{Surplus} = Q_s - Q_d = 95 - 50 = 45 \text{ units}
+$$
+
+</StepItem>
+
+<StepItem label="Government cost (if buying surplus)">
+
+$$
+\text{Cost} = \text{Surplus} \times P_f = 45 \times 25 = 1125
+$$
+
+</StepItem>
+
+</StepByStep>
+
+</Solution>
+
+### Price Ceiling Example
+
+Market for rental housing. Demand: $Q_d = 200 - 4P$. Supply: $Q_s = 20 + 2P$.
+Price ceiling: $P_c = 20$ (below equilibrium).
+
+Find the equilibrium without the ceiling, the quantity demanded and quantity supplied at the ceiling, the resulting shortage, and the deadweight loss.
+
+<Solution>
+
+<StepByStep>
+
+<StepItem label="Equilibrium without ceiling">
+
+$$
+200 - 4P = 20 + 2P \implies 6P = 180 \implies P^* = 30,\quad Q^* = 80
+$$
+
+</StepItem>
+
+<StepItem label="Quantity demanded at ceiling price">
+
+$$
+Q_d = 200 - 4(20) = 120
+$$
+
+</StepItem>
+
+<StepItem label="Quantity supplied at ceiling price">
+
+$$
+Q_s = 20 + 2(20) = 60
+$$
+
+</StepItem>
+
+<StepItem label="Shortage">
+
+$$
+\text{Shortage} = Q_d - Q_s = 120 - 60 = 60 \text{ units}
+$$
+
+</StepItem>
+
+<StepItem label="Deadweight loss">
+
+DWL $= \frac{1}{2} \times (Q^* - Q_s) \times (P_d - P_c)$ where $P_d$ is demand price at $Q_s$:
+
+$$
+P_d = \frac{200 - 60}{4} = 35
+$$
+
+DWL $= \frac{1}{2} \times (80 - 60) \times (35 - 20) = 150$
+
+</StepItem>
+
+</StepByStep>
+
+</Solution>

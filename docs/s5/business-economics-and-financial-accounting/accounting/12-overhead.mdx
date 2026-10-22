@@ -1,7 +1,7 @@
 ---
 title: Overhead
 dateCreated: 2026-08-18T07:03:53.000Z
-lastUpdatedOn: 2026-10-19T12:09:01.747Z
+lastUpdatedOn: 2026-10-22T17:53:00.886Z
 ---
 
 Total cost of indirect materials, indirect labour, and indirect expenses.
@@ -234,3 +234,62 @@ Further rounds converge these towards the Simultaneous Equation Method's result.
   Weight and distance.
 - Inspection  
   Inspection hours devoted to each department.
+
+## Reciprocal Method Worked Example
+
+Using the overheads and percentages from the Reciprocal Method section, find the total overhead of $P_1$ and $P_2$ after reapportionment by the Simultaneous Equation Method.
+
+<Solution>
+
+Let $S_1$ and $S_2$ be the total overhead of each service department after receiving the share of the other.
+
+$$
+\begin{aligned}
+S_1 &= 4000 + 0.20 S_2 \\
+S_2 &= 2000 + 0.10 S_1
+\end{aligned}
+$$
+
+Substitute the second equation into the first:
+
+$$
+\begin{array}{rcl}
+S_1 & = & 4000 + 0.20 (2000 + 0.10 S_1) \\
+S_1 & = & 4400 + 0.02 S_1 \\
+0.98 S_1 & = & 4400 \\
+S_1 & = & 4489.80
+\end{array}
+$$
+
+Substitute $S_1$ back into the second equation:
+
+$$
+S_2 = 2000 + 0.10 \times 4489.80 = 2448.98
+$$
+
+The share of each service department going to the other service department is already included in its solved total. Only the production department shares are apportioned.
+
+$S_1$ apportioned to $P_1$ and $P_2$ at 60% and 30%:
+
+$$
+P_1 = 4489.80 \times 0.60 = 2693.88, \qquad P_2 = 4489.80 \times 0.30 = 1346.94
+$$
+
+$S_2$ apportioned to $P_1$ and $P_2$ at 40% and 40%:
+
+$$
+P_1 = 2448.98 \times 0.40 = 979.59, \qquad P_2 = 2448.98 \times 0.40 = 979.59
+$$
+
+Total overhead after reapportionment:
+
+$$
+\begin{array}{rcl}
+P_1 & = & 10000 + 2693.88 + 979.59 = 13673.47 \\
+P_2 & = & 8000 + 1346.94 + 979.59 = 10326.53
+\end{array}
+$$
+
+The total of $P_1$ and $P_2$ is $24000$, equal to all the overhead before reapportionment ($10000 + 8000 + 4000 + 2000$).
+
+</Solution>

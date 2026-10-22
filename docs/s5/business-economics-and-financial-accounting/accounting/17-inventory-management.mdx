@@ -1,7 +1,7 @@
 ---
 title: Inventory Management
 dateCreated: 2026-08-31T07:54:07.767Z
-lastUpdatedOn: 2026-09-29T18:39:07.920Z
+lastUpdatedOn: 2026-10-22T17:53:00.942Z
 ---
 
 Inventory is the stock of any item or resource used in an organization: raw materials, work-in-process, finished products.
@@ -142,3 +142,43 @@ Disadvantages:
   Issues are priced at the cost of the oldest stock on hand.
 - WAC  
   Weighted average cost. Issues are priced at the average cost of all stock on hand, recomputed after each purchase.
+
+## Worked Example
+
+A store has annual demand $D = 7500$ units over 300 working days, ordering cost $C_o = 50$ per order and holding cost $C_h = 3$ per unit per year. Daily consumption ranges from $20$ to $30$ units, averaging $25$ units. Lead time ranges from $2$ to $6$ days, averaging $4$ days.
+
+Find the economic order quantity, the number of orders per year, and the re-order, maximum and minimum stock levels.
+
+<Solution>
+
+Economic order quantity:
+
+$$
+Q = \sqrt{\frac{2 \times 7500 \times 50}{3}} = \sqrt{250000} = 500
+$$
+
+Number of orders per year:
+
+$$
+\frac{D}{Q} = \frac{7500}{500} = 15
+$$
+
+Re-order level, using the maximum consumption rate and maximum lead time:
+
+$$
+R = 30 \times 6 = 180
+$$
+
+Maximum stock level, using the minimum consumption rate and minimum lead time:
+
+$$
+M = 180 + 500 - (20 \times 2) = 640
+$$
+
+Minimum stock level, using the average consumption rate and average lead time:
+
+$$
+S = 180 - (25 \times 4) = 80
+$$
+
+</Solution>
