@@ -358,6 +358,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     }
   }
 
+  :global(html.study-mode) .note-body {
+    padding-bottom: calc(8 * var(--spacing));
+  }
+
   /* ── MAIN ─────────────────────────────────────────────────────── */
   .main {
     flex: 1;
@@ -518,7 +522,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     display: flex;
     align-items: center;
     gap: 4px;
-    max-width: 0;
     margin-right: 0;
     opacity: 0;
     overflow: hidden;
