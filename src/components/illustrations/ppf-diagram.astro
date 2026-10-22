@@ -66,24 +66,21 @@ import AxesFigure from "./primitives/axes-figure.astro";
     C
   </text>
 
-  <text class="description tone-pt" x="220" y="410" text-anchor="middle">
-    A = Efficient
-  </text>
-  <text class="description tone-key" x="350" y="410" text-anchor="middle">
-    B = Inefficient
-  </text>
-  <text class="description tone-ct" x="480" y="410" text-anchor="end">
-    C = Unattainable
-  </text>
-
   <Fragment slot="caption">
-    <span class="tone-pt">A</span> on the frontier, efficient.
-    <span class="tone-key">B</span> inside the frontier, inefficient.
-    <span class="tone-ct">C</span> outside the frontier, unattainable.
+    <p>
+      <span class="tone-pt">A</span> on the frontier,{" "}
+      <span class="tone-pt">efficient</span>. <span class="tone-key">B</span>{" "}
+      inside the frontier, <span class="tone-key">inefficient</span>.
+      <span class="tone-ct">C</span> outside the frontier,{" "}
+      <span class="tone-ct">unattainable</span>.
+    </p>
   </Fragment>
 </AxesFigure>
 
 <style>
+  p {
+    text-balance: pretty;
+  }
   .origin {
     fill: var(--text-muted);
     font-size: 13px;
