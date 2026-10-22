@@ -1,0 +1,76 @@
+---
+// Static producer surplus diagram: linear demand and supply curves meeting at
+// the equilibrium point, with the producer surplus triangle shaded between the
+// supply curve and the equilibrium price.
+import AxesFigure from "./primitives/axes-figure.astro";
+---
+
+<AxesFigure
+  captionSlot
+  title="Producer Surplus"
+  desc="Linear demand and supply curves meet at the equilibrium point. The triangle between the supply curve and the equilibrium price, from the minimum price up to the equilibrium price, is the producer surplus."
+  yLabel="Price"
+  xLabel="Quantity"
+>
+  <path class="region tone-ct" d="M 50 230 L 50 150 L 220 150 Z"></path>
+
+  <path class="curve tone-s5" d="M 50 40 L 370 247"></path>
+  <path class="curve tone-ct" d="M 50 230 L 370 79"></path>
+
+  <line class="guide" x1="220" y1="150" x2="50" y2="150"></line>
+  <line class="guide" x1="220" y1="150" x2="220" y2="290"></line>
+
+  <circle class="pt tone-pt" cx="220" cy="150" r="5"></circle>
+
+  <text class="axis-tick" x="42" y="234" text-anchor="end">
+    P
+    <tspan dy="4" font-size="9">
+      min
+    </tspan>
+  </text>
+  <text class="axis-tick" x="42" y="154" text-anchor="end">
+    P
+    <tspan dy="4" font-size="9">
+      *
+    </tspan>
+  </text>
+  <text class="axis-tick" x="220" y="305" text-anchor="middle">
+    Q
+    <tspan dy="4" font-size="9">
+      *
+    </tspan>
+  </text>
+
+  <text class="region-label tone-ct" x="110" y="182">
+    PS
+  </text>
+
+  <text class="curve-label tone-s5" x="378" y="252">
+    D
+  </text>
+  <text class="curve-label tone-ct" x="378" y="84">
+    S
+  </text>
+  <text class="pt-label tone-pt" x="226" y="140">
+    E
+  </text>
+
+  <Fragment slot="caption">
+    <span class="tone-ct">Producer surplus</span> is the shaded triangle between
+    the supply curve <span class="tone-ct">S</span> and the equilibrium price,
+    from the minimum price up to <span class="tone-pt">E</span>.
+  </Fragment>
+</AxesFigure>
+
+<style>
+  .region {
+    fill: var(--tone);
+    opacity: 0.15;
+  }
+
+  .region-label {
+    fill: var(--tone);
+    font-size: 13px;
+    font-weight: 600;
+  }
+</style>

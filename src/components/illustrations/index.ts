@@ -60,12 +60,14 @@ export { default as TreePropertiesProofs } from "./tree-properties-proofs.astro"
 export { default as UrlBreakdown } from "./url-breakdown.astro";
 export { default as Walkthrough } from "./walkthrough.astro";
 export { default as WalksVennDiagram } from "./walks-venn-diagram.astro";
+export { default as ProducerSurplusDiagram } from "./producer-surplus-diagram.astro";
 export { default as ProductionFunctionDiagram } from "./production-function-diagram.astro";
 export { default as TPAPMPDiagram } from "./tp-ap-mp-diagram.astro";
 export { default as StagesOfProductionDiagram } from "./stages-of-production-diagram.astro";
 export { default as OptimalInputDiagram } from "./optimal-input-diagram.astro";
 export { default as OverheadDistributionTable } from "./overhead-distribution-table.astro";
 export { default as IsoquantDiagram } from "./isoquant-diagram.astro";
+export { default as ConsumerSurplusDiagram } from "./consumer-surplus-diagram.astro";
 export { default as ConvexIsoquantDiagram } from "./convex-isoquant-diagram.astro";
 export { default as PerfectSubstitutesDiagram } from "./perfect-substitutes-diagram.astro";
 export { default as PerfectComplementsDiagram } from "./perfect-complements-diagram.astro";
