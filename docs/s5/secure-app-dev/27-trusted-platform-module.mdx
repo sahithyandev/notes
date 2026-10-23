@@ -1,7 +1,7 @@
 ---
 title: Trusted Platform Module
 dateCreated: 2026-09-30T15:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:26.412Z
+lastUpdatedOn: 2026-10-23T13:55:25.886Z
 ---
 
 <Aka>TPM</Aka>. A tamper-resistant cryptographic coprocessor on the motherboard.
@@ -21,12 +21,27 @@ a platform.
 - Storage root key  
   Wraps other keys, so keys can be stored outside the TPM while remaining protected by it.
 
-## PCR Extend
+## Platform Configuration Registers
+
+A PCR is a separate register, identified by its index. Each PCR holds 1 hash-sized value, 32 bytes with SHA-256.
+
+The [TPM 2.0 specification](https://www.trustedcomputinggroup.org/resources/documents/tpm-library-specification) requires at least 24 PCRs, indexed 0 to 23. Many chips keep a separate bank for each hash algorithm, such as SHA-1 and SHA-256.
+
+The index ranges are assigned as follows:
+
+- PCRs 0 to 7  
+  Reserved for firmware and boot components by the PC Client platform specification. PCR 0 holds firmware code, PCR 4 the boot manager, and PCR 7 the Secure Boot policy.
+- PCRs 8 to 15  
+  Assigned by the bootloader and operating system, so the use of each register varies between systems.
+- PCRs 16 to 23  
+  PCR 16 is for debugging, PCRs 17 to 22 for a dynamic root of trust, and PCR 23 for applications.
+
+### PCR Extend
 
 A PCR can only be updated by combining its current value with a new measurement.
 
 $$
-PCR_{new} = H(PCR_{old} \parallel m)
+PCR_{\text{new}} = H(PCR_{\text{old}} \parallel m)
 $$
 
 Here:
@@ -41,23 +56,17 @@ The final value depends on every measurement and their order. A PCR cannot be se
 
 ## Establishing the Chain of Trust
 
-Measured boot uses the TPM to record each link of the chain.
+[Measured boot](/s5/secure-app-dev/chain-of-trust#measured-boot) uses the TPM to record each link of the chain.
 
-```
-Boot ROM (core root of trust for measurement)
-   │ measures UEFI firmware      → extends PCR 0
-   ▼
-UEFI firmware
-   │ measures bootloader         → extends PCR 4
-   ▼
-Bootloader
-   │ measures kernel, initramfs  → extends PCR 8, 9
-   ▼
-Kernel
-   │ measures applications       → extends PCR 10
-   ▼
-Applications
-```
+<ChainOfTrustDiagram mode="measure" />
+
+Each link extends the PCR of the component it measures. The numbers below assume a Linux system booted with GRUB. PCRs 0 and 4 follow the PC Client specification. PCRs 8 to 10 are conventions used by GRUB and IMA, and other bootloaders or operating systems may use different PCRs.
+
+- UEFI firmware, measured by the Boot ROM, extends PCR 0.
+- Bootloader, measured by UEFI firmware, extends PCR 4.
+- Kernel and initramfs, measured by the bootloader, extend PCRs 8 and 9.
+- Kernel modules and init, measured by the kernel through IMA, extend PCR 10.
+- Applications, measured by the kernel, extend PCR 10.
 
 Each component measures the next before executing it. A modified component produces a different PCR value.
 
@@ -99,7 +108,7 @@ Developers should:
   Send a signed quote with a fresh nonce before a server releases sensitive data.
 - Use monotonic counters  
   Prevent rollback to an older, vulnerable version of the application or its data.
-- Use the TPM random number generator
+- Use the TPM random number generator  
   For keys and nonces.
 - Reseal after legitimate updates  
   A software update changes the PCR values and would otherwise lock the application out of its own secrets.

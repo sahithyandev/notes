@@ -1,0 +1,208 @@
+---
+// Static chain of trust diagram: each stage verifies the next before passing
+// control to it. The stages sit on a 3 x 2 grid read as a snake: left to right
+// on the top row, then right to left on the bottom row, so every link is a
+// short arrow. The root of trust is trusted without verification, so it uses
+// the key colour (tone-key); every verify link uses the verified colour (tone-pt).
+//
+// `mode="measure"` shows measured boot instead: each arrow is a measurement, and
+// each box shows the PCR that the measurement of that stage is extended into.
+import ArrowFigure from "./primitives/arrow-figure.astro";
+import { makeUid } from "./lib/uid";
+
+interface Props {
+  mode?: "verify" | "measure";
+}
+
+const { mode = "verify" } = Astro.props;
+const measure = mode === "measure";
+
+const uid = makeUid("chain-of-trust");
+
+const STAGES = [
+  {
+    label: "Root of trust",
+    sub: "Boot ROM, TPM",
+    pcr: "Not measured",
+    root: true,
+  },
+  { label: "Firmware", sub: "UEFI", pcr: "PCR 0" },
+  { label: "Bootloader", sub: "GRUB", pcr: "PCR 4" },
+  {
+    label: "Kernel and initramfs",
+    sub: "Kernel image, ramdisk",
+    pcr: "PCR 8, 9",
+  },
+  {
+    label: "Kernel modules and init",
+    sub: "Drivers, init system",
+    pcr: "PCR 10",
+  },
+  {
+    label: "Applications and data",
+    sub: "User programs, stored data",
+    pcr: "PCR 10",
+  },
+];
+
+// [row, column] of each stage, in chain order.
+const GRID = [
+  [0, 0],
+  [0, 1],
+  [0, 2],
+  [1, 2],
+  [1, 1],
+  [1, 0],
+];
+
+const MARGIN = 24;
+const BOX_W = 160;
+const BOX_H = 76;
+const COL_GAP = 96;
+const ROW_GAP = 72;
+const TOP = 24;
+const PAD = 6;
+
+const colX = (c: number) => MARGIN + c * (BOX_W + COL_GAP);
+const rowY = (r: number) => TOP + r * (BOX_H + ROW_GAP);
+
+// Each link is labelled with the PCR that the next stage's measurement extends.
+const links = GRID.slice(0, -1).map(([r1, c1], i) => {
+  const [r2, c2] = GRID[i + 1];
+  const label = `extend ${STAGES[i + 1].pcr}`;
+  if (r1 === r2) {
+    const y = rowY(r1) + BOX_H / 2;
+    const right = c2 > c1;
+    const x1 = right ? colX(c1) + BOX_W + PAD : colX(c1) - PAD;
+    const x2 = right ? colX(c2) - PAD : colX(c2) + BOX_W + PAD;
+    return {
+      d: `M ${x1},${y} L ${x2},${y}`,
+      label,
+      lx: (x1 + x2) / 2,
+      ly: y - 8,
+      anchor: "middle",
+    };
+  }
+  const x = colX(c1) + BOX_W / 2;
+  const y1 = rowY(r1) + BOX_H + PAD;
+  const y2 = rowY(r2) - PAD;
+  return {
+    d: `M ${x},${y1} L ${x},${y2}`,
+    label,
+    lx: x + 8,
+    ly: (y1 + y2) / 2 + 3,
+    anchor: "start",
+  };
+});
+
+const tone = measure ? "tone-ct" : "tone-pt";
+
+const VIEW_W = MARGIN * 2 + 3 * BOX_W + 2 * COL_GAP;
+const VIEW_H = rowY(1) + BOX_H + TOP;
+---
+
+<ArrowFigure
+  uid={uid}
+  title={measure ? "Measured Boot Chain" : "Chain of Trust"}
+  desc={
+    measure
+      ? "Six stages on a 3 by 2 grid, read as a snake. Each stage measures the next one and extends a PCR with that measurement before passing control. Each box shows the PCR its measurement is recorded in."
+      : "Six stages on a 3 by 2 grid, read as a snake. Each stage verifies the next one before passing control to it, starting from the root of trust."
+  }
+  viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+  caption={
+    measure
+      ? "Each arrow means measures: the stage it leaves hashes the next one and extends a PCR with the hash before passing control. The PCR in each box records that stage's measurement."
+      : "Each arrow means verifies: the stage it leaves checks the next one before passing control. Trust flows along the numbered path from the root of trust."
+  }
+>
+  {STAGES.map((stage, i) => {
+    const [r, c] = GRID[i];
+    return (
+      <g
+        class={`stage${stage.root ? " tone-key" : ""}`}
+        transform={`translate(${colX(c)}, ${rowY(r)})`}
+      >
+        <rect width={BOX_W} height={BOX_H} rx="10" />
+        <text x="12" y="18" class="stage-step">
+          {i + 1}
+        </text>
+        <text x={BOX_W / 2} y="36" text-anchor="middle" class="stage-label">
+          {stage.label}
+        </text>
+        <text
+          x={BOX_W / 2}
+          y="58"
+          text-anchor="middle"
+          class={measure ? "stage-pcr" : "stage-sub"}
+        >
+          {measure ? stage.pcr : stage.sub}
+        </text>
+      </g>
+    );
+  })}
+
+  {links.map((l) => (
+    <>
+      <path
+        class={`arrow ${tone}`}
+        d={l.d}
+        marker-end={`url(#${uid}-${measure ? "ct" : "pt"})`}
+      />
+      {measure && (
+        <text x={l.lx} y={l.ly} text-anchor={l.anchor} class="arrow-label">
+          {l.label}
+        </text>
+      )}
+    </>
+  ))}
+</ArrowFigure>
+
+<style>
+  .stage rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+
+  .stage.tone-key rect {
+    stroke: var(--tone);
+    stroke-width: 2;
+  }
+
+  .stage-step {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    fill: var(--text-muted);
+  }
+
+  .stage-label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    fill: var(--text-primary);
+  }
+
+  .stage.tone-key .stage-label {
+    fill: var(--tone);
+  }
+
+  .stage-sub {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    fill: var(--text-muted);
+  }
+
+  .stage-pcr {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    font-weight: 700;
+    fill: var(--dia-ct);
+  }
+
+  .arrow-label {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    fill: var(--text-muted);
+  }
+</style>

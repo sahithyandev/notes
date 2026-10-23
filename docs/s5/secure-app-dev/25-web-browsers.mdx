@@ -1,7 +1,7 @@
 ---
 title: Web Browsers
 dateCreated: 2026-09-03T05:28:58.273Z
-lastUpdatedOn: 2026-09-30T15:28:09.404Z
+lastUpdatedOn: 2026-10-23T13:55:25.869Z
 ---
 
 A browser is a large, complex, network-facing codebase written in memory-unsafe languages, with features added constantly.
@@ -22,7 +22,7 @@ The Rule of 2: for a given task, pick at most 2 of these 3.
 
 If a task needs all 3, split the work.
 
-## Chrome Multi-Process Architecture
+## Multi-Process Architecture
 
 Renderer processes have no direct disk, network, or device access. They run in a restricted sandbox, which limits damage from a renderer exploit. The split also gives parallelism across tabs and survives a single renderer crash. See the [Chrome worked example](/s5/computer-security/secure-system-design#worked-example-chrome) for the full multi-process architecture and threat model.
 
@@ -36,7 +36,7 @@ Auto-update shipped from the start, and it is now the delivery mechanism for the
 
 ## Site Isolation
 
-Site isolation puts content from one site in its own renderer process. The unit is a site, not a tab, and a site, not an origin. The browser process can then restrict each renderer to its own site's data.
+Site isolation puts content from one site in its own renderer process. The unit is a site, not a tab or an origin. The browser process can then restrict each renderer to its own site's data.
 
 It defends against Spectre-style [speculative side channels](/s5/secure-app-dev/meltdown-and-spectre#spectre) from JavaScript, universal XSS (UXSS), and fully compromised renderers.
 
