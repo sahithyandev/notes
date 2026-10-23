@@ -1,56 +1,153 @@
 ---
 title: Game Theory
 dateCreated: 2026-08-26T11:55:46.453Z
-lastUpdatedOn: 2026-09-28T04:57:33.905Z
+lastUpdatedOn: 2026-10-23T10:33:28.422Z
 ---
 
 Studies decision making between agents (players) whose outcomes depend on each other's choices, not just their own.
 
-## Two-Person Zero-Sum Game
+## Assumptions
 
-A game with exactly 2 players where one player's gain equals the other's loss; the payoffs always sum to 0.
+The models in this note rely on the following assumptions.
 
-- Payoff matrix  
-  Rows are one player's strategies, columns the other's. Entry $a_{ij}$ is the row player's gain (equivalently, the column player's loss) when the row player picks strategy $i$ and the column player picks strategy $j$.
+- Finite options  
+  Each player has a finite list of options.
+- Simultaneous choice  
+  Each player picks an option without observing the opponent's choice.
+- Complete information  
+  Both players know every option and outcome available to each player, and each knows the other knows it.
+- Rational players  
+  Each player maximizes their own expected outcome.
+- Expected outcome  
+  Randomizing over options gives the probability-weighted average of the outcomes.
+- Independent randomization  
+  Each player's randomization does not depend on the other player's.
+- Repeated play  
+  The game is played over many periods, such as weekly decisions. A player's randomization describes how often each option is used over time.
+
+## Zero-Sum Game
+
+A game with $n$ players where the sum of each player's gain and loss equals 0.
+
+When $n=2$, it is a two-player zero-sum game.
+
+### Value of a Game
+
+The game value $v$ is the average payoff to the row player per play when both players play optimally. It lies between the maximin and minimax values, and equals both when a saddle point exists.
+
+### Payoff Matrix
+
+A table of the row player's payoffs for every pair of strategies. Rows are the row player's pure strategies, columns are the column player's pure strategies.
+
+$$
+A = \begin{pmatrix}
+a_{11} & \cdots & a_{1n} \\
+\vdots & \ddots & \vdots \\
+a_{m1} & \cdots & a_{mn}
+\end{pmatrix}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="m">number of row player strategies</Sym>
+  <Sym s="n">number of column player strategies</Sym>
+  <Sym s="a_{ij}">
+    row player's payoff when the row player picks $i$ and the column player
+    picks $j$
+  </Sym>
+</Symbols>
+
+In a two-player zero-sum game, the column-player's payoff is $-A$. In that case, the matrix defines the whole game.
+
+<PayoffMatrixDiagram
+  caption="The row player picks a row and the column player picks a column. The entry in that cell is the row player's payoff. Here the row player gets 2 when row 2 meets column 1."
+  matrix={[
+    [3, -1],
+    [2, 4],
+  ]}
+  rowLabels={["Row 1 (A plays 1)", "Row 2 (A plays 2)"]}
+  colLabels={["Col 1 (B plays 1)", "Col 2 (B plays 2)"]}
+/>
+
+### Strategy Types
+
+A strategy is a rule a player uses to choose among their options. Each player's strategy is either pure or mixed.
+
 - Pure strategy  
-  A player always picks the same single strategy.
+  A probability distribution that puts probability $1$ on one strategy, so the player always picks that strategy.
+- Mixed strategy  
+  A probability distribution over a player's pure strategies.
+- Optimal strategy  
+  A strategy that guarantees an expected payoff of at least $v$ against every opposing strategy, where $v$ is the game's value.
+- Dominant strategy  
+  A strategy that gives a payoff at least as good as every other strategy against every opposing strategy.
 
-## Prisoner's Dilemma
+<Note>
 
-A 2-player, non-zero-sum game illustrating that individually rational choices can produce a jointly worse outcome than cooperation would.
+A pure strategy is a special case of a mixed strategy where the probablity is 1.
 
-## Maximin Criterion
+</Note>
+
+## Pure Strategy Solution
+
+A game is solved with pure strategies when its maximin and minimax values match.
+
+### Maximin Criterion
 
 The row player picks the strategy maximizing their guaranteed minimum payoff: $\max_i \min_j a_{ij}$.
 
-## Minimax Criterion
+### Minimax Criterion
 
 The column player picks the strategy minimizing the row player's guaranteed maximum payoff: $\min_j \max_i a_{ij}$.
 
-## Saddle Point
+### Saddle Point
 
 Exists when $\max_i \min_j a_{ij} = \min_j \max_i a_{ij}$. The corresponding entry is the game's value, and both players have an optimal pure strategy: neither benefits from deviating alone.
 
 If the maximin and minimax values differ, no saddle point exists, and pure strategies alone don't give an optimal solution.
 
-## Mixed Strategy Games
+<Note>
+
+In a saddle point game, $v$ is the saddle point entry. A negative $v$ means the row player loses on average even under optimal play, since optimal play only limits the loss. Changing the sign of $v$ requires a different payoff matrix.
+
+</Note>
+
+## Mixed Strategy Solution
 
 When a game has no saddle point, players randomize over their strategies (a mixed strategy) instead of committing to one.
 
-- Mixed strategy  
-  A probability distribution over a player's pure strategies.
+Work through these steps in order and stop at the first one that applies.
 
-## 2x2 Game Without a Saddle Point
+- Check for a saddle point. If the row maximin equals the column minimax, play safe and stop.
+- Remove dominated rows and columns to shrink the matrix.
+- Solve a 2x2 game algebraically by equalizing the payoffs.
+- Solve a 2xn or mx2 game graphically.
+- Otherwise, use linear programming with the simplex method.
 
-Solved algebraically: for optimal mixed strategy probabilities $p, 1-p$ (row) and $q, 1-q$ (column), the row player's expected payoff is equalized across the column player's 2 strategies, and vice versa. Solving the resulting linear equations gives $p$, $q$, and the game's value.
+<Note>
 
-## Dominance
+Mixed strategy probabilities are long-run frequencies. Over 100 plays, a decision with probability $\frac{1}{2}$ is picked about 50 times. The game value is then an average payoff per play, so it need not appear in the matrix.
+
+</Note>
+
+### Dominance
 
 A strategy is dominated if another strategy gives the same player a payoff at least as good against every opposing strategy. Dominated strategies are removed before solving, reducing the payoff matrix.
 
-## 2xn and mx2 Games
+### 2x2 Game Without a Saddle Point
+
+Solved algebraically: for optimal mixed strategy probabilities $p, 1-p$ (row) and $q, 1-q$ (column), the row player's expected payoff is equalized across the column player's 2 strategies, and vice versa. Solving the resulting linear equations gives $p$, $q$, and the game's value.
+
+### 2xn and mx2 Games
 
 Solved graphically: plot each of the smaller player's strategies as a line over the opponent's mixing probability, take the upper envelope (row player) or lower envelope (column player), and read off the optimal point. Reduces the game to an equivalent 2x2 game at that point.
+
+<Note>
+
+If the envelope is flat over an interval, the optimal mix is not unique. Every probability in that interval gives the same value.
+
+</Note>
 
 ## Game Theory as a Linear Program
 
@@ -72,4 +169,393 @@ $
 
 Subject to $\sum_{j=1}^{n} q_j a_{ij} \le v$ for every row $i$, $\sum_{j=1}^{n} q_j = 1$, $q_j \ge 0$.
 
-The 2 LPs are duals of each other. Solving either with the simplex algorithm gives the game's value $v$ and both players' optimal mixed strategies.
+The column player's LP is solved after the substitution $x_j = q_j / v$, which requires $v > 0$. Dividing the constraints by $v$ gives $\sum_j a_{ij} x_j \le 1$, and maximizing $\sum_j x_j$ equals $1/v$. Positivity is ensured by adding a constant $c$ to every entry, which shifts the game value to $v + c$ and leaves the strategies unchanged. Choose $c$ so that the shifted maximin is positive.
+
+The 2 LPs are duals of each other. Solving one with the simplex algorithm gives that player's optimal mixed strategy and the game's value. The other player's strategy is read from the dual values in the final tableau, so only one LP needs solving.
+
+To convert a game into a linear program:
+
+- Shift every entry by $c$ so the shifted value $v + c$ is positive.
+- Substitute $x_j = q_j / v$, so each constraint becomes $\sum_j a_{ij} x_j \le 1$ and the objective is $\max \sum_j x_j = 1/v$.
+- Add slack variables and solve with the simplex method.
+- The column strategy follows from $v = 1 / \sum_j x_j$ and $q_j = v x_j$.
+- The row strategy follows from the dual values $y_i$ in the final tableau, using $p_i = v y_i$.
+- Subtract $c$ from $v$ to get the original game value.
+
+<Note>
+
+The maximin and minimax criteria assume the opponent plays to minimize the player's payoff. The equal values of the row and column LPs follow from the minimax theorem, which holds under the finite options assumption above.
+
+</Note>
+
+## Prisoner's Dilemma
+
+A 2-player, non-zero-sum game illustrating that individually rational choices can produce a jointly worse outcome than cooperation would.
+
+<Note>
+
+The game is not zero-sum, so the maximin, minimax, saddle point and LP methods above do not apply to it.
+
+</Note>
+
+## Worked Example
+
+### Saddle Point Game
+
+Given the payoff matrix
+
+$$
+C = \begin{pmatrix}
+1 & 4 & 2 \\
+3 & 5 & 2
+\end{pmatrix}
+$$
+
+Find the value of the game and its saddle point.
+
+<Solution>
+
+<PayoffMatrixDiagram
+  matrix={[
+    [1, 4, 2],
+    [3, 5, 2],
+  ]}
+  saddle={[1, 2]}
+/>
+
+Row minimums are $1$ and $2$, so the maximin is $\max\{1, 2\} = 2$, attained by row 2. Column maximums are $3$, $5$ and $2$, so the minimax is $\min\{3, 5, 2\} = 2$, attained by column 3.
+
+Maximin equals minimax, so a saddle point exists at $(2, 3)$.
+
+Result: $v = 2$. Row player plays row 2 and column player plays column 3, both with probability $1$.
+
+</Solution>
+
+### Dominance Reduction
+
+Given the payoff matrix
+
+$$
+F = \begin{pmatrix}
+4 & 1 & 3 \\
+2 & 3 & 3
+\end{pmatrix}
+$$
+
+Reduce the game by removing dominated strategies, then check whether a saddle point exists.
+
+<Solution>
+
+The column player minimizes, so column 3 is dominated by column 2, since $1 \le 3$ and $3 \le 3$. Removing column 3 gives
+
+$$
+\begin{pmatrix}
+4 & 1 \\
+2 & 3
+\end{pmatrix}
+$$
+
+The maximin is $2$ and the minimax is $3$, so no saddle point exists.
+
+</Solution>
+
+### 2x2 Mixed Game
+
+Solve the reduced matrix $\begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}$.
+
+<Solution>
+
+Let the row player play row 1 with probability $p$. Equalizing the payoffs against both columns gives $4p + 2(1-p) = p + 3(1-p)$, so $p = \frac{1}{4}$.
+
+Let the column player play column 1 with probability $q$. Equalizing the payoffs against both rows gives $4q + (1-q) = 2q + 3(1-q)$, so $q = \frac{1}{2}$.
+
+The value is $v = 4\cdot\frac{1}{4} + 2 \cdot\frac{3}{4} = \frac{5}{2}$.
+
+Result: $v = \frac{5}{2}$. Row mix $\left(\frac{1}{4}, \frac{3}{4}\right)$. Column mix $\left(\frac{1}{2}, \frac{1}{2}, 0\right)$ on the original columns.
+
+</Solution>
+
+### Graphical 2x2 Game
+
+Given the payoff matrix
+
+$$
+H = \begin{pmatrix}
+3 & 5 \\
+4 & 2
+\end{pmatrix}
+$$
+
+Find the value of the game and the optimal mixed strategies of both players.
+
+<Solution>
+
+Let the row player play row 1 with probability $P$. Column 1 gives $3P + 4(1-P) = 4 - P$, and column 2 gives $5P + 2(1-P) = 2 + 3P$. The lower envelope peaks where the 2 lines cross: $4 - P = 2 + 3P$, so $P = \frac{1}{2}$ and $v = \frac{7}{2}$.
+
+<LowerEnvelopeDiagram
+  title="Graphical 2x2 Game Envelope"
+  caption="Each line is one column's expected payoff for the row player as P moves from 0 to 1. The envelope is the lower of the two lines, and its peak at P = 1/2 is the game value."
+  lines={[
+    { label: "4 − P", from: 4, to: 3, tone: "s5" },
+    { label: "2 + 3P", from: 2, to: 5, tone: "ct" },
+  ]}
+  mode="lower"
+  xLabel="P"
+  yLabel="Payoff"
+/>
+
+Let the column player play column 1 with probability $q$. Row 1 gives $3q + 5(1-q) = 5 - 2q$, and row 2 gives $4q + 2(1-q) = 2 + 2q$. Equalizing gives $q = \frac{3}{4}$.
+
+Result: $v = \frac{7}{2}$. Row mix $\left(\frac{1}{2}, \frac{1}{2}\right)$. Column mix $\left(\frac{3}{4}, \frac{1}{4}\right)$.
+
+</Solution>
+
+### 2xn Game
+
+Given the payoff matrix
+
+$$
+G = \begin{pmatrix}
+2 & 1 & 4 \\
+3 & 4 & 0
+\end{pmatrix}
+$$
+
+Find the value of the game and the optimal mixed strategies of both players.
+
+<Solution>
+
+Let the row player play row 1 with probability $p$. The payoffs for the columns are $3 - p$, $4 - 3p$ and $4p$.
+
+<LowerEnvelopeDiagram
+  title="2xn Game Envelope"
+  lines={[
+    { label: "3 − p", from: 3, to: 2, tone: "s5" },
+    { label: "4 − 3p", from: 4, to: 1, tone: "ct" },
+    { label: "4p", from: 0, to: 4, tone: "pt" },
+  ]}
+  mode="lower"
+  xLabel="p"
+  yLabel="Payoff"
+/>
+
+The illustration shows where the lowest payoff per column peaks, $p=\frac{4}{7}$. Column 1 never participates in the lowest payoff curve. Hence it can be removed.
+
+Reduce to the 2x2 game on columns 2 and 3: $\begin{pmatrix} 1 & 4 \\ 4 & 0 \end{pmatrix}$. Let the column player play column 2 with probability $r$. Equalizing the payoffs against both rows gives $4 - 3r = 4r$, so $r = \frac{4}{7}$.
+
+Result: $v = \frac{16}{7}$. Row mix $\left(\frac{4}{7}, \frac{3}{7}\right)$. Column mix $\left(0, \frac{4}{7}, \frac{3}{7}\right)$.
+
+</Solution>
+
+### Linear Program Solution
+
+Given the payoff matrix $A = \begin{pmatrix} 3 & -1 \\ 2 & 4 \end{pmatrix}$, solve the row player's LP.
+
+<Solution>
+
+The row player's constraints are $3p_1 + 2p_2 \ge v$ and $-p_1 + 4p_2 \ge v$. Both bind at the optimum. Substituting $p_2 = 1 - p_1$ and equating gives $2 + p_1 = 4 - 5p_1$, so $p_1 = \frac{1}{3}$ and $v = \frac{7}{3}$.
+
+The column player's constraints are $3q_1 - q_2 \le v$ and $2q_1 + 4q_2 \le v$. Substituting $q_2 = 1 - q_1$ and equating gives $4q_1 - 1 = 4 - 2q_1$, so $q_1 = \frac{5}{6}$.
+
+Result: $v = \frac{7}{3}$. Row mix $\left(\frac{1}{3}, \frac{2}{3}\right)$. Column mix $\left(\frac{5}{6}, \frac{1}{6}\right)$.
+
+</Solution>
+
+### 3x3 Game with Linear Programming
+
+Given the payoff matrix
+
+$$
+D = \begin{pmatrix}
+3 & -4 & 2 \\
+1 & -3 & -7 \\
+-2 & 4 & 7
+\end{pmatrix}
+$$
+
+Find the value of the game and the optimal mixed strategies of both players.
+
+<Solution>
+
+Row minimums are $-4$, $-7$ and $-2$, so the maximin is $-2$. Column maximums are $3$, $4$ and $7$, so the minimax is $3$. The two differ, so no saddle point exists and the value lies strictly between them.
+
+The smallest entry is $-7$, so add $8$ to every entry to make them all strictly positive. This adds $8$ to the value and leaves the optimal strategies unchanged:
+
+$$
+M = \begin{pmatrix}
+11 & 4 & 10 \\
+9 & 5 & 1 \\
+6 & 12 & 15
+\end{pmatrix}
+$$
+
+Let $v$ be the value of $M$ and $q_j$ the probability that the column player plays column $j$. The column player wants every row to give the row player at most $v$, so $\sum_j M_{ij} q_j \le v$ for each row $i$. Substitute $x_j = q_j / v$. Dividing by $v$ gives:
+
+$$
+11x_1 + 4x_2 + 10x_3 \le 1, \quad 9x_1 + 5x_2 + x_3 \le 1, \quad 6x_1 + 12x_2 + 15x_3 \le 1
+$$
+
+These constraints are linear because the right-hand side is now the constant $1$. Since $\sum_j q_j = 1$, the scaled variables satisfy $x_1 + x_2 + x_3 = \frac{1}{v}$. The column player wants the smallest $v$, which is the same as the largest $\frac{1}{v}$. The column player's LP is therefore to maximize $x_1 + x_2 + x_3$ subject to the three constraints above and $x_j \ge 0$.
+
+The simplex method gives $x_1 = \frac{2}{27}$, $x_2 = \frac{5}{108}$ and $x_3 = 0$. The first and third constraints are tight. The second has slack $\frac{11}{108}$.
+
+The optimal sum is $\frac{13}{108} = \frac{1}{v}$, so $v = \frac{108}{13}$. Then $q_j = v x_j$ gives the column mix $\left(\frac{8}{13}, \frac{5}{13}, 0\right)$.
+
+The row mix is $p_i = v y_i$, where $y_i$ are the optimal dual values of the LP. Complementary slackness gives $y_2 = 0$, since the second constraint is not tight. Also $y_1$ and $y_3$ must satisfy the dual constraints with equality for columns 1 and 2, which are used by the column player. Solving gives $y = \left(\frac{1}{18}, 0, \frac{7}{108}\right)$, and so $p = \left(\frac{6}{13}, 0, \frac{7}{13}\right)$.
+
+Result: the original value is $\frac{108}{13} - 8 = \frac{4}{13}$. Row mix $\left(\frac{6}{13}, 0, \frac{7}{13}\right)$. Column mix $\left(\frac{8}{13}, \frac{5}{13}, 0\right)$.
+
+</Solution>
+
+### 4x3 Game Without a Stable Solution
+
+Given the payoff matrix
+
+$$
+E = \begin{pmatrix}
+3 & -4 & 2 \\
+-1 & 4 & -2 \\
+-3 & 1 & 4 \\
+1 & -1 & 1
+\end{pmatrix}
+$$
+
+Find the maximin, the minimax and whether a saddle point exists.
+
+<Solution>
+
+Row minimums are $-4$, $-2$, $-3$ and $-1$, so the maximin is $-1$. Column maximums are $3$, $4$ and $4$, so the minimax is $3$. They differ, so no saddle point exists and both players need mixed strategies.
+
+</Solution>
+
+### 2x2 Game with Dual Payoff Matrix
+
+Given the payoff matrix for A
+
+$$
+F = \begin{pmatrix}
+4 & -2 \\
+-5 & 3
+\end{pmatrix}
+$$
+
+Find the maximin and minimax of $A$, and write the payoff matrix for $B$.
+
+<Solution>
+
+Row minimums are $-2$ and $-5$, so the maximin is $-2$. Column maximums are $4$ and $3$, so the minimax is $3$. No saddle point exists.
+
+The payoff matrix for B is the negative transpose of $F$:
+
+$$
+\begin{pmatrix}
+-4 & 5 \\
+2 & -3
+\end{pmatrix}
+$$
+
+</Solution>
+
+### Row Dominance Reduction
+
+Given the payoff matrix
+
+$$
+K = \begin{pmatrix}
+7 & 1 \\
+-3 & 6 \\
+4 & 0
+\end{pmatrix}
+$$
+
+Reduce the game by removing dominated rows.
+
+<Solution>
+
+Row 1 dominates row 3 for A, since $7 \ge 4$ and $1 \ge 0$. Removing row 3 gives $\begin{pmatrix} 7 & 1 \\ -3 & 6 \end{pmatrix}$.
+
+</Solution>
+
+### Column Dominance Reduction
+
+Given the payoff matrix
+
+$$
+L = \begin{pmatrix}
+7 & 1 & -2 \\
+-3 & 6 & 1
+\end{pmatrix}
+$$
+
+Reduce the game by removing dominated columns.
+
+<Solution>
+
+B minimizes A's payoff, so column 2 is dominated by column 3, since $-2 \le 1$ and $1 \le 6$. Removing column 2 gives $\begin{pmatrix} 7 & -2 \\ -3 & 1 \end{pmatrix}$.
+
+</Solution>
+
+### 2x2 Mixed Game with Dual Payoff Matrix
+
+Solve the game with payoff matrix $F = \begin{pmatrix} 4 & -2 \\ -5 & 3 \end{pmatrix}$ from the previous example.
+
+<Solution>
+
+Let the row player play row 1 with probability $p$. Column 1 gives $4p - 5(1-p) = 9p - 5$, and column 2 gives $-2p + 3(1-p) = 3 - 5p$. Equalizing gives $p = \frac{4}{7}$, so $v = \frac{1}{7}$.
+
+Let the column player play column 1 with probability $q$. Row 1 gives B $2 - 6q$, and row 2 gives B $8q - 3$. Equalizing gives $q = \frac{5}{14}$, so B's value is $-\frac{1}{7}$.
+
+Result: $v = \frac{1}{7}$. Row mix $\left(\frac{4}{7}, \frac{3}{7}\right)$. Column mix $\left(\frac{5}{14}, \frac{9}{14}\right)$.
+
+</Solution>
+
+### 2x3 Graphical Game
+
+Given the payoff matrix
+
+$$
+M = \begin{pmatrix}
+-5 & 2 & -1 \\
+2 & -3 & 1
+\end{pmatrix}
+$$
+
+Find the value of the game and the optimal mix for the row player.
+
+<Solution>
+
+Row minimums are $-5$ and $-3$, so the maximin is $-3$. Column maximums are $2$, $2$ and $1$, so the minimax is $1$. No saddle point exists.
+
+Let the row player play row 1 with probability $p$. Column 1 gives $2 - 7p$, column 2 gives $5p - 3$ and column 3 gives $1 - 2p$. The lower envelope peaks where the first 2 lines cross: $2 - 7p = 5p - 3$, so $p = \frac{5}{12}$.
+
+Column 3 gives $\frac{1}{6}$ here, which is above the value, so it does not bind. The value is $v = 2 - \frac{35}{12} = -\frac{11}{12}$.
+
+Result: $v = -\frac{11}{12}$. Row mix $\left(\frac{5}{12}, \frac{7}{12}\right)$.
+
+</Solution>
+
+### 3x2 Graphical Game
+
+Given the payoff matrix for A
+
+$$
+N = \begin{pmatrix}
+4 & -1 \\
+3 & 4 \\
+1 & 7
+\end{pmatrix}
+$$
+
+Find the value of the game and the optimal mix for the column player.
+
+<Solution>
+
+Row minimums are $-1$, $3$ and $1$, so the maximin is $3$. Column maximums are $4$ and $7$, so the minimax is $4$. No saddle point exists.
+
+Let the column player play column 1 with probability $q$. Winnings for B are $1 - 5q$ for row 1, $q - 4$ for row 2 and $6q - 7$ for row 3.
+
+The lower envelope peaks where rows 1 and 2 cross: $1 - 5q = q - 4$, so $q = \frac{5}{6}$. Row 3 gives $-2$ here, which is above the value, so it does not bind. The crossing of rows 1 and 3 is not the answer, since row 2 is lower there.
+
+Result: column mix $\left(\frac{5}{6}, \frac{1}{6}\right)$. Value to B $-\frac{19}{6}$.
+
+</Solution>

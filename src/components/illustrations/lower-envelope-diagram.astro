@@ -1,0 +1,142 @@
+---
+// Graphical method for a 2-option player. Each line is one opponent option's
+// expected payoff, drawn over the probability of the player's first option
+// (t = 0 to t = 1). The envelope is the lower envelope (min over the lines, for
+// the row player) or the upper envelope (max, for the column player). Its best
+// point is marked: the maximin of the envelope, or the minimax for the upper one.
+import AxesFigure from "./primitives/axes-figure.astro";
+
+interface Line {
+  label: string;
+  // Value at t = 0 and at t = 1.
+  from: number;
+  to: number;
+  tone: "s5" | "ct" | "pt" | "key";
+}
+
+interface Props {
+  title: string;
+  lines: Line[];
+  mode: "lower" | "upper";
+  xLabel?: string;
+  yLabel?: string;
+}
+
+const {
+  title,
+  lines,
+  mode,
+  xLabel = "Probability",
+  yLabel = "Expected payoff",
+} = Astro.props;
+
+const value = (line: Line, t: number) => line.from + (line.to - line.from) * t;
+const envelopeAt = (t: number) => {
+  const values = lines.map((line) => value(line, t));
+  return mode === "lower" ? Math.min(...values) : Math.max(...values);
+};
+
+const SAMPLES = 400;
+const ts = Array.from({ length: SAMPLES + 1 }, (_, k) => k / SAMPLES);
+const best = ts.reduce(
+  (acc, t) => {
+    const v = envelopeAt(t);
+    const better = mode === "lower" ? v > acc.v : v < acc.v;
+    return better ? { t, v } : acc;
+  },
+  { t: 0, v: envelopeAt(0) },
+);
+
+const all = lines.flatMap((line) => [line.from, line.to]);
+const pad = (Math.max(...all) - Math.min(...all)) * 0.1 || 1;
+const lo = Math.min(...all, 0) - pad;
+const hi = Math.max(...all, 0) + pad;
+
+const X0 = 50;
+const XR = 390;
+const PLOT_TOP = 30;
+const PLOT_BOTTOM = 282;
+const X = (t: number) => X0 + t * (XR - X0);
+const Y = (v: number) =>
+  PLOT_BOTTOM - ((v - lo) / (hi - lo)) * (PLOT_BOTTOM - PLOT_TOP);
+
+const path = (line: Line) =>
+  `M ${X(0)} ${Y(line.from)} L ${X(1)} ${Y(line.to)}`;
+const envelopePoints = ts
+  .map((t) => `${X(t).toFixed(1)},${Y(envelopeAt(t)).toFixed(1)}`)
+  .join(" ");
+---
+
+<AxesFigure
+  size="sm"
+  title={title}
+  captionSlot
+  xLabel={xLabel}
+  yLabel={yLabel}
+  xLabelOffset={36}
+>
+  {lines.map((line) => (
+    <>
+      <path class:list={["curve", `tone-${line.tone}`]} d={path(line)} />
+      <text
+        class:list={["curve-label", `tone-${line.tone}`]}
+        x={X(0.93)}
+        y={Y(value(line, 0.93)) - 7}
+        text-anchor="middle"
+      >
+        {line.label}
+      </text>
+    </>
+  ))}
+
+  {lo < 0 && hi > 0 && (
+    <>
+      <line class="guide" x1={X0} y1={Y(0)} x2={XR} y2={Y(0)} />
+      <text class="axis-tick" x={X0 - 6} y={Y(0) + 4} text-anchor="end">
+        0
+      </text>
+    </>
+  )}
+
+  <text class="axis-tick" x={X0} y={PLOT_BOTTOM + 16} text-anchor="middle">
+    0
+  </text>
+  <text class="axis-tick" x={XR} y={PLOT_BOTTOM + 16} text-anchor="middle">
+    1
+  </text>
+
+  <polyline class="envelope" points={envelopePoints} />
+
+  <line
+    class="guide"
+    x1={X(best.t)}
+    y1={Y(best.v)}
+    x2={X(best.t)}
+    y2={PLOT_BOTTOM}
+  />
+  <circle class="pt tone-pt" cx={X(best.t)} cy={Y(best.v)} r="5" />
+  <text
+    class="pt-label tone-pt"
+    x={best.t > 0.6 ? X(best.t) - 8 : X(best.t) + 8}
+    y={PLOT_BOTTOM - 8}
+    text-anchor={best.t > 0.6 ? "end" : "start"}
+  >
+    {mode === "lower" ? "Maximin" : "Minimax"} ({best.t.toFixed(2)},{" "}
+    {best.v.toFixed(2)})
+  </text>
+
+  <p slot="caption">
+    The envelope is the lowest line at each p, and its peak is at p = 4/7, where
+    the column 2 and column 3 lines cross.
+  </p>
+</AxesFigure>
+
+<style>
+  .envelope {
+    fill: none;
+    stroke: var(--text-primary);
+    stroke-width: 3.5;
+    stroke-linejoin: round;
+    opacity: 0.85;
+  }
+</style>

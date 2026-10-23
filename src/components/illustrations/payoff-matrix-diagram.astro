@@ -1,0 +1,179 @@
+---
+// A payoff matrix as a table. Optional annotations show each row's minimum
+// (the row player's worst case) and each column's maximum (the column player's
+// worst case), with the maximin and minimax entries marked. `saddle` highlights
+// the saddle point cell, and `removedRows` / `removedCols` dim the rows or
+// columns that dominance removes.
+import Panel from "./primitives/panel.astro";
+
+interface Props {
+  matrix: number[][];
+  rowLabels?: string[];
+  colLabels?: string[];
+  saddle?: [number, number];
+  removedRows?: number[];
+  removedCols?: number[];
+}
+
+const {
+  matrix,
+  rowLabels = matrix.map((_, i) => `Row ${i + 1}`),
+  colLabels = matrix[0].map((_, j) => `Col ${j + 1}`),
+  saddle,
+  removedRows = [],
+  removedCols = [],
+} = Astro.props;
+const showWorstCases = true;
+
+const rowMins = matrix.map((r) => Math.min(...r));
+const colMaxs = matrix[0].map((_, j) => Math.max(...matrix.map((r) => r[j])));
+const maximin = Math.max(...rowMins);
+const minimax = Math.min(...colMaxs);
+const maximinRow = rowMins.indexOf(maximin);
+const minimaxCol = colMaxs.indexOf(minimax);
+---
+
+<Panel captionSlot class="payoff-panel">
+  <table class="payoff">
+    <thead>
+      <tr>
+        <th></th>
+        {colLabels.map((label) => (
+          <th scope="col">{label}</th>
+        ))}
+        {showWorstCases && (
+          <th scope="col" class="worst">
+            Row min
+          </th>
+        )}
+      </tr>
+    </thead>
+    <tbody>
+      {matrix.map((row, i) => (
+        <tr class:list={{ removed: removedRows.includes(i) }}>
+          <th scope="row">{rowLabels[i]}</th>
+          {row.map((value, j) => (
+            <td
+              class:list={{
+                removed: removedRows.includes(i) || removedCols.includes(j),
+                saddle: saddle?.[0] === i && saddle?.[1] === j,
+              }}
+            >
+              {value}
+            </td>
+          ))}
+          {showWorstCases && (
+            <td
+              class:list={{
+                worst: true,
+                maximin: i === maximinRow,
+              }}
+            >
+              {rowMins[i]}
+            </td>
+          )}
+        </tr>
+      ))}
+    </tbody>
+    {showWorstCases && (
+      <tfoot>
+        <tr>
+          <th scope="row" class="worst">
+            Col max
+          </th>
+          {colMaxs.map((value, j) => (
+            <td
+              class:list={{
+                worst: true,
+                minimax: j === minimaxCol,
+                removed: removedCols.includes(j),
+              }}
+            >
+              {value}
+            </td>
+          ))}
+          {showWorstCases && <td></td>}
+        </tr>
+      </tfoot>
+    )}
+  </table>
+  <p class="legend" slot="caption">
+    Maximin <span class="maximin-key">{maximin}</span> (row {maximinRow + 1})
+    and minimax <span class="minimax-key">{minimax}</span> (column{" "}
+    {minimaxCol + 1}).
+  </p>
+</Panel>
+
+<style>
+  .payoff-panel {
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .payoff {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+  }
+
+  .payoff th,
+  .payoff td {
+    padding: 6px 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+
+  .payoff thead th,
+  .payoff tbody th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: var(--surface-2);
+  }
+
+  .payoff .worst {
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .payoff td.saddle {
+    background: var(--s5-bg);
+    box-shadow: inset 0 0 0 2px var(--s5);
+    font-weight: 700;
+  }
+
+  .payoff td.maximin {
+    color: var(--dia-pt);
+    font-weight: 700;
+  }
+
+  .payoff td.minimax {
+    color: var(--dia-ct);
+    font-weight: 700;
+  }
+
+  .payoff .removed {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+
+  .legend {
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .maximin-key {
+    color: var(--dia-pt);
+    font-weight: 700;
+  }
+
+  .minimax-key {
+    color: var(--dia-ct);
+    font-weight: 700;
+  }
+</style>
