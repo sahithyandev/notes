@@ -1,0 +1,34 @@
+---
+title: Modes
+dateCreated: 2026-10-20T09:00:00.000Z
+lastUpdatedOn: 2026-10-23T13:55:01.086Z
+---
+
+Besides baseline sequential coding, the standard defines progressive and lossless modes. Progressive mode sends the coefficients of each block over several scans. Lossless mode skips the DCT and quantization.
+
+## Progressive Mode
+
+The coefficients of each block are sent over several scans.
+
+- Spectral selection  
+  Early scans send the DC coefficients of all blocks. Later scans send bands of AC coefficients, such as indices 1 to 5, then 6 to 63.
+- Successive approximation  
+  A coefficient is first sent with its most significant bits (shifted right by $A_l$). Later scans send the remaining bits 1 bit at a time.
+
+An AC scan covers 1 component. The entropy coder adds an end-of-band run symbol that covers many blocks, so long runs of all-zero bands cost little. The compressed size is similar to the sequential mode and often slightly smaller.
+
+## Lossless Mode
+
+No DCT or quantization. The predicted value of sample $x$ uses its left neighbour $A$, upper neighbour $B$ and upper-left neighbour $C$.
+
+| Selector | Predictor $\hat{x}$ |
+| -------- | ------------------- |
+| 1        | $A$                 |
+| 2        | $B$                 |
+| 3        | $C$                 |
+| 4        | $A + B - C$         |
+| 5        | $A + (B - C)/2$     |
+| 6        | $B + (A - C)/2$     |
+| 7        | $(A + B)/2$         |
+
+The difference $x - \hat{x}$ is coded as a category and extra bits, as with [DC coefficients](/s5/image-processing/jpeg/entropy-coding#magnitude-categories). The first sample of a row uses a fixed default prediction.
