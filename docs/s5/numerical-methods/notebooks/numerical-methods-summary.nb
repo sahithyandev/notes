@@ -1,0 +1,396 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     18174,        387]
+NotebookOptionsPosition[     14458,        338]
+NotebookOutlinePosition[     14775,        352]
+CellTagsIndexPosition[     14732,        349]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Numerical Methods Summary", "Title",ExpressionUUID->"94ba5fea-3eee-47e8-8e5f-8b71161da43a"],
+
+Cell["\<\
+Reusable functions for the numerical methods module. Each function has a \
+usage message, so type ?name to read its signature. Evaluate the cells from \
+top to bottom (Shift+Enter), then build your own problems on top of these \
+definitions. The notebook contains no worked examples.\
+\>", "Text",ExpressionUUID->"f6ccf1b9-d5e7-49e5-98a0-c4a06c0ca90e"],
+
+Cell["Linear Systems", "Section",ExpressionUUID->"959c2e99-6029-457f-9f1d-8edf28eb6381"],
+
+Cell["\<\
+Solvers for A x = b. Matrices are lists of rows and vectors are lists.\
+\>", "Text",ExpressionUUID->"390c4213-ed1e-4686-bdae-fca860a4ad49"],
+
+Cell["\<\
+residual::usage = \"residual[A, x, b] returns the vector A.x - b. It is zero \
+when x solves A.x == b.\";
+residual[A_List, x_List, b_List] := A . x - b\
+\>", "Input",ExpressionUUID->"ef2ae083-0686-4ca5-adb3-a83def836a65"],
+
+Cell["\<\
+forwardElimination::usage = \"forwardElimination[A, b] reduces the augmented \
+system [A | b] to upper triangular form without row exchanges. It returns {U, \
+c}, where U.x == c has the same solution as A.x == b. Assumes every pivot is \
+nonzero.\";
+forwardElimination[A_List, b_List] := Module[{n = Length[A], M},
+  M = MapThread[Append, {A, b}];
+  Do[M[[i]] = M[[i]] - (M[[i, k]]/M[[k, k]]) M[[k]], {k, n - 1}, {i, k + 1, \
+n}];
+  {M[[All, ;; n]], M[[All, n + 1]]}]\
+\>", "Input",ExpressionUUID->"706841e5-e9e4-44bb-a2aa-7cc673dd60c1"],
+
+Cell["\<\
+backSubstitution::usage = \"backSubstitution[U, c] solves U.x == c for an \
+upper triangular matrix U by back substitution.\";
+backSubstitution[U_List, c_List] := Module[{n = Length[c], x = \
+ConstantArray[0, Length[c]]},
+  Do[x[[i]] = (c[[i]] - U[[i, i + 1 ;;]] . x[[i + 1 ;;]])/U[[i, i]], {i, n, \
+1, -1}];
+  x]\
+\>", "Input",ExpressionUUID->"2a5d6250-a056-458d-8b09-ade278dc7f19"],
+
+Cell["\<\
+solveScaledPivot::usage = \"solveScaledPivot[A, b] solves A.x == b by \
+Gaussian elimination with scaled partial pivoting and returns x. At each step \
+the pivot row maximises |a_ik| divided by the largest entry of its original \
+row of A.\";
+solveScaledPivot[A_List, b_List] := Module[{n = Length[A], M, s, p, ratios},
+  M = MapThread[Append, {A, b}];
+  s = Max /@ Abs[A];
+  Do[
+    ratios = Table[Abs[M[[i, k]]]/s[[i]], {i, k, n}];
+    p = k - 1 + First[Ordering[ratios, -1]];
+    M[[{k, p}]] = M[[{p, k}]];
+    s[[{k, p}]] = s[[{p, k}]];
+    Do[M[[i]] = M[[i]] - (M[[i, k]]/M[[k, k]]) M[[k]], {i, k + 1, n}],
+    {k, n - 1}];
+  backSubstitution[M[[All, ;; n]], M[[All, n + 1]]]]\
+\>", "Input",ExpressionUUID->"86012f12-8b9d-45fb-90ca-9d642be1a3fd"],
+
+Cell["\<\
+isDiagonallyDominant::usage = \"isDiagonallyDominant[A] returns True when, in \
+every row, the absolute value of the diagonal entry is strictly larger than \
+the sum of the absolute values of the other entries in that row.\";
+isDiagonallyDominant[A_List] := AllTrue[Range[Length[A]], Function[i, \
+Abs[A[[i, i]]] > Total[Abs[A[[i]]]] - Abs[A[[i, i]]]]]\
+\>", "Input",ExpressionUUID->"414e5e67-d755-43f6-9c65-00dd2e5d770f"],
+
+Cell["LU and Cholesky Factorisation", "Section",ExpressionUUID->"1772bb8a-5d97-4b4b-b8cf-a61b7d4dbd01"],
+
+Cell["\<\
+Factor A once, then solve for as many right-hand sides as needed.\
+\>", "Text",ExpressionUUID->"cf18bcf6-0022-46cf-bb80-f087ad8e0454"],
+
+Cell["\<\
+luFactor::usage = \"luFactor[A] returns {L, U, P} with P.A == L.U, where L is \
+unit lower triangular, U is upper triangular and P is a permutation matrix \
+from partial pivoting.\";
+luFactor[A_List] := Module[{lu, p, n = Length[A]},
+  {lu, p} = Take[LUDecomposition[A], 2];
+  {IdentityMatrix[n] + LowerTriangularize[lu, -1], UpperTriangularize[lu], \
+IdentityMatrix[n][[p]]}]\
+\>", "Input",ExpressionUUID->"9c759595-297c-4bc6-9b88-676d380b2916"],
+
+Cell["\<\
+forwardSubstitution::usage = \"forwardSubstitution[L, c] solves L.y == c for \
+a lower triangular matrix L by forward substitution.\";
+forwardSubstitution[L_List, c_List] := Module[{n = Length[c], y = \
+ConstantArray[0, Length[c]]},
+  Do[y[[i]] = (c[[i]] - L[[i, ;; i - 1]] . y[[;; i - 1]])/L[[i, i]], {i, n}];
+  y]\
+\>", "Input",ExpressionUUID->"a2aae06f-d555-42da-8132-8f5b20aeca0d"],
+
+Cell["\<\
+luSolve::usage = \"luSolve[A, b] solves A.x == b using the factorisation from \
+luFactor and returns x.\";
+luSolve[A_List, b_List] := Module[{L, U, P},
+  {L, U, P} = luFactor[A];
+  backSubstitution[U, forwardSubstitution[L, P . b]]]\
+\>", "Input",ExpressionUUID->"11d81695-9d19-4301-904f-6fae115cd200"],
+
+Cell["\<\
+choleskyFactor::usage = \"choleskyFactor[A] returns the lower triangular \
+matrix L with A == L.Transpose[L], for a symmetric positive definite matrix \
+A.\";
+choleskyFactor[A_List] := Transpose[CholeskyDecomposition[A]]\
+\>", "Input",ExpressionUUID->"8ffdb25e-eeab-45ea-a05d-11ea26244775"],
+
+Cell["Non-Linear Systems", "Section",ExpressionUUID->"3f585291-e24d-4bc7-80cb-123fffaff212"],
+
+Cell["\<\
+Functions for solving F(x) == 0 and for fixed point iteration. F, J and g are \
+functions of one vector argument, which vectorFunction and jacobianMatrix \
+build from symbolic expressions.\
+\>", "Text",ExpressionUUID->"4d9bfcd9-d29d-4b6c-b2c9-7c8b279dec4b"],
+
+Cell["\<\
+vectorFunction::usage = \"vectorFunction[exprs, vars] returns a function of \
+one vector argument that substitutes the components of that vector for vars \
+in the list exprs.\";
+vectorFunction[exprs_List, vars_List] := Function[pt, exprs /. Thread[vars -> \
+pt]]\
+\>", "Input",ExpressionUUID->"c687d9cc-b71a-42cc-ab75-00a37bf4cfaa"],
+
+Cell["\<\
+jacobianMatrix::usage = \"jacobianMatrix[exprs, vars] returns the symbolic \
+Jacobian matrix of the list exprs with respect to the list vars.\";
+jacobianMatrix[exprs_List, vars_List] := D[exprs, {vars}]\
+\>", "Input",ExpressionUUID->"be1f2cae-32c4-4ff1-a324-57e225570d31"],
+
+Cell["\<\
+newtonStep::usage = \"newtonStep[F, J, x] returns x + s, where s solves \
+J[x].s == -F[x]. J is the Jacobian of F.\";
+newtonStep[F_, J_, x_] := x + LinearSolve[J[x], -F[x]]\
+\>", "Input",ExpressionUUID->"74f2be25-112a-4f5f-986a-ee27bc9aaae3"],
+
+Cell["\<\
+newtonIterates::usage = \"newtonIterates[F, J, x0, n] returns the list of the \
+first n Newton iterates for F[x] == 0, starting from x0.\";
+newtonIterates[F_, J_, x0_, n_] := NestList[newtonStep[F, J, #] &, x0, n]\
+\>", "Input",ExpressionUUID->"22064b4c-2ce9-4edf-a4a2-26322172d151"],
+
+Cell["\<\
+newtonRaphson::usage = \"newtonRaphson[expr, var, x0, n] returns the list of \
+the first n Newton-Raphson iterates for expr == 0 in the variable var, \
+starting from x0.\";
+newtonRaphson[expr_, var_, x0_, n_] := NestList[(# - (expr /. var -> \
+#)/(D[expr, var] /. var -> #)) &, x0, n]\
+\>", "Input",ExpressionUUID->"5fefe40b-0cb9-4806-8dff-f698f56cb469"],
+
+Cell["\<\
+iterateToTolerance::usage = \"iterateToTolerance[g, x0, tol, maxIter] applies \
+x -> g[x] from x0 until the infinity norm of the change is below tol or \
+maxIter steps have been taken. It returns the list of all iterates, and the \
+last one is the approximation.\";
+iterateToTolerance[g_, x0_, tol_, maxIter_] := Module[{xs = {x0}, x = x0, xn, \
+k = 0},
+  While[k < maxIter,
+    xn = g[x];
+    k++;
+    AppendTo[xs, xn];
+    If[Norm[xn - x, Infinity] < tol, Break[]];
+    x = xn];
+  xs]\
+\>", "Input",ExpressionUUID->"969e7dfa-c3d9-4da1-8a21-376f22d05a84"],
+
+Cell["Interpolation", "Section",ExpressionUUID->"89d8f5ea-9d57-4905-b928-3c2c84582e96"],
+
+Cell["\<\
+Interpolating polynomials and cubic splines through data points {{x0, y0}, \
+{x1, y1}, ...}.\
+\>", "Text",ExpressionUUID->"6f1b6c19-9b99-40e2-9607-0a0595e9c0ba"],
+
+Cell["\<\
+dividedDifferences::usage = \"dividedDifferences[pts] returns the Newton \
+divided difference coefficients {f[x0], f[x0, x1], ...} for the data points \
+pts = {{x0, y0}, {x1, y1}, ...}.\";
+dividedDifferences[pts_List] := Module[{x = pts[[All, 1]], c = pts[[All, 2]], \
+n = Length[pts]},
+  Do[Do[c[[i]] = (c[[i]] - c[[i - 1]])/(x[[i]] - x[[i - j]]), {i, n, j + 1, \
+-1}], {j, n - 1}];
+  c]\
+\>", "Input",ExpressionUUID->"35ed0b88-329c-46f0-87fd-3e9628229256"],
+
+Cell["\<\
+newtonPolynomial::usage = \"newtonPolynomial[pts, v] returns the Newton form \
+of the polynomial through pts, as an expression in the variable v.\";
+newtonPolynomial[pts_List, v_] := Module[{x = pts[[All, 1]], c = \
+dividedDifferences[pts]},
+  Sum[c[[k]] Product[v - x[[m]], {m, k - 1}], {k, Length[pts]}]]\
+\>", "Input",ExpressionUUID->"7c0c2b97-74ac-4b68-a31e-4d6bac9c6125"],
+
+Cell["\<\
+cubicSpline::usage = \"cubicSpline[pts, method, ends] returns a function of t \
+that evaluates the cubic spline through pts. method is \\\"Natural\\\" \
+(default) or \\\"Clamped\\\". For a clamped spline, ends = {m0, mn} gives the \
+slopes at the two end points.\";
+cubicSpline[pts_List, method_String : \"Natural\", ends_List : {0, 0}] /; \
+MemberQ[{\"Natural\", \"Clamped\"}, method] := Module[{x, y, n, aa, bb, cc, \
+dd, tt, s, eqs, sol, pw},
+  x = pts[[All, 1]];
+  y = pts[[All, 2]];
+  n = Length[pts] - 1;
+  s = Table[aa[i] + bb[i] (tt - x[[i]]) + cc[i] (tt - x[[i]])^2 + dd[i] (tt - \
+x[[i]])^3, {i, n}];
+  eqs = Join[
+    Flatten[Table[{(s[[i]] /. tt -> x[[i]]) == y[[i]], (s[[i]] /. tt -> x[[i \
++ 1]]) == y[[i + 1]]}, {i, n}]],
+    Table[(D[s[[i]], tt] /. tt -> x[[i + 1]]) == (D[s[[i + 1]], tt] /. tt -> \
+x[[i + 1]]), {i, n - 1}],
+    Table[(D[s[[i]], {tt, 2}] /. tt -> x[[i + 1]]) == (D[s[[i + 1]], {tt, 2}] \
+/. tt -> x[[i + 1]]), {i, n - 1}],
+    If[method == \"Natural\",
+      {(D[s[[1]], {tt, 2}] /. tt -> x[[1]]) == 0, (D[s[[-1]], {tt, 2}] /. tt \
+-> x[[-1]]) == 0},
+      {(D[s[[1]], tt] /. tt -> x[[1]]) == ends[[1]], (D[s[[-1]], tt] /. tt -> \
+x[[-1]]) == ends[[2]]}]];
+  sol = First[Solve[eqs, Flatten[Table[{aa[i], bb[i], cc[i], dd[i]}, {i, \
+n}]]]];
+  pw = Piecewise[Table[{s[[i]] /. sol, If[i < n, x[[i]] <= tt < x[[i + 1]], \
+x[[i]] <= tt <= x[[i + 1]]]}, {i, n}]];
+  Function[Evaluate[pw /. tt -> Slot[1]]]]\
+\>", "Input",ExpressionUUID->"b70afaf1-c8ff-442d-af31-f71c2a9b1d78"],
+
+Cell["Initial Value Problems", "Section",ExpressionUUID->"a111cea1-553b-4d9e-9bcf-d7a6aa26ed8a"],
+
+Cell["\<\
+One-step methods take a stepper, the right-hand side f[t, w] and the step \
+size h. A stepper maps {t, w} to the next point {t, w}. The same steppers \
+work for systems when w is a list.\
+\>", "Text",ExpressionUUID->"fb489156-7c77-4ddb-b81f-6a34f0502740"],
+
+Cell["\<\
+eulerStep::usage = \"eulerStep[f, h, {t, w}] returns {t + h, w + h f[t, w]}, \
+one step of Euler's method for w' == f[t, w].\";
+eulerStep[f_, h_, {t_, w_}] := {t + h, w + h f[t, w]}\
+\>", "Input",ExpressionUUID->"c45f7153-e51f-46ea-ae99-b71d2df8b216"],
+
+Cell["\<\
+midpointStep::usage = \"midpointStep[f, h, {t, w}] returns one step of the \
+midpoint (modified Euler) method for w' == f[t, w].\";
+midpointStep[f_, h_, {t_, w_}] := {t + h, w + h f[t + h/2, w + (h/2) f[t, w]]}\
+\>", "Input",ExpressionUUID->"67ed858f-8811-4700-9db7-33a90d4fd253"],
+
+Cell["\<\
+modifiedEulerStep::usage = \"modifiedEulerStep[f, h, {t, w}] returns one step \
+of the modified Euler (Heun) method for w' == f[t, w].\";
+modifiedEulerStep[f_, h_, {t_, w_}] := {t + h, w + (h/2) (f[t, w] + f[t + h, \
+w + h f[t, w]])}\
+\>", "Input",ExpressionUUID->"dc657dfa-6a61-436d-b0c8-573ec710fb18"],
+
+Cell["\<\
+rk4Step::usage = \"rk4Step[f, h, {t, w}] returns one step of the classical \
+fourth order Runge-Kutta method for w' == f[t, w].\";
+rk4Step[f_, h_, {t_, w_}] := Module[{k1, k2, k3, k4},
+  k1 = h f[t, w];
+  k2 = h f[t + h/2, w + k1/2];
+  k3 = h f[t + h/2, w + k2/2];
+  k4 = h f[t + h, w + k3];
+  {t + h, w + (k1 + 2 k2 + 2 k3 + k4)/6}]\
+\>", "Input",ExpressionUUID->"44b1987b-4fe7-4ff3-b6f9-ecd6c717eaf7"],
+
+Cell["\<\
+solveIVP::usage = \"solveIVP[stepper, f, {a, alpha}, b, n] solves w' == f[t, \
+w] with w[a] == alpha on [a, b] in n steps of the given stepper, such as \
+eulerStep or rk4Step. It returns the n + 1 points {t, w}.\";
+solveIVP[stepper_, f_, {a_, alpha_}, b_, n_] := NestList[stepper[f, (b - \
+a)/n, #] &, {a, alpha}, n]\
+\>", "Input",ExpressionUUID->"52b17cf9-4148-47ed-b42c-d20e5dd1110c"],
+
+Cell["\<\
+ivpErrorTable::usage = \"ivpErrorTable[points, exact] returns a table of t, \
+w, the exact value exact[t] and the absolute error for a list of points {t, \
+w} from solveIVP.\";
+ivpErrorTable[points_List, exact_] := TableForm[
+  Map[{#[[1]], #[[2]], exact[#[[1]]], Abs[exact[#[[1]]] - #[[2]]]} &, \
+points],
+  TableHeadings -> {None, {\"t_i\", \"w_i\", \"y(t_i)\", \"error\"}}]\
+\>", "Input",ExpressionUUID->"e40d6b01-080e-40a4-9ed5-71917d6ca6d2"],
+
+Cell["\<\
+adamsBashforth2::usage = \"adamsBashforth2[f, {a, alpha}, b, n] solves w' == \
+f[t, w] with the two-step Adams-Bashforth method, started from one step of \
+rk4Step. It returns the n + 1 points {t, w}.\";
+adamsBashforth2[f_, {a_, alpha_}, b_, n_] := Module[{h = (b - a)/n, pts, fv, \
+tn},
+  pts = NestList[rk4Step[f, h, #] &, {a, alpha}, 1];
+  fv = MapThread[f, Transpose[pts]];
+  Do[
+    tn = pts[[m, 1]] + h;
+    AppendTo[pts, {tn, pts[[m, 2]] + (h/2) (3 fv[[m]] - fv[[m - 1]])}];
+    AppendTo[fv, f[tn, pts[[-1, 2]]]],
+    {m, 2, n}];
+  pts]\
+\>", "Input",ExpressionUUID->"3948c2f8-9958-4815-8d62-ef8151916775"],
+
+Cell["\<\
+adamsBashforthMoulton4::usage = \"adamsBashforthMoulton4[f, {a, alpha}, b, n] \
+solves w' == f[t, w] with the four-step Adams-Bashforth predictor and \
+Adams-Moulton corrector, started from three steps of rk4Step. It returns the \
+n + 1 points {t, w}.\";
+adamsBashforthMoulton4[f_, {a_, alpha_}, b_, n_] := Module[{h = (b - a)/n, \
+pts, fv, tn, wp, wn},
+  pts = NestList[rk4Step[f, h, #] &, {a, alpha}, 3];
+  fv = MapThread[f, Transpose[pts]];
+  Do[
+    tn = pts[[m, 1]] + h;
+    wp = pts[[m, 2]] + (h/24) (55 fv[[m]] - 59 fv[[m - 1]] + 37 fv[[m - 2]] - \
+9 fv[[m - 3]]);
+    wn = pts[[m, 2]] + (h/24) (9 f[tn, wp] + 19 fv[[m]] - 5 fv[[m - 1]] + \
+fv[[m - 2]]);
+    AppendTo[pts, {tn, wn}];
+    AppendTo[fv, f[tn, wn]],
+    {m, 4, n}];
+  pts]\
+\>", "Input",ExpressionUUID->"4ab58708-8072-4d85-9d3d-ce73aa3ac1c4"]
+},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"f191ae8c-5b1d-4451-96ad-e98740f89227"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 97, 0, 87, "Title",ExpressionUUID->"94ba5fea-3eee-47e8-8e5f-8b71161da43a"],
+Cell[654, 22, 362, 5, 87, "Text",ExpressionUUID->"f6ccf1b9-d5e7-49e5-98a0-c4a06c0ca90e"],
+Cell[1019, 29, 88, 0, 87, "Section",ExpressionUUID->"959c2e99-6029-457f-9f1d-8edf28eb6381"],
+Cell[1110, 31, 149, 2, 87, "Text",ExpressionUUID->"390c4213-ed1e-4686-bdae-fca860a4ad49"],
+Cell[1262, 35, 231, 4, 87, "Input",ExpressionUUID->"ef2ae083-0686-4ca5-adb3-a83def836a65"],
+Cell[1496, 41, 547, 10, 87, "Input",ExpressionUUID->"706841e5-e9e4-44bb-a2aa-7cc673dd60c1"],
+Cell[2046, 53, 393, 8, 87, "Input",ExpressionUUID->"2a5d6250-a056-458d-8b09-ade278dc7f19"],
+Cell[2442, 63, 761, 16, 87, "Input",ExpressionUUID->"86012f12-8b9d-45fb-90ca-9d642be1a3fd"],
+Cell[3206, 81, 432, 6, 87, "Input",ExpressionUUID->"414e5e67-d755-43f6-9c65-00dd2e5d770f"],
+Cell[3641, 89, 103, 0, 87, "Section",ExpressionUUID->"1772bb8a-5d97-4b4b-b8cf-a61b7d4dbd01"],
+Cell[3747, 91, 144, 2, 87, "Text",ExpressionUUID->"cf18bcf6-0022-46cf-bb80-f087ad8e0454"],
+Cell[3894, 95, 456, 8, 87, "Input",ExpressionUUID->"9c759595-297c-4bc6-9b88-676d380b2916"],
+Cell[4353, 105, 395, 7, 87, "Input",ExpressionUUID->"a2aae06f-d555-42da-8132-8f5b20aeca0d"],
+Cell[4751, 114, 312, 6, 87, "Input",ExpressionUUID->"11d81695-9d19-4301-904f-6fae115cd200"],
+Cell[5066, 122, 300, 5, 87, "Input",ExpressionUUID->"8ffdb25e-eeab-45ea-a05d-11ea26244775"],
+Cell[5369, 129, 92, 0, 87, "Section",ExpressionUUID->"3f585291-e24d-4bc7-80cb-123fffaff212"],
+Cell[5464, 131, 267, 4, 87, "Text",ExpressionUUID->"4d9bfcd9-d29d-4b6c-b2c9-7c8b279dec4b"],
+Cell[5734, 137, 342, 6, 87, "Input",ExpressionUUID->"c687d9cc-b71a-42cc-ab75-00a37bf4cfaa"],
+Cell[6079, 145, 282, 4, 87, "Input",ExpressionUUID->"be1f2cae-32c4-4ff1-a324-57e225570d31"],
+Cell[6364, 151, 252, 4, 87, "Input",ExpressionUUID->"74f2be25-112a-4f5f-986a-ee27bc9aaae3"],
+Cell[6619, 157, 293, 4, 87, "Input",ExpressionUUID->"22064b4c-2ce9-4edf-a4a2-26322172d151"],
+Cell[6915, 163, 364, 6, 87, "Input",ExpressionUUID->"5fefe40b-0cb9-4806-8dff-f698f56cb469"],
+Cell[7282, 171, 566, 14, 87, "Input",ExpressionUUID->"969e7dfa-c3d9-4da1-8a21-376f22d05a84"],
+Cell[7851, 187, 87, 0, 87, "Section",ExpressionUUID->"89d8f5ea-9d57-4905-b928-3c2c84582e96"],
+Cell[7941, 189, 171, 3, 87, "Text",ExpressionUUID->"6f1b6c19-9b99-40e2-9607-0a0595e9c0ba"],
+Cell[8115, 194, 468, 9, 87, "Input",ExpressionUUID->"35ed0b88-329c-46f0-87fd-3e9628229256"],
+Cell[8586, 205, 386, 6, 87, "Input",ExpressionUUID->"7c0c2b97-74ac-4b68-a31e-4d6bac9c6125"],
+Cell[8975, 213, 1514, 30, 87, "Input",ExpressionUUID->"b70afaf1-c8ff-442d-af31-f71c2a9b1d78"],
+Cell[10492, 245, 96, 0, 87, "Section",ExpressionUUID->"a111cea1-553b-4d9e-9bcf-d7a6aa26ed8a"],
+Cell[10591, 247, 265, 4, 87, "Text",ExpressionUUID->"fb489156-7c77-4ddb-b81f-6a34f0502740"],
+Cell[10859, 253, 261, 4, 87, "Input",ExpressionUUID->"c45f7153-e51f-46ea-ae99-b71d2df8b216"],
+Cell[11123, 259, 290, 4, 87, "Input",ExpressionUUID->"67ed858f-8811-4700-9db7-33a90d4fd253"],
+Cell[11416, 265, 313, 5, 87, "Input",ExpressionUUID->"dc657dfa-6a61-436d-b0c8-573ec710fb18"],
+Cell[11732, 272, 413, 9, 87, "Input",ExpressionUUID->"44b1987b-4fe7-4ff3-b6f9-ecd6c717eaf7"],
+Cell[12148, 283, 396, 6, 87, "Input",ExpressionUUID->"52b17cf9-4148-47ed-b42c-d20e5dd1110c"],
+Cell[12547, 291, 456, 8, 87, "Input",ExpressionUUID->"e40d6b01-080e-40a4-9ed5-71917d6ca6d2"],
+Cell[13006, 301, 623, 14, 87, "Input",ExpressionUUID->"3948c2f8-9958-4815-8d62-ef8151916775"],
+Cell[13632, 317, 822, 19, 87, "Input",ExpressionUUID->"4ab58708-8072-4d85-9d3d-ce73aa3ac1c4"]
+}
+]
+*)
+
+(* End of internal cache information *)

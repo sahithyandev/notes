@@ -5,6 +5,7 @@ import { getEntry, getEntries } from "astro:content";
 import Nav from "../components/layout/nav.astro";
 import Breadcrumb from "../components/layout/breadcrumb.astro";
 import { SITE_NAME, SITE_HOST_URL, isWip } from "../utils/values";
+import { summaryNotebookId } from "../utils/summary-notebook";
 import Note from "../components/mdx/note.astro";
 import Solution from "../components/mdx/solution.astro";
 import Method from "../components/mdx/method.astro";
@@ -92,6 +93,10 @@ const prereqEntries = notesEntry.data.prereqs
 
 const authorEntries = await getEntries(notesEntry.data.authors);
 const notebookEntries = await getEntries(notesEntry.data.notebooks ?? []);
+const summaryId = summaryNotebookId(slug);
+const summaryEntry = summaryId
+  ? (await getCollection("notebooks")).find((entry) => entry.id === summaryId)
+  : undefined;
 
 const sidebarData = await getSidebarData(slug);
 const wip = isWip(slug);
@@ -227,7 +232,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
           />
         </Article>
 
-        <NoteNotebooks notebooks={notebookEntries} />
+        <NoteNotebooks notebooks={notebookEntries} summary={summaryEntry} />
 
         <NoteAuthors
           authors={authorEntries}

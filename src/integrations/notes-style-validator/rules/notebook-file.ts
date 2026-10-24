@@ -1,5 +1,6 @@
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
+import { summaryNotebookId } from "../../../utils/summary-notebook.ts";
 
 // A note's `notebooks` frontmatter lists Wolfram notebooks (.nb) offered as
 // downloads at the end of the note. Each entry is a basename without the
@@ -59,8 +60,16 @@ export function checkNotebookFiles(
   const notebookFiles = files[0]?.notebookFiles;
   if (!notebookFiles) return [];
 
+  // A module's summary notebook is linked from every note in that module, so
+  // it counts as referenced whenever one of those notes exists.
   const referenced = new Set(
-    files.flatMap((f) => f.notebooks.map((n) => n.value)),
+    files.flatMap((f) => {
+      const summary = summaryNotebookId(f.slug);
+      return [
+        ...f.notebooks.map((n) => n.value),
+        ...(summary ? [summary] : []),
+      ];
+    }),
   );
 
   const out: Array<{ file: string; violation: Violation }> = [];

@@ -1,0 +1,792 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     38702,        783]
+NotebookOptionsPosition[     32688,        710]
+NotebookOutlinePosition[     33005,        724]
+CellTagsIndexPosition[     32962,        721]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Operational Research Summary", "Title",ExpressionUUID->"55300622-a5ac-47c7-9e69-8adc6092d889"],
+
+Cell["\<\
+Reusable functions for the operational research module. Each function has a \
+usage message, so type ?name to read its signature. Evaluate the cells from \
+top to bottom (Shift+Enter), then build your own problems on top of these \
+definitions. The notebook contains no worked examples.
+
+Problems are written as maximise c.x subject to A.x <= b and x >= 0 unless a \
+function says otherwise.\
+\>", "Text",ExpressionUUID->"93185f90-e183-4077-a2aa-eff99ba797bd"],
+
+Cell["Linear Programs", "Section",ExpressionUUID->"e8aa7b90-b328-471d-8edc-9d9a235fa90f"],
+
+Cell["\<\
+solveLP::usage = \"solveLP[c, A, b] maximises c.x subject to A.x <= b and x \
+>= 0, using LinearProgramming. It returns an association with the optimal x \
+and the objective value z.\";
+solveLP[c_List, A_List, b_List] := Module[{x = LinearProgramming[-c, -A, \
+-b]},
+  Association[\"x\" -> x, \"z\" -> c . x]]\
+\>", "Input",ExpressionUUID->"2053f9dc-1242-4423-ab23-eb47f0cc6bd3"],
+
+Cell["\<\
+isFeasible::usage = \"isFeasible[A, b, x] returns True when x satisfies A.x \
+<= b and x >= 0.\";
+isFeasible[A_List, b_List, x_List] := And @@ Thread[A . x <= b] && And @@ \
+Thread[x >= 0]\
+\>", "Input",ExpressionUUID->"5d04807d-d4c5-48b7-9587-1b248af76850"],
+
+Cell["\<\
+basicSolution::usage = \"basicSolution[A, b, basis] returns the basic \
+solution of A.x == b in which the variables listed in basis are solved for \
+and the others are zero. It returns $Failed when the columns in basis are \
+singular.\";
+basicSolution[A_List, b_List, basis_List] := Module[{x = ConstantArray[0, \
+Length[A[[1]]]], sol},
+  If[Length[basis] != Length[A] || Det[A[[All, basis]]] == 0, Return[$Failed]];
+  sol = LinearSolve[A[[All, basis]], b];
+  x[[basis]] = sol;
+  x]\
+\>", "Input",ExpressionUUID->"52cb6e9c-6ecb-499c-92e4-95762caabc99"],
+
+Cell["\<\
+basicFeasibleSolutions::usage = \"basicFeasibleSolutions[A, b] returns every \
+basic feasible solution of A.x == b with x >= 0, found by trying every set of \
+m columns as a basis.\";
+basicFeasibleSolutions[A_List, b_List] := Module[{m = Length[A], n = \
+Length[A[[1]]], sols},
+  sols = Table[basicSolution[A, b, bs], {bs, Subsets[Range[n], {m}]}];
+  Select[sols, # =!= $Failed && And @@ Thread[# >= 0] &]]\
+\>", "Input",ExpressionUUID->"23ab7bf8-d40c-45f6-91ad-c17a9bd9bc43"],
+
+Cell["Graphical Method", "Section",ExpressionUUID->"013bc2d3-c8fc-4d80-bb4d-546c6f3332ad"],
+
+Cell["\<\
+Corner points are found by solving every choice of n constraints as \
+equalities, where n is the number of variables.\
+\>", "Text",ExpressionUUID->"041aad88-7fee-4dd6-8e7e-a20b73ebf3fd"],
+
+Cell["\<\
+cornerPoints::usage = \"cornerPoints[A, b] returns the feasible corner points \
+of {x | A.x <= b, x >= 0}. Works for any number of variables.\";
+cornerPoints[A_List, b_List] := Module[{n = Length[A[[1]]], Mb, rb, cands},
+  Mb = Join[A, IdentityMatrix[n]];
+  rb = Join[b, ConstantArray[0, n]];
+  cands = DeleteDuplicates[Table[Quiet[Check[LinearSolve[Mb[[p]], rb[[p]]], \
+Nothing]], {p, Subsets[Range[Length[Mb]], {n}]}]];
+  Select[cands, And @@ Thread[A . # <= b] && And @@ Thread[# >= 0] &]]\
+\>", "Input",ExpressionUUID->"512224bc-3774-4155-b6d7-24c1b8da47d7"],
+
+Cell["\<\
+bestCorner::usage = \"bestCorner[c, A, b] returns an association with the \
+corner point x that maximises c.x and the value z. It returns $Failed when \
+the feasible region has no corner points.\";
+bestCorner[c_List, A_List, b_List] := Module[{pts = cornerPoints[A, b]},
+  If[pts === {}, $Failed,
+    With[{x = First[MaximalBy[pts, c . # &]]}, Association[\"x\" -> x, \"z\" \
+-> c . x]]]]\
+\>", "Input",ExpressionUUID->"fd9cb883-23a1-4119-9353-fd86838998b8"],
+
+Cell["Standard Form", "Section",ExpressionUUID->"31dd00a4-a395-4e2d-b319-51092bc29d7c"],
+
+Cell["\<\
+standardForm::usage = \"standardForm[c, rows] converts a maximisation problem \
+into equality form. rows is a list of {coefficients, sense, rhs} with sense \
+\\\"<=\\\", \\\">=\\\" or \\\"==\\\". Slack s, surplus e and artificial a \
+columns are added as needed. It returns an association with the keys names, \
+A, b, c and basis, where c holds zeros for the added columns and basis lists \
+the starting basic column of each row.\";
+standardForm[c_List, rows_List] := Module[{n = Length[c], m = Length[rows], \
+coef, senses, bvec, extra, names, basicNames},
+  coef = rows[[All, 1]];
+  senses = rows[[All, 2]];
+  bvec = rows[[All, 3]];
+  extra = Join @@ Table[
+    Switch[senses[[i]],
+      \"<=\", {{\"s\" <> ToString[i], UnitVector[m, i]}},
+      \">=\", {{\"e\" <> ToString[i], -UnitVector[m, i]}, {\"a\" <> \
+ToString[i], UnitVector[m, i]}},
+      \"==\", {{\"a\" <> ToString[i], UnitVector[m, i]}}],
+    {i, m}];
+  names = Join[Table[\"x\" <> ToString[j], {j, n}], extra[[All, 1]]];
+  basicNames = Table[If[senses[[i]] === \"<=\", \"s\" <> ToString[i], \"a\" \
+<> ToString[i]], {i, m}];
+  Association[
+    \"names\" -> names,
+    \"A\" -> MapThread[Join, {coef, Transpose[extra[[All, 2]]]}],
+    \"b\" -> bvec,
+    \"c\" -> Join[c, ConstantArray[0, Length[extra]]],
+    \"basis\" -> Flatten[Map[Position[names, #] &, basicNames]]]]\
+\>", "Input",ExpressionUUID->"e19c506e-b2cd-4c56-bb0a-93a04c2d6c7d"],
+
+Cell["Simplex Method", "Section",ExpressionUUID->"0f2a37c7-de24-4f6d-9153-b0d000ce1ef9"],
+
+Cell["\<\
+A tableau has one objective row followed by one row per constraint. Its last \
+column is the right-hand side. The last entry of the objective row is the \
+objective value, and the basis lists the basic column of each constraint row.\
+\
+\>", "Text",ExpressionUUID->"01ea617b-d131-4bbd-bd82-868e4e4fce8e"],
+
+Cell["\<\
+buildTableau::usage = \"buildTableau[cExt, A, b, basis] returns the simplex \
+tableau for maximising cExt.x subject to A.x == b, with the columns in basis \
+already basic. The first row is the objective row and each further row is a \
+constraint.\";
+buildTableau[cExt_List, A_List, b_List, basis_List] := Module[{Binv = \
+Inverse[A[[All, basis]]], rowsAb, obj},
+  rowsAb = MapThread[Append, {Binv . A, Binv . b}];
+  obj = -Append[cExt, 0] + Sum[cExt[[basis[[i]]]] rowsAb[[i]], {i, \
+Length[basis]}];
+  Prepend[rowsAb, obj]]\
+\>", "Input",ExpressionUUID->"f00ebb07-e0be-4764-bf02-1c2236d381aa"],
+
+Cell["\<\
+simplexTableau::usage = \"simplexTableau[c, A, b] returns {T, basis, names} \
+for maximising c.x subject to A.x <= b and x >= 0. Slack variables s1, s2, \
+... are added, and basis lists their columns in the starting tableau T.\";
+simplexTableau[c_List, A_List, b_List] := Module[{m = Length[A], n = \
+Length[c], names, basis},
+  names = Join[Table[\"x\" <> ToString[j], {j, n}], Table[\"s\" <> \
+ToString[i], {i, m}]];
+  basis = Range[n + 1, n + m];
+  {buildTableau[Join[c, ConstantArray[0, m]], Join[A, IdentityMatrix[m], 2], \
+b, basis], basis, names}]\
+\>", "Input",ExpressionUUID->"f16bed93-e9b8-4e04-a308-1bd129b9d777"],
+
+Cell["\<\
+pivot::usage = \"pivot[T, row, col] returns the tableau after pivoting on the \
+entry in row row and column col. Row 1 is the objective row.\";
+pivot[T_List, row_Integer, col_Integer] := Module[{P = T},
+  P[[row]] = T[[row]]/T[[row, col]];
+  Do[If[i != row, P[[i]] = T[[i]] - T[[i, col]] P[[row]]], {i, Length[T]}];
+  P]\
+\>", "Input",ExpressionUUID->"61eb28a1-0110-44dc-8cab-7c6f26a2b383"],
+
+Cell["\<\
+showTableau::usage = \"showTableau[T, basis, names] displays the tableau T as \
+a table, with the basic variables in the row labels and names as the column \
+labels.\";
+showTableau[T_List, basis_List, names_List] := TableForm[T,
+  TableHeadings -> {Prepend[names[[basis]], \"z\"], Append[names, \"RHS\"]}]\
+\>", "Input",ExpressionUUID->"c28f4bdd-84a9-431c-a218-245be23885fa"],
+
+Cell["\<\
+simplexRun::usage = \"simplexRun[T, basis] runs the primal simplex method \
+from the tableau T with the starting basis, using the most negative objective \
+entry to choose the entering column and the minimum ratio to choose the \
+leaving row. It returns a history list of {T, basis, enteringColumn, \
+leavingRow} for each step, and the last entry, with None in the last two \
+places, holds the final tableau.\";
+simplexRun[T0_List, basis0_List] := Module[{T = T0, basis = basis0, hist = \
+{}, obj, ratios, col, row},
+  Do[
+    obj = T[[1, 1 ;; -2]];
+    If[Min[obj] >= 0, Break[]];
+    col = First[Ordering[obj, 1]];
+    ratios = Table[If[T[[i, col]] > 0, T[[i, -1]]/T[[i, col]], Infinity], {i, \
+2, Length[T]}];
+    If[Min[ratios] === Infinity, Print[\"unbounded\"]; Break[]];
+    row = First[Ordering[ratios, 1]] + 1;
+    AppendTo[hist, {T, basis, col, row}];
+    T = pivot[T, row, col];
+    basis[[row - 1]] = col, {20}];
+  AppendTo[hist, {T, basis, None, None}];
+  hist]\
+\>", "Input",ExpressionUUID->"c1e6b18c-ce09-48da-bf52-859fd577f709"],
+
+Cell["\<\
+showSimplexSteps::usage = \"showSimplexSteps[hist, names] displays every \
+tableau in the history returned by simplexRun, labelled by step number.\";
+showSimplexSteps[hist_List, names_List] := Column[MapIndexed[
+  Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], \
+showTableau[#1[[1]], #1[[2]], names]}] &, hist]]\
+\>", "Input",ExpressionUUID->"7e3ae60e-32c1-47e2-a729-060f0833581a"],
+
+Cell["\<\
+tableauSolution::usage = \"tableauSolution[T, basis] returns an association \
+with the value of every column of the final tableau T, where nonbasic columns \
+are zero, and the objective value z.\";
+tableauSolution[T_List, basis_List] := Module[{x = ConstantArray[0, \
+Length[T[[1]]] - 1]},
+  x[[basis]] = T[[2 ;;, -1]];
+  Association[\"x\" -> x, \"z\" -> T[[1, -1]]]]\
+\>", "Input",ExpressionUUID->"78e43248-c028-49b1-98d8-4636aac897ff"],
+
+Cell["Big-M and Two-Phase Methods", "Section",ExpressionUUID->"46a0bf3c-f490-4e7a-a897-3b867077f319"],
+
+Cell["\<\
+Both methods start from standardForm. Artificial variables are given a large \
+negative cost in the big-M method, and phase 1 of the two-phase method \
+maximises minus their sum.\
+\>", "Text",ExpressionUUID->"a53713d2-6a72-4a15-a1f0-e9bcce4de83a"],
+
+Cell["\<\
+bigMTableau::usage = \"bigMTableau[std, M] returns {T, basis, names} for the \
+big-M method, where std is the association from standardForm. Each artificial \
+variable has cost -M, and the objective row is adjusted so that the starting \
+basis is in canonical form.\";
+bigMTableau[std_Association, M_] := Module[{isArt = Map[StringStartsQ[#, \
+\"a\"] &, std[\"names\"]], cExt},
+  cExt = std[\"c\"] - M Boole[isArt];
+  {buildTableau[cExt, std[\"A\"], std[\"b\"], std[\"basis\"]], \
+std[\"basis\"], std[\"names\"]}]\
+\>", "Input",ExpressionUUID->"9e750b1c-8d08-4da4-af31-9a65cf22d590"],
+
+Cell["\<\
+phaseOneTableau::usage = \"phaseOneTableau[std] returns {T, basis, names} for \
+phase 1 of the two-phase method, which maximises minus the sum of the \
+artificial variables. The problem is feasible when the optimal objective \
+value z is zero.\";
+phaseOneTableau[std_Association] := Module[{isArt = Map[StringStartsQ[#, \
+\"a\"] &, std[\"names\"]], cExt},
+  cExt = -Boole[isArt];
+  {buildTableau[cExt, std[\"A\"], std[\"b\"], std[\"basis\"]], \
+std[\"basis\"], std[\"names\"]}]\
+\>", "Input",ExpressionUUID->"55c55cc6-10e1-42d8-9903-006b0e5984e4"],
+
+Cell["\<\
+phaseTwoTableau::usage = \"phaseTwoTableau[std, basis] returns {T, basis, \
+names} for phase 2 of the two-phase method. The artificial columns are \
+removed and the original objective is restored. basis is the final basis of \
+phase 1, and it must not contain an artificial variable.\";
+phaseTwoTableau[std_Association, basis_List] := Module[{keep, newBasis},
+  keep = Flatten[Position[Map[StringStartsQ[#, \"a\"] &, std[\"names\"]], \
+False]];
+  newBasis = Flatten[Map[Position[keep, #] &, basis]];
+  {buildTableau[std[\"c\"][[keep]], std[\"A\"][[All, keep]], std[\"b\"], \
+newBasis], newBasis, std[\"names\"][[keep]]}]\
+\>", "Input",ExpressionUUID->"49872a71-b573-45a9-8314-0d0af0c10ce5"],
+
+Cell["Dual Simplex Method", "Section",ExpressionUUID->"11a942e1-fb68-4f7e-9762-27eaa3995462"],
+
+Cell["\<\
+eliminateBasis::usage = \"eliminateBasis[T, basis, row] subtracts multiples \
+of the constraint rows of T so that row is zero in every basic column. Use it \
+before appending a new constraint, such as a cut, to a tableau.\";
+eliminateBasis[T_List, basis_List, row_List] := Module[{r = row},
+  Do[r = r - r[[basis[[i]]]] T[[i + 1]], {i, Length[basis]}];
+  r]\
+\>", "Input",ExpressionUUID->"234d868a-5b34-4e93-8ed5-e6179e3f0f8f"],
+
+Cell["\<\
+dualSimplexRun::usage = \"dualSimplexRun[T, basis] runs the dual simplex \
+method from a tableau that is dual feasible but has negative right-hand \
+sides. It returns a history in the same form as simplexRun.\";
+dualSimplexRun[T0_List, basis0_List] := Module[{T = T0, basis = basis0, hist \
+= {}, rhs, row, cands, ratios, col},
+  Do[
+    rhs = T[[2 ;;, -1]];
+    If[Min[rhs] >= 0, Break[]];
+    row = First[Ordering[rhs, 1]] + 1;
+    cands = Select[Range[Length[T[[1]]] - 1], T[[row, #]] < 0 &];
+    If[cands === {}, Print[\"infeasible\"]; Break[]];
+    ratios = Table[Abs[T[[1, j]]/T[[row, j]]], {j, cands}];
+    col = cands[[First[Ordering[ratios, 1]]]];
+    AppendTo[hist, {T, basis, col, row}];
+    T = pivot[T, row, col];
+    basis[[row - 1]] = col, {20}];
+  AppendTo[hist, {T, basis, None, None}];
+  hist]\
+\>", "Input",ExpressionUUID->"7a85a843-fbc5-4fba-9dcc-119032a4999e"],
+
+Cell["Duality", "Section",ExpressionUUID->"94cb59cd-bc7b-4285-bf13-1bc15d209a41"],
+
+Cell["\<\
+dualProblem::usage = \"dualProblem[c, A, b] returns {w, M, r} for the dual of \
+maximising c.x subject to A.x <= b and x >= 0. The dual minimises w.y subject \
+to M.y >= r and y >= 0, and it can be solved with LinearProgramming[w, M, r].\
+\";
+dualProblem[c_List, A_List, b_List] := {b, Transpose[A], c}\
+\>", "Input",ExpressionUUID->"656844fb-0fa5-44b2-937c-a451575b9c9d"],
+
+Cell["\<\
+complementarySlackness::usage = \"complementarySlackness[c, A, b, x, y] \
+returns an association with the primal slacks b - A.x, the dual slacks A^T.y \
+- c, and the products of each variable with its complementary slack. All \
+products are zero for optimal x and y.\";
+complementarySlackness[c_List, A_List, b_List, x_List, y_List] := Module[{ps \
+= b - A . x, ds = Transpose[A] . y - c},
+  Association[\"primalSlack\" -> ps, \"dualSlack\" -> ds, \"xTimesDualSlack\" \
+-> x*ds, \"yTimesPrimalSlack\" -> y*ps]]\
+\>", "Input",ExpressionUUID->"21acd581-bb96-4961-9103-10939b20f6f3"],
+
+Cell["Sensitivity Analysis", "Section",ExpressionUUID->"1fdc54bd-56bc-44ea-bc9e-6e9ed52c83fc"],
+
+Cell["\<\
+sensitivityData computes the optimal basis data that the other sensitivity \
+functions use. The basis lists columns of [A | I], so the slack columns come \
+after the variables.\
+\>", "Text",ExpressionUUID->"5067c973-638d-42d7-b26f-7c47a1cff5dd"],
+
+Cell["\<\
+sensitivityData::usage = \"sensitivityData[c, A, b, basis] returns an \
+association for the optimal basis of maximising c.x subject to A.x <= b. It \
+holds the basis inverse Binv, the basic values xB, the dual values y, the \
+reduced costs zRow and the data needed by rhsRange and costRange.\";
+sensitivityData[c_List, A_List, b_List, basis_List] := Module[{m = Length[A], \
+cs, As, Binv, xB, y, zRow},
+  cs = Join[c, ConstantArray[0, m]];
+  As = Join[A, IdentityMatrix[m], 2];
+  Binv = Inverse[As[[All, basis]]];
+  xB = Binv . b;
+  y = cs[[basis]] . Binv;
+  zRow = y . As - cs;
+  Association[\"basis\" -> basis, \"As\" -> As, \"cs\" -> cs, \"b\" -> b, \
+\"Binv\" -> Binv, \"xB\" -> xB, \"y\" -> y, \"zRow\" -> zRow]]\
+\>", "Input",ExpressionUUID->"e1a585b9-20cb-4383-b92b-b598cb6b39ec"],
+
+Cell["\<\
+rhsRange::usage = \"rhsRange[data, i] returns {lo, hi}, the range of values \
+of the right-hand side b_i for which the current basis stays feasible. data \
+comes from sensitivityData.\";
+rhsRange[data_Association, i_Integer] := Module[{xB = data[\"xB\"], rhs = \
+data[\"b\"], m, col, lo, hi},
+  m = Length[xB];
+  col = data[\"Binv\"] . UnitVector[m, i];
+  lo = Max[Table[If[col[[k]] > 0, -xB[[k]]/col[[k]], -Infinity], {k, m}]];
+  hi = Min[Table[If[col[[k]] < 0, -xB[[k]]/col[[k]], Infinity], {k, m}]];
+  {rhs[[i]] + lo, rhs[[i]] + hi}]\
+\>", "Input",ExpressionUUID->"986fa1f8-65f7-47de-ab11-8880fe7d21fa"],
+
+Cell["\<\
+costRange::usage = \"costRange[data, j] returns {lo, hi}, the range of values \
+of the cost c_j for which the current basis stays optimal. j must be a basic \
+column. data comes from sensitivityData.\";
+costRange[data_Association, j_Integer] := Module[{basis = data[\"basis\"], cs \
+= data[\"cs\"], zRow = data[\"zRow\"], r, alpha, nonbasic, lo, hi},
+  r = First[Flatten[Position[basis, j]]];
+  alpha = (data[\"Binv\"] . data[\"As\"])[[r]];
+  nonbasic = Complement[Range[Length[cs]], basis];
+  lo = Max[Table[If[alpha[[k]] > 0, -zRow[[k]]/alpha[[k]], -Infinity], {k, \
+nonbasic}]];
+  hi = Min[Table[If[alpha[[k]] < 0, -zRow[[k]]/alpha[[k]], Infinity], {k, \
+nonbasic}]];
+  {cs[[j]] + lo, cs[[j]] + hi}]\
+\>", "Input",ExpressionUUID->"429a78e8-e1a5-4d60-8658-919f2eb800f9"],
+
+Cell["\<\
+newVariableReducedCost::usage = \"newVariableReducedCost[data, a, cNew] \
+returns z - c for a new variable with column a and objective coefficient \
+cNew. A nonnegative value means the current solution stays optimal. data \
+comes from sensitivityData.\";
+newVariableReducedCost[data_Association, a_List, cNew_] := \
+data[\"cs\"][[data[\"basis\"]]] . (data[\"Binv\"] . a) - cNew\
+\>", "Input",ExpressionUUID->"1f37a8ff-86b0-4e63-b637-c4e2bbe569c0"],
+
+Cell["Integer Programming", "Section",ExpressionUUID->"634d84a6-f282-442a-b3dd-22e327f523fe"],
+
+Cell["\<\
+fractionalPart::usage = \"fractionalPart[v] returns v - Floor[v], the \
+fractional part of v.\";
+fractionalPart[v_] := v - Floor[v]\
+\>", "Input",ExpressionUUID->"a6b4de89-5f63-41d3-8b5a-c215c2023c90"],
+
+Cell["\<\
+branchAndBound::usage = \"branchAndBound[c, A, b] maximises c.x subject to \
+A.x <= b, x >= 0 and x integer, by branch and bound on LP relaxations. It \
+returns an association with the optimal integer point x, its value z, and \
+log, a list of {node, x, z, action} for every node visited.\";
+branchAndBound[c_List, A_List, b_List] := Module[{n = Length[c], log = {}, \
+best = {-Infinity, None}, relax, bb},
+  relax[lo_, hi_] := Module[{ups = Select[Range[n], hi[[#]] =!= Infinity &], \
+res},
+    res = Quiet[Check[LinearProgramming[-c, Join[-A, IdentityMatrix[n], \
+-IdentityMatrix[n][[ups]]], Join[-b, lo, -hi[[ups]]]], $Failed]];
+    If[res === $Failed, $Failed, {res, c . res}]];
+  bb[lo_, hi_, label_] := Module[{res, x, z, frac, j, hiL, loR},
+    res = relax[lo, hi];
+    If[res === $Failed,
+      AppendTo[log, {label, \"-\", \"-\", \"infeasible\"}],
+      {x, z} = res;
+      frac = Select[Range[n], Abs[x[[#]] - Round[x[[#]]]] > 10^-9 &];
+      Which[
+        z <= best[[1]], AppendTo[log, {label, x, z, \"bound\"}],
+        frac === {}, (best = {z, x}; AppendTo[log, {label, x, z, \"integer, \
+new best\"}]),
+        True, (
+          j = First[frac];
+          AppendTo[log, {label, x, z, \"branch on x\" <> ToString[j]}];
+          hiL = hi;
+          hiL[[j]] = Floor[x[[j]]];
+          loR = lo;
+          loR[[j]] = Ceiling[x[[j]]];
+          bb[lo, hiL, label <> \"L\"];
+          bb[loR, hi, label <> \"R\"])]]];
+  bb[ConstantArray[0, n], ConstantArray[Infinity, n], \"root\"];
+  Association[\"x\" -> best[[2]], \"z\" -> best[[1]], \"log\" -> log]]\
+\>", "Input",ExpressionUUID->"6cb6dead-b877-4afd-987c-e4cf7579f1b9"],
+
+Cell["\<\
+gomoryCut::usage = \"gomoryCut[A, b, basis] returns {row, rhs} for a Gomory \
+cut row.x <= rhs, built from the optimal LP tableau row whose basic variable \
+has the largest fractional part. basis lists the basic columns of [A | I] at \
+the LP optimum. The cut removes the current LP optimum and keeps every \
+integer feasible point.\";
+gomoryCut[A_List, b_List, basis_List] := Module[{m = Length[A], n = \
+Length[A[[1]]], As, Binv, xB, rows, nonbasic, r, f0, coef, constant},
+  As = Join[A, IdentityMatrix[m], 2];
+  Binv = Inverse[As[[All, basis]]];
+  xB = Binv . b;
+  rows = Binv . As;
+  nonbasic = Complement[Range[n + m], basis];
+  r = First[Ordering[-(fractionalPart /@ xB), 1]];
+  f0 = fractionalPart[xB[[r]]];
+  coef = ConstantArray[0, n];
+  constant = 0;
+  Do[
+    With[{fk = fractionalPart[rows[[r, k]]]},
+      If[k <= n,
+        coef += fk UnitVector[n, k],
+        coef -= fk A[[k - n]];
+        constant += fk b[[k - n]]]],
+    {k, nonbasic}];
+  {-coef, constant - f0}]\
+\>", "Input",ExpressionUUID->"9d5a749f-682b-4d04-8b3b-2c1f4dd21f54"],
+
+Cell["Transportation and Transshipment", "Section",ExpressionUUID->"dec971cf-aeb4-42ae-8ec2-2be260b0b289"],
+
+Cell["\<\
+Transportation tables are balanced with a dummy row or column before the \
+methods run. Costs are a matrix, supply and demand are lists.\
+\>", "Text",ExpressionUUID->"302575be-4c18-4ab3-ae31-ac9bbe82b0da"],
+
+Cell["\<\
+balanceTransport::usage = \"balanceTransport[cost, sup, dem] adds a dummy \
+destination or source with zero costs when supply and demand differ. It \
+returns {cost, sup, dem} for a balanced problem.\";
+balanceTransport[costs_List, supply_List, demand_List] := Module[{gap = \
+Total[supply] - Total[demand]},
+  Which[
+    gap > 0, {Map[Append[#, 0] &, costs], supply, Append[demand, gap]},
+    gap < 0, {Append[costs, ConstantArray[0, Length[demand]]], Append[supply, \
+-gap], demand},
+    True, {costs, supply, demand}]]\
+\>", "Input",ExpressionUUID->"e12560ad-6cb4-4cf3-bd03-54d38bccd4fb"],
+
+Cell["\<\
+leastCost::usage = \"leastCost[cost, sup, dem] returns the initial allocation \
+matrix found by the least cost method for a balanced transportation problem.\";
+leastCost[cst_List, sp_List, dm_List] := Module[{s = sp, d = dm, alloc = \
+ConstantArray[0, Dimensions[cst]], cells, pick, q},
+  While[Total[s] > 0,
+    cells = Select[Flatten[Table[{i, j}, {i, Length[s]}, {j, Length[d]}], 1], \
+s[[#[[1]]]] > 0 && d[[#[[2]]]] > 0 &];
+    pick = First[SortBy[cells, {cst[[#[[1]], #[[2]]]] &, -Min[s[[#[[1]]]], \
+d[[#[[2]]]]] &}]];
+    q = Min[s[[pick[[1]]]], d[[pick[[2]]]]];
+    alloc[[pick[[1]], pick[[2]]]] += q;
+    s[[pick[[1]]]] -= q;
+    d[[pick[[2]]]] -= q];
+  alloc]\
+\>", "Input",ExpressionUUID->"90ae072d-d291-428d-a4e9-6ccdb0621869"],
+
+Cell["\<\
+vam::usage = \"vam[cost, sup, dem] returns the initial allocation matrix \
+found by Vogel's approximation method (VAM) for a balanced transportation \
+problem.\";
+vam[cst_List, sp_List, dm_List] := Module[{s = sp, d = dm, alloc = \
+ConstantArray[0, Dimensions[cst]], rows, cols, rowLines, colLines, lines, \
+best, i, j, q, pen},
+  pen[v_] := Sort[v][[2]] - Sort[v][[1]];
+  While[Total[s] > 0,
+    rows = Select[Range[Length[s]], s[[#]] > 0 &];
+    cols = Select[Range[Length[d]], d[[#]] > 0 &];
+    rowLines = If[Length[cols] >= 2, Table[{pen[cst[[rr, cols]]], 1, rr}, \
+{rr, rows}], {}];
+    colLines = If[Length[rows] >= 2, Table[{pen[cst[[rows, cc]]], 2, cc}, \
+{cc, cols}], {}];
+    lines = Join[rowLines, colLines];
+    If[lines === {},
+      (i = rows[[1]]; j = cols[[1]]),
+      best = First[MaximalBy[lines, First]];
+      If[best[[2]] == 1,
+        (i = best[[3]]; j = cols[[First[Ordering[cst[[i, cols]], 1]]]]),
+        (j = best[[3]]; i = rows[[First[Ordering[cst[[rows, j]], 1]]]])]];
+    q = Min[s[[i]], d[[j]]];
+    alloc[[i, j]] += q;
+    s[[i]] -= q;
+    d[[j]] -= q];
+  alloc]\
+\>", "Input",ExpressionUUID->"14ad5b9a-a1b6-4675-9c0c-c0c2abc8c602"],
+
+Cell["\<\
+potentials::usage = \"potentials[cost, alloc] returns {u, v} with u[i] + v[j] \
+== cost[i, j] for every basic cell, where alloc[i, j] > 0, and with u[1] = 0. \
+The allocation must be a nondegenerate basic solution with m + n - 1 basic \
+cells.\";
+potentials[cost_List, alloc_List] := Module[{mm = Length[cost], nn = \
+Length[cost[[1]]], cells, eqs, rhs, sol},
+  cells = Position[alloc, _?Positive];
+  eqs = Append[Map[UnitVector[mm + nn, #[[1]]] + UnitVector[mm + nn, mm + \
+#[[2]]] &, cells], UnitVector[mm + nn, 1]];
+  rhs = Append[Map[cost[[#[[1]], #[[2]]]] &, cells], 0];
+  sol = LinearSolve[eqs, rhs];
+  {sol[[;; mm]], sol[[mm + 1 ;;]]}]\
+\>", "Input",ExpressionUUID->"8a68ebde-e45c-4c27-a3f9-67ac646c6822"],
+
+Cell["\<\
+reducedCostMatrix::usage = \"reducedCostMatrix[cost, u, v] returns the matrix \
+cost[i, j] - u[i] - v[j]. Its entries are zero in the basic cells and \
+nonnegative everywhere at an optimal solution.\";
+reducedCostMatrix[cost_List, u_List, v_List] := cost - Outer[Plus, u, v]\
+\>", "Input",ExpressionUUID->"e1b757c4-bb18-4103-aa52-a851648cea21"],
+
+Cell["\<\
+transportationLP::usage = \"transportationLP[cost, sup, dem] returns the \
+optimal allocation matrix of a balanced transportation problem, solved as a \
+linear program with LinearProgramming.\";
+transportationLP[cost_List, sup_List, dem_List] := Module[{mm = Length[sup], \
+nn = Length[dem], rowEq, colEq, x},
+  rowEq = Table[Flatten[Table[If[i == r, 1, 0], {i, mm}, {j, nn}]], {r, mm}];
+  colEq = Table[Flatten[Table[If[j == cc, 1, 0], {i, mm}, {j, nn}]], {cc, nn}];
+  x = LinearProgramming[Flatten[cost], Join[rowEq, colEq], Join[Map[{#, 0} &, \
+sup], Map[{#, 0} &, dem]]];
+  ArrayReshape[x, {mm, nn}]]\
+\>", "Input",ExpressionUUID->"9f3da950-a9cd-4553-bc5f-ee2dcb0cef69"],
+
+Cell["Assignment Problem", "Section",ExpressionUUID->"2d14d1a5-88c9-4b9d-a2b8-05f6bde35fb4"],
+
+Cell["\<\
+hungarian::usage = \"hungarian[cst] solves the assignment problem of \
+minimising the total cost of a square cost matrix cst by the Hungarian \
+method. It returns {steps, pairs, total}, where steps is a list of {label, \
+matrix} for each reduction, pairs gives the assigned {row, column} pairs and \
+total is the minimum cost.\";
+hungarian[cst_List] := Module[{n = Length[cst], mat = cst, steps = {}, edges, \
+cover, rc, cc, unc, mn, perm, pairs},
+  steps = Append[steps, {\"Initial\", mat}];
+  mat = Map[# - Min[#] &, mat];
+  steps = Append[steps, {\"Row reduction\", mat}];
+  mat = Transpose[Map[# - Min[#] &, Transpose[mat]]];
+  steps = Append[steps, {\"Column reduction\", mat}];
+  Do[
+    edges = Flatten[Table[If[mat[[i, j]] == 0, UndirectedEdge[\"A\" <> \
+ToString[i], \"T\" <> ToString[j]], Nothing], {i, n}, {j, n}]];
+    cover = FindVertexCover[Graph[Join[Table[\"A\" <> ToString[i], {i, n}], \
+Table[\"T\" <> ToString[j], {j, n}]], edges]];
+    rc = ToExpression[StringDrop[#, 1]] & /@ Select[cover, StringStartsQ[#, \
+\"A\"] &];
+    cc = ToExpression[StringDrop[#, 1]] & /@ Select[cover, StringStartsQ[#, \
+\"T\"] &];
+    steps = Append[steps, {\"Cover: rows \" <> ToString[rc] <> \", columns \" \
+<> ToString[cc], mat}];
+    If[Length[cover] == n, Break[]];
+    unc = Flatten[Table[If[! MemberQ[rc, i] && ! MemberQ[cc, j], mat[[i, j]], \
+Nothing], {i, n}, {j, n}]];
+    mn = Min[unc];
+    mat = Table[Which[
+        ! MemberQ[rc, i] && ! MemberQ[cc, j], mat[[i, j]] - mn,
+        MemberQ[rc, i] && MemberQ[cc, j], mat[[i, j]] + mn,
+        True, mat[[i, j]]], {i, n}, {j, n}];
+    steps = Append[steps, {\"Adjustment by \" <> ToString[mn], mat}], {50}];
+  perm = First[Select[Permutations[Range[n]], And @@ Table[mat[[i, #[[i]]]] \
+== 0, {i, n}] &]];
+  pairs = Table[{i, perm[[i]]}, {i, n}];
+  {steps, pairs, Total[Map[cst[[#[[1]], #[[2]]]] &, pairs]]}]\
+\>", "Input",ExpressionUUID->"2bbf65bf-f13c-45ad-9bc7-9990f2e548e8"],
+
+Cell["Project Networks", "Section",ExpressionUUID->"2383a54a-6ed5-4619-8bc1-db390e2019e2"],
+
+Cell["\<\
+projectSchedule::usage = \"projectSchedule[acts] computes the earliest and \
+latest event times of a project network. Each activity is {name, startEvent, \
+endEvent, duration}, with events numbered so that each activity ends at a \
+higher number than it starts. It returns an association with early, late, \
+duration, the activities as {name, start, end, duration, total float, free \
+float, independent float}, and the names of the critical activities.\";
+projectSchedule[acts_List] := Module[{nEv = Max[acts[[All, 2 ;; 3]]], early, \
+late, activities},
+  early = Association[1 -> 0];
+  Do[AssociateTo[early, j -> Max[Cases[acts, {_, i_, j, t_} :> early[i] + \
+t]]], {j, 2, nEv}];
+  late = Association[nEv -> early[nEv]];
+  Do[AssociateTo[late, i -> Min[Cases[acts, {_, i, j_, t_} :> late[j] - t]]], \
+{i, nEv - 1, 1, -1}];
+  activities = Map[
+    Function[a, With[{s = a[[2]], e = a[[3]], d = a[[4]]},
+      {a[[1]], s, e, d, late[e] - early[s] - d, early[e] - early[s] - d, \
+Max[early[e] - late[s] - d, 0]}]],
+    acts];
+  Association[
+    \"early\" -> early,
+    \"late\" -> late,
+    \"duration\" -> early[nEv],
+    \"activities\" -> activities,
+    \"critical\" -> Select[activities, #[[5]] == 0 &][[All, 1]]]]\
+\>", "Input",ExpressionUUID->"533cf45f-29ef-45ad-a799-a4c656ef57b0"],
+
+Cell["\<\
+showProjectNetwork::usage = \"showProjectNetwork[acts] draws the activity \
+network as a directed graph, with each arc labelled by its activity name and \
+duration.\";
+showProjectNetwork[acts_List] := Module[{edgeRules = Map[#[[2]] -> #[[3]] &, \
+acts]},
+  Graph[edgeRules,
+    EdgeLabels -> Thread[edgeRules -> Map[StringJoin[#[[1]], \", \", \
+ToString[#[[4]]]] &, acts]],
+    VertexLabels -> Automatic,
+    GraphLayout -> \"LayeredDigraphEmbedding\"]]\
+\>", "Input",ExpressionUUID->"1ff03cf7-f3da-4f02-8766-83655e695969"],
+
+Cell["Game Theory", "Section",ExpressionUUID->"0c395624-b66b-4cfc-be0a-5ba2b5e4d712"],
+
+Cell["\<\
+gameBounds::usage = \"gameBounds[G] returns {maximin, minimax} for the payoff \
+matrix G of the row player. The two values are equal when a saddle point \
+exists, and that common value is the value of the game.\";
+gameBounds[G_List] := {Max[Min /@ G], Min[Max /@ Transpose[G]]}\
+\>", "Input",ExpressionUUID->"7c91cbaf-a34d-4bb3-aec4-d46074ac6d94"],
+
+Cell["\<\
+removeDominated::usage = \"removeDominated[G] repeatedly deletes a dominated \
+row of the payoff matrix G (for the row player) or a dominated column (for \
+the column player). It returns an association with the reduced game and the \
+indices of the kept rows and columns.\";
+removeDominated[G_List] := Module[{rows = Range[Length[G]], cols = \
+Range[Length[First[G]]], M, rowDom, colDom, rs, cs, changed = True},
+  While[changed,
+    M = G[[rows, cols]];
+    rowDom = Function[i, AnyTrue[Complement[Range[Length[M]], {i}],
+      Function[k, And @@ Thread[M[[k]] >= M[[i]]] && M[[k]] =!= M[[i]]]]];
+    colDom = Function[j, AnyTrue[Complement[Range[Length[First[M]]], {j}],
+      Function[k, And @@ Thread[M[[All, k]] <= M[[All, j]]] && M[[All, k]] \
+=!= M[[All, j]]]]];
+    rs = Select[Range[Length[M]], rowDom];
+    cs = Select[Range[Length[First[M]]], colDom];
+    Which[
+      rs =!= {}, rows = Delete[rows, First[rs]],
+      cs =!= {}, cols = Delete[cols, First[cs]],
+      True, changed = False]];
+  Association[\"game\" -> G[[rows, cols]], \"rows\" -> rows, \"cols\" -> \
+cols]]\
+\>", "Input",ExpressionUUID->"bf9c738a-b4b2-4699-90f5-b8fd0cca5ba6"],
+
+Cell["\<\
+solveGame::usage = \"solveGame[G] solves the zero-sum game with payoff matrix \
+G for the row player by linear programming. It returns an association with \
+the optimal row mix p, the optimal column mix q and the value of the game.\";
+solveGame[G_List] := Module[{mm, nn, shift, MM, x, vs, q, y},
+  {mm, nn} = Dimensions[G];
+  shift = If[Min[G] <= 0, 1 - Min[G], 0];
+  MM = G + shift;
+  x = LinearProgramming[-ConstantArray[1, nn], -MM, -ConstantArray[1, mm]];
+  vs = 1/Total[x];
+  q = vs*x;
+  y = LinearProgramming[ConstantArray[1, mm], Transpose[MM], ConstantArray[1, \
+nn]];
+  Association[\"p\" -> y/Total[y], \"q\" -> q, \"value\" -> vs - shift]]\
+\>", "Input",ExpressionUUID->"4cf72f37-f429-4983-8cac-0a89bd4257e0"],
+
+Cell["\<\
+solve2x2::usage = \"solve2x2[{{a, b}, {c, d}}] returns an association with \
+the row mix p, the column mix q and the value of a 2 x 2 game. Use it only \
+when the game has no saddle point.\";
+solve2x2[{{a_, b_}, {c_, d_}}] := Module[{den = a - b - c + d},
+  Association[\"p\" -> (d - c)/den, \"q\" -> (d - b)/den, \"value\" -> (a*d - \
+b*c)/den]]\
+\>", "Input",ExpressionUUID->"b98b1f44-eb51-4544-b88c-3e880cba2eaf"],
+
+Cell["\<\
+payoffLines::usage = \"payoffLines[H, p] returns the expected payoff of each \
+column of the 2 x n game H when the row player plays (p, 1 - p), as \
+expressions in p. Plot them with their lower envelope to find the optimal mix \
+graphically.\";
+payoffLines[H_List, p_] := Table[p H[[1, j]] + (1 - p) H[[2, j]], {j, \
+Length[First[H]]}]\
+\>", "Input",ExpressionUUID->"bdb217a7-6526-4e33-b118-4925fcb7bd39"]
+},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"f191ae8c-5b1d-4451-96ad-e98740f89227"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 100, 0, 87, "Title",ExpressionUUID->"55300622-a5ac-47c7-9e69-8adc6092d889"],
+Cell[657, 22, 470, 8, 87, "Text",ExpressionUUID->"93185f90-e183-4077-a2aa-eff99ba797bd"],
+Cell[1130, 32, 89, 0, 87, "Section",ExpressionUUID->"e8aa7b90-b328-471d-8edc-9d9a235fa90f"],
+Cell[1222, 34, 389, 7, 87, "Input",ExpressionUUID->"2053f9dc-1242-4423-ab23-eb47f0cc6bd3"],
+Cell[1614, 43, 268, 5, 87, "Input",ExpressionUUID->"5d04807d-d4c5-48b7-9587-1b248af76850"],
+Cell[1885, 50, 562, 11, 87, "Input",ExpressionUUID->"52cb6e9c-6ecb-499c-92e4-95762caabc99"],
+Cell[2450, 63, 486, 8, 87, "Input",ExpressionUUID->"23ab7bf8-d40c-45f6-91ad-c17a9bd9bc43"],
+Cell[2939, 73, 90, 0, 87, "Section",ExpressionUUID->"013bc2d3-c8fc-4d80-bb4d-546c6f3332ad"],
+Cell[3032, 75, 196, 3, 87, "Text",ExpressionUUID->"041aad88-7fee-4dd6-8e7e-a20b73ebf3fd"],
+Cell[3231, 80, 572, 9, 87, "Input",ExpressionUUID->"512224bc-3774-4155-b6d7-24c1b8da47d7"],
+Cell[3806, 91, 468, 8, 87, "Input",ExpressionUUID->"fd9cb883-23a1-4119-9353-fd86838998b8"],
+Cell[4277, 101, 87, 0, 87, "Section",ExpressionUUID->"31dd00a4-a395-4e2d-b319-51092bc29d7c"],
+Cell[4367, 103, 1415, 28, 87, "Input",ExpressionUUID->"e19c506e-b2cd-4c56-bb0a-93a04c2d6c7d"],
+Cell[5785, 133, 88, 0, 87, "Section",ExpressionUUID->"0f2a37c7-de24-4f6d-9153-b0d000ce1ef9"],
+Cell[5876, 135, 313, 5, 87, "Text",ExpressionUUID->"01ea617b-d131-4bbd-bd82-868e4e4fce8e"],
+Cell[6192, 142, 603, 11, 87, "Input",ExpressionUUID->"f00ebb07-e0be-4764-bf02-1c2236d381aa"],
+Cell[6798, 155, 634, 11, 87, "Input",ExpressionUUID->"f16bed93-e9b8-4e04-a308-1bd129b9d777"],
+Cell[7435, 168, 400, 7, 87, "Input",ExpressionUUID->"61eb28a1-0110-44dc-8cab-7c6f26a2b383"],
+Cell[7838, 177, 385, 6, 87, "Input",ExpressionUUID->"c28f4bdd-84a9-431c-a218-245be23885fa"],
+Cell[8226, 185, 1054, 22, 87, "Input",ExpressionUUID->"c1e6b18c-ce09-48da-bf52-859fd577f709"],
+Cell[9283, 209, 401, 6, 87, "Input",ExpressionUUID->"7e3ae60e-32c1-47e2-a729-060f0833581a"],
+Cell[9687, 217, 447, 8, 87, "Input",ExpressionUUID->"78e43248-c028-49b1-98d8-4636aac897ff"],
+Cell[10137, 227, 101, 0, 87, "Section",ExpressionUUID->"46a0bf3c-f490-4e7a-a897-3b867077f319"],
+Cell[10241, 229, 257, 4, 87, "Text",ExpressionUUID->"a53713d2-6a72-4a15-a1f0-e9bcce4de83a"],
+Cell[10501, 235, 593, 10, 87, "Input",ExpressionUUID->"9e750b1c-8d08-4da4-af31-9a65cf22d590"],
+Cell[11097, 247, 557, 10, 87, "Input",ExpressionUUID->"55c55cc6-10e1-42d8-9903-006b0e5984e4"],
+Cell[11657, 259, 700, 11, 87, "Input",ExpressionUUID->"49872a71-b573-45a9-8314-0d0af0c10ce5"],
+Cell[12360, 272, 93, 0, 87, "Section",ExpressionUUID->"11a942e1-fb68-4f7e-9762-27eaa3995462"],
+Cell[12456, 274, 437, 7, 87, "Input",ExpressionUUID->"234d868a-5b34-4e93-8ed5-e6179e3f0f8f"],
+Cell[12896, 283, 891, 19, 87, "Input",ExpressionUUID->"7a85a843-fbc5-4fba-9dcc-119032a4999e"],
+Cell[13790, 304, 81, 0, 87, "Section",ExpressionUUID->"94cb59cd-bc7b-4285-bf13-1bc15d209a41"],
+Cell[13874, 306, 382, 6, 87, "Input",ExpressionUUID->"656844fb-0fa5-44b2-937c-a451575b9c9d"],
+Cell[14259, 314, 590, 9, 87, "Input",ExpressionUUID->"21acd581-bb96-4961-9103-10939b20f6f3"],
+Cell[14852, 325, 94, 0, 87, "Section",ExpressionUUID->"1fdc54bd-56bc-44ea-bc9e-6e9ed52c83fc"],
+Cell[14949, 327, 255, 4, 87, "Text",ExpressionUUID->"5067c973-638d-42d7-b26f-7c47a1cff5dd"],
+Cell[15207, 333, 797, 15, 87, "Input",ExpressionUUID->"e1a585b9-20cb-4383-b92b-b598cb6b39ec"],
+Cell[16007, 350, 616, 11, 87, "Input",ExpressionUUID->"986fa1f8-65f7-47de-ab11-8880fe7d21fa"],
+Cell[16626, 363, 782, 14, 87, "Input",ExpressionUUID->"429a78e8-e1a5-4d60-8658-919f2eb800f9"],
+Cell[17411, 379, 457, 7, 87, "Input",ExpressionUUID->"1f37a8ff-86b0-4e63-b637-c4e2bbe569c0"],
+Cell[17871, 388, 93, 0, 87, "Section",ExpressionUUID->"634d84a6-f282-442a-b3dd-22e327f523fe"],
+Cell[17967, 390, 211, 4, 87, "Input",ExpressionUUID->"a6b4de89-5f63-41d3-8b5a-c215c2023c90"],
+Cell[18181, 396, 1644, 33, 87, "Input",ExpressionUUID->"6cb6dead-b877-4afd-987c-e4cf7579f1b9"],
+Cell[19828, 431, 1061, 25, 87, "Input",ExpressionUUID->"9d5a749f-682b-4d04-8b3b-2c1f4dd21f54"],
+Cell[20892, 458, 106, 0, 87, "Section",ExpressionUUID->"dec971cf-aeb4-42ae-8ec2-2be260b0b289"],
+Cell[21001, 460, 215, 3, 87, "Text",ExpressionUUID->"302575be-4c18-4ab3-ae31-ac9bbe82b0da"],
+Cell[21219, 465, 600, 11, 87, "Input",ExpressionUUID->"e12560ad-6cb4-4cf3-bd03-54d38bccd4fb"],
+Cell[21822, 478, 748, 15, 87, "Input",ExpressionUUID->"90ae072d-d291-428d-a4e9-6ccdb0621869"],
+Cell[22573, 495, 1174, 27, 87, "Input",ExpressionUUID->"14ad5b9a-a1b6-4675-9c0c-c0c2abc8c602"],
+Cell[23750, 524, 722, 13, 87, "Input",ExpressionUUID->"8a68ebde-e45c-4c27-a3f9-67ac646c6822"],
+Cell[24475, 539, 354, 5, 87, "Input",ExpressionUUID->"e1b757c4-bb18-4103-aa52-a851648cea21"],
+Cell[24832, 546, 684, 11, 87, "Input",ExpressionUUID->"9f3da950-a9cd-4553-bc5f-ee2dcb0cef69"],
+Cell[25519, 559, 92, 0, 87, "Section",ExpressionUUID->"2d14d1a5-88c9-4b9d-a2b8-05f6bde35fb4"],
+Cell[25614, 561, 1946, 37, 87, "Input",ExpressionUUID->"2bbf65bf-f13c-45ad-9bc7-9990f2e548e8"],
+Cell[27563, 600, 90, 0, 87, "Section",ExpressionUUID->"2383a54a-6ed5-4619-8bc1-db390e2019e2"],
+Cell[27656, 602, 1297, 26, 87, "Input",ExpressionUUID->"533cf45f-29ef-45ad-a799-a4c656ef57b0"],
+Cell[28956, 630, 533, 11, 87, "Input",ExpressionUUID->"1ff03cf7-f3da-4f02-8766-83655e695969"],
+Cell[29492, 643, 85, 0, 87, "Section",ExpressionUUID->"0c395624-b66b-4cfc-be0a-5ba2b5e4d712"],
+Cell[29580, 645, 357, 5, 87, "Input",ExpressionUUID->"7c91cbaf-a34d-4bb3-aec4-d46074ac6d94"],
+Cell[29940, 652, 1164, 22, 87, "Input",ExpressionUUID->"bf9c738a-b4b2-4699-90f5-b8fd0cca5ba6"],
+Cell[31107, 676, 730, 14, 87, "Input",ExpressionUUID->"4cf72f37-f429-4983-8cac-0a89bd4257e0"],
+Cell[31840, 692, 426, 7, 87, "Input",ExpressionUUID->"b98b1f44-eb51-4544-b88c-3e880cba2eaf"],
+Cell[32269, 701, 415, 7, 87, "Input",ExpressionUUID->"bdb217a7-6526-4e33-b118-4925fcb7bd39"]
+}
+]
+*)
+
+(* End of internal cache information *)

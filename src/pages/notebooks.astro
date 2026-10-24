@@ -6,6 +6,7 @@ import Nav from "../components/layout/nav.astro";
 import NotebookGroup from "../components/notebooks/notebook-group.astro";
 import { buildNotebookTree } from "../lib/notebooks";
 import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+import Footer from "../components/layout/footer.astro";
 
 const [notebooks, notes] = await Promise.all([
   getCollection("notebooks"),
@@ -40,6 +41,8 @@ const root = buildNotebookTree(notebooks, notes);
       )}
     </section>
   </main>
+
+  <Footer />
 </Layout>
 
 <style>

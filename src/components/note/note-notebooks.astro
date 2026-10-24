@@ -8,23 +8,33 @@ interface Props {
    * links to `/notebooks/<id>.nb`, served from the .nb file under docs/.
    */
   notebooks: CollectionEntry<"notebooks">[];
+  /**
+   * The module's summary notebook, linked from every note in the module. It
+   * is not listed in the note's frontmatter.
+   */
+  summary?: CollectionEntry<"notebooks"> | undefined;
 }
 
-const { notebooks } = Astro.props;
+const { notebooks, summary } = Astro.props;
+const entries = summary ? [...notebooks, summary] : notebooks;
 ---
 
-{notebooks.length > 0 && (
+{entries.length > 0 && (
   <section class="note-notebooks" aria-labelledby="note-notebooks-title">
     <p class="note-notebooks-title" id="note-notebooks-title">
-      Wolfram Mathematica notebook
+      {entries.length > 1
+        ? "Wolfram Mathematica notebooks"
+        : "Wolfram Mathematica notebook"}
     </p>
-    <p class="note-notebooks-desc">
-      {notebooks.length > 1
-        ? "Companion notebooks for this note. Open one in Mathematica and evaluate the cells to reproduce the worked example."
-        : "A companion notebook for this note. Open it in Mathematica and evaluate the cells to reproduce the worked example."}
-    </p>
+    {notebooks.length > 0 && (
+      <p class="note-notebooks-desc">
+        {notebooks.length > 1
+          ? "Companion notebooks for this note. Open one in Mathematica and evaluate the cells to reproduce the worked example."
+          : "A companion notebook for this note. Open it in Mathematica and evaluate the cells to reproduce the worked example."}
+      </p>
+    )}
     <ul class="note-notebooks-list">
-      {notebooks.map((entry) => (
+      {entries.map((entry) => (
         <li>
           <a
             class="note-notebooks-link"
@@ -37,6 +47,13 @@ const { notebooks } = Astro.props;
         </li>
       ))}
     </ul>
+    {summary && (
+      <p class="note-notebooks-desc">
+        The summary notebook defines every function used in this module, with
+        documentation and no examples, as a starting point for your own
+        problems.
+      </p>
+    )}
   </section>
 )}
 

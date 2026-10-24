@@ -26,29 +26,44 @@ const authors = defineCollection({
 const notebooks = defineCollection({
   loader: {
     name: "notebooks-loader",
-    load: async ({ store, parseData, generateDigest }) => {
+    load: async ({ store, parseData, generateDigest, watcher }) => {
       const docsDir = fileURLToPath(new URL("../docs/", import.meta.url));
-      const paths = (await readdir(docsDir, { recursive: true }))
-        .filter((path) => path.endsWith(".nb"))
-        .sort();
+      const sync = async () => {
+        const paths = (await readdir(docsDir, { recursive: true }))
+          .filter((path) => path.endsWith(".nb"))
+          .sort();
 
-      store.clear();
-      const seen = new Set<string>();
-      for (const path of paths) {
-        const id = basename(path, ".nb");
-        if (seen.has(id)) {
-          throw new Error(
-            `Duplicate notebook "${id}.nb" under docs/ (${path})`,
-          );
+        store.clear();
+        const seen = new Set<string>();
+        for (const path of paths) {
+          const id = basename(path, ".nb");
+          if (seen.has(id)) {
+            throw new Error(
+              `Duplicate notebook "${id}.nb" under docs/ (${path})`,
+            );
+          }
+          seen.add(id);
+
+          const { size, mtimeMs } = await stat(join(docsDir, path));
+          const data = await parseData({
+            id,
+            data: { url: `/notebooks/${id}.nb`, bytes: size, path },
+          });
+          store.set({
+            id,
+            data,
+            digest: generateDigest({ id, size, mtimeMs }),
+          });
         }
-        seen.add(id);
+      };
 
-        const { size, mtimeMs } = await stat(join(docsDir, path));
-        const data = await parseData({
-          id,
-          data: { url: `/notebooks/${id}.nb`, bytes: size, path },
+      await sync();
+      // In dev, re-sync when a notebook is added or removed, so a new .nb file
+      // shows up without restarting the server.
+      for (const event of ["add", "unlink"] as const) {
+        watcher?.on(event, (path: string) => {
+          if (path.endsWith(".nb")) void sync();
         });
-        store.set({ id, data, digest: generateDigest({ id, size, mtimeMs }) });
       }
     },
   },

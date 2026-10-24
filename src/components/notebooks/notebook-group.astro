@@ -11,6 +11,7 @@ interface Props {
 const { group, level } = Astro.props;
 const Heading = `h${level}` as "h2" | "h3" | "h4";
 const childLevel = Math.min(level + 1, 4) as 2 | 3 | 4;
+const MAX_USED_IN = 1;
 ---
 
 {group.label && <Heading>{group.label}</Heading>}
@@ -30,12 +31,14 @@ const childLevel = Math.min(level + 1, 4) as 2 | 3 | 4;
         <span class="nb-meta">
           {formatBytes(notebook.bytes)}
           {notebook.notes.length > 0 && " · Used in "}
-          {notebook.notes.map((note, i) => (
+          {notebook.notes.slice(0, MAX_USED_IN).map((note, i) => (
             <>
               {i > 0 && ", "}
               <a href={note.href}>{note.title}</a>
             </>
           ))}
+          {notebook.notes.length > MAX_USED_IN &&
+            ` and ${notebook.notes.length - MAX_USED_IN} more`}
         </span>
       </li>
     ))}

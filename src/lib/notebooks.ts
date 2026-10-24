@@ -1,5 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import { titleize } from "../utils";
+import { summaryNotebookId } from "../utils/summary-notebook";
 
 export interface NotebookLink {
   title: string;
@@ -42,13 +43,17 @@ export function buildNotebookTree(
   notebooks: CollectionEntry<"notebooks">[],
   notes: CollectionEntry<"notes">[],
 ): NotebookGroup {
+  const notebookIds = new Set(notebooks.map((entry) => entry.id));
   const notesByNotebook = new Map<string, NotebookLink[]>();
+  const addLink = (notebookId: string, note: CollectionEntry<"notes">) => {
+    const links = notesByNotebook.get(notebookId) ?? [];
+    links.push({ title: note.data.title, href: `/${note.id}` });
+    notesByNotebook.set(notebookId, links);
+  };
   for (const note of notes) {
-    for (const ref of note.data.notebooks ?? []) {
-      const links = notesByNotebook.get(ref.id) ?? [];
-      links.push({ title: note.data.title, href: `/${note.id}` });
-      notesByNotebook.set(ref.id, links);
-    }
+    for (const ref of note.data.notebooks ?? []) addLink(ref.id, note);
+    const summaryId = summaryNotebookId(note.id);
+    if (summaryId && notebookIds.has(summaryId)) addLink(summaryId, note);
   }
 
   const root: NotebookGroup = {
