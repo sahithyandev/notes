@@ -1,0 +1,48 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Branch and Bound", "Title",ExpressionUUID->"E03656CF-BA58-4607-A29A-C1FBCD7DDF93"],
+
+Cell["Companion to docs/s5/operational-research/14-branch-and-bound.mdx. Solves the LP relaxation at each node, branches on the first fractional variable (left child first), and prunes nodes whose relaxed value cannot beat the best integer solution. The log records every node in the order the search visits it.", "Text",ExpressionUUID->"464A0078-6833-4229-957F-E20D68A004A8"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"CECC8AC8-2FD3-4181-8BFB-0BEE2A30E088"],
+
+Cell["c = {2, 3};", "Input",ExpressionUUID->"E03B4FB2-1314-4377-9BB1-03F0F17233B9"],
+
+Cell["A = {{1, 1}, {0, 2}};", "Input",ExpressionUUID->"FB54A134-0BE3-449E-81F1-E18216AB8982"],
+
+Cell["b = {5, 7};", "Input",ExpressionUUID->"18AAB8DE-87B8-4623-99BF-CB142F2B31B8"],
+
+Cell["LP relaxation with bounds", "Subsection",ExpressionUUID->"4BDFA197-D7FD-4AAA-B50F-21E082DBE5A1"],
+
+Cell["lpSolve[lo_, hi_] := Module[{triples, res}, triples = Join[Table[{A[[i]], b[[i]], -1}, {i, Length[A]}], Table[{UnitVector[2, j], lo[[j]], 1}, {j, 2}], Select[Table[{UnitVector[2, j], hi[[j]], -1}, {j, 2}], FreeQ[#[[2]], Infinity] &]]; res = Quiet[Check[LinearProgramming[-c, triples[[All, 1]], triples[[All, {2, 3}]]], $Failed]]; If[res === $Failed, $Failed, {res, c.res}]]", "Input",ExpressionUUID->"9ADBDADD-2E39-434A-B2AF-158DE63845AF"],
+
+Cell["lpSolve[{0, 0}, {Infinity, Infinity}]", "Input",ExpressionUUID->"EFD4509B-4234-401F-9124-575F27186464"],
+
+Cell["Branch and bound search", "Subsection",ExpressionUUID->"DC3AFADF-EADD-4A8A-BDB2-70DCF45F0663"],
+
+Cell["log = {}; best = {-Infinity, None};", "Input",ExpressionUUID->"394C3639-2AAE-4EA6-896E-7BBFC052BA96"],
+
+Cell["bb[lo_, hi_, label_] := Module[{res, x, z, frac, j, hiL, loR}, res = lpSolve[lo, hi]; If[res === $Failed, AppendTo[log, {label, \"-\", \"-\", \"infeasible\"}], ({x, z} = res; frac = Select[Range[2], Abs[x[[#]] - Round[x[[#]]]] > 10^-9 &]; Which[z <= best[[1]], AppendTo[log, {label, x, z, \"bound\"}], frac === {}, (best = {z, x}; AppendTo[log, {label, x, z, \"integer, new best\"}]), True, (j = First[frac]; AppendTo[log, {label, x, z, \"branch on x\" <> ToString[j]}]; hiL = hi; hiL[[j]] = Floor[x[[j]]]; loR = lo; loR[[j]] = Ceiling[x[[j]]]; bb[lo, hiL, label <> \"L\"]; bb[loR, hi, label <> \"R\"])])]]", "Input",ExpressionUUID->"2B8AB9C1-0158-4596-A9BA-8AD55E43D2E5"],
+
+Cell["bb[{0, 0}, {Infinity, Infinity}, \"root\"];", "Input",ExpressionUUID->"C85C4B2A-97D6-4AAB-8905-6365B898FC83"],
+
+Cell["TableForm[log, TableHeadings -> {None, {\"node\", \"x\", \"Z\", \"action\"}}]", "Input",ExpressionUUID->"19D69887-46C9-4F94-AE31-51EFF49802BB"],
+
+Cell["best", "Input",ExpressionUUID->"232C6447-46C0-4604-B9E7-00FE437C6E07"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"E13A2E16-28B6-4B3F-9EFD-7B75FAE7DBF2"],
+
+Cell["Maximize[{c.{x1, x2}, And @@ Join[Thread[A.{x1, x2} <= b], {x1 >= 0, x2 >= 0}]}, {x1, x2}, Integers]", "Input",ExpressionUUID->"4603B257-DFCA-45FC-B153-F01F69013A99"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"42A9685E-1158-4435-98AB-4FE205EF530E"
+]

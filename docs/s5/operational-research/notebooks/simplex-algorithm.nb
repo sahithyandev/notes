@@ -1,0 +1,66 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Simplex Algorithm", "Title",ExpressionUUID->"19A9113D-78EF-478A-9F0C-52C7FC3C636A"],
+
+Cell["Companion to docs/s5/operational-research/07-simplex-algorithm.mdx. Runs the tableau simplex method on the worked example. Each step pivots on the entering column (most negative objective coefficient) and the leaving row (minimum ratio). Edit c, A and b to try another problem in the same form.", "Text",ExpressionUUID->"54481605-044D-4B7A-A151-4C3287C7A3B7"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"326AE86E-A08C-4312-9DE3-BCAEA0BD6CB8"],
+
+Cell["c = {3, 5};", "Input",ExpressionUUID->"1755FEE5-E534-46EC-8F20-B5ED58AD3B82"],
+
+Cell["A = {{1, 0}, {0, 2}, {3, 2}};", "Input",ExpressionUUID->"FCFE7EB7-0DE0-4D0B-86FD-05A53CB78483"],
+
+Cell["b = {4, 12, 18};", "Input",ExpressionUUID->"AA7F2A8D-2A35-4A77-881D-824BF1037280"],
+
+Cell["Tableau setup", "Subsection",ExpressionUUID->"61428E33-DC61-4B5B-815A-629CF2499BC7"],
+
+Cell["n = Length[c]; m = Length[A];", "Input",ExpressionUUID->"E8EE6D22-4F94-490D-96FF-F1EEAEBFCD08"],
+
+Cell["names = Join[Table[\"x\" <> ToString[j], {j, n}], Table[\"s\" <> ToString[i], {i, m}]];", "Input",ExpressionUUID->"43F76F9A-68DE-43BF-8C87-C420D04A03A6"],
+
+Cell["T0 = Join[{Join[-c, ConstantArray[0, m], {0}]}, Table[Join[A[[i]], UnitVector[m, i], {b[[i]]}], {i, m}]];", "Input",ExpressionUUID->"EE6309CD-4C02-4749-A8EC-D245197559FB"],
+
+Cell["basis0 = Range[n + 1, n + m];", "Input",ExpressionUUID->"555EA5B9-2E2E-4AA2-B495-58B5D67E9031"],
+
+Cell["Pivot and iteration", "Subsection",ExpressionUUID->"AA3E2EA5-B73B-4545-A3BA-B87F88A63DF7"],
+
+Cell["pivot[T_, row_, col_] := Module[{P = T}, P[[row]] = T[[row]]/T[[row, col]]; Do[If[i != row, P[[i]] = T[[i]] - T[[i, col]] P[[row]]], {i, Length[T]}]; P]", "Input",ExpressionUUID->"CB88A1D5-F0C1-43C3-A57A-E1CDCF8C17A9"],
+
+Cell["showTableau[T_, basis_, nm_] := TableForm[T, TableHeadings -> {Prepend[nm[[basis]], \"z\"], Append[nm, \"RHS\"]}]", "Input",ExpressionUUID->"059BD89D-C445-4E6B-B22B-3BE56455F2B9"],
+
+Cell["simplexRun[T0_, basis0_] := Module[{T = T0, basis = basis0, hist = {}, obj, ratios, col, row}, Do[obj = T[[1, 1 ;; -2]]; If[Min[obj] >= 0, Break[]]; col = First@Ordering[obj, 1]; ratios = Table[If[T[[i, col]] > 0, T[[i, -1]]/T[[i, col]], Infinity], {i, 2, Length[T]}]; If[Min[ratios] === Infinity, Print[\"unbounded\"]; Break[]]; row = First@Ordering[ratios, 1] + 1; AppendTo[hist, {T, basis, col, row}]; T = pivot[T, row, col]; basis[[row - 1]] = col, {20}]; AppendTo[hist, {T, basis, None, None}]; hist]", "Input",ExpressionUUID->"FA21F7F4-F9DD-4B1D-B6B1-E007EDE386FD"],
+
+Cell["showTableau[T0, basis0, names]", "Input",ExpressionUUID->"49DE7088-034B-49D8-A75A-7340EDAEFDB2"],
+
+Cell["hist = simplexRun[T0, basis0];", "Input",ExpressionUUID->"854BDBB5-0E2C-4AAC-BC41-C63264996CCE"],
+
+Cell["Iterations", "Subsection",ExpressionUUID->"4F0A5351-CE71-422B-880D-E33BC41DF3E8"],
+
+Cell["Column[MapIndexed[Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], showTableau[#1[[1]], #1[[2]], names]}] &, hist]]", "Input",ExpressionUUID->"DF997E76-311D-4D3E-A6AE-4BEA909C68C3"],
+
+Cell["Solution", "Subsection",ExpressionUUID->"B1631115-3230-4ADE-964A-98E2C5ED9D1B"],
+
+Cell["finalT = hist[[-1, 1]]; finalBasis = hist[[-1, 2]];", "Input",ExpressionUUID->"650320A8-0966-417B-93F2-8B443677021B"],
+
+Cell["xsol = ConstantArray[0, n + m]; xsol[[finalBasis]] = finalT[[2 ;;, -1]];", "Input",ExpressionUUID->"53E0085F-00F8-4E54-BD0E-73C1FA76B425"],
+
+Cell["Thread[names -> xsol]", "Input",ExpressionUUID->"4C1D3C56-FCFA-4622-B4EA-8EE54E13A8D8"],
+
+Cell["z = finalT[[1, -1]]", "Input",ExpressionUUID->"B9386226-4C58-4C52-98F7-CBBF7FCB226F"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"1C34F6AF-CBC3-403F-82E3-07771691EBFA"],
+
+Cell["Maximize[{c.{x1, x2}, And @@ Join[Thread[A.{x1, x2} <= b], {x1 >= 0, x2 >= 0}]}, {x1, x2}]", "Input",ExpressionUUID->"E781E4BD-D8FC-4A69-A25E-A053032F9BBD"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"EFA45A80-05EB-4A76-89B0-A0F36F3E91D2"
+]

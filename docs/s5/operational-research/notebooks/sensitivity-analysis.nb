@@ -1,0 +1,80 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Sensitivity Analysis", "Title",ExpressionUUID->"8EA6A0A4-3F09-40AC-972C-FAE9B22232E7"],
+
+Cell["Companion to docs/s5/operational-research/12-sensitivity-analysis.mdx. Starts from the optimal basis (s1, x2, x1) of the simplex example and reads the shadow prices, the range of each right-hand side, the range of each cost coefficient, and the effect of a new variable or a new constraint. Edit the basis or the new data to test other cases.", "Text",ExpressionUUID->"2A9AA4E3-D606-415E-AFF0-199AF1F34D7D"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"B244C33F-6E05-4735-B8DF-889185856FEB"],
+
+Cell["c = {3, 5};", "Input",ExpressionUUID->"26B172B3-0C39-4AD0-9D06-794965DE94DE"],
+
+Cell["A = {{1, 0}, {0, 2}, {3, 2}};", "Input",ExpressionUUID->"9F643CF2-11D0-4BD5-84BB-8E3D864F7735"],
+
+Cell["b = {4, 12, 18};", "Input",ExpressionUUID->"924230FC-8DEC-4901-B25D-E14CA8CC9D35"],
+
+Cell["nm = {\"x1\", \"x2\", \"s1\", \"s2\", \"s3\"};", "Input",ExpressionUUID->"1BE728EF-CAFC-414F-95AD-455BF419CB11"],
+
+Cell["basis = {3, 2, 1};", "Input",ExpressionUUID->"73578C90-C221-427E-87B0-3822FB74A98A"],
+
+Cell["Optimal basis", "Subsection",ExpressionUUID->"14AD3D12-D9B9-4CD0-9DD9-95C93965BA7D"],
+
+Cell["cs = Join[c, {0, 0, 0}]; As = Join[A, IdentityMatrix[3], 2];", "Input",ExpressionUUID->"CBE5F1D7-49D1-4820-BA03-AD3BB9730BC1"],
+
+Cell["B = As[[All, basis]]; Binv = Inverse[B];", "Input",ExpressionUUID->"250B0F80-E833-4BDF-995F-8AA868A0F9BF"],
+
+Cell["xB = Binv.b;", "Input",ExpressionUUID->"9268C71A-ABC7-4530-92A7-1ED6D7434EA9"],
+
+Cell["y = cs[[basis]].Binv", "Input",ExpressionUUID->"9D08ADEE-677A-4E2B-8951-240C27E2B6D7"],
+
+Cell["zRow = y.As - cs", "Input",ExpressionUUID->"38935BB4-7233-40FE-8855-C56BF89ACED7"],
+
+Cell["xFull = ConstantArray[0, 5]; xFull[[basis]] = xB;", "Input",ExpressionUUID->"875F6544-68AE-4B0A-B42E-0D0744887053"],
+
+Cell["Thread[nm -> xFull]", "Input",ExpressionUUID->"476882F1-D29F-465F-9982-97FFE0A47F92"],
+
+Cell["Right-hand side ranging", "Subsection",ExpressionUUID->"AD34D418-019C-4793-8A02-AC886B6335C2"],
+
+Cell["rhsRange[i_] := Module[{col = Binv.UnitVector[3, i], lo, hi}, lo = Max[Table[If[col[[k]] > 0, -xB[[k]]/col[[k]], -Infinity], {k, 3}]]; hi = Min[Table[If[col[[k]] < 0, -xB[[k]]/col[[k]], Infinity], {k, 3}]]; {b[[i]] + lo, b[[i]] + hi}]", "Input",ExpressionUUID->"73E54567-F2FB-49C9-909A-16B3E8A74910"],
+
+Cell["TableForm[Table[{i, rhsRange[i]}, {i, 3}], TableHeadings -> {None, {\"constraint\", \"range of b_i\"}}]", "Input",ExpressionUUID->"4B2DD813-49AA-451F-9A54-796EDEAFBED5"],
+
+Cell["Shadow prices by re-solving", "Subsection",ExpressionUUID->"010135E5-FD8A-4BE8-A373-833E8A6AF6C3"],
+
+Cell["zOf[bb_] := First@Maximize[{c.{x1, x2}, And @@ Join[Thread[A.{x1, x2} <= bb], {x1 >= 0, x2 >= 0}]}, {x1, x2}];", "Input",ExpressionUUID->"3EF2CD17-6CE0-4994-893B-69AFAA46035D"],
+
+Cell["Table[zOf[b + UnitVector[3, i]] - zOf[b], {i, 3}]", "Input",ExpressionUUID->"A48D9794-B95E-4434-9084-3EA58EE6EE4C"],
+
+Cell["Cost ranging", "Subsection",ExpressionUUID->"3C1D1B22-A0F7-4798-AE6F-84FA28784FF4"],
+
+Cell["costRange[j_] := Module[{r, alpha, nonbasic, lo, hi}, r = Position[basis, j][[1, 1]]; alpha = (Binv.As)[[r]]; nonbasic = Complement[Range[5], basis]; lo = Max[Table[If[alpha[[k]] > 0, -zRow[[k]]/alpha[[k]], -Infinity], {k, nonbasic}]]; hi = Min[Table[If[alpha[[k]] < 0, -zRow[[k]]/alpha[[k]], Infinity], {k, nonbasic}]]; {cs[[j]] + lo, cs[[j]] + hi}]", "Input",ExpressionUUID->"93E95F2E-E495-4285-A330-2341F1BB7F94"],
+
+Cell["{costRange[1], costRange[2]}", "Input",ExpressionUUID->"868C3C46-9CCA-4150-BF25-AE24FD8BEF39"],
+
+Cell["Addition of a variable", "Subsection",ExpressionUUID->"19761E40-5B93-4581-9180-E88FCE0F179F"],
+
+Cell["a = {1, 1, 1}; cNew = 4;", "Input",ExpressionUUID->"C88A7E3D-3127-4F04-872A-95576F89DE87"],
+
+Cell["colNew = Binv.a", "Input",ExpressionUUID->"E12AE73E-7E26-40EE-8E1C-5D317D0D0B1C"],
+
+Cell["reducedNew = cs[[basis]].colNew - cNew", "Input",ExpressionUUID->"49FD6D44-CEFF-4821-BED3-AFB7118DA3E0"],
+
+Cell["If[reducedNew >= 0, \"current solution stays optimal\", \"x3 enters the basis\"]", "Input",ExpressionUUID->"0CE51790-065B-4626-8CBA-12AD795038E6"],
+
+Cell["Addition of a constraint", "Subsection",ExpressionUUID->"88D4B97E-EF7C-42BF-B640-B0CA81BA6CEF"],
+
+Cell["kNew = 5;", "Input",ExpressionUUID->"D5FDE4B0-B9CD-4BD2-A5EF-094BB8059364"],
+
+Cell["If[xFull[[1]] + xFull[[2]] <= kNew, \"current solution stays optimal\", \"violated: continue with the dual simplex method\"]", "Input",ExpressionUUID->"6436145D-EDDC-463C-961E-BC7CF88E19B1"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"30303B09-804E-496D-A963-540B48D5E4BC"
+]

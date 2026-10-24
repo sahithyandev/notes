@@ -1,0 +1,60 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Duality", "Title",ExpressionUUID->"F67E2FBE-4663-4E74-A8F4-909C75F6F270"],
+
+Cell["Companion to docs/s5/operational-research/10-duality.mdx. Builds the dual of a maximization primal with Ax <= b and x >= 0, solves it, and checks strong duality. Weak duality and complementary slackness are checked on the optimal pair. Edit c, A and b to try another problem.", "Text",ExpressionUUID->"CF624894-8023-4FAE-A1F7-0E9EEB831289"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"D4721210-5578-456F-BAB3-3612794EF222"],
+
+Cell["c = {3, 5};", "Input",ExpressionUUID->"54CE9487-E7BD-4084-96CE-278951292207"],
+
+Cell["A = {{1, 0}, {0, 2}, {3, 2}};", "Input",ExpressionUUID->"4A57B87D-9B58-43C1-A513-2ACC8508BC0F"],
+
+Cell["b = {4, 12, 18};", "Input",ExpressionUUID->"DA4AAE03-02A1-441E-96A9-B497DDD47695"],
+
+Cell["Dual problem", "Subsection",ExpressionUUID->"C8A2D2FA-71BF-4EFC-99DF-57E2E4723AD4"],
+
+Cell["n = Length[c]; m = Length[A];", "Input",ExpressionUUID->"135A44EA-48BA-4570-AF61-26B03C5C1A12"],
+
+Cell["yVars = Array[Subscript[y, #] &, m];", "Input",ExpressionUUID->"77AD7FE3-3A04-4622-BA2B-0F2F39B1F6AE"],
+
+Cell["dualConstraints = Table[A[[All, j]].yVars >= c[[j]], {j, n}]", "Input",ExpressionUUID->"7FCD9347-29A9-40AB-AB4B-99B273618508"],
+
+Cell["b.yVars", "Input",ExpressionUUID->"DD4C8F78-A3CB-4835-8FB6-E62D4A21263E"],
+
+Cell["dualSol = LinearProgramming[b, Transpose[A], c]", "Input",ExpressionUUID->"4929BA3D-5903-4EAA-B534-AA07ED886040"],
+
+Cell["dualValue = b.dualSol", "Input",ExpressionUUID->"C4E464F1-DCFD-4DA9-B12E-3F1B2D932AB5"],
+
+Cell["Primal solution", "Subsection",ExpressionUUID->"1BA2C296-1A67-4A93-8387-BF7F20107338"],
+
+Cell["primalConstraints = And @@ Join[Thread[A.{x1, x2} <= b], {x1 >= 0, x2 >= 0}];", "Input",ExpressionUUID->"5266133F-2C3B-407D-B7FB-FACDB2B86A7C"],
+
+Cell["{primalValue, primalSol} = Maximize[{c.{x1, x2}, primalConstraints}, {x1, x2}]", "Input",ExpressionUUID->"0A78D325-01D4-4549-8156-56FE176FDAFF"],
+
+Cell["xs = {x1, x2} /. primalSol", "Input",ExpressionUUID->"C75E2CD9-7A84-4070-8869-86E96FA475D7"],
+
+Cell["Weak duality", "Subsection",ExpressionUUID->"1A427E14-30D7-46A9-BED8-A928D7F489A2"],
+
+Cell["xTest = {1, 1}; yTest = {1, 2, 1};", "Input",ExpressionUUID->"8EB8DE03-F037-4BC6-A536-D2031FC41C1B"],
+
+Cell["TableForm[{{\"primal c.x\", c.xTest, And @@ Thread[A.xTest <= b]}, {\"dual b.y\", b.yTest, And @@ Thread[Transpose[A].yTest >= c]}}, TableHeadings -> {None, {\"objective\", \"value\", \"feasible\"}}]", "Input",ExpressionUUID->"E5A83F4C-B322-4519-A1D5-74EDD8DBAF2B"],
+
+Cell["Complementary slackness", "Subsection",ExpressionUUID->"35AE8F80-C61D-478E-8A9B-46898A7DFF39"],
+
+Cell["primalSlack = b - A.xs; dualSlack = Transpose[A].dualSol - c;", "Input",ExpressionUUID->"47ADBA22-1FF4-4FD1-9BBC-70D724FD95C8"],
+
+Cell["Grid[{{\"quantity\", \"values\"}, {\"primal slack\", primalSlack}, {\"x_j times dual slack\", xs dualSlack}, {\"y_i times primal slack\", dualSol primalSlack}}, Frame -> All]", "Input",ExpressionUUID->"85A1A773-5DC5-4CCF-A778-FA6F275071AC"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"3486E3E1-316D-4D65-BF14-FE4AD6FDBA5A"
+]

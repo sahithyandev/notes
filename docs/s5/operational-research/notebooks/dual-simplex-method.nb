@@ -1,0 +1,62 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Dual Simplex Method", "Title",ExpressionUUID->"274C7F21-B6F2-43BB-B79D-7BE6C5330838"],
+
+Cell["Companion to docs/s5/operational-research/11-dual-simplex-method.mdx. Starts from the optimal tableau of the simplex example, adds the constraint x1 + x2 <= 5, and repairs the infeasible tableau with the dual simplex method. The leaving row is the most negative right-hand side, and the entering column minimizes the ratio of objective coefficient to pivot entry.", "Text",ExpressionUUID->"5DEE0B8C-5C42-4A6A-A303-F2E248D17736"],
+
+Cell["Optimal tableau before the new constraint", "Subsection",ExpressionUUID->"9B0693B7-653A-4478-A177-18714FF9481F"],
+
+Cell["names = {\"x1\", \"x2\", \"s1\", \"s2\", \"s3\", \"s4\"};", "Input",ExpressionUUID->"228B7278-DE5E-444A-997E-C4C800F288C7"],
+
+Cell["T0 = {{0, 0, 0, 3/2, 1, 0, 36}, {0, 0, 1, 1/3, -1/3, 0, 2}, {0, 1, 0, 1/2, 0, 0, 6}, {1, 0, 0, -1/3, 1/3, 0, 2}};", "Input",ExpressionUUID->"0F52E081-75B0-496F-8FCA-0ACA52A09674"],
+
+Cell["basis0 = {3, 2, 1};", "Input",ExpressionUUID->"93C245BF-D129-4B6E-A331-1225C175EABD"],
+
+Cell["Add the constraint x1 + x2 + s4 = 5", "Subsection",ExpressionUUID->"B204CDA1-E58A-4322-869F-592764B3DCDB"],
+
+Cell["newRow = {1, 1, 0, 0, 0, 1, 5} - T0[[4]] - T0[[3]];", "Input",ExpressionUUID->"2B5FB4D2-8F5B-4455-9FE8-897CA1C1748E"],
+
+Cell["T1 = Append[T0, newRow];", "Input",ExpressionUUID->"451BEEA4-4C75-4A52-BFCD-415B9E7185C5"],
+
+Cell["basis1 = Append[basis0, 6];", "Input",ExpressionUUID->"9C70C0D4-A345-4B2E-8DB3-F8C98F2D3558"],
+
+Cell["Pivot and dual simplex iteration", "Subsection",ExpressionUUID->"EBCA58C6-11E1-4C44-A9E8-1243901A23DD"],
+
+Cell["pivot[T_, row_, col_] := Module[{P = T}, P[[row]] = T[[row]]/T[[row, col]]; Do[If[i != row, P[[i]] = T[[i]] - T[[i, col]] P[[row]]], {i, Length[T]}]; P]", "Input",ExpressionUUID->"6214A64C-2745-4C4D-BA58-3224CD7C75F9"],
+
+Cell["showTableau[T_, basis_, nm_] := TableForm[T, TableHeadings -> {Prepend[nm[[basis]], \"z\"], Append[nm, \"RHS\"]}]", "Input",ExpressionUUID->"D52F0CFE-54CD-4CBF-805F-63360F13F404"],
+
+Cell["dualSimplexRun[T0_, basis0_] := Module[{T = T0, basis = basis0, hist = {}, rhs, row, cands, ratios, col}, Do[rhs = T[[2 ;;, -1]]; If[Min[rhs] >= 0, Break[]]; row = First@Ordering[rhs, 1] + 1; cands = Select[Range[Length[T[[1]]] - 1], T[[row, #]] < 0 &]; If[cands === {}, Print[\"infeasible\"]; Break[]]; ratios = Table[Abs[T[[1, j]]/T[[row, j]]], {j, cands}]; col = cands[[First@Ordering[ratios, 1]]]; AppendTo[hist, {T, basis, col, row}]; T = pivot[T, row, col]; basis[[row - 1]] = col, {20}]; AppendTo[hist, {T, basis, None, None}]; hist]", "Input",ExpressionUUID->"52BB1CF4-3FDA-4E2C-BC50-D64EA3EA7F9D"],
+
+Cell["showTableau[T1, basis1, names]", "Input",ExpressionUUID->"4EB7B3C7-2075-4E8C-84AB-8973DB4F1453"],
+
+Cell["hist = dualSimplexRun[T1, basis1];", "Input",ExpressionUUID->"B34614FB-C933-4A2B-AB9E-2E04966E476A"],
+
+Cell["Column[MapIndexed[Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], showTableau[#1[[1]], #1[[2]], names]}] &, hist]]", "Input",ExpressionUUID->"893C111E-3244-43BD-9629-9DF2B291DE0E"],
+
+Cell["Solution", "Subsection",ExpressionUUID->"8DA54EFA-F20E-49A8-905B-F7A148D488B7"],
+
+Cell["finalT = hist[[-1, 1]]; finalBasis = hist[[-1, 2]];", "Input",ExpressionUUID->"2BF03A75-B75D-4954-A38A-8785E62EAA3E"],
+
+Cell["xsol = ConstantArray[0, 6]; xsol[[finalBasis]] = finalT[[2 ;;, -1]];", "Input",ExpressionUUID->"33BA2E33-C0A4-4924-A118-39FDE75E77DB"],
+
+Cell["Thread[names -> xsol]", "Input",ExpressionUUID->"C7165F39-B163-4795-8BF2-90D70CC99770"],
+
+Cell["z = finalT[[1, -1]]", "Input",ExpressionUUID->"EA785994-3535-47D0-B9EF-088D202FD6AB"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"475F1D41-0CDD-4B7E-A690-44C91743D143"],
+
+Cell["Maximize[{3 x1 + 5 x2, And @@ {x1 <= 4, 2 x2 <= 12, 3 x1 + 2 x2 <= 18, x1 + x2 <= 5, x1 >= 0, x2 >= 0}}, {x1, x2}]", "Input",ExpressionUUID->"A80961DA-B317-4396-A7CB-246035E09CC5"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"0DFA9FAC-EF11-4895-A711-0198837683C4"
+]

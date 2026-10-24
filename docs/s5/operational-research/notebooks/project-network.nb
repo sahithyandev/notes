@@ -1,0 +1,56 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Project Network", "Title",ExpressionUUID->"27600EDF-96C0-4545-9686-E27771CD1ECD"],
+
+Cell["Companion to docs/s5/operational-research/20-project-network.mdx. Runs the forward and backward passes over the event network, reads the project duration and the critical path, and computes the total, free and independent float of every activity. Each activity is a list {name, start event, end event, duration}.", "Text",ExpressionUUID->"45BA59B5-E656-4394-93F9-C183EB9A12AA"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"EECB7271-CF49-46F2-B1D9-5C197222B907"],
+
+Cell["acts = {{\"A\", 1, 2, 4}, {\"B\", 1, 3, 3}, {\"C\", 2, 4, 2}, {\"D\", 3, 4, 0}, {\"E\", 3, 5, 5}, {\"F\", 4, 6, 3}, {\"G\", 5, 6, 4}};", "Input",ExpressionUUID->"AEF0786D-FCC7-40EF-9E27-E84B45DA2A8B"],
+
+Cell["nEv = 6;", "Input",ExpressionUUID->"4E68C7E1-A496-4726-833B-B0A100ACD8B5"],
+
+Cell["Forward pass: earliest event times", "Subsection",ExpressionUUID->"E8086D93-A824-4480-A8AD-B8A59D437063"],
+
+Cell["early = <|1 -> 0|>;", "Input",ExpressionUUID->"9E7A79C9-9AD7-44D3-9A0D-0CAE1398801D"],
+
+Cell["Do[AssociateTo[early, j -> Max[Cases[acts, {_, i_, j, t_} :> early[i] + t]]], {j, 2, nEv}];", "Input",ExpressionUUID->"AE42D7C4-85AA-44C6-945D-9BF02270AD65"],
+
+Cell["early", "Input",ExpressionUUID->"8EE87532-33B6-495B-BF57-11CAA0F0A154"],
+
+Cell["Backward pass: latest event times", "Subsection",ExpressionUUID->"FADD663F-A399-4790-AB47-627EE7469C0A"],
+
+Cell["late = <|nEv -> early[nEv]|>;", "Input",ExpressionUUID->"5EB99B08-2DD4-477D-8063-E80F1A1FBF6C"],
+
+Cell["Do[AssociateTo[late, i -> Min[Cases[acts, {_, i, j_, t_} :> late[j] - t]]], {i, nEv - 1, 1, -1}];", "Input",ExpressionUUID->"783E489B-34B4-4F74-AEB8-2BA8D4724B88"],
+
+Cell["TableForm[Table[{i, early[i], late[i], If[early[i] == late[i], \"critical\", \"\"]}, {i, nEv}], TableHeadings -> {None, {\"event\", \"early\", \"late\", \"status\"}}]", "Input",ExpressionUUID->"179DB5D5-F605-4FD5-8EDE-3D9B2B0F328F"],
+
+Cell["duration = early[nEv]", "Input",ExpressionUUID->"F75F485B-0214-4A49-AEEE-B22282FBB8AD"],
+
+Cell["Float", "Subsection",ExpressionUUID->"ECA292A1-80CF-4FDD-AD09-EB5B5ADC3B29"],
+
+Cell["floats = Map[Replace[#, {nm_, i_, j_, t_} :> {nm, i, j, t, late[j] - early[i] - t, early[j] - early[i] - t, Max[early[j] - late[i] - t, 0]}] &, acts];", "Input",ExpressionUUID->"F4DF5DDE-2B8F-43D2-85CD-FBD0915A4E9B"],
+
+Cell["TableForm[floats, TableHeadings -> {None, {\"activity\", \"start\", \"end\", \"duration\", \"total\", \"free\", \"independent\"}}]", "Input",ExpressionUUID->"CCAF8E46-4547-4DCB-AF45-35ADE5EB9F46"],
+
+Cell["Critical path", "Subsection",ExpressionUUID->"A4DF4F73-BC95-434A-BF8A-1FC33E6FF9C3"],
+
+Cell["Select[floats, #[[5]] == 0 &][[All, 1]]", "Input",ExpressionUUID->"B070C9E8-16A5-4324-B64B-361EA3534FAD"],
+
+Cell["edgeRules = Map[#[[2]] -> #[[3]] &, acts];", "Input",ExpressionUUID->"7B97F318-EB19-424C-B027-FFDF4B0DB137"],
+
+Cell["Graph[edgeRules, EdgeLabels -> Thread[edgeRules -> Map[#[[1]] <> \", \" <> ToString[#[[4]]] &, acts]], VertexLabels -> Automatic, GraphLayout -> \"LayeredDigraphEmbedding\"]", "Input",ExpressionUUID->"2D7DCB27-9698-43ED-9806-2943BE6B2E61"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"98BEC97B-EB57-4FEA-9D4F-D656966A3E99"
+]

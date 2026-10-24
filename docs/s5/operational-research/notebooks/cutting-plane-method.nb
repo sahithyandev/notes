@@ -1,0 +1,66 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Cutting Plane Method", "Title",ExpressionUUID->"4CF713A6-4FE6-450C-B2A7-885B197E9C5C"],
+
+Cell["Companion to docs/s5/operational-research/15-cutting-plane-method.mdx. Solves the LP relaxation, builds the Gomory fractional cut from the row of the optimal tableau with the largest fractional part, expresses the cut in the original variables, and re-solves.", "Text",ExpressionUUID->"89E6605C-CCB6-41FB-BE6D-BABCC27C02A1"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"1B3BCA9B-B449-4268-9994-DFA7488D1BA3"],
+
+Cell["c = {2, 3};", "Input",ExpressionUUID->"11F4DB31-41CC-4203-B0E6-C90C27E4B84F"],
+
+Cell["A = {{1, 1}, {0, 2}};", "Input",ExpressionUUID->"8EF2E593-77FB-4A34-89B6-F55EE35396F3"],
+
+Cell["b = {5, 7};", "Input",ExpressionUUID->"C3716FAF-470B-48F6-9034-D2A71AC35561"],
+
+Cell["LP relaxation", "Subsection",ExpressionUUID->"46B14937-3C37-46E8-9F25-CE871D8332D0"],
+
+Cell["xLP = LinearProgramming[-c, -A, -b]", "Input",ExpressionUUID->"2C069F40-0A38-4D6D-BB6C-4F4FAACB44FD"],
+
+Cell["zLP = c.xLP", "Input",ExpressionUUID->"90D9EF6C-59E7-4201-B6E9-AAE9199D8D78"],
+
+Cell["Gomory cut from the optimal tableau", "Subsection",ExpressionUUID->"5065E31F-F312-41FD-8A74-4C566CA572C5"],
+
+Cell["As = Join[A, IdentityMatrix[2], 2];", "Input",ExpressionUUID->"876AB7F3-773A-4CBC-8096-42505C8D820E"],
+
+Cell["B = As[[All, {1, 2}]]; Binv = Inverse[B];", "Input",ExpressionUUID->"B9361615-E3FC-4342-91B4-29CA83D9192D"],
+
+Cell["xB = Binv.b", "Input",ExpressionUUID->"CB11B2B2-C14F-4506-BFAB-23F0CD20B009"],
+
+Cell["rows = Binv.As[[All, {3, 4}]]", "Input",ExpressionUUID->"4D262C63-BEBC-4D62-9644-1E0BC85F926F"],
+
+Cell["f[v_] := v - Floor[v];", "Input",ExpressionUUID->"5FE2D262-4F44-4270-9291-D8AAA3C86218"],
+
+Cell["r = First@Ordering[-Map[f, xB], 1]", "Input",ExpressionUUID->"3CBA401F-AD3C-423A-8412-9E6E5531BD84"],
+
+Cell["fRow = Map[f, rows[[r]]]; f0 = f[xB[[r]]];", "Input",ExpressionUUID->"B697C1FE-7E51-4476-B9B9-9346F43ED23E"],
+
+Cell["slacks = b - A.{x1, x2};", "Input",ExpressionUUID->"237A126B-B5DD-4FAB-873A-2A51376244D1"],
+
+Cell["cut = Simplify[fRow.slacks >= f0]", "Input",ExpressionUUID->"46919962-0B5F-4F83-8C61-5664A7767285"],
+
+Cell["Re-solve with the cut", "Subsection",ExpressionUUID->"C65ED91C-BDD6-456E-AF95-F4CA4558534B"],
+
+Cell["A2 = Join[A, {{0, 1}}]; b2 = Join[b, {3}];", "Input",ExpressionUUID->"571F6462-4448-44DA-B25C-10994C68A738"],
+
+Cell["xCut = LinearProgramming[-c, -A2, -b2]", "Input",ExpressionUUID->"C4028FAF-EE40-465C-94CD-F298FF2DFE86"],
+
+Cell["zCut = c.xCut", "Input",ExpressionUUID->"9E88FD83-32DA-4864-AD55-A1F13D79758B"],
+
+Cell["And @@ (IntegerQ /@ xCut)", "Input",ExpressionUUID->"BC79C3B4-1BD0-42CE-9904-A910DBE9E245"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"9D5213B3-939E-4FFB-B7B4-B4EFA93AA777"],
+
+Cell["Maximize[{c.{x1, x2}, And @@ Join[Thread[A.{x1, x2} <= b], {x1 >= 0, x2 >= 0}]}, {x1, x2}, Integers]", "Input",ExpressionUUID->"36828D9C-814C-4C22-8F86-90A1AE19A565"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"BD4F5C18-FEAD-4AAF-8AD9-D3AD0FDFD2E8"
+]

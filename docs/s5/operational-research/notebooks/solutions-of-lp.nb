@@ -1,0 +1,50 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Basic Solutions of an LP", "Title",ExpressionUUID->"58268EB0-C156-49F2-AFF8-576FE11D8DCB"],
+
+Cell["Companion to docs/s5/operational-research/06-solutions-of-lp.mdx. Enumerates every basis of the standard form system, solves for the basic variables, and keeps the basic feasible solutions. The best one is checked against the solver.", "Text",ExpressionUUID->"C8EF1DBA-8938-4B1F-A22F-BEA0A0F3C437"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"59BB1277-A56E-40E8-80D6-4F9556113ABD"],
+
+Cell["A = {{1, 1, 1, 0}, {1, 2, 0, 1}};", "Input",ExpressionUUID->"2AB3B6A1-5E04-4878-BB11-2FB6613ADEC4"],
+
+Cell["b = {4, 6};", "Input",ExpressionUUID->"D80E8274-715F-461D-92E4-3E536D8C695A"],
+
+Cell["c = {3, 2, 0, 0};", "Input",ExpressionUUID->"7F4512F2-083F-459E-99D3-C60FF65FE083"],
+
+Cell["Basic solutions", "Subsection",ExpressionUUID->"068ED412-AF11-44A0-9BCC-AE5072AF10EE"],
+
+Cell["m = Length[A]; nv = Length[A[[1]]];", "Input",ExpressionUUID->"02818E58-7817-413B-A5CE-0FA366A4D6CA"],
+
+Cell["bases = Subsets[Range[nv], {m}];", "Input",ExpressionUUID->"8595B3FE-4DF3-4DE0-AF00-2B87E5E9607A"],
+
+Cell["basicSol[bs_] := Module[{x = ConstantArray[0, nv], sol}, sol = Quiet[Check[LinearSolve[A[[All, bs]], b], $Failed]]; If[sol === $Failed, $Failed, x[[bs]] = sol; x]]", "Input",ExpressionUUID->"9DF27331-EDB5-4770-9DE8-0EC54B0773D7"],
+
+Cell["report = Table[{bs, basicSol[bs], If[basicSol[bs] === $Failed, \"singular\", If[And @@ Thread[basicSol[bs] >= 0], \"feasible\", \"infeasible\"]]}, {bs, bases}];", "Input",ExpressionUUID->"4F7B7CA4-AE82-4975-A7FA-E7BE6B4B0EB0"],
+
+Cell["TableForm[report, TableHeadings -> {None, {\"basic\", \"x\", \"status\"}}]", "Input",ExpressionUUID->"DEEC9449-9D19-4DF5-BFB3-6B357C6F57D0"],
+
+Cell["bfs = Select[Table[basicSol[bs], {bs, bases}], (# =!= $Failed && And @@ Thread[# >= 0]) &];", "Input",ExpressionUUID->"A7D928D3-D74A-45A5-ACC4-623BF2DCACD1"],
+
+Cell["Length[bfs]", "Input",ExpressionUUID->"32A158B5-82FF-45DA-B666-31BC0F5AD4A0"],
+
+Cell["optimal = First[MaximalBy[bfs, c.# &]]", "Input",ExpressionUUID->"2AECF6ED-924A-4656-8E45-BC43661E3094"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"26D32099-D1CA-4EA3-8EA4-F5E443DB3F33"],
+
+Cell["LinearProgramming[-c, A, {{4, 0}, {6, 0}}]", "Input",ExpressionUUID->"3792B646-8094-46E7-96FB-491BAAD5F722"],
+
+Cell["Maximize[{c.{x1, x2, x3, x4}, And @@ Join[Thread[A.{x1, x2, x3, x4} == b], Thread[{x1, x2, x3, x4} >= 0]]}, {x1, x2, x3, x4}]", "Input",ExpressionUUID->"157AC154-9FEC-4BF5-A51B-B9C1C8146DC9"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"08FD4001-AA41-46B3-A553-D387D27DF590"
+]

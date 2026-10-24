@@ -1,0 +1,52 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Standard Form", "Title",ExpressionUUID->"AE56D505-7BC4-480B-8637-6BD01B861C29"],
+
+Cell["Companion to docs/s5/operational-research/05-standard-form.mdx. Each row of rows is {coefficients, sense, right-hand side}, with sense one of <=, >= or ==. The minimization objective c is turned into a maximization. The notebook builds the standard form with slack, surplus and artificial columns, then reads the starting basis.", "Text",ExpressionUUID->"84D28BAF-F1A6-4DA8-B532-09A6AAB05FF0"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"A1957CD8-9F27-46D7-9AA2-F1E47F5991CA"],
+
+Cell["c = {2, 3};", "Input",ExpressionUUID->"0F65179F-6FB3-4CE9-BF12-D930CF7A81F5"],
+
+Cell["rows = {{{1, 1}, \"<=\", 4}, {{1, 3}, \">=\", 6}, {{1, -1}, \"==\", 1}};", "Input",ExpressionUUID->"F2879C17-2B83-4AD2-932A-57CD7F81B1F5"],
+
+Cell["Standard form", "Subsection",ExpressionUUID->"C25D0BE0-BEB7-4754-B6EC-DD192C3A4ED4"],
+
+Cell["m = Length[rows]; n = Length[c];", "Input",ExpressionUUID->"68E2F69B-DA82-4259-ACEB-1D293A93100E"],
+
+Cell["Coef = rows[[All, 1]]; senses = rows[[All, 2]]; bvec = rows[[All, 3]];", "Input",ExpressionUUID->"D4AB7D61-D252-4840-AF80-AE2687F3D498"],
+
+Cell["extra = Join @@ Table[Switch[senses[[i]], \"<=\", {{\"s\" <> ToString[i], UnitVector[m, i]}}, \">=\", {{\"e\" <> ToString[i], -UnitVector[m, i]}, {\"a\" <> ToString[i], UnitVector[m, i]}}, \"==\", {{\"a\" <> ToString[i], UnitVector[m, i]}}], {i, m}];", "Input",ExpressionUUID->"DA83C1D4-FE05-435B-84C1-732E3706741A"],
+
+Cell["names = Join[Table[\"x\" <> ToString[j], {j, n}], extra[[All, 1]]];", "Input",ExpressionUUID->"FD5CD0E2-C6B0-484A-B31F-D56A0EBF7C65"],
+
+Cell["Astd = MapThread[Join, {Coef, Transpose[extra[[All, 2]]]}];", "Input",ExpressionUUID->"8D085E2C-80A3-4E68-BF7A-BD26EF44781B"],
+
+Cell["cStd = Join[-c, ConstantArray[0, Length[extra]]];", "Input",ExpressionUUID->"8B768CDA-E3DD-46CF-9562-0D1FBDAF2CE3"],
+
+Cell["Grid[Prepend[MapThread[Append, {Astd, bvec}], Append[names, \"rhs\"]], Frame -> All]", "Input",ExpressionUUID->"5911B5FD-053F-4AF2-9608-253C441E5562"],
+
+Cell["Thread[names -> cStd]", "Input",ExpressionUUID->"044F75E4-9AEC-4A4F-8B87-3D75AE18B74B"],
+
+Cell["Starting basis", "Subsection",ExpressionUUID->"FC511462-04EA-4489-9A85-E27C52EBA91A"],
+
+Cell["basisIdx = Flatten[Position[names, _String?(StringStartsQ[#, \"s\" | \"a\"] &)]];", "Input",ExpressionUUID->"4722D15A-CE8E-4F4B-ABB6-5E8422FCE3F3"],
+
+Cell["xB = LinearSolve[Astd[[All, basisIdx]], bvec];", "Input",ExpressionUUID->"A5D59655-1E8B-4DCB-83D2-13486AD4BCE9"],
+
+Cell["Thread[names[[basisIdx]] -> xB]", "Input",ExpressionUUID->"7A961736-EAA4-47A9-8760-486470F20960"],
+
+Cell["And @@ Thread[xB >= 0]", "Input",ExpressionUUID->"E131725D-CA55-4883-9AD5-003BC9971919"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"6929C982-BF5D-4B6A-9CBE-B150F569C0AA"
+]

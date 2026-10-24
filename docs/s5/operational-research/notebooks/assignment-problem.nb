@@ -1,0 +1,52 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Assignment Problem", "Title",ExpressionUUID->"B01ED4A2-BC07-4286-BDFE-A7D88116A05C"],
+
+Cell["Companion to docs/s5/operational-research/19-assignment-problem.mdx. Runs the Hungarian method on a cost matrix. Each pass reduces the rows and columns, covers the zeros with the fewest lines (a minimum vertex cover of the zero graph, which by König's theorem has the size of the largest set of independent zeros), and adjusts the matrix until the lines number n. The assignment is read as a set of independent zeros and checked against brute force.", "Text",ExpressionUUID->"BD61E9D6-6684-4773-9B42-998160D70818"],
+
+Cell["Cost matrices", "Subsection",ExpressionUUID->"DCE0F506-AC2D-462E-B035-E1E8D775DC4E"],
+
+Cell["cost1 = {{9, 2, 7}, {6, 4, 3}, {5, 8, 1}};", "Input",ExpressionUUID->"277EECFD-487D-49F8-B4E2-22C4768E026F"],
+
+Cell["cost2 = {{4, 2, 8}, {4, 3, 7}, {3, 1, 6}};", "Input",ExpressionUUID->"1B591DD3-DE41-4D6E-A9DB-A8CFB236EC1E"],
+
+Cell["Hungarian method", "Subsection",ExpressionUUID->"917460E6-A88A-4F2A-AD10-8F77DFC946CC"],
+
+Cell["hungarian[cst_] := Module[{n = Length[cst], mat = cst, steps = {}, edges, cover, rc, cc, unc, mn, pairs, pairFromEdge}, steps = Append[steps, {\"Initial\", mat}]; mat = Map[# - Min[#] &, mat]; steps = Append[steps, {\"Row reduction\", mat}]; mat = Transpose[Map[# - Min[#] &, Transpose[mat]]]; steps = Append[steps, {\"Column reduction\", mat}]; Do[edges = Flatten[Table[If[mat[[i, j]] == 0, UndirectedEdge[\"A\" <> ToString[i], \"T\" <> ToString[j]], Nothing], {i, n}, {j, n}]]; cover = FindVertexCover[Graph[Join[Table[\"A\" <> ToString[i], {i, n}], Table[\"T\" <> ToString[j], {j, n}]], edges]]; rc = ToExpression[StringDrop[#, 1]] & /@ Select[cover, StringStartsQ[#, \"A\"] &]; cc = ToExpression[StringDrop[#, 1]] & /@ Select[cover, StringStartsQ[#, \"T\"] &]; steps = Append[steps, {\"Cover: rows \" <> ToString[rc] <> \", columns \" <> ToString[cc], mat}]; If[Length[cover] == n, Break[]]; unc = Flatten[Table[If[! MemberQ[rc, i] && ! MemberQ[cc, j], mat[[i, j]], Nothing], {i, n}, {j, n}]]; mn = Min[unc]; mat = Table[Which[! MemberQ[rc, i] && ! MemberQ[cc, j], mat[[i, j]] - mn, MemberQ[rc, i] && MemberQ[cc, j], mat[[i, j]] + mn, True, mat[[i, j]]], {i, n}, {j, n}]; steps = Append[steps, {\"Adjustment by \" <> ToString[mn], mat}], {50}]; perm = First@Select[Permutations[Range[n]], And @@ Table[mat[[i, #[[i]]]] == 0, {i, n}] &]; pairs = Table[{i, perm[[i]]}, {i, n}]; {steps, pairs, Total[Map[cst[[#[[1]], #[[2]]]] &, pairs]]}]", "Input",ExpressionUUID->"2F1EAC6C-9ACE-45E0-9059-7231A91DC338"],
+
+Cell["Example 1", "Subsection",ExpressionUUID->"F3E57196-772C-4F2D-BBFA-2698ABF75C30"],
+
+Cell["{steps1, pairs1, total1} = hungarian[cost1];", "Input",ExpressionUUID->"733BD49E-75CB-4435-8533-A5154BB82960"],
+
+Cell["Column[Map[Column[{Style[#[[1]], Bold], TableForm[#[[2]]]}] &, steps1]]", "Input",ExpressionUUID->"1579786A-E5B2-4CD3-997B-8DBED0708639"],
+
+Cell["pairs1", "Input",ExpressionUUID->"789BDA40-E1FA-4FE8-84DC-63CD76571B28"],
+
+Cell["total1", "Input",ExpressionUUID->"1D4324AD-D41C-4BF9-9E58-F86DC09B6B8F"],
+
+Cell["Min[Table[Total[Table[cost1[[i, p[[i]]]], {i, 3}]], {p, Permutations[Range[3]]}]]", "Input",ExpressionUUID->"EA5042E3-80DD-41AE-86E0-00A23CBA278E"],
+
+Cell["Example 2", "Subsection",ExpressionUUID->"39C72D03-D2BE-48EE-9325-EBA9B507B148"],
+
+Cell["{steps2, pairs2, total2} = hungarian[cost2];", "Input",ExpressionUUID->"DBB89D28-B34A-4143-B114-722384B5E448"],
+
+Cell["Column[Map[Column[{Style[#[[1]], Bold], TableForm[#[[2]]]}] &, steps2]]", "Input",ExpressionUUID->"5D322B8A-31CE-45A0-95E3-83B0A258FEB6"],
+
+Cell["pairs2", "Input",ExpressionUUID->"87A31826-6CD9-4F96-BF1C-4965EF9571A2"],
+
+Cell["total2", "Input",ExpressionUUID->"7E3FE491-9860-46A6-90B4-F6E558C2DECC"],
+
+Cell["Min[Table[Total[Table[cost2[[i, p[[i]]]], {i, 3}]], {p, Permutations[Range[3]]}]]", "Input",ExpressionUUID->"E7E6A91E-03ED-45F7-9FF1-53C832D3063A"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"ED88013F-2B8E-469B-A124-B0B9E503B209"
+]

@@ -1,0 +1,82 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Two-Phase Method", "Title",ExpressionUUID->"C9E5299A-514F-43CE-921A-51C02138BDB2"],
+
+Cell["Companion to docs/s5/operational-research/09-two-phase-method.mdx. Phase 1 minimizes the sum of the artificial variables, which is run as a maximization of w = -a1 - a2. Phase 2 drops the artificial columns, restores the original objective, and re-prices it against the phase 1 basis.", "Text",ExpressionUUID->"B8594D62-E648-4BB4-8AFC-9EE3BC7D8ABD"],
+
+Cell["Standard form", "Subsection",ExpressionUUID->"C2BB2DDE-8689-4F95-854D-88DFC3F1D014"],
+
+Cell["Astd = {{3, 1, 0, 0, 1, 0}, {4, 3, -1, 0, 0, 1}, {1, 2, 0, 1, 0, 0}};", "Input",ExpressionUUID->"33F8CD6F-6C73-48E2-AFD3-AFC8AB8C6542"],
+
+Cell["bvec = {3, 6, 4};", "Input",ExpressionUUID->"02CDC6BE-1DF9-407E-8B01-9F504B1B9E84"],
+
+Cell["names = {\"x1\", \"x2\", \"s2\", \"s3\", \"a1\", \"a2\"};", "Input",ExpressionUUID->"8ADB9CCB-46D6-4F24-8F3A-C8517FABF383"],
+
+Cell["rowsAb = MapThread[Append, {Astd, bvec}];", "Input",ExpressionUUID->"7614845A-56BB-4540-AD23-27EB5F1E035D"],
+
+Cell["Phase 1 setup", "Subsection",ExpressionUUID->"6A073310-7238-4539-879A-82FB02B6BBCE"],
+
+Cell["raw1 = {0, 0, 0, 0, 1, 1, 0};", "Input",ExpressionUUID->"DCC42872-F931-4FAA-8B3B-5E9D49106049"],
+
+Cell["T0 = Prepend[rowsAb, Expand[raw1 - rowsAb[[1]] - rowsAb[[2]]]];", "Input",ExpressionUUID->"6CB564F9-329B-4CE7-9289-5DFBED4AF957"],
+
+Cell["TableForm[T0, TableHeadings -> {{\"w\", \"a1\", \"a2\", \"s3\"}, Append[names, \"RHS\"]}]", "Input",ExpressionUUID->"5C6E7474-9940-4AFE-BD67-65FAF793F801"],
+
+Cell["pivot[T_, row_, col_] := Module[{P = T}, P[[row]] = T[[row]]/T[[row, col]]; Do[If[i != row, P[[i]] = T[[i]] - T[[i, col]] P[[row]]], {i, Length[T]}]; P]", "Input",ExpressionUUID->"AAD8DFA5-C734-43D3-84B9-FA7E734865AF"],
+
+Cell["showTableau[T_, basis_, nm_] := TableForm[T, TableHeadings -> {Prepend[nm[[basis]], \"z\"], Append[nm, \"RHS\"]}]", "Input",ExpressionUUID->"C6F34801-B747-4A5F-B20A-FB031E5D2DCC"],
+
+Cell["simplexRun[T0_, basis0_] := Module[{T = T0, basis = basis0, hist = {}, obj, ratios, col, row}, Do[obj = T[[1, 1 ;; -2]]; If[Min[obj] >= 0, Break[]]; col = First@Ordering[obj, 1]; ratios = Table[If[T[[i, col]] > 0, T[[i, -1]]/T[[i, col]], Infinity], {i, 2, Length[T]}]; If[Min[ratios] === Infinity, Print[\"unbounded\"]; Break[]]; row = First@Ordering[ratios, 1] + 1; AppendTo[hist, {T, basis, col, row}]; T = pivot[T, row, col]; basis[[row - 1]] = col, {20}]; AppendTo[hist, {T, basis, None, None}]; hist]", "Input",ExpressionUUID->"625F365C-3455-46FF-B3CC-2960ADE597C2"],
+
+Cell["hist1 = simplexRun[T0, {5, 6, 4}];", "Input",ExpressionUUID->"A989F0CE-E124-4FA3-B2DB-B4733AC8336E"],
+
+Cell["Phase 1 iterations", "Subsection",ExpressionUUID->"25146EAB-447E-4619-BD56-B26AE73702DE"],
+
+Cell["Column[MapIndexed[Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], showTableau[#1[[1]], #1[[2]], names]}] &, hist1]]", "Input",ExpressionUUID->"72717746-4DED-4FD2-96FC-1AAE150762EC"],
+
+Cell["finalT1 = hist1[[-1, 1]]; basis1 = hist1[[-1, 2]];", "Input",ExpressionUUID->"ADF04E0C-51AA-479B-A723-F12604C95AF5"],
+
+Cell["w = finalT1[[1, -1]]", "Input",ExpressionUUID->"C7D280EE-E309-4925-972D-05CE4AAAB7D9"],
+
+Cell["Phase 2 setup", "Subsection",ExpressionUUID->"B00F6957-BB97-4235-95FE-5228D26F9097"],
+
+Cell["raw2 = {4, 1, 0, 0, 0};", "Input",ExpressionUUID->"B4E76F10-4B36-4C0A-BB66-741A92EC62D5"],
+
+Cell["T2rows = finalT1[[2 ;;, {1, 2, 3, 4, 7}]];", "Input",ExpressionUUID->"D3F3865F-404F-4AE9-8DA1-E8814ACB23E0"],
+
+Cell["z2 = raw2; Do[z2 = z2 - z2[[basis1[[i]]]] T2rows[[i]], {i, Length[basis1]}];", "Input",ExpressionUUID->"868E7EF6-D925-4302-B778-F4F90E99C1B8"],
+
+Cell["nm2 = {\"x1\", \"x2\", \"s2\", \"s3\"};", "Input",ExpressionUUID->"61546552-CDA0-428A-85B8-9C1363DB4AD7"],
+
+Cell["T2 = Prepend[T2rows, z2];", "Input",ExpressionUUID->"6FC437E1-5792-430B-9B0B-61A3451DDB26"],
+
+Cell["TableForm[T2, TableHeadings -> {Prepend[nm2[[basis1]], \"z\"], Append[nm2, \"RHS\"]}]", "Input",ExpressionUUID->"736E4128-4D91-4F23-8140-4D01E732D4DE"],
+
+Cell["Phase 2 iterations", "Subsection",ExpressionUUID->"35AF4176-E0B2-4A9C-B14D-12202A310C9C"],
+
+Cell["hist2 = simplexRun[T2, basis1];", "Input",ExpressionUUID->"751AF48A-91E5-4D0D-88A7-C9A1EF518692"],
+
+Cell["Column[MapIndexed[Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], showTableau[#1[[1]], #1[[2]], nm2]}] &, hist2]]", "Input",ExpressionUUID->"73127452-EE65-45C3-89E4-2AC2904AE44F"],
+
+Cell["Solution", "Subsection",ExpressionUUID->"DD84229C-C3BB-4388-B260-EFAFE120D06B"],
+
+Cell["finalT2 = hist2[[-1, 1]]; basis2 = hist2[[-1, 2]];", "Input",ExpressionUUID->"738EFEA1-A027-4C68-9C51-86108841AFF7"],
+
+Cell["xsol = ConstantArray[0, 4]; xsol[[basis2]] = finalT2[[2 ;;, -1]];", "Input",ExpressionUUID->"C7137D8B-C7EC-4F81-BC00-D70398F89506"],
+
+Cell["Thread[nm2 -> xsol]", "Input",ExpressionUUID->"6E974E50-EE27-484A-9789-C70AF6D40CD7"],
+
+Cell["z = -finalT2[[1, -1]]", "Input",ExpressionUUID->"3E38D16A-FC60-4032-8D01-A6FC590FC45B"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"CD3266AC-281A-4CCA-AD55-BCA6D75A247D"
+]

@@ -1,7 +1,9 @@
 ---
 title: Assignment Problem
+notebooks:
+  - assignment-problem
 dateCreated: 2026-08-26T11:55:10.616Z
-lastUpdatedOn: 2026-09-28T04:57:33.876Z
+lastUpdatedOn: 2026-10-24T06:41:49.489Z
 ---
 
 The problem of assigning $n$ agents to $n$ tasks one-to-one, minimizing total cost, given a cost $c_{ij}$ for assigning agent $i$ to task $j$. A special case of the [transportation problem](/s5/operational-research/transportation-problem).
@@ -52,7 +54,9 @@ Solves a balanced assignment problem in polynomial time, avoiding the degeneracy
 
 Once $n$ lines are needed, select $n$ independent 0s (1 per row and column) by assigning rows/columns with a unique 0 first, then resolving remaining choices, until every agent is assigned a task.
 
-## Worked Example
+## Worked Examples
+
+### Simple Example
 
 3 agents and 3 tasks, with cost matrix:
 
@@ -119,5 +123,106 @@ Once $n$ lines are needed, select $n$ independent 0s (1 per row and column) by a
     Independent 0s, 1 per row and column: Agent 1 has a single 0, at Task 2.
     Agent 3 has a single 0, at Task 3. Task 1 is then Agent 2's only remaining
     column.
+  </AssignmentStep>
+</Walkthrough>
+
+### Adjusting the Matrix
+
+Here the 0s need only 2 lines after reduction, so no assignment exists yet. The matrix is adjusted and covered again.
+
+<Walkthrough variant="assignment">
+  <AssignmentStep
+    label="Initial"
+    agents={["Agent 1", "Agent 2", "Agent 3"]}
+    tasks={["Task 1", "Task 2", "Task 3"]}
+    costs={[
+      [4, 2, 8],
+      [4, 3, 7],
+      [3, 1, 6],
+    ]}
+  >
+    Balanced, since 3 agents equal 3 tasks.
+  </AssignmentStep>
+
+<AssignmentStep
+  label="Row Reduction"
+  agents={["Agent 1", "Agent 2", "Agent 3"]}
+  tasks={["Task 1", "Task 2", "Task 3"]}
+  costs={[
+    [2, 0, 6],
+    [1, 0, 4],
+    [2, 0, 5],
+  ]}
+>
+  Subtract each row's minimum ($2$, $3$, $1$) from every entry in that row.
+</AssignmentStep>
+
+<AssignmentStep
+  label="Column Reduction"
+  agents={["Agent 1", "Agent 2", "Agent 3"]}
+  tasks={["Task 1", "Task 2", "Task 3"]}
+  costs={[
+    [1, 0, 2],
+    [0, 0, 0],
+    [1, 0, 1],
+  ]}
+  coveredRows={[1]}
+  coveredCols={[1]}
+>
+  Subtract each column's minimum ($1$, $0$, $4$) from every entry in that
+  column. Covering all 0s needs only 2 lines (row Agent 2, column Task 2), fewer
+  than $n = 3$, so no optimal assignment exists yet. The smallest uncovered
+  entry is $1$.
+</AssignmentStep>
+
+<AssignmentStep
+  label="Adjustment"
+  agents={["Agent 1", "Agent 2", "Agent 3"]}
+  tasks={["Task 1", "Task 2", "Task 3"]}
+  costs={[
+    [0, 0, 1],
+    [0, 1, 0],
+    [0, 0, 0],
+  ]}
+>
+  Subtract $1$ from every uncovered entry (Agents 1 and 3, Tasks 1 and 3). Add
+  $1$ to the entry covered twice (Agent 2, Task 2). Entries covered once stay
+  unchanged.
+</AssignmentStep>
+
+<AssignmentStep
+  label="Cover Again"
+  agents={["Agent 1", "Agent 2", "Agent 3"]}
+  tasks={["Task 1", "Task 2", "Task 3"]}
+  costs={[
+    [0, 0, 1],
+    [0, 1, 0],
+    [0, 0, 0],
+  ]}
+  coveredCols={[0, 1, 2]}
+>
+  Covering all 0s needs 3 lines (Task 1, Task 2, Task 3), equal to $n = 3$. An
+  optimal assignment exists among the 0s.
+</AssignmentStep>
+
+  <AssignmentStep
+    label="Assignment"
+    agents={["Agent 1", "Agent 2", "Agent 3"]}
+    tasks={["Task 1", "Task 2", "Task 3"]}
+    costs={[
+      [4, 2, 8],
+      [4, 3, 7],
+      [3, 1, 6],
+    ]}
+    assigned={[
+      [0, 0],
+      [1, 2],
+      [2, 1],
+    ]}
+    total="z = 4 + 7 + 1 = 12"
+  >
+    No row or column has a single 0 here, so choose one. Agent 1 to Task 1
+    forces Agent 2 to Task 3 and Agent 3 to Task 2. Agent 1 to Task 2 also
+    gives $z = 12$, so the optimum is not unique.
   </AssignmentStep>
 </Walkthrough>

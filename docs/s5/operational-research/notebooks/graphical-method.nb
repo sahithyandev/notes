@@ -1,0 +1,50 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Graphical Method", "Title",ExpressionUUID->"F1455A83-810C-4CC8-B730-50AFD70BC9E7"],
+
+Cell["Companion to docs/s5/operational-research/04-graphical-method.mdx. Edit the objective c, the constraint matrix A and the right-hand side b in the parameters cell, then use Evaluate Notebook from the Kernel menu. The notebook lists every vertex of the feasible region and checks the best one against the solver.", "Text",ExpressionUUID->"507E8869-D978-4692-A493-396EAF0C082B"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"8CFA88BA-C93B-452E-BD29-32F44A04F4F6"],
+
+Cell["c = {3, 2};", "Input",ExpressionUUID->"4BF33AA9-6262-47ED-8BFB-830EDD6B04BF"],
+
+Cell["A = {{1, 1}, {1, 3}};", "Input",ExpressionUUID->"8056D027-4B7B-4E05-8DCE-9D7882C7FA4F"],
+
+Cell["b = {4, 6};", "Input",ExpressionUUID->"F37ABBBA-B729-4802-B482-DC8A93AEA15A"],
+
+Cell["Feasible region and vertices", "Subsection",ExpressionUUID->"4CA19E1B-BBD1-42FA-B153-F8A947A9605B"],
+
+Cell["cons = Join[Thread[A.{x1, x2} <= b], {x1 >= 0, x2 >= 0}];", "Input",ExpressionUUID->"7C17EA02-9010-4C48-87D9-E95028AB8A0E"],
+
+Cell["Mb = Join[A, IdentityMatrix[2]]; rb = Join[b, {0, 0}];", "Input",ExpressionUUID->"1A132E8A-B7DD-439E-B5A2-56062F597C62"],
+
+Cell["candidates = DeleteDuplicates[Table[Quiet[Check[LinearSolve[Mb[[p]], rb[[p]]], Nothing]], {p, Subsets[Range[4], {2}]}]];", "Input",ExpressionUUID->"5AA0CFB8-D92E-484B-A6F9-67C4777F8701"],
+
+Cell["vertices = Select[candidates, (And @@ Thread[A.# <= b] && And @@ Thread[# >= 0]) &];", "Input",ExpressionUUID->"723B6F83-1428-4E8D-A5DC-8689AFE0A44C"],
+
+Cell["TableForm[Map[{#, c.#} &, vertices], TableHeadings -> {None, {\"vertex\", \"z\"}}]", "Input",ExpressionUUID->"ED6C26B3-5911-44B1-BAD1-07B32FA95AC3"],
+
+Cell["optimal = First[MaximalBy[vertices, c.# &]]", "Input",ExpressionUUID->"C92F1058-38FA-4607-BF4B-3C4CC498F0C5"],
+
+Cell["Check with the solver", "Subsection",ExpressionUUID->"5D49BE23-DAE4-464F-B5C4-959C3D29F120"],
+
+Cell["Maximize[{c.{x1, x2}, And @@ cons}, {x1, x2}]", "Input",ExpressionUUID->"0DAA84C8-6FB6-4881-8856-54F35BDF1868"],
+
+Cell["LinearProgramming[-c, -A, -b]", "Input",ExpressionUUID->"33E11D50-4E1A-40CF-A864-6D8EB0246B60"],
+
+Cell["Feasible region", "Subsection",ExpressionUUID->"4082551E-977B-401E-9B15-9B1D29C6B508"],
+
+Cell["Show[RegionPlot[And @@ cons, {x1, 0, 5}, {x2, 0, 5}, PlotStyle -> Directive[Opacity[0.3], Blue], BoundaryStyle -> None], ContourPlot[Evaluate[Thread[A.{x1, x2} == b]], {x1, 0, 5}, {x2, 0, 5}, ContourStyle -> Black], ListPlot[vertices, PlotStyle -> Red, PlotMarkers -> Automatic], Frame -> True, Axes -> False, PlotRange -> {{0, 5}, {0, 5}}]", "Input",ExpressionUUID->"2995BCE7-1FC1-4C97-914F-7617C342BF5C"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"9EE95481-00E2-4945-99A2-6E695B54DB70"
+]

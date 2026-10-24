@@ -1,0 +1,82 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Transportation Problem", "Title",ExpressionUUID->"8AE89C01-720C-4A8E-8DD7-AF8CE51E1917"],
+
+Cell["Companion to docs/s5/operational-research/17-transportation-problem.mdx. Balances the table with a dummy destination, builds an initial solution with the least cost method and with Vogel's approximation method, then checks optimality with the MODI (u, v) method, which gives the same improvement indices as the stepping stone method. The optimum is confirmed with the solver. Edit the costs, supply and demand to try another table with total supply above total demand.", "Text",ExpressionUUID->"36263640-0965-4C51-80C5-58B10DE9B17B"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"04C75174-AE74-4772-8828-E0043AB6EF92"],
+
+Cell["costs = {{4, 6, 8}, {3, 5, 2}, {3, 9, 6}};", "Input",ExpressionUUID->"0D8DD98D-ED83-4A2F-B300-490F30FE69DA"],
+
+Cell["supply = {20, 70, 25};", "Input",ExpressionUUID->"2F008F9F-389A-41F7-AD7E-42B0630C973B"],
+
+Cell["demand = {30, 25, 20};", "Input",ExpressionUUID->"73903F1B-BC8A-4C89-B0DA-9A8FF6B63D50"],
+
+Cell["Balancing", "Subsection",ExpressionUUID->"6C39613D-5BC7-4776-A60E-FA955DFA5BA5"],
+
+Cell["gap = Total[supply] - Total[demand]", "Input",ExpressionUUID->"B7A6CF8F-E991-4C18-98F0-601AB02E1654"],
+
+Cell["cost = If[gap > 0, Map[Append[#, 0] &, costs], costs];", "Input",ExpressionUUID->"754BB6B5-2481-4EC8-85A3-1254BA1C4110"],
+
+Cell["dem = If[gap > 0, Append[demand, gap], demand];", "Input",ExpressionUUID->"87C5646D-C265-4596-803F-BC01DEDF9133"],
+
+Cell["sup = supply;", "Input",ExpressionUUID->"25D1AF95-58D9-4E94-8AD9-90CE1D2D68C5"],
+
+Cell["TableForm[cost, TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"9AFD08F5-68A7-450C-AA17-B9E48237056D"],
+
+Cell["Least cost method", "Subsection",ExpressionUUID->"D79A9309-B20A-4E1D-BEB0-82E75A78C7A0"],
+
+Cell["leastCost[cst_, sp_, dm_] := Module[{s = sp, d = dm, alloc = ConstantArray[0, Dimensions[cst]], cells, pick, q}, While[Total[s] > 0, cells = Select[Flatten[Table[{i, j}, {i, Length[s]}, {j, Length[d]}], 1], s[[#[[1]]]] > 0 && d[[#[[2]]]] > 0 &]; pick = First@SortBy[cells, {cst[[#[[1]], #[[2]]]] &, -Min[s[[#[[1]]]], d[[#[[2]]]]] &}]; q = Min[s[[pick[[1]]]], d[[pick[[2]]]]]; alloc[[pick[[1]], pick[[2]]]] += q; s[[pick[[1]]]] -= q; d[[pick[[2]]]] -= q]; alloc]", "Input",ExpressionUUID->"1DE08BCE-CFDC-4C35-A76A-951D95F017C7"],
+
+Cell["lcm = leastCost[cost, sup, dem];", "Input",ExpressionUUID->"3FEADABA-2797-44AB-99C2-465EF3530B6B"],
+
+Cell["TableForm[lcm, TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"FA0CDE02-D1C9-46BF-85C7-4CA55CE6B516"],
+
+Cell["Total[Flatten[cost lcm]]", "Input",ExpressionUUID->"2CF231EB-D223-4620-9370-F4E846E5FC87"],
+
+Cell["Vogel's approximation method", "Subsection",ExpressionUUID->"4CCE53C3-2EA5-4FAF-8572-F1C4E2C15D0C"],
+
+Cell["vam[cst_, sp_, dm_] := Module[{s = sp, d = dm, alloc = ConstantArray[0, Dimensions[cst]], rows, cols, rowLines, colLines, lines, best, i, j, q, pen}, pen[v_] := Sort[v][[2]] - Sort[v][[1]]; While[Total[s] > 0, rows = Select[Range[Length[s]], s[[#]] > 0 &]; cols = Select[Range[Length[d]], d[[#]] > 0 &]; rowLines = If[Length[cols] >= 2, Table[{pen[cst[[rr, cols]]], 1, rr}, {rr, rows}], {}]; colLines = If[Length[rows] >= 2, Table[{pen[cst[[rows, cc]]], 2, cc}, {cc, cols}], {}]; lines = Join[rowLines, colLines]; If[lines === {}, (i = rows[[1]]; j = cols[[1]]), (best = First[MaximalBy[lines, First]]; If[best[[2]] == 1, (i = best[[3]]; j = cols[[First@Ordering[cst[[i, cols]], 1]]]), (j = best[[3]]; i = rows[[First@Ordering[cst[[rows, j]], 1]]])])]; q = Min[s[[i]], d[[j]]]; alloc[[i, j]] += q; s[[i]] -= q; d[[j]] -= q]; alloc];", "Input",ExpressionUUID->"944ECD85-F376-4CB0-8569-89B2575C7A35"],
+
+Cell["vamSol = vam[cost, sup, dem];", "Input",ExpressionUUID->"03F7F382-F4A5-4D12-AA07-28D5B4F5701F"],
+
+Cell["TableForm[vamSol, TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"D3AF3DC2-1989-4998-A631-9CBDEEA97320"],
+
+Cell["Total[Flatten[cost vamSol]]", "Input",ExpressionUUID->"D835D923-DDB2-43F3-8687-CBD2748612AE"],
+
+Cell["Optimality check with u and v", "Subsection",ExpressionUUID->"6626CBBF-E7D7-48C1-AD60-BEACBD1BB43B"],
+
+Cell["uv[alloc_] := Module[{mm = Length[sup], nn = Length[dem], cells, eqs, rhs, sol}, cells = Position[alloc, _?Positive]; eqs = Append[Map[UnitVector[mm + nn, #[[1]]] + UnitVector[mm + nn, mm + #[[2]]] &, cells], UnitVector[mm + nn, 1]]; rhs = Append[Map[cost[[#[[1]], #[[2]]]] &, cells], 0]; sol = LinearSolve[eqs, rhs]; {sol[[;; mm]], sol[[mm + 1 ;;]]}]", "Input",ExpressionUUID->"2CB3C33F-05D2-4292-A3B8-2EDC6DD683CF"],
+
+Cell["{uL, vL} = uv[lcm];", "Input",ExpressionUUID->"5A0A7334-9586-4139-BE0C-276D74F90D16"],
+
+Cell["TableForm[Table[cost[[i, j]] - uL[[i]] - vL[[j]], {i, Length[sup]}, {j, Length[dem]}], TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"6E3BE6A9-AE0F-49F6-8E6E-94842DF89083"],
+
+Cell["{uV, vV} = uv[vamSol];", "Input",ExpressionUUID->"54CF2337-E368-4C78-A7FF-0BB2091859E0"],
+
+Cell["TableForm[Table[cost[[i, j]] - uV[[i]] - vV[[j]], {i, Length[sup]}, {j, Length[dem]}], TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"7AFD757F-DD76-48DB-8D50-121815DAB351"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"818B46F9-E8C1-49E2-A803-25178BCA17D4"],
+
+Cell["rowEq = Table[Flatten[Table[If[i == r, 1, 0], {i, Length[sup]}, {j, Length[dem]}]], {r, Length[sup]}];", "Input",ExpressionUUID->"2E5FC2C5-F1CA-485E-8F0C-8811BE3C16CF"],
+
+Cell["colEq = Table[Flatten[Table[If[j == cc, 1, 0], {i, Length[sup]}, {j, Length[dem]}]], {cc, Length[dem]}];", "Input",ExpressionUUID->"4FEB02F4-F305-48B2-A969-EE68DECCB3CA"],
+
+Cell["xOpt = LinearProgramming[Flatten[cost], Join[rowEq, colEq], Join[Map[{#, 0} &, sup], Map[{#, 0} &, dem]]];", "Input",ExpressionUUID->"D956AF40-B0F4-4642-968D-DED6220118FE"],
+
+Cell["TableForm[ArrayReshape[xOpt, Dimensions[cost]], TableHeadings -> {{\"O1\", \"O2\", \"O3\"}, {\"D1\", \"D2\", \"D3\", \"D4\"}}]", "Input",ExpressionUUID->"980F7F0B-237C-4C3F-B6E0-59E5F211A990"],
+
+Cell["Total[Flatten[cost ArrayReshape[xOpt, Dimensions[cost]]]]", "Input",ExpressionUUID->"1BEFE3EA-E9BB-4953-91EA-DAC10C2ED196"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"6494A1AA-DB53-44A5-927F-A422ECCC4D8C"
+]

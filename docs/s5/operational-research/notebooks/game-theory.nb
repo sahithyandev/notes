@@ -1,0 +1,102 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Game Theory", "Title",ExpressionUUID->"788B55B0-C331-4D65-9784-5B3D917EDF0F"],
+
+Cell["Companion to docs/s5/operational-research/22-game-theory.mdx. Solves a two-player zero-sum game with the row player's payoff matrix A. The notebook checks for a saddle point, removes dominated strategies, solves the game as a linear program, and gives the closed form for a 2x2 game. Edit A to try another game.", "Text",ExpressionUUID->"D861ED00-F36B-4C45-B7AD-5EC0DC9C5277"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"77BC47FA-A46A-406D-B892-24F680E800F5"],
+
+Cell["A = {{3, -4, 2}, {1, -3, -7}, {-2, 4, 7}};", "Input",ExpressionUUID->"F93E5ED6-75D0-469B-B775-57480D2B9B3B"],
+
+Cell["{m, n} = Dimensions[A];", "Input",ExpressionUUID->"404F2787-A6C7-4F80-8979-B3DB2C70E561"],
+
+Cell["Saddle point check", "Subsection",ExpressionUUID->"4A6F7124-B426-4B59-89DC-738DC15CC44C"],
+
+Cell["maximin = Max[Min /@ A]", "Input",ExpressionUUID->"E4966186-1CFE-45F3-BC0E-8E0AC4BF4BB2"],
+
+Cell["minimax = Min[Max /@ Transpose[A]]", "Input",ExpressionUUID->"6AB557B1-D97E-4957-9C92-90B870E81DA5"],
+
+Cell["If[maximin == minimax, \"saddle point, value \" <> ToString[maximin], \"no saddle point: maximin \" <> ToString[maximin] <> \" < minimax \" <> ToString[minimax]]", "Input",ExpressionUUID->"BB52D766-F8F9-41E7-98D0-20BDF8179BC3"],
+
+Cell["Dominance", "Subsection",ExpressionUUID->"F92D260B-B4C1-4964-BA9A-C783B5B51528"],
+
+Cell["dominatedRow[i_] := AnyTrue[Complement[Range[m], {i}], (And @@ Thread[A[[#]] >= A[[i]]]) &];", "Input",ExpressionUUID->"5B23A63A-DF46-46E2-951B-804D77A66A87"],
+
+Cell["dominatedCol[j_] := AnyTrue[Complement[Range[n], {j}], (And @@ Thread[A[[All, #]] <= A[[All, j]]]) &];", "Input",ExpressionUUID->"7FF399EA-D542-4D19-9478-478776B83C68"],
+
+Cell["domRows = Select[Range[m], dominatedRow]; domCols = Select[Range[n], dominatedCol];", "Input",ExpressionUUID->"61CBD852-E928-444D-AD59-390702727A06"],
+
+Cell["reduced = A[[Complement[Range[m], domRows], Complement[Range[n], domCols]]];", "Input",ExpressionUUID->"E2479DD3-553A-435B-A1E6-DEA315D3AB58"],
+
+Cell["MatrixForm[reduced]", "Input",ExpressionUUID->"CA863E32-9B8B-4F53-9D96-46FD2933E4DA"],
+
+Cell["Solve with linear programming", "Subsection",ExpressionUUID->"1A774D2F-53D0-4A6C-8209-BA5C8034E441"],
+
+Cell["solveGame[G_] := Module[{mm, nn, shift, MM, x, vs, q, y}, {mm, nn} = Dimensions[G]; shift = If[Min[G] <= 0, 1 - Min[G], 0]; MM = G + shift; x = LinearProgramming[-ConstantArray[1, nn], -MM, -ConstantArray[1, mm]]; vs = 1/Total[x]; q = vs x; y = LinearProgramming[ConstantArray[1, mm], Transpose[MM], ConstantArray[1, nn]]; <|\"p\" -> y/Total[y], \"q\" -> q, \"value\" -> vs - shift|>]", "Input",ExpressionUUID->"3DCF1DC2-1DFB-43A2-A2BE-990C8BD9F13A"],
+
+Cell["result = solveGame[A];", "Input",ExpressionUUID->"37C74C81-A9FD-4A38-81F5-B3CAED8979A8"],
+
+Cell["TableForm[{{\"row mix p\", result[\"p\"]}, {\"column mix q\", result[\"q\"]}, {\"value\", result[\"value\"]}}]", "Input",ExpressionUUID->"E2C7BBA3-17E0-4A4C-8AB0-EA71AED5191B"],
+
+Cell["Check the strategies", "Subsection",ExpressionUUID->"D485B286-A17C-435A-B597-EB4555B23915"],
+
+Cell["A.result[\"q\"]", "Input",ExpressionUUID->"F84CFF3F-EBA2-4146-9918-4257C7AD3B72"],
+
+Cell["result[\"p\"].A", "Input",ExpressionUUID->"9D01CE2B-531E-4507-8492-29D87609D607"],
+
+Cell["3x3 Games", "Subsection",ExpressionUUID->"A2608362-17A4-45E4-B0DB-904DD77A2B8F"],
+
+Cell["Any m x n game is solved by solveGame, so a 3x3 game needs no special case. Each step is the same: check for a saddle point, remove dominated strategies, then solve the LP. The first example is the 3x3 game from the notes, with the same parameters as above.", "Text",ExpressionUUID->"0A4A5E90-D641-495C-876D-6FCA43F8C915"],
+
+Cell["D3 = {{3, -4, 2}, {1, -3, -7}, {-2, 4, 7}};", "Input",ExpressionUUID->"71E1836C-CA26-4C09-B9FF-922466C82E6F"],
+
+Cell["{Max[Min /@ D3], Min[Max /@ Transpose[D3]]}", "Input",ExpressionUUID->"FE3EF7C6-257C-4FE8-910A-A781D1D6A97C"],
+
+Cell["solveGame[D3]", "Input",ExpressionUUID->"90E0B348-0A7C-41D7-9AE8-8CCED849FF06"],
+
+Cell["D3.solveGame[D3][\"q\"]", "Input",ExpressionUUID->"932D13B6-5AFF-47A0-895D-B6BE1355CF4D"],
+
+Cell["solveGame[D3][\"p\"].D3", "Input",ExpressionUUID->"90409014-7D8A-415D-AFF4-656D0B0132BA"],
+
+Cell["The second example has a dominated row. Row 2 is dominated by row 1, since every entry of row 1 is at least as large. Removing it leaves a 2x3 game, and the value is the same as for the full 3x3 game.", "Text",ExpressionUUID->"47EFBB16-FB3E-41B0-B23F-704B3E081871"],
+
+Cell["G3 = {{4, 2, 3}, {1, 0, 1}, {3, 3, 2}};", "Input",ExpressionUUID->"AA2F8FF6-AAC1-49AC-9CE6-03DD1EF68CF2"],
+
+Cell["rowDominated[G_, i_] := AnyTrue[Complement[Range[Length[G]], {i}], (And @@ Thread[G[[#]] >= G[[i]]]) &];", "Input",ExpressionUUID->"33586156-CC60-45A0-8AF6-C6131A0435A0"],
+
+Cell["domRows3 = Select[Range[3], rowDominated[G3, #] &]", "Input",ExpressionUUID->"56A0880E-C1AC-4E2C-AF31-F37A09272E1A"],
+
+Cell["reduced3 = G3[[Complement[Range[3], domRows3]]]", "Input",ExpressionUUID->"F081297A-367D-4BE9-8FE5-1BCA701E9A25"],
+
+Cell["solveGame[G3][\"value\"] == solveGame[reduced3][\"value\"]", "Input",ExpressionUUID->"5CFBCB0B-B145-4F6E-B1B7-8C85A3810429"],
+
+Cell["solveGame[G3]", "Input",ExpressionUUID->"FA6D13A8-D812-437F-85D6-85F8FC7AF510"],
+
+Cell["2x2 closed form", "Subsection",ExpressionUUID->"4A881F6D-2ED9-41BE-B6B1-DD3613282180"],
+
+Cell["solve2x2[{{a_, b_}, {c_, d_}}] := Module[{den = a - b - c + d}, <|\"p\" -> (d - c)/den, \"q\" -> (d - b)/den, \"value\" -> (a d - b c)/den|>]", "Input",ExpressionUUID->"76FEC5BB-9A7C-4E96-81E7-A40E302DC6EA"],
+
+Cell["solve2x2[{{4, 1}, {2, 3}}]", "Input",ExpressionUUID->"966DDD71-FF97-4596-A6DF-216CD8500E34"],
+
+Cell["Graphical envelope for a 2x2 game", "Subsection",ExpressionUUID->"481564BA-409D-4BBD-A26D-1CFFA07EAEA7"],
+
+Cell["H = {{3, 5}, {4, 2}};", "Input",ExpressionUUID->"9AA694F6-72AD-4C89-AA54-6A26E5BF20E6"],
+
+Cell["lines = Table[P H[[1, j]] + (1 - P) H[[2, j]], {j, 2}];", "Input",ExpressionUUID->"9AB3B231-13CC-41F9-B943-DB3BBE093B16"],
+
+Cell["Plot[Evaluate[Append[lines, Min[lines]]], {P, 0, 1}, PlotLegends -> {\"column 1\", \"column 2\", \"lower envelope\"}]", "Input",ExpressionUUID->"B7AE9CB0-F31C-48F9-B214-BE2CE3F3AD35"],
+
+Cell["solve2x2[H]", "Input",ExpressionUUID->"0D6366C1-EA76-4B14-93A5-4E9F8CEA812C"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"C8C1BCD1-B52C-4F50-B4C0-57EACF105B37"
+]

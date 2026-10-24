@@ -1,0 +1,72 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Big-M Method", "Title",ExpressionUUID->"5F644E54-FE37-4E7B-81C7-53DD688D1DF5"],
+
+Cell["Companion to docs/s5/operational-research/08-big-m-method.mdx. Writes the objective with the artificial variables penalized by M, shows the symbolic starting tableau, then runs the simplex method with a large numerical M. Here M = 1000 is large enough that the sign of every coefficient is decided by its M term.", "Text",ExpressionUUID->"827C889D-4FF1-4E23-A797-FB98925520BC"],
+
+Cell["Standard form", "Subsection",ExpressionUUID->"AA5E4131-0306-4831-B24C-618D8C155BF7"],
+
+Cell["Astd = {{3, 1, 0, 0, 1, 0}, {4, 3, -1, 0, 0, 1}, {1, 2, 0, 1, 0, 0}};", "Input",ExpressionUUID->"FC6C8208-F903-443D-AAB4-B7093053BAF0"],
+
+Cell["bvec = {3, 6, 4};", "Input",ExpressionUUID->"A9245608-992A-4DC0-BF99-0A79C9248821"],
+
+Cell["names = {\"x1\", \"x2\", \"s2\", \"s3\", \"a1\", \"a2\"};", "Input",ExpressionUUID->"1EBE65C1-5C99-4293-8DC7-6306894F2383"],
+
+Cell["rowsAb = MapThread[Append, {Astd, bvec}];", "Input",ExpressionUUID->"DDF41003-836E-4E4A-A26F-DDDCE991B365"],
+
+Cell["Symbolic starting tableau", "Subsection",ExpressionUUID->"7DE9D95F-31B7-4432-B7B6-B539BD133390"],
+
+Cell["raw = {4, 1, 0, 0, M, M, 0};", "Input",ExpressionUUID->"8A47F941-2920-420F-8E0D-3109E3672081"],
+
+Cell["zRow = Expand[raw - M rowsAb[[1]] - M rowsAb[[2]]];", "Input",ExpressionUUID->"4B6F8D92-8485-4937-BF27-8A828489EB2B"],
+
+Cell["T0sym = Prepend[rowsAb, zRow];", "Input",ExpressionUUID->"46FB0C1B-90D4-4324-805E-1DEC83F5E365"],
+
+Cell["TableForm[T0sym, TableHeadings -> {{\"z\", \"a1\", \"a2\", \"s3\"}, Append[names, \"RHS\"]}]", "Input",ExpressionUUID->"C74EF439-29BF-4286-B27E-6930E103E970"],
+
+Cell["Pivot and iteration with M = 1000", "Subsection",ExpressionUUID->"3A492784-71A7-41E1-9337-DADDFD2C80EA"],
+
+Cell["Mval = 1000;", "Input",ExpressionUUID->"81B50670-0A86-47BC-B090-C1FBF25DF0C9"],
+
+Cell["pivot[T_, row_, col_] := Module[{P = T}, P[[row]] = T[[row]]/T[[row, col]]; Do[If[i != row, P[[i]] = T[[i]] - T[[i, col]] P[[row]]], {i, Length[T]}]; P]", "Input",ExpressionUUID->"477C13AE-13C6-418A-B1BB-159C4A9D7A05"],
+
+Cell["showTableau[T_, basis_, nm_] := TableForm[T, TableHeadings -> {Prepend[nm[[basis]], \"z\"], Append[nm, \"RHS\"]}]", "Input",ExpressionUUID->"BD965535-585A-4EB3-9013-E57703398B47"],
+
+Cell["simplexRun[T0_, basis0_] := Module[{T = T0, basis = basis0, hist = {}, obj, ratios, col, row}, Do[obj = T[[1, 1 ;; -2]]; If[Min[obj] >= 0, Break[]]; col = First@Ordering[obj, 1]; ratios = Table[If[T[[i, col]] > 0, T[[i, -1]]/T[[i, col]], Infinity], {i, 2, Length[T]}]; If[Min[ratios] === Infinity, Print[\"unbounded\"]; Break[]]; row = First@Ordering[ratios, 1] + 1; AppendTo[hist, {T, basis, col, row}]; T = pivot[T, row, col]; basis[[row - 1]] = col, {20}]; AppendTo[hist, {T, basis, None, None}]; hist]", "Input",ExpressionUUID->"E9CB220D-5E50-4D99-8F11-508C10BF66CA"],
+
+Cell["T0 = T0sym /. M -> Mval;", "Input",ExpressionUUID->"F9FA4BF1-1DB7-423A-B59E-463130439F25"],
+
+Cell["hist = simplexRun[T0, {5, 6, 4}];", "Input",ExpressionUUID->"CB9A19CC-0B74-43CD-ADEC-8D8022933601"],
+
+Cell["Iterations", "Subsection",ExpressionUUID->"1051DC41-C0AF-46F0-A829-F2394AE1843B"],
+
+Cell["Column[MapIndexed[Column[{Style[\"Step \" <> ToString[#2[[1]] - 1], Bold], showTableau[#1[[1]], #1[[2]], names]}] &, hist]]", "Input",ExpressionUUID->"E2F1BED5-562E-4462-B62A-9F79F6D4D18B"],
+
+Cell["Solution", "Subsection",ExpressionUUID->"BDB171D8-4ABD-47D8-BA5D-C2D7D6EB3836"],
+
+Cell["finalT = hist[[-1, 1]]; finalBasis = hist[[-1, 2]];", "Input",ExpressionUUID->"1695EB12-A4EE-4448-80FB-79BFFFA2403F"],
+
+Cell["xsol = ConstantArray[0, 6]; xsol[[finalBasis]] = finalT[[2 ;;, -1]];", "Input",ExpressionUUID->"7322A2FD-7CCD-4EB5-851E-9467A407A156"],
+
+Cell["Thread[names -> xsol]", "Input",ExpressionUUID->"22AA1C61-06B4-42E1-B453-8D74A80CAC2B"],
+
+Cell["z = -finalT[[1, -1]]", "Input",ExpressionUUID->"C293D557-4DF6-4EAF-9403-BDA34AE5C4F8"],
+
+Cell["And @@ Thread[xsol[[5 ;; 6]] == 0]", "Input",ExpressionUUID->"C41DB790-2036-4A0F-BC22-6FB8FE8B3590"],
+
+Cell["Solver check", "Subsection",ExpressionUUID->"2E37F827-F29D-4586-98B0-E0BF93C9AA49"],
+
+Cell["LinearProgramming[{4, 1}, {{3, 1}, {4, 3}, {1, 2}}, {{3, 0}, {6, 1}, {4, -1}}]", "Input",ExpressionUUID->"50C80A21-7800-45C9-9AE7-CA0AB05C31C3"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"9D84F3ED-764A-464B-BA93-11DCB8DB39F5"
+]
