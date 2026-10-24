@@ -1,0 +1,82 @@
+---
+export const prerender = true;
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/layout/nav.astro";
+import NotebookGroup from "../components/notebooks/notebook-group.astro";
+import { buildNotebookTree } from "../lib/notebooks";
+import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
+
+const [notebooks, notes] = await Promise.all([
+  getCollection("notebooks"),
+  getCollection("notes"),
+]);
+const root = buildNotebookTree(notebooks, notes);
+---
+
+<Layout
+  title={`Notebooks | ${SITE_NAME}`}
+  description="Wolfram Mathematica notebooks that accompany the notes, grouped by semester and module."
+  image={`${SITE_HOST_URL}/og/default.jpg`}
+  canonical={`${SITE_HOST_URL}/notebooks`}
+  slug="notebooks"
+>
+  <Nav />
+
+  <main id="main-content" class="notebooks-page">
+    <section class="notebooks-content">
+      <h1>Notebooks</h1>
+
+      <p>
+        Companion notebooks for the notes. Open one in Mathematica and evaluate
+        the cells to reproduce the worked examples. You may find these in the
+        individual note pages as well.
+      </p>
+
+      {notebooks.length === 0 ? (
+        <p class="notebooks-empty">No notebooks yet.</p>
+      ) : (
+        <NotebookGroup group={root} level={1} />
+      )}
+    </section>
+  </main>
+</Layout>
+
+<style>
+  :root {
+    --nav-h: 54px;
+  }
+
+  .notebooks-page {
+    min-height: calc(100dvh - var(--nav-h));
+    width: var(--body-width);
+    margin: calc(8 * var(--spacing)) auto 0;
+  }
+
+  .notebooks-content {
+    max-width: 960px;
+    width: 100%;
+  }
+
+  .notebooks-content h1 {
+    font-family: var(--font-ui);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+  }
+
+  .notebooks-content > p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .notebooks-empty {
+    margin-top: 32px;
+  }
+</style>

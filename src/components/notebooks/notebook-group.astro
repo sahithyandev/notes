@@ -1,0 +1,134 @@
+---
+import MathematicaIcon from "../icons/mathematica-icon.astro";
+import { formatBytes, type NotebookGroup } from "../../lib/notebooks";
+
+interface Props {
+  group: NotebookGroup;
+  /** Heading level for this group's label. The unlabeled root passes 1. */
+  level: 1 | 2 | 3 | 4;
+}
+
+const { group, level } = Astro.props;
+const Heading = `h${level}` as "h2" | "h3" | "h4";
+const childLevel = Math.min(level + 1, 4) as 2 | 3 | 4;
+---
+
+{group.label && <Heading>{group.label}</Heading>}
+
+{group.notebooks.length > 0 && (
+  <ul class="nb-list">
+    {group.notebooks.map((notebook) => (
+      <li class="nb-item">
+        <a
+          class="nb-download"
+          href={notebook.url}
+          download={`${notebook.id}.nb`}
+        >
+          <MathematicaIcon width={20} height={20} />
+          <span class="nb-name">{notebook.id}.nb</span>
+        </a>
+        <span class="nb-meta">
+          {formatBytes(notebook.bytes)}
+          {notebook.notes.length > 0 && " · Used in "}
+          {notebook.notes.map((note, i) => (
+            <>
+              {i > 0 && ", "}
+              <a href={note.href}>{note.title}</a>
+            </>
+          ))}
+        </span>
+      </li>
+    ))}
+  </ul>
+)}
+
+{group.children.map((child) => (
+  <Astro.self group={child} level={childLevel} />
+))}
+
+<style>
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 36px 0 12px;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 24px 0 10px;
+  }
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 18px 0 8px;
+  }
+
+  .nb-list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .nb-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.12s ease;
+  }
+
+  .nb-item:hover {
+    border-color: var(--border-strong);
+  }
+
+  .nb-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .nb-download:hover .nb-name {
+    text-decoration: underline;
+  }
+
+  .nb-download svg {
+    flex-shrink: 0;
+  }
+
+  .nb-name {
+    overflow-wrap: anywhere;
+  }
+
+  .nb-meta {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  .nb-meta a {
+    color: var(--text-secondary);
+  }
+</style>
