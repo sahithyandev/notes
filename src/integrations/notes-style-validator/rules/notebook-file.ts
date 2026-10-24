@@ -1,20 +1,18 @@
-import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
 
 // A note's `notebooks` frontmatter lists Wolfram notebooks (.nb) offered as
 // downloads at the end of the note. Each entry is a basename without the
-// extension, resolving to /notebooks/<name>.nb, served from
-// public/notebooks/.
+// extension. The .nb files sit anywhere under docs/ (usually a module's
+// notebooks/ folder) and are served at /notebooks/<name>.nb.
 //
 // Two failure modes are caught here, both of which ship a broken download
 // link without any other signal:
 //
 //  1. A note references a notebook that isn't on disk (a typo, or a file that
 //     was renamed and the frontmatter wasn't updated).
-//  2. A notebook sits in public/notebooks/ but no note references it, so it
-//     is never reachable from the site.
+//  2. A notebook sits under docs/ but no note references it, so it is never
+//     reachable from the site.
 //
 // The second one is corpus-wide, since it needs every note's list.
 export function checkNotebookFile(f: ScannedFile): Violation[] {
@@ -41,11 +39,11 @@ export function checkNotebookFile(f: ScannedFile): Violation[] {
       continue;
     }
 
-    if (!existsSync(join(f.notebookDir, `${value}.nb`))) {
+    if (!f.notebookFiles.has(value)) {
       violations.push({
         rule: "notebook-file",
         line,
-        text: `notebook "${value}.nb" does not exist in public/notebooks/`,
+        text: `notebook "${value}.nb" does not exist under docs/`,
         snippet: value,
       });
     }
@@ -54,36 +52,27 @@ export function checkNotebookFile(f: ScannedFile): Violation[] {
   return violations;
 }
 
-// Notebooks in public/notebooks/ that no note links to.
+// .nb files under docs/ that no note links to.
 export function checkNotebookFiles(
   files: ScannedFile[],
 ): Array<{ file: string; violation: Violation }> {
-  const notebookDir = files[0]?.notebookDir;
-  if (!notebookDir) return [];
+  const notebookFiles = files[0]?.notebookFiles;
+  if (!notebookFiles) return [];
 
   const referenced = new Set(
     files.flatMap((f) => f.notebooks.map((n) => n.value)),
   );
 
   const out: Array<{ file: string; violation: Violation }> = [];
-  let entries: string[];
-  try {
-    entries = readdirSync(notebookDir);
-  } catch {
-    return [];
-  }
-
-  for (const entry of entries) {
-    if (!entry.endsWith(".nb")) continue;
-    const name = entry.slice(0, -".nb".length);
+  for (const [name, path] of notebookFiles) {
     if (referenced.has(name)) continue;
     out.push({
-      file: `public/notebooks/${entry}`,
+      file: `docs/${path}`,
       violation: {
         rule: "notebook-file",
         line: 1,
-        text: `notebook "${entry}" is not linked from any note`,
-        snippet: entry,
+        text: `notebook "${name}.nb" is not linked from any note`,
+        snippet: `${name}.nb`,
       },
     });
   }

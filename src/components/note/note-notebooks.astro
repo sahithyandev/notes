@@ -1,13 +1,13 @@
 ---
+import type { CollectionEntry } from "astro:content";
 import MathematicaIcon from "../icons/mathematica-icon.astro";
 
 interface Props {
   /**
-   * Notebook basenames without the `.nb` extension, as listed in the note's
-   * `notebooks` frontmatter. Each one resolves to `/notebooks/<name>.nb`,
-   * served straight out of `public/notebooks/`.
+   * Notebook entries listed in the note's `notebooks` frontmatter. Each one
+   * links to `/notebooks/<id>.nb`, served from the .nb file under docs/.
    */
-  notebooks: string[];
+  notebooks: CollectionEntry<"notebooks">[];
 }
 
 const { notebooks } = Astro.props;
@@ -24,15 +24,15 @@ const { notebooks } = Astro.props;
         : "A companion notebook for this note. Open it in Mathematica and evaluate the cells to reproduce the worked example."}
     </p>
     <ul class="note-notebooks-list">
-      {notebooks.map((name) => (
+      {notebooks.map((entry) => (
         <li>
           <a
             class="note-notebooks-link"
-            href={`/notebooks/${name}.nb`}
-            download={`${name}.nb`}
+            href={entry.data.url}
+            download={`${entry.id}.nb`}
           >
             <MathematicaIcon width={22} height={22} />
-            <span>Download {name}.nb</span>
+            <span>Download {entry.id}.nb</span>
           </a>
         </li>
       ))}

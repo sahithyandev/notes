@@ -91,6 +91,7 @@ const prereqEntries = notesEntry.data.prereqs
   : [];
 
 const authorEntries = await getEntries(notesEntry.data.authors);
+const notebookEntries = await getEntries(notesEntry.data.notebooks ?? []);
 
 const sidebarData = await getSidebarData(slug);
 const wip = isWip(slug);
@@ -226,7 +227,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
           />
         </Article>
 
-        <NoteNotebooks notebooks={notesEntry.data.notebooks ?? []} />
+        <NoteNotebooks notebooks={notebookEntries} />
 
         <NoteAuthors
           authors={authorEntries}

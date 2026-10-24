@@ -1,4 +1,5 @@
 import { readdir, stat } from "node:fs/promises";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineCollection, reference } from "astro:content";
 import { file, glob } from "astro/loaders";
@@ -20,26 +21,32 @@ const authors = defineCollection({
     .strict(),
 });
 
-// Wolfram notebooks in public/notebooks/, one entry per .nb file. The id is the
-// basename without the extension, matching the `notebooks` note frontmatter.
+// Wolfram notebooks (.nb) anywhere under docs/, one entry per file. The id is
+// the basename without the extension, matching the `notebooks` note frontmatter.
 const notebooks = defineCollection({
   loader: {
     name: "notebooks-loader",
     load: async ({ store, parseData, generateDigest }) => {
-      const dir = fileURLToPath(
-        new URL("../public/notebooks/", import.meta.url),
-      );
-      const files = (await readdir(dir))
-        .filter((name) => name.endsWith(".nb"))
+      const docsDir = fileURLToPath(new URL("../docs/", import.meta.url));
+      const paths = (await readdir(docsDir, { recursive: true }))
+        .filter((path) => path.endsWith(".nb"))
         .sort();
 
       store.clear();
-      for (const name of files) {
-        const id = name.slice(0, -".nb".length);
-        const { size, mtimeMs } = await stat(`${dir}${name}`);
+      const seen = new Set<string>();
+      for (const path of paths) {
+        const id = basename(path, ".nb");
+        if (seen.has(id)) {
+          throw new Error(
+            `Duplicate notebook "${id}.nb" under docs/ (${path})`,
+          );
+        }
+        seen.add(id);
+
+        const { size, mtimeMs } = await stat(join(docsDir, path));
         const data = await parseData({
           id,
-          data: { url: `/notebooks/${name}`, bytes: size },
+          data: { url: `/notebooks/${id}.nb`, bytes: size, path },
         });
         store.set({ id, data, digest: generateDigest({ id, size, mtimeMs }) });
       }
@@ -47,9 +54,11 @@ const notebooks = defineCollection({
   },
   schema: z
     .object({
-      // Public URL the download link points at.
+      // Public URL the download link points at, served by src/pages/notebooks/.
       url: z.string(),
       bytes: z.number().int().nonnegative(),
+      // Path relative to docs/, read when the file is served.
+      path: z.string(),
     })
     .strict(),
 });
@@ -82,8 +91,8 @@ const notes = defineCollection({
       keywords: z.optional(z.array(z.string())),
       prereqs: z.optional(z.array(z.string())),
       // Wolfram notebooks (.nb) offered as downloads at the end of the note.
-      // Each entry is a basename without the extension, resolving to
-      // /notebooks/<name>.nb (served from public/notebooks/).
+      // Each entry is a basename without the extension, resolving to a
+      // notebooks entry (the .nb file sits under docs/).
       notebooks: z.optional(z.array(reference("notebooks"))),
       authors: z
         .array(reference("authors"))

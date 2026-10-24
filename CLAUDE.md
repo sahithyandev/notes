@@ -175,7 +175,7 @@ Don't phrase a heading as "What Is X?" or "What Are X?". Use the bare noun phras
 
 ### Wolfram notebooks
 
-A note can offer Wolfram notebooks (`.nb`) as downloads at the end of its body. The `.nb` files live in `public/notebooks/`, served verbatim at `/notebooks/<name>.nb`, and a note opts into one or more of them through the `notebooks` frontmatter field:
+A note can offer Wolfram notebooks (`.nb`) as downloads at the end of its body. The `.nb` files live in their module's `notebooks/` folder (`docs/<sem>/<module>/notebooks/`), are loaded by the `notebooks` content collection (`src/content.config.ts`, which walks `docs/`), and are served verbatim at `/notebooks/<name>.nb` by `src/pages/notebooks/[file].ts`. A note opts into one or more of them through the `notebooks` frontmatter field:
 
 ```yaml
 notebooks:
@@ -183,11 +183,11 @@ notebooks:
   - runge-kutta-modified-euler
 ```
 
-Each entry is a basename _without_ the `.nb` extension, matching a file in `public/notebooks/`. The page renders a minimal download link per notebook at the end of the note body, with the Mathematica mark (`src/components/note/note-notebooks.astro`, icon in `src/components/icons/mathematica-icon.astro`).
+Each entry is a basename _without_ the `.nb` extension, matching a `.nb` file somewhere under `docs/`. The page renders a minimal download link per notebook at the end of the note body, with the Mathematica mark (`src/components/note/note-notebooks.astro`, icon in `src/components/icons/mathematica-icon.astro`).
 
-`notebook-file` (`src/integrations/notes-style-validator/rules/notebook-file.ts`) enforces both directions: a listed notebook must exist on disk, and a notebook sitting in `public/notebooks/` must be listed by some note, so neither a typo nor a forgotten wiring ships a dead or unreachable download. The orphan half is corpus-wide, like `broken-link`.
+`notebook-file` (`src/integrations/notes-style-validator/rules/notebook-file.ts`) enforces both directions: a listed notebook must exist under `docs/`, and a notebook under `docs/` must be listed by some note, so neither a typo nor a forgotten wiring ships a dead or unreachable download. The orphan half is corpus-wide, like `broken-link`.
 
-Add a new notebook by dropping the `.nb` file into `public/notebooks/` and listing its basename in the note's frontmatter, in the same change. The rule fails the build otherwise.
+Add a new notebook by dropping the `.nb` file into its module's `notebooks/` folder and listing its basename in the note's frontmatter, in the same change. The rule fails the build otherwise.
 
 ## Astro integrations
 

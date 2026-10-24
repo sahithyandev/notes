@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 import matter from "gray-matter";
 import { maskFile, maskWholeLine } from "./mask.ts";
 import { slugFromDocsPath } from "../../utils/note-path.ts";
@@ -53,8 +53,8 @@ export interface ScannedFile {
   headingSlugs: Set<string>;
   prereqs: ScannedPrereq[];
   notebooks: ScannedNotebook[];
-  /** Absolute path of the directory holding the downloadable .nb files (public/notebooks/). */
-  notebookDir: string;
+  /** Every downloadable .nb file under docs/, keyed by basename. Values are paths relative to docsRoot. */
+  notebookFiles: Map<string, string>;
   links: ExtractedLink[];
 }
 
@@ -345,9 +345,11 @@ function extractLinks(content: string, lineOffset: number): ExtractedLink[] {
 }
 
 export function scanFiles(docsRoot: string): ScannedFile[] {
-  // The downloadable .nb files live in public/notebooks/, next to the docs
-  // tree rather than inside it.
-  const notebookDir = join(dirname(docsRoot), "public", "notebooks");
+  const notebookFiles = new Map(
+    readdirSync(docsRoot, { recursive: true })
+      .filter((path) => path.endsWith(".nb"))
+      .map((path) => [basename(path, ".nb"), path]),
+  );
 
   return walkDocs(docsRoot).map((file) => {
     const raw = readFileSync(file, "utf-8");
@@ -385,7 +387,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       headingSlugs: extractHeadingSlugs(content),
       prereqs: frontmatterListLinesOf(raw, "prereqs", prereqs),
       notebooks: frontmatterListLinesOf(raw, "notebooks", notebooks),
-      notebookDir,
+      notebookFiles,
       links: extractLinks(content, fmLines),
     };
   });
