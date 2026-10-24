@@ -60,10 +60,12 @@ import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
     isFresh,
     normalizePath,
   } from "../scripts/offline";
+  import { track } from "../scripts/analytics";
 
-  document
-    .getElementById("offline-retry")
-    ?.addEventListener("click", () => location.reload());
+  document.getElementById("offline-retry")?.addEventListener("click", () => {
+    track("offline_retry");
+    location.reload();
+  });
   window.addEventListener("online", () => location.reload());
 
   type Saved = { path: string; title: string; cachedAt: number };

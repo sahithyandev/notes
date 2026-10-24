@@ -56,6 +56,12 @@ const semesters = semesterNumbers.map((s) => ({
   <Footer />
 </Layout>
 
+<script>
+  import { track } from "../scripts/analytics";
+
+  track("not_found_view", location.pathname);
+</script>
+
 <style>
   :root {
     --nav-h: 54px;

@@ -69,6 +69,13 @@ function armReadObserver(): void {
   readObserver.observe(end);
 }
 
+function cardClick(el: HTMLElement, kind: string): void {
+  const href = el.getAttribute("href") ?? el.dataset.href;
+  if (!href) return track("card_click", { kind });
+  const path = new URL(href, location.href).pathname;
+  track("card_click", path, { kind });
+}
+
 function onClick(e: MouseEvent): void {
   const target = e.target instanceof Element ? e.target : null;
   if (!target) return;
@@ -78,6 +85,13 @@ function onClick(e: MouseEvent): void {
 
   const ai = target.closest<HTMLElement>(".note-action-btn[data-provider]");
   if (ai) return track("ai_open", { provider: ai.dataset.provider });
+
+  const subject = target.closest<HTMLAnchorElement>(".sem-card-subject-link");
+  if (subject) return cardClick(subject, "module");
+  const semCard = target.closest<HTMLElement>(".sem-card");
+  if (semCard) return cardClick(semCard, "semester");
+  const noteCard = target.closest<HTMLAnchorElement>(".note-card");
+  if (noteCard) return cardClick(noteCard, "note");
 
   const source = navSource(target);
   if (!source) return;

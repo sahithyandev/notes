@@ -356,6 +356,7 @@ const graph = NoteGraph.build(
     forceLink,
     type SimulationNodeDatum,
   } from "d3-force";
+  import { track } from "../scripts/analytics";
 
   // Kind 0 joins consecutive notes of a module, kind 1 is a prerequisite
   type Link = [GNode, GNode, number];
@@ -1026,8 +1027,10 @@ const graph = NoteGraph.build(
     canvas.classList.remove("dragging");
     if (wasClick) {
       const n = pick(e.offsetX, e.offsetY);
-      if (n) window.location.href = `/${n.id}`;
-      else if (pinned) {
+      if (n) {
+        track("sitegraph_node_open", `/${n.id}`);
+        window.location.href = `/${n.id}`;
+      } else if (pinned) {
         pinned = null;
         dirty = true;
       }
@@ -1047,6 +1050,7 @@ const graph = NoteGraph.build(
     const off = hiddenSems.delete(sem) ? false : true;
     if (off) hiddenSems.add(sem);
     btn.setAttribute("aria-pressed", String(!off));
+    track("sitegraph_semester_filter", { semester: sem, on: !off });
     dirty = true;
   });
 
@@ -1084,9 +1088,13 @@ const graph = NoteGraph.build(
     }
     dirty = true;
   }
-  longestBtn.addEventListener("click", () => setPath(!showPath));
+  longestBtn.addEventListener("click", () => {
+    track("sitegraph_longest_path", { on: !showPath });
+    setPath(!showPath);
+  });
 
   document.getElementById("reset")!.addEventListener("click", () => {
+    track("sitegraph_reset");
     if (showPath) setPath(false);
     pinned = null;
     input.value = "";
@@ -1115,6 +1123,7 @@ const graph = NoteGraph.build(
     });
   }
   function choose(n: GNode) {
+    track("sitegraph_search", { query: input.value.trim(), note: n.id });
     pinned = n;
     hiddenSems.delete(n.sem);
     legend

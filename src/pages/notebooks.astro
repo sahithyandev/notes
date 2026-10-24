@@ -45,6 +45,29 @@ const root = buildNotebookTree(notebooks, notes);
   <Footer />
 </Layout>
 
+<script>
+  import { track } from "../scripts/analytics";
+
+  track("notebooks_view");
+
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const download = target?.closest<HTMLAnchorElement>("a.nb-download");
+    if (download) {
+      track("notebook_download", { name: download.getAttribute("download") });
+      return;
+    }
+    const note = target?.closest<HTMLAnchorElement>(".nb-meta a[href]");
+    if (!note) return;
+    const name = note
+      .closest(".nb-item")
+      ?.querySelector("a.nb-download")
+      ?.getAttribute("download");
+    const path = new URL(note.href, location.href).pathname;
+    track("notebook_note_link", path, { notebook: name });
+  });
+</script>
+
 <style>
   :root {
     --nav-h: 54px;

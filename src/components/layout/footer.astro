@@ -17,6 +17,16 @@
   </div>
 </footer>
 
+<script>
+  import { track } from "../../scripts/analytics";
+
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const link = target?.closest<HTMLElement>(".footer a, .footer button");
+    if (link) track("footer_click", { target: link.textContent?.trim() });
+  });
+</script>
+
 <style>
   .footer {
     padding: 20px var(--body-margin-x);
