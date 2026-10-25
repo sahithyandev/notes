@@ -140,8 +140,8 @@ Never place 2 `<Note>` components next to each other with the same `type` (defau
   A bordered note card (icon, label, body), always expanded, ending in a ∎. The icon is a lightbulb when `label` contains "hint", a pen otherwise. It follows the `<Theorem>` it proves, with at most a `<Note>` between them. It has no heading and never appears in the TOC.
 - `<Proof label="Proof Hint">`
   The form for a proof hint, the terse scaffolding steps under a claim. Never write `<Note title="Proof Hint">`: the `proof-hint` rule flags it (case-insensitive). A hint follows a plain claim, so the `math-block` rule exempts this label from needing a preceding `<Theorem>`.
-- `<Formula name="...">`
-  A standalone, centred equation with an optional small label. No box or fill.
+- `<Formula>`
+  A standalone, centred equation. No box or fill.
 
 - `<Symbols>` with `<Sym s="l">length</Sym>` rows
   A legend of the symbols in the equation above it, rendered as an aligned 2-column grid (`columns={2}` for a side-by-side layout when there are many symbols). `s` is TeX without `$`. It replaces `- $x$: meaning` glossary bullets, which the `label-description` rule now flags like any other `label: description` bullet.
