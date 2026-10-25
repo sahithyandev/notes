@@ -79,7 +79,8 @@ const entries = summary ? [...notebooks, summary] : notebooks;
 
   .note-notebooks-list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: flex-start;
     gap: 8px;
     list-style: none;
@@ -92,8 +93,8 @@ const entries = summary ? [...notebooks, summary] : notebooks;
     align-items: center;
     gap: 10px;
     padding: 10px 18px;
-    font-size: 0.9375rem;
-    font-weight: 700;
+    font-size: 0.875rem !important;
+    font-weight: 600;
     color: var(--sem);
     background: var(--sem-bg);
     border: 1px solid var(--sem-border);
@@ -103,10 +104,6 @@ const entries = summary ? [...notebooks, summary] : notebooks;
       background 0.12s ease,
       border-color 0.12s ease,
       transform 0.12s ease;
-  }
-
-  .note-notebooks-link:hover {
-    background: var(--sem-border);
   }
 
   .note-notebooks-link:active {
