@@ -25,6 +25,7 @@ import { parsePage } from "./parse-page.ts";
 import { bindImages } from "./image-zoom.ts";
 import { initTocScrollSpy } from "./toc-scroll-spy.ts";
 import { initNoteFeedback } from "./note-feedback.ts";
+import { restoreSolutions } from "./solution-state.ts";
 import { initRelativeTime } from "./relative-time.ts";
 import { hideUpdateToast, initOfflineStatus } from "./offline.ts";
 import { initAnalytics, track } from "./analytics.ts";
@@ -186,6 +187,7 @@ function applyDocument(nextDoc: Document, url: URL): void {
   initCopyButtons(section);
   bindImages(section);
   initNoteFeedback();
+  restoreSolutions();
   hideUpdateToast();
   initOfflineStatus();
   initRelativeTime();

@@ -15,6 +15,7 @@ import { initCopyButtons } from "./copy-code.ts";
 import { parsePage } from "./parse-page.ts";
 import { bindImages } from "./image-zoom.ts";
 import { initTocScrollSpy } from "./toc-scroll-spy.ts";
+import { restoreSolutions } from "./solution-state.ts";
 
 // Astro/Vite dev-serves each component's own script as its own ES module
 // URL (e.g. ".../walkthrough.astro?astro&type=script..."), and the browser
@@ -90,6 +91,7 @@ export async function applyContentUpdate(): Promise<void> {
   await reExecuteScripts(newArticle);
   initCopyButtons(newArticle);
   bindImages(newArticle);
+  restoreSolutions();
 
   // TOC: swap the whole rendered block (it's fully derived from headings,
   // nothing in it needs to survive) and always re-run the scroll-spy after,

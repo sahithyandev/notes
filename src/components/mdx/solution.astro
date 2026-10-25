@@ -55,6 +55,11 @@ const { label = "Solution" } = Astro.props;
 
 <script>
   import { track } from "../../scripts/analytics";
+  import {
+    isRestoredToggle,
+    restoreSolutions,
+    saveSolutions,
+  } from "../../scripts/solution-state";
 
   // panels come from <Method>; the tab bar is built when a solution is revealed
   let tabCount = 0;
@@ -123,9 +128,12 @@ const { label = "Solution" } = Astro.props;
     "toggle",
     (event) => {
       const solution = event.target;
-      if (!(solution instanceof HTMLDetailsElement) || !solution.open) return;
+      if (!(solution instanceof HTMLDetailsElement)) return;
       if (!solution.classList.contains("solution")) return;
-      track("solution_reveal");
+      const restored = isRestoredToggle(solution);
+      saveSolutions();
+      if (!solution.open) return;
+      if (!restored) track("solution_reveal");
       const body = solution.querySelector<HTMLElement>(
         ":scope > .solution-body",
       );
@@ -133,6 +141,8 @@ const { label = "Solution" } = Astro.props;
     },
     true,
   );
+
+  restoreSolutions();
 </script>
 
 <style is:global>
