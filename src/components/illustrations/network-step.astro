@@ -1,0 +1,20 @@
+---
+// One step of a network-building walkthrough: the project network drawn so far
+// plus the prose note. Stage-less, so the walkthrough shows it in place.
+import type { ComponentProps } from "astro/types";
+import NetworkDiagram from "./network-diagram.astro";
+import StepNote from "./primitives/step-note.astro";
+
+type Props = ComponentProps<typeof NetworkDiagram> & {
+  label: string;
+};
+
+const { label, ...diagram } = Astro.props;
+---
+
+<div class="step" data-label={label}>
+  <NetworkDiagram {...diagram} />
+  <StepNote>
+    <slot />
+  </StepNote>
+</div>

@@ -31,6 +31,7 @@ export { default as LuWalkthrough } from "./lu-walkthrough.astro";
 export { default as LuZeroPattern } from "./lu-zero-pattern.astro";
 export { default as MarketEquilibriumDiagram } from "./market-equilibrium-diagram.astro";
 export { default as NetworkDiagram } from "./network-diagram.astro";
+export { default as NetworkStep } from "./network-step.astro";
 export { default as NormalFormsNesting } from "./normal-forms-nesting.astro";
 export { default as NormalizationExample } from "./normalization-example.astro";
 export { default as Packet } from "./packet.astro";

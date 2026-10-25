@@ -2,22 +2,28 @@
 import { tex } from "../../utils/tex";
 
 interface Props {
-  events: string[];
-  earliest: string[];
-  latest: string[];
+  activities: string[];
+  es: string[];
+  ef: string[];
+  ls: string[];
+  lf: string[];
+  tf: string[];
   critical?: number[];
   dataSource?: boolean;
 }
 
 const {
-  events,
-  earliest,
-  latest,
+  activities,
+  es,
+  ef,
+  ls,
+  lf,
+  tf,
   critical = [],
   dataSource = false,
 } = Astro.props;
 
-const isCritical = (ei: number) => critical.includes(ei);
+const isCritical = (ai: number) => critical.includes(ai);
 ---
 
 <table
@@ -29,20 +35,29 @@ const isCritical = (ei: number) => critical.includes(ei);
     <col class="c-label" />
     <col class="c-data" />
     <col class="c-data" />
+    <col class="c-data" />
+    <col class="c-data" />
+    <col class="c-data" />
   </colgroup>
   <thead>
     <tr>
-      <th>Event</th>
-      <th class="num" set:html={tex("E(i)")} />
-      <th class="num" set:html={tex("L(i)")} />
+      <th>Activity</th>
+      <th class="num" set:html={tex("\\text{ES}")} />
+      <th class="num" set:html={tex("\\text{EF}")} />
+      <th class="num" set:html={tex("\\text{LS}")} />
+      <th class="num" set:html={tex("\\text{LF}")} />
+      <th class="num" set:html={tex("\\text{TF}")} />
     </tr>
   </thead>
   <tbody>
-    {events.map((e, ei) => (
-      <tr class:list={{ critical: isCritical(ei) }}>
-        <th set:html={tex(e)} />
-        <td class="num" set:html={earliest[ei] ? tex(earliest[ei]) : ""} />
-        <td class="num" set:html={latest[ei] ? tex(latest[ei]) : ""} />
+    {activities.map((a, ai) => (
+      <tr class:list={{ critical: isCritical(ai) }}>
+        <th set:html={tex(a)} />
+        <td class="num" set:html={es[ai] ? tex(es[ai]) : ""} />
+        <td class="num" set:html={ef[ai] ? tex(ef[ai]) : ""} />
+        <td class="num" set:html={ls[ai] ? tex(ls[ai]) : ""} />
+        <td class="num" set:html={lf[ai] ? tex(lf[ai]) : ""} />
+        <td class="num" set:html={tf[ai] ? tex(tf[ai]) : ""} />
       </tr>
     ))}
   </tbody>
@@ -52,7 +67,7 @@ const isCritical = (ei: number) => critical.includes(ei);
   table.tableau {
     border-collapse: collapse;
     font-size: 0.9rem;
-    max-width: 320px;
+    max-width: 460px;
     margin: 0 auto;
   }
 
@@ -60,7 +75,7 @@ const isCritical = (ei: number) => critical.includes(ei);
     width: 4.5rem;
   }
   col.c-data {
-    width: 5rem;
+    width: 4.5rem;
   }
 
   th,

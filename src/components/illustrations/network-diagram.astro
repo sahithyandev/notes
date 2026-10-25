@@ -1,14 +1,26 @@
 ---
 // Static node-and-arrow project network diagram: events as circles, activities
-// as labeled directed arrows between them (dashed for a dummy activity).
+// as labeled directed arrows between them (dashed for a dummy activity). With
+// `times` on a node, its earliest finish and latest finish values sit in 2
+// squares above the circle.
 import { makeUid } from "./lib/uid";
 import ArrowMarker from "./primitives/arrow-marker.astro";
 import FigureCaption from "./primitives/figure-caption.astro";
+
+interface Times {
+  // Earliest finish time at the event.
+  ef?: string;
+  // Latest finish time at the event.
+  lf?: string;
+  // Set in the current step of a walkthrough.
+  current?: boolean;
+}
 
 interface Node {
   id: string;
   x: number;
   y: number;
+  times?: Times;
 }
 
 interface Edge {
@@ -16,6 +28,8 @@ interface Edge {
   to: string;
   label: string;
   dashed?: boolean;
+  // On the critical path.
+  critical?: boolean;
 }
 
 interface Props {
@@ -37,6 +51,9 @@ const {
 const uid = makeUid("net");
 
 const R = 18;
+const SQ = 46;
+const SQ_H = 34;
+const SQ_GAP = 4;
 
 const byId = new Map(nodes.map((n) => [n.id, n]));
 
@@ -61,9 +78,26 @@ const arrows = edges.map((edge) => {
   const labelY = midY + ny * 12;
   return { ...edge, x1, y1, x2, y2, labelX, labelY };
 });
+
+const boxes = nodes
+  .filter((n) => n.times)
+  .map((n) => {
+    const top = n.y - R - 8 - SQ_H;
+    const left = n.x - SQ - SQ_GAP / 2;
+    const right = n.x + SQ_GAP / 2;
+    return {
+      ...n,
+      cells: [
+        { x: left, label: "EF", value: n.times!.ef ?? "" },
+        { x: right, label: "LF", value: n.times!.lf ?? "" },
+      ].map((c) => ({ ...c, top })),
+      current: n.times!.current,
+      top,
+    };
+  });
 ---
 
-<figure class="network" id={uid}>
+<figure class="network" id={uid} style={`max-width: ${width}px`}>
   <svg
     viewBox={`0 0 ${width} ${height}`}
     width="100%"
@@ -81,7 +115,7 @@ const arrows = edges.map((edge) => {
           y1={a.y1}
           x2={a.x2}
           y2={a.y2}
-          class:list={["shaft", { dummy: a.dashed }]}
+          class:list={["shaft", { dummy: a.dashed, critical: a.critical }]}
           marker-end={`url(#${uid}-arrow)`}
         />
         <text x={a.labelX} y={a.labelY} class="edge-label" text-anchor="middle">
@@ -96,6 +130,32 @@ const arrows = edges.map((edge) => {
         <text x={n.x} y={n.y} text-anchor="middle" dominant-baseline="central">
           {n.id}
         </text>
+      </g>
+    ))}
+
+    {boxes.map((b) => (
+      <g class:list={["values", { current: b.current }]}>
+        {b.cells.map((c) => (
+          <g class="cell">
+            <rect x={c.x} y={c.top} width={SQ} height={SQ_H} rx="4" />
+            <text
+              x={c.x + SQ / 2}
+              y={c.top + 11}
+              text-anchor="middle"
+              class="cell-label"
+            >
+              {c.label}
+            </text>
+            <text
+              x={c.x + SQ / 2}
+              y={c.top + 27}
+              text-anchor="middle"
+              class="cell-value"
+            >
+              {c.value}
+            </text>
+          </g>
+        ))}
       </g>
     ))}
   </svg>
@@ -123,10 +183,39 @@ const arrows = edges.map((edge) => {
     stroke-dasharray: 5 4;
   }
 
+  .shaft.critical {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+
   .edge-label {
     fill: var(--text-secondary);
     font-size: 12px;
     font-family: var(--font-mono);
+  }
+
+  .cell rect {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+
+  .values.current .cell rect {
+    stroke: var(--accent);
+    stroke-width: 2;
+  }
+
+  .cell-label {
+    fill: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+
+  .cell-value {
+    fill: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
   }
 
   .node circle {

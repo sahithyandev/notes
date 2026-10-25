@@ -77,11 +77,15 @@ export const WALKTHROUGH_PRESETS = {
     caption: "Step-by-step walkthrough of a critical path method calculation",
     legend: [
       {
-        label: "critical event (E(i) = L(i))",
+        label: "critical activity (total float 0)",
         kind: "swatch",
         fill: "var(--accent-subtle)",
       },
-      { label: "updated this step", kind: "text" },
+      {
+        label: "value set this step",
+        kind: "outline",
+        border: "var(--accent)",
+      },
     ] satisfies Chip[],
   },
 } satisfies Record<string, { caption: string; legend: Chip[] }>;

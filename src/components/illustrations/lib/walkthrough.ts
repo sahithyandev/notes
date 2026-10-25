@@ -20,6 +20,44 @@ function tableOf(stage: HTMLElement): HTMLTableElement {
     : stage.querySelector<HTMLTableElement>("table")!;
 }
 
+function syncStage(srcStage: HTMLElement, liveStage: HTMLElement): void {
+  const srcTable = tableOf(srcStage);
+  const dstTable = tableOf(liveStage);
+
+  const srcRows = srcTable.querySelectorAll("tr");
+  const dstRows = dstTable.querySelectorAll("tr");
+  srcRows.forEach((sr, ri) => {
+    const dr = dstRows[ri];
+    if (!dr) return;
+    dr.className = sr.className;
+    const sCells = sr.querySelectorAll<HTMLElement>("th,td");
+    const dCells = dr.querySelectorAll<HTMLElement>("th,td");
+    sCells.forEach((sc, ci) => {
+      const dc = dCells[ci];
+      if (!dc) return;
+      const changed = dc.innerHTML !== sc.innerHTML;
+      if (changed) dc.innerHTML = sc.innerHTML;
+      dc.className = sc.className;
+      dc.classList.toggle("changed", changed);
+    });
+  });
+
+  // Figcaption sync: self-guarding, a no-op when the stage has none (the
+  // bare <table> stages, e.g. simplex).
+  const srcCaption = srcStage.querySelector("figcaption");
+  let dstCaption = liveStage.querySelector("figcaption");
+  if (srcCaption) {
+    if (!dstCaption) {
+      dstCaption = document.createElement("figcaption");
+      liveStage.appendChild(dstCaption);
+    }
+    dstCaption.innerHTML = srcCaption.innerHTML;
+    dstCaption.hidden = false;
+  } else if (dstCaption) {
+    dstCaption.hidden = true;
+  }
+}
+
 export function initWalkthrough(root: HTMLElement): void {
   const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
   if (!steps.length) return;
@@ -36,11 +74,16 @@ export function initWalkthrough(root: HTMLElement): void {
   );
   const live = root.querySelector<HTMLElement>(".live")!;
 
-  // The persistent stage: a clone of the first step's data source.
-  const firstStage = steps[0].querySelector<HTMLElement>("[data-stage]")!;
-  const liveStage = firstStage.cloneNode(true) as HTMLElement;
-  tableOf(liveStage).removeAttribute("aria-hidden");
-  holder.appendChild(liveStage);
+  // The persistent stage: a clone of the first step's data source. Steps with
+  // no stage (each one shows its own diagram) skip the live table entirely.
+  const firstStage = steps[0].querySelector<HTMLElement>("[data-stage]");
+  const liveStage = firstStage
+    ? (firstStage.cloneNode(true) as HTMLElement)
+    : null;
+  if (liveStage) {
+    tableOf(liveStage).removeAttribute("aria-hidden");
+    holder.appendChild(liveStage);
+  }
 
   total.textContent = String(steps.length);
 
@@ -54,42 +97,8 @@ export function initWalkthrough(root: HTMLElement): void {
 
   function show(n: number) {
     i = Math.max(0, Math.min(steps.length - 1, n));
-    const srcStage = steps[i].querySelector<HTMLElement>("[data-stage]")!;
-    const srcTable = tableOf(srcStage);
-    const dstTable = tableOf(liveStage);
-
-    const srcRows = srcTable.querySelectorAll("tr");
-    const dstRows = dstTable.querySelectorAll("tr");
-    srcRows.forEach((sr, ri) => {
-      const dr = dstRows[ri];
-      if (!dr) return;
-      dr.className = sr.className;
-      const sCells = sr.querySelectorAll<HTMLElement>("th,td");
-      const dCells = dr.querySelectorAll<HTMLElement>("th,td");
-      sCells.forEach((sc, ci) => {
-        const dc = dCells[ci];
-        if (!dc) return;
-        const changed = dc.innerHTML !== sc.innerHTML;
-        if (changed) dc.innerHTML = sc.innerHTML;
-        dc.className = sc.className;
-        dc.classList.toggle("changed", changed);
-      });
-    });
-
-    // Figcaption sync: self-guarding, a no-op when the stage has none (the
-    // bare <table> stages, e.g. simplex).
-    const srcCaption = srcStage.querySelector("figcaption");
-    let dstCaption = liveStage.querySelector("figcaption");
-    if (srcCaption) {
-      if (!dstCaption) {
-        dstCaption = document.createElement("figcaption");
-        liveStage.appendChild(dstCaption);
-      }
-      dstCaption.innerHTML = srcCaption.innerHTML;
-      dstCaption.hidden = false;
-    } else if (dstCaption) {
-      dstCaption.hidden = true;
-    }
+    const srcStage = steps[i].querySelector<HTMLElement>("[data-stage]");
+    if (srcStage && liveStage) syncStage(srcStage, liveStage);
 
     steps.forEach((s, idx) => s.classList.toggle("active", idx === i));
     dots.forEach((d, idx) =>
