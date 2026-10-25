@@ -3,7 +3,7 @@ title: Project Network
 notebooks:
   - project-network
 dateCreated: 2026-08-26T11:55:23.746Z
-lastUpdatedOn: 2026-10-25T08:45:04.676Z
+lastUpdatedOn: 2026-10-25T11:43:01.524Z
 ---
 
 Project management represents a project as a network of activities and events, used to schedule and analyze the project's timeline.
@@ -54,6 +54,11 @@ An activity starting at that event.
 
 Critical Path Method finds that duration, and identifies the activities on that slowest chain.
 
+## Course Scope
+
+Network analysis is treated through the LP approach in this course. Dijkstra's
+algorithm was not covered in class.
+
 ### Earliest Start Time
 
 $ES_{ij}$ is the largest total duration of any chain that ends at a predecessor of $(i,j)$, or $0$ if $(i,j)$ has no predecessors.
@@ -61,6 +66,11 @@ $ES_{ij}$ is the largest total duration of any chain that ends at a predecessor 
 ### Earliest Finish Time
 
 $EF_{ij} = ES_{ij} + t_{ij}$, the earliest time activity $(i,j)$ can end.
+
+When 2 activities affect the start of a milestone, the milestone's earliest
+start time is the maximum of the 2 incoming early finish times. Reordering a
+dummy arrow can change an intermediate milestone value without changing the
+actual activity's early finish time or the total project duration.
 
 ### Latest Start Time
 
@@ -131,17 +141,16 @@ $$
 
 ## Worked Example
 
-A project has 7 activities. The table is the network's edge list. Start event and end event are node labels.
+A project has 6 activities. The table gives the duration and predecessors of each activity.
 
-| Activity    | Start event | End event | Duration | Predecessor |
-| ----------- | ----------- | --------- | -------- | ----------- |
-| $A$         | 1           | 2         | 4        | none        |
-| $B$         | 1           | 3         | 3        | none        |
-| $C$         | 2           | 4         | 2        | $A$         |
-| $D$ (dummy) | 3           | 4         | 0        | $B$         |
-| $E$         | 3           | 5         | 5        | $B$         |
-| $F$         | 4           | 6         | 3        | $C$, $D$    |
-| $G$         | 5           | 6         | 4        | $E$         |
+| Activity | Duration | Predecessor |
+| -------- | -------- | ----------- |
+| $A$      | 4        | none        |
+| $B$      | 3        | none        |
+| $C$      | 2        | $A$         |
+| $E$      | 5        | $B$         |
+| $F$      | 3        | $B$, $C$    |
+| $G$      | 4        | $E$         |
 
 Construct the network from the table, one activity at a time, then compute the earliest and latest times of every activity and the floats.
 

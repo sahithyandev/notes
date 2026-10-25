@@ -1,7 +1,7 @@
 ---
 title: Excel Solver
 dateCreated: 2026-09-16T16:54:07.618Z
-lastUpdatedOn: 2026-10-19T12:09:03.898Z
+lastUpdatedOn: 2026-10-25T11:43:01.462Z
 ---
 
 Excel Solver is an add-on that finds the optimal value of a target cell by changing a set of decision-variable cells, subject to constraints defined on other cells.
@@ -61,6 +61,18 @@ Solver is suited to problems small enough to lay out on a worksheet:
 - Integer and binary programs, by adding `int` or `bin` constraints on the variable cells.
 - Transportation and assignment problems, modelled directly as a grid of supply and demand cells.
 - Quick sensitivity checks on an already-solved model, without re-deriving the dual by hand.
+
+## Interpreting Solver Output
+
+- Check the values of the decision variables.
+- Check the objective value.
+- Substitute the decision-variable values into every constraint.
+- Identify binding constraints by checking whether the constraint value equals
+  its bound.
+- Report the obtained solution in the notation of the original problem.
+
+Solver is a calculation platform. The formulation and interpretation of the
+solution remain part of the answer.
 
 ## Limitations
 

@@ -3,7 +3,7 @@ title: Transportation Problem
 notebooks:
   - transportation-problem
 dateCreated: 2026-08-26T11:54:50.043Z
-lastUpdatedOn: 2026-10-24T06:41:49.442Z
+lastUpdatedOn: 2026-10-25T11:43:01.473Z
 ---
 
 Minimizes the cost of shipping a single commodity from $m$ supply points to $n$ demand points, given a per-unit shipping cost $c_{ij}$ for every supply-demand pair.
@@ -33,6 +33,10 @@ Balance makes the last of the $m + n$ supply/demand equality constraints redunda
 ### Unbalanced
 
 Total supply and demand differ. Add a dummy supply point (if demand exceeds supply) or a dummy demand point (if supply exceeds demand) with 0 shipping cost, absorbing the excess, to rebalance it.
+
+The zero-cost dummy route is treated as an ordinary least-cost cell during an
+initial feasible-solution method. Resolve ties using the adopted tie-breaking
+rule.
 
 ### Maximization
 
@@ -101,6 +105,15 @@ Steps:
 
 Generally gives a BFS closer to optimal than the least cost method.
 
+When the 2 smallest costs are equal, either of the following penalty
+conventions is acceptable:
+
+- Set the penalty to 0.
+- Use the difference between the smallest and next smallest costs.
+
+Using the difference is preferred. Both conventions produce a feasible
+solution.
+
 ### Stepping Stone Method
 
 Improves an initial BFS to optimality.
@@ -114,6 +127,11 @@ Improves an initial BFS to optimality.
 - The $-$ cell with the minimum allocation leaves the basis (becomes 0/unoccupied).
 
 Repeat until every improvement index is $\ge 0$.
+
+When several unoccupied cells have negative improvement indices, select the
+cell that gives the greatest total cost reduction after multiplying the
+improvement by the allocatable quantity in its loop. Do not compare the
+improvement indices alone.
 
 <Note>
 
@@ -135,6 +153,15 @@ Causes:
   A pivot's loop has 2 or more $-$ cells tied at the minimum allocation. Only 1 leaves the basis. The rest drop to $0$ too.
 
 Fix: allocate $0$ to an unoccupied cell that doesn't close a loop with the occupied cells. This restores the count to $m+n-1$, and the cell counts as occupied in loops despite shipping nothing.
+
+If
+
+$$
+(m+n-1)-\text{number of occupied cells}=1
+$$
+
+then 1 zero allocation is required. Select its location so that the required
+closed loops can be formed.
 
 A dummy row or column's allocation is a real basic variable, not a placeholder: it counts toward $m+n-1$ and takes part in loops like any other occupied cell.
 

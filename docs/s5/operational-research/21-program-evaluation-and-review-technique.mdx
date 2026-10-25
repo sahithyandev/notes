@@ -1,27 +1,47 @@
 ---
 title: Program Evaluation and Review Technique
+sidebar:
+  label: PERT
+notebooks:
+  - program-evaluation-and-review-technique
 dateCreated: 2026-10-25T08:43:25.365Z
-lastUpdatedOn: 2026-10-25T08:45:26.712Z
+lastUpdatedOn: 2026-10-25T11:43:01.550Z
 ---
 
-Program Evaluation and Review Technique (PERT) estimates project duration when activity times are uncertain. It uses 3 time estimates for each activity and models the resulting project duration with a normal distribution.
+<Aka>PERT</Aka>. Estimates project duration when activity times are uncertain.
+It uses 3 time estimates for each activity and models the resulting project
+duration with a normal distribution.
+
+### Assumptions
+
+PERT uses the following approximations:
+
+- Activity times follow beta distributions.
+- Activity durations are statistically independent.
+- The critical path remains unchanged near the target completion time.
+- The project duration is approximately normally distributed.
+
+The normal approximation becomes less reliable when several paths have similar expected durations or when activity durations are strongly correlated.
 
 ## Time Estimates
 
 PERT uses 3 estimates for every activity:
 
-- Optimistic time  
-  The shortest realistic duration when execution conditions are favourable.
-- Most likely time  
-  The duration expected under normal execution conditions.
-- Pessimistic time  
-  The longest realistic duration under unfavourable conditions, excluding catastrophes.
+### Optimistic Time
 
-Let $a$, $m$, and $b$ denote the optimistic, most likely, and pessimistic times.
+The shortest realistic duration when execution conditions are favourable. Denoted by $a$.
+
+### Most Likely Time
+
+The duration expected under normal execution conditions. Denoted by $m$.
+
+### Pessimistic Time
+
+The longest realistic duration under unfavourable conditions, excluding catastrophes. Denoted by $b$.
 
 ## Expected Activity Time
 
-The expected time of an activity is a weighted average:
+The expected time of an activity is a weighted average.
 
 $$
 t_e = \frac{a + 4m + b}{6}
@@ -29,25 +49,19 @@ $$
 
 The most likely time receives 4 times the weight of either extreme estimate.
 
-## Activity Variance
+## Activity Standard Deviation
 
-PERT estimates the activity variance with:
-
-$$
-\sigma^2 = \left(\frac{b-a}{6}\right)^2
-$$
-
-The activity standard deviation is:
+Denoted by $\sigma$.
 
 $$
-\sigma = \frac{b-a}{6}
+\sigma = \left(\frac{b-a}{6}\right)
 $$
 
-Greater uncertainty between the optimistic and pessimistic times produces a larger variance.
+$\sigma^2$ is the activity variation. Greater uncertainty between the optimistic and pessimistic times produces a larger variance.
 
 ## Project Duration
 
-Construct the project network using the expected activity times. Apply the [critical path method](/s5/operational-research/project-network) to identify the critical path.
+Construct the project network using the expected activity times. Apply the [critical path method](/s5/operational-research/project-network#critical-path-method) to identify the critical path.
 
 The expected project duration is the sum of expected activity times on the critical path:
 
@@ -82,17 +96,6 @@ P(T \le D) = \Phi(Z)
 $$
 
 A positive $Z$ means the target is later than the expected project duration. A negative $Z$ means the target is earlier.
-
-## Assumptions
-
-PERT uses the following approximations:
-
-- Activity times follow beta distributions.
-- Activity durations are statistically independent.
-- The critical path remains unchanged near the target completion time.
-- The project duration is approximately normally distributed.
-
-The normal approximation becomes less reliable when several paths have similar expected durations or when activity durations are strongly correlated.
 
 ## Steps
 

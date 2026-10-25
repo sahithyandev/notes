@@ -3,7 +3,7 @@ title: Assignment Problem
 notebooks:
   - assignment-problem
 dateCreated: 2026-08-26T11:55:10.616Z
-lastUpdatedOn: 2026-10-24T06:41:49.489Z
+lastUpdatedOn: 2026-10-25T11:43:01.512Z
 ---
 
 The problem of assigning $n$ agents to $n$ tasks one-to-one, minimizing total cost, given a cost $c_{ij}$ for assigning agent $i$ to task $j$. A special case of the [transportation problem](/s5/operational-research/transportation-problem).
@@ -22,7 +22,13 @@ An assignment problem is balanced **iff** the number of agents equals the number
 
 ### Unbalanced
 
-When the problem is not balanced. Dummy agents or tasks are added with 0 cost to rebalance.
+When the problem is not balanced. Dummy agents or tasks are added to rebalance.
+
+- Minimisation problem  
+  Use 0 as the dummy assignment cost.
+- Maximisation problem  
+  First convert the profit matrix to a minimisation cost matrix. Then use 0 as
+  the dummy assignment cost.
 
 ### Maximization
 
@@ -35,6 +41,10 @@ The problem is converted to minimization by subtracting every cost from the larg
 An assignment problem is restricted **iff** there are prohibited agent-task pairs.
 
 A prohibited agent-task pair is assigned a very large cost $M$, driving it out of the optimal assignment.
+
+Big $M$ is used for prohibited assignments. It is not required for an ordinary
+dummy assignment after a maximisation problem has been converted to a
+minimisation problem.
 
 ## Hungarian Method
 
