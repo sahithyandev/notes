@@ -3,7 +3,7 @@ title: Project Network
 notebooks:
   - project-network
 dateCreated: 2026-08-26T11:55:23.746Z
-lastUpdatedOn: 2026-10-24T06:41:49.502Z
+lastUpdatedOn: 2026-10-25T08:45:04.676Z
 ---
 
 Project management represents a project as a network of activities and events, used to schedule and analyze the project's timeline.
@@ -17,6 +17,14 @@ A task consuming time and resources. Represented as an arrow between 2 events.
 ### Predecessor
 
 An activity that must finish before another can start.
+
+### Successor
+
+An activity that cannot start until another finishes.
+
+### Chain
+
+A sequence of activities in which each is a predecessor of the next.
 
 ### Dummy Activity
 
@@ -46,73 +54,42 @@ An activity starting at that event.
 
 Critical Path Method finds that duration, and identifies the activities on that slowest chain.
 
-### Earliest Event Time
-
-Earliest event time $E(j)$ of an event $j$:
-
-$$
-E(j) = \max_{(i,j)} \big(E(i) + t_{ij}\big)
-$$
-
-Here:
-
-<Symbols>
-  <Sym s="(i,j)">an activity incoming to $j$, starting at event $i$</Sym>
-  <Sym s="t_{ij}">duration of that activity</Sym>
-</Symbols>
-
-The max ranges over every activity incoming to $j$.
-
-$E(j) = 0$ for the initial event, which has no incoming activities.
-
 ### Earliest Start Time
 
-Earliest start time of an activity $(i,j)$ is $E(i)$, the earliest event time of the event it starts at.
+$ES_{ij}$ is the largest total duration of any chain that ends at a predecessor of $(i,j)$, or $0$ if $(i,j)$ has no predecessors.
 
-### Latest Event Time
+### Earliest Finish Time
 
-Latest event time $L(i)$ of an event $i$:
+$EF_{ij} = ES_{ij} + t_{ij}$, the earliest time activity $(i,j)$ can end.
 
-$$
-L(i) = \min_{(i,j)} \big(L(j) - t_{ij}\big)
-$$
+### Latest Start Time
 
-Here:
-
-<Symbols>
-  <Sym s="(i,j)">an activity outgoing from $i$, ending at event $j$</Sym>
-  <Sym s="t_{ij}">duration of that activity</Sym>
-</Symbols>
-
-The min ranges over every activity outgoing from $i$.
-
-$L(i) = E(i)$ for the final event, which has no outgoing activities.
+$LS_{ij} = LF_{ij} - t_{ij}$, the latest time activity $(i,j)$ can begin without delaying the project.
 
 ### Latest Finish Time
 
-Latest finish time of an activity $(i,j)$ is $L(j)$, the latest event time of the event it ends at.
-
-Computed by a backward pass through the network, starting from the final event.
+$LF_{ij}$ is the project duration minus the largest total duration of any chain that starts at a successor of $(i,j)$, or the project duration if $(i,j)$ has no successors.
 
 ### Project Duration
 
-The earliest (= latest) event time of the final event. Equal to the length of the longest path from the initial to the final event, since every activity on that path must finish in sequence before the final event is reached.
+The largest total duration of any chain of activities. Every activity on that chain must finish in sequence before the project ends.
 
 ### Critical Path
 
-The path from the initial to the final event along which every event's earliest time equals its latest time. Delaying any activity on the critical path delays the entire project.
+The chain of activities from the initial to the final event in which every activity has total float $0$. Delaying any activity on the critical path delays the entire project.
 
 Every activity still has to complete for the project to finish, not only the ones on the critical path. An activity off the critical path has slack, room to start later or take longer without pushing the project duration past what the critical path already fixes.
 
 ### Steps
 
 1. Forward pass  
-   Compute the earliest event time $E(i)$ for every event, from the initial event to the final event.
+   Compute $ES$ and $EF$ for every activity, from the first activity to the last.
 2. Backward pass  
-   Compute the latest event time $L(i)$ for every event, from the final event back to the initial event.
-3. Project duration is $E$ of the final event.
+   Compute $LF$ and $LS$ for every activity, from the last activity back to the first.
+   Each $LS$ uses its own $LF$, so no step needs a value that is computed later.
+3. Project duration is the largest $EF$.
 4. Critical path  
-   The events with $E(i) = L(i)$.
+   The activities with total float $0$.
 
 ## Float
 
@@ -123,7 +100,7 @@ For an activity $(i,j)$ starting at event $i$ and ending at event $j$, with dura
 ### Total Float
 
 $$
-\text{Total float} = L(j) - E(i) - t_{ij}
+\text{Total float} = LF_{ij} - EF_{ij} = LS_{ij} - ES_{ij}
 $$
 
 How much an activity can be delayed without delaying the project's completion. Delaying it by more than its total float may still delay other activities.
@@ -131,16 +108,20 @@ How much an activity can be delayed without delaying the project's completion. D
 ### Free Float
 
 $$
-\text{Free float} = E(j) - E(i) - t_{ij}
+\text{Free float} = \min_{s} ES_{s} - EF_{ij}
 $$
+
+Here $s$ ranges over the successors of $(i,j)$. If $(i,j)$ has no successors, use the project duration in place of $\min_{s} ES_{s}$.
 
 How much an activity can be delayed without delaying the earliest start of any following activity.
 
 ### Independent Float
 
 $$
-\text{Independent float} = \max\big(E(j) - L(i) - t_{ij},\ 0\big)
+\text{Independent float} = \max\Big(\min_{s} ES_{s} - \min_{k} LS_{k} - t_{ij},\ 0\Big)
 $$
+
+Here $s$ ranges over the successors of $(i,j)$, and $k$ ranges over every activity starting at event $i$. Use the project duration in place of $\min_{s} ES_{s}$ if $(i,j)$ has no successors.
 
 How much an activity can be delayed without affecting any preceding or following activity's float. Negative values are treated as 0.
 
@@ -150,7 +131,7 @@ $$
 
 ## Worked Example
 
-A project has 7 activities. The table is the network's edge list. Start event and end event are node labels, not points in time.
+A project has 7 activities. The table is the network's edge list. Start event and end event are node labels.
 
 | Activity    | Start event | End event | Duration | Predecessor |
 | ----------- | ----------- | --------- | -------- | ----------- |
@@ -162,115 +143,469 @@ A project has 7 activities. The table is the network's edge list. Start event an
 | $F$         | 4           | 6         | 3        | $C$, $D$    |
 | $G$         | 5           | 6         | 4        | $E$         |
 
-<NetworkDiagram
-  nodes={[
-    { id: "1", x: 60, y: 150 },
-    { id: "2", x: 220, y: 70 },
-    { id: "3", x: 220, y: 230 },
-    { id: "4", x: 380, y: 110 },
-    { id: "5", x: 380, y: 230 },
-    { id: "6", x: 540, y: 170 },
-  ]}
-  edges={[
-    { from: "1", to: "2", label: "A, 4" },
-    { from: "1", to: "3", label: "B, 3" },
-    { from: "2", to: "4", label: "C, 2" },
-    { from: "3", to: "4", label: "D, 0", dashed: true },
-    { from: "3", to: "5", label: "E, 5" },
-    { from: "4", to: "6", label: "F, 3" },
-    { from: "5", to: "6", label: "G, 4" },
-  ]}
-/>
+Construct the network from the table, one activity at a time, then compute the earliest and latest times of every activity and the floats.
 
-<Note>
+<Solution>
 
-$F$ depends on both $B$ and $C$, but $B$'s arrow already ends at event 3, where $E$ starts, and an activity can only have one end event. Merging events 3 and 4 to let $B$ reach $F$ directly would wrongly make $E$ depend on $C$ too, since $E$ would then start no earlier than event 4's own earliest time. The dummy $D$ (event 3 to event 4, duration $0$) carries the precedence "$F$ waits for $B$" into event 4 without touching event 3's own timing.
-
-</Note>
-
-Forward pass, earliest event time $E(i)$:
-
-- $E(1) = 0$
-- $E(2) = E(1) + 4 = 4$
-- $E(3) = E(1) + 3 = 3$
-- $E(4) = \max(E(2) + 2,\ E(3) + 0) = \max(6, 3) = 6$
-- $E(5) = E(3) + 5 = 8$
-- $E(6) = \max(E(4) + 3,\ E(5) + 4) = \max(9, 12) = 12$
-
-Project duration is $E(6) = 12$.
-
-Backward pass, latest event time $L(i)$, starting from $L(6) = E(6) = 12$:
-
-- $L(6) = 12$
-- $L(5) = L(6) - 4 = 8$
-- $L(4) = L(6) - 3 = 9$
-- $L(3) = \min(L(4) - 0,\ L(5) - 5) = \min(9, 3) = 3$
-- $L(2) = L(4) - 2 = 7$
-- $L(1) = \min(L(2) - 4,\ L(3) - 3) = \min(3, 0) = 0$
-
-Comparing $E(i)$ and $L(i)$ per event identifies the critical path:
-
-<Walkthrough variant="cpm">
-  <CpmStep
-    label="Network events"
-    events={["1", "2", "3", "4", "5", "6"]}
-    earliest={["", "", "", "", "", ""]}
-    latest={["", "", "", "", "", ""]}
+<Walkthrough caption="Step-by-step construction of the project network">
+  <NetworkStep
+    label="Activity A"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+    ]}
+    edges={[{ from: "1", to: "2", label: "A, 4" }]}
   >
-    6 events, joined by activities $A$ through $G$ (with dummy $D$). $E(i)$
-    fills left to right with a forward pass, $L(i)$ fills right to left with
-    a backward pass.
-  </CpmStep>
 
-<CpmStep
-  label="Forward pass"
-  events={["1", "2", "3", "4", "5", "6"]}
-  earliest={["0", "4", "3", "6", "8", "12"]}
-  latest={["", "", "", "", "", ""]}
->
-  $E(4) = \max(E(2)+2,\ E(3)+0) = 6$ and $E(6) = \max(E(4)+3,\ E(5)+4) = 12$.
-  Project duration is $E(6) = 12$.
-</CpmStep>
+    $A$ runs from event 1 to event 2, duration $4$.
 
-<CpmStep
-  label="Backward pass"
-  events={["1", "2", "3", "4", "5", "6"]}
-  earliest={["0", "4", "3", "6", "8", "12"]}
-  latest={["0", "7", "3", "9", "8", "12"]}
->
-  Starting from $L(6) = E(6) = 12$: $L(3) = \min(L(4)-0,\ L(5)-5) = \min(9, 3) =
-  3$ and $L(1) = \min(L(2)-4,\ L(3)-3) = \min(3, 0) = 0$.
-</CpmStep>
+  </NetworkStep>
 
-  <CpmStep
-    label="Critical path"
-    events={["1", "2", "3", "4", "5", "6"]}
-    earliest={["0", "4", "3", "6", "8", "12"]}
-    latest={["0", "7", "3", "9", "8", "12"]}
-    critical={[0, 2, 4, 5]}
+  <NetworkStep
+    label="Activity B"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+    ]}
   >
-    Events 1, 3, 5, 6 satisfy $E(i) = L(i)$ and form a connected path:
-    $1 \to 3 \to 5 \to 6$, covering activities $B$, $E$, $G$. Duration
-    $3 + 5 + 4 = 12$, matching the project duration.
-  </CpmStep>
+
+    $B$ runs from event 1 to event 3, duration $3$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Activity C"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+      { id: "4", x: 380, y: 110 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+      { from: "2", to: "4", label: "C, 2" },
+    ]}
+  >
+
+    $C$ runs from event 2 to event 4, duration $2$. It starts only after $A$ finishes.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Dummy Activity D"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+      { id: "4", x: 380, y: 110 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+      { from: "2", to: "4", label: "C, 2" },
+      { from: "3", to: "4", label: "D, 0", dashed: true },
+    ]}
+  >
+
+    $D$ runs from event 3 to event 4, duration $0$. It consumes no time or resources.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Activity E"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+      { id: "4", x: 380, y: 110 },
+      { id: "5", x: 380, y: 230 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+      { from: "2", to: "4", label: "C, 2" },
+      { from: "3", to: "4", label: "D, 0", dashed: true },
+      { from: "3", to: "5", label: "E, 5" },
+    ]}
+  >
+
+    $E$ runs from event 3 to event 5, duration $5$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Activity F"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+      { id: "4", x: 380, y: 110 },
+      { id: "5", x: 380, y: 230 },
+      { id: "6", x: 540, y: 170 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+      { from: "2", to: "4", label: "C, 2" },
+      { from: "3", to: "4", label: "D, 0", dashed: true },
+      { from: "3", to: "5", label: "E, 5" },
+      { from: "4", to: "6", label: "F, 3" },
+    ]}
+  >
+
+    $F$ runs from event 4 to event 6, duration $3$. Its predecessors are $C$ and $D$.
+
+    $F$ depends on both $B$ and $C$, but $B$'s arrow already ends at event 3, where $E$ starts, and an activity can only have one end event. Merging events 3 and 4 would make $E$ depend on $C$ too. The dummy $D$ makes $F$ wait for $B$ without making $E$ wait for $C$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Activity G"
+    nodes={[
+      { id: "1", x: 60, y: 150 },
+      { id: "2", x: 220, y: 70 },
+      { id: "3", x: 220, y: 230 },
+      { id: "4", x: 380, y: 110 },
+      { id: "5", x: 380, y: 230 },
+      { id: "6", x: 540, y: 170 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A, 4" },
+      { from: "1", to: "3", label: "B, 3" },
+      { from: "2", to: "4", label: "C, 2" },
+      { from: "3", to: "4", label: "D, 0", dashed: true },
+      { from: "3", to: "5", label: "E, 5" },
+      { from: "4", to: "6", label: "F, 3" },
+      { from: "5", to: "6", label: "G, 4" },
+    ]}
+  >
+
+    $G$ runs from event 5 to event 6, duration $4$. The network is complete.
+
+  </NetworkStep>
 </Walkthrough>
 
-The dummy activity $D$ carries 0 duration and sits off the critical path here, but it still enforces that $F$ can't start until both $C$ and $B$ finish.
+Each event gets 2 squares above it. The left square holds the earliest finish time ($EF$), and the right square the latest finish time, $LF$.
 
-Total, free, and independent float for every activity, using $E(i)$ and $L(i)$ from the passes above:
+The forward pass fills $EF$ from event 1 to event 6, $EF_j = \max_i (EF_i + t_{ij})$ over the activities $i \to j$ entering event $j$. The backward pass fills $LF$ from event 6 back to event 1, $LF_i = \min_j (LF_j - t_{ij})$ over the activities $i \to j$ leaving event $i$.
 
-| Activity    | $(i,j)$ | Duration | $E(i)$ | $E(j)$ | $L(i)$ | $L(j)$ | Total float | Free float | Independent float |
-| ----------- | ------- | -------- | ------ | ------ | ------ | ------ | ----------- | ---------- | ----------------- |
-| $A$         | 1, 2    | 4        | 0      | 4      | 0      | 7      | 3           | 0          | 0                 |
-| $B$         | 1, 3    | 3        | 0      | 3      | 0      | 3      | 0           | 0          | 0                 |
-| $C$         | 2, 4    | 2        | 4      | 6      | 7      | 9      | 3           | 0          | 0                 |
-| $D$ (dummy) | 3, 4    | 0        | 3      | 6      | 3      | 9      | 6           | 3          | 3                 |
-| $E$         | 3, 5    | 5        | 3      | 8      | 3      | 8      | 0           | 0          | 0                 |
-| $F$         | 4, 6    | 3        | 6      | 12     | 9      | 12     | 3           | 3          | 0                 |
-| $G$         | 5, 6    | 4        | 8      | 12     | 8      | 12     | 0           | 0          | 0                 |
+<Walkthrough caption="Forward and backward pass on the project network">
+  <NetworkStep
+    label="Forward pass: events 2 and 3"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4", current: true } },
+      { id: "3", x: 250, y: 310, times: { ef: "3", current: true } },
+      { id: "4", x: 470, y: 130 },
+      { id: "5", x: 470, y: 310 },
+      { id: "6", x: 640, y: 190 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
 
-For $A$: total float $= L(2) - E(1) - 4 = 7 - 0 - 4 = 3$, free float $= E(2) - E(1) - 4 = 4 - 0 - 4 = 0$, independent float $= E(2) - L(1) - 4 = 4 - 0 - 4 = 0$.
+    Event 1 has no predecessors, so $EF_1 = 0$. Each of events 2 and 3 has a single incoming activity from event 1, so $EF_2 = 0 + 4 = 4$ and $EF_3 = 0 + 3 = 3$.
 
-For $C$: total float $= L(4) - E(2) - 2 = 9 - 4 - 2 = 3$, but independent float $= E(4) - L(2) - 2 = 6 - 7 - 2 = -3$, treated as $0$.
+  </NetworkStep>
 
-$B$, $E$, $G$, the activities on the critical path, all have total float $0$, matching the critical path found above.
+  <NetworkStep
+    label="Forward pass: event 4"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6", current: true } },
+      { id: "5", x: 470, y: 310 },
+      { id: "6", x: 640, y: 190 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    Event 4 waits for both incoming activities, $C$ and the dummy $D$. $EF_4 = \max(EF_2 + 2,\ EF_3 + 0) = \max(6,\ 3) = 6$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Forward pass: event 5"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", current: true } },
+      { id: "6", x: 640, y: 190 },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    Event 5 has the single incoming activity $E$, so $EF_5 = EF_3 + 5 = 3 + 5 = 8$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Forward pass: event 6"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", current: true } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    $EF_6 = \max(EF_4 + 3,\ EF_5 + 4) = \max(9,\ 12) = 12$. The project duration is $12$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 6"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12", current: true } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    Event 6 has no successors, so $LF_6$ is the project duration, $LF_6 = 12$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 5"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", lf: "8", current: true } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12" } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    $LF_5 = LF_6 - t_G = 12 - 4 = 8$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 4"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6", lf: "9", current: true } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", lf: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12" } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    $LF_4 = LF_6 - t_F = 12 - 3 = 9$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 3"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3", lf: "3", current: true } },
+      { id: "4", x: 470, y: 130, times: { ef: "6", lf: "9" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", lf: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12" } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    Event 3 has 2 outgoing activities, the dummy $D$ and $E$, so the smaller value wins. $LF_3 = \min(LF_4 - 0,\ LF_5 - 5) = \min(9,\ 3) = 3$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 2"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0" } },
+      { id: "2", x: 250, y: 70, times: { ef: "4", lf: "7", current: true } },
+      { id: "3", x: 250, y: 310, times: { ef: "3", lf: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6", lf: "9" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", lf: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12" } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    $LF_2 = LF_4 - t_C = 9 - 2 = 7$.
+
+  </NetworkStep>
+
+  <NetworkStep
+    label="Backward pass: event 1"
+    width={700}
+    height={360}
+    nodes={[
+      { id: "1", x: 60, y: 250, times: { ef: "0", lf: "0", current: true } },
+      { id: "2", x: 250, y: 70, times: { ef: "4", lf: "7" } },
+      { id: "3", x: 250, y: 310, times: { ef: "3", lf: "3" } },
+      { id: "4", x: 470, y: 130, times: { ef: "6", lf: "9" } },
+      { id: "5", x: 470, y: 310, times: { ef: "8", lf: "8" } },
+      { id: "6", x: 640, y: 190, times: { ef: "12", lf: "12" } },
+    ]}
+    edges={[
+      { from: "1", to: "2", label: "A (4)" },
+      { from: "1", to: "3", label: "B (3)" },
+      { from: "2", to: "4", label: "C (2)" },
+      { from: "3", to: "4", label: "D (0)", dashed: true },
+      { from: "3", to: "5", label: "E (5)" },
+      { from: "4", to: "6", label: "F (3)" },
+      { from: "5", to: "6", label: "G (4)" },
+    ]}
+  >
+
+    Event 1 has 2 outgoing activities, $A$ and $B$. $LF_1 = \min(LF_2 - 4,\ LF_3 - 3) = \min(3,\ 0) = 0$.
+
+  </NetworkStep>
+</Walkthrough>
+
+Every float can be read from the graph. For an activity from event $i$ to event $j$ with duration $t$, use the boxes at its two events:
+
+- The EF box at $i$ is the earliest the activity can start.
+- The LF box at $j$ is the latest the activity can finish.
+- The EF box at $j$ is the earliest any successor of the activity can start.
+- The LF box at $i$ is the latest any predecessor of the activity can finish.
+
+This gives the three floats directly:
+
+$$
+\text{Total float} = LF_j - EF_i - t
+$$
+
+$$
+\text{Free float} = EF_j - EF_i - t
+$$
+
+$$
+\text{Independent float} = \max\big(EF_j - LF_i - t,\ 0\big)
+$$
+
+For $A$, which runs from event 1 to event 2 with $t = 4$, the boxes show $EF_1 = 0$, $LF_1 = 0$, $EF_2 = 4$ and $LF_2 = 7$.
+
+- Total float is $7 - 0 - 4 = 3$
+- Free float is $4 - 0 - 4 = 0$
+- Independent float is $\max(4 - 0 - 4,\ 0) = 0$
+
+For $C$, which runs from event 2 to event 4 with $t = 2$, the boxes show $EF_2 = 4$, $LF_2 = 7$, $EF_4 = 6$ and $LF_4 = 9$.
+
+- Total float is $9 - 4 - 2 = 3$
+- Free float is $6 - 4 - 2 = 0$
+- Independent float is $\max(6 - 7 - 2,\ 0) = 0$
+
+For $F$, which runs from event 4 to event 6 with $t = 3$, the boxes show $EF_4 = 6$, $LF_4 = 9$, $EF_6 = 12$ and $LF_6 = 12$.
+
+- Total float is $12 - 6 - 3 = 3$
+- Free float is $12 - 6 - 3 = 3$
+- Independent float is $\max(12 - 9 - 3,\ 0) = 0$
+
+The other activities are read the same way.
+
+</Solution>
