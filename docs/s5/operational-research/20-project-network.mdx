@@ -3,7 +3,7 @@ title: Project Network
 notebooks:
   - project-network
 dateCreated: 2026-08-26T11:55:23.746Z
-lastUpdatedOn: 2026-10-25T11:43:01.524Z
+lastUpdatedOn: 2026-10-25T20:55:17.043Z
 ---
 
 Project management represents a project as a network of activities and events, used to schedule and analyze the project's timeline.
@@ -29,6 +29,14 @@ A sequence of activities in which each is a predecessor of the next.
 ### Dummy Activity
 
 Consumes 0 time and resources. Added only to preserve correct precedence when 2 activities share the same start and end events, or to represent a precedence relationship the diagram couldn't otherwise express.
+
+#### Logical Dummy
+
+A dummy activity that represents a precedence relationship between activities. It shows that one activity must finish before another can start, without implying any additional activity.
+
+#### Identity Dummy
+
+A dummy activity that distinguishes activities with the same start and end events. It preserves the rule that no 2 activities can share both events.
 
 ## Event
 

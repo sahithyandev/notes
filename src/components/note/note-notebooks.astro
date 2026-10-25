@@ -1,6 +1,5 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import MathematicaIcon from "../icons/mathematica-icon.astro";
 
 interface Props {
   /**
@@ -41,8 +40,7 @@ const entries = summary ? [...notebooks, summary] : notebooks;
             href={entry.data.url}
             download={`${entry.id}.nb`}
           >
-            <MathematicaIcon width={22} height={22} />
-            <span>Download {entry.id}.nb</span>
+            Download {entry.id}.nb
           </a>
         </li>
       ))}
@@ -64,53 +62,29 @@ const entries = summary ? [...notebooks, summary] : notebooks;
   }
 
   .note-notebooks-title {
-    margin: 0 0 6px;
-    font-size: 1.125rem;
-    font-weight: 800;
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text-primary);
   }
 
   .note-notebooks-desc {
-    margin: 0 0 14px;
-    font-size: 0.9375rem;
+    margin: 0 0 10px;
+    font-size: 0.875rem;
     line-height: 1.6;
     color: var(--text-secondary);
   }
 
   .note-notebooks-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .note-notebooks-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 18px;
-    font-size: 0.875rem !important;
-    font-weight: 600;
-    color: var(--sem);
-    background: var(--sem-bg);
-    border: 1px solid var(--sem-border);
-    border-radius: 8px;
-    text-decoration: none;
-    transition:
-      background 0.12s ease,
-      border-color 0.12s ease,
-      transform 0.12s ease;
-  }
-
-  .note-notebooks-link:active {
-    transform: translateY(1px);
-  }
-
-  .note-notebooks-link svg {
-    flex-shrink: 0;
+    font-size: 0.875rem;
+    color: var(--link, var(--sem));
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 </style>

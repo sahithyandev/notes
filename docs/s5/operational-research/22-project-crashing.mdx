@@ -1,30 +1,186 @@
 ---
 title: Project Crashing
+notebooks:
+  - project-crashing
 dateCreated: 2026-08-26T11:55:39.175Z
-lastUpdatedOn: 2026-10-25T11:43:01.560Z
+lastUpdatedOn: 2026-10-25T20:55:17.073Z
 ---
 
-Reduces a project's duration by shortening (crashing) critical activities, trading extra cost for time saved.
+Project crashing reduces a project's duration by shortening critical activities. It increases direct cost in exchange for time saved.
 
-- Normal time / normal cost  
-  An activity's duration and cost under regular execution.
-- Crash time / crash cost  
-  The minimum achievable duration and its (higher) cost.
-- Cost slope  
-  $\dfrac{\text{crash cost} - \text{normal cost}}{\text{normal time} - \text{crash time}}$. The cost of shortening the activity by 1 time unit.
+The project duration is the duration of its longest path. A path with this duration is critical. Crashing an activity on a shorter path does not immediately reduce the project duration. The [critical path method](/s5/operational-research/project-network#critical-path-method) identifies which activities can reduce the project duration.
 
-## Crashing Steps
+## Activity Limits
 
-- Find the critical path(s) at normal duration.
-- Crash the critical activity with the lowest cost slope, by 1 time unit at a time.
-- Recompute the critical path after every crash: a non-critical path can become critical, requiring simultaneous crashing on multiple paths.
-- Stop when every activity is at crash time, or when the marginal cost of crashing further exceeds the benefit (e.g. the cost of the delay it avoids).
+Each activity has a normal duration and a minimum duration.
+
+To crash an activity is to shorten its duration below its normal time, usually by using additional resources or faster methods. This increases the activity's direct cost. Its duration cannot be reduced below its crash time.
+
+- Normal time  
+  Activity duration under regular execution.
+- Crash time  
+  Shortest achievable activity duration.
+
+The crash allowance is the maximum time reduction for an activity.
+
+$$
+\text{Crash allowance} = \text{Normal time} - \text{Crash time}
+$$
+
+For activity $i$, its reduction $x_i$ must satisfy:
+
+$$
+0 \leq x_i \leq t_i^{N} - t_i^{C}
+$$
+
+<Symbols>
+  <Sym s="x_i">time reduction for activity $i$</Sym>
+  <Sym s="t_i^{N}">normal time for activity $i$</Sym>
+  <Sym s="t_i^{C}">crash time for activity $i$</Sym>
+</Symbols>
+
+### Crashable Activity
+
+An activity can still be crashed when its current duration is greater than its crash time.
+
+$$
+t_i > t_i^{C}
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="t_i">activity's current duration</Sym>
+  <Sym s="t_i^{C}">activity's crash time</Sym>
+</Symbols>
+
+If $t_i = t_i^{C}$, the activity has no remaining crash allowance.
+
+### Cost Slope
+
+The cost slope is the additional direct cost per unit of activity time reduced. A constant slope assumes each reducible time unit has the same cost.
+
+$$
+\text{Cost slope}_i =
+-\frac{C_i^{N} - C_i^{C}}
+{t_i^{N} - t_i^{C}}
+$$
+
+<Symbols>
+  <Sym s="C_i^{N}">direct cost of activity $i$ at normal time</Sym>
+  <Sym s="C_i^{C}">direct cost of activity $i$ at crash time</Sym>
+</Symbols>
+
+An activity can only be crashed when its duration is above its crash time. The direct cost of reducing activity $i$ by $x_i$ time units is:
+
+$$
+\text{Added direct cost}_i = x_i \times \text{Cost slope}_i
+$$
+
+## Crashing Procedure
+
+Use these steps for each reduction:
+
+1. Find critical paths.  
+   Calculate the duration of every path. Mark every longest path as critical.
+2. Find crashable activities on each critical path.  
+   On each critical path, compare each activity's current duration with its crash time. Keep activities whose current duration is greater.
+3. Choose activities to crash.  
+   Choose low-cost activities that shortens all the critical paths. One activity may shorten several paths. Otherwise, choose a combination with at least one activity from each critical path and add their cost slopes.
+4. Crash activities.  
+   Reduce the chosen activity durations. Recalculate path durations as soon as an activity reaches its crash time, another path becomes critical, or the target duration is reached.
+5. Repeat from step 1.  
+   Stop when the target or cost limit is reached, or when a critical path has no crashable activity.
+
+Crashing one time unit means reducing an activity's duration by one unit. The project duration only falls if this reduction shortens every path that currently has the longest duration. A new critical path can appear after a reduction, so recalculate before choosing the next crash action.
+
+<Note>
+
+When several critical paths exist, every critical path must be shortened to reduce the project duration. Crashing an activity on only one critical path does not reduce the overall duration.
+
+</Note>
+
+## Project Cost
+
+Total direct cost equals the normal direct cost plus the added cost of crashing activities.
+
+$$
+C_D = \sum_i C_i^{N} + \sum_i x_i s_i
+$$
+
+<Symbols>
+  <Sym s="C_D">total direct cost</Sym>
+  <Sym s="x_i">time reduction for activity $i$</Sym>
+  <Sym s="s_i">cost slope of activity $i$</Sym>
+</Symbols>
+
+Indirect costs are project-wide expenses that continue while the project is in progress, such as site rent, utilities, and administration. They depend on project duration, rather than on the duration of a specific activity.
+
+If indirect costs accrue at a constant rate $r$ per project time unit, total project cost is:
+
+$$
+C_T = C_D + rT
+$$
+
+<Symbols>
+  <Sym s="C_T">total project cost</Sym>
+  <Sym s="r">indirect cost rate per time unit</Sym>
+  <Sym s="T">project duration</Sym>
+</Symbols>
+
+Reducing the project by one time unit is economically justified when the added direct cost does not exceed the indirect cost saved. Deadline penalties can be included as additional indirect costs.
 
 ## Crashing Offer
 
-The best crashing offer gives the maximum possible reduction in project
-duration without exceeding the allowed net additional project cost.
+A crashing offer gives a maximum net additional cost for reducing the project duration. The net additional cost compares added direct cost with indirect cost saved.
 
-- Include indirect cost savings in the net additional project cost.
-- In the discussed example, the limit was Rs. 200,000.
-- The indirect cost saving was Rs. 50,000 per activity.
+$$
+C_{\text{net}} = \Delta C_D - r\Delta T
+$$
+
+<Symbols>
+  <Sym s="C_{\text{net}}">net additional cost</Sym>
+  <Sym s="\Delta C_D">added direct cost</Sym>
+  <Sym s="\Delta T">reduction in project duration</Sym>
+</Symbols>
+
+The indirect cost saving depends on project time saved, not on the number of activities crashed.
+
+## Worked Example
+
+A project has 3 paths. Its normal duration is $10$ days, the duration of its longest path.
+
+| Path  | Activities | Normal Duration |
+| ----- | ---------- | --------------: |
+| $P_1$ | $A \to C$  |            $10$ |
+| $P_2$ | $B \to D$  |             $9$ |
+| $P_3$ | $E$        |             $8$ |
+
+The activity data are:
+
+| Activity | Normal Time | Crash Time |    Normal Cost |     Crash Cost | Cost Slope per Day |
+| -------- | ----------: | ---------: | -------------: | -------------: | -----------------: |
+| $A$      |         $6$ |        $5$ | Rs. $40{,}000$ | Rs. $70{,}000$ |     Rs. $30{,}000$ |
+| $B$      |         $5$ |        $4$ | Rs. $30{,}000$ | Rs. $50{,}000$ |     Rs. $20{,}000$ |
+| $C$      |         $4$ |        $3$ | Rs. $20{,}000$ | Rs. $60{,}000$ |     Rs. $40{,}000$ |
+| $D$      |         $4$ |        $3$ | Rs. $35{,}000$ | Rs. $85{,}000$ |     Rs. $50{,}000$ |
+
+Indirect cost is Rs. $50{,}000$ per day. Find the maximum possible duration reduction and determine whether it lowers total project cost.
+
+<Solution>
+
+1. The initial path durations are $P_1=10$, $P_2=9$, and $P_3=8$ days. Only $P_1$ is critical. Activities $A$ and $C$ can shorten $P_1$. Activity $A$ costs Rs. $30{,}000$ per day to crash, while $C$ costs Rs. $40{,}000$ per day. Choose $A$.
+2. Crash $A$ by $1$ day, from $6$ to $5$ days. Then $P_1$ falls from $10$ to $9$ days. The paths are now $P_1=9$, $P_2=9$, and $P_3=8$. Both $P_1$ and $P_2$ are critical. The project duration has fallen by $1$ day, and the added direct cost is Rs. $30{,}000$.
+3. To reduce the project duration again, shorten both critical paths. Activity $A$ is already at its crash time, so choose $C$ on $P_1$ and $B$ on $P_2$. Their combined cost per day is Rs. $40{,}000 + \text{Rs. }20{,}000 = \text{Rs. }60{,}000$.
+4. Crash $C$ and $B$ by $1$ day each. The path durations become $P_1=8$, $P_2=8$, and $P_3=8$. Added direct cost for this step is Rs. $60{,}000$, bringing the total added direct cost to Rs. $90{,}000$.
+5. All 3 paths are now critical. Path $P_3$ contains only activity $E$, which has no crash data and therefore cannot be shortened. The project cannot be reduced below $8$ days.
+
+The project duration falls from $10$ to $8$ days. This saves $2 \times \text{Rs. }50{,}000 = \text{Rs. }100{,}000$ in indirect cost. The added direct cost is Rs. $90{,}000$.
+
+$$
+C_{\text{net}} = \text{Rs. }90{,}000 - \text{Rs. }100{,}000 = -\text{Rs. }10{,}000
+$$
+
+The $8$-day plan reduces total project cost by Rs. $10{,}000$.
+
+</Solution>

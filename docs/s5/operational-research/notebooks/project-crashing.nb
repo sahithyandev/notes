@@ -1,0 +1,54 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Project Crashing", "Title",ExpressionUUID->"A39E6C17-FAB7-45CA-A7E9-E34C17B08C61"],
+
+Cell["Companion to docs/s5/operational-research/22-project-crashing.mdx. Enumerates integer crash plans, finds the least-cost plan for each target duration, and compares added direct cost with indirect cost saved. Each activity is {name, normal time, crash time, cost slope}. Paths are lists of activity names.", "Text",ExpressionUUID->"A6D199F9-E88B-4527-98E5-58B82DE25593"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"5B2E9EA9-23A1-42DE-9333-02F0CD70B6FD"],
+
+Cell["activities = {{\"A\", 6, 5, 30000}, {\"B\", 5, 4, 20000}, {\"C\", 4, 3, 40000}, {\"D\", 4, 3, 50000}, {\"E\", 8, 8, 0}};", "Input",ExpressionUUID->"D453EE21-F64A-443E-BDAA-1AA19A4C6C26"],
+
+Cell["paths = {{\"A\", \"C\"}, {\"B\", \"D\"}, {\"E\"}};", "Input",ExpressionUUID->"594F2CEE-59D7-4714-BEA2-5FBB146B3F9B"],
+
+Cell["indirectRate = 50000;", "Input",ExpressionUUID->"1B899684-5D8F-4F69-A8C7-F3CBB311B49A"],
+
+Cell["Crash plan enumeration", "Subsection",ExpressionUUID->"BDA85E56-BCF4-4308-9719-7F77F4C273D2"],
+
+Cell["names = activities[[All, 1]]; normal = AssociationThread[names, activities[[All, 2]]]; crash = AssociationThread[names, activities[[All, 3]]]; slope = AssociationThread[names, activities[[All, 4]]]; allowance = activities[[All, 2]] - activities[[All, 3]];", "Input",ExpressionUUID->"AC9F81B7-221D-4E50-9086-E9F522D6CE41"],
+
+Cell["plans = Tuples[Map[Range[0, #] &, allowance]];", "Input",ExpressionUUID->"D6EBC843-73D0-4DB0-B545-BD7D111BA4CE"],
+
+Cell["planData[x_] := Module[{reduction = AssociationThread[names, x], durations, pathTimes, projectTime, addedCost}, durations = AssociationMap[normal[#] - reduction[#] &, names]; pathTimes = (Total[Lookup[durations, #]] &) /@ paths; projectTime = Max[pathTimes]; addedCost = Total[MapThread[#1 #2 &, {x, activities[[All, 4]]}]]; <|\"reductions\" -> reduction, \"durations\" -> durations, \"pathTimes\" -> pathTimes, \"projectTime\" -> projectTime, \"addedCost\" -> addedCost|>];", "Input",ExpressionUUID->"F8C8D43E-0BCF-48C5-983D-1EAC25EFA143"],
+
+Cell["evaluatedPlans = planData /@ plans;", "Input",ExpressionUUID->"6BC2D1AF-858A-4941-9BAB-8F8AB77B3A9A"],
+
+Cell["{Length[plans], Min[Lookup[evaluatedPlans, \"projectTime\"]], Max[Lookup[evaluatedPlans, \"projectTime\"]]}", "Input",ExpressionUUID->"B63FC54C-EE26-43D3-8B28-4CC23A81505C"],
+
+Cell["Least-cost plans by target duration", "Subsection",ExpressionUUID->"93D2DCD8-0C32-4B94-9A6E-8B2F46A2783C"],
+
+Cell["bestPlan[target_] := Module[{feasible}, feasible = Select[evaluatedPlans, #[\"projectTime\"] <= target &]; If[feasible === {}, Missing[\"NoFeasiblePlan\"], First@SortBy[feasible, #[\"addedCost\"] &]]];", "Input",ExpressionUUID->"E524E4BE-97D3-4B60-8FEA-64B27EAED229"],
+
+Cell["targets = Range[10, 8, -1];", "Input",ExpressionUUID->"A4D8E88A-6C1C-46D0-B865-168B3B6C2A6E"],
+
+Cell["results = Table[With[{best = bestPlan[target]}, {target, best[\"projectTime\"], best[\"reductions\"], best[\"pathTimes\"], best[\"addedCost\"], best[\"addedCost\"] - indirectRate (10 - target)}], {target, targets}];", "Input",ExpressionUUID->"8D72AFA3-13DB-427D-A425-28971A07D27D"],
+
+Cell["Grid[Prepend[results, {\"target\", \"duration\", \"reductions\", \"path durations\", \"added direct cost\", \"net cost change\"}], Frame -> All]", "Input",ExpressionUUID->"9BCCBF0C-935B-4132-AC17-108CF6CB2327"],
+
+Cell["Inspecting a target", "Subsection",ExpressionUUID->"7B222783-1AA0-4EC9-8B35-5D69F23D36F8"],
+
+Cell["target = 8; best = bestPlan[target]; {best[\"durations\"], best[\"pathTimes\"], best[\"addedCost\"], indirectRate (10 - target), best[\"addedCost\"] - indirectRate (10 - target)}", "Input",ExpressionUUID->"C9AC9EA6-B9F4-4558-9C79-69F45ACF9B2E"],
+
+Cell["A negative net cost change means the indirect cost saving exceeds the added direct cost. The path list must include every start-to-finish path. Add a path containing an activity only if that activity can affect the project duration.", "Text",ExpressionUUID->"A19AF32C-9EBE-41F4-B75C-8200FDC8B9F3"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"EC0B294C-DBD5-47FE-81E4-D8D211209EF7"
+]
