@@ -1,0 +1,127 @@
+---
+title: Resource Management
+dateCreated: 2026-10-25T08:22:27.779Z
+lastUpdatedOn: 2026-10-25T08:45:26.735Z
+---
+
+Resource scheduling assigns resources to project activities over time while respecting precedence relationships, resource availability, and the required completion date. It uses the activity times and floats calculated by the [project network](/s5/operational-research/project-network).
+
+## Resource Scheduling
+
+Resource scheduling produces a timetable that specifies when each activity starts and finishes, and which resources it uses.
+
+### Scheduling Procedure
+
+1. List every activity, its duration, predecessors, and resource requirements.
+2. Construct the project network and calculate the earliest and latest start and finish times.
+3. Prepare an initial schedule by placing each activity at its earliest feasible start time.
+4. Prepare a resource-use table by adding the requirements of all activities running in each time period.
+5. Compare the resource demand in each period with the available capacity.
+6. Resolve over-allocation by moving activities with available float, increasing resource availability, splitting activities when allowed, or extending the project duration.
+7. Recalculate the schedule, resource-use table, and critical path after each change.
+
+Activities on the critical path have no total float, so delaying them delays the project unless another activity or path absorbs the delay. Activities with float are the first candidates for movement. Every movement must preserve precedence relationships and must not create a new resource conflict.
+
+## Resource Leveling
+
+Resource leveling modifies a schedule to remove resource over-allocation. It may delay activities beyond their available float and extend the project duration when the resource limit cannot otherwise be satisfied.
+
+## Resource Smoothing
+
+Resource smoothing modifies a feasible schedule to make resource use more uniform over time while keeping the project completion date unchanged. It reduces avoidable peaks and idle periods, and improves the continuity of work.
+
+Smoothing shifts activities within their allowable time windows. It does not change their durations or precedence relationships. It may reduce resource variation without removing every period of over-allocation. Leveling is required when the resource limit must be satisfied in every period.
+
+### Smoothing Procedure
+
+1. Start with the earliest-start schedule and calculate the resource demand in every time period.
+2. Identify resource peaks and periods with unused capacity.
+3. Select a non-critical activity that uses the resource causing the peak and has available float.
+4. Move the activity toward a lower-demand period while preserving its predecessor and successor constraints.
+5. Recalculate the resource profile and all affected floats.
+6. Continue shifting eligible activities until no feasible improvement remains or the profile is sufficiently smooth.
+7. Confirm that the project completion date and precedence relationships are unchanged.
+
+The aim is not to make resource use constant. A smoothed schedule reduces avoidable variation while preserving the project completion date. Activities with zero total float are not moved during smoothing unless the planner accepts a change to the project duration.
+
+## Worked Example
+
+Use the project network with activities $A$ through $G$. The critical path is $B \to E \to G$, and the project duration is $12$. The activities have the following resource requirements for resource $R$:
+
+| Activity    | Duration | Predecessor | Resource $R$ |
+| ----------- | -------- | ----------- | ------------ |
+| $A$         | 4        | none        | 1            |
+| $B$         | 3        | none        | 1            |
+| $C$         | 2        | $A$         | 1            |
+| $D$ (dummy) | 0        | $B$         | 0            |
+| $E$         | 5        | $B$         | 2            |
+| $F$         | 3        | $C$, $D$    | 3            |
+| $G$         | 4        | $E$         | 0            |
+
+Prepare the earliest-start schedule, calculate the resource demand, then smooth the schedule without extending the project duration.
+
+<Solution>
+
+The network calculations give the following earliest and latest times:
+
+| Activity    | $ES$ | $EF$ | $LS$ | $LF$ | Total float |
+| ----------- | ---- | ---- | ---- | ---- | ----------- |
+| $A$         | 0    | 4    | 3    | 7    | 3           |
+| $B$         | 0    | 3    | 0    | 3    | 0           |
+| $C$         | 4    | 6    | 7    | 9    | 3           |
+| $D$ (dummy) | 3    | 3    | 3    | 9    | 6           |
+| $E$         | 3    | 8    | 3    | 8    | 0           |
+| $F$         | 6    | 9    | 9    | 12   | 3           |
+| $G$         | 8    | 12   | 8    | 12   | 0           |
+
+The earliest-start schedule is:
+
+| Activity    | Start | Finish | Resource $R$ |
+| ----------- | ----- | ------ | ------------ |
+| $A$         | 0     | 4      | 1            |
+| $B$         | 0     | 3      | 1            |
+| $C$         | 4     | 6      | 1            |
+| $D$ (dummy) | 3     | 3      | 0            |
+| $E$         | 3     | 8      | 2            |
+| $F$         | 6     | 9      | 3            |
+| $G$         | 8     | 12     | 0            |
+
+The resource profile is:
+
+| Time period | Running activities | Demand for $R$ |
+| ----------- | ------------------ | -------------- |
+| $0$–$3$     | $A$, $B$           | $1 + 1 = 2$    |
+| $3$–$4$     | $A$, $E$           | $1 + 2 = 3$    |
+| $4$–$6$     | $C$, $E$           | $1 + 2 = 3$    |
+| $6$–$8$     | $E$, $F$           | $2 + 3 = 5$    |
+| $8$–$9$     | $F$                | $3$            |
+| $9$–$12$    | none               | $0$            |
+
+The peak demand is $5$ during $6$–$8$. Activity $F$ has total float $3$, so its start can move from $6$ to its latest start time $9$. Its predecessor activities still finish before it starts. Activity $G$ remains on its critical path and still finishes at time $12$.
+
+The smoothed schedule is:
+
+| Activity    | Start | Finish | Resource $R$ |
+| ----------- | ----- | ------ | ------------ |
+| $A$         | 0     | 4      | 1            |
+| $B$         | 0     | 3      | 1            |
+| $C$         | 4     | 6      | 1            |
+| $D$ (dummy) | 3     | 3      | 0            |
+| $E$         | 3     | 8      | 2            |
+| $F$         | 9     | 12     | 3            |
+| $G$         | 8     | 12     | 0            |
+
+The new resource profile is:
+
+| Time period | Running activities | Demand for $R$ |
+| ----------- | ------------------ | -------------- |
+| $0$–$3$     | $A$, $B$           | $1 + 1 = 2$    |
+| $3$–$4$     | $A$, $E$           | $1 + 2 = 3$    |
+| $4$–$6$     | $C$, $E$           | $1 + 2 = 3$    |
+| $6$–$8$     | $E$                | $2$            |
+| $8$–$9$     | none               | $0$            |
+| $9$–$12$    | $F$                | $3$            |
+
+The peak demand falls from $5$ to $3$. The project duration remains $12$, and every precedence relationship remains satisfied.
+
+</Solution>

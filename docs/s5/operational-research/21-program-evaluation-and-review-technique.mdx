@@ -1,0 +1,175 @@
+---
+title: Program Evaluation and Review Technique
+dateCreated: 2026-10-25T08:43:25.365Z
+lastUpdatedOn: 2026-10-25T08:45:26.712Z
+---
+
+Program Evaluation and Review Technique (PERT) estimates project duration when activity times are uncertain. It uses 3 time estimates for each activity and models the resulting project duration with a normal distribution.
+
+## Time Estimates
+
+PERT uses 3 estimates for every activity:
+
+- Optimistic time  
+  The shortest realistic duration when execution conditions are favourable.
+- Most likely time  
+  The duration expected under normal execution conditions.
+- Pessimistic time  
+  The longest realistic duration under unfavourable conditions, excluding catastrophes.
+
+Let $a$, $m$, and $b$ denote the optimistic, most likely, and pessimistic times.
+
+## Expected Activity Time
+
+The expected time of an activity is a weighted average:
+
+$$
+t_e = \frac{a + 4m + b}{6}
+$$
+
+The most likely time receives 4 times the weight of either extreme estimate.
+
+## Activity Variance
+
+PERT estimates the activity variance with:
+
+$$
+\sigma^2 = \left(\frac{b-a}{6}\right)^2
+$$
+
+The activity standard deviation is:
+
+$$
+\sigma = \frac{b-a}{6}
+$$
+
+Greater uncertainty between the optimistic and pessimistic times produces a larger variance.
+
+## Project Duration
+
+Construct the project network using the expected activity times. Apply the [critical path method](/s5/operational-research/project-network) to identify the critical path.
+
+The expected project duration is the sum of expected activity times on the critical path:
+
+$$
+T_e = \sum_{i \in C} t_{e,i}
+$$
+
+The project variance is approximated by the sum of the variances on the critical path:
+
+$$
+\sigma_T^2 = \sum_{i \in C} \sigma_i^2
+$$
+
+The project standard deviation is:
+
+$$
+\sigma_T = \sqrt{\sigma_T^2}
+$$
+
+## Completion Probability
+
+For a target completion time $D$, the standard normal score is:
+
+$$
+Z = \frac{D-T_e}{\sigma_T}
+$$
+
+The probability of completing by $D$ is approximated by the standard normal cumulative distribution function:
+
+$$
+P(T \le D) = \Phi(Z)
+$$
+
+A positive $Z$ means the target is later than the expected project duration. A negative $Z$ means the target is earlier.
+
+## Assumptions
+
+PERT uses the following approximations:
+
+- Activity times follow beta distributions.
+- Activity durations are statistically independent.
+- The critical path remains unchanged near the target completion time.
+- The project duration is approximately normally distributed.
+
+The normal approximation becomes less reliable when several paths have similar expected durations or when activity durations are strongly correlated.
+
+## Steps
+
+1. List every activity, its predecessors, and its optimistic, most likely, and pessimistic times.
+2. Calculate the expected time and variance of every activity.
+3. Construct the network using the expected activity times.
+4. Apply the critical path method.
+5. Sum the expected times and variances on the critical path.
+6. Calculate the standard normal score for any target completion time.
+7. Read the completion probability from the standard normal distribution.
+
+## Worked Example
+
+A project has 5 activities with the following precedence relationships and time estimates.
+
+| Activity | Predecessor | $a$ | $m$ | $b$ |
+| -------- | ----------- | --- | --- | --- |
+| $A$      | none        | 2   | 4   | 6   |
+| $B$      | $A$         | 1   | 2   | 3   |
+| $C$      | $A$         | 2   | 5   | 8   |
+| $D$      | $B$, $C$    | 1   | 3   | 5   |
+| $E$      | $C$         | 1   | 2   | 3   |
+
+Calculate the expected project duration and the probability of completing the project within $14$ time units.
+
+<Solution>
+
+For each activity:
+
+$$
+t_e = \frac{a + 4m + b}{6},
+\qquad
+\sigma^2 = \left(\frac{b-a}{6}\right)^2
+$$
+
+| Activity | $t_e$                   | $\sigma^2$                                   |
+| -------- | ----------------------- | -------------------------------------------- |
+| $A$      | $\dfrac{2+4(4)+6}{6}=4$ | $\left(\dfrac{6-2}{6}\right)^2=\dfrac{4}{9}$ |
+| $B$      | $\dfrac{1+4(2)+3}{6}=2$ | $\left(\dfrac{3-1}{6}\right)^2=\dfrac{1}{9}$ |
+| $C$      | $\dfrac{2+4(5)+8}{6}=5$ | $\left(\dfrac{8-2}{6}\right)^2=1$            |
+| $D$      | $\dfrac{1+4(3)+5}{6}=3$ | $\left(\dfrac{5-1}{6}\right)^2=\dfrac{4}{9}$ |
+| $E$      | $\dfrac{1+4(2)+3}{6}=2$ | $\left(\dfrac{3-1}{6}\right)^2=\dfrac{1}{9}$ |
+
+The possible paths and their expected durations are:
+
+| Path            | Expected duration |
+| --------------- | ----------------- |
+| $A \to B \to D$ | $4 + 2 + 3 = 9$   |
+| $A \to C \to D$ | $4 + 5 + 3 = 12$  |
+| $A \to C \to E$ | $4 + 5 + 2 = 11$  |
+
+The critical path is $A \to C \to D$. Therefore:
+
+$$
+T_e = 4 + 5 + 3 = 12
+$$
+
+$$
+\sigma_T^2 = \frac{4}{9} + 1 + \frac{4}{9} = \frac{17}{9}
+$$
+
+$$
+\sigma_T = \sqrt{\frac{17}{9}} = \frac{\sqrt{17}}{3} \approx 1.37
+$$
+
+For the target duration $D=14$:
+
+$$
+Z = \frac{14-12}{1.37} \approx 1.46
+$$
+
+The standard normal cumulative distribution gives:
+
+$$
+P(T \le 14) = \Phi(1.46) \approx 0.928
+$$
+
+The probability of completing the project within $14$ time units is approximately $92.8\%$.
+
+</Solution>
