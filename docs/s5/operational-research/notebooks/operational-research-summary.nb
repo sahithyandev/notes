@@ -641,6 +641,75 @@ ToString[#[[4]]]] &, acts]],
     GraphLayout -> \"LayeredDigraphEmbedding\"]]\
 \>", "Input",ExpressionUUID->"1ff03cf7-f3da-4f02-8766-83655e695969"],
 
+Cell["Program Evaluation and Review Technique", "Section",ExpressionUUID->"A13B24C5-D6E7-4890-F1A2-B3C4D5E6F7A8"],
+
+Cell["PERT activities are represented as {name, predecessors, optimistic time, most likely time, pessimistic time}. The project is represented by a list of paths from the start to the finish.", "Text",ExpressionUUID->"B24C35D6-E7F8-4901-A2B3-C4D5E6F7A8B9"],
+
+Cell["\<\
+pertExpected::usage = \"pertExpected[activity] returns the expected time of a PERT activity. activity is {name, predecessors, a, m, b}.\";
+pertExpected[{_, _, a_, m_, b_}] := (a + 4 m + b)/6;
+
+pertVariance::usage = \"pertVariance[activity] returns the PERT variance of an activity.\";
+pertVariance[{_, _, a_, _, b_}] := ((b - a)/6)^2;
+
+pertProject::usage = \"pertProject[activities, paths] returns the expected duration, variance, standard deviation and critical path of a PERT project.\";
+pertProject[activities_List, paths_List] := Module[{times, variances, durations, critical, projectVariance},
+  times = AssociationThread[activities[[All, 1]], pertExpected /@ activities];
+  variances = AssociationThread[activities[[All, 1]], pertVariance /@ activities];
+  durations = Total[Lookup[times, #]] & /@ paths;
+  critical = First@MaximalBy[paths, Total[Lookup[times, #]] &];
+  projectVariance = Total[Lookup[variances, critical]];
+  Association[\"duration\" -> Max[durations],
+    \"variance\" -> projectVariance,
+    \"standardDeviation\" -> Sqrt[projectVariance],
+    \"criticalPath\" -> critical,
+    \"pathDurations\" -> AssociationThread[paths, durations]]]
+
+pertCompletionProbability::usage = \"pertCompletionProbability[project, target] returns the approximate probability of completing a PERT project by target.\";
+pertCompletionProbability[project_Association, target_] := CDF[NormalDistribution[project[\"duration\"], project[\"standardDeviation\"]], target]
+\
+\>", "Input",ExpressionUUID->"C35D46E7-F8A9-4012-B3C4-D5E6F7A8B9C0"],
+
+Cell["Resource Management", "Section",ExpressionUUID->"D46E57F8-A9B0-4123-C4D5-E6F7A8B9C0D1"],
+
+Cell["Resource activities are represented as {name, duration, predecessors, resource demand}. A schedule is an association from activity names to start times.", "Text",ExpressionUUID->"E57F68A9-B0C1-4234-D5E6-F7A8B9C0D1E2"],
+
+Cell["\<\
+resourceDuration::usage = \"resourceDuration[activities, name] returns the duration of an activity.\";
+resourceDuration[activities_List, name_] := Select[activities, First[#] == name &][[1, 2]];
+
+resourcePredecessors::usage = \"resourcePredecessors[activities, name] returns the predecessors of an activity.\";
+resourcePredecessors[activities_List, name_] := Select[activities, First[#] == name &][[1, 3]];
+
+resourceDemand::usage = \"resourceDemand[activities, name] returns the resource demand of an activity.\";
+resourceDemand[activities_List, name_] := Select[activities, First[#] == name &][[1, 4]];
+
+resourceEarliestStarts::usage = \"resourceEarliestStarts[activities, order] returns the earliest-start schedule for a topological activity order.\";
+resourceEarliestStarts[activities_List, order_List] := Module[{starts = <||>},
+  Do[AssociateTo[starts, name -> Max[Join[{0},
+      (starts[#] + resourceDuration[activities, #] & /@
+        resourcePredecessors[activities, name])]]], {name, order}];
+  starts]
+
+resourceProfile::usage = \"resourceProfile[activities, order, starts] returns {time, running activities, total demand} for each integer time.\";
+resourceProfile[activities_List, order_List, starts_Association] := Module[{finish, projectFinish},
+  finish[name_] := starts[name] + resourceDuration[activities, name];
+  projectFinish = Max[finish /@ order];
+  Table[{t, Select[order, starts[#] <= t < finish[#] &],
+    Total[resourceDemand[activities, #] & /@
+      Select[order, starts[#] <= t < finish[#] &]]}, {t, 0, projectFinish - 1}]]
+
+resourceFeasibleQ::usage = \"resourceFeasibleQ[activities, order, starts, capacity, deadline] returns True when precedence, capacity and deadline constraints are satisfied.\";
+resourceFeasibleQ[activities_List, order_List, starts_Association, capacity_, deadline_] := Module[{finish, profile},
+  finish[name_] := starts[name] + resourceDuration[activities, name];
+  profile = resourceProfile[activities, order, starts];
+  And @@ Table[starts[name] >= Max[Join[{0},
+      (finish[#] & /@ resourcePredecessors[activities, name])]], {name, order}] &&
+  And @@ Table[finish[name] <= deadline, {name, order}] &&
+  And @@ Thread[profile[[All, 3]] <= capacity]]
+\
+\>", "Input",ExpressionUUID->"F68A79B0-C1D2-4345-E6F7-A8B9C0D1E2F3"],
+
 Cell["Game Theory", "Section",ExpressionUUID->"0c395624-b66b-4cfc-be0a-5ba2b5e4d712"],
 
 Cell["\<\

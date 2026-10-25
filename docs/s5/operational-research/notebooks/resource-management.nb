@@ -1,0 +1,70 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+Notebook[{
+Cell["Resource Management", "Title",ExpressionUUID->"6A9B9A1A-9A7F-45A5-8A34-7C0F1F35F7A1"],
+
+Cell["Companion to docs/s5/operational-research/23-resource-management.mdx. Builds an earliest-start schedule, computes the resource profile, levels an over-allocated schedule by moving noncritical activities to their latest feasible starts, and searches for a smoother feasible schedule. Each activity is {name, duration, predecessors, resource demand}.", "Text",ExpressionUUID->"9E4D3A13-7E5A-4B5F-9CF3-2AE0E23B4B6F"],
+
+Cell["Parameters: edit these and re-evaluate the notebook", "Subsection",ExpressionUUID->"D4AF9AF8-8B8B-4DC5-AE0B-3A4B3F6C6B8C"],
+
+Cell["activities = {{\"A\", 4, {}, 1}, {\"B\", 3, {}, 1}, {\"C\", 2, {\"A\"}, 1}, {\"D\", 0, {\"B\"}, 0}, {\"E\", 5, {\"B\"}, 2}, {\"F\", 3, {\"C\", \"D\"}, 3}, {\"G\", 4, {\"E\"}, 0}};", "Input",ExpressionUUID->"B3F8E2D4-BC38-4EA2-8B26-2CC2D15B59AA"],
+
+Cell["order = {\"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\"}; capacity = 3; deadline = 12;", "Input",ExpressionUUID->"E5F0A2A5-6D01-4B3B-9E2E-A3F2D9D94610"],
+
+Cell["duration[n_] := Select[activities, First[#] == n &][[1, 2]]; predecessors[n_] := Select[activities, First[#] == n &][[1, 3]]; demand[n_] := Select[activities, First[#] == n &][[1, 4]]; successors[n_] := Select[activities, MemberQ[#[[3]], n] &][[All, 1]];", "Input",ExpressionUUID->"9B8C4F56-C4D1-4D0F-99B9-1A5A2DBB3785"],
+
+Cell["Earliest-start schedule", "Subsection",ExpressionUUID->"1A2B6F5D-8D6A-4E2D-B2BD-6D15F22ACB0D"],
+
+Cell["earliest = <||>; Do[AssociateTo[earliest, n -> Max[Join[{0}, (earliest[#] + duration[#] & /@ predecessors[n])]]], {n, order}];", "Input",ExpressionUUID->"D7D1B5E8-4A5F-48DC-AE7D-019CE4BC06E6"],
+
+Cell["finish[s_, n_] := s[n] + duration[n]; scheduleTable[s_] := Table[{n, s[n], finish[s, n], latest[n] - s[n]}, {n, order}];", "Input",ExpressionUUID->"A40E13D1-8E7E-4D4A-9A72-3BA7B0C0A4F9"],
+
+Cell["projectFinish = Max[finish[earliest, #] & /@ order]; If[deadline < projectFinish, deadline = projectFinish]; projectFinish", "Input",ExpressionUUID->"C0D5E1E6-3EAF-4557-AED1-1537F3E0B5E6"],
+
+Cell["latest = <||>; Do[succ = successors[n]; lf = If[succ === {}, deadline, Min[latest[#] & /@ succ]]; AssociateTo[latest, n -> lf - duration[n]], {n, Reverse[order]}];", "Input",ExpressionUUID->"A54AA46E-9E5F-4FA8-A6B0-7C6D1E4B76CF"],
+
+Cell["Grid[Prepend[scheduleTable[earliest], {\"activity\", \"start\", \"finish\", \"total float\"}], Frame -> All]", "Input",ExpressionUUID->"B2E2CE9A-C4CF-4D6D-A6B0-81D7BF6DE0D4"],
+
+Cell["Critical activities", "Subsection",ExpressionUUID->"D1F6C6D8-A1AE-4E1C-AF9E-07ED9B2BE7B7"],
+
+Cell["critical = Select[order, latest[#] == earliest[#] &]; critical", "Input",ExpressionUUID->"A8D9F5A1-6F67-4E0C-BB0C-59F0D8A6E24C"],
+
+Cell["Resource profile", "Subsection",ExpressionUUID->"F5D1D4EF-79F4-4A44-AE99-77B35EDE0E15"],
+
+Cell["profile[s_] := Table[{t, Select[order, s[#] <= t && t < finish[s, #] &], Total[demand /@ Select[order, s[#] <= t && t < finish[s, #] &]]}, {t, 0, deadline - 1}]; profileTable[s_] := Grid[Prepend[profile[s], {\"period\", \"running activities\", \"demand\"}], Frame -> All];", "Input",ExpressionUUID->"0E6BB6FA-2FA8-4D46-8CB5-DB6D0ED9B5C4"],
+
+Cell["profileTable[earliest]", "Input",ExpressionUUID->"D67E50D0-6B37-4515-9C61-4B3AE5F6C6D0"],
+
+Cell["Leveling", "Subsection",ExpressionUUID->"E9E2F6A7-3F2E-4D25-8F4C-6F50C94216A6"],
+
+Cell["levelSchedule = earliest; levelLog = {}; While[True, overloaded = Select[profile[levelSchedule], Last[#] > capacity &]; If[overloaded === {}, Break[]]; t = overloaded[[1, 1]]; active = Select[order, levelSchedule[#] <= t && t < finish[levelSchedule, #] &]; candidates = Select[active, ! MemberQ[critical, #] && latest[#] > levelSchedule[#] &]; If[candidates === {}, AppendTo[levelLog, {t, \"capacity cannot be met without extending the project\"}]; Break[]]; move = First@SortBy[candidates, {- (latest[#] - levelSchedule[#]), #} &]; old = levelSchedule[move]; AssociateTo[levelSchedule, move -> latest[move]]; AppendTo[levelLog, {move, old, latest[move]}]];", "Input",ExpressionUUID->"5B3B7A5A-7A26-438B-A1D0-1AAE91F1C7D9"],
+
+Cell["levelLog", "Input",ExpressionUUID->"B5C83243-8E2E-4E7F-A1CD-6A9C87E6CF3E"],
+
+Cell["Grid[Prepend[scheduleTable[levelSchedule], {\"activity\", \"start\", \"finish\", \"total float\"}], Frame -> All]", "Input",ExpressionUUID->"C0F55995-0DBB-47E0-A2ED-A65CFB1DE2CB"],
+
+Cell["profileTable[levelSchedule]", "Input",ExpressionUUID->"7E9F5F67-6B99-4F8F-BAA7-B1B7419D50A2"],
+
+Cell["Smoothing", "Subsection",ExpressionUUID->"D4C8A9F6-CE19-4D08-9A05-2C8D1A6C1C4D"],
+
+Cell["descendants[n_] := FixedPoint[Union[#, Flatten[successors /@ #]] &, successors[n]]; shiftSchedule[s_, root_, delta_] := Module[{ns = Association[s], group = Prepend[descendants[root], root]}, Do[AssociateTo[ns, n -> s[n] + delta], {n, group}]; ns]; feasibleQ[s_] := And @@ Join[Table[s[n] >= Max[Join[{0}, (finish[s, #] & /@ predecessors[n])]], {n, order}], Table[finish[s, n] <= deadline, {n, order}], Thread[Last /@ profile[s] <= capacity]]; score[s_] := Total[(Last /@ profile[s] - Mean[Last /@ profile[s]])^2];", "Input",ExpressionUUID->"9F4B2E6E-8E19-4E15-A3DC-0D12E8B5C7D0"],
+
+Cell["smoothSchedule = levelSchedule; While[True, trials = Flatten[Table[If[latest[root] > smoothSchedule[root], With[{trial = shiftSchedule[smoothSchedule, root, delta]}, If[feasibleQ[trial], {{score[trial], trial, root, delta}}, {}]], {}], {root, Select[order, ! MemberQ[critical, #] &]}, {delta, 1, Max[0, latest[root] - smoothSchedule[root]]}], 2]; If[trials === {}, Break[]]; best = First@SortBy[trials, First]; If[best[[1]] >= score[smoothSchedule], Break[]]; smoothSchedule = best[[2]]; AppendTo[levelLog, {\"smooth\", best[[3]], best[[4]]}]];", "Input",ExpressionUUID->"1A2D6CE7-1DF3-48FA-8F9D-9B2AE3A9818D"],
+
+Cell["Grid[Prepend[scheduleTable[smoothSchedule], {\"activity\", \"start\", \"finish\", \"total float\"}], Frame -> All]", "Input",ExpressionUUID->"B7E7C1D8-EC24-4C6B-ACBA-472B8F63D305"],
+
+Cell["profileTable[smoothSchedule]", "Input",ExpressionUUID->"A9C1C0C8-4B82-49F5-97D7-20F3A0F6A3EA"],
+
+Cell["The final table keeps every activity within its precedence bounds, satisfies the resource capacity, and preserves the project deadline. Change activities, capacity, or deadline above to explore other leveling and smoothing decisions.", "Text",ExpressionUUID->"E4E27E5C-7B45-4638-BD72-3E0D0AA2D807"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit) (July 8, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"B5F8F3B9-7B9B-48B4-A46C-B8E9B16B9344"
+]
