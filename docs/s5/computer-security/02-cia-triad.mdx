@@ -4,7 +4,7 @@ prereqs:
   - s4/operating-systems-security/cia-triad
   - s4/operating-systems-security/access-control
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-09-28T05:07:13.808Z
+lastUpdatedOn: 2026-10-26T15:29:58.212Z
 ---
 
 The 3 basic actions of a person on an item of data: viewing (confidentiality), modifying (integrity), using (availability).
@@ -103,6 +103,12 @@ Rules:
 
 Information flows only upward. A discretionary access matrix applies on top. Declassification needs a trusted subject outside the rules. Says nothing about integrity.
 
+Examples:
+
+- A military analyst with Secret clearance and the Nuclear compartment can read a Secret Nuclear report.
+- The analyst cannot read a Top Secret Nuclear report, since its rank exceeds the analyst's clearance.
+- The analyst cannot copy a Secret Nuclear report into an Unclassified briefing, since that would write information down.
+
 <Note>
 
 These policies cannot be represented using an [access control matrix](/s4/operating-systems-security/access-control#access-control-matrix), since the matrix has no notion of a dominance relation between classes.
@@ -122,19 +128,17 @@ Rules:
 
 Information flows only downward in integrity. Untrusted data cannot reach a high-integrity subject.
 
+Examples:
+
+- A production deployment service accepts release artifacts signed by the build system.
+- It does not use a script downloaded from an employee's email as a deployment artifact, since the script has lower integrity.
+- A junior clerk can enter an expense claim into a low-integrity queue but cannot alter the approved accounting ledger.
+
 ### Separation of Duty
 
 Separation of duty requires that a sensitive action need approval from 2 or more distinct authorized people, so no single person can act alone.
 
-- A check over $10,000 is only valid if signed by 2 authorized people.
-- The 2 signers must be different people.
-- The policy involves both role membership and an inequality between the signers, which a matrix entry cannot express.
-
-<Note>
-
 This policy cannot be represented using an [access control matrix](/s4/operating-systems-security/access-control#access-control-matrix), since the matrix has no notion of a relationship between 2 permissions.
-
-</Note>
 
 ### Chinese Wall Model
 
@@ -161,9 +165,9 @@ The Chinese wall policy cannot be represented using an [access control matrix](/
 
 Examples:
 
-- Lawyers $L_1$ and $L_2$ work at the same firm.
-- If company $C_1$ competes with $C_2$, $L_1$ and $L_2$ can each work for either $C_1$ or $C_2$, but no lawyer can work for both competing firms.
-- Whether a permission is granted depends on which other permissions that subject has already used.
+- An investment-bank analyst reviews confidential records for company $C_1$.
+- If $C_1$ and $C_2$ compete, the analyst cannot later review company $C_2$'s records.
+- Another analyst who has not accessed either dataset can work for $C_2$.
 
 ### Capabilities in Amoeba
 

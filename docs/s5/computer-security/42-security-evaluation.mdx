@@ -1,88 +1,247 @@
 ---
 title: Security Evaluation
 dateCreated: 2026-10-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-19T12:09:02.889Z
+lastUpdatedOn: 2026-10-26T15:29:58.667Z
 ---
 
-Security evaluation frameworks give independent assurance about a product or the process that built it. The 3 frameworks cover different targets and do not replace each other.
+Security evaluation determines whether a system meets stated security requirements under stated conditions. A system supported by sufficient assurance evidence is a trusted system.
 
-| Framework       | Evaluates                           |
-| --------------- | ----------------------------------- |
-| Common Criteria | Security of an IT product or system |
-| FIPS 140-3      | Cryptographic module                |
-| SSE-CMM         | Maturity of engineering processes   |
+An evaluation methodology defines:
 
-A project needing both high cryptographic assurance and functional security validation combines FIPS 140-3 for the cryptographic module with a Common Criteria evaluation of the whole system.
+- Security functional requirements for the system.
+- Assurance requirements for establishing that the system meets its functional requirements.
+- A method for analyzing assurance evidence.
+- A level of trust derived from the evaluation result.
+
+Independent experts assess whether requirements are complete, consistent, technically sound, and sufficient against the identified threats. They also assess the documentation needed to configure, administer, and use the system securely.
+
+| Framework       | Evaluates                                  |
+| --------------- | ------------------------------------------ |
+| TCSEC           | Security of trusted computer systems       |
+| FIPS 140        | Cryptographic modules                      |
+| Common Criteria | Security of an IT product or system        |
+| SSE-CMM         | Maturity of security-engineering processes |
+
+## Trusted Computer System Evaluation Criteria
+
+<Aka>TCSEC, Orange Book</Aka>. A United States Department of Defense evaluation
+standard used from 1983 to 1999. The Rainbow Series extended it with criteria
+for specific areas.
+
+TCSEC was strongly influenced by the [Bell-LaPadula model](/s5/computer-security/information-flow-control) and the reference monitor concept. It emphasizes confidentiality. The \*-property addresses integrity.
+
+### Functional Requirements
+
+- Discretionary access control \
+  Controls sharing of named objects, access-right propagation, access-control lists, and the granularity of controls.
+- Object reuse \
+  Prevents recovery of data left in disk or memory resources from a previous use.
+- Mandatory access control \
+  Required at class B1 and above. Enforces the simple-security condition and \*-property through a hierarchy of labels.
+- Labels \
+  Required at class B1 and above. Represent classifications and clearances, and preserve labels when information is exported or shown to people.
+- Identification and authentication \
+  Protects authentication data and associates identities with auditable actions.
+- Audit \
+  Defines the audit records and events to record. The required event set grows with the evaluation class.
+- Trusted path \
+  Required at class B2 and above. Provides a communication path guaranteed between the user and the trusted computing base.
+- System architecture \
+  Requires a tamperproof reference validation mechanism, process isolation, least privilege, and well-defined interfaces.
+- Trusted facility management \
+  Required at class B2 and above. Separates operator and administrator roles.
+- Trusted recovery \
+  Required at class A1. Recovers securely after a failure or discontinuity.
+- System integrity \
+  Uses hardware diagnostics to validate the trusted computing base hardware and firmware at the installation site.
+
+### Assurance Requirements
+
+- Configuration management \
+  Required at class B2 and above. Identifies configuration items and maintains consistent mappings among documentation, code, and trusted-computing-base build tools.
+- Architecture \
+  Requires modularity and limited complexity. A full reference validation mechanism is required at class B3.
+- Trusted distribution \
+  Required at class A1. Preserves the integrity of the mapping between master copies and installed versions, including acceptance procedures.
+- Design specification and verification \
+  Strengthens from an informal security-policy model at B1 to a formal top-level specification and a verified source-code mapping at A1.
+- Testing \
+  Checks conformance with claims, resistance to penetration, and correction of flaws. Some classes require covert-channel analysis.
+- Product documentation \
+  Includes a Security Features User's Guide, a Trusted Facility Manual, and supporting test and design documentation.
+
+### Evaluation Classes
+
+| Class | Protection                                                                                                                                                                                   |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D     | Does not meet the requirements of another class.                                                                                                                                             |
+| C1    | Discretionary protection with identification, authentication, and discretionary access control.                                                                                              |
+| C2    | Controlled access protection with object reuse, auditing, and stricter security testing.                                                                                                     |
+| B1    | Labeled security protection with mandatory access control for some objects, labels, and an informal security-policy model.                                                                   |
+| B2    | Structured protection with a formal security-policy model, mandatory access control for all objects, a trusted path, least privilege, covert-channel analysis, and configuration management. |
+| B3    | Security domains with a full reference validation mechanism, stronger trusted-path requirements, and further design and documentation controls.                                              |
+| A1    | Verified protection with formal methods, trusted distribution, and a verified correspondence between code and the formal top-level specification.                                            |
+
+### TCSEC Evaluation Process
+
+The TCSEC evaluation process had 3 stages:
+
+- Application \
+  The vendor requests evaluation. The request can be denied when the government has no need for the product.
+- Preliminary technical review \
+  Evaluators and the vendor discuss the process, schedule, development process, and technical material. They establish an evaluation schedule.
+- Evaluation phase \
+  A technical review board approves each part before the next begins.
+
+The evaluation phase includes:
+
+- Design analysis \
+  Evaluators review the documented design and prepare an initial product assessment report. They do not review source code at this stage.
+- Test analysis \
+  Evaluators analyze vendor tests and their own tests.
+- Final evaluation report \
+  After approval and closure of all items, the product receives its rating.
+
+The Ratings Maintenance Program maintained assurance for a new version of an evaluated product. The vendor updated its assurance evidence, and the technical review board could assign the existing rating to the new version. A major structural change or new function could require a full evaluation.
+
+### Limitations and Contributions
+
+TCSEC was written for operating systems. The National Computer Security Center issued interpretations for networks and databases, but the criteria did not cover applications well. Its focus on United States government needs made mandatory access control unnecessary for many commercial products. It did not adequately address integrity or availability.
+
+The evaluation process was resource-intensive and slow. Requirements expanded and changed as evaluators interpreted the criteria for product types, creating inconsistency over time. TCSEC also combined assurance and functionality in its classes, and its results were recognized only in the United States.
+
+TCSEC introduced assurance-based evaluation, rigorous design and implementation analysis, and high technical standards. It raised commercial awareness of computer security and influenced the Federal Criteria and Common Criteria.
+
+## FIPS 140
+
+FIPS 140 evaluates cryptographic modules that implement cryptographic logic or processes. It evaluates only the module. For software modules, the executing processor and operating system can fall within the evaluation boundary.
+
+FIPS 140 has 4 increasing security levels. It covers module design, documentation, roles, key management, testing, interfaces, finite-state behavior, physical security, and attack mitigation.
+
+### Security Levels
+
+- Level 1 \
+  Uses approved cryptographic algorithms and production-grade equipment. No physical security mechanism is required. Software and firmware may run on a general-purpose system with an unevaluated operating system.
+- Level 2 \
+  Adds tamper-evident coatings, seals, or pick-resistant locks. It requires role-based authentication. Software and firmware on a multiuser system require an operating system evaluated at Common Criteria EAL2 or an equivalent level.
+- Level 3 \
+  Adds physical protection against access to critical security parameters and requires identity-based authentication. It places stronger controls on reading and changing critical security parameters. Software and firmware require an EAL3 operating system or an equivalent trusted operating system.
+- Level 4 \
+  Adds an envelope of protection that detects and responds to unauthorized physical access and environmental conditions outside the module's operating range. Software and firmware require the functional requirements of Level 3 and assurance comparable to EAL4.
 
 ## Common Criteria
 
-Common Criteria (ISO/IEC 15408) evaluates the security functions of a product and the assurance gained in building it. An accredited third-party laboratory performs the evaluation, and results are recognized internationally under the CCRA.
+<Aka>CC, ISO/IEC 15408</Aka>. Common Criteria evaluates security functions of an
+IT product or system and the assurance gained while building it. An accredited
+third-party laboratory performs the evaluation under a national evaluation
+scheme.
 
-### Terminology
+### Terms
 
 - Target of Evaluation
   <Aka>TOE</Aka>. The product or system being evaluated.
+- TOE Security Policy
+  <Aka>TSP</Aka>. The rules regulating how the TOE manages, protects, and
+  distributes assets.
+- TOE Security Functions
+  <Aka>TSF</Aka>. The hardware, software, and firmware relied upon to enforce
+  the TSP. It generalizes the trusted computing base.
 - Protection Profile
-  <Aka>PP</Aka>. An implementation-independent statement of security
-  requirements for a category of products, such as next-generation firewalls or
-  enterprise routers.
+  <Aka>PP</Aka>. An implementation-independent set of security requirements for
+  a category of products or systems.
 - Security Target
-  <Aka>ST</Aka>. An implementation-dependent statement of what a specific TOE
-  claims to provide.
+  <Aka>ST</Aka>. The security requirements and specifications used to evaluate
+  an identified product or system.
 - Evaluation Assurance Level
-  <Aka>EAL</Aka>. The depth and rigor of the evaluation.
+  <Aka>EAL</Aka>. The rigor and depth of assurance activities.
 
-An ST that claims conformance to a PP must show strict compliance or demonstrable equivalence to it. A product that satisfies its own ST but whose ST omits requirements mandated by the applicable PP fails certification.
+### Protection Profiles
+
+A protection profile defines security requirements for a family of products, such as firewalls or desktop systems. It selects functional and assurance requirements from Common Criteria and can add further requirements.
+
+A protection profile contains:
+
+- Introduction \
+  Identifies and summarizes the profile.
+- Product or system family description \
+  Describes the product type and its general features.
+- Security environment \
+  States assumptions, threats to assets, and organizational security policies.
+- Security objectives \
+  Traces objectives for the product and its environment back to threats, policies, and assumptions.
+- IT security requirements \
+  Specifies functional and assurance requirements.
+- Rationale \
+  Shows that objectives and requirements are complete, consistent, technically sound, and traceable.
+
+### Security Targets
+
+A security target applies requirements to a specific TOE. It can derive from a protection profile or directly from Common Criteria. A security target based on a profile can reference that profile directly.
+
+A security target contains the product description, security environment, security objectives, IT security requirements, a summary specification, protection-profile claims, and a rationale. The summary specification describes the TOE security functions and assurance measures. The rationale traces these measures back to the stated requirements.
+
+### Common Criteria Evaluation Process
+
+An evaluator selects an appropriate protection profile and develops a security target. When no suitable protection profile exists, the evaluator develops the security target directly from Common Criteria.
+
+The evaluator first checks the security target against assurance class ASE for completeness, consistency, and technical soundness. The evaluator then assesses the TOE against the security target.
+
+Common Criteria has both functional and assurance requirements. Requirements are organized into classes, families, and components. EALs are built from assurance requirements.
 
 ### Evaluation Assurance Levels
 
-- EAL1  
+- EAL1 \
   Functionally tested.
-- EAL2  
+- EAL2 \
   Structurally tested.
-- EAL3  
+- EAL3 \
   Methodically tested and checked.
-- EAL4  
-  Methodically designed, tested, and reviewed. The limit of economically feasible security retrofitted onto an existing product.
-- EAL5  
-  Semi-formally designed and tested. Security must be designed in from the start.
-- EAL6  
+- EAL4 \
+  Methodically designed, tested, and reviewed.
+- EAL5 \
+  Semi-formally designed and tested.
+- EAL6 \
   Semi-formally verified design and tested.
-- EAL7  
+- EAL7 \
   Formally verified design and tested.
 
-A higher EAL means more assurance, not more security functions.
+A higher EAL provides more assurance. It does not add security functions.
 
-### Criticism
+## Systems Security Engineering Capability Maturity Model
 
-The process is slow and costly. A certified version is often obsolete by the time certification is granted.
+<Aka>SSE-CMM, ISO/IEC 21827</Aka>. SSE-CMM evaluates the process used to develop
+secure systems. It does not evaluate a system itself.
 
-## FIPS 140-3
+It measures process maturity, not trust. Process capability is the range of results expected from following a process. Process performance measures actual results. Process maturity measures how explicitly a process is defined, managed, measured, controlled, and made effective.
 
-FIPS 140-3 validates cryptographic modules. It checks that the algorithms are approved and correctly implemented, and that the module protects its keys. Common Criteria does not provide this.
+### Process Areas
 
-- Level 1  
-  Basic requirements. Approved algorithms and production-grade components. No physical security mechanisms.
-- Level 2  
-  Adds tamper evidence and role-based authentication.
-- Level 3  
-  Adds tamper resistance and response. The module detects physical tampering and zeroizes its keys. Identity-based authentication.
-- Level 4  
-  Adds a formal model of the module's state transitions and protection against environmental attacks and side-channel analysis such as differential power analysis.
+SSE-CMM includes security-engineering process areas such as:
 
-## SSE-CMM
+- Administering security controls.
+- Assessing security impacts, risks, threats, and vulnerabilities.
+- Building assurance arguments.
+- Coordinating security activities.
+- Monitoring the system security posture.
+- Providing security input.
+- Specifying security needs.
+- Verifying and validating security.
 
-The Systems Security Engineering Capability Maturity Model (ISO/IEC 21827) rates the maturity of an organization's security engineering processes. It does not inspect the technical attributes of a specific product release.
+It also defines project and organizational practices for quality, configuration, risk, technical effort, process improvement, product-line evolution, skills, knowledge, and supplier coordination.
 
-- Level 1  
-  Performed informally.
-- Level 2  
-  Planned and tracked.
-- Level 3  
-  Well defined.
-- Level 4  
-  Quantitatively controlled. The organization measures its processes against defined metrics.
-- Level 5  
-  Continuously improving.
+### Capability Maturity Levels
 
-High maturity makes engineering predictable and lowers systemic risk. It does not guarantee defect-free output, so a Level 5 organization can still ship a design flaw.
+- Performed informally \
+  Base processes are performed.
+- Planned and tracked \
+  The project defines, plans, performs, and verifies the processes.
+- Well defined \
+  The organization defines and refines standard practices, then coordinates their use.
+- Quantitatively controlled \
+  The organization sets measurable quality goals and objectively manages performance.
+- Continuously improving \
+  The organization improves its capability and process effectiveness.
+
+### Evaluation Procedure
+
+The evaluator selects a process area and identifies its goals and base processes. When all base processes are present, the evaluator assesses the maturity of each one. The maturity level for the area is the lowest maturity level among its base processes. A rating profile records and communicates the results.

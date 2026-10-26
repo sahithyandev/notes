@@ -1,7 +1,7 @@
 ---
 title: Principles of Secure System Design
 dateCreated: 2026-09-14T04:38:13.728Z
-lastUpdatedOn: 2026-10-14T05:30:02.496Z
+lastUpdatedOn: 2026-10-26T15:29:58.612Z
 ---
 
 ## Compartmentalization
@@ -50,7 +50,9 @@ A simpler system is easier to verify and has fewer places for a vulnerability to
 
 Open review is effective and informative. Prefer borrowing an existing, reviewed component over building a new one.
 
-## Worked Example: Qmail
+## Case Studies
+
+### Qmail
 
 Sendmail, a complicated mail transport agent with many past vulnerabilities, runs entirely as root: it needs root privilege to bind port 25 and later to write to user mailboxes, but keeps root privilege the whole time even though it is not needed in between.
 
@@ -60,7 +62,7 @@ Qmail, written by Dan Bernstein starting in 1995, applies least privilege throug
 - Only 1 program, `qmail-queue`, is setuid, and only to a dedicated qmail user ID, never to root. Its only function is to add a new message to the queue.
 - Only 1 program, `qmail-lspawn`, runs as root, and only to spawn the local delivery program under the UID and GID of the recipient. It never delivers to root, and always changes its effective UID to the recipient before running a user-specified program.
 
-### Structure
+#### Structure
 
 - `qmail-smtpd` and `qmail-inject` accept incoming mail, over SMTP or otherwise, and pass it to `qmail-queue`.
 - `qmail-queue` splits the message into 3 files, the message contents and 2 copies of the header, then signals `qmail-send`.
@@ -72,7 +74,7 @@ Each qmail process runs under its own dedicated UID: `qmail-smtpd` as `qmaild`, 
 
 Of 20 sample Sendmail security holes, 11 worked only because the entire Sendmail system is setuid. Qmail was offered a $500 reward for a successful attack, and no one has collected it.
 
-## Worked Example: Multics
+### Multics
 
 Multics is an operating system, designed 1964 to 1967 at MIT Project MAC, Bell Labs, and GE, with extensive security mechanisms that influenced many subsequent systems.
 
@@ -81,7 +83,7 @@ Multics is an operating system, designed 1964 to 1967 at MIT Project MAC, Bell L
 - Innovations included segmented virtual memory, a high-level language implementation in PL/1, and a shared memory multiprocessor design.
 - Multics received the first B2 security rating under the Orange Book criteria below, the only system rated that highly for years.
 
-### Ring Structure
+#### Ring Structure
 
 A ring is a domain in which a process executes.
 
@@ -105,7 +107,7 @@ Access to a segment depends on 2 mechanisms:
 
 Interprocess communication in Multics happens through channels.
 
-### Orange Book Criteria
+#### Orange Book Criteria
 
 The Orange Book (TCSEC) rates a system's security from D to A1.
 
@@ -114,11 +116,11 @@ The Orange Book (TCSEC) rates a system's security from D to A1.
 - Level C  
   For environments with cooperating users. C1 requires a protected mode OS, authenticated login, discretionary access control, and security testing and documentation. C2 adds discretionary access control to the level of an individual user, object initialization, and auditing.
 - Level B  
-  All users and objects must be assigned a security label, and the system must enforce the [Bell-LaPadula model](/s5/computer-security/confidentiality-integrity-availability#blp-model). B1 adds classification and Bell-LaPadula. B2 requires a top-down modular design that can be verified, with covert channels analyzed. B3 requires access control lists with users and groups, a formal trusted computing base, adequate security auditing, and secure crash recovery.
+  All users and objects must be assigned a security label, and the system must enforce the [Bell-LaPadula model](/s5/computer-security/cia-triad#blp-model). B1 adds classification and Bell-LaPadula. B2 requires a top-down modular design that can be verified, with covert channels analyzed. B3 requires access control lists with users and groups, a formal trusted computing base, adequate security auditing, and secure crash recovery.
 - Level A1  
   Requires a formal proof of the protection system, a formal proof that the model is correct, a demonstration that the implementation conforms to the model, and a formal covert channel analysis.
 
-## Worked Example: Chrome
+### Chrome
 
 Chrome treats a web browser as an operating system, protecting content based on origin instead of user identity, and leveraging OS isolation mechanisms to enforce it.
 
@@ -128,14 +130,14 @@ Chrome treats a web browser as an operating system, protecting content based on 
 | Principals, users, discretionary access control | Principals, origins, mandatory access control                   |
 | Vulnerabilities, buffer overflow, root exploit  | Vulnerabilities, cross-site scripting, universal scripting      |
 
-### Browser Security Policy
+#### Browser Security Policy
 
 - Frame-frame relationships  
   `canScript(A, B)` asks whether frame $A$ can execute a script that manipulates arbitrary or nontrivial DOM elements of frame $B$. `canNavigate(A, B)` asks whether frame $A$ can change the origin of content shown in frame $B$.
 - Frame-principal relationships  
   `readCookie(A, S)` and `writeCookie(A, S)` ask whether frame $A$ can read or write cookies belonging to site $S$.
 
-### Multi-Process Architecture
+#### Multi-Process Architecture
 
 Chromium separates the browser kernel from the content it renders.
 
@@ -147,7 +149,7 @@ Chromium separates the browser kernel from the content it renders.
 
 The browser kernel and rendering engine communicate over IPC, exchanging HTML and JavaScript for a rendered bitmap.
 
-### Threat Model
+#### Threat Model
 
 - Malware  
   An attacker cannot write arbitrary files.
@@ -158,7 +160,7 @@ The browser kernel and rendering engine communicate over IPC, exchanging HTML an
 - Out of scope  
   Cookie theft, password theft, and similar.
 
-### Design Decisions
+#### Design Decisions
 
 - Compatibility  
   Sites rely on the existing browser security policy, and a browser is only as useful as the sites it can render, which rules out a clean-slate redesign.
@@ -166,7 +168,7 @@ The browser kernel and rendering engine communicate over IPC, exchanging HTML an
   Only the renderer may parse HTML or JavaScript. The kernel enforces a coarse-grained security policy, and the renderer enforces finer-grained policy decisions.
 - Minimize user decisions.
 
-### Leveraging OS Isolation
+#### Leveraging OS Isolation
 
 The sandbox for the rendering engine rests on 4 OS mechanisms: a restricted token, the Windows job object, the Windows desktop object, and, on Windows Vista, integrity levels.
 
@@ -176,11 +178,11 @@ The sandbox for the rendering engine rests on 4 OS mechanisms: a restricted toke
 
 A broker process holds an interception manager and policy engine outside the sandbox, communicating over IPC with each sandboxed target's IPC client and policy engine client.
 
-## Worked Example: Android
+### Android
 
 Android applies OS-level user isolation to individual applications, and uses a reference monitor to mediate communication between them.
 
-### Application Sandbox
+#### Application Sandbox
 
 Each application runs with its own UID, inside its own Dalvik virtual machine.
 
@@ -190,7 +192,7 @@ Each application runs with its own UID, inside its own Dalvik virtual machine.
 
 Each application announces the permissions it requires. A whitelist model asks the user to grant access, but to avoid asking often, every permission question is asked at install time rather than at each use.
 
-### Inter-Component Communication Reference Monitor
+#### Inter-Component Communication Reference Monitor
 
 Android middleware mediates inter-component communication (ICC) between applications, since each application executes as its own user identity and cannot otherwise access another application's components.
 
@@ -198,7 +200,7 @@ Android middleware mediates inter-component communication (ICC) between applicat
 - A component inherits the permission labels of the application that contains it.
 - Component $A$ in one application can access components $B$ and $C$ in another application only if $A$'s permission labels are equal to or dominate the target application's labels.
 
-### Application Components
+#### Application Components
 
 - Activity  
   A one-user task, e.g. scrolling through an inbox. An email client comprises many activities.
@@ -211,7 +213,7 @@ Android middleware mediates inter-component communication (ICC) between applicat
 - Broadcast receiver  
   A mailbox for messages from other applications.
 
-### Exploit Prevention
+#### Exploit Prevention
 
 Android's runtime combines around 100 open source libraries with around 500 million lines of new code, with no obscurity to fall back on since the code is open source.
 

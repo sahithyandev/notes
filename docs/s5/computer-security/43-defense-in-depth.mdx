@@ -1,59 +1,118 @@
 ---
 title: Defense in Depth
 dateCreated: 2026-10-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-14T05:30:02.570Z
+lastUpdatedOn: 2026-10-26T15:29:58.687Z
 ---
 
 Defense in depth deploys multiple, redundant layers of diverse security controls, so the failure of one layer does not compromise the whole system. No single product delivers all the protection a network needs.
 
 See [principles of secure system design](/s5/computer-security/secure-system-design#defense-in-depth) for the underlying principle.
 
-## Layers
-
-- Awareness and commitment
-- Perimeter security (firewall, intrusion detection, perimeter antivirus)
-- Network and system monitoring
-- Access control and authentication
-- Antivirus on hosts
-- Encryption
-- VPN
-- Server integrity
-- Auditing
-
 Each layer sits at a different point between the Internet and the data.
 
-- Perimeter  
-  Edge controls such as [firewalls](/s5/computer-security/firewalls) and DDoS mitigation stop attacks before they overwhelm internal infrastructure.
-- Network  
-  Segmentation and internal firewalls contain a breach.
-- Host  
-  OS security, host-based antivirus, and [server protection](/s5/computer-security/server-protection).
-- Application  
-  Secure coding and a web application firewall.
-- Data  
-  Encryption at rest and in transit.
-- Identity  
-  Authentication and least privilege.
+## Perimeter
 
-## Control Categories
+The perimeter is the boundary between an untrusted network and the organization's network. It filters and monitors traffic before that traffic reaches internal systems.
 
-- Technical controls  
-  Software and hardware mechanisms, such as multi-factor authentication, end-to-end encryption, and endpoint detection and response.
-- Administrative controls  
-  Policies, procedures, and training.
-- Physical controls  
-  Locks, guards, and server room access control.
+- [Firewalls](/s5/computer-security/firewalls) permit only required protocols, ports, and destinations.
+- DDoS mitigation absorbs or filters large volumes of malicious traffic.
+- An intrusion prevention system blocks traffic matching known attacks or policy violations.
+- A demilitarized zone isolates public-facing services from internal systems.
 
-## Network Segmentation
+Examples:
+
+- An Internet-facing firewall permits HTTPS traffic to a web server but blocks remote desktop traffic.
+- A DDoS protection service filters a flood of requests before it reaches the organization's Internet connection.
+
+### Demilitarized Zone
+
+A demilitarized zone (DMZ) holds the publicly available servers, such as web and mail. It is separated from the internal hosts and application servers by firewalls. A compromised public server then does not give direct access to the internal network.
+
+## Network
+
+The network layer limits communication between internal systems. It contains a compromise so that an attacker cannot move freely from an exposed machine to a sensitive system.
+
+- Network segmentation divides systems into zones with different trust levels.
+- Internal firewalls enforce rules between zones.
+- Network access control restricts devices that may join a network.
+- Network monitoring detects unusual connections, scans, and data transfers.
+
+Examples:
+
+- An employee workstation can reach the Internet and application servers but cannot connect directly to the database subnet.
+- A guest wireless network has Internet access but no route to the corporate network.
+
+### Network Segmentation
 
 Network segmentation splits the internal network into zones separated by firewalls, such as Finance and Engineering subnets.
 
 - It restricts lateral movement. An attacker who compromises a machine in 1 subnet cannot freely reach assets in another.
 - It does not remove the need for the perimeter firewall.
 
-### Demilitarized Zone
+## Host
 
-A demilitarized zone (DMZ) holds the publicly available servers, such as web and mail. It is separated from the internal hosts and application servers by firewalls. A compromised public server then does not give direct access to the internal network.
+The host layer protects each endpoint and server after traffic reaches it. It reduces the chance that a compromised account or application becomes full control of a machine.
+
+- OS hardening removes unnecessary services and disables insecure defaults.
+- Patch management fixes vulnerabilities in the OS and installed software.
+- Endpoint protection detects malware and suspicious process behavior.
+- File permissions and local privilege controls restrict access to system resources.
+
+Examples:
+
+- A web server runs only its web service and accepts administrative access only through a managed channel.
+- Endpoint detection software quarantines a downloaded executable that attempts to modify system files.
+
+## Application
+
+The application layer protects the code that processes requests and makes business decisions. It prevents a valid network connection from becoming unauthorized actions or access to data.
+
+- Input validation rejects malformed and unexpected data.
+- Authorization checks run before every access to a protected function or record.
+- Secure session management protects authentication tokens from theft and reuse.
+- A web application firewall filters common HTTP attacks before they reach the application.
+
+Examples:
+
+- A banking application verifies that a customer owns an account before showing its transaction history.
+- Parameterized database queries prevent user input from changing the structure of an SQL query.
+
+## Data
+
+The data layer protects information wherever it is stored, processed, or transmitted. It preserves confidentiality and integrity even after another layer has failed.
+
+- Encryption at rest protects files, databases, backups, and removable storage.
+- TLS protects data in transit between clients, services, and administrators.
+- Access controls limit which identities may read, change, or delete data.
+- Backups and integrity checks support recovery from corruption, deletion, and ransomware.
+
+Examples:
+
+- A stolen backup cannot be read without the encryption key.
+- A database account used by a reporting service can read reports but cannot modify customer records.
+
+## Identity
+
+The identity layer establishes who or what is requesting access. It grants only the permissions needed for the requested task and records the resulting actions.
+
+- Authentication verifies a user, service, or device identity.
+- Multi-factor authentication requires an additional factor beyond a password.
+- Least privilege limits permissions to the minimum required scope and duration.
+- Privileged access management separates administrative accounts from ordinary user accounts.
+
+Examples:
+
+- A developer uses a standard account for email and source control, then receives temporary administrative access for a deployment.
+- A service account can read objects from 1 storage bucket but cannot list or access other buckets.
+
+## Control Categories
+
+- Technical controls \
+  Software and hardware mechanisms, such as multi-factor authentication, end-to-end encryption, and endpoint detection and response.
+- Administrative controls \
+  Policies, procedures, and training.
+- Physical controls \
+  Locks, guards, and server room access control.
 
 ## Diversity of Defense
 
@@ -61,11 +120,11 @@ Layers should come from different vendors and use different technologies. A sing
 
 ## Complementary Controls
 
-- Stateful firewall plus web application firewall  
+- Stateful firewall plus web application firewall \
   A [web application firewall](/s5/computer-security/firewalls#web-application-firewall) inspects Layer 7 traffic for application-specific attacks. A next-generation firewall does not specialize in these.
-- SSL inspection  
+- SSL inspection \
   A firewall decrypts and inspects TLS traffic, so attackers cannot hide malicious payloads, command-and-control traffic, or data exfiltration inside encrypted streams.
-- Least privilege at the identity layer  
+- Least privilege at the identity layer \
   Users and systems get only the minimum access needed for their job.
 
 ## Security Policy
@@ -99,9 +158,9 @@ The vulnerability window is $15{:}50 - 02{:}30 = 13\text{h}\,20\text{m}$.
 
 ## Intrusion Detection and Prevention
 
-- Intrusion detection  
+- Intrusion detection \
   Uses logs to check for vulnerabilities. It cannot prevent an attack, only detect it after or while it happens. Passive security.
-- Intrusion prevention  
+- Intrusion prevention \
   Blocks an attack before it happens, and needs more processing power. Active security.
 
 Prevention methods:
@@ -112,20 +171,20 @@ Prevention methods:
 
 ## Qualities of a Good Security System
 
-- Simplicity  
+- Simplicity \
   Complex designs and configurations are hard to manage and create holes. Simple designs are used consistently and correctly.
-- Scalability  
+- Scalability \
   The system grows with the business.
-- High uptime and quick recovery  
+- High uptime and quick recovery \
   High mean time between failures and failover recovery.
-- Distributed architecture  
+- Distributed architecture \
   Different tasks run on different machines.
-- Dynamic security  
+- Dynamic security \
   Not a static, one-time product.
-- Economy of IP addresses  
+- Economy of IP addresses \
   Hide internal addresses and reduce the number of public ones.
-- Secure connections  
+- Secure connections \
   VPN, management station, and subcomponents, with authentication.
-- Logging and notification  
+- Logging and notification \
   Summarized reports of network activity.
 - Physical security
