@@ -1,12 +1,16 @@
 ---
 title: Substitution Cipher
 dateCreated: 2026-07-29T05:50:15.139Z
-lastUpdatedOn: 2026-10-19T12:09:02.310Z
+lastUpdatedOn: 2026-10-26T17:31:12.223Z
 ---
 
-A [classical](/s5/computer-security/ciphers#classical-cipher) and [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. The key is a proper permutation of the plaintext alphabet.
+A [classical](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. The key is a proper permutation of the plaintext alphabet.
 
 You can find an implementation of the substitution cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/substitution-cipher.c).
+
+### Key Expansion
+
+A keyword can construct the permutation. Write its distinct letters first, then append the unused alphabet letters in order. For `lobster`, this gives `LOBSTERACDFGHIJKMNPQUVWXYZ`.
 
 ## Encryption
 
@@ -25,7 +29,7 @@ Frequency analysis recovers the key without searching the key space. Might fail 
 Steps:
 
 - Count the frequency of each ciphertext letter.
-- Match the most frequent ciphertext letters to the most frequent letters of the plaintext language. In English, $e$, $t$, $a$, $o$, $i$, $n$ are the most common.
+- Match the most frequent ciphertext letters to the most frequent letters of the plaintext language. In English, `e`, `t`, `a`, `o`, `i`, `n` are the most common.
 - Compare digram (such as `th`, `in`) and trigram (such as `the`) counts against known language statistics.
 - Use word boundaries when spaces are retained. Single-letter words are $a$ or $I$. Common short words are $the$, $of$, $to$, $and$.
 - Fix the confident mappings, then fill the rest by trial, checking that partially decrypted words are valid.

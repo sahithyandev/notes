@@ -1,7 +1,7 @@
 ---
 title: Cryptosystems
 dateCreated: 2026-07-01T06:36:45.904Z
-lastUpdatedOn: 2026-10-26T16:18:13.867Z
+lastUpdatedOn: 2026-10-26T17:31:12.156Z
 ---
 
 A cryptosystem protects data with algorithms and keys.
@@ -27,7 +27,14 @@ An encryption algorithm can be public. A key must remain secret when secrecy dep
 
 Encoding converts data into a format suited to storage or transmission. It does not provide secrecy.
 
-Anyone who knows the encoding can reverse it. Base64 converts binary data into printable characters. UTF-8 converts text characters into bytes.
+Anyone who knows the encoding can reverse it.
+
+Examples:
+
+- Base64  
+  Converts binary data into printable characters.
+- UTF-8  
+  Converts text characters into bytes.
 
 ## Kerckhoffs's Principle
 
@@ -42,9 +49,9 @@ These rules are recommended by Auguste Kerckhoffs for military ciphers.
 - Memorable, changeable keys  
   The key must be easy to communicate and remember, without requiring written notes, and correspondents must be able to change or modify it at will.
 - Telegraph compatibility  
-  It must be applicable to telegraph communications.
+  It must be applicable to telegraph communications. Due to historical reasons.
 - Portability  
-  It must be portable, and its use must not require several people.
+  Must be easy to move, and its use must not require several people.
 - Ease of use  
   Given the circumstances in which it is used, the system must be easy to use, requiring neither mental strain nor knowledge of a long series of rules.
 
@@ -52,16 +59,11 @@ These rules are recommended by Auguste Kerckhoffs for military ciphers.
 
 Relying on secrecy of the design, algorithm, or architecture itself for security.
 
-Contrast with Kerckhoffs's principle:
-
-- Secret  
-  Kerckhoffs's principle keeps only the key secret. Obscurity keeps the whole algorithm and architecture secret.
-- Assumed attacker  
-  Kerckhoffs's principle assumes they know the full system. Obscurity assumes they know nothing.
+Keeps the whole algorithm and architecture secret. Assumes the hacker knows nothing.
 
 A single leak or reverse-engineering of the secret design compromises the entire system, and the key cannot be rotated to recover.
 
-Proprietary or closed crypto loses public peer review. Hidden flaws and backdoors stay undetected until attackers find and exploit them. Open, peer-reviewed standards are preferred.
+Proprietary or closed cryptosystems loses public peer review. Hidden flaws and backdoors stay undetected until attackers find and exploit them. Open, peer-reviewed standards are preferred.
 
 Secret ciphers broken after reverse-engineering:
 

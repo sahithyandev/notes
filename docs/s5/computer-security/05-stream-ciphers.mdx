@@ -1,7 +1,7 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.073Z
+lastUpdatedOn: 2026-10-26T17:31:12.180Z
 ---
 
 Models plaintext as a bit stream, combined with a random keystream via a reversible operation, bitwise XOR.
@@ -78,9 +78,3 @@ Knowing one plaintext also recovers the keystream, $k = c_1 \oplus m_1$. Any fur
 To encrypt a message $m$ (of length $n$), a keystream $k$ (of length $n$) is generated that is random and never reused. The message bits are XORed with the keystream bits to produce the ciphertext.
 
 Impractical as it requires a key as long as the message and never reused, but applications need a short key and reuse it across many messages.
-
-### RC4
-
-RC4 is a widely deployed keystream generator built around a permutation of the 256 byte values, rather than an LFSR.
-
-RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, but is now considered broken. The first output bytes are measurably biased toward certain values, letting an attacker who sees the same key reused across enough sessions recover plaintext without ever recovering the key, and RC4 has since been deprecated in the protocols that used it.

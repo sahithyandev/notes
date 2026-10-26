@@ -1,7 +1,7 @@
 ---
 title: Ciphers
 dateCreated: 2026-07-01T06:36:45.904Z
-lastUpdatedOn: 2026-10-26T16:17:19.341Z
+lastUpdatedOn: 2026-10-26T17:31:20.077Z
 ---
 
 <Aka>encryption algorithm</Aka>. A function that ($e$) transforms a plaintext
@@ -26,8 +26,6 @@ The secrecy of plaintext $m$ is totally dependent on the secrecy of the key $k$.
 
 Algorithms with this property are called symmetric cryptosystems or secret key cryptosystems. Both parties to a secret communication must know $k$ and keep it secret.
 
-Security also depends on [Kerckhoffs's principle](/s5/computer-security/cryptosystems#kerckhoffss-principle) for what a cryptosystem may safely assume is public.
-
 ## Encryption Scheme
 
 A cipher is the core keyed primitive, a fixed function $e_k$ with a defined input size. An encryption scheme is a complete construction that encrypts messages of arbitrary length, built from a cipher by supplying whatever the cipher lacks.
@@ -49,9 +47,15 @@ This uniqueness requirement is specific to randomising encryption. Some authenti
 
 Ciphers are classified along several axes, not mutually exclusive. A modern cipher often falls into multiple categories at once.
 
+### Keyless Cipher
+
+A cipher with no key. Its encryption and decryption transformations are fixed and public.
+
+It provides no secrecy once the transformation is known.
+
 ### Classical Cipher
 
-<Aka>historical cipher</Aka>. The ciphers used in the pre-computer.
+<Aka>historical cipher</Aka>. The ciphers used in the pre-computer era.
 
 Historical ciphers used plaintext linked to:
 
@@ -78,9 +82,9 @@ Examples:
 
 ### Poly-Alphabetic Cipher
 
-Uses multiple substitution alphabets, e.g. one alphabet for odd-numbered positions and a different one for even-numbered positions, flattening the character frequency graph.
+Uses different substitution rules at different plaintext positions. Each rule maps every plaintext letter to a ciphertext letter.
 
-Using $n$ alphabets in a poly-alphabetic cipher gives a key space of $(26!)^n$ at the cost of remembering a key of length $26n$ characters.
+If each rule can be any permutation of the 26 letters, there are $26!$ choices for one rule. Choosing $n$ rules independently gives $(26!)^n$ possible keys. A key written as $n$ substitution alphabets takes $26n$ characters, with each alphabet listing the 26 ciphertext letters in order. This count applies only when each rule can be any permutation.
 
 Examples:
 
@@ -99,8 +103,6 @@ Effects:
 - Single-letter frequencies are partly flattened.
 - Bigram frequencies are preserved.
 
-A polygraphic cipher is not poly-alphabetic. The substitution is fixed and does not change with position. A poly-alphabetic cipher keeps single-letter substitution but varies the alphabet by position.
-
 Examples:
 
 - Playfair cipher
@@ -108,12 +110,12 @@ Examples:
 
 ### Transposition Cipher
 
-Also called a permutation cipher, as a category. Scrambles the positions of the plaintext characters without changing the characters themselves.
-
-One specific cipher in this category is also named the permutation cipher.
+Scrambles the positions of the plaintext characters without changing the characters themselves.
 
 The key defines the permutation applied to character positions. Decryption applies the inverse permutation.
 
 Every single-letter frequency is preserved unchanged. Bigram and trigram frequencies are disturbed, since adjacent plaintext letters are pulled apart. This exposes it to anagramming attacks, where the analyst rearranges ciphertext fragments to recover valid plaintext.
 
-A transposition and a substitution can be composed in one cipher. Modern block ciphers use both.
+Examples:
+
+- Permutation cipher

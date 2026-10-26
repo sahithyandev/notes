@@ -1,10 +1,10 @@
 ---
 title: Shift Cipher
 dateCreated: 2026-07-29T05:49:37.219Z
-lastUpdatedOn: 2026-10-19T12:09:02.296Z
+lastUpdatedOn: 2026-10-26T17:31:12.208Z
 ---
 
-A [classical cipher](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. Every letter is shifted by the same amount, so plaintext letter frequencies are preserved in the ciphertext.
+A [classical cipher](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. Every plaintext letter is shifted by the same amount.
 
 You can find an implementation of the shift cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/shift-cipher.c).
 
@@ -52,7 +52,7 @@ Character frequency analysis computes the frequency of characters in the ciphert
 A more rigorous technique computes the statistical distance between the standard character frequency distribution and the ciphertext's frequency distribution, for each candidate shift $k$.
 
 $$
-\Delta[X, Y_k] = \frac{1}{2}\sum_{u \in V} \left| \Pr_{X \leftarrow D_{\text{standard}}}[X = u] - \Pr_{Y_k \leftarrow D_k}[Y_k = u] \right|
+\Delta[X, Y_k] = \frac{1}{2}\sum_{u \in V} \left| \Pr_{X \leftarrow D_{\text{std}}}[X = u] - \Pr_{Y_k \leftarrow D_k}[Y_k = u] \right|
 $$
 
 Here:

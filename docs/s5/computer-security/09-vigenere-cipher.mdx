@@ -1,7 +1,7 @@
 ---
 title: Vigenere Cipher
 dateCreated: 2026-07-29T05:53:41.958Z
-lastUpdatedOn: 2026-10-19T12:09:02.323Z
+lastUpdatedOn: 2026-10-26T17:31:12.238Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
@@ -10,19 +10,13 @@ Each letter is shifted by an amount that depends on its position in the message,
 
 You can find an implementation of the Vigenère cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/vigenere-cipher.c).
 
+### Key Expansion
+
+Repeat the key until it matches the plaintext length. Align each key letter with 1 plaintext letter.
+
 ## Encryption
 
-The key is repeated and aligned with the plaintext (as shown below for the key `LEMON`).
-
-```
-plaintext:  IAMINEVITABLE
-key:        LEMONLEMONLEM
-```
-
-Each plaintext letter is shifted forward in the alphabet by the position of the key letter above it (A = 0, B = 1, ..., Z = 25).
-
-- `I` shifted by `L` (11) gives `T`
-- `A` shifted by `E` (4) gives `E`
+Assign each plaintext letter and its aligned key letter a value from $0$ to $25$, where $A = 0$ and $Z = 25$. Add their values modulo $26$. The result identifies the ciphertext letter.
 
 For a key of length $n$, each key letter picks one of 26 possible shift amounts, independently of the other $n - 1$ key letters. So the number of possible keys is $26 \times 26 \times \dots$ ($n$ times) $= 26^n$.
 
