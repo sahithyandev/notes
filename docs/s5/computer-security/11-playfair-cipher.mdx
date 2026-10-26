@@ -1,7 +1,7 @@
 ---
 title: Playfair Cipher
 dateCreated: 2026-07-29T05:53:47.519Z
-lastUpdatedOn: 2026-10-26T17:31:12.273Z
+lastUpdatedOn: 2026-10-26T18:18:36.122Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [polygraphic](/s5/computer-security/ciphers#polygraphic-cipher) cipher. Invented by Sir Charles Wheatstone in 1854. Named after Lord Playfair who promoted its use in diplomatic communication. The first digram substitution cipher, encrypting pairs of letters (bigrams) rather than single letters.
@@ -16,6 +16,8 @@ Construction:
 
 - Write a secret keyword with no repeating letters into the grid, starting from the top left, row by row.
 - Fill the remaining cells with the unused letters in alphabetical order.
+
+<PlayfairKeyGrid keyword="PANTHER" />
 
 ### Preparation
 
@@ -78,13 +80,31 @@ Plaintext `wakandaforever` under keyword `PANTHER`.
 
 The grid built from `PANTHER`:
 
-```
-P A N T H
-E R B C D
-F G I K L
-M O Q S U
-V W X Y Z
-```
+<PlayfairKeyGrid keyword="PANTHER" />
+
+<PlayfairPairing
+  keyword="PANTHER"
+  examples={[
+    {
+      rule: "Same Row",
+      input: "ER",
+      output: "RB",
+      description: "Move each letter 1 cell right.",
+    },
+    {
+      rule: "Same Column",
+      input: "WA",
+      output: "AR",
+      description: "Move each letter 1 cell down.",
+    },
+    {
+      rule: "Rectangle",
+      input: "KA",
+      output: "GT",
+      description: "Take the other corner on the same row.",
+    },
+  ]}
+/>
 
 Positions are $(\text{row}, \text{column})$ with both starting at $0$.
 
@@ -124,10 +144,13 @@ Recovered text is `wakandaforever`.
 
 A known-plaintext attack uses 3 matched bigrams from the run above, with the grid unknown.
 
-```
-plaintext:   wa or ka
-ciphertext:  AR WG GT
-```
+<CharacterAlignment
+  rows={[
+    { label: "Plaintext", value: "waorka" },
+    { label: "Ciphertext", value: "ARWGGT" },
+  ]}
+  caption="Matched bigrams are WA/AR, OR/WG, and KA/GT."
+/>
 
 - `wa` to `AR`. Testing the same-row rule for `w`,`a` fails to reproduce `AR`, but the same-column rule holds: shifting each letter 1 row down (wrapping) turns `w` into `a` and `a` into `r`. So `w`, `a`, `r` sit in the same column, in that cyclic order.
 - `or` to `WG`. The same-column rule holds again: shifting `o` and `r` 1 row down (wrapping) gives `w` and `g`. Since `w` was already placed in the shared column from the previous bigram, this extends it to `o`, `w`, `a`, `r`, `g`, in cyclic order.

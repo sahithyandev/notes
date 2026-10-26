@@ -1,7 +1,7 @@
 ---
 title: Vigenere Cipher
 dateCreated: 2026-07-29T05:53:41.958Z
-lastUpdatedOn: 2026-10-26T17:31:12.238Z
+lastUpdatedOn: 2026-10-26T18:18:36.103Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
@@ -51,11 +51,14 @@ Plaintext `finishhimfinishhim` under keyword `RUN`, with $A = 0$ to $Z = 25$. Th
 
 The keyword is repeated to match the plaintext length.
 
-```
-plaintext:   f i n i s h h i m f i n i s h h i m
-keystream:   R U N R U N R U N R U N R U N R U N
-ciphertext:  W C A Z M U Y C Z W C A Z M U Y C Z
-```
+<CharacterAlignment
+  rows={[
+    { label: "Plaintext", value: "finishhimfinishhim" },
+    { label: "Keystream", value: "RUNRUNRUNRUNRUNRUN" },
+    { label: "Ciphertext", value: "WCAZMUYCZWCAZMUYCZ" },
+  ]}
+  caption="Each column combines 1 plaintext letter with 1 keystream letter to produce the ciphertext letter below it."
+/>
 
 Each position adds the keystream letter modulo $26$.
 
