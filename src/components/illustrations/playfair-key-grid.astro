@@ -1,0 +1,63 @@
+---
+import { buildPlayfairGrid } from "./lib/playfair";
+
+interface Props {
+  keyword: string;
+}
+
+const { keyword } = Astro.props;
+const rows = buildPlayfairGrid(keyword);
+---
+
+<figure class="playfair-key-grid">
+  <table aria-label={`Playfair key grid for keyword ${keyword}`}>
+    <tbody>
+      {rows.map((row) => (
+        <tr>
+          {row.map((letter) => (
+            <td>{letter === "I" ? "I/J" : letter}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <figcaption>Key grid from {keyword}.</figcaption>
+</figure>
+
+<style>
+  .playfair-key-grid {
+    margin: 20px 0;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    margin: 0 auto;
+    table-layout: fixed;
+    width: 12.5rem;
+  }
+
+  td {
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border) !important;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    height: 2.5rem;
+    line-height: 1;
+    padding: 0 !important;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 2.5rem;
+  }
+
+  figcaption {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 8px;
+    text-align: center;
+  }
+</style>

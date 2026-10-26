@@ -1,0 +1,128 @@
+---
+import { buildPlayfairGrid, type PlayfairPairExample } from "./lib/playfair";
+
+interface Props {
+  keyword: string;
+  examples: PlayfairPairExample[];
+}
+
+const { keyword, examples } = Astro.props;
+const rows = buildPlayfairGrid(keyword);
+---
+
+<figure class="playfair-pairing">
+  <div class="examples">
+    {examples.map((example) => (
+      <section
+        aria-label={`${example.rule}: ${example.input} encrypts to ${example.output}`}
+      >
+        <h4>{example.rule}</h4>
+        <table aria-hidden="true">
+          <tbody>
+            {rows.map((row) => (
+              <tr>
+                {row.map((letter) => (
+                  <td>{letter === "I" ? "I/J" : letter}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="mapping">
+          <span>{example.input}</span>
+          <span aria-hidden="true">→</span>
+          <span>{example.output}</span>
+        </p>
+        <p class="description">{example.description}</p>
+      </section>
+    ))}
+  </div>
+  <figcaption>Pair encryption in the {keyword} key grid.</figcaption>
+</figure>
+
+<style>
+  .examples {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .playfair-pairing {
+    margin: 20px 0;
+  }
+
+  section {
+    min-width: 0;
+    text-align: center;
+  }
+
+  h4 {
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 0.76rem;
+    margin: 0 0 8px;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    margin: 0 auto;
+    table-layout: fixed;
+    width: 9.5rem;
+  }
+
+  td {
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border) !important;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 600;
+    height: 1.9rem;
+    line-height: 1;
+    padding: 0 !important;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 1.9rem;
+  }
+
+  .mapping {
+    align-items: center;
+    color: var(--text-primary);
+    display: flex;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    gap: 8px;
+    justify-content: center;
+    margin: 9px 0 3px;
+  }
+
+  .description {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    line-height: 1.4;
+    margin: 0 auto;
+    max-width: 19ch;
+  }
+
+  figcaption {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .examples {
+      grid-template-columns: 1fr;
+    }
+
+    section + section {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+  }
+</style>
