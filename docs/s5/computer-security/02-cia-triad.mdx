@@ -4,7 +4,7 @@ prereqs:
   - s4/operating-systems-security/cia-triad
   - s4/operating-systems-security/access-control
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T15:29:58.212Z
+lastUpdatedOn: 2026-10-26T16:17:19.304Z
 ---
 
 The 3 basic actions of a person on an item of data: viewing (confidentiality), modifying (integrity), using (availability).
@@ -105,9 +105,10 @@ Information flows only upward. A discretionary access matrix applies on top. Dec
 
 Examples:
 
-- A military analyst with Secret clearance and the Nuclear compartment can read a Secret Nuclear report.
-- The analyst cannot read a Top Secret Nuclear report, since its rank exceeds the analyst's clearance.
-- The analyst cannot copy a Secret Nuclear report into an Unclassified briefing, since that would write information down.
+- An analyst has Secret clearance and Nuclear access.
+- A Secret Nuclear report is readable by that analyst.
+- A Top Secret Nuclear report is not readable.
+- The analyst cannot copy the Secret report into an Unclassified briefing.
 
 <Note>
 
@@ -130,9 +131,10 @@ Information flows only downward in integrity. Untrusted data cannot reach a high
 
 Examples:
 
-- A production deployment service accepts release artifacts signed by the build system.
-- It does not use a script downloaded from an employee's email as a deployment artifact, since the script has lower integrity.
-- A junior clerk can enter an expense claim into a low-integrity queue but cannot alter the approved accounting ledger.
+- The build system signs a release artifact.
+- The production deployment service accepts the signed artifact.
+- It rejects a deployment script from an employee's email.
+- A clerk can submit an expense claim. The clerk cannot change the approved ledger.
 
 ### Separation of Duty
 
@@ -165,43 +167,50 @@ The Chinese wall policy cannot be represented using an [access control matrix](/
 
 Examples:
 
-- An investment-bank analyst reviews confidential records for company $C_1$.
-- If $C_1$ and $C_2$ compete, the analyst cannot later review company $C_2$'s records.
-- Another analyst who has not accessed either dataset can work for $C_2$.
+- An investment-bank analyst first reads company $C_1$'s records.
+- Company $C_1$ competes with company $C_2$.
+- The analyst cannot then read company $C_2$'s records.
+- Another analyst can work for company $C_2$.
+
+## Examples
 
 ### Capabilities in Amoeba
 
-Amoeba is a distributed capability-based operating system, implementing the [capability](/s4/operating-systems-security/access-control#capability) concept across multiple processors connected by a network.
+Amoeba is a distributed operating system. It uses [capabilities](/s4/operating-systems-security/access-control#capability) across networked machines.
 
-- Each object resides on a server, identified within a capability by a server port and an object number, alongside a rights field and a check field.
-- The check field is an unforgeable random value the server uses to verify a capability was not forged, letting protection be enforced entirely by the user-level server process, without special OS support.
-- An owner capability grants every right. The owner can derive a capability with fewer rights, whose check field is computed from the original so the server can still verify it.
+- A file server stores a report.
+- A capability identifies the server and the report.
+- Its rights field might grant read access only.
+- The server verifies the capability's check field before returning the report.
+- An owner can give another user a reduced capability. For example, read access without write access.
 
-<Note>
-
-Revocation of a capability is possible through indirection: a capability points to a pointer to the resource, rather than to the resource directly. Revoking capability $C$ pointing to pointer $P$ pointing to resource $R$ is done by setting $P = 0$.
-
-</Note>
+Revocation uses indirection. A capability points to a pointer. The pointer points to the resource. The server revokes access by setting the pointer to $0$.
 
 ### Unix File Security
 
-Every Unix file has an owner and a group, with read, write, and execute permissions set separately for owner, group, and other. Only the owner or root can change a file's permissions.
+Unix gives every file an owner and a group. It stores read, write, and execute permissions for the owner, group, and others.
 
-- Each process carries a real, effective, and saved user ID.
-- The effective ID determines the process's actual permissions.
-- The setuid bit on an executable file lets a process temporarily run with the file owner's identity instead of the caller's.
+- Alice owns `budget.txt`.
+- She grants her Finance group read access.
+- She denies other users all access.
+- Only Alice or root can change these permissions.
+- A process's effective user ID determines its permissions.
+- A setuid program runs with the file owner's effective user ID.
 
 <Note>
 
-An EUID of $0$ means root, which can do anything. Setuid programs must be careful not to get tricked into acting on an attacker's behalf while running as root.
+An EUID of $0$ is root. Root can access any file. A setuid program must not act on an attacker's input as root.
 
 </Note>
 
-Setuid scripts are a bad idea, historically prone to race conditions where an attacker changes the contents of a program after it begins executing but before it loads.
+Setuid scripts are unsafe. An attacker can replace the script between execution and loading.
 
 ### Windows Access Control
 
-Windows NTFS extends the same access list idea: each object carries a security descriptor with an owner, a group, and a discretionary access control list (DACL) of allowed users and groups, checked by priority of explicit deny, explicit allow, inherited deny, then inherited allow.
+Windows NTFS attaches a security descriptor to every object. It records an owner, a group, and a discretionary access control list (DACL).
 
-- A security identifier (SID) replaces the Unix UID as the identity of a principal.
-- An impersonation token lets a thread temporarily adopt another user's security context, similar in purpose to Unix setuid.
+- An HR folder allows the HR group to read and edit files.
+- It explicitly denies an intern access to the folder.
+- Windows checks explicit deny before explicit allow.
+- A security identifier (SID) identifies a user or group.
+- An impersonation token lets a thread use another user's security context.

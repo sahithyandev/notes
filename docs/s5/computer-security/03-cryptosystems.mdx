@@ -1,14 +1,39 @@
 ---
-title: Kerckhoffs's Principle
+title: Cryptosystems
 dateCreated: 2026-07-01T06:36:45.904Z
-lastUpdatedOn: 2026-09-28T05:07:13.845Z
+lastUpdatedOn: 2026-10-26T16:18:13.867Z
 ---
+
+A cryptosystem protects data with algorithms and keys.
+
+### Encryption
+
+Encryption transforms plaintext into ciphertext using an encryption algorithm and a key. Decryption recovers the plaintext using a key.
+
+- Plaintext  
+  The original readable data.
+- Ciphertext  
+  The encrypted data.
+- Encryption algorithm  
+  The procedure that produces ciphertext.
+- Decryption algorithm  
+  The procedure that recovers plaintext.
+- Key  
+  A value that controls encryption or decryption.
+
+An encryption algorithm can be public. A key must remain secret when secrecy depends on it.
+
+### Encoding
+
+Encoding converts data into a format suited to storage or transmission. It does not provide secrecy.
+
+Anyone who knows the encoding can reverse it. Base64 converts binary data into printable characters. UTF-8 converts text characters into bytes.
+
+## Kerckhoffs's Principle
 
 A cryptosystem must remain secure even if everything about the system, except the key, is public knowledge.
 
-## Design Guidelines
-
-Recommended by Auguste Kerckhoffs for military ciphers.
+These rules are recommended by Auguste Kerckhoffs for military ciphers.
 
 - Practical indecipherability  
   The system must be practically, if not mathematically, indecipherable.

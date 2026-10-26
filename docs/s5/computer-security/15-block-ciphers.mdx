@@ -1,7 +1,7 @@
 ---
 title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:25.480Z
+lastUpdatedOn: 2026-10-26T16:17:19.456Z
 ---
 
 A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
@@ -12,7 +12,7 @@ $$
 c_i \leftarrow e_k(m_i), \quad m_i \leftarrow d_k(c_i)
 $$
 
-For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$. Per [Kerckhoffs's principle](/s5/computer-security/kerckhoffs-principle), $e$ and $d$ are public. Only $k$ is secret.
+For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$, so it is invertible via $d_k$. Per [Kerckhoffs's principle](/s5/computer-security/cryptosystems#kerckhoffss-principle), $e$ and $d$ are public. Only $k$ is secret.
 
 A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
 
