@@ -15,7 +15,12 @@ interface Props {
 const { sidebarData, slug, slugParts } = Astro.props;
 ---
 
-<aside class="sidebar">
+<aside
+  class="sidebar"
+  id="note-sidebar"
+  tabindex="-1"
+  aria-label="Note contents"
+>
   <div class="sb-sem-wrap">
     <button
       class="sb-sem"
@@ -312,7 +317,7 @@ const { sidebarData, slug, slugParts } = Astro.props;
       top: var(--nav-h);
       left: 0;
       height: calc(100dvh - var(--nav-h));
-      width: min(300px, 85vw);
+      width: min(340px, 90vw);
       z-index: 50;
       transform: translateX(-100%);
       box-shadow: 2px 0 18px rgba(0, 0, 0, 0.18);
@@ -324,6 +329,10 @@ const { sidebarData, slug, slugParts } = Astro.props;
 
     :global(html.sidebar-open) .sidebar {
       transform: translateX(0);
+    }
+
+    .sb-sem {
+      min-height: 48px;
     }
   }
 </style>

@@ -141,6 +141,8 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
       id="open-sidebar"
       type="button"
       aria-label="Open contents"
+      aria-controls="note-sidebar"
+      aria-expanded="false"
     >
       <MenuIcon />
     </button>
@@ -182,6 +184,8 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
         id="open-toc"
         type="button"
         aria-label="Open table of contents"
+        aria-controls="note-toc"
+        aria-expanded="false"
       >
         <TocIcon />
       </button>
@@ -416,7 +420,7 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
 
   .note-title {
     font-family: var(--font-ui);
-    font-size: 2rem;
+    font-size: clamp(1.75rem, 3vw, 2rem);
     font-weight: 800;
     letter-spacing: -0.8px;
     line-height: 1.08;
@@ -608,6 +612,10 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
   }
 
   @media (max-width: 48rem) {
+    :root {
+      --nav-h: 56px;
+    }
+
     main {
       display: block !important;
       height: auto;
@@ -619,14 +627,39 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
     }
 
     section:has(article) {
-      padding: 0 calc(4 * var(--spacing));
+      padding: 0 clamp(1rem, 4vw, 1.5rem)
+        calc(2rem + env(safe-area-inset-bottom));
       overflow: visible;
       height: auto;
     }
 
     /* Article tweaks for narrow screens */
     .note-title {
-      font-size: 1.4rem;
+      font-size: clamp(1.5rem, 7vw, 1.8rem);
+      line-height: 1.12;
+      margin-bottom: 16px;
+      text-wrap: balance;
+    }
+
+    .wip-banner {
+      width: 100%;
+      align-items: flex-start;
+      line-height: 1.45;
+    }
+
+    .note-meta,
+    .note-meta > * {
+      width: 100%;
+    }
+
+    .note-meta > * {
+      flex-wrap: wrap;
+    }
+
+    :global(article h2),
+    :global(article h3),
+    :global(article h4) {
+      scroll-margin-top: calc(var(--nav-h) + 16px);
     }
   }
 </style>

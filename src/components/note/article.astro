@@ -459,7 +459,7 @@
 
     @media (max-width: 48rem) {
       margin-top: 20px;
-      font-size: 0.9375rem;
+      font-size: 1rem;
 
       h2 {
         font-size: 1.1875rem;
@@ -474,7 +474,7 @@
       }
 
       p {
-        line-height: 1.55;
+        line-height: 1.65;
       }
 
       p:has(.MathJax:only-of-type) mjx-container svg,
@@ -483,7 +483,7 @@
       }
 
       li {
-        font-size: 0.9375rem;
+        font-size: 1rem;
 
         .MathJax {
           font-size: 1.05rem;
@@ -515,12 +515,21 @@
       .katex-display {
         font-size: 1rem;
       }
+
+      h2,
+      h3,
+      h4 {
+        scroll-margin-top: calc(var(--nav-h) + 16px);
+        text-wrap: balance;
+      }
     }
   }
 
   :global(.table-scroll) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
   }
 
   article :global(mjx-container[display="true"]) {

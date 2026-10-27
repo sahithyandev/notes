@@ -3,23 +3,46 @@ import { track } from "./analytics.ts";
 const openSidebarBtn = document.getElementById("open-sidebar");
 const openTocBtn = document.getElementById("open-toc");
 const backdrop = document.getElementById("drawer-backdrop");
-const sidebarEl = document.querySelector(".sidebar");
-const tocEl = document.querySelector(".right-sidebar");
+const sidebarEl = document.querySelector<HTMLElement>(".sidebar");
+const tocEl = document.querySelector<HTMLElement>(".right-sidebar");
 const root = document.documentElement;
 
+let lastTrigger: HTMLElement | null = null;
+
+const syncTriggerState = () => {
+  openSidebarBtn?.setAttribute(
+    "aria-expanded",
+    String(root.classList.contains("sidebar-open")),
+  );
+  openTocBtn?.setAttribute(
+    "aria-expanded",
+    String(root.classList.contains("toc-open")),
+  );
+};
+
 const closeDrawers = () => {
+  const trigger = lastTrigger;
   root.classList.remove("sidebar-open", "toc-open");
   document.body.style.overflow = "";
+  syncTriggerState();
+  lastTrigger = null;
+  trigger?.focus();
 };
 const openSidebar = () => {
+  lastTrigger = openSidebarBtn;
   root.classList.add("sidebar-open");
   root.classList.remove("toc-open");
   document.body.style.overflow = "hidden";
+  syncTriggerState();
+  sidebarEl?.focus();
 };
 const openToc = () => {
+  lastTrigger = openTocBtn;
   root.classList.add("toc-open");
   root.classList.remove("sidebar-open");
   document.body.style.overflow = "hidden";
+  syncTriggerState();
+  tocEl?.focus();
 };
 
 openSidebarBtn?.addEventListener("click", openSidebar);
@@ -68,3 +91,5 @@ studyBtn?.addEventListener("click", () => {
 requestAnimationFrame(() => {
   requestAnimationFrame(() => root.classList.add("drawers-ready"));
 });
+
+syncTriggerState();
