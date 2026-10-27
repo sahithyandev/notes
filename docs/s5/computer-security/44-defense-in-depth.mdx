@@ -1,7 +1,7 @@
 ---
 title: Defense in Depth
 dateCreated: 2026-10-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.382Z
+lastUpdatedOn: 2026-10-27T15:30:27.407Z
 ---
 
 Defense in depth deploys multiple, redundant layers of diverse security controls, so the failure of one layer does not compromise the whole system. No single product delivers all the protection a network needs.
@@ -20,7 +20,6 @@ The perimeter is the boundary between an untrusted network and the organization'
   Observes network or host activity and raises an alert for suspicious behaviour or a known attack pattern. It can detect attacks inside permitted connections.
 - DDoS mitigation absorbs or filters large volumes of malicious traffic.
 - An intrusion prevention system blocks traffic matching known attacks or policy violations.
-- A demilitarized zone isolates public-facing services from internal systems.
 
 Examples:
 
@@ -29,7 +28,10 @@ Examples:
 
 ### Demilitarized Zone
 
-A demilitarized zone (DMZ) holds the publicly available servers, such as web and mail. It is separated from the internal hosts and application servers by firewalls. A compromised public server then does not give direct access to the internal network.
+<Aka>DMZ</Aka>. Holds the publicly available servers, such as web and mail. It
+is separated from the internal hosts and application servers by firewalls. A
+compromised public server then does not give direct access to the internal
+network.
 
 ## Network
 
@@ -49,12 +51,11 @@ Examples:
 
 Network segmentation splits the internal network into zones separated by firewalls, such as Finance and Engineering subnets.
 
-- It restricts lateral movement. An attacker who compromises a machine in 1 subnet cannot freely reach assets in another.
-- It does not remove the need for the perimeter firewall.
+Prevents an attacker who compromises a machine in 1 subnet from freely reaching assets in another.
 
 ## Host
 
-The host layer protects each endpoint and server after traffic reaches it. It reduces the chance that a compromised account or application becomes full control of a machine.
+The host layer protects each endpoint and server after traffic reaches it. Reduces the chance that a compromised account or application becomes full control of a machine.
 
 - OS hardening removes unnecessary services and disables insecure defaults.
 - Patch management fixes vulnerabilities in the OS and installed software.
@@ -171,23 +172,3 @@ Prevention methods:
 - Protocol anomaly detection
 - Signature based detection
 - Behavior based detection
-
-## Qualities of a Good Security System
-
-- Simplicity \
-  Complex designs and configurations are hard to manage and create holes. Simple designs are used consistently and correctly.
-- Scalability \
-  The system grows with the business.
-- High uptime and quick recovery \
-  High mean time between failures and failover recovery.
-- Distributed architecture \
-  Different tasks run on different machines.
-- Dynamic security \
-  Not a static, one-time product.
-- Economy of IP addresses \
-  Hide internal addresses and reduce the number of public ones.
-- Secure connections \
-  VPN, management station, and subcomponents, with authentication.
-- Logging and notification \
-  Summarized reports of network activity.
-- Physical security

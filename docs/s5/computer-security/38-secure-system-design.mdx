@@ -1,16 +1,20 @@
 ---
 title: Principles of Secure System Design
 dateCreated: 2026-09-14T04:38:13.728Z
-lastUpdatedOn: 2026-10-27T13:10:12.281Z
+lastUpdatedOn: 2026-10-27T15:30:27.327Z
 ---
 
-## Compartmentalization
+Secure system design limits the consequences of failure through constrained privileges, independent controls, and mechanisms that remain usable and verifiable.
+
+## Core Principles
+
+### Compartmentalization
 
 Compartmentalization divides a system into modules, each serving a specific purpose, with different access rights assigned to different modules, e.g. read/write access to files, reading user or network input, or executing privileged instructions such as Unix root operations.
 
 The principle of least privilege gives each module only the rights it needs.
 
-## Defense in Depth
+### Defense in Depth
 
 Defense in depth combines multiple, independent security mechanisms rather than relying on a single one.
 
@@ -18,37 +22,59 @@ Defense in depth combines multiple, independent security mechanisms rather than 
 - Secure the weakest link, since an attacker targets the easiest point of entry.
 - Fail securely, so that a failure in one mechanism does not grant access by default.
 
-## Separation of Privileges
+### Separation of Privileges
 
 Access to a resource depends on more than 1 condition, and privileges are split so no single component holds all of them. Hardware protection rings separate user mode from kernel mode for this reason.
 
-## Complete Mediation
+### Complete Mediation
 
 Every access to every resource is checked against the access control rules. A prior check is never assumed to still be valid. A reference monitor enforces it.
 
-## Fail-Safe Defaults
+### Fail-Safe Defaults
 
 Access is denied unless explicitly granted. When a security mechanism errors or fails, the system denies access instead of granting it.
 
-## Open Design
+## Design Qualities
+
+### Open Design
 
 Security does not depend on keeping the design secret. It relies on strong keys and rigorous auditing, as in [Kerckhoffs's principle](/s5/computer-security/cryptosystems#kerckhoffss-principle). Open design does not require open source code, and does not mean anyone can change security settings.
 
-## Least Common Mechanism
+### Least Common Mechanism
 
 Users and processes share as few resources and mechanisms as possible. Shared mechanisms create covert channels and unintended side effects.
 
-## Psychological Acceptability
+### Psychological Acceptability
 
 Security mechanisms must be easy to use. A feature so complicated that users disable it to get their work done fails this principle.
 
-## Keep It Simple
+### Keep It Simple
 
 A simpler system is easier to verify and has fewer places for a vulnerability to hide.
 
-## Consult Experts
+### Consult Experts
 
 Open review is effective and informative. Prefer borrowing an existing, reviewed component over building a new one.
+
+## System Qualities
+
+- Simplicity \
+  Complex designs and configurations are hard to manage and create holes. Simple designs are used consistently and correctly.
+- Scalability \
+  The system grows with the business.
+- High uptime and quick recovery \
+  High mean time between failures and failover recovery.
+- Distributed architecture \
+  Different tasks run on different machines.
+- Dynamic security \
+  Not a static, one-time product.
+- Economy of IP addresses \
+  Hide internal addresses and reduce the number of public ones.
+- Secure connections \
+  VPN, management station, and subcomponents, with authentication.
+- Logging and notification \
+  Summarized reports of network activity.
+- Physical security
 
 ## Case Studies
 

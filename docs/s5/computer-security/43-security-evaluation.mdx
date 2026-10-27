@@ -1,7 +1,7 @@
 ---
 title: Security Evaluation
 dateCreated: 2026-10-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.362Z
+lastUpdatedOn: 2026-10-27T15:30:27.390Z
 ---
 
 Security evaluation determines whether a system meets stated security requirements under stated conditions. A system supported by sufficient assurance evidence is a trusted system.
@@ -36,10 +36,11 @@ TCSEC was strongly influenced by the [Bell-LaPadula model](/s5/computer-security
   Controls sharing of named objects, access-right propagation, access-control lists, and the granularity of controls.
 - Object reuse \
   Prevents recovery of data left in disk or memory resources from a previous use.
+- Labels  
+  Required at class B1 and above.  
+  A security label is metadata attached to an object or associated with a user. It records a classification such as Unclassified, Confidential, or Secret, and may include compartments.
 - Mandatory access control \
-  Required at class B1 and above. Enforces the simple-security condition and \*-property through a hierarchy of labels.
-- Labels \
-  Required at class B1 and above. Represent classifications and clearances, and preserve labels when information is exported or shown to people.
+  Required at class B1 and above. Enforces the simple-security condition and \*-property through a hierarchy of labels. Compares an object's label with the user's clearance to decide access. The system preserves the label when information is exported and displays it to users so they know the information's sensitivity.
 - Identification and authentication \
   Protects authentication data and associates identities with auditable actions.
 - Audit \
@@ -112,29 +113,11 @@ The evaluation process was resource-intensive and slow. Requirements expanded an
 
 TCSEC introduced assurance-based evaluation, rigorous design and implementation analysis, and high technical standards. It raised commercial awareness of computer security and influenced the Federal Criteria and Common Criteria.
 
-## FIPS 140
-
-FIPS 140 evaluates cryptographic modules that implement cryptographic logic or processes. It evaluates only the module. For software modules, the executing processor and operating system can fall within the evaluation boundary.
-
-FIPS 140 has 4 increasing security levels. It covers module design, documentation, roles, key management, testing, interfaces, finite-state behavior, physical security, and attack mitigation.
-
-### Security Levels
-
-- Level 1 \
-  Uses approved cryptographic algorithms and production-grade equipment. No physical security mechanism is required. Software and firmware may run on a general-purpose system with an unevaluated operating system.
-- Level 2 \
-  Adds tamper-evident coatings, seals, or pick-resistant locks. It requires role-based authentication. Software and firmware on a multiuser system require an operating system evaluated at Common Criteria EAL2 or an equivalent level.
-- Level 3 \
-  Adds physical protection against access to critical security parameters and requires identity-based authentication. It places stronger controls on reading and changing critical security parameters. Software and firmware require an EAL3 operating system or an equivalent trusted operating system.
-- Level 4 \
-  Adds an envelope of protection that detects and responds to unauthorized physical access and environmental conditions outside the module's operating range. Software and firmware require the functional requirements of Level 3 and assurance comparable to EAL4.
-
 ## Common Criteria
 
-<Aka>CC, ISO/IEC 15408</Aka>. Common Criteria evaluates security functions of an
-IT product or system and the assurance gained while building it. An accredited
-third-party laboratory performs the evaluation under a national evaluation
-scheme.
+<Aka>CC, ISO/IEC 15408</Aka>. Evaluates security functions of an IT product or
+system and the assurance gained while building it. An accredited third-party
+laboratory performs the evaluation under a national evaluation scheme.
 
 ### Terms
 
@@ -207,12 +190,13 @@ Common Criteria has both functional and assurance requirements. Requirements are
 
 A higher EAL provides more assurance. It does not add security functions.
 
-## Systems Security Engineering Capability Maturity Model
+## SSE-CMM
 
-<Aka>SSE-CMM, ISO/IEC 21827</Aka>. SSE-CMM evaluates the process used to develop
-secure systems. It does not evaluate a system itself.
+<Aka>Systems Security Engineering Capability Maturity Model, ISO/IEC 21827</Aka>
+. Evaluates the process used to develop secure systems. It does not evaluate a
+system itself.
 
-It measures process maturity, not trust. Process capability is the range of results expected from following a process. Process performance measures actual results. Process maturity measures how explicitly a process is defined, managed, measured, controlled, and made effective.
+Process capability is the range of results expected from following a process. Process performance measures actual results. Process maturity measures how explicitly a process is defined, managed, measured, controlled, and made effective.
 
 ### Process Areas
 
@@ -245,3 +229,23 @@ It also defines project and organizational practices for quality, configuration,
 ### Evaluation Procedure
 
 The evaluator selects a process area and identifies its goals and base processes. When all base processes are present, the evaluator assesses the maturity of each one. The maturity level for the area is the lowest maturity level among its base processes. A rating profile records and communicates the results.
+
+## FIPS 140
+
+<Aka>Federal Information Processing Standards</Aka>. Evaluates cryptographic
+modules that implement cryptographic logic or processes. It evaluates only the
+module. For software modules, the executing processor and operating system can
+fall within the evaluation boundary.
+
+FIPS 140 has 4 increasing security levels. It covers module design, documentation, roles, key management, testing, interfaces, finite-state behavior, physical security, and attack mitigation.
+
+### Security Levels
+
+- Level 1 \
+  Uses approved cryptographic algorithms and production-grade equipment. No physical security mechanism is required. Software and firmware may run on a general-purpose system with an unevaluated operating system.
+- Level 2 \
+  Adds tamper-evident coatings, seals, or pick-resistant locks. It requires role-based authentication. Software and firmware on a multiuser system require an operating system evaluated at [Common Criteria EAL2](#evaluation-assurance-levels) or an equivalent level.
+- Level 3 \
+  Adds physical protection against access to critical security parameters and requires identity-based authentication. It places stronger controls on reading and changing critical security parameters. Software and firmware require an [EAL3](#evaluation-assurance-levels) operating system or an equivalent trusted operating system.
+- Level 4 \
+  Adds an envelope of protection that detects and responds to unauthorized physical access and environmental conditions outside the module's operating range. Software and firmware require the functional requirements of Level 3 and assurance comparable to [EAL4](#evaluation-assurance-levels).
