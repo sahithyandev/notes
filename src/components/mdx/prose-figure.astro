@@ -1,16 +1,29 @@
 ---
 // Pairs a compact figure with the prose that introduces it. The source order
 // remains prose then figure for narrow viewports and assistive technology.
+// `figuresOnly` lays out figure-slot children as a responsive figure pair.
+
+interface Props {
+  figuresOnly?: boolean;
+}
+
+const { figuresOnly = false } = Astro.props;
 ---
 
-<div class="prose-figure">
-  <div class="prose">
-    <slot />
-  </div>
-  <div class="figure">
+{figuresOnly ? (
+  <div class="prose-figure prose-figure--figures">
     <slot name="figure" />
   </div>
-</div>
+) : (
+  <div class="prose-figure">
+    <div class="prose">
+      <slot />
+    </div>
+    <div class="figure">
+      <slot name="figure" />
+    </div>
+  </div>
+)}
 
 <style>
   .prose-figure {
@@ -28,10 +41,24 @@
     justify-content: center;
   }
 
-  @media (min-width: 48rem) {
+  .prose-figure--figures {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .prose-figure--figures :global(svg) {
+    min-width: 0;
+    width: 100%;
+  }
+
+  @media (min-width: 56rem) {
     .prose-figure {
       column-gap: clamp(1.5rem, 4vw, 2.5rem);
       grid-template-columns: minmax(0, 1fr) minmax(12.5rem, 0.75fr);
+    }
+
+    .prose-figure--figures {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

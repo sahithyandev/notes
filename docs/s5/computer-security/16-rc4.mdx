@@ -1,7 +1,7 @@
 ---
 title: RC4
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T06:18:02.607Z
+lastUpdatedOn: 2026-10-27T10:07:19.324Z
 ---
 
 A byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an LFSR. Designed by Ron Rivest in 1987.
@@ -60,13 +60,13 @@ Each output byte depends on the entire current permutation rather than a fixed l
 
 ## Security Analysis
 
-RC4 was widely deployed in SSL/TLS, WEP, and WPA for its speed and simplicity, but every major use of it has since been broken or deprecated.
+RC4 was used in SSL/TLS, WEP, and WPA. It is now broken or deprecated in each protocol.
 
-- Key scheduling bias  
-  The KSA leaves a detectable statistical bias in the early PRGA output: the second keystream byte equals 0 with probability close to $2/256$ instead of the expected $1/256$, so the start of every keystream leaks information about the key.
+- Early-byte bias  
+  The 2nd keystream byte is $0$ with probability close to $2/256$. A uniform byte has probability $1/256$. The early output is distinguishable from random.
 - Related-key weakness  
-  WEP prepends a 24-bit public IV to the long-term key for every packet. For certain weak IV values, the first KSA swaps leak 1 byte of the long-term key directly into the first PRGA output byte. The Fluhrer-Mantin-Shamir attack collects packets under enough weak IVs to recover the entire long-term key, breaking WEP outright.
+  WEP prefixes the long-term key with a public 24-bit IV. Certain IVs make the first KSA swaps expose 1 key byte through the first PRGA byte. The Fluhrer-Mantin-Shamir attack collects enough such packets to recover the long-term key.
 - Keystream bias  
-  Beyond the first bytes, the PRGA output is not perfectly uniform either. Digraph biases such as Mantin's ABSAB bias let an attacker who sees the same plaintext encrypted under many unrelated keys, as in a broadcast setting, recover it by majority vote across sessions, without recovering any key.
+  Later PRGA output also has statistical biases. Mantin's ABSAB bias can reveal a plaintext sent under many unrelated keys. The attack uses byte frequencies across sessions. It does not recover a key.
 
-Dropping the first 256 or more output bytes and never deriving a key by concatenating it with a public IV patches the specific attacks above, but does not restore RC4 to a currently recommended cipher. Modern protocols use AES or other authenticated stream ciphers instead.
+Discarding the first 256 or more bytes removes some early-output biases. Keeping a public IV separate from the key prevents the WEP-style related-key attack. Neither change makes RC4 safe for new systems. Modern protocols use authenticated ciphers such as AES-GCM or ChaCha20-Poly1305.
