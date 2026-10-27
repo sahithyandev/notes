@@ -1,10 +1,14 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T04:18:29.469Z
+lastUpdatedOn: 2026-10-27T05:24:49.497Z
 ---
 
-A linear feedback shift register (LFSR) builds a [keystream](/s5/computer-security/stream-ciphers) from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
+<Aka>LFSR</Aka>. Builds a [keystream](/s5/computer-security/stream-ciphers) from
+a register of $n$ bits $s_0, s_1, \ldots, s_{n - 1}$, where each new bit is the
+XOR of a fixed subset of the current bits.
+
+In an LFSR, the register is a row of $n$ 1-bit memory cells. Its contents are the current $n$-bit state. Each clock tick outputs 1 designated bit, shifts every cell's bit to the next cell, then inserts the feedback bit into the vacant cell.
 
 $$
 s_i = c_1 s_{i-1} \oplus c_2 s_{i-2} \oplus \cdots \oplus c_n s_{i-n}, \quad i \ge n
@@ -19,19 +23,20 @@ $$
   </Sym>
 </Symbols>
 
-Each step outputs 1 bit, usually $s_{i-n}$, then shifts the register and inserts the new feedback bit.
-
 import Lfsr from "./images/lfsr.svg";
 
 <Lfsr />
 
-## Key Space
-
-With a fixed public connection polynomial, the initial $n$-bit state is the key. The all-zero state is excluded because it remains zero forever. The key space therefore has $2^n - 1$ members.
-
 ## Connection Polynomial
 
-The taps are written as a connection polynomial over $\mathrm{GF}(2)$, also called the feedback polynomial.
+<Aka>feedback polynomial</Aka>. The taps are written as a connection polynomial
+over $\mathrm{GF}(2)$.
+
+<Note>
+
+$\mathrm{GF}(2)$ is the field $\{0, 1\}$. Addition is XOR and multiplication is bitwise AND, so each coefficient is either 0 or 1.
+
+</Note>
 
 $$
 p(x) = 1 + c_1 x + c_2 x^2 + \cdots + c_n x^n
@@ -39,13 +44,19 @@ $$
 
 Each term $c_k x^k$ marks whether the tap $k$ steps back feeds into the recurrence, so $p(x)$ is a complete description of the LFSR's wiring, independent of the initial state.
 
-The output sequence has period $2^n - 1$, the maximum possible for an $n$-bit register, **iff** $p(x)$ is a primitive polynomial over $\mathrm{GF}(2)$.
+### Primitive Polynomial
 
-<Note>
+A degree-$n$ polynomial $p(x)$ over $\mathrm{GF}(2)$ is primitive **iff** it is irreducible and any root has multiplicative order $2^n - 1$ in $\mathrm{GF}(2^n)$. Its successive powers therefore generate every nonzero field element.
+
+To test whether a degree-$n$ polynomial $p(x)$ is primitive, first check that it is irreducible over $\mathrm{GF}(2)$. Let $M = 2^n - 1$. For every prime factor $q$ of $M$, compute $x^{M/q} \bmod p(x)$. The polynomial is primitive **iff** none of these remainders equals 1.
+
+The output sequence has period $2^n - 1$, the maximum possible for an $n$-bit register, **iff** $p(x)$ is a primitive polynomial over $\mathrm{GF}(2)$.
 
 A non-primitive connection polynomial still produces a periodic sequence, just with a period shorter than $2^n - 1$, and possibly a period that depends on the initial state.
 
-</Note>
+## Key Space
+
+With a fixed public connection polynomial, the initial $n$-bit state is the key. The all-zero state is excluded because it remains zero forever. The key space therefore has $2^n - 1$ members.
 
 ## Characteristic Polynomial
 
@@ -55,7 +66,7 @@ $$
 p^*(x) = x^n p(1/x) = x^n + c_1 x^{n-1} + c_2 x^{n-2} + \cdots + c_n
 $$
 
-$p^*(x)$ is primitive over $\mathrm{GF}(2)$ **iff** $p(x)$ is, so either polynomial can be used to check for maximal period. The characteristic polynomial is the one whose roots in the extension field $\mathrm{GF}(2^n)$ generate the output sequence, each output bit expressible as a trace function of a root raised to successive powers.
+$p^*(x)$ is primitive over $\mathrm{GF}(2)$ **iff** $p(x)$ is. Either polynomial can be used to check for maximal period. Its roots in the extension field $\mathrm{GF}(2^n)$ determine the solutions of the recurrence and therefore the possible output sequences.
 
 ## Combining LFSRs
 
@@ -70,11 +81,15 @@ $$
   <Sym s="f">a fixed nonlinear function of the $m$ component outputs.</Sym>
 </Symbols>
 
-For example, the Geffe generator combines 3 LFSRs through $f(x_1, x_2, x_3) = x_1 x_2 \oplus (1 \oplus x_1) x_3$, using $x_1$ to select between $x_2$ and $x_3$.
+## Clock Control
+
+Component LFSRs need not advance together. A clock-control function can select which registers advance at each step from their current output bits. Irregular clocking disrupts the fixed alignment between component sequences and the output keystream.
+
+Clock control must not leave a component's output statistically detectable in the resulting keystream.
 
 ## Security
 
-A combining function $f$ must satisfy several properties for the resulting keystream to resist analysis.
+A combining or clock-control function must satisfy several properties for the resulting keystream to resist analysis.
 
 - Balance  
   $f$ outputs 0 and 1 equally often across all input combinations, so the keystream carries no statistical bias.
@@ -83,7 +98,7 @@ A combining function $f$ must satisfy several properties for the resulting keyst
 - Correlation immunity  
   $k_i$ is statistically independent of each individual $s_i^{(j)}$, so no component LFSR's output correlates with the combiner's output.
 
-A higher correlation immunity order generally forces a lower achievable nonlinear order, so the 2 properties trade off against each other rather than maximising independently. The Geffe generator above illustrates the failure mode: despite being nonlinear and balanced, its output agrees with $x_2$ on $75\%$ of inputs and with $x_3$ on $75\%$ of inputs, since $x_1$ only selects which of the two it copies.
+A higher correlation immunity order generally forces a lower achievable nonlinear order, so the 2 properties trade off against each other rather than maximising independently.
 
 ## Attacking
 
@@ -97,13 +112,15 @@ Targets a single LFSR directly, exploiting the linearity of its recurrence.
 
 ### Correlation Attack
 
-Targets a combined generator whose combining function $f$ correlates with 1 of its component LFSRs, as in the Geffe example above.
+Targets a combined generator whose combining function $f$ correlates with 1 of its component LFSRs.
 
 - The attacker guesses the connection polynomial of the correlated LFSR (public in most designs) and searches over its $2^n - 1$ possible initial states.
 - Each candidate state produces a candidate output sequence, compared against the keystream bit by bit.
 - The candidate whose sequence agrees with the keystream noticeably more than $50\%$ of the time is accepted as the recovered state.
 
 This reduces recovering an $m$-LFSR generator's full state from 1 search of size $2^{\sum n_j} - 1$ to $m$ separate searches of size $2^{n_j} - 1$ each, so correlation immunity directly defends against it.
+
+If clock control repeatedly holds 1 component's output while another advances, the output can retain detectable structure from the held component. Statistical tests can then reveal its period or state.
 
 ## Example
 
@@ -115,14 +132,14 @@ $$
 s_i = s_{i-1} \oplus s_{i-4}
 $$
 
-| $i$ | $s_{i-4} s_{i-3} s_{i-2} s_{i-1}$ | $s_i$ | Output  |
-| --- | --------------------------------- | ----- | ------- |
-| 4   | 1000                              | 1     | $s_0=1$ |
-| 5   | 0001                              | 1     | $s_1=0$ |
-| 6   | 0011                              | 0     | $s_2=0$ |
-| 7   | 0110                              | 1     | $s_3=0$ |
-| 8   | 1101                              | 1     | $s_4=1$ |
-| 9   | 1011                              | 0     | $s_5=1$ |
+| $i$ | $s_{i-4} s_{i-3} s_{i-2} s_{i-1}$ | $s_i$                        | Output  |
+| --- | --------------------------------- | ---------------------------- | ------- |
+| 4   | <TabularNums>1000</TabularNums>   | <TabularNums>1</TabularNums> | $s_0=1$ |
+| 5   | <TabularNums>0001</TabularNums>   | <TabularNums>1</TabularNums> | $s_1=0$ |
+| 6   | <TabularNums>0011</TabularNums>   | <TabularNums>1</TabularNums> | $s_2=0$ |
+| 7   | <TabularNums>0111</TabularNums>   | <TabularNums>1</TabularNums> | $s_3=0$ |
+| 8   | <TabularNums>1111</TabularNums>   | <TabularNums>0</TabularNums> | $s_4=1$ |
+| 9   | <TabularNums>1110</TabularNums>   | <TabularNums>1</TabularNums> | $s_5=1$ |
 
 Continuing the recurrence for 15 steps cycles through every nonzero state of the register once before repeating, giving the maximal period $2^4 - 1 = 15$, confirming $p(x) = 1 + x + x^4$ is primitive over $\mathrm{GF}(2)$.
 
