@@ -1,0 +1,321 @@
+---
+export const prerender = true;
+
+import { getCollection } from "astro:content";
+import Footer from "../components/layout/footer.astro";
+import Nav from "../components/layout/nav.astro";
+import Layout from "../layouts/Layout.astro";
+import {
+  buildGlossary,
+  renderGlossaryText,
+  titleCaseGlossaryAlias,
+} from "../lib/glossary";
+import { SITE_HOST_URL, SITE_NAME } from "../utils/values";
+
+const notes = await getCollection("notes");
+const entries = buildGlossary(
+  notes.map((note) => ({
+    id: note.id,
+    title: note.data.title,
+    body: note.body,
+  })),
+);
+---
+
+<Layout
+  title={`Glossary | ${SITE_NAME}`}
+  description="An index of abbreviations and alternate names used across Sahithyan's Notes."
+  canonical={`${SITE_HOST_URL}/glossary`}
+  slug="glossary"
+>
+  <Nav />
+
+  <main id="main-content" class="glossary-page">
+    <section class="glossary-content" aria-labelledby="glossary-title">
+      <header class="glossary-header">
+        <p class="glossary-kicker">Reference</p>
+        <h1 id="glossary-title">Glossary</h1>
+        <p>
+          Short forms and alternate names used throughout the notes. Each entry
+          links to the note where it is introduced.
+        </p>
+      </header>
+
+      <div class="glossary-tools">
+        <label for="glossary-filter">Filter entries</label>
+        <input
+          id="glossary-filter"
+          type="search"
+          placeholder="Try CLI, Fourier, or scheduling"
+          autocomplete="off"
+          spellcheck="false"
+          aria-controls="glossary-entries"
+        />
+        <p id="glossary-count" aria-live="polite">
+          {entries.length} entries
+        </p>
+      </div>
+
+      <div class="glossary-table-wrap" tabindex="0">
+        <table id="glossary-entries">
+          <thead>
+            <tr>
+              <th scope="col">Short Form or Alias</th>
+              <th scope="col">Associated Term</th>
+              <th scope="col">Source Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map((entry) => (
+              <tr
+                data-entry
+                data-search={`${entry.alias} ${entry.term} ${entry.noteTitle}`.toLowerCase()}
+              >
+                <td
+                  class="alias"
+                  set:html={renderGlossaryText(
+                    titleCaseGlossaryAlias(entry.alias),
+                  )}
+                />
+                <td>
+                  <a
+                    href={entry.href}
+                    set:html={renderGlossaryText(entry.term)}
+                  />
+                </td>
+                <td class="source">
+                  <a
+                    href={entry.href}
+                    set:html={renderGlossaryText(entry.noteTitle)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p id="glossary-empty" class="glossary-empty" hidden>
+        No glossary entries match that filter.
+      </p>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>("#glossary-filter");
+  const rows = Array.from(
+    document.querySelectorAll<HTMLTableRowElement>("[data-entry]"),
+  );
+  const count = document.querySelector<HTMLElement>("#glossary-count");
+  const empty = document.querySelector<HTMLElement>("#glossary-empty");
+
+  input?.addEventListener("input", () => {
+    const query = input.value.trim().toLocaleLowerCase();
+    let visible = 0;
+
+    for (const row of rows) {
+      const matches = !query || row.dataset.search?.includes(query);
+      row.hidden = !matches;
+      if (matches) visible += 1;
+    }
+
+    if (count)
+      count.textContent = `${visible} ${visible === 1 ? "entry" : "entries"}`;
+    if (empty) empty.hidden = visible !== 0;
+  });
+</script>
+
+<style>
+  :root {
+    --nav-h: 54px;
+  }
+
+  .glossary-page {
+    min-height: calc(100dvh - var(--nav-h));
+    width: var(--body-width);
+    margin: calc(8 * var(--spacing)) auto 0;
+  }
+
+  .glossary-content {
+    width: 100%;
+    max-width: 1080px;
+    padding-bottom: 56px;
+  }
+
+  .glossary-header {
+    max-width: 680px;
+  }
+
+  .glossary-kicker {
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  h1 {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  .glossary-header > p:last-child {
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .glossary-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 16px;
+    align-items: end;
+    max-width: 620px;
+    margin: 36px 0 16px;
+  }
+
+  .glossary-tools label {
+    grid-column: 1 / -1;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .glossary-tools input {
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-primary);
+    font: inherit;
+  }
+
+  .glossary-tools input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .glossary-tools input:focus-visible {
+    outline: 3px solid var(--accent-dim);
+    outline-offset: 2px;
+    border-color: var(--accent);
+  }
+
+  #glossary-count {
+    padding-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .glossary-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  .glossary-table-wrap:focus-visible {
+    outline: 3px solid var(--accent-dim);
+    outline-offset: 3px;
+  }
+
+  table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  td {
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    line-height: 1.45;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  tbody tr:hover td {
+    background: var(--accent-dim);
+  }
+
+  .alias {
+    width: 28%;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-weight: 700;
+  }
+
+  .source {
+    width: 24%;
+    font-size: 0.9375rem;
+  }
+
+  td a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  td a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  td a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .glossary-empty {
+    margin-top: 20px;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 520px) {
+    .glossary-page {
+      margin-top: calc(5 * var(--spacing));
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .glossary-tools {
+      grid-template-columns: 1fr;
+    }
+
+    #glossary-count {
+      padding-bottom: 0;
+    }
+  }
+</style>
