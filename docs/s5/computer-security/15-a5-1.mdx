@@ -1,7 +1,7 @@
 ---
 title: A5/1 Stream Cipher
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T04:18:29.481Z
+lastUpdatedOn: 2026-10-27T06:18:02.596Z
 ---
 
 A5/1 is an [LFSR](/s5/computer-security/linear-feedback-shift-registers) based [stream cipher](/s5/computer-security/stream-ciphers) used to encrypt on-air mobile communication traffic in the GSM standard.
@@ -42,6 +42,8 @@ $$
 $$
 
 A register is clocked **iff** its clocking bit equals $\text{maj}$. At least 2 registers are clocked at every step.
+
+Clocking advances a register by 1 LFSR shift. Its clocking-bit position then holds the new bit shifted into that position. A register that is not clocked does not shift, so its clocking bit remains unchanged for that step.
 
 | $c_1$ | $c_2$ | $c_3$ | $\text{maj}$ | $R_1$ | $R_2$ | $R_3$ |
 | ----- | ----- | ----- | ------------ | ----- | ----- | ----- |
