@@ -1,9 +1,21 @@
 ---
 // Inline alias lead-in: <Aka>SNR, signal-to-noise ratio</Aka>. Ratio of signal to noise power.
+interface Props {
+  original?: string;
+}
+const { original } = Astro.props;
 ---
 
+<>
+  <!-- prettier-ignore -->
+  {original == undefined ? <span class="aka" data-pagefind-weight="1.2"><span class="aka-label">Also known as </span><span class="aka-names"><slot /></span></span> :
+<span>
+    {original}
 <!-- prettier-ignore -->
-<span class="aka" data-pagefind-weight="1.2"><span class="aka-label">Also known as </span><span class="aka-names"><slot /></span></span>
+(<span class="aka" data-pagefind-weight="1.2"><span class="aka-label">also known as </span><span class="aka-names"><slot /></span></span>)
+</span>
+}
+</>
 
 <style is:global>
   .aka-label {

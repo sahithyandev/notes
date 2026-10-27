@@ -8,11 +8,15 @@ import Legend from "./primitives/legend.astro";
 interface Props {
   url: string;
   caption?: string;
+  highlight?: Highlight[];
 }
+
+type Highlight = "host" | "path" | "parameter name" | "parameter value";
 
 const {
   url,
   caption = `The URL ${url} split into scheme, host, path and query segments`,
+  highlight,
 } = Astro.props;
 
 type SegmentKind =
@@ -65,21 +69,39 @@ const LEGEND: { label: string; kind: SegmentKind; color: string }[] = [
   { label: "Parameter name", kind: "param-name", color: "var(--dia-key)" },
   { label: "Parameter value", kind: "param-value", color: "var(--dia-out)" },
 ];
+const highlightKind: Record<Highlight, SegmentKind> = {
+  host: "host",
+  path: "path",
+  "parameter name": "param-name",
+  "parameter value": "param-value",
+};
+const highlightedKinds = new Set(
+  (highlight ?? (Object.keys(highlightKind) as Highlight[])).map(
+    (item) => highlightKind[item],
+  ),
+);
 const presentKinds = new Set(segments.map((s) => s.kind));
-const legendItems = LEGEND.filter((l) => presentKinds.has(l.kind)).map((l) => ({
-  label: l.label,
+const legendItems = LEGEND.filter(
+  (item) => presentKinds.has(item.kind) && highlightedKinds.has(item.kind),
+).map((item) => ({
+  label: item.label,
   kind: "swatch" as const,
-  fill: l.color,
+  fill: item.color,
 }));
+const segmentClass = (segment: Segment) => [
+  "seg",
+  segment.kind,
+  { highlighted: highlightedKinds.has(segment.kind) },
+];
 ---
 
 <Panel class="url-breakdown" caption={caption} hideCaption>
   <p class="url">
     {segments.map((s) => (
-      <span class:list={["seg", s.kind]}>{s.text}</span>
+      <span class:list={segmentClass(s)}>{s.text}</span>
     ))}
   </p>
-  <Legend items={legendItems} />
+  {legendItems.length > 0 && <Legend items={legendItems} />}
 </Panel>
 
 <style>
@@ -101,27 +123,23 @@ const legendItems = LEGEND.filter((l) => presentKinds.has(l.kind)).map((l) => ({
   .seg.connector {
     color: var(--text-muted);
   }
-  .seg.host {
+  .seg.host.highlighted {
     color: var(--dia-pt);
     font-weight: 700;
   }
-  .seg.path {
+  .seg.path.highlighted {
     color: var(--dia-ct);
     font-weight: 700;
   }
-  .seg.param-name {
+  .seg.param-name.highlighted {
     color: var(--dia-key);
     font-weight: 700;
   }
-  .seg.param-value {
+  .seg.param-value.highlighted {
     color: var(--dia-out);
     font-weight: 700;
   }
-  .seg.scheme:hover,
-  .seg.host:hover,
-  .seg.path:hover,
-  .seg.param-name:hover,
-  .seg.param-value:hover {
+  .seg.highlighted:hover {
     background: color-mix(in srgb, currentColor 16%, transparent);
     box-shadow: 0 0 0 1px currentColor;
   }
