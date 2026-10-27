@@ -71,9 +71,46 @@ tocEl?.addEventListener("click", (e) => {
 const mqDesktop = window.matchMedia("(min-width: 48rem)");
 mqDesktop.addEventListener("change", (e) => {
   if (e.matches) closeDrawers();
+  syncStudySidebarPeek();
 });
 
 const studyBtn = document.getElementById("study-toggle");
+
+const STUDY_EDGE_PX = 24;
+const studySidebarWidth = () =>
+  Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue("--sidebar-w"),
+  ) || 280;
+
+const syncStudySidebarPeek = (event?: PointerEvent) => {
+  if (!root.classList.contains("study-mode") || !mqDesktop.matches) {
+    root.classList.remove("study-sidebar-left", "study-sidebar-right");
+    return;
+  }
+
+  if (!event || event.pointerType === "touch") return;
+
+  const belowNav = event.clientY >= 54;
+  const sidebarWidth = studySidebarWidth();
+  const leftWasOpen = root.classList.contains("study-sidebar-left");
+  const rightWasOpen = root.classList.contains("study-sidebar-right");
+  const revealLeft =
+    belowNav &&
+    (event.clientX <= STUDY_EDGE_PX ||
+      (leftWasOpen && event.clientX <= sidebarWidth));
+  const revealRight =
+    belowNav &&
+    (event.clientX >= window.innerWidth - STUDY_EDGE_PX ||
+      (rightWasOpen && event.clientX >= window.innerWidth - sidebarWidth));
+
+  root.classList.toggle("study-sidebar-left", revealLeft);
+  root.classList.toggle("study-sidebar-right", revealRight);
+};
+
+document.addEventListener("pointermove", syncStudySidebarPeek, {
+  passive: true,
+});
+
 studyBtn?.setAttribute(
   "aria-pressed",
   String(root.classList.contains("study-mode")),
@@ -81,6 +118,7 @@ studyBtn?.setAttribute(
 studyBtn?.addEventListener("click", () => {
   const on = root.classList.toggle("study-mode");
   studyBtn.setAttribute("aria-pressed", String(on));
+  if (!on) syncStudySidebarPeek();
   track("study_mode", { on });
   try {
     if (on) localStorage.setItem("sn-study-mode", "1");

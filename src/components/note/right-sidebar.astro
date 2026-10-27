@@ -22,6 +22,7 @@
 
   @media (min-width: 48rem) {
     :global(html.study-mode) .right-sidebar {
+      transform: translateX(0);
       visibility: hidden;
     }
 
@@ -30,7 +31,19 @@
     }
 
     :global(html.drawers-ready.study-mode) .right-sidebar {
-      transition: visibility 0s var(--study-dur);
+      transition:
+        transform var(--study-dur) var(--study-ease),
+        visibility 0s var(--study-dur);
+    }
+
+    :global(html.study-mode.study-sidebar-right) .right-sidebar {
+      z-index: 10;
+      transform: translateX(-100%);
+      visibility: visible;
+      box-shadow: -8px 0 12px rgba(0, 0, 0, 0.12);
+      transition:
+        transform var(--study-dur) var(--study-ease),
+        visibility 0s;
     }
   }
 

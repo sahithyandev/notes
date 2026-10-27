@@ -305,6 +305,17 @@ const { sidebarData, slug, slugParts } = Astro.props;
         transform var(--study-dur) var(--study-ease),
         visibility 0s var(--study-dur);
     }
+
+    :global(html.study-mode.study-sidebar-left) .sidebar {
+      position: relative;
+      z-index: 10;
+      transform: translateX(0);
+      visibility: visible;
+      box-shadow: 8px 0 12px rgba(0, 0, 0, 0.12);
+      transition:
+        transform var(--study-dur) var(--study-ease),
+        visibility 0s;
+    }
   }
 
   @media (max-width: 48rem) {
