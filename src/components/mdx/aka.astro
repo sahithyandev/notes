@@ -4,18 +4,15 @@ interface Props {
   original?: string;
 }
 const { original } = Astro.props;
+const hasOriginal = original !== undefined;
+let label = "Also known as ";
+if (hasOriginal) {
+  label = label.toLowerCase();
+}
 ---
 
-<>
-  <!-- prettier-ignore -->
-  {original == undefined ? <span class="aka" data-pagefind-weight="1.2"><span class="aka-label">Also known as </span><span class="aka-names"><slot /></span></span> :
-<span>
-    {original}
 <!-- prettier-ignore -->
-(<span class="aka" data-pagefind-weight="1.2"><span class="aka-label">also known as </span><span class="aka-names"><slot /></span></span>)
-</span>
-}
-</>
+<span class="aka" data-pagefind-weight="1.2">{hasOriginal && `${original} (`}<span class="aka-label">{label}</span><span class="aka-names"><slot /></span>{hasOriginal && ")"}</span>
 
 <style is:global>
   .aka-label {
