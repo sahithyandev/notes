@@ -1,0 +1,80 @@
+---
+title: SHA Family
+dateCreated: 2026-10-27T12:08:05.849Z
+lastUpdatedOn: 2026-10-27T13:10:12.094Z
+---
+
+The Secure Hash Algorithm family is published by NIST, using the [MD4](/s5/computer-security/md-family#md4) and [MD5](/s5/computer-security/md-family#md5) design pattern.
+
+## SHA-0
+
+SHA-0 was published in 1993 and withdrawn in 1995 due to an undisclosed flaw. The technical flaw was never publicly disclosed.
+
+- Output size  
+  160 bits.
+- Block size  
+  512 bits.
+- Structure  
+  80 rounds over a state of 5 32-bit words.
+
+Later collision attacks took about $2^{36}$ operations, below the expected $2^{80}$ operations for a 160-bit hash.
+
+## SHA-1
+
+SHA-1 fixed the SHA-0 flaw by adding a 1-bit left rotation to each word in the message expansion.
+Same properties as SHA-0.
+
+The rotation disrupts differential patterns that enable collision attacks.
+
+The expected collision work is $2^{80}$ by the birthday bound. Attacks reduced it over time.
+
+- 2005  
+  Wang et al. reduce the collision cost to about $2^{69}$.
+- 2017  
+  The SHAttered attack by CWI and Google produces the first full collision, at about $2^{63}$ work.
+- 2020  
+  Leurent and Peyrin give a chosen-prefix collision, making certificate forgery practical.
+
+SHA-1 is deprecated for signatures and certificates.
+
+Git uses SHA-1 by default to name blobs, trees, commits and tags. These object IDs have 40 hexadecimal digits. Git also supports SHA-256 repositories.
+
+## SHA-2
+
+Published in 2001. It keeps the Merkle–Damgård design with a stronger compression function.
+
+### Variants
+
+| Variant     | Output bits | Word bits | Block bits | Rounds |
+| ----------- | ----------- | --------- | ---------- | ------ |
+| SHA-224     | 224         | 32        | 512        | 64     |
+| SHA-256     | 256         | 32        | 512        | 64     |
+| SHA-384     | 384         | 64        | 1024       | 80     |
+| SHA-512     | 512         | 64        | 1024       | 80     |
+| SHA-512/224 | 224         | 64        | 1024       | 80     |
+| SHA-512/256 | 256         | 64        | 1024       | 80     |
+
+SHA-512/224 and SHA-512/256 use SHA-512 with different initialization vectors and truncated output.
+
+No practical attack on full SHA-2 is known. The truncated variants SHA-224, SHA-384 and SHA-512/t are not vulnerable to length extension, since part of the state is never output.
+
+## SHA-3
+
+After the attacks on MD5 and SHA-1, NIST held a public competition from 2007. Keccak won in 2012 and was standardized as SHA-3 in FIPS 202 in 2015.
+
+SHA-3 does not use the Merkle–Damgård construction. It uses a sponge construction, in which the message is absorbed into a large state and the digest is squeezed out of it.
+
+- The state is never fully output, so there is no length extension.
+- The design is unrelated to SHA-2, so an attack on SHA-2 is unlikely to carry over.
+
+SHA-3 was designed as a fallback and SHA-2 remains widely used.
+
+## Summary
+
+| Function | Output bits | Block bits  | Status |
+| -------- | ----------- | ----------- | ------ |
+| SHA-0    | 160         | 512         | Broken |
+| SHA-1    | 160         | 512         | Broken |
+| SHA-256  | 256         | 512         | Secure |
+| SHA-512  | 512         | 1024        | Secure |
+| SHA-3    | 224 to 512  | 1152 to 576 | Secure |

@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Codes
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.486Z
+lastUpdatedOn: 2026-10-27T13:10:12.110Z
 ---
 
 A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
@@ -93,7 +93,7 @@ Fixes:
 Hash functions are faster than block ciphers in software and were freely exportable, so MACs built from them were attractive. Turning a keyless hash into a keyed one needed care.
 
 - Secret prefix  
-  $H(k \,\|\, m)$ breaks under length extension on [Merkle–Damgård](/s5/computer-security/md-family-hash-functions) hashes. Knowing $H(k \,\|\, m)$ gives a valid tag for $m \,\|\, \text{pad} \,\|\, x$.
+  $H(k \,\|\, m)$ breaks under length extension on [Merkle–Damgård](/s5/computer-security/md-family) hashes. Knowing $H(k \,\|\, m)$ gives a valid tag for $m \,\|\, \text{pad} \,\|\, x$.
 - Secret suffix  
   $H(m \,\|\, k)$ resists length extension. A collision $H(m) = H(m')$ still gives $H(m \,\|\, k) = H(m' \,\|\, k)$, so the MAC is only as strong as the collision resistance of $H$.
 - Envelope  

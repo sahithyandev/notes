@@ -3,10 +3,12 @@ title: MD Family Hash Functions
 sidebar:
   label: MD Functions
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.472Z
+lastUpdatedOn: 2026-10-27T13:10:12.080Z
 ---
 
 The MD family is a line of [hash functions](/s5/computer-security/hash-functions) designed by Ronald Rivest, comprising MD2, MD4 and MD5. MD4 and MD5 defined the design that the SHA family later followed.
+
+All MD functions use 128 output bits by design. They all are broken now.
 
 ## Merkle–Damgård Construction
 
@@ -24,7 +26,9 @@ If $f$ is collision resistant, then $H$ is collision resistant. The length in th
 
 <Note>
 
-Merkle–Damgård hashes are vulnerable to length extension. The digest $H(m)$ is the final internal state, so an attacker who knows $H(m)$ and the length of $m$ computes $H(m \,\|\, \text{pad} \,\|\, x)$ for any $x$ without knowing $m$. This breaks the naive MAC $H(k \,\|\, m)$.
+Merkle–Damgård hashes are vulnerable to length extension. The digest $H(m)$ exposes the state after processing $m$ and its padding. An attacker who knows $H(m)$ and $|m|$ can use that state as the starting point, then process a chosen suffix $x$. They obtain $H(m \,\|\, \operatorname{pad}(m) \,\|\, x)$ without learning $m$.
+
+This breaks the naive MAC $H(k \,\|\, m)$. Given a valid tag for $m$, an attacker can forge a valid tag for $m \,\|\, \operatorname{pad}(k \,\|\, m) \,\|\, x$ if they can determine or guess $|k|$.
 
 </Note>
 
@@ -32,8 +36,6 @@ Merkle–Damgård hashes are vulnerable to length extension. The digest $H(m)$ i
 
 Designed in 1989 for 8-bit machines.
 
-- Output size  
-  128 bits.
 - Block size  
   16 bytes, with a 16-byte checksum appended before hashing.
 - Structure  
@@ -45,8 +47,6 @@ Collisions in the compression function were found in 1997 and a full collision i
 
 Designed in 1990 as a fast hash for 32-bit machines.
 
-- Output size  
-  128 bits.
 - Block size  
   512 bits.
 - Structure  
@@ -58,8 +58,6 @@ The 3-round structure proved too weak. Den Boer and Bosselaers attacked reduced 
 
 Designed in 1991 as a strengthened MD4, published as RFC 1321 in 1992.
 
-- Output size  
-  128 bits.
 - Block size  
   512 bits.
 - Structure  
@@ -84,64 +82,10 @@ Timeline of attacks:
 
 MD5 must not be used where collision resistance matters. It remains acceptable only as a non-security checksum. RFC 6151 records the attacks.
 
-## SHA Family
-
-The Secure Hash Algorithm family is published by NIST, using the MD4 and MD5 design pattern.
-
-### SHA-0 and SHA-1
-
-SHA-0 was published in 1993 and withdrawn in 1995 due to an undisclosed flaw. SHA-1 fixed it by adding a 1-bit rotation in the message expansion.
-
-- Output size  
-  160 bits.
-- Block size  
-  512 bits.
-- Structure  
-  80 rounds over a state of 5 words.
-
-The expected collision work is $2^{80}$ by the birthday bound. Attacks reduced it over time.
-
-- 2005  
-  Wang et al. reduce the collision cost to about $2^{69}$.
-- 2017  
-  The SHAttered attack by CWI and Google produces the first full collision, at about $2^{63}$ work.
-- 2020  
-  Leurent and Peyrin give a chosen-prefix collision, making certificate forgery practical.
-
-SHA-1 is deprecated for signatures and certificates.
-
-### SHA-2
-
-Published in 2001. It keeps the Merkle–Damgård design with a stronger compression function.
-
-- SHA-224 and SHA-256  
-  32-bit words, 512-bit blocks, 64 rounds.
-- SHA-384 and SHA-512  
-  64-bit words, 1024-bit blocks, 80 rounds.
-- SHA-512/224 and SHA-512/256  
-  SHA-512 with different initialization vectors and truncated output.
-
-No practical attack on full SHA-2 is known. The truncated variants SHA-224, SHA-384 and SHA-512/t are not vulnerable to length extension, since part of the state is never output.
-
-### SHA-3
-
-After the attacks on MD5 and SHA-1, NIST held a public competition from 2007. Keccak won in 2012 and was standardized as SHA-3 in FIPS 202 in 2015.
-
-SHA-3 does not use the Merkle–Damgård construction. It uses a sponge construction, in which the message is absorbed into a large state and the digest is squeezed out of it.
-
-- The state is never fully output, so there is no length extension.
-- The design is unrelated to SHA-2, so an attack on SHA-2 is unlikely to carry over.
-
-SHA-3 was designed as a fallback and SHA-2 remains widely used.
-
 ## Summary
 
-| Function | Output bits | Block bits  | Status |
-| -------- | ----------- | ----------- | ------ |
-| MD2      | 128         | 128         | Broken |
-| MD4      | 128         | 512         | Broken |
-| MD5      | 128         | 512         | Broken |
-| SHA-1    | 160         | 512         | Broken |
-| SHA-256  | 256         | 512         | Secure |
-| SHA-512  | 512         | 1024        | Secure |
-| SHA-3    | 224 to 512  | 1152 to 576 | Secure |
+| Function | Output bits | Block bits |
+| -------- | ----------- | ---------- |
+| MD2      | 128         | 128        |
+| MD4      | 128         | 512        |
+| MD5      | 128         | 512        |

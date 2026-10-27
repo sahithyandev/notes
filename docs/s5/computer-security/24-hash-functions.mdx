@@ -1,7 +1,7 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.450Z
+lastUpdatedOn: 2026-10-27T13:10:12.066Z
 ---
 
 A hash function $H$ maps a message $m$ of any length to a fixed $n$-bit digest $H(m)$. It is public and keyless.
@@ -76,9 +76,34 @@ In real world:
 
 ## Examples
 
+### Basic Mathematical Hash Functions
+
+The following functions map non-negative integers to a fixed range. They
+illustrate hashing, but they are not cryptographically secure.
+
+$$
+H_1(x) = x \bmod 10
+$$
+
+$$
+H_2(x) = (7x + 3) \bmod 10
+$$
+
+Examples:
+
+- $H_1(42) = 2$
+- $H_1(52) = 2$
+- $H_2(7) = 2$
+- $H_2(17) = 2$
+
+Both functions have collisions. $42$ and $52$ have the same digest under
+$H_1$. $7$ and $17$ have the same digest under $H_2$. A digest of $2$ does not
+identify a unique input.
+
 ### OAEP
 
-Optimal Asymmetric Encryption Padding. A randomised padding applied to a message before RSA encryption.
+<Aka>Optimal Asymmetric Encryption Padding</Aka>. A randomised padding applied
+to a message before RSA encryption.
 
 It is a 2-round Feistel network over the message $M$ and a random seed $r$, with round functions built from a hash $H$:
 

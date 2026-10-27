@@ -1,0 +1,124 @@
+---
+title: Pseudorandomness
+dateCreated: 2026-09-28T03:02:07.502Z
+lastUpdatedOn: 2026-10-27T13:10:11.980Z
+---
+
+Pseudorandomness is the property that an efficiently computable deterministic construction is indistinguishable from an ideal random object to every efficient adversary.
+
+Purely deterministic computer programs cannot produce true randomness. They require entropy from physical events. Pseudorandom constructions expand a short true-random seed into values that look random to efficient adversaries.
+
+PRFs and PRPs use a short secret key to select a deterministic efficient function. Both are secure when no efficient distinguisher can distinguish the keyed function from its ideal random object.
+
+### Distinguisher
+
+A distinguisher $D$ is an algorithm that receives a value or oracle and outputs 1 bit to guess which of 2 distributions produced it.
+
+A probabilistic polynomial-time (PPT) distinguisher uses random bits and runs in time polynomial in the security parameter $n$.
+
+### Computational Indistinguishability
+
+Distributions $X = \{X_n\}$ and $Y = \{Y_n\}$ are computationally indistinguishable **iff** every PPT distinguisher $D$ has negligible advantage:
+
+$$
+\Big\lvert \Pr[D(X_n) = 1] - \Pr[D(Y_n) = 1] \Big\rvert
+$$
+
+<Symbols>
+
+<Sym s="X_n">first distribution at security parameter $n$</Sym>
+<Sym s="Y_n">second distribution at security parameter $n$</Sym>
+<Sym s="D">PPT distinguisher</Sym>
+<Sym s="\Pr[D(X_n) = 1]">
+  probability that $D$ outputs $1$ for a sample from $X_n$
+</Sym>
+<Sym s="\Pr[D(Y_n) = 1]">
+  probability that $D$ outputs $1$ for a sample from $Y_n$
+</Sym>
+<Sym s="n">security parameter</Sym>
+
+</Symbols>
+
+Both probabilities include the random sample and the random choices made by $D$. As $n$ increases, no efficient distinguisher gains a useful way to tell the 2 distributions apart.
+
+## Pseudorandom Generators
+
+<Aka>PRG</Aka>. A function that stretches a short seed into a longer
+pseudorandom string. The output $G(k)$ is computationally indistinguishable from
+a uniformly random $m(n)$-bit string when $k$ is chosen uniformly.
+
+$$
+G : \{0,1\}^n \to \{0,1\}^{m(n)}\quad \text{where } m(n) > n
+$$
+
+## Pseudorandom Functions
+
+<Aka>PRF</Aka>. A PRF family is a set of efficiently computable functions $\{f_k : \{0,1\}^n \to \{0,1\}^n\}_{k \in \{0,1\}^n}$, indexed by a key $k$, that no efficient adversary can distinguish from a function chosen uniformly at random from all functions on $\{0,1\}^n$.
+
+### Key Space
+
+The definition uses an $n$-bit key, so the family has $2^n$ candidate keys. This is the number of selectable keyed functions before accounting for any distinct keys that happen to define the same function. It is much smaller than the $2^{n \cdot 2^n}$ functions from $n$ bits to $n$ bits.
+
+### Security Game
+
+A distinguisher $D$ is an efficient attacker program. It receives blackbox access to a hidden function. $D$ can query the blackbox for any input $x$ and receive the function's output for $x$.
+
+The challenger secretly gives $D$ 1 of 2 possible oracles.
+
+- PRF oracle  
+  The challenger chooses $k \leftarrow \{0,1\}^n$ uniformly and uses $f_k$. Once $k$ is chosen, $f_k$ is deterministic.
+- Random oracle  
+  The challenger chooses a truly random function $R : \{0,1\}^n \to \{0,1\}^n$. Every input has an independently chosen random output. Repeated queries for the same input produce the same output.
+
+$D$ may make queries adaptively. Each new query may depend on earlier answers. The challenger never reveals $k$ or $R$.
+
+After making its queries, $D$ outputs 1 bit. Output $1$ means that $D$ guesses the PRF oracle. Output $0$ means that $D$ guesses the random oracle.
+
+$$
+\mathrm{Adv}_{\mathrm{PRF}}(D) = \left| \Pr[D^{f_k} = 1] - \Pr[D^{R} = 1] \right|
+$$
+
+The first probability is the chance that $D$ says PRF when it receives $f_k$. The second is the chance that $D$ says PRF when it receives $R$. The difference is $D$'s distinguishing advantage.
+
+A family is a secure PRF **iff** $\mathrm{Adv}_{\mathrm{PRF}}(D)$ is negligible for every probabilistic polynomial-time (PPT) $D$, over the random choice of $k$ or $R$. $f_k$ is pseudorandom because it looks like the truly random function $R$ to every efficient distinguisher.
+
+- The number of oracle queries $D$ may make is polynomial in $n$, since $D$ itself runs in polynomial time.
+- $D$ never sees $k$, only input-output pairs of the oracle it queries.
+
+### Construction from a Pseudorandom Generator
+
+Write $G_0(k)$ and $G_1(k)$ for the first and second $n$-bit halves of $G(k)$.
+
+The Goldreich-Goldwasser-Micali (GGM) construction builds a PRF from $G$. To evaluate $f_k(x)$ for an $n$-bit input $x = x_1 x_2 \cdots x_n$, walk a binary tree of depth $n$ rooted at $k$, taking the left half $G_0$ at each $0$ bit of $x$ and the right half $G_1$ at each $1$ bit.
+
+$$
+f_k(x_1 x_2 \cdots x_n) = G_{x_n}(\cdots G_{x_2}(G_{x_1}(k)) \cdots)
+$$
+
+- Every leaf of the tree corresponds to a distinct input $x$, reached by a distinct sequence of $n$ PRG calls.
+- A secure PRG makes each level indistinguishable from random, so the composed function is indistinguishable from random overall.
+
+This shows a PRF exists whenever a PRG does, and a PRG exists whenever a one-way function does.
+
+### Uses
+
+- Message authentication  
+  A MAC over a fixed-length message $m$ under key $k$ can be computed directly as $f_k(m)$.
+- Counter mode encryption  
+  CTR mode, in [block encryption schemes](/s5/computer-security/block-ciphers), uses $f_k$ evaluated at a counter as the keystream. Only the PRF property is needed, not the PRP's invertibility.
+- Key derivation  
+  A single master key $k$ produces many independent-looking sub-keys $f_k(1), f_k(2), \ldots$
+
+## Pseudorandom Permutations
+
+<Aka>PRP</Aka>. A PRP family restricts each $f_k$ to a bijection on $\{0,1\}^n$. It is indistinguishable from a permutation chosen uniformly at random from all permutations on $\{0,1\}^n$.
+
+Different inputs of a PRP always have different outputs. A PRF allows repeated outputs. A PRP is bijective, so its inverse exists and is efficiently computable. A PRF need not be bijective. It need not have an inverse.
+
+[Block ciphers](/s5/computer-security/block-ciphers) are designed to be PRP families. $e_k$ plays the role of $f_k$. $d_k = f_k^{-1}$ provides the reverse transformation.
+
+<Note>
+
+Every PRP family is also a PRF family, under a slightly larger advantage bound. A permutation never repeats an output, so a distinguisher can only exploit the missing collisions a random function would otherwise show, and that gap is negligible once $n$ is large enough.
+
+</Note>
