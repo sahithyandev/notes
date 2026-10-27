@@ -1,7 +1,7 @@
 ---
 title: Vigenere Cipher
 dateCreated: 2026-07-29T05:53:41.958Z
-lastUpdatedOn: 2026-10-27T04:18:29.387Z
+lastUpdatedOn: 2026-10-27T18:18:05.486Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
@@ -44,6 +44,24 @@ Steps:
 - Take the greatest common divisor of these distances as the keyword length, or a multiple of it.
 
 Repeated short strings, often common bigrams or trigrams of the language, that align to the same keyword position produce the same ciphertext string.
+
+### Fixed Transposition
+
+A fixed transposition after Vigenère encryption does not remove the keyword's period. Under Kerckhoffs's principle, the transposition is public and an attacker reverses it before attacking the substitution.
+
+If the transposition block length $b$ is a multiple of the keyword length $l$, each block begins at the same keyword position.
+
+$$
+b \equiv 0 \pmod l
+$$
+
+The period therefore remains aligned across every block. Repeated ciphertext patterns still expose multiples of $l$.
+
+<Note>
+
+A secret transposition key enlarges the key space, but a short periodic substitution remains structurally weak. Combining 2 classical ciphers does not make either suitable for modern communication.
+
+</Note>
 
 ## Worked Example
 

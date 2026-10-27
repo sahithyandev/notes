@@ -3,25 +3,18 @@ title: Firewalls
 prereqs:
   - s3/data-communication-and-networking/ip
 dateCreated: 2026-09-28T03:03:26.410Z
-lastUpdatedOn: 2026-10-27T15:30:27.362Z
+lastUpdatedOn: 2026-10-27T18:18:05.994Z
 ---
 
-A firewall is a device that protects a private network from outside intrusions by examining every packet that passes through it against a set of rules. A firewall is not a virus guard.
+A hardware device or a software or both, that protects a private network from outside intrusions. It examines every passing packet against a set of rules.
 
-## Stance
+## Firewall Policy
 
-The stance dictates what a firewall does in the absence of a matching rule. The default stance blocks everything unless explicitly allowed.
+### Default Stance
 
-## Interfaces
+The stance dictates what a firewall does when no rule matches. The default stance blocks everything unless explicitly allowed.
 
-- External interface  
-  Connects to an untrusted network, typically the Internet.
-- Trusted interface  
-  Connects to the internal network, requiring maximum protection.
-- Optional interface  
-  Connects to a DMZ or another semi-trusted zone, hosting public web, mail, FTP, or DNS servers.
-
-## Security Policy
+### Security Policy
 
 A firewall's security policy specifies:
 
@@ -32,64 +25,53 @@ A firewall's security policy specifies:
 - Which times of day users may browse the web.
 - Which categories of website users may visit.
 
-## Packet Filtering
+## Network Interfaces and Zones
 
-Packet filtering inspects a packet's header, filtering on IP address, port, protocol, or type of service, and treats incoming and outgoing packets separately.
+### Interfaces
 
-- Operates at the network and transport layers.
-- Cannot detect stateless attacks such as [denial of service](/s5/computer-security/network-attacks#denial-of-service), since it judges every packet independently.
+- External interface  
+  Connects to an untrusted network, typically the Internet.
+- Trusted interface  
+  Connects to the internal network, requiring maximum protection.
+- Optional interface  
+  Connects to a DMZ or another semi-trusted zone, hosting public web, mail, FTP, or DNS servers.
 
-## Circuit Relay
+### Demilitarized Zone
 
-Circuit relay filters using information outside the packet header, such as the user or time of day, and tracks connection state dynamically instead of judging each packet in isolation.
+A demilitarized zone (DMZ) is a separate network segment behind the optional firewall interface. It hosts public servers such as web and mail. It remains isolated from the internal network.
+
+## Traffic Inspection
+
+### Stateless Packet Filtering
+
+Packet filtering inspects a packet header. It filters on IP address, port, protocol, or type of service. It treats incoming and outgoing packets separately. Operates at the network and transport layers.
+
+Cannot detect stateless attacks such as [denial of service](/s5/computer-security/network-attacks#denial-of-service), since it judges every packet independently.
+
+### Stateful Inspection
+
+A stateless packet filter judges each packet independently. It has no memory of the protocol context.
+
+A stateful firewall tracks the state of each connection. It permits inbound traffic only when it matches an established, legitimate outbound request. Unsolicited probes and forged replies are dropped.
+
+### Circuit Relay
+
+Circuit relay filters using information outside the packet header, such as the user or time of day. It tracks connection state dynamically.
 
 Combining packet filtering with circuit relay is more effective than either alone.
 
-## Security Proxy
+### Security Proxy
 
-A security proxy intercepts each packet, strips its wrapping, inspects and processes the content, then re-wraps and forwards it, detecting forbidden content that packet filtering and circuit relay cannot see.
+A security proxy intercepts each packet, strips its wrapping, inspects and processes the content, then re-wraps and forwards it. It detects forbidden content that packet filtering and circuit relay cannot see.
 
-- Blocks entire categories of attack rather than individual packets.
-- Conceals details of internal servers from the public Internet.
-- Adds processing delay to every packet.
+Works at application layer.
+Conceals details of internal servers from the public Internet. Blocks entire categories of attack rather than individual packets.
 
-| Firewall type  | Lowest layer inspected |
-| -------------- | ---------------------- |
-| Packet filter  | Network                |
-| Circuit relay  | Transport              |
-| Security proxy | Application            |
+Adds processing delay to every packet.
 
-A lower layer means less information is available to the filter, but less processing overhead per packet.
+A lower layer makes less information available to the filter. It also adds less processing overhead per packet.
 
-## Virtual Private Networks
-
-A virtual private network (VPN) gives 2 hosts an encrypted channel over a public network, using a protocol such as IPsec, L2TP, or PPTP.
-
-- Encrypts traffic end to end.
-- Encryption overhead trades bandwidth and processing power for confidentiality.
-- This overhead can noticeably reduce throughput on a high-speed connection.
-
-A VPN server needs to be dedicated to the task, since a server shared with other services cannot sustain the added processing load.
-
-## Stateless and Stateful Inspection
-
-A stateless packet filter judges each packet independently, with no memory of the protocol context.
-
-A stateful firewall tracks the state of each connection. It permits inbound traffic only if it matches an established, legitimate outbound request, so unsolicited probes and forged replies are dropped.
-
-## Web Application Firewall
-
-A web application firewall (WAF) inspects Layer 7 traffic in depth. It mitigates application-specific attacks such as SQL injection and cross-site scripting. A traditional or next-generation firewall that works on lower-layer traffic does not specialize in these.
-
-## URL Filtering
-
-Web pages are filtered against a database controlled by a third party. The administrator can add sites or exceptions. Filtering can depend on the user, the user group, the time of day, and similar attributes.
-
-## Demilitarized Zone
-
-A demilitarized zone (DMZ) is a separate network segment behind the optional firewall interface. It hosts public servers such as web and mail, isolated from the internal network.
-
-## Proxy Advantages
+### Proxy Advantages
 
 - Harder to hack  
   Blocks entire categories of common attacks and conceals internal servers from the public Internet.
@@ -100,7 +82,30 @@ A demilitarized zone (DMZ) is a separate network segment behind the optional fir
 - Easier management  
   Administrators apply tools and defaults broadly instead of desktop by desktop.
 
-## Software and Hardware Firewalls
+## Specialized Controls
+
+### VPN
+
+<Aka>Virtual Private Networks</Aka>. Gives 2 hosts an encrypted channel over a
+public network. It uses a protocol such as IPsec, L2TP, or PPTP.
+
+Encrypts traffic end to end.
+Encryption overhead trades bandwidth and processing power for confidentiality.
+This overhead can noticeably reduce throughput on a high-speed connection.
+
+A VPN server needs to be dedicated to the task. A server shared with other services cannot sustain the added processing load.
+
+### Web Application Firewall
+
+A web application firewall (WAF) inspects Layer 7 traffic in depth. It mitigates application-specific attacks such as SQL injection and cross-site scripting. A traditional or next-generation firewall that works on lower-layer traffic does not specialize in these.
+
+### URL Filtering
+
+Web pages are filtered against a database controlled by a third party. The administrator can add sites or exceptions. Filtering can depend on the user, the user group, the time of day, and similar attributes.
+
+## Firewall Deployment
+
+### Software and Hardware Firewalls
 
 - Server-based firewall  
   Runs on a general-purpose server. The OS is less secure and not real-time. The deployment pays for unnecessary features, needs parts from several vendors, and needs frequent patches. Low initial cost, high total cost of ownership.

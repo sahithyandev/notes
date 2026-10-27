@@ -3,7 +3,7 @@ title: Advanced Encryption Standard
 sidebar:
   label: AES
 dateCreated: 2026-09-10T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T04:18:29.566Z
+lastUpdatedOn: 2026-10-27T18:18:05.698Z
 ---
 
 <Aka>AES, originally Rijndael</Aka>. Selected by NIST in 2001 as FIPS 197,
@@ -45,6 +45,14 @@ Each round is built from 4 byte-level steps, each serving one design goal.
   Combine the 4 bytes of each column. Together with ShiftRows this gives diffusion, spreading each input byte's influence across the whole block within 2 rounds.
 - AddRoundKey  
   XOR the state with the round key.
+
+## Non-Linearity
+
+ShiftRows, MixColumns, and AddRoundKey are linear or affine operations over $\operatorname{GF}(2)$. They spread differences but cannot create confusion on their own.
+
+The S-box is the non-linear operation that prevents the whole cipher from reducing to a solvable system of linear equations. Replacing it with a linear bit transformation makes the complete round structure linear or affine, regardless of the number of rounds.
+
+A public linear cipher can be recovered from a small set of chosen plaintext and ciphertext pairs. More rounds only compose more linear transformations.
 
 ## Encryption
 

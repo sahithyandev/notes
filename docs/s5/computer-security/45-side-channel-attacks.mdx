@@ -1,0 +1,43 @@
+---
+title: Side-Channel Attacks
+dateCreated: 2026-10-27T00:00:00.000Z
+lastUpdatedOn: 2026-10-27T18:18:06.068Z
+---
+
+A side-channel attack learns secrets from observable properties of an implementation rather than from a weakness in the cryptographic algorithm.
+
+Leakage sources include:
+
+- Execution time
+- Branch behaviour
+- Cache accesses
+- Power consumption
+- Electromagnetic emissions
+- Fault responses
+
+## Timing Attacks
+
+A timing attack measures how long an operation takes. A difference correlated with a secret bit, byte, or comparison result leaks information over repeated measurements.
+
+An attacker may average many noisy observations. A small but repeatable timing difference can then reveal the secret-dependent path.
+
+### Square-and-Multiply
+
+Naive modular exponentiation processes each bit of a private exponent $d$.
+
+- A $0$ bit squares the accumulator.
+- A $1$ bit squares the accumulator, then multiplies.
+
+The extra multiplication changes the execution time, power trace, or electromagnetic trace. An observer can distinguish the bits of $d$.
+
+## Mitigation
+
+Cryptographic code must not expose secret-dependent observable behaviour.
+
+- Use constant-time algorithms with a fixed instruction pattern and memory-access pattern.
+- Replace secret-dependent branches with constant-time selection.
+- Use exponent blinding or message blinding for private-key operations.
+- Use vetted cryptographic libraries and hardware implementations.
+- Test implementations for timing, cache, power, and fault leakage.
+
+Constant time reduces a major source of leakage. It does not eliminate power analysis, electromagnetic analysis, or fault injection by itself.

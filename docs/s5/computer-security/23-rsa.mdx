@@ -1,7 +1,7 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.435Z
+lastUpdatedOn: 2026-10-27T18:18:05.729Z
 ---
 
 Named after Rivest, Shamir, Adleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures. Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
@@ -66,6 +66,12 @@ RSA is not used to encrypt large data directly, since modular exponentiation on 
 - The sender picks a random symmetric session key $k$ and encrypts the file with a symmetric cipher such as AES under $k$.
 - The sender encrypts $k$ with the receiver's RSA public key and sends both the encrypted file and the encrypted key.
 - The receiver recovers $k$ with their RSA private key, then decrypts the file.
+
+### Key Length
+
+RSA-1024 provides less than 112 bits of security strength. It is not acceptable for new encryption, key transport, or signature generation.
+
+Use an RSA modulus of at least 2048 bits where RSA is required. The larger modulus increases the cost of modular exponentiation, so resource-constrained systems should use a standard modern protocol and an appropriate authenticated key-establishment algorithm rather than weakening RSA.
 
 ### Correctness
 
