@@ -1,7 +1,7 @@
 ---
 title: Stream Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T17:31:12.180Z
+lastUpdatedOn: 2026-10-27T04:18:29.344Z
 ---
 
 Models plaintext as a bit stream, combined with a random keystream via a reversible operation, bitwise XOR.
@@ -15,6 +15,12 @@ Both encryption and decryption must generate the identical keystream $k_i$.
 - No error propagation  
   A bit error in a transmitted ciphertext bit corrupts only the corresponding decrypted plaintext bit.
 - Efficient for real-time data (audio, video streaming) when the keystream generation algorithm is fast.
+
+## Key Space
+
+The key space is determined by the keystream generator, not by the message length. A generator with a uniformly selected $b$-bit secret key has $2^b$ candidate keys. The initialization vector is public and does not enlarge this space.
+
+For a one-time pad protecting an $n$-bit message, the key is an independently random $n$-bit string. Its key space has $2^n$ members. Each key may encrypt only 1 message.
 
 ## Stream Encryption Scheme
 

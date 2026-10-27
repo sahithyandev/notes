@@ -3,7 +3,7 @@ title: Data Encryption Standard
 sidebar:
   label: DES
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.382Z
+lastUpdatedOn: 2026-10-27T04:18:29.534Z
 ---
 
 <Aka>DES</Aka>. Published in 1975 and standardized in 1977. Superseded by AES
@@ -20,6 +20,10 @@ DES is a [Feistel cipher](/s5/computer-security/block-ciphers). It splits each b
 - Round function combining substitution and permutation.
 - 16 round keys of 48 bits each, from a subkey generation algorithm.
 - Secret key length 56 bits.
+
+## Key Space
+
+DES has 56 effective key bits. Its key space has $2^{56}$ members. The 8 additional bits in the 64-bit input key are parity bits, so they do not create independent keys. An exhaustive search requires $2^{55}$ DES evaluations on average.
 
 ## Permutation Tables
 

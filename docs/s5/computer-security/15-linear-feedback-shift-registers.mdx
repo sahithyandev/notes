@@ -1,7 +1,7 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.299Z
+lastUpdatedOn: 2026-10-27T04:18:29.469Z
 ---
 
 A linear feedback shift register (LFSR) builds a [keystream](/s5/computer-security/stream-ciphers) from a register of $n$ bits $s_0, s_1, \ldots, s_{n-1}$, where each new bit is the XOR of a fixed subset of the current bits.
@@ -24,6 +24,10 @@ Each step outputs 1 bit, usually $s_{i-n}$, then shifts the register and inserts
 import Lfsr from "./images/lfsr.svg";
 
 <Lfsr />
+
+## Key Space
+
+With a fixed public connection polynomial, the initial $n$-bit state is the key. The all-zero state is excluded because it remains zero forever. The key space therefore has $2^n - 1$ members.
 
 ## Connection Polynomial
 

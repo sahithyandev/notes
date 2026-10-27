@@ -1,10 +1,10 @@
 ---
 title: Block Ciphers
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.330Z
+lastUpdatedOn: 2026-10-27T04:18:29.489Z
 ---
 
-A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$, both drawn from $\{0,1\}^n$.
+A block cipher operates on a fixed-length block of plaintext $m$ of $n$ bits, mapping it to a ciphertext block $c$ of the same length under a secret key $k$. The blocks are drawn from $\{0,1\}^n$. The key is drawn from $\{0,1\}^b$.
 
 Large messages are divided into blocks and encrypted per block, under a mode of operation.
 
@@ -17,6 +17,10 @@ For a fixed key $k$, the encryption function $e_k$ is a bijection on $\{0,1\}^n$
 A block cipher's key design objective is to behave like a family of pseudorandom permutations (PRP) indexed by $k$.
 
 A block cipher encrypts a set of bits or characters at a time, whereas a stream cipher encrypts a single bit or character at a time.
+
+## Key Space
+
+The block size and key size are separate parameters. A block cipher with a $b$-bit key has $2^b$ possible keys, regardless of its $n$-bit block size. The key space indexes the family of permutations. It is not the $2^n!$ permutations theoretically possible on $n$-bit blocks.
 
 ## Iterated Block Cipher Design
 

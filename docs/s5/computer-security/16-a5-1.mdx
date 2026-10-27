@@ -1,12 +1,16 @@
 ---
 title: A5/1 Stream Cipher
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.318Z
+lastUpdatedOn: 2026-10-27T04:18:29.481Z
 ---
 
 A5/1 is an [LFSR](/s5/computer-security/linear-feedback-shift-registers) based [stream cipher](/s5/computer-security/stream-ciphers) used to encrypt on-air mobile communication traffic in the GSM standard.
 
 It combines 3 LFSRs $R_1$, $R_2$, $R_3$ of lengths 19, 22 and 23 bits. The keystream bit at each step is the XOR of the output bits of the 3 registers.
+
+## Key Space
+
+A5/1 uses a 64-bit session key. Its nominal key space has $2^{64}$ members. The 64 key bits initialize the 3 registers, whose lengths also total 64 bits. The public GSM frame number changes the register state but is not secret key material.
 
 ## Kerckhoffs's Principle Violation
 

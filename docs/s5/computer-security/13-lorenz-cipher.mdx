@@ -1,7 +1,7 @@
 ---
 title: Lorenz Cipher
 dateCreated: 2026-07-29T05:56:03.713Z
-lastUpdatedOn: 2026-10-26T17:31:12.302Z
+lastUpdatedOn: 2026-10-27T04:18:29.447Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher), [stream](/s5/computer-security/stream-ciphers) cipher. Encrypts a Baudot-coded plaintext bit stream into 5 ciphertext bit streams. Each bit is masked by a fresh keystream bit, so ciphertext symbol frequencies are flattened.
@@ -37,11 +37,7 @@ A register is a wheel of pins, 1 per position around its length, each fixed to $
 
 $\chi_i$ pairs with $\psi_i$ for each of the 5 Baudot bit positions, giving 5 parallel lanes.
 
-<Note>
-
 $\chi$ registers advance every tick, unconditionally. $\psi$ registers advance only when gated by the $\mu$ registers, so their motion is irregular. Without this stutter, the keystream period would just be the $\text{lcm}$ of the $\chi$ lengths, a much weaker linear structure.
-
-</Note>
 
 At each clock tick $t$:
 
@@ -51,17 +47,15 @@ At each clock tick $t$:
 - $\mu^{(2)}$ conditionally triggers the $\psi$ registers to advance.
 - Output $K$.
 
-Key space:
+## Key Space
+
+Each wheel pin is independently set to $0$ or $1$. The 12 wheel patterns therefore give:
 
 $$
 2^{41+31+29+26+23+43+47+51+53+59+61+37} = 2^{501}
 $$
 
-<Note>
-
 Register settings can be rotated on different schedules to behave like session keys, e.g. $\mu$ registers changed daily, $\chi$ registers monthly, $\psi$ registers quarterly.
-
-</Note>
 
 ## Decryption
 

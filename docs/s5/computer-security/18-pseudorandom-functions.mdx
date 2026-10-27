@@ -1,10 +1,14 @@
 ---
 title: Pseudorandom Functions
 dateCreated: 2026-09-28T03:02:07.502Z
-lastUpdatedOn: 2026-10-26T20:31:36.353Z
+lastUpdatedOn: 2026-10-27T04:18:29.505Z
 ---
 
 A pseudorandom function (PRF) family is a set of efficiently computable functions $\{f_k : \{0,1\}^n \to \{0,1\}^n\}_{k \in \{0,1\}^n}$, indexed by a key $k$, that no efficient adversary can distinguish from a function chosen uniformly at random from all functions on $\{0,1\}^n$.
+
+## Key Space
+
+The definition uses an $n$-bit key, so the family has $2^n$ candidate keys. This is the number of selectable keyed functions before accounting for any distinct keys that happen to define the same function. It is much smaller than the $2^{n \cdot 2^n}$ functions from $n$ bits to $n$ bits.
 
 ## Security Game
 

@@ -1,7 +1,7 @@
 ---
 title: Block Encryption Schemes
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T20:31:36.367Z
+lastUpdatedOn: 2026-10-27T04:18:29.520Z
 ---
 
 A scheme that encrypts messages of arbitrary length, built from a [block cipher](/s5/computer-security/block-ciphers) through a mode of operation. Messages $m$ and ciphertexts $c$ are bit strings of any length, under a key $k$.
@@ -14,6 +14,10 @@ On top of a block cipher, the below operations are added to make it a scheme:
   Extra bytes appended to the last block so the message length is a multiple of $n$.
 - Chaining  
   Each block's encryption depends on previous blocks, so a repeated plaintext block does not produce a repeated ciphertext block.
+
+## Key Space
+
+A block encryption scheme inherits its secret-key space from the underlying block cipher. A scheme built from a $b$-bit cipher key has $2^b$ candidate secret keys. An IV or nonce is public per-message input, so it must be unique or unpredictable as required by the mode but does not enlarge the key space.
 
 ## Attack Models
 

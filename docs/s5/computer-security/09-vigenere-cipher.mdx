@@ -1,7 +1,7 @@
 ---
 title: Vigenere Cipher
 dateCreated: 2026-07-29T05:53:41.958Z
-lastUpdatedOn: 2026-10-26T18:18:36.103Z
+lastUpdatedOn: 2026-10-27T04:18:29.387Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Invented in 1533 by Giovan Battista Bellaso, misattributed to Blaise de Vigenère.
@@ -14,11 +14,13 @@ You can find an implementation of the Vigenère cipher in [sahithyandev/ciphers]
 
 Repeat the key until it matches the plaintext length. Align each key letter with 1 plaintext letter.
 
+## Key Space
+
+For a fixed keyword length $n$, each position independently selects 1 of 26 shifts. The key space has $26^n$ members. Different allowed keyword lengths form separate key spaces, so the length must be specified when quoting the size.
+
 ## Encryption
 
 Assign each plaintext letter and its aligned key letter a value from $0$ to $25$, where $A = 0$ and $Z = 25$. Add their values modulo $26$. The result identifies the ciphertext letter.
-
-For a key of length $n$, each key letter picks one of 26 possible shift amounts, independently of the other $n - 1$ key letters. So the number of possible keys is $26 \times 26 \times \dots$ ($n$ times) $= 26^n$.
 
 ## Decryption
 

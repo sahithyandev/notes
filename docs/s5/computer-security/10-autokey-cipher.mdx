@@ -1,12 +1,16 @@
 ---
 title: Autokey Cipher
 dateCreated: 2026-08-26T00:00:00.000Z
-lastUpdatedOn: 2026-10-26T18:18:36.114Z
+lastUpdatedOn: 2026-10-27T04:18:29.399Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [poly-alphabetic](/s5/computer-security/ciphers#poly-alphabetic-cipher) cipher. Created by Blaise de Vigenère. Provides higher security than the [Bellaso variant](./vigenere-cipher). This was <b>NOT</b> covered in the class; only included here for the sake of completeness.
 
 You may find an implementation of Autokey cipher in [sahithyandev/ciphers](https://github.com/sahithyandev/ciphers/blob/main/src/autokey-cipher.c).
+
+## Key Space
+
+The secret key is the primer. For a fixed primer length $L$, its $L$ letters independently select 1 of 26 values, giving $26^L$ possible keys. The plaintext-derived remainder of the keystream is not key material.
 
 ## Encryption
 
