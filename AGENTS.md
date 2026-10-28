@@ -66,7 +66,7 @@ When fixing a violation inside a list where the other bullets already use the 2-
 
 Glossaries of symbols use `<Symbols>` (see "Math blocks"), not `$symbol$: meaning` bullets. The rule flags those like any other label bullet.
 
-Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written _without_ the required 2 trailing spaces (or a trailing `\`): that's a rendering bug, not just a style nit, since the label and description silently run together on the published page.
+Enforced by the `notes-style-validator` Astro integration's `label-description` rule (`src/integrations/notes-style-validator/rules/label-description.ts`). A sibling `collapsed-label` rule catches the same 2-line format written without the required 2 trailing spaces or a single trailing `\`. `\\` is rejected because it is not a valid line-break marker. The rule ignores code and math.
 
 ### Dashes
 

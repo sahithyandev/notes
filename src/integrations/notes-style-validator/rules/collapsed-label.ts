@@ -1,5 +1,6 @@
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
+import { MASK_CHAR } from "../mask.ts";
 
 const BULLET_START_RE = /^(\s*)([-*])\s+(.*)$/;
 const MAX_LABEL_WORDS = 5;
@@ -55,6 +56,10 @@ function wordCount(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length;
 }
 
+function isFullyMasked(line: string): boolean {
+  return line.length > 0 && [...line].every((char) => char === MASK_CHAR);
+}
+
 // True when `label` reads as an unfinished sentence fragment rather than a
 // complete, standalone label: unbalanced brackets/parens/math (a link or
 // formula split across the line break), trailing punctuation that implies
@@ -90,8 +95,8 @@ function startsNewSentence(line: string): boolean {
   return /[A-Z0-9$]/.test(first);
 }
 
-// The 2-line label format requires a hard break (two trailing spaces, or a
-// trailing backslash) on the label line, or the description silently
+// The 2-line label format requires a hard break of 2 trailing spaces or 1
+// trailing backslash on the label line. Without it, the description silently
 // collapses onto the same rendered line. Detects a short, complete-looking
 // label with no hard break, immediately followed by a more-indented line
 // that reads as a fresh, separate sentence — as opposed to an ordinary
@@ -101,7 +106,13 @@ export function checkCollapsedLabel(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
 
   for (let i = 0; i < f.lines.length - 1; i++) {
-    if (f.lineIsCode[i] || f.lineIsCode[i + 1]) continue;
+    if (
+      f.lineIsCode[i] ||
+      f.lineIsCode[i + 1] ||
+      isFullyMasked(f.maskedLines[i]) ||
+      isFullyMasked(f.maskedLines[i + 1])
+    )
+      continue;
 
     const line = f.lines[i];
     const m = BULLET_START_RE.exec(line);
@@ -110,7 +121,11 @@ export function checkCollapsedLabel(f: ScannedFile): Violation[] {
     const label = m[3];
     if (label.includes(":")) continue; // handled by label-description, not this rule
     if (wordCount(label) > MAX_LABEL_WORDS) continue;
-    if (line.endsWith("  ") || line.trimEnd().endsWith("\\")) continue; // valid hard break
+    if (
+      line.endsWith("  ") ||
+      (line.trimEnd().endsWith("\\") && !line.trimEnd().endsWith("\\\\"))
+    )
+      continue;
     if (looksUnfinished(label)) continue;
 
     const next = f.lines[i + 1];

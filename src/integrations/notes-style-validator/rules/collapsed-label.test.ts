@@ -12,8 +12,20 @@ test("does not flag a label with two trailing spaces", () => {
   expect(checkCollapsedLabel(f)).toHaveLength(0);
 });
 
-test("does not flag a label with a trailing backslash", () => {
+test("does not flag a label with a single trailing backslash", () => {
   const f = scanOne("- **Euler**\\\n  Uses a fixed step size throughout.");
+  expect(checkCollapsedLabel(f)).toHaveLength(0);
+});
+
+test("flags a label with 2 trailing backslashes", () => {
+  const f = scanOne("- **Euler**\\\\\n  Uses a fixed step size throughout.");
+  expect(checkCollapsedLabel(f)).toHaveLength(1);
+});
+
+test("does not flag 2 trailing backslashes inside a display math block", () => {
+  const f = scanOne(
+    "$$\n- **Euler**\\\\\n  Uses a fixed step size throughout.\n$$",
+  );
   expect(checkCollapsedLabel(f)).toHaveLength(0);
 });
 
