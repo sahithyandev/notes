@@ -76,7 +76,8 @@ mqDesktop.addEventListener("change", (e) => {
 
 const studyBtn = document.getElementById("study-toggle");
 
-const STUDY_EDGE_PX = 24;
+const STUDY_LEFT_EDGE_PX = 48;
+const STUDY_RIGHT_EDGE_PX = 24;
 const studySidebarWidth = () =>
   Number.parseFloat(
     getComputedStyle(document.documentElement).getPropertyValue("--sidebar-w"),
@@ -96,11 +97,11 @@ const syncStudySidebarPeek = (event?: PointerEvent) => {
   const rightWasOpen = root.classList.contains("study-sidebar-right");
   const revealLeft =
     belowNav &&
-    (event.clientX <= STUDY_EDGE_PX ||
+    (event.clientX <= STUDY_LEFT_EDGE_PX ||
       (leftWasOpen && event.clientX <= sidebarWidth));
   const revealRight =
     belowNav &&
-    (event.clientX >= window.innerWidth - STUDY_EDGE_PX ||
+    (event.clientX >= window.innerWidth - STUDY_RIGHT_EDGE_PX ||
       (rightWasOpen && event.clientX >= window.innerWidth - sidebarWidth));
 
   root.classList.toggle("study-sidebar-left", revealLeft);
