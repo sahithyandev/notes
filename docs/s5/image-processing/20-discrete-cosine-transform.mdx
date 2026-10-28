@@ -1,7 +1,7 @@
 ---
 title: Discrete Cosine Transform
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-28T17:01:40.707Z
+lastUpdatedOn: 2026-10-28T17:58:19.963Z
 ---
 
 <Aka>DCT</Aka>. Expresses a sequence of $N$ samples as a weighted sum of $N$
@@ -177,3 +177,23 @@ Implementation checks:
 - A block of all $5$s with $N = 8$ gives $F[0][0] = 40$ and every other coefficient $0$.
 - `idct2(dct2(f, T), T)` returns `f` up to floating-point error.
 - The sum of squares of `f` equals the sum of squares of `dct2(f, T)`.
+
+## Worked Example
+
+### Constant Block
+
+Find the 2-D DCT of a $2 \times 2$ block where every value is $5$.
+
+<Solution>
+
+$$
+F(0,0) = \frac{1}{2}\sum_{x=0}^{1}\sum_{y=0}^{1} 5 = 10
+$$
+
+Every coefficient with $u > 0$ or $v > 0$ is $0$, since its cosine terms cancel over the constant block.
+
+$$
+F = \begin{bmatrix} 10 & 0 \\ 0 & 0 \end{bmatrix}
+$$
+
+</Solution>

@@ -1,0 +1,218 @@
+---
+// A common pixel pair shown under the 3 distance measures. Each panel uses
+// the same 5x5 lattice and endpoints, so only the allowed path changes.
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("pixel-distance");
+const size = 5;
+const cell = 34;
+const panelWidth = 204;
+const gridTop = 44;
+const gridWidth = size * cell;
+const width = panelWidth * 3;
+const height = 252;
+const p = { col: 1, row: 3 };
+const q = { col: 3, row: 2 };
+const indices = Array.from({ length: size }, (_, i) => i);
+
+const metrics = [
+  {
+    label: "Euclidean",
+    value: "Dₑ = √5",
+    tone: "euclidean",
+    route: (x: number) =>
+      `M ${point(x, p).x} ${point(x, p).y} L ${point(x, q).x} ${point(x, q).y}`,
+  },
+  {
+    label: "City-Block",
+    value: "D₄ = 3",
+    tone: "city-block",
+    route: (x: number) =>
+      `M ${point(x, p).x} ${point(x, p).y} H ${point(x, q).x} V ${point(x, q).y}`,
+  },
+  {
+    label: "Chessboard",
+    value: "D₈ = 2",
+    tone: "chessboard",
+    guide: (x: number) =>
+      `M ${point(x, p).x} ${point(x, p).y} H ${point(x, q).x}`,
+    route: (x: number) => {
+      const start = point(x, p);
+      const end = point(x, q);
+      return `M ${end.x} ${start.y} V ${end.y}`;
+    },
+  },
+];
+
+function point(panelX: number, pixel: { col: number; row: number }) {
+  return {
+    x: panelX + pixel.col * cell + cell / 2,
+    y: gridTop + pixel.row * cell + cell / 2,
+  };
+}
+---
+
+<figure class="distance-diagram">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-labelledby={`${uid}-title`}
+  >
+    <title id={`${uid}-title`}>
+      Euclidean, city-block and chessboard distances between the same pixels in a grid
+    </title>
+    {metrics.map((metric, index) => {
+      const panelX = index * panelWidth + (panelWidth - gridWidth) / 2;
+      const start = point(panelX, p);
+      const end = point(panelX, q);
+      return (
+        <g class={metric.tone}>
+          <text
+            class="heading"
+            x={panelX + gridWidth / 2}
+            y="15"
+            text-anchor="middle"
+          >
+            {metric.label}
+          </text>
+          <text
+            class="value"
+            x={panelX + gridWidth / 2}
+            y="30"
+            text-anchor="middle"
+          >
+            {metric.value}
+          </text>
+          {indices.map((row) =>
+            indices.map((col) => (
+              <rect
+                class="cell"
+                x={panelX + col * cell}
+                y={gridTop + row * cell}
+                width={cell}
+                height={cell}
+              ></rect>
+            )),
+          )}
+          {metric.guide ? (
+            <path class="guide" d={metric.guide(panelX)}></path>
+          ) : null}
+          <path class="route" d={metric.route(panelX)}></path>
+          <circle class="point source" cx={start.x} cy={start.y} r="5"></circle>
+          <circle class="point target" cx={end.x} cy={end.y} r="5"></circle>
+          <text
+            class="point-label source-label"
+            x={start.x}
+            y={start.y}
+            text-anchor="middle"
+          >
+            p
+          </text>
+          <text
+            class="point-label target-label"
+            x={end.x}
+            y={end.y}
+            text-anchor="middle"
+          >
+            q
+          </text>
+        </g>
+      );
+    })}
+    <text class="note" x={width / 2} y="238" text-anchor="middle">
+      Same endpoints: Δx = 2, Δy = 1
+    </text>
+  </svg>
+  <FigureCaption>
+    The same pixels are compared in each grid. Euclidean distance follows the
+    direct line. City-block distance uses horizontal and vertical moves. The
+    chessboard panel marks the 1-unit vertical component. Dotted guides retain
+    the fixed horizontal offset.
+  </FigureCaption>
+</figure>
+
+<style>
+  .distance-diagram {
+    max-width: 660px;
+    margin: 24px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cell {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 0.8;
+  }
+  .heading,
+  .value,
+  .note,
+  .point-label {
+    font-family: var(--font-ui);
+  }
+  .heading {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .value {
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .route {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .guide {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .point {
+    stroke-width: 1.5;
+  }
+  .source {
+    fill: var(--text-primary);
+    stroke: var(--surface);
+  }
+  .target {
+    fill: var(--surface);
+    stroke: var(--text-primary);
+  }
+  .point-label {
+    font-size: 8px;
+    font-weight: 700;
+    dominant-baseline: central;
+  }
+  .source-label {
+    fill: var(--surface);
+  }
+  .target-label {
+    fill: var(--text-primary);
+  }
+  .euclidean {
+    --tone: var(--accent);
+  }
+  .city-block {
+    --tone: var(--dia-ct);
+  }
+  .chessboard {
+    --tone: var(--dia-pt);
+  }
+  .euclidean .value,
+  .city-block .value,
+  .chessboard .value {
+    fill: var(--tone);
+  }
+  .note {
+    font-size: 11px;
+    fill: var(--text-secondary);
+  }
+</style>

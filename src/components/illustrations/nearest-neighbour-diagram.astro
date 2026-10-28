@@ -1,0 +1,152 @@
+---
+import FigureCaption from "./primitives/figure-caption.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("nearest-neighbour");
+const cell = 48;
+const gridX = 34;
+const gridY = 48;
+const sample = {
+  x: gridX + cell / 2 + cell * 0.75,
+  y: gridY + cell / 2 + cell * 0.25,
+};
+const pixels = [
+  { x: 0, y: 0, value: "10" },
+  { x: 1, y: 0, value: "30" },
+  { x: 0, y: 1, value: "50" },
+  { x: 1, y: 1, value: "90" },
+];
+---
+
+<figure class="nearest-neighbour-diagram">
+  <svg
+    viewBox="0 0 360 190"
+    role="img"
+    aria-labelledby={`${uid}-title ${uid}-desc`}
+  >
+    <title
+      id={`${uid}-title`}
+    >Nearest-neighbour selection from 4 source pixels</title>
+    <desc id={`${uid}-desc`}>
+      A mapped target position lies between 4 source-pixel centres. Its direct
+      connection to the closest centre, with value 30, is highlighted.
+    </desc>
+    <text class="label" x="34" y="16">
+      Source neighbourhood
+    </text>
+    {pixels.map((pixel) => (
+      <g>
+        <rect
+          class="cell"
+          x={gridX + pixel.x * cell}
+          y={gridY + pixel.y * cell}
+          width={cell}
+          height={cell}
+        />
+        <text
+          class="value"
+          x={gridX + pixel.x * cell + cell / 2}
+          y={gridY + pixel.y * cell + 29}
+          text-anchor="middle"
+        >
+          {pixel.value}
+        </text>
+      </g>
+    ))}
+    <rect
+      class="selected"
+      x={gridX + cell}
+      y={gridY}
+      width={cell}
+      height={cell}
+    />
+    <line
+      class="nearest-line"
+      x1={sample.x}
+      y1={sample.y}
+      x2={gridX + cell + cell / 2}
+      y2={gridY + cell / 2}
+    />
+    <circle class="sample" cx={sample.x} cy={sample.y} r="3.5" />
+    <text class="sample-text" x={gridX} y="166">
+      mapped target at (0.75, 0.25)
+    </text>
+    <path class="connector" d="M 150 96 H 224" />
+    <path class="arrow" d="M 224 96 l -8 -5 M 224 96 l -8 5" />
+    <text class="label" x="268" y="72" text-anchor="middle">
+      Output
+    </text>
+    <rect class="output" x="244" y="84" width="48" height="48" rx="5" />
+    <text class="output-value" x="268" y="114" text-anchor="middle">
+      30
+    </text>
+    <text class="explanation" x="268" y="166" text-anchor="middle">
+      closest source value
+    </text>
+  </svg>
+  <FigureCaption>
+    Nearest-neighbour selection from a 2 by 2 source neighbourhood.
+  </FigureCaption>
+</figure>
+
+<style>
+  .nearest-neighbour-diagram {
+    max-width: 440px;
+    margin: 14px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  text {
+    font-family: var(--font-ui);
+  }
+  .label,
+  .value,
+  .output-value {
+    fill: var(--text-primary);
+    font-weight: 650;
+  }
+  .label {
+    font-size: 12px;
+  }
+  .value,
+  .output-value {
+    font-size: 15px;
+  }
+  .cell {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+  }
+  .selected {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+  }
+  .nearest-line {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+  .sample {
+    fill: var(--dia-pt);
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+  .sample-text,
+  .explanation {
+    fill: var(--text-secondary);
+    font-size: 11px;
+  }
+  .connector,
+  .arrow {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1.5;
+  }
+  .output {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+</style>

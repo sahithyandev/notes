@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-10-18T09:17:02.343Z
+lastUpdatedOn: 2026-10-28T17:58:19.775Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -220,3 +220,27 @@ Uses:
 - Progressively encoded compression, coarse levels sent first
 - Image blending across scales
 - Image indexing and search
+
+## Worked Example
+
+### Bilinear Value
+
+The values at $(0,0)$, $(1,0)$, $(0,1)$ and $(1,1)$ are $10$, $30$, $50$ and $90$. Find the value at $(0.25, 0.5)$.
+
+<Solution>
+
+$$
+r_0 = 10(1-0.25) + 30(0.25) = 15
+$$
+
+$$
+r_1 = 50(1-0.25) + 90(0.25) = 60
+$$
+
+$$
+P(0.25, 0.5) = 15(1-0.5) + 60(0.5) = 37.5
+$$
+
+The interpolated value is $37.5$.
+
+</Solution>

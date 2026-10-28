@@ -1,7 +1,7 @@
 ---
 title: Sampling and Quantization
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-10-19T12:09:03.013Z
+lastUpdatedOn: 2026-10-28T17:58:19.682Z
 ---
 
 Sampling and quantization are the 2 independent choices made when converting an analog image to a [digital image](/s5/image-processing/image-model). Sampling sets the grid size $m \times n$. Quantization sets the number of levels $L = 2^k$. Together they fix the storage size $m \times n \times k$ bits per channel.
@@ -41,6 +41,22 @@ Generated from a photo by [Hannes Röst](https://commons.wikimedia.org/wiki/File
 </figcaption>
 
 </figure>
+
+## Worked Example
+
+### Nyquist Sampling Rate
+
+A stripe pattern has $120$ cycles per millimetre. Find the minimum sampling rate that prevents aliasing.
+
+<Solution>
+
+$$
+f_s \ge 2f_{\max} = 2 \cdot 120 = 240\text{ samples/mm}
+$$
+
+The sampling grid needs at least $240\text{ samples/mm}$.
+
+</Solution>
 
 ### Aliasing
 

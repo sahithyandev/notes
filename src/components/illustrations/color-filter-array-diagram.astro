@@ -1,0 +1,87 @@
+---
+// A Bayer color filter array lets each sensor element record a single color.
+import FigureCaption from "./primitives/figure-caption.astro";
+
+const bayer = [
+  ["G", "R", "G", "R"],
+  ["B", "G", "B", "G"],
+  ["G", "R", "G", "R"],
+  ["B", "G", "B", "G"],
+];
+const fills: Record<string, string> = {
+  R: "#d64545",
+  G: "#3f9d5a",
+  B: "#3f6fd6",
+};
+---
+
+<figure>
+  <svg viewBox="0 0 300 235" aria-hidden="true">
+    <text x="150" y="23" text-anchor="middle">
+      Bayer Pattern
+    </text>
+    {bayer.map((row, r) =>
+      row.map((color, c) => (
+        <rect
+          class="filter"
+          x={62 + c * 44}
+          y={43 + r * 36}
+          width="44"
+          height="36"
+          fill={fills[color]}
+        ></rect>
+      )),
+    )}
+    {bayer.map((row, r) =>
+      row.map((color, c) => (
+        <text class="key" x={84 + c * 44} y={66 + r * 36} text-anchor="middle">
+          {color}
+        </text>
+      )),
+    )}
+    <line class="guide" x1="62" y1="203" x2="238" y2="203"></line>
+    <text class="sub" x="150" y="222" text-anchor="middle">
+      1 filter over each sensor element
+    </text>
+  </svg>
+  <FigureCaption>
+    A Bayer color filter array gives each sensor element a red, green or blue
+    filter. Green filters occur twice as often.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 360px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .filter {
+    stroke: var(--surface, #fff);
+    stroke-width: 2;
+    fill-opacity: 0.88;
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--text-primary);
+  }
+  .key {
+    fill: #fff;
+    font-size: 13px;
+  }
+  .guide {
+    stroke: var(--text-secondary);
+    stroke-width: 1;
+  }
+  .sub {
+    fill: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 400;
+  }
+</style>

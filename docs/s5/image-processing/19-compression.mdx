@@ -1,7 +1,7 @@
 ---
 title: Compression
 dateCreated: 2026-08-18T07:19:11.017Z
-lastUpdatedOn: 2026-10-20T08:45:41.134Z
+lastUpdatedOn: 2026-10-28T17:58:19.949Z
 ---
 
 Compression reduces the volume of data required to represent an image, without necessarily reducing its information content. It works by removing [data redundancy](/s5/image-processing/entropy#data-redundancy).
@@ -129,3 +129,23 @@ Examples:
 
 - Parity bit, with $n = k + 1$
 - Hamming code, such as $(n, k) = (7, 4)$ with $R_c = \frac{4}{7}$
+
+## Worked Example
+
+### Uniform Quantization
+
+A mapper coefficient is $v = 27$. A uniform quantizer has $\Delta = 8$. Find the reconstructed coefficient and its squared error.
+
+<Solution>
+
+$$
+\hat{v} = 8 \cdot \operatorname{round}\left(\frac{27}{8}\right) = 8 \cdot 3 = 24
+$$
+
+$$
+(v - \hat{v})^2 = (27 - 24)^2 = 9
+$$
+
+The quantizer reconstructs $24$ with squared error $9$.
+
+</Solution>

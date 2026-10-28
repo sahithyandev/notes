@@ -1,7 +1,7 @@
 ---
 title: Color
 dateCreated: 2026-07-26T04:59:00.680Z
-lastUpdatedOn: 2026-10-18T08:23:54.457Z
+lastUpdatedOn: 2026-10-28T17:58:19.668Z
 ---
 
 Color is a construct in the brain. It doesn't correspond to a physical phenomenon. Mixing light waves of different wavelengths produces the perception of different colors.
@@ -184,3 +184,29 @@ $S_{\text{indexed}} < S_{\text{true}}$ for any realistic $N$ since $b < 24$ and 
 ### High Color
 
 Each pixel stores its color directly in 15 or 16 bits, with fewer bits per channel than true color. 15 bits gives 5 bits per channel, allowing 32768 colors. 16 bits usually gives the extra bit to green, as 5-6-5, allowing 65536 colors. Largely historical.
+
+## Worked Example
+
+### Indexed Image Storage
+
+A $640 \times 480$ image uses a palette of $256$ RGB colours. Find the storage required for indexed and true-color representations.
+
+<Solution>
+
+$$
+b = \lceil \log_2 256 \rceil = 8
+$$
+
+$$
+S_{\text{indexed}} = 640 \cdot 480 \cdot 8 + 24 \cdot 256
+= 2{,}463{,}744\text{ bits}
+$$
+
+$$
+S_{\text{true}} = 24 \cdot 640 \cdot 480
+= 7{,}372{,}800\text{ bits}
+$$
+
+The indexed representation uses $4{,}909{,}056\text{ bits}$ less storage.
+
+</Solution>

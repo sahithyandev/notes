@@ -1,7 +1,7 @@
 ---
 title: Pixel Connectivity
 dateCreated: 2026-07-26T04:59:26.159Z
-lastUpdatedOn: 2026-10-19T12:09:03.057Z
+lastUpdatedOn: 2026-10-28T17:58:19.727Z
 ---
 
 Once an image is digitized, only a matrix of values remains. Pixel geometry is often lost.
@@ -30,6 +30,34 @@ A path between 2 pixels is a sequence of adjacent pixels connecting them.
 
 A local neighborhood is a sample window selecting the pixels around a given pixel $p$, used when an operation depends on a group of adjacent pixels.
 
+## Resampling Neighbourhoods
+
+Image resampling finds a source position for each pixel in a new grid. A non-integer source position lies inside a $2 \times 2$ neighbourhood of source pixels.
+
+<ProseFigure>
+
+### Nearest Neighbour
+
+Nearest-neighbour resampling copies the value of the closest source pixel. It preserves source values but creates blocky regions when enlarging an image.
+
+<NearestNeighbourDiagram slot="figure" />
+
+The target output pixel maps backward to source coordinate $(0.75,0.25)$ between the $4$ source-pixel centres. Its distance to the centre of $30$ is $\sqrt{0.25^2 + 0.25^2}$. Its distance to the centre of $10$ is $\sqrt{0.75^2 + 0.25^2}$. The $30$ pixel is closest, so nearest-neighbour resampling copies $30$ to the output.
+
+</ProseFigure>
+
+<ProseFigure>
+
+### Bilinear Interpolation
+
+Bilinear interpolation forms a weighted sum of the $4$ surrounding pixels. Each weight decreases with distance from the source position.
+
+<BilinearInterpolationDiagram slot="figure" />
+
+The distance-based weights are $0.1875$, $0.5625$, $0.0625$ and $0.1875$. Their weighted sum is $38.75$, which rounds to output value $39$.
+
+</ProseFigure>
+
 ## Distance Measures
 
 For 2 pixels $p(x,y)$ and $q(s,t)$:
@@ -56,6 +84,8 @@ $$
 D_8(p,q) = \max(|x-s|, |y-t|)
 $$
 
+<PixelDistanceDiagram />
+
 ### Connectivity Correspondence
 
 Each metric equals the length of the shortest path allowed by its matching connectivity.
@@ -66,3 +96,27 @@ Each metric equals the length of the shortest path allowed by its matching conne
   Pixels within $D_8 \le 1$ of $p$ are $p$ and all 8 surrounding pixels. A minimal $D_8$ path may also move diagonally.
 
 $D_e$ has no such grid correspondence, since its unit disc is not aligned to the pixel lattice.
+
+## Worked Example
+
+### Pixel Distances
+
+Find the distances from $p(2,3)$ to $q(7,9)$.
+
+<Solution>
+
+$$
+D_e(p,q) = \sqrt{(2-7)^2 + (3-9)^2} = \sqrt{61} \approx 7.81
+$$
+
+$$
+D_4(p,q) = |2-7| + |3-9| = 11
+$$
+
+$$
+D_8(p,q) = \max(|2-7|, |3-9|) = 6
+$$
+
+A shortest 4-path has $11$ moves. A shortest 8-path has $6$ moves.
+
+</Solution>

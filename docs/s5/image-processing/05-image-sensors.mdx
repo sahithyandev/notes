@@ -1,7 +1,7 @@
 ---
 title: Image Sensors
 dateCreated: 2026-07-26T04:59:10.531Z
-lastUpdatedOn: 2026-10-28T17:01:40.453Z
+lastUpdatedOn: 2026-10-28T17:58:19.650Z
 ---
 
 A photo-sensor produces a weak electrical signal proportional to incident light.
@@ -13,8 +13,6 @@ A photo-sensor produces a weak electrical signal proportional to incident light.
 ## Image Sensor Types
 
 An image sensor is a 2D array of photo-sensors. The 2 main types differ in how the signal leaves the array.
-
-<SensorReadoutDiagram />
 
 ### CCD
 
@@ -44,6 +42,8 @@ Support circuitry takes up space on the sensor surface, blocking light in those 
 
 ### Comparison
 
+<SensorReadoutDiagram />
+
 | Property             | CCD                           | CMOS                          |
 | -------------------- | ----------------------------- | ----------------------------- |
 | Response             | Integrating                   | Non-integrating               |
@@ -62,7 +62,7 @@ Each photo-receptor must be read fast enough that the captured scene can be cons
 - CMOS sensors require direct on-sensor reading through complex multiplexing
 - CCD sensors retain charge like memory, even after light is removed, and can transfer it to a holding memory to be read in the background
 
-Delayed reading causes motion blur or the rolling shutter effect
+Delayed reading causes motion blur or the rolling shutter effect.
 
 ### Strobe Lighting
 
@@ -99,21 +99,31 @@ The response curve, output signal against incident light, has 3 regions.
 
 By default an image sensor captures only illumination, not color. Color is recovered by separating the light into its primary colors before it is recorded. There are 2 approaches.
 
-<ColorCaptureDiagram />
-
+<ProseFigure>
+    
 ### Beam Splitting
 
-- A dichroic prism splits incoming light into primary colors
-- A separate image sensor captures each separated beam
-- Structure must be rigid and properly aligned
-- Color and illumination have the same resolution
+The incident light is split into multiple components. Each component is read by a sensor. Structure must be rigid and properly aligned.
 
+A dichroic prism splits incoming light into primary colors.
+
+Color and illumination have the same resolution.
+
+<BeamSplittingDiagram slot="figure" />
+
+</ProseFigure>
+
+<ProseFigure>
+    
 ### Color Filter Array
 
-<Aka>CFA</Aka>.
-
-- An optical filter allows only one color per sensing element
-- Other color components are estimated from nearby sensors
-- Color resolution is lower than illumination resolution
+<Aka>CFA</Aka>. An optical filter allows only one color per sensing element.
+Other color components are estimated from nearby sensors.
 
 The most common arrangement is the Bayer pattern. It has twice as many green filters as red or blue, since the human eye is most sensitive to green. The missing 2 color values at each pixel are interpolated from neighbouring pixels, a step called demosaicing.
+
+Color resolution is lower than illumination resolution.
+
+<ColorFilterArrayDiagram slot="figure" />
+
+</ProseFigure>

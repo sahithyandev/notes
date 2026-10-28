@@ -1,7 +1,7 @@
 ---
 title: Gradient-Based Edge Detection
 dateCreated: 2026-10-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T17:01:40.730Z
+lastUpdatedOn: 2026-10-28T17:58:19.986Z
 ---
 
 An edge is a set of pixels where image intensity or colour changes rapidly. It usually marks an object boundary.
@@ -285,3 +285,19 @@ $$
 $$
 
 Sharpening also amplifies noise. Apply it after denoising when necessary.
+
+## Worked Example
+
+### Laplacian Response
+
+Find the $4$-neighbour Laplacian response at a pivot value of $80$ with neighbours $20$, $20$, $100$ and $100$.
+
+<Solution>
+
+$$
+\nabla^2 f = 20 + 20 + 100 + 100 - 4(80) = -80
+$$
+
+The response is $-80$.
+
+</Solution>

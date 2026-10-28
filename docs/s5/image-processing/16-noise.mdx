@@ -1,7 +1,7 @@
 ---
 title: Noise
 dateCreated: 2026-08-18T07:18:54.109Z
-lastUpdatedOn: 2026-10-28T17:01:40.606Z
+lastUpdatedOn: 2026-10-28T17:58:19.856Z
 ---
 
 Noise is an unwanted component added to the true image signal during acquisition, storage or transmission, usually random. Structured corruptions introduced by processing, such as compression blocking or aliasing, are normally called artefacts instead.
@@ -198,3 +198,27 @@ Replaces the pivot pixel with the median value of its neighbourhood.
 
 - Preserves edges better than mean filtering
 - Well suited to salt and pepper noise, since outlier values get discarded rather than averaged in
+
+## Worked Example
+
+### Median Filtering
+
+Apply a $3 \times 3$ median filter to the following neighbourhood.
+
+$$
+\begin{bmatrix}
+10 & 11 & 10 \\
+12 & 255 & 11 \\
+10 & 12 & 11
+\end{bmatrix}
+$$
+
+<Solution>
+
+$$
+\{10, 10, 10, 11, 11, 11, 12, 12, 255\}
+$$
+
+The middle value is $11$. The filtered pivot value is $11$.
+
+</Solution>

@@ -1,0 +1,111 @@
+---
+// A dichroic prism separates incoming light into red, green and blue beams.
+// Each beam reaches its own image sensor.
+import FigureCaption from "./primitives/figure-caption.astro";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("beam-splitting");
+---
+
+<figure>
+  <svg viewBox="0 0 400 220" aria-hidden="true">
+    <defs>
+      <ArrowMarker id={`${uid}-a`} fill="var(--text-secondary)" size={5} />
+    </defs>
+
+    <line
+      class="ray"
+      x1="20"
+      y1="110"
+      x2="94"
+      y2="110"
+      marker-end={`url(#${uid}-a)`}
+    ></line>
+    <text class="sub" x="50" y="98" text-anchor="middle">
+      incoming light
+    </text>
+    <polygon class="prism" points="94,67 94,153 144,110"></polygon>
+    <polygon class="prism" points="144,110 94,67 182,67"></polygon>
+
+    <line class="ray r" x1="162" y1="91" x2="262" y2="48"></line>
+    <line class="ray g" x1="144" y1="110" x2="262" y2="110"></line>
+    <line class="ray b" x1="162" y1="129" x2="262" y2="172"></line>
+    <rect class="sensor r" x="262" y="31" width="18" height="34"></rect>
+    <rect class="sensor g" x="262" y="93" width="18" height="34"></rect>
+    <rect class="sensor b" x="262" y="155" width="18" height="34"></rect>
+    <text class="label r" x="294" y="53">
+      red sensor
+    </text>
+    <text class="label g" x="294" y="115">
+      green sensor
+    </text>
+    <text class="label b" x="294" y="177">
+      blue sensor
+    </text>
+  </svg>
+  <FigureCaption>
+    A dichroic prism separates incoming light into red, green and blue beams for
+    3 sensors.
+  </FigureCaption>
+</figure>
+
+<style>
+  figure {
+    max-width: 400px;
+    margin: 16px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .ray {
+    stroke: var(--text-secondary);
+    stroke-width: 1.8;
+  }
+  .ray.r,
+  .label.r {
+    stroke: #d64545;
+    fill: #d64545;
+  }
+  .ray.g,
+  .label.g {
+    stroke: #3f9d5a;
+    fill: #3f9d5a;
+  }
+  .ray.b,
+  .label.b {
+    stroke: #3f6fd6;
+    fill: #3f6fd6;
+  }
+  .prism {
+    fill: var(--dia-key);
+    fill-opacity: 0.15;
+    stroke: var(--text-primary);
+    stroke-width: 1.2;
+  }
+  .sensor {
+    stroke: var(--text-primary);
+    stroke-width: 1;
+  }
+  .sensor.r {
+    fill: #d64545;
+  }
+  .sensor.g {
+    fill: #3f9d5a;
+  }
+  .sensor.b {
+    fill: #3f6fd6;
+  }
+  text {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .sub {
+    fill: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 400;
+  }
+</style>
