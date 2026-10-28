@@ -1,7 +1,7 @@
 ---
 title: Image Encoding
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-20T08:45:41.108Z
+lastUpdatedOn: 2026-10-28T23:42:27.563Z
 ---
 
 Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
@@ -117,8 +117,12 @@ The ideal length of grey level $k$ is its information content. Real codewords ha
 $$
 l_\text{ideal}(k) = -\log_2 P(k)
 \qquad
-l(k) = \lceil -\log_2 P(k) \rceil \text{ satisfies the Kraft inequality}
+l(k) = \lceil -\log_2 P(k) \rceil
+
+
 $$
+
+Satisfies the Kraft inequality.
 
 $$
 B_\text{avg} \le L_\text{avg} < B_\text{avg} + 1
@@ -182,7 +186,7 @@ $$
 
 Each layer stores the difference from the layer above, upscaled to match resolution. Removes correlation relative to the previous layer.
 
-The image is repeatedly smoothed and downsampled to build layers of decreasing resolution:
+The image is repeatedly filtered with a Gaussian low-pass filter and downsampled to build layers of decreasing resolution:
 
 $$
 G_0 = I, \qquad G_{k+1} = \text{reduce}(G_k)
@@ -207,7 +211,7 @@ Here:
   <Sym s="G_k">image at level $k$, with $G_0$ the full-resolution image</Sym>
   <Sym s="K">index of the coarsest level</Sym>
   <Sym s="\text{reduce}">
-    smoothing followed by downsampling by 2 in each dimension
+    Gaussian low-pass filtering followed by downsampling by 2 in each dimension
   </Sym>
   <Sym s="\text{expand}">
     upsampling by 2 in each dimension with interpolation
@@ -287,7 +291,7 @@ Here:
 Not all image detail is equally perceivable. Removing imperceptible detail doesn't affect apparent quality, but always loses information.
 
 - Re-quantizing with lower grey level depth
-- Smoothing to remove noise and minor variations before coding
+- Gaussian filtering to remove noise and minor variations before coding
 
 Re-quantizing an $m$-bit image to $m'$ bits keeps the top $m'$ bits of each pixel:
 
@@ -301,7 +305,7 @@ $$
 CR = \frac{m}{m'}
 $$
 
-Smoothing replaces each pixel with a weighted average of its neighbourhood:
+Gaussian filtering replaces each pixel with a weighted average of its neighbourhood:
 
 $$
 I'(x,y) = \sum_{i,j} h(i,j)\, I(x+i, y+j)
@@ -314,7 +318,7 @@ Here:
 <Symbols>
   <Sym s="m, m'">bits per pixel before and after re-quantizing</Sym>
   <Sym s="I'(x,y)">pixel value after the operation</Sym>
-  <Sym s="h(i,j)">smoothing weight at offset $(i,j)$</Sym>
+  <Sym s="h(i,j)">Gaussian weight at offset $(i,j)$</Sym>
 </Symbols>
 
 <Note>

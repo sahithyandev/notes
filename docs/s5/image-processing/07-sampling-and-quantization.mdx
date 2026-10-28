@@ -1,7 +1,7 @@
 ---
 title: Sampling and Quantization
 dateCreated: 2026-07-26T04:59:21.791Z
-lastUpdatedOn: 2026-10-28T17:58:19.682Z
+lastUpdatedOn: 2026-10-28T23:42:27.254Z
 ---
 
 Sampling and quantization are the 2 independent choices made when converting an analog image to a [digital image](/s5/image-processing/image-model). Sampling sets the grid size $m \times n$. Quantization sets the number of levels $L = 2^k$. Together they fix the storage size $m \times n \times k$ bits per channel.
@@ -67,7 +67,7 @@ Aliasing happens when a pattern in the scene repeats faster than the sampling gr
 - The alias frequency is the true frequency folded about half the sampling rate. A higher scene frequency gives a lower alias frequency.
 - On fine repeating textures the alias shows up as broad curved bands, called moire fringes.
 
-Anti-aliasing removes detail finer than the grid can represent, by optical blur or a low-pass filter, before the image is sampled. This costs high-frequency detail, which is less noticeable when sub-sampling.
+Anti-aliasing removes detail finer than the grid can represent, by optical blur or a Gaussian low-pass filter, before the image is sampled. A Gaussian filter weights nearby pixels with smoothly decreasing coefficients. This costs high-frequency detail, which is less noticeable when sub-sampling.
 
 <figure>
 

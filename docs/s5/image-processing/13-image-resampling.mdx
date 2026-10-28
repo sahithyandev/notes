@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-10-28T17:58:19.775Z
+lastUpdatedOn: 2026-10-28T23:42:27.409Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -162,16 +162,34 @@ A series of progressively lower-resolution images derived from one source, each 
 
 ### Gaussian Pyramid
 
-The stack of smoothed, downsampled images.
+The stack of Gaussian-filtered, downsampled images.
 
 <Symbols>
   <Sym s="G_0">the original image</Sym>
   <Sym s="G_{n+1}">
-    $G_n$ smoothed with a low-pass kernel, then downsampled by 2
+    $G_n$ filtered with a Gaussian low-pass filter, then downsampled by 2
   </Sym>
 </Symbols>
 
-Each level halves the width and height. Smoothing before downsampling removes the high frequencies that would otherwise alias.
+Each level halves the width and height. The Gaussian filter removes the high frequencies that would otherwise alias during downsampling.
+
+### Gaussian Pyramid Filter
+
+Use the [5&times;5 Gaussian low-pass filter](/s5/image-processing/image-filters#gaussian-filter). Apply its 1-D kernel horizontally, then vertically.
+
+After filtering, retain every second row and column:
+
+$$
+G_{n+1}(x,y) = \sum_{i=-2}^{2}\sum_{j=-2}^{2} H(i,j)\,G_n(2x-i,2y-j)
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="H">2-D Gaussian-pyramid filter</Sym>
+  <Sym s="G_n">input pyramid level</Sym>
+  <Sym s="G_{n+1}">filtered and downsampled pyramid level</Sym>
+</Symbols>
 
 ### Laplacian Pyramid
 
@@ -189,7 +207,7 @@ Here:
   <Sym s="L_n">band-pass detail at level $n$</Sym>
 </Symbols>
 
-$U(G_{n+1})$ is a blurred version of $G_n$, since it was smoothed and downsampled to make $G_{n+1}$ then interpolated back up. Subtracting it leaves only the high-frequency detail that step discarded.
+$U(G_{n+1})$ is a blurred version of $G_n$, since a Gaussian filter and downsampling made $G_{n+1}$ before interpolation back up. Subtracting it leaves only the high-frequency detail that step discarded.
 
 The top level keeps the full Gaussian image $G_N$, not a difference.
 

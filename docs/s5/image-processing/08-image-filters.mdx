@@ -1,0 +1,322 @@
+---
+title: Image Filters
+dateCreated: 2026-10-28T22:46:31.625Z
+lastUpdatedOn: 2026-10-28T23:42:27.278Z
+---
+
+An image filter transforms pixels in a [digital image](/s5/image-processing/image-model) from values in a local neighbourhood. A filter suppresses or strengthens selected image detail.
+
+## Filter Kernel
+
+<Aka>mask, template or window</Aka>. A kernel is a grid of coefficients centred
+on the pixel being processed.
+
+For a linear filter:
+
+$$
+P(x,y) = \sum_{i=-N}^{N}\sum_{j=-M}^{M} H(i,j)\,I(x-i,y-j)
+$$
+
+Here:
+
+<Symbols>
+  <Sym s="I(x,y)">input image intensity</Sym>
+  <Sym s="P(x,y)">filtered output intensity</Sym>
+  <Sym s="H(i,j)">kernel coefficient at offset $(i,j)$</Sym>
+</Symbols>
+
+The kernel moves over every pixel. The weighted sum becomes the output pixel.
+
+### Kernel Properties
+
+- Normalized kernel  
+  Coefficients sum to $1$. Constant-intensity regions retain their intensity.
+- Symmetric kernel  
+  The kernel gives equal weight to opposite offsets. Correlation and convolution produce the same result.
+- Separable kernel  
+  A 2-D kernel factors into two 1-D kernels. Filter rows, then columns, with fewer operations.
+
+## Kernel Classification
+
+For a linear kernel, first add all coefficients:
+
+$$
+S = \sum_{i,j} H(i,j)
+$$
+
+On a constant-intensity region with value $c$, every covered pixel is $c$. The filter output is $Sc$.
+
+- $S=1$  
+  Constant intensity passes unchanged. The kernel preserves the zero-frequency component.
+- $S=0$  
+  Constant intensity becomes $0$. The kernel rejects the zero-frequency component.
+- $S \ne 0,1$  
+  Constant intensity changes. The kernel scales or inverts the zero-frequency component.
+
+### Low-Pass Kernels
+
+A low-pass kernel usually has these features:
+
+- All or nearly all coefficients are positive
+- The greatest coefficient is at the centre
+- Coefficients decrease with distance from the centre
+- Coefficients sum to $1$
+
+The mean and Gaussian kernels have this pattern. They average a neighbourhood, so neighbouring differences cancel.
+
+### High-Pass Kernels
+
+A high-pass kernel usually has these features:
+
+- Positive and negative coefficients
+- Coefficients that sum to $0$
+- A positive centre surrounded by negative coefficients, or the reverse
+
+The kernel returns $0$ on constant regions. It produces a large magnitude where neighbouring pixels differ.
+
+### Derivative Kernels
+
+A derivative kernel has opposite signs on opposite sides of the pivot. It detects change in one direction.
+
+$$
+\begin{bmatrix}
+-1 & 0 & 1
+\end{bmatrix}
+\qquad
+\begin{bmatrix}
+-1 \\
+0 \\
+1
+\end{bmatrix}
+$$
+
+The first kernel responds to horizontal intensity change. The second responds to vertical intensity change.
+
+### Sharpening Kernels
+
+A sharpening kernel often has a positive centre and negative neighbours, but its coefficients sum to $1$. It preserves constant intensity while adding a high-pass response to the original image.
+
+$$
+\begin{bmatrix}
+0 & -1 & 0 \\
+-1 & 5 & -1 \\
+0 & -1 & 0
+\end{bmatrix}
+$$
+
+It is not a pure high-pass filter, since constant regions remain visible.
+
+### Exact Classification
+
+Coefficient patterns give a quick classification. The exact result comes from the frequency response:
+
+$$
+\mathcal{H}(\omega_x,\omega_y)
+= \sum_{i,j} H(i,j)\,e^{-j(\omega_x i + \omega_y j)}
+$$
+
+A low-pass filter has a large magnitude near $(0,0)$ and a small magnitude near the highest frequencies. A high-pass filter has the reverse. A band-pass filter suppresses both regions and keeps an intermediate frequency band.
+
+<Note>
+
+The median filter has no kernel. It is non-linear, so coefficient-sum and frequency-response tests do not apply.
+
+</Note>
+
+## Low-Pass Filters
+
+A low-pass filter keeps slowly varying intensity and attenuates rapid change. It smooths noise and fine detail.
+
+Used before downsampling to prevent [aliasing](/s5/image-processing/sampling-and-quantization#aliasing). It also reduces noise before feature extraction or lossy coding.
+
+### Mean Filter
+
+The mean filter assigns equal weight to every pixel in its neighbourhood:
+
+$$
+H = \frac{1}{9}
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & 1 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+$$
+
+It strongly blurs edges. Use it for zero-mean random noise when edge preservation is not important.
+
+### Gaussian Filter
+
+The Gaussian filter gives the greatest weight to the pivot pixel. Weights decrease smoothly with distance:
+
+$$
+h(x,y) = \exp\left[-\frac{x^2+y^2}{2\sigma^2}\right]
+$$
+
+$\sigma$ controls the blur width. Larger $\sigma$ spreads weight farther from the pivot and removes more high-frequency detail.
+
+### Kernel Construction
+
+The continuous function must be sampled to make a finite kernel. For a $5 \times 5$ kernel, use the offsets $-2,-1,0,1,2$.
+
+Choose $\sigma$, then calculate the unnormalized 1-D weights:
+
+$$
+g(i) = \exp\left[-\frac{i^2}{2\sigma^2}\right]
+\qquad
+i \in \{-2,-1,0,1,2\}
+$$
+
+Normalize them so their sum is $1$:
+
+$$
+w(i) = \frac{g(i)}{\sum_{k=-2}^{2}g(k)}
+$$
+
+For $\sigma=1$, the unnormalized weights are approximately:
+
+$$
+\begin{bmatrix}
+0.135 & 0.607 & 1 & 0.607 & 0.135
+\end{bmatrix}
+$$
+
+Their normalized values are approximately:
+
+$$
+\begin{bmatrix}
+0.054 & 0.244 & 0.403 & 0.244 & 0.054
+\end{bmatrix}
+$$
+
+Form the 2-D kernel by multiplying 1 horizontal weight by 1 vertical weight:
+
+$$
+H(i,j) = w(i)w(j)
+$$
+
+The centre coefficient is largest. Corner coefficients are smallest.
+
+### Binomial Approximation
+
+A common integer approximation for $\sigma \approx 1$ is:
+
+$$
+w = \frac{1}{16}\begin{bmatrix}1 & 4 & 6 & 4 & 1\end{bmatrix}
+$$
+
+The numerator coefficients sum to $16$, so division by $16$ normalizes the 1-D kernel. Its outer product forms the 2-D kernel:
+
+$$
+H = w^\mathsf{T}w
+= \frac{1}{256}
+\begin{bmatrix}
+1 & 4 & 6 & 4 & 1 \\
+4 & 16 & 24 & 16 & 4 \\
+6 & 24 & 36 & 24 & 6 \\
+4 & 16 & 24 & 16 & 4 \\
+1 & 4 & 6 & 4 & 1
+\end{bmatrix}
+$$
+
+The top-left corner coefficient is $\frac{1}{16}\frac{1}{16} = \frac{1}{256}$. The coefficients sum to $1$. Apply $w$ horizontally, then vertically. This is equivalent to convolution with $H$.
+
+At each output pixel, multiply every value in the covered $5 \times 5$ neighbourhood by the matching $H$ coefficient, then sum the $25$ products.
+
+Use the Gaussian filter before downsampling, in Gaussian pyramids and to smooth noise before differentiation.
+
+## High-Pass Filters
+
+A high-pass filter attenuates slowly varying intensity and preserves rapid change. It strengthens edges and fine detail.
+
+A simple high-pass kernel is:
+
+$$
+\begin{bmatrix}
+0 & -1 & 0 \\
+-1 & 4 & -1 \\
+0 & -1 & 0
+\end{bmatrix}
+$$
+
+Its response is near $0$ in constant regions and large at intensity transitions. High-pass filters also amplify noise.
+
+## Non-Linear Filters
+
+Non-linear filters do not form a weighted sum. The median filter replaces the pivot with the median neighbourhood intensity.
+
+It removes isolated salt-and-pepper noise while preserving edges better than mean or Gaussian filtering.
+
+## Worked Examples
+
+### Classifying Kernels
+
+Classify the following kernels.
+
+$$
+H_1 = \frac{1}{9}
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & 1 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+\qquad
+H_2 =
+\begin{bmatrix}
+0 & -1 & 0 \\
+-1 & 4 & -1 \\
+0 & -1 & 0
+\end{bmatrix}
+\qquad
+H_3 =
+\begin{bmatrix}
+0 & -1 & 0 \\
+-1 & 5 & -1 \\
+0 & -1 & 0
+\end{bmatrix}
+$$
+
+<Solution>
+
+$$
+\sum_{i,j}H_1(i,j) = 1
+$$
+
+$H_1$ has only positive, equal weights. It is a mean low-pass filter.
+
+$$
+\sum_{i,j}H_2(i,j) = 4 - 1 - 1 - 1 - 1 = 0
+$$
+
+$H_2$ rejects constant regions. It is a high-pass Laplacian kernel.
+
+$$
+\sum_{i,j}H_3(i,j) = 5 - 1 - 1 - 1 - 1 = 1
+$$
+
+$H_3$ preserves constant regions and strengthens differences from the pivot. It is a sharpening kernel.
+
+</Solution>
+
+### Median Filter
+
+Apply a $3 \times 3$ median filter to the neighbourhood below.
+
+$$
+\begin{bmatrix}
+10 & 11 & 10 \\
+12 & 255 & 11 \\
+10 & 12 & 11
+\end{bmatrix}
+$$
+
+<Solution>
+
+The filter does not multiply values by kernel coefficients. Sort the $9$ neighbourhood values:
+
+$$
+\{10,10,10,11,11,11,12,12,255\}
+$$
+
+The middle value is $11$. The filtered pivot value is $11$.
+
+</Solution>
