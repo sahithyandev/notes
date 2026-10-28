@@ -13,7 +13,6 @@ export const WIP_PREFIXES: string[] = [
   "s5/advanced-software-engineering",
   "s5/business-economics-and-financial-accounting",
   "s5/calculus",
-  "s5/computer-security",
   "s5/image-processing",
   "s5/numerical-methods",
   "s5/secure-app-dev",
