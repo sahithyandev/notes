@@ -1,7 +1,7 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.144Z
+lastUpdatedOn: 2026-10-28T02:38:15.165Z
 ---
 
 Diffie-Hellman (DH), invented in 1976 by Whitfield Diffie and Martin Hellman, lets 2 parties agree on a shared secret key using only publicly exchanged information. Security rests on the difficulty of computing discrete logarithms.
@@ -10,20 +10,12 @@ This is the Discrete Logarithm Problem (DLP) over the finite field $\mathbb{Z}_p
 
 The [interactive guide to Diffie-Hellman key exchange](https://sahithyan.dev/post/diffie-hellman-key-exchange) walks through the exchange and the discrete logarithm problem behind it.
 
-<Note>
-
-DH is a key agreement scheme: both parties contribute equally to the shared key. RSA, by contrast, is a key delivery scheme.
-
-</Note>
-
-The protocol has 4 parts: define public parameters, generate key pairs, exchange public keys, compute the shared secret.
-
 ## Public Parameters
 
 - A large prime modulus $p$, defining the multiplicative group $\mathbb{Z}_p^*$.
 - A generator $g$, a primitive root modulo $p$.
 
-$g$ is a primitive root modulo $p$ **iff** every $a$ coprime to $p$ satisfies $a \equiv g^i \pmod p$ for some integer $i$, called the discrete logarithm of $a$ to base $g$.
+$g$ is a primitive root modulo $p$ **iff** every $a$ coprime to $p$ (i.e. $\gcd(a,p) = 1$) satisfies $a \equiv g^i \pmod p$ for some integer $i$, called the discrete logarithm of $a$ to base $g$.
 
 For prime $p$, the $p - 1$ values $i = 1, \dots, p-1$ generate $\{1, \dots, p-1\}$, in some order, via $g^i \bmod p$.
 
@@ -31,13 +23,7 @@ Choosing $g$ as a primitive root maximises the order of the group it generates t
 
 ### Choosing a Modulus
 
-$p$ is chosen as a safe prime: a prime of the form $p = 2q + 1$ where $q$ is also prime.
-
-Here:
-
-<Symbols>
-  <Sym s="q">the Sophie Germain prime paired with $p$</Sym>
-</Symbols>
+$p$ is chosen as a safe prime: a prime of the form $p = 2q + 1$ where $q$ is also prime. $(p,q)$ are a Sophie-Germain prime pair.
 
 Reasons:
 
@@ -80,77 +66,81 @@ Each party chooses a secret integer and publishes its exponentiation modulo $p$.
 - Alice chooses secret $a \in \mathbb{Z}_p^*$, computes public $A \equiv g^a \pmod p$.
 - Bob chooses secret $b \in \mathbb{Z}_p^*$, computes public $B \equiv g^b \pmod p$.
 
-## Exchange of Public Keys
+### Exchange of Public Keys
 
 Public keys need no confidentiality, only authenticity and integrity, since a forged public key lets an attacker substitute their own key undetected.
 
-Methods: a trusted public key server, in-person or verified exchange, or a CA-issued digital certificate.
+Methods:
 
-## Shared Secret Key
+- a trusted public key server
+- in-person or verified exchange
+- a CA-issued digital certificate.
+
+### Shared Secret Key
 
 Alice computes $k = B^a \bmod p = g^{ba} \bmod p$. Bob computes $k = A^b \bmod p = g^{ab} \bmod p$. Both arrive at the same value since $g^{ab} \equiv g^{ba} \pmod p$.
 
-### Worked Example
-
-$p = 23$, $g = 5$, $a = 6$, $b = 15$.
-
-<Solution>
-
-- $A = 5^6 \bmod 23$.
-- $B = 5^{15} \bmod 23$.
-- Alice computes $k = B^6 \bmod 23 = 2$.
-- Bob computes $k = A^{15} \bmod 23 = 2$.
-
-</Solution>
-
 ## Ephemeral Diffie-Hellman
 
-Ephemeral Diffie-Hellman (DHE) generates a fresh key pair for every session and deletes both private keys once the shared secret is set up. Long-term keys authenticate the exchange only, they do not derive the session key.
+<Aka>DHE</Aka>. Runs a new DH exchange for every session.
 
-This gives perfect forward secrecy: if the long-term keys are stolen later, past session keys stay safe, because the private keys that produced them no longer exist and cannot be recovered from the recorded public values.
+### Session Lifecycle
 
-### Static DH
+- Alice generates a fresh DH exponent $a_s$, computes $A_s = g^{a_s} \bmod p$
+- Bob generates a fresh DH exponent $b_s$, computes $B_s = g^{b_s} \bmod p$
+- Both derive $k_s = g^{a_sb_s} \bmod p$ and use a key derivation function to obtain session traffic keys.
+- Both delete $a_s$ and $b_s$ after the exchange.
 
-Both parties reuse the same key pair across every session instead of generating a fresh one.
+This gives perfect forward secrecy. If an attacker steals a long-term authentication key later, past session keys remain unavailable because the ephemeral private exponents no longer exist. Recovering $a_s$ or $b_s$ from recorded public values requires solving the DLP.
 
-- A single compromised private key exposes every past and future session, since the same $a$ or $b$ derives every session's shared secret.
-- Costs 1 exponentiation total per party, instead of 1 per session.
+Normal DH reuses the same private exponents across sessions. A compromised static private exponent exposes every session derived from it. DHE adds fresh public-key generation for every session. Both forms still require 1 shared-secret exponentiation per party per session.
 
 ### Authenticating the Ephemeral Keys
 
-Raw DH has no identity binding, so a fresh, unsigned $A$ or $B$ is exactly what a [man-in-the-middle](#man-in-the-middle-attack) substitutes. DHE fixes this by signing the ephemeral public key with a separate long-term signing key, not by deriving the session key from it.
+Raw DHE has no identity binding. A fresh, unsigned $A_s$ or $B_s$ is exactly what a [man-in-the-middle](#man-in-the-middle-attack) substitutes. DHE provides forward secrecy, not authentication.
 
-- Alice signs $A$ with her long-term private signing key, sends $(A, \text{signature})$.
-- Bob verifies the signature against Alice's long-term public key, then proceeds with $A$ exactly as in plain DH.
+A protocol combines DHE with long-term signatures or certificates to authenticate the ephemeral public keys. The authentication key proves the sender's identity. The ephemeral private exponent derives the session secret.
 
-<Note>
+- Alice signs the exchange with $SK_A$, sends $(A_s, \text{signature})$.
+- Bob verifies the signature with $PK_A$, then proceeds with $A_s$ exactly as in plain DH.
 
-TLS cipher suites name this split explicitly. `DHE_RSA` signs the ephemeral exchange with a long-term RSA key, `DHE_DSS` with DSA, `ECDHE_RSA` and `ECDHE_ECDSA` the elliptic-curve analogue. The long-term key authenticates $A$ and $B$, it never enters the shared secret computation.
+### ECDHE
 
-</Note>
+<Aka>Elliptic-Curve Ephemeral Diffie-Hellman</Aka>. Uses an elliptic-curve group
+instead of the multiplicative group $\mathbb{Z}_p^*$.
 
-Why forward secrecy holds:
+- The curve and base point $G$ are public parameters.
+- Alice chooses a fresh private scalar $a_s$ and sends the public point $A_s = a_sG$.
+- Bob chooses a fresh private scalar $b_s$ and sends the public point $B_s = b_sG$.
+- Alice computes $S = a_sB_s$.
+- Bob computes $S = b_sA_s$.
 
-- $a$ and $b$ are generated fresh per session and destroyed once $k$ is computed.
-- Recovering $a$ from the recorded public $A$ requires solving the DLP, not merely knowing the long-term signing key.
-- A long-term key compromised later lets an attacker forge future signatures, but supplies no way to recompute a past session's $a$ or $b$.
+Both obtain $S = a_sb_sG$. A key derivation function converts $S$ into session traffic keys. Recovering $a_s$ from $A_s$ requires solving the Elliptic-Curve Discrete Logarithm Problem.
+
+ECDHE keeps the same roles as DHE. The ephemeral scalars derive $S$. Long-term keys authenticate the exchanged points. ECDHE uses smaller public keys for comparable security.
 
 ## Man-in-the-Middle Attack
+
+import DhManInTheMiddleAttack from "./images/dh-man-in-the-middle-attack.svg";
+
+<ProseFigure>
 
 The basic DH protocol has no authentication of public keys, so it is vulnerable to a man-in-the-middle attack.
 
 <Proof label="Proof Hint">
 
-- Alice sends her public key $A$ toward Bob.
-- Mallory intercepts, and forwards her own public key $A'$ to Bob instead, claiming it is Alice's.
-- Bob computes a shared key $k_1$ with Mallory, believing it is shared with Alice.
-- Bob sends his public key $B$ toward Alice.
-- Mallory intercepts, and forwards her own public key $B'$ to Alice instead, claiming it is Bob's.
-- Alice computes a shared key $k_2$ with Mallory, believing it is shared with Bob.
+- Mallory replaces Alice's $A$ with $M_1$ before forwarding it to Bob.
+- Mallory replaces Bob's $B$ with $M_2$ before forwarding it to Alice.
+- Bob derives $k_2$ with Mallory, believing it is shared with Alice.
+- Alice derives $k_1$ with Mallory, believing it is shared with Bob.
+
+Mallory holds both keys and can decrypt, inspect, modify, or inject messages between Alice and Bob.
 
 </Proof>
 
-Mallory now holds a separate shared key with each party, and can decrypt, inspect, modify, or inject messages in the supposedly secure channel between Alice and Bob.
+<DhManInTheMiddleAttack slot="figure" />
+
+</ProseFigure>
 
 ### Preventing the Attack
 
@@ -165,8 +155,106 @@ The attack works because $A$ and $B$ carry no proof of who sent them. Every fix 
 - Out-of-band verification  
   Compare a short fingerprint of the exchanged keys over a separate trusted channel, e.g. reading it aloud on a phone call.
 
-<Note>
-
 Every fix needs a trust anchor Mallory cannot also forge or intercept, a long-term signing key, a CA, or a side channel. Plain DH supplies none of these on its own.
 
-</Note>
+## Worked Examples
+
+### Choosing $p$
+
+Select the safe prime $p$ from $15$, $17$, $19$, $23$, and $29$.
+
+Evaluate every candidate before revealing the solution.
+
+<Solution>
+
+- $15$ is composite.
+- $17$ is prime, but $\dfrac{17 - 1}{2} = 8$ is composite.
+- $19$ is prime, but $\dfrac{19 - 1}{2} = 9$ is composite.
+- $23$ is prime and $\dfrac{23 - 1}{2} = 11$ is prime.
+- $29$ is prime, but $\dfrac{29 - 1}{2} = 14$ is composite.
+
+Select $p = 23$.
+
+</Solution>
+
+### Choosing $q$
+
+Let $p = 23$. Select the value of $q$ satisfying $p = 2q + 1$ from $7$, $9$, $11$, $13$, and $15$.
+
+Evaluate every candidate before revealing the solution.
+
+<Solution>
+
+- $q = 7$ gives $2q + 1 = 15$, not $23$.
+- $q = 9$ gives $2q + 1 = 19$, not $23$.
+- $q = 11$ gives $2q + 1 = 23$.
+- $q = 13$ gives $2q + 1 = 27$, not $23$.
+- $q = 15$ gives $2q + 1 = 31$, not $23$.
+
+Select $q = 11$.
+
+</Solution>
+
+### Alice's Calculations
+
+Let $p = 23$, $g = 5$, $a = 6$, and $B = 19$. Select Alice's public key $A$ and shared secret $k$:
+
+- $(A,k) = (4,2)$
+- $(A,k) = (8,2)$
+- $(A,k) = (8,4)$
+- $(A,k) = (16,2)$
+- $(A,k) = (8,19)$
+
+Compute both values before revealing the solution.
+
+<Solution>
+
+- $5^2 \bmod 23 = 2$.
+- $5^4 \bmod 23 = 2^2 \bmod 23 = 4$.
+- $A = 5^6 \bmod 23 = 5^4 \cdot 5^2 \bmod 23 = 4 \cdot 2 \bmod 23 = 8$.
+- $19^2 \bmod 23 = 16$.
+- $19^4 \bmod 23 = 16^2 \bmod 23 = 3$.
+- $k = 19^6 \bmod 23 = 19^4 \cdot 19^2 \bmod 23 = 3 \cdot 16 \bmod 23 = 2$.
+
+The computed pair is $(A,k) = (8,2)$.
+
+- $(4,2)$ has the wrong public key.
+- $(8,2)$ is correct.
+- $(8,4)$ has the wrong shared secret.
+- $(16,2)$ has the wrong public key.
+- $(8,19)$ has the wrong shared secret.
+
+</Solution>
+
+### Bob's Calculations
+
+Let $p = 23$, $g = 5$, $b = 15$, and $A = 8$. Select Bob's public key $B$ and shared secret $k$:
+
+- $(B,k) = (8,2)$
+- $(B,k) = (19,2)$
+- $(B,k) = (19,4)$
+- $(B,k) = (16,2)$
+- $(B,k) = (19,8)$
+
+Compute both values before revealing the solution.
+
+<Solution>
+
+- $5^2 \bmod 23 = 2$.
+- $5^4 \bmod 23 = 4$.
+- $5^8 \bmod 23 = 16$.
+- $B = 5^{15} \bmod 23 = 5^8 \cdot 5^4 \cdot 5^2 \cdot 5 \bmod 23 = 16 \cdot 4 \cdot 2 \cdot 5 \bmod 23 = 19$.
+- $8^2 \bmod 23 = 18$.
+- $8^4 \bmod 23 = 18^2 \bmod 23 = 2$.
+- $8^8 \bmod 23 = 2^2 \bmod 23 = 4$.
+- $k = 8^{15} \bmod 23 = 8^8 \cdot 8^4 \cdot 8^2 \cdot 8 \bmod 23 = 4 \cdot 2 \cdot 18 \cdot 8 \bmod 23 = 2$.
+
+The computed pair is $(B,k) = (19,2)$.
+
+- $(8,2)$ has the wrong public key.
+- $(19,2)$ is correct.
+- $(19,4)$ has the wrong shared secret.
+- $(16,2)$ has the wrong public key.
+- $(19,8)$ has the wrong shared secret.
+
+</Solution>

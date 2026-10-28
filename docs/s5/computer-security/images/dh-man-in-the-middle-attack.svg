@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 600 500" width="760" height="633" role="img" aria-label="Diffie-Hellman man-in-the-middle attack. Mallory intercepts Alice's public value A and Bob's public value B, replacing them with M1 and M2. Alice and Bob each establish a separate shared key with Mallory.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-key { fill: var(--dia-key, #6d4bb6); }
+    .proto .w-key { stroke: var(--dia-key, #6d4bb6); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs>
+    <marker id="ah-dh-mitm" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="45" y="6" width="100" height="30" rx="4" />
+  <text x="95" y="21" text-anchor="middle">Alice</text>
+  <rect class="box w-alert" x="250" y="6" width="100" height="30" rx="4" />
+  <text x="300" y="21" text-anchor="middle" class="t-alert">Mallory</text>
+  <rect class="box" x="455" y="6" width="100" height="30" rx="4" />
+  <text x="505" y="21" text-anchor="middle">Bob</text>
+
+  <path class="life" d="M95 36 V466" />
+  <path class="life" d="M300 36 V466" />
+  <path class="life" d="M505 36 V466" />
+
+  <text x="198" y="64" text-anchor="middle" class="t-pt">A = gᵃ</text>
+  <path class="wire w-pt" d="M95 78 H300" marker-end="url(#ah-dh-mitm)" />
+  <text x="198" y="96" text-anchor="middle" class="sub">intercept</text>
+
+  <text x="402" y="132" text-anchor="middle" class="t-alert">M₁ = gᵐ¹</text>
+  <path class="wire w-alert" d="M300 146 H505" marker-end="url(#ah-dh-mitm)" />
+  <text x="402" y="164" text-anchor="middle" class="sub">claiming to be Alice</text>
+
+  <text x="402" y="202" text-anchor="middle" class="t-pt">B = gᵇ</text>
+  <path class="wire w-pt" d="M505 216 H300" marker-end="url(#ah-dh-mitm)" />
+  <text x="402" y="234" text-anchor="middle" class="sub">intercept</text>
+
+  <text x="198" y="270" text-anchor="middle" class="t-alert">M₂ = gᵐ²</text>
+  <path class="wire w-alert" d="M300 284 H95" marker-end="url(#ah-dh-mitm)" />
+  <text x="198" y="302" text-anchor="middle" class="sub">claiming to be Bob</text>
+
+  <rect class="note w-key" x="50" y="334" width="245" height="58" rx="3" />
+  <text x="172" y="352" text-anchor="middle" class="t-key">Alice derives k₁ = M₂ᵃ</text>
+  <text x="172" y="374" text-anchor="middle" class="sub">Mallory derives the same k₁ from A</text>
+
+  <rect class="note w-key" x="305" y="408" width="245" height="58" rx="3" />
+  <text x="428" y="426" text-anchor="middle" class="t-key">Bob derives k₂ = M₁ᵇ</text>
+  <text x="428" y="448" text-anchor="middle" class="sub">Mallory derives the same k₂ from B</text>
+</svg>

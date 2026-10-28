@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 560 390" width="560" height="390" role="img" aria-label="Denial-of-service attack. An attacker sends many bogus protocol requests. The Server performs costly private-key decryptions or Diffie-Hellman exponentiations before it can reject each request.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs><marker id="ah-dos" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" /></marker></defs>
+  <rect class="box w-alert" x="85" y="6" width="120" height="30" rx="4" /><text x="145" y="21" text-anchor="middle" class="t-alert">Attacker</text>
+  <rect class="box" x="355" y="6" width="120" height="30" rx="4" /><text x="415" y="21" text-anchor="middle">Server</text>
+  <path class="life" d="M145 36 V350" /><path class="life" d="M415 36 V350" />
+  <text x="280" y="70" text-anchor="middle" class="t-alert">bogus request 1</text><path class="wire w-alert" d="M145 84 H415" marker-end="url(#ah-dos)" />
+  <rect class="note w-ct" x="330" y="98" width="170" height="40" rx="3" /><text x="415" y="115" text-anchor="middle" class="t-ct">costly operation</text><text x="415" y="132" text-anchor="middle" class="sub">decrypt or compute Aᵇ</text>
+  <text x="280" y="174" text-anchor="middle" class="t-alert">bogus request 2</text><path class="wire w-alert" d="M145 188 H415" marker-end="url(#ah-dos)" />
+  <rect class="note w-ct" x="330" y="202" width="170" height="40" rx="3" /><text x="415" y="219" text-anchor="middle" class="t-ct">costly operation</text><text x="415" y="236" text-anchor="middle" class="sub">before authentication</text>
+  <text x="280" y="278" text-anchor="middle" class="t-alert">bogus request n</text><path class="wire w-alert" d="M145 292 H415" marker-end="url(#ah-dos)" />
+  <rect class="note w-alert" x="300" y="314" width="230" height="44" rx="3" /><text x="415" y="331" text-anchor="middle" class="t-alert">Server bears the computation cost.</text><text x="415" y="348" text-anchor="middle" class="sub">The attacker needs no valid credential.</text>
+</svg>

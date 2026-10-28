@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 600 375" width="600" height="375" role="img" aria-label="Replay attack. The attacker records an earlier valid encrypted login message, then sends the unchanged message to the Server later. The Server accepts it because it contains no fresh challenge.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs><marker id="ah-replay" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" /></marker></defs>
+  <rect class="box" x="45" y="6" width="100" height="30" rx="4" /><text x="95" y="21" text-anchor="middle">User</text>
+  <rect class="box w-alert" x="250" y="6" width="100" height="30" rx="4" /><text x="300" y="21" text-anchor="middle" class="t-alert">Attacker</text>
+  <rect class="box" x="455" y="6" width="100" height="30" rx="4" /><text x="505" y="21" text-anchor="middle">Server</text>
+  <path class="life" d="M95 36 V350" /><path class="life" d="M300 36 V350" /><path class="life" d="M505 36 V350" />
+  <text x="300" y="68" text-anchor="middle" class="sub">earlier session</text>
+  <text x="300" y="98" text-anchor="middle" class="t-ct">Encₚₖₛ(Uᵢd, pwd, k)</text><path class="wire w-ct" d="M95 112 H505" marker-end="url(#ah-replay)" />
+  <rect class="note w-alert" x="225" y="128" width="150" height="42" rx="3" /><text x="300" y="145" text-anchor="middle" class="t-alert">record message</text><text x="300" y="162" text-anchor="middle" class="sub">no secret is needed</text>
+  <text x="300" y="208" text-anchor="middle" class="sub">later</text>
+  <text x="402" y="238" text-anchor="middle" class="t-alert">same message, unchanged</text><path class="wire w-alert" d="M300 252 H505" marker-end="url(#ah-replay)" />
+  <rect class="note w-alert" x="415" y="274" width="140" height="50" rx="3" /><text x="485" y="292" text-anchor="middle" class="t-alert">accepts replay</text><text x="485" y="309" text-anchor="middle" class="sub">no fresh challenge</text>
+</svg>

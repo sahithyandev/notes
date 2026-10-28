@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 705 470" width="705" height="470" role="img" aria-label="Cut-and-paste attack across 2 servers. The attacker withholds Server 1's challenge, sends Server 2's challenge to the User as though it came from Server 1, then forwards the User's resulting credential response to Server 2. Server 2 accepts the attacker as the User.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs>
+    <marker id="ah-cut-paste" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="25" y="6" width="110" height="30" rx="4" />
+  <text x="80" y="21" text-anchor="middle">User</text>
+  <rect class="box w-alert" x="190" y="6" width="110" height="30" rx="4" />
+  <text x="245" y="21" text-anchor="middle" class="t-alert">Attacker</text>
+  <rect class="box" x="385" y="6" width="110" height="30" rx="4" />
+  <text x="440" y="21" text-anchor="middle">Server S₁</text>
+  <rect class="box" x="570" y="6" width="110" height="30" rx="4" />
+  <text x="625" y="21" text-anchor="middle">Server S₂</text>
+
+  <path class="life" d="M80 36 V446" />
+  <path class="life" d="M245 36 V446" />
+  <path class="life" d="M440 36 V446" />
+  <path class="life" d="M625 36 V446" />
+
+  <text x="342" y="64" text-anchor="middle" class="t-pt">start session for S₁</text>
+  <path class="wire w-pt" d="M80 78 H440" marker-end="url(#ah-cut-paste)" />
+
+  <text x="342" y="112" text-anchor="middle" class="sub">challenge from S₁</text>
+  <path class="wire" d="M440 126 H245" marker-end="url(#ah-cut-paste)" />
+  <text x="245" y="145" text-anchor="middle" class="t-alert">withhold</text>
+
+  <text x="435" y="180" text-anchor="middle" class="t-alert">start parallel session</text>
+  <path class="wire w-alert" d="M245 194 H625" marker-end="url(#ah-cut-paste)" />
+
+  <text x="435" y="230" text-anchor="middle" class="t-pt">challenge from S₂</text>
+  <path class="wire w-pt" d="M625 244 H245" marker-end="url(#ah-cut-paste)" />
+
+  <text x="162" y="278" text-anchor="middle" class="t-alert">challenge from S₂</text>
+  <text x="162" y="296" text-anchor="middle" class="sub">presented as S₁</text>
+  <path class="wire w-alert" d="M245 310 H80" marker-end="url(#ah-cut-paste)" />
+
+  <text x="162" y="342" text-anchor="middle" class="t-ct">credential response</text>
+  <path class="wire w-ct" d="M80 356 H245" marker-end="url(#ah-cut-paste)" />
+  <text x="435" y="382" text-anchor="middle" class="t-ct">forward credential response</text>
+  <path class="wire w-ct" d="M245 396 H625" marker-end="url(#ah-cut-paste)" />
+
+  <rect class="note w-alert" x="530" y="402" width="150" height="42" rx="3" />
+  <text x="605" y="419" text-anchor="middle" class="t-alert">S₂ accepts attacker</text>
+  <text x="605" y="436" text-anchor="middle" class="sub">as the User</text>
+</svg>

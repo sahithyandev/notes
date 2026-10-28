@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 600 470" width="600" height="470" role="img" aria-label="Man-in-the-middle attack against the signature-key authentication protocol. An attacker substitutes its public key for the User's, receives the session key encrypted to that key, decrypts it, then re-encrypts it to the User's real public key. The attacker can then read and alter traffic encrypted under the session key.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-pt { fill: var(--dia-pt, #1f7a4d); }
+    .proto .w-pt { stroke: var(--dia-pt, #1f7a4d); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-key { fill: var(--dia-key, #6d4bb6); }
+    .proto .w-key { stroke: var(--dia-key, #6d4bb6); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs>
+    <marker id="ah-mitm" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="45" y="6" width="100" height="30" rx="4" />
+  <text x="95" y="21" text-anchor="middle">User</text>
+  <rect class="box w-alert" x="250" y="6" width="100" height="30" rx="4" />
+  <text x="300" y="21" text-anchor="middle" class="t-alert">Attacker</text>
+  <rect class="box" x="455" y="6" width="100" height="30" rx="4" />
+  <text x="505" y="21" text-anchor="middle">Server</text>
+
+  <path class="life" d="M95 36 V446" />
+  <path class="life" d="M300 36 V446" />
+  <path class="life" d="M505 36 V446" />
+
+  <text x="198" y="64" text-anchor="middle" class="t-pt">Uᵢd, r, (eᵤ,nᵤ)</text>
+  <path class="wire w-pt" d="M95 78 H300" marker-end="url(#ah-mitm)" />
+  <text x="198" y="96" text-anchor="middle" class="sub">intercept</text>
+
+  <text x="402" y="132" text-anchor="middle" class="t-alert">Uᵢd, r, (eₐ,nₐ)</text>
+  <path class="wire w-alert" d="M300 146 H505" marker-end="url(#ah-mitm)" />
+  <text x="402" y="164" text-anchor="middle" class="sub">replace the User's public key</text>
+
+  <text x="402" y="202" text-anchor="middle" class="t-key">σ(r), Encₑₐ(k)</text>
+  <path class="wire w-key" d="M505 216 H300" marker-end="url(#ah-mitm)" />
+
+  <rect class="note w-alert" x="205" y="238" width="190" height="44" rx="3" />
+  <text x="300" y="255" text-anchor="middle" class="t-alert">decrypt k, re-encrypt it</text>
+  <text x="300" y="272" text-anchor="middle" class="sub">the attacker learns k</text>
+
+  <text x="198" y="314" text-anchor="middle" class="t-key">σ(r), Encₑᵤ(k)</text>
+  <path class="wire w-key" d="M300 328 H95" marker-end="url(#ah-mitm)" />
+  <text x="198" y="346" text-anchor="middle" class="sub">the User accepts the signed nonce</text>
+
+  <text x="198" y="382" text-anchor="middle" class="t-ct">Encₖ(Uᵢd, pwd)</text>
+  <path class="wire w-ct" d="M95 396 H300" marker-end="url(#ah-mitm)" />
+  <path class="wire w-ct" d="M300 396 H505" marker-end="url(#ah-mitm)" />
+  <text x="300" y="426" text-anchor="middle" class="t-alert">The attacker can read or alter traffic under k.</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="block-image proto" viewBox="0 0 705 440" width="705" height="440" role="img" aria-label="Interleaving attack. Two servers derive the same session key from reused inputs. The attacker intercepts their encrypted privilege tokens and swaps them between protocol runs.">
+  <style>
+    .proto text { fill: currentColor; font: 500 15px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; dominant-baseline: middle; }
+    .proto .sub { opacity: 0.65; font-size: 13px; font-weight: 400; }
+    .proto .box { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .life { stroke: currentColor; stroke-opacity: 0.25; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .proto .wire { fill: none; stroke: currentColor; stroke-width: 1.5; }
+    .proto .note { fill: currentColor; fill-opacity: 0.07; stroke: currentColor; stroke-width: 1.5; }
+    .proto .t-key { fill: var(--dia-key, #6d4bb6); }
+    .proto .w-key { stroke: var(--dia-key, #6d4bb6); }
+    .proto .t-ct { fill: var(--dia-ct, #b3541e); }
+    .proto .w-ct { stroke: var(--dia-ct, #b3541e); }
+    .proto .t-alert { fill: var(--dia-alert, #e18b72); }
+    .proto .w-alert { stroke: var(--dia-alert, #e18b72); }
+  </style>
+  <defs><marker id="ah-interleave" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1.5 1.5 11 6 1.5 10.5 3.5 6z" fill="context-stroke" /></marker></defs>
+  <rect class="box" x="25" y="6" width="110" height="30" rx="4" /><text x="80" y="21" text-anchor="middle">User</text>
+  <rect class="box w-alert" x="190" y="6" width="110" height="30" rx="4" /><text x="245" y="21" text-anchor="middle" class="t-alert">Attacker</text>
+  <rect class="box" x="385" y="6" width="110" height="30" rx="4" /><text x="440" y="21" text-anchor="middle">Server S₁</text>
+  <rect class="box" x="570" y="6" width="110" height="30" rx="4" /><text x="625" y="21" text-anchor="middle">Server S₂</text>
+  <path class="life" d="M80 36 V418" /><path class="life" d="M245 36 V418" /><path class="life" d="M440 36 V418" /><path class="life" d="M625 36 V418" />
+  <rect class="note w-key" x="300" y="58" width="345" height="44" rx="3" /><text x="472" y="75" text-anchor="middle" class="t-key">both sessions derive the same k</text><text x="472" y="92" text-anchor="middle" class="sub">Hash(pwd || nonce) repeats across servers</text>
+  <text x="342" y="136" text-anchor="middle" class="t-ct">Encₖ(token for S₁)</text><path class="wire w-ct" d="M440 150 H245" marker-end="url(#ah-interleave)" />
+  <text x="435" y="190" text-anchor="middle" class="t-ct">Encₖ(token for S₂)</text><path class="wire w-ct" d="M625 204 H245" marker-end="url(#ah-interleave)" />
+  <rect class="note w-alert" x="170" y="225" width="150" height="44" rx="3" /><text x="245" y="242" text-anchor="middle" class="t-alert">swap ciphertexts</text><text x="245" y="259" text-anchor="middle" class="sub">same key accepts both</text>
+  <text x="260" y="304" text-anchor="middle" class="t-ct">token for S₂</text><path class="wire w-ct" d="M245 318 H440" marker-end="url(#ah-interleave)" />
+  <text x="352" y="358" text-anchor="middle" class="t-ct">token for S₁</text><path class="wire w-ct" d="M245 372 H625" marker-end="url(#ah-interleave)" />
+  <text x="440" y="400" text-anchor="middle" class="t-alert">tokens cross protocol contexts</text>
+</svg>
