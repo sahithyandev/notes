@@ -6,6 +6,7 @@ export { default as AssignmentStep } from "./assignment-step.astro";
 export { default as AssignmentTable } from "./assignment-table.astro";
 export { default as BranchAndBoundTree } from "./branch-and-bound-tree.astro";
 export { default as BreakevenChart } from "./breakeven-chart.astro";
+export { default as BlurredStepThresholdDiagram } from "./blurred-step-threshold-diagram.astro";
 export { default as ChainOfTrustDiagram } from "./chain-of-trust-diagram.astro";
 export { default as CharacterAlignment } from "./character-alignment.astro";
 export { default as CircularFlowDiagram } from "./circular-flow-diagram.astro";
@@ -76,6 +77,7 @@ export { default as ConsumerSurplusDiagram } from "./consumer-surplus-diagram.as
 export { default as ConvexIsoquantDiagram } from "./convex-isoquant-diagram.astro";
 export { default as PerfectSubstitutesDiagram } from "./perfect-substitutes-diagram.astro";
 export { default as PerfectComplementsDiagram } from "./perfect-complements-diagram.astro";
+export { default as ParallelEdgeResponseDiagram } from "./parallel-edge-response-diagram.astro";
 export { default as CostMinimizationDiagram } from "./cost-minimization-diagram.astro";
 export { default as MRTSDiagram } from "./mrts-diagram.astro";
 export { default as ZigZagScan } from "./zig-zag-scan.astro";

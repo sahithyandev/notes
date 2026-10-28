@@ -1,43 +1,62 @@
 ---
 title: Discrete Cosine Transform
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-20T08:45:41.148Z
+lastUpdatedOn: 2026-10-28T17:01:40.707Z
 ---
 
-The discrete cosine transform (DCT) writes a sequence of $N$ samples as a weighted sum of $N$ cosines of increasing frequency.
+<Aka>DCT</Aka>. Expresses a sequence of $N$ samples as a weighted sum of $N$
+cosines of increasing frequency.
 
-### Properties
-
-- The coefficients are real
-- The transform is orthonormal
-- Energy of smooth signals concentrates in the first few coefficients
-- The inverse transform reconstructs the samples exactly, up to rounding
+Each coefficient measures how strongly 1 cosine pattern appears in the samples. Low-frequency patterns change slowly. High-frequency patterns change quickly.
 
 ## One-Dimensional DCT
 
-For samples $x(n)$, $n = 0, \dots, N-1$:
+The input is $N$ samples $x(n)$. The output is $N$ coefficients $X(k)$, 1 for each cosine pattern. Each $X(k)$ gives the amount of the $k$th pattern in the samples.
 
 $$
 X(k) = \alpha(k) \sum_{n=0}^{N-1} x(n) \cos\frac{(2n+1)k\pi}{2N}
-\qquad
+$$
+
+<Symbols>
+  <Sym s="n">sample index</Sym>
+  <Sym s="k">frequency index</Sym>
+  <Sym s="N">number of samples</Sym>
+  <Sym s="x(n)">sample value at index $n$</Sym>
+  <Sym s="X(k)">coefficient for frequency $k$</Sym>
+  <Sym s="\alpha(0)">$\sqrt{1 / N}$</Sym>
+  <Sym s="\alpha(k) \ \text{for} \ k \geq 1">$\sqrt{2 / N}$</Sym>
+</Symbols>
+
+The $k=0$ cosine is constant. Therefore $X(0)$ is the DC coefficient, equal to $\sqrt{N}$ times the sample mean. Every $k \geq 1$ coefficient is an AC coefficient. Its cosine completes $k/2$ cycles across the samples.
+
+The inverse DCT reconstructs the samples from the coefficients:
+
+$$
 x(n) = \sum_{k=0}^{N-1} \alpha(k) X(k) \cos\frac{(2n+1)k\pi}{2N}
 $$
 
-Here:
+The forward and inverse DCT retain all information. Reconstruction is exact apart from floating-point rounding.
 
-<Symbols>
-  <Sym s="k">frequency index</Sym>
-  <Sym s="\alpha(0)">$\sqrt{1 / N}$</Sym>
-  <Sym s="\alpha(k) \ \text{for} \ k \geq 1">$\sqrt{2 / N}$</Sym>
-  <Sym s="X(0)">DC coefficient, equal to $\sqrt{N}$ times the sample mean</Sym>
-  <Sym s="X(k) \ \text{for} \ k \geq 1">AC coefficients</Sym>
-</Symbols>
+## Orthonormality
 
-The term $\cos\frac{(2n+1)k\pi}{2N}$ completes $k/2$ cycles across the $N$ samples.
+The transformation is orthonormal. Its cosine patterns form an orthonormal basis.
+
+- Every pattern has length $1$. Its squared values sum to $1$.
+- Any 2 different patterns have dot product $0$.
+
+Each coefficient measures only its own pattern.
+
+The transform preserves the sum of squared values:
+
+$$
+\sum_{n=0}^{N-1} x(n)^2 = \sum_{k=0}^{N-1} X(k)^2
+$$
+
+This lets squared error be measured in either the sample domain or the coefficient domain.
 
 ## Two-Dimensional DCT
 
-For an $N \times N$ block $f(x, y)$ with $x$ the column and $y$ the row:
+For an $N \times N$ image block $f(x, y)$, the 2D DCT applies the 1D DCT to every row, then to every column.
 
 $$
 F(u, v) = \alpha(u)\,\alpha(v) \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} f(x, y) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
@@ -50,39 +69,48 @@ $$
 Here:
 
 <Symbols>
+  <Sym s="x, y">column and row indices</Sym>
   <Sym s="u, v">horizontal and vertical frequency indices</Sym>
+  <Sym s="f(x, y)">pixel value at column $x$ and row $y$</Sym>
+  <Sym s="F(u, v)">
+    coefficient at horizontal frequency $u$ and vertical frequency $v$
+  </Sym>
   <Sym s="F(0, 0)">DC coefficient, equal to $N$ times the block mean</Sym>
-  <Sym s="F(u, v) \ \text{for} \ (u, v) \neq (0, 0)">AC coefficients</Sym>
 </Symbols>
 
-For $N = 8$, $\alpha(k) = \frac{C(k)}{2}$ with $C(0) = \frac{1}{\sqrt{2}}$ and $C(k) = 1$ otherwise. The 2D transform then has the form
+A constant block of value $c$ has $F(0, 0) = Nc$. Every other coefficient is $0$.
+
+For $N = 8$, $\alpha(k) = \frac{C(k)}{2}$, where $C(0) = \frac{1}{\sqrt{2}}$ and $C(k) = 1$ for $k \geq 1$. The forward transform becomes:
 
 $$
 F(u, v) = \frac{1}{4} C(u) C(v) \sum_{x=0}^{7} \sum_{y=0}^{7} f(x, y) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
 $$
 
-A constant block of value $c$ gives $F(0, 0) = Nc$ and all AC coefficients 0.
-
 ### Matrix Form
 
-The kernel is separable, so the 2D transform is a 1D transform on every row followed by a 1D transform on every column.
+Let $\mathbf{T}$ be the $N \times N$ DCT matrix. Row $k$ contains the $k$th normalized cosine pattern:
+
+$$
+T(k, n) = \alpha(k) \cos\frac{(2n+1)k\pi}{2N}
+$$
+
+The matrix form is:
 
 $$
 \mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top
 \qquad
 \mathbf{f} = \mathbf{T}^\top \mathbf{F}\, \mathbf{T}
-\qquad
-T(k, n) = \alpha(k) \cos\frac{(2n+1)k\pi}{2N}
 $$
 
-- $\mathbf{f}$ is stored with the row index $y$ first, so $\mathbf{f}[y][x] = f(x, y)$
-- $\mathbf{F}$ is stored with the vertical frequency $v$ first, so $\mathbf{F}[v][u] = F(u, v)$
-- $\mathbf{T}$ is orthogonal, so $\mathbf{T}^{-1} = \mathbf{T}^\top$
-- $\mathbf{T}$ depends only on $N$ and is computed once
+$\mathbf{T}^\top$ is the transpose of $\mathbf{T}$. It swaps the rows and columns. Orthonormality gives $\mathbf{T}^{-1} = \mathbf{T}^\top$, which is why the inverse uses the transpose.
+
+- $\mathbf{f}[y][x] = f(x, y)$
+- $\mathbf{F}[v][u] = F(u, v)$
+- $\mathbf{T}$ depends only on $N$, so it can be computed once
 
 ## Basis Functions
 
-The inverse DCT writes each block as a weighted sum of $N^2$ fixed patterns:
+The inverse DCT builds a block from $N^2$ fixed cosine patterns:
 
 $$
 f(x, y) = \sum_{u=0}^{N-1} \sum_{v=0}^{N-1} F(u, v)\, b_{u,v}(x, y)
@@ -91,31 +119,29 @@ b_{u,v}(x, y) = \alpha(u)\,\alpha(v) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v
 $$
 
 - $b_{0,0}$ is constant
-- $b_{u,v}$ completes $u/2$ cycles horizontally and $v/2$ cycles vertically across the block
-- Frequency grows from the top-left to the bottom-right of $\mathbf{F}$
+- $b_{u,v}$ completes $u/2$ horizontal cycles and $v/2$ vertical cycles across the block
+- Higher $u$ and $v$ produce faster changes
 
-Because $\mathbf{T}$ is orthogonal, the patterns are orthonormal and the transform preserves energy.
+The coefficients weight these patterns. A coefficient of $0$ removes its pattern from the reconstructed block.
 
 $$
 \sum_{x,y} f(x, y)^2 = \sum_{u,v} F(u, v)^2
 $$
 
-Squared error in the coefficient domain therefore equals squared error in the sample domain.
+The 2D transform also preserves the sum of squared values.
 
-## Choice of Transform
+## Why the DCT Is Useful
 
-- Compaction  
-  For highly correlated neighbouring samples, the DCT approaches the Karhunen–Loève transform in energy compaction, without needing signal-dependent basis vectors.
-- Boundary behaviour  
-  The DCT is the DFT of an even-symmetric extension of the block. The extension has no jump at the block border, so it avoids the leakage that the DFT produces from wrap-around discontinuities.
-- Real arithmetic  
-  All coefficients are real. The DFT of a real block is complex.
+- Neighbouring pixels in natural images usually have similar values. Most energy then concentrates in low-frequency coefficients.
+- Quantization can preserve low-frequency coefficients more accurately than high-frequency coefficients.
+- All DCT coefficients are real. A DFT of a real block is generally complex.
+- The DCT is equivalent to a DFT of an even-symmetric extension. The extension avoids a jump at the block boundary.
 
 ## Fast Computation
 
-- Direct evaluation of the 2D sum costs $N^4$ multiplications per block, which is 4096 for $N = 8$
-- Row-column evaluation costs $2N^3$ multiplications, which is 1024 for $N = 8$
-- Fast 1D factorisations cost $O(N \log N)$ per transform. The AAN algorithm needs 5 multiplications for $N = 8$, since it leaves out the scale factors and expects the caller to fold them in later, for example into the divisors of a quantizer
+- Direct evaluation of the 2D sum costs $N^4$ multiplications per block. This is 4096 for $N = 8$.
+- Row-column evaluation costs $2N^3$ multiplications. This is 1024 for $N = 8$.
+- Fast 1D factorisations cost $O(N \log N)$ per transform. The AAN algorithm uses 5 multiplications for $N = 8$ when scale factors are folded into later quantization.
 
 ## Implementation
 
@@ -146,8 +172,8 @@ def idct2(F, T):   # f = T^t F T
     return matmul(matmul(transpose(T), F), T)
 ```
 
-Checks for a correct implementation:
+Implementation checks:
 
-- A block of all 5s with $N = 8$ gives $F[0][0] = 40$ and every other coefficient 0
-- `idct2(dct2(f, T), T)` returns `f` up to floating point error
-- The sum of squares of `f` equals the sum of squares of `dct2(f, T)`
+- A block of all $5$s with $N = 8$ gives $F[0][0] = 40$ and every other coefficient $0$.
+- `idct2(dct2(f, T), T)` returns `f` up to floating-point error.
+- The sum of squares of `f` equals the sum of squares of `dct2(f, T)`.

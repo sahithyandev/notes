@@ -1,0 +1,287 @@
+---
+title: Gradient-Based Edge Detection
+dateCreated: 2026-10-28T00:00:00.000Z
+lastUpdatedOn: 2026-10-28T17:01:40.730Z
+---
+
+An edge is a set of pixels where image intensity or colour changes rapidly. It usually marks an object boundary.
+
+An edge map is a binary image that marks the pixels judged to be edges. It supports segmentation, which groups pixels into image regions. It also supports feature detection, motion analysis and object selection.
+
+## Edge Profiles
+
+An ideal step edge changes intensity at 1 position. A real boundary spreads across several pixels because of blur, sampling and the optical system.
+
+- Step edge  
+  Intensity changes from 1 nearly constant level to another.
+- Ramp edge  
+  Intensity changes gradually across an interval.
+- Line edge  
+  Intensity rises, then falls again across a narrow bright or dark band.
+
+Texture, noise and gradual illumination can also produce local intensity changes. An edge detector must reject those changes when they do not represent a boundary.
+
+## First-Order Edge Detection
+
+A first-order detector measures the rate of intensity change. It has 4 stages:
+
+- Optional smoothing  
+  Reduces noise before differentiation.
+- Horizontal and vertical derivatives  
+  Measure change along the image axes.
+- Gradient magnitude  
+  Measures the local edge strength.
+- Thresholding  
+  Converts the strength image into a binary edge map.
+
+## Image Gradient
+
+The image gradient is the vector of first partial derivatives at $(x,y)$:
+
+$$
+\nabla f(x,y) =
+\begin{bmatrix}
+G_x \\
+G_y
+\end{bmatrix}
+=
+{\Large
+\begin{bmatrix}
+\frac{\partial f(x,y)}{\partial x} \\
+\frac{\partial f(x,y)}{\partial y}
+\end{bmatrix}}
+$$
+
+<Symbols>
+  <Sym s="f(x,y)">image intensity at $(x,y)$</Sym>
+  <Sym s="G_x">horizontal intensity derivative</Sym>
+  <Sym s="G_y">vertical intensity derivative</Sym>
+</Symbols>
+
+The gradient points towards the greatest intensity increase. Its direction is perpendicular to the edge.
+
+$$
+\lvert\nabla f(x,y)\rvert = \sqrt{G_x^2 + G_y^2}
+\qquad
+\theta(x,y) = \operatorname{atan2}(G_y,G_x)
+$$
+
+$\lvert\nabla f\rvert$ is the gradient magnitude. It is the edge-strength response used for thresholding. $\theta$ is the gradient direction.
+
+## Discrete Derivatives
+
+An image contains samples, not a continuous intensity function. A finite difference estimates a derivative by subtracting neighbouring pixel values.
+
+$$
+\begin{aligned}
+\frac{\partial f(x,y)}{\partial x} &\approx \frac{f(x+\Delta x,y)-f(x,y)}{\Delta x} \\
+\frac{\partial f(x,y)}{\partial y} &\approx \frac{f(x,y+\Delta y)-f(x,y)}{\Delta y}
+\end{aligned}
+$$
+
+The horizontal derivative compares pixels in 1 row. The vertical derivative compares pixels in 1 column. Pixel centres are 1 sample apart, so $\Delta x = \Delta y = 1$.
+
+### Difference Masks
+
+A difference mask is a small [spatial-filter](/s5/image-processing/neighbourhood-operations) kernel that subtracts neighbouring pixel values. The kernel moves over the image. At each position, its entries are multiplied by the covered pixels and summed. The sum is the derivative response.
+
+The sign of a derivative depends on the mask direction. Reversing a mask reverses the sign. It does not change the gradient magnitude or the detected edge locations.
+
+### Forward Difference
+
+A forward difference compares a pixel with its right or lower neighbour.
+
+$$
+G_x \approx f(x+1,y) - f(x,y)
+\qquad
+G_y \approx f(x,y+1) - f(x,y)
+$$
+
+For horizontal values $a$ and $b$, ordered from left to right, $\begin{bmatrix}-1 & 1\end{bmatrix}$ gives $-a+b=b-a$. A positive response means intensity increases to the right.
+
+$$
+H_x = \begin{bmatrix} -1 & 1 \end{bmatrix}
+\qquad
+H_y = \begin{bmatrix} -1 \\ 1 \end{bmatrix}
+$$
+
+The response lies halfway between the 2 sampled pixels. It does not identify a single edge pixel.
+
+### Centred Difference
+
+A centred difference compares the 2 neighbours around the current pixel.
+
+$$
+G_x \approx \frac{f(x+1,y) - f(x-1,y)}{2}
+\qquad
+G_y \approx \frac{f(x,y+1) - f(x,y-1)}{2}
+$$
+
+The denominator is $2$ because the outer samples are 2 pixels apart. The response belongs to the centre pixel $(x,y)$.
+
+$$
+H_x = \frac{1}{2}\begin{bmatrix} -1 & 0 & 1 \end{bmatrix}
+\qquad
+H_y = \frac{1}{2}\begin{bmatrix} -1 \\ 0 \\ 1 \end{bmatrix}
+$$
+
+## Gradient Operators
+
+Raw differences amplify [noise](/s5/image-processing/noise). Gradient operators combine a derivative with local averaging, which reduces that sensitivity.
+
+### Prewitt Operator
+
+The Prewitt operator applies a centred difference across 3 parallel rows or columns. Each row or column has equal weight.
+
+$$
+P_x = \begin{bmatrix}
+-1 & 0 & 1 \\
+-1 & 0 & 1 \\
+-1 & 0 & 1
+\end{bmatrix}
+\qquad
+P_y = \begin{bmatrix}
+1 & 1 & 1 \\
+0 & 0 & 0 \\
+-1 & -1 & -1
+\end{bmatrix}
+$$
+
+### Sobel Operator
+
+The Sobel operator is a Prewitt-like derivative with twice the weight on the centre row or column. The extra averaging usually reduces noise sensitivity.
+
+$$
+S_x = \begin{bmatrix}
+-1 & 0 & 1 \\
+-2 & 0 & 2 \\
+-1 & 0 & 1
+\end{bmatrix}
+\qquad
+S_y = \begin{bmatrix}
+1 & 2 & 1 \\
+0 & 0 & 0 \\
+-1 & -2 & -1
+\end{bmatrix}
+$$
+
+### Roberts Operator
+
+The Roberts operator uses 2-point differences along the 2 diagonal directions. Its $2 \times 2$ support is computationally small and highly sensitive to noise.
+
+$$
+R_1 = \begin{bmatrix}
+0 & 1 \\
+-1 & 0
+\end{bmatrix}
+\qquad
+R_2 = \begin{bmatrix}
+1 & 0 \\
+0 & -1
+\end{bmatrix}
+$$
+
+## Thresholded Edge Maps
+
+A gradient response exists at every pixel. Thresholding compares its magnitude with an edge-strength threshold $T$. Pixels meeting the threshold become edges in the binary map.
+
+$$
+g(x,y) =
+\begin{cases}
+1 & \lvert\nabla f(x,y)\rvert \geq T \\
+0 & \lvert\nabla f(x,y)\rvert < T
+\end{cases}
+$$
+
+<Symbols>
+  <Sym s="g(x,y)">binary edge-map value</Sym>
+  <Sym s="T">minimum gradient magnitude accepted as an edge</Sym>
+</Symbols>
+
+- Low $T$  
+  Retains weak boundaries and false edges from noise or texture.
+- High $T$  
+  Rejects false edges and can remove weak object boundaries.
+
+A [Gaussian filter](/s5/image-processing/noise#gaussian-filter) can smooth noise before differentiation. Smoothing also broadens real transitions.
+
+### Thick and Parallel Edges
+
+Thresholding a blurred step can retain a band of pixels around 1 transition. The binary edge is thick.
+
+<BlurredStepThresholdDiagram />
+
+A bright band has 1 rising boundary and 1 falling boundary. Its gradient magnitude has 2 peaks. Thresholding produces 2 parallel edges.
+
+<ParallelEdgeResponseDiagram />
+
+## Second-Order Edge Detection
+
+A second-order detector measures how quickly the gradient changes. It locates edges from a zero crossing, where its signed response changes between positive and negative values.
+
+## Laplacian
+
+The Laplacian is the sum of the 2 second partial derivatives:
+
+$$
+\nabla^2 f(x,y) = \frac{\partial^2 f(x,y)}{\partial x^2} + \frac{\partial^2 f(x,y)}{\partial y^2}
+$$
+
+For a 1-dimensional signal with unit pixel spacing:
+
+$$
+\frac{\partial^2 f(x)}{\partial x^2} \approx f(x+1) - 2f(x) + f(x-1)
+$$
+
+Applying the same estimate horizontally and vertically gives:
+
+$$
+\nabla^2 f(x,y) \approx f(x+1,y) + f(x-1,y) + f(x,y+1) + f(x,y-1) - 4f(x,y)
+$$
+
+The $4$-neighbour [convolution](/s5/image-processing/neighbourhood-operations#convolution) kernel is:
+
+$$
+L = \begin{bmatrix}
+0 & 1 & 0 \\
+1 & -4 & 1 \\
+0 & 1 & 0
+\end{bmatrix}
+$$
+
+A Laplacian response of $0$ at 1 pixel does not by itself locate an edge. A zero crossing requires a sign change between neighbouring responses. The sign-change direction identifies the darker and brighter sides.
+
+## Laplacian of Gaussian
+
+The Laplacian amplifies noise. The Laplacian of Gaussian first smooths the image with a Gaussian filter, then applies the Laplacian:
+
+$$
+\operatorname{LoG}(f) = \nabla^2(G_\sigma * f)
+$$
+
+<Symbols>
+  <Sym s="G_\sigma">Gaussian kernel with standard deviation $\sigma$</Sym>
+  <Sym s="*">convolution</Sym>
+</Symbols>
+
+A larger $\sigma$ rejects more noise and removes more fine edge detail. The LoG reduces false zero crossings but does not remove every response caused by texture.
+
+## Edge Sharpening
+
+The negative Laplacian increases contrast around a rapid intensity change. Adding it to the original image sharpens the change:
+
+$$
+g(x,y) = f(x,y) - \nabla^2 f(x,y)
+$$
+
+With the $4$-neighbour Laplacian, the combined convolution filter is:
+
+$$
+\begin{bmatrix}
+0 & -1 & 0 \\
+-1 & 5 & -1 \\
+0 & -1 & 0
+\end{bmatrix}
+$$
+
+Sharpening also amplifies noise. Apply it after denoising when necessary.

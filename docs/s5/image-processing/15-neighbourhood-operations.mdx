@@ -1,7 +1,7 @@
 ---
 title: Neighbourhood Operations
 dateCreated: 2026-08-18T07:18:45.000Z
-lastUpdatedOn: 2026-10-17T06:00:25.896Z
+lastUpdatedOn: 2026-10-28T17:01:40.594Z
 ---
 
 Neighbourhood operations compute an output pixel from a group of pixels in a local region.
@@ -63,6 +63,24 @@ The flip makes the operation associative and commutative, so a chain of convolut
 When the mask is symmetrical, there are no difference between convolution and correlation.
 
 </Note>
+
+### Convolution Properties
+
+For compatible images or kernels $f$, $g$ and $h$:
+
+$$
+f * g = g * f
+$$
+
+$$
+(f * g) * h = f * (g * h)
+$$
+
+$$
+f * (g + h) = f * g + f * h
+$$
+
+Correlation does not generally have these properties. A non-symmetrical correlation mask must be flipped to obtain the corresponding convolution output.
 
 ## Frequency Domain Filtering
 

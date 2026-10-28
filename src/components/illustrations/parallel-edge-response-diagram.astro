@@ -1,0 +1,65 @@
+---
+// A bright band has 2 boundaries. Its gradient magnitude has a peak at each
+// boundary, which becomes 2 parallel edges after thresholding.
+
+import AxesFigure from "./primitives/axes-figure.astro";
+---
+
+<AxesFigure
+  caption="A bright band has a rising boundary and a falling boundary. Its gradient magnitude has 2 peaks, so thresholding produces 2 parallel edges."
+  title="Parallel Edges From a Bright Band"
+  desc="A bright band intensity profile, its 2 gradient-magnitude peaks, a threshold and 2 detected edge bands."
+  yLabel="Normalised Value"
+  xLabel="Pixel Position"
+  xLabelOffset={45}
+>
+  <path
+    class="curve round tone-s5"
+    d="M 50 270 L 120 270 C 142 270, 148 190, 170 85 L 270 85 C 292 190, 298 270, 320 270 L 390 270"
+  ></path>
+  <path
+    class="curve round tone-ct"
+    d="M 50 280 C 100 280, 112 260, 130 125 C 148 260, 160 280, 220 280 C 280 280, 292 260, 310 125 C 328 260, 340 280, 390 280"
+  ></path>
+
+  <line class="guide threshold" x1="50" y1="220" x2="390" y2="220"></line>
+  <rect
+    class="edge-band tone-ct"
+    x="116"
+    y="300"
+    width="28"
+    height="9"
+    rx="4.5"
+  ></rect>
+  <rect
+    class="edge-band tone-ct"
+    x="296"
+    y="300"
+    width="28"
+    height="9"
+    rx="4.5"
+  ></rect>
+
+  <text class="curve-label tone-s5" x="220" y="70" text-anchor="middle">
+    bright band
+  </text>
+  <text class="curve-label tone-ct" x="130" y="113" text-anchor="middle">
+    |∇f|
+  </text>
+  <text class="pt-label tone-ink" x="382" y="214" text-anchor="end">
+    T
+  </text>
+</AxesFigure>
+<style>
+  .threshold {
+    stroke: var(--text-secondary);
+  }
+
+  .edge-band {
+    fill: var(--tone);
+  }
+
+  :global(.axes-figure svg) {
+    pointer-events: none;
+  }
+</style>
