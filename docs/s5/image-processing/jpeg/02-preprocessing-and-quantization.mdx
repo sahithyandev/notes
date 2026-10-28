@@ -1,7 +1,7 @@
 ---
 title: Preprocessing and Quantization
 dateCreated: 2026-10-20T09:00:00.000Z
-lastUpdatedOn: 2026-10-28T17:01:59.034Z
+lastUpdatedOn: 2026-10-28T17:58:40.943Z
 ---
 
 Baseline JPEG first prepares the image, then transforms and quantizes each block. This note covers those stages and the artefacts they cause.
@@ -202,3 +202,23 @@ $$
   Chroma smears across edges. Caused by chroma subsampling and the coarse chrominance table.
 - Generation loss  
   Re-encoding a decoded image quantizes again and compounds the error. The loss shrinks when the tables and block grid are identical.
+
+## Worked Example
+
+### Quantizing a DCT Coefficient
+
+A DCT coefficient is $F(u,v) = 37$. Its quantization-table entry is $Q(u,v) = 12$. Find the quantized and reconstructed coefficients.
+
+<Solution>
+
+$$
+F_q(u,v) = \operatorname{round}\left(\frac{37}{12}\right) = 3
+$$
+
+$$
+\hat{F}(u,v) = 3 \cdot 12 = 36
+$$
+
+The reconstructed coefficient is $36$. Its error is $1$.
+
+</Solution>
