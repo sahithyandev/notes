@@ -1,10 +1,12 @@
 ---
 title: RSA
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T18:18:05.729Z
+lastUpdatedOn: 2026-10-28T02:38:15.098Z
 ---
 
-Named after Rivest, Shamir, Adleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures. Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
+Named after Ronald *R*ivest, Adi *S*hamir, Leonard *A*dleman. A block cipher over $\mathbb{Z}_n$ used for both encryption and digital signatures.
+
+Security rests on the integer factorization problem: given $n = pq$ for 2 large equal-size primes, finding $p, q$ is computationally intractable.
 The [interactive guide to RSA](https://sahithyan.dev/post/interactive-guide-to-rsa) steps through key generation, encryption, and why factoring $n$ is hard.
 
 ### Key Pair Generation
@@ -21,8 +23,7 @@ Public key: $\{e, n\}$. Private key: $\{d\}$. $p$, $q$, and $\phi(n)$ must be de
 
 $p$ and $q$ are found by drawing random odd integers of the target bit length and testing each for primality until one passes.
 
-- Trial division by the first few hundred small primes rejects most candidates in a few operations.
-- Survivors go to the Miller-Rabin probabilistic test.
+Trial division by the first few hundred small primes rejects most candidates in a few operations. Survivors go to the Miller-Rabin probabilistic test.
 
 Miller-Rabin tests an odd $n > 2$. Write $n - 1 = 2^s m$ with $m$ odd. Pick a random base $a$ with $2 \le a \le n - 2$. Then $n$ passes base $a$ **iff** $a^m \equiv 1 \pmod n$ **or** $a^{2^r m} \equiv -1 \pmod n$ for some $r$ with $0 \le r < s$.
 
@@ -33,19 +34,6 @@ Each base costs 1 modular exponentiation, $O\!\left((\log n)^3\right)$ bit opera
 <Note>
 
 Deterministic polynomial-time primality testing exists via the AKS algorithm. Miller-Rabin is still used in practice because it is far faster at cryptographic sizes.
-
-</Note>
-
-Trace for $n = 221$, base $a = 137$:
-
-- $n - 1 = 220 = 2^2 \cdot 55$, so $s = 2$, $m = 55$.
-- $a^m \bmod n = 137^{55} \bmod 221 = 188$, not $1$ and not $220$.
-- For $r = 1$, $188^2 \bmod 221 = 205$, not $220$.
-- No residue reached $-1$, so $137$ is a witness and $221$ is composite.
-
-Indeed $221 = 13 \times 17$.
-
-<Note>
 
 $e = 2^{16}+1 = 65537$ is a common choice, small enough for cheap encryption while avoiding weaknesses of very small exponents.
 
@@ -88,9 +76,27 @@ $$
 
 </Proof>
 
-### Worked Example
+<Note>
 
-$p = 17$, $q = 11$.
+It is widely believed, but not proven, that breaking RSA encryption is as hard as factoring $n$.
+
+</Note>
+
+### Worked Examples
+
+Given $n = 221$ and base $a = 137$, determine whether Miller-Rabin identifies $n$ as composite.
+
+<Solution>
+
+- $n - 1 = 220 = 2^2 \cdot 55$, so $s = 2$, $m = 55$.
+- $a^m \bmod n = 137^{55} \bmod 221 = 188$, not $1$ and not $220$.
+- For $r = 1$, $188^2 \bmod 221 = 205$, not $220$.
+- No residue reached $-1$, so $137$ is a witness and $221$ is composite.
+- $221 = 13 \times 17$.
+
+</Solution>
+
+Given $p = 17$, $q = 11$, and $m = 88$, generate an RSA key pair. Encrypt and decrypt $m$.
 
 <Solution>
 
@@ -102,9 +108,3 @@ $p = 17$, $q = 11$.
 - For $m = 88$, $c = 88^7 \bmod 187 = 11$, and $m = 11^{23} \bmod 187 = 88$.
 
 </Solution>
-
-<Note>
-
-It is widely believed, but not proven, that breaking RSA encryption is as hard as factoring $n$.
-
-</Note>

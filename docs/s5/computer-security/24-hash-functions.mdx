@@ -1,21 +1,10 @@
 ---
 title: Hash Functions
 dateCreated: 2026-09-08T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.066Z
+lastUpdatedOn: 2026-10-28T02:38:15.108Z
 ---
 
 A hash function $H$ maps a message $m$ of any length to a fixed $n$-bit digest $H(m)$. It is public and keyless.
-
-A cryptographically secure hash function is:
-
-- Computationally efficient  
-  $H(m)$ is fast to compute for any $m$.
-- Deterministic  
-  The same $m$ always gives the same digest.
-- One-way  
-  Preimage resistant, defined below.
-- Collision resistant  
-  Defined below.
 
 ## Strict Avalanche Criterion
 
@@ -25,7 +14,15 @@ bit flips is independent of which input bit was flipped and of the input value.
 
 ## Properties
 
-Each property is stated as work an attacker cannot afford. $H$ is modelled to be a uniformly random function, for the below analysis.
+$H$ is the hash function and is modelled to be a uniformly random function.
+
+### Computationally Efficient
+
+$H(m)$ is fast to compute for any $m$ and does not vary much.
+
+### Deterministic
+
+Same plaintext input produces the same digest.
 
 ### Preimage Resistance
 

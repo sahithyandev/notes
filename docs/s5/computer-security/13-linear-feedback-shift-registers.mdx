@@ -1,7 +1,7 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T05:24:49.497Z
+lastUpdatedOn: 2026-10-28T02:38:14.956Z
 ---
 
 <Aka>LFSR</Aka>. Builds a [keystream](/s5/computer-security/stream-ciphers) from
@@ -29,8 +29,9 @@ import Lfsr from "./images/lfsr.svg";
 
 ## Connection Polynomial
 
-<Aka>feedback polynomial</Aka>. The taps are written as a connection polynomial
-over $\mathrm{GF}(2)$.
+<Aka>feedback polynomial</Aka>. A connection polynomial encodes an LFSR's
+feedback recurrence as coefficients of a polynomial. It is not a separate part
+of the LFSR.
 
 <Note>
 
@@ -42,7 +43,20 @@ $$
 p(x) = 1 + c_1 x + c_2 x^2 + \cdots + c_n x^n
 $$
 
-Each term $c_k x^k$ marks whether the tap $k$ steps back feeds into the recurrence, so $p(x)$ is a complete description of the LFSR's wiring, independent of the initial state.
+The coefficient $c_k$ is $1$ **iff** $s_{i-k}$ feeds into the new bit $s_i$.
+A coefficient of $0$ omits that tap. The polynomial therefore describes the
+LFSR's wiring independently of its initial state.
+
+The constant $1$ is fixed by convention. It represents the new bit $s_i$ after
+the recurrence is moved to 1 side.
+
+$$
+s_i + c_1s_{i-1} + c_2s_{i-2} + \cdots + c_ns_{i-n} = 0
+$$
+
+It is not a tap. Over $\mathrm{GF}(2)$, subtraction and addition are identical.
+Some texts use the reversed characteristic polynomial instead. Its fixed
+coefficient is the leading $x^n$ term.
 
 ### Primitive Polynomial
 
@@ -60,13 +74,26 @@ With a fixed public connection polynomial, the initial $n$-bit state is the key.
 
 ## Characteristic Polynomial
 
-The recurrence itself corresponds to a characteristic polynomial, related to the connection polynomial by $x^n$ reversal.
+A characteristic polynomial is algebraic notation for the feedback rule. The
+LFSR does not evaluate this polynomial while it shifts. It lets finite-field
+algebra determine properties of the recurrence, especially its period.
+
+Replace the new bit $s_i$ with $x^n$. Replace each delayed bit $s_{i-k}$ with
+$x^{n-k}$. The feedback rule then becomes the characteristic polynomial.
 
 $$
 p^*(x) = x^n p(1/x) = x^n + c_1 x^{n-1} + c_2 x^{n-2} + \cdots + c_n
 $$
 
-$p^*(x)$ is primitive over $\mathrm{GF}(2)$ **iff** $p(x)$ is. Either polynomial can be used to check for maximal period. Its roots in the extension field $\mathrm{GF}(2^n)$ determine the solutions of the recurrence and therefore the possible output sequences.
+For $s_i = s_{i-1} \oplus s_{i-4}$, the characteristic polynomial is
+$x^4 + x^3 + 1$. It records exactly the same recurrence. It is not a different
+LFSR.
+
+The connection polynomial $p(x)$ records the same coefficients in reverse
+order. Some texts use $p^*(x)$ as their connection-polynomial convention.
+
+$p^*(x)$ is primitive over $\mathrm{GF}(2)$ **iff** $p(x)$ is. Either
+polynomial can be used to test whether the LFSR has maximal period.
 
 ## Combining LFSRs
 

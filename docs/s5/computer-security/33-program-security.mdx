@@ -1,7 +1,7 @@
 ---
 title: Program Security
 dateCreated: 2026-09-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.218Z
+lastUpdatedOn: 2026-10-28T02:38:15.230Z
 ---
 
 Program security is the protection of confidentiality, integrity, and availability in the programs a system runs.
@@ -17,7 +17,11 @@ Programs to secure:
 
 Security concerns an honest user and a dishonest attacker. The attacker either disrupts the honest user's use of the system or learns information intended for the user alone.
 
-Program security applies [confidentiality, integrity, and availability](/s5/computer-security/cia-triad) directly to this attacker: confidentiality fails if the attacker learns information about the system or its users, integrity fails if the system reaches a state that would not occur without the attacker, and availability fails if the attacker prevents authorized users from using the system.
+Program security applies [confidentiality, integrity, and availability](/s5/computer-security/cia-triad) directly to this attacker:
+
+- Confidentiality fails if the attacker learns information about the system or its users
+- Integrity fails if the system reaches a state that would not occur without the attacker
+- Availability fails if the attacker prevents authorized users from using the system
 
 ## Correctness and Security
 
@@ -36,22 +40,22 @@ Faults introduced without intent to harm, still exploitable by an attacker.
 
 ## Time-of-Check to Time-of-Use Errors
 
-A time-of-check to time-of-use (TOCTTOU) error is a concurrency issue where control is given to another process between an access control check and the access operation it guards, letting the checked condition change before it is used.
+A TOCTTOU error is a concurrency issue where control is given to another process between an access control check and the access operation it guards, letting the checked condition change before it is used.
 
 ```c
 int openfile(char *path) {
     struct stat s;
-    if (stat(path, &s) < 0)
+    if (stat(path, &s) < 0) // checks that path is a regular file
         return -1;
     if (!S_ISREG(s.st_mode)) {
         error("only allowed to regular files");
         return -1;
     }
-    return open(path, O_RDONLY);
+    return open(path, O_RDONLY); // file at path is opened
 }
 ```
 
-`stat` checks that `path` is a regular file. Between that check and `open`, an attacker can change what `path` refers to, so the file actually opened is not the one checked.
+Between the `stat` check and `open`, an attacker can change what `path` refers to, so the file actually opened is not the one checked.
 
 ### Attack Mechanism
 
@@ -106,9 +110,9 @@ SQL injection is a technique where a malicious user injects SQL commands into an
 
 Web applications commonly build SQL statements by concatenating user input:
 
-```
-txtUserId = getRequestString("UserId")
-txtSQL = "SELECT * FROM Users WHERE UserId = " + txtUserId
+```ts
+txtUserId = getRequestString("UserId");
+txtSQL = "SELECT * FROM Users WHERE UserId = " + txtUserId;
 ```
 
 ### Always-True Injection

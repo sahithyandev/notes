@@ -1,41 +1,17 @@
 ---
-title: Message Authentication Codes
+title: Message Authentication Code
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T13:10:12.110Z
+lastUpdatedOn: 2026-10-28T02:38:15.142Z
 ---
 
-A message authentication code (MAC) is a keyed function that produces a short tag $t$ for a message $m$, proving the message came from a holder of the key and was not altered.
+<Aka>MAC</Aka>. A keyed function that produces a short tag $t$ for a message
+$m$, proving the message came from a holder of the key and was not altered.
 
 $$
 t = \text{MAC}_k(m)
 $$
 
 The sender transmits $(m, t)$. The receiver recomputes $\text{MAC}_k(m)$ and accepts **iff** it equals $t$.
-
-- Integrity  
-  Any change to $m$ changes the tag.
-- Authenticity  
-  Only a holder of the shared key $k$ can produce a valid tag.
-- No non-repudiation  
-  Both parties hold $k$, so a tag cannot prove which of them created it. Digital signatures provide non-repudiation.
-
-A [hash function](/s5/computer-security/hash-functions) alone gives no authenticity, since an attacker can alter $m$ and recompute the public digest.
-
-## Security Definition
-
-A MAC is secure **iff** it is existentially unforgeable under a chosen-message attack.
-
-- The attacker may request tags for any messages of their choice.
-- The attacker wins by producing a valid tag for any message not yet queried, even a meaningless one.
-
-The tag length bounds security. An $n$-bit tag lets a random guess succeed with probability $2^{-n}$.
-
-## Verification
-
-- Constant time comparison  
-  Comparing tags byte by byte and stopping at the first mismatch leaks the matching prefix length through timing, letting an attacker forge a tag one byte at a time.
-- Replay  
-  A valid $(m, t)$ pair can be resent. A sequence number or timestamp inside $m$ is needed to stop this.
 
 ## History
 
@@ -56,9 +32,43 @@ Early MACs came from banking, where interbank transfers needed to be authenticat
 - 2005  
   CMAC is standardized in NIST SP 800-38B.
 
-## CBC-MAC
+## Properties
 
-Encrypts the message with a [block cipher](/s5/computer-security/block-ciphers) in [CBC mode](/s5/computer-security/block-encryption-schemes) using a zero IV. The tag is the final ciphertext block only.
+- Integrity  
+  Any change to $m$ changes the tag.
+- Authenticity  
+  Only a holder of the shared key $k$ can produce a valid tag.
+- No non-repudiation  
+  Both parties hold $k$, so a tag cannot prove which of them created it.
+
+A [hash function](/s5/computer-security/hash-functions) alone gives no authenticity, since an attacker can alter $m$ and recompute the public digest.
+
+### Forgery Security
+
+A MAC is secure **iff** it is existentially unforgeable under a chosen-message attack.
+
+The attacker may request tags for any messages of their choice. The attacker wins by producing a valid tag for any message not yet queried, even a meaningless one.
+
+The tag length bounds security. An $n$-bit tag lets a random guess succeed with probability $2^{-n}$.
+
+## Verification Requirements
+
+MAC verification confirms authenticity and integrity. It does not confirm that a
+message is new.
+
+- Constant time comparison  
+  Comparing tags byte by byte and stopping at the first mismatch leaks the matching prefix length through timing, letting an attacker forge a tag one byte at a time.
+- Replay  
+  An attacker can capture a valid $(m, t)$ pair and send it again. The receiver
+  accepts it because both $m$ and $t$ are unchanged. Include a sequence number
+  or timestamp in $m$. The receiver rejects a repeated sequence number or an
+  expired timestamp.
+
+## Block-Cipher MACs
+
+### CBC-MAC
+
+Encrypts the message with a [block cipher](/s5/computer-security/block-ciphers) in [CBC mode](/s5/computer-security/block-ciphers#cbc-mode) using a zero IV. The tag is the final ciphertext block.
 
 $$
 c_0 = 0, \quad c_i = E_k(c_{i-1} \oplus m_i), \quad t = c_t
@@ -69,12 +79,15 @@ It is secure only when all messages have the same fixed length. For variable len
 - Obtain $t_1 = \text{MAC}_k(m_1)$ and $t_2 = \text{MAC}_k(m_2)$ for single-block messages.
 - The message $m_1 \,\|\, (m_2 \oplus t_1)$ has tag $t_2$.
 
+The forged message has 2 blocks. CBC-MAC processes the first block $m_1$ before
+processing the second block $m_2 \oplus t_1$.
+
 <Proof label="Proof Hint">
 
-- Start with the CBC chain for $m_1 \,\|\, (m_2 \oplus t_1)$
-- Substitute $c_1 = t_1$
-- Cancel $t_1$ in the second block input
-- Compare with the chain for $m_2$
+- For the first block, compute $c_1 = E_k(0 \oplus m_1) = E_k(m_1) = t_1$.
+- For the second block, compute $c_2 = E_k(c_1 \oplus (m_2 \oplus t_1))$.
+- Substitute $c_1 = t_1$ to get $c_2 = E_k(t_1 \oplus m_2 \oplus t_1) = E_k(m_2)$.
+- Since $t_1 \oplus t_1 = 0$, $c_2 = E_k(m_2) = t_2$.
 
 </Proof>
 
@@ -88,7 +101,7 @@ Fixes:
 - ECBC-MAC  
   Encrypt the final tag again under a second key.
 
-## Hash-Based Constructions
+## Hash-Based MACs
 
 Hash functions are faster than block ciphers in software and were freely exportable, so MACs built from them were attractive. Turning a keyless hash into a keyed one needed care.
 
@@ -99,9 +112,9 @@ Hash functions are faster than block ciphers in software and were freely exporta
 - Envelope  
   $H(k \,\|\, m \,\|\, k)$ was an early patch. Its security was not proved, which led to HMAC.
 
-## HMAC
+### HMAC
 
-HMAC nests 2 hash calls under 2 keys derived from $k$.
+<Aka>Hash-based MAC</Aka>. Nests 2 hash calls under 2 keys derived from $k$.
 
 $$
 \text{HMAC}_k(m) = H\big((k' \oplus \text{opad}) \,\|\, H((k' \oplus \text{ipad}) \,\|\, m)\big)
@@ -114,8 +127,8 @@ Here:
     key $k$ padded with zeros to the hash block size, or hashed first if longer
     than a block
   </Sym>
-  <Sym s="\text{ipad}">the byte 0x36 repeated to the block size</Sym>
-  <Sym s="\text{opad}">the byte 0x5c repeated to the block size</Sym>
+  <Sym s="\text{ipad}">the byte `0x36` repeated to the block size</Sym>
+  <Sym s="\text{opad}">the byte `0x5c` repeated to the block size</Sym>
 </Symbols>
 
 The outer hash hides the inner digest, which defeats length extension.
@@ -124,18 +137,18 @@ Bellare, Canetti and Krawczyk proved HMAC secure if the compression function of 
 
 HMAC is used in TLS, IPsec, JWT and as the core of HKDF in key derivation functions.
 
-## Universal Hash MACs
+### Universal Hash MACs
 
-Faster than HMAC for small messages. A universal hash compresses the message using a secret key, then a block cipher or stream cipher masks the result. This is the Carter–Wegman construction.
+Faster than HMAC for small messages. Compresses the message using a secret key, then a block cipher or stream cipher masks the result. This is the Carter–Wegman construction.
 
 Examples:
 
 - Poly1305 by Daniel Bernstein, 2005
 - GMAC, the authentication part of AES-GCM, 2004
 
-## Combining with Encryption
+## Encryption and Authentication
 
-Encryption alone does not detect tampering. See malleability in [stream ciphers](/s5/computer-security/stream-ciphers).
+Encryption alone does not detect tampering. See [malleability](/s5/computer-security/stream-ciphers#malleability).
 
 - Encrypt-then-MAC  
   Encrypt $m$ to $c$, then send $(c, \text{MAC}_{k_2}(c))$. This is the secure composition. The receiver rejects tampered ciphertext before decrypting.

@@ -1,48 +1,113 @@
 ---
 title: Information Flow Control
 dateCreated: 2026-09-14T04:37:20.381Z
-lastUpdatedOn: 2026-10-27T13:10:12.269Z
+lastUpdatedOn: 2026-10-28T02:38:15.298Z
 ---
 
-Information flow control restricts what a process's low outputs may depend on, rather than only restricting reads and writes to objects.
+Information flow control prevents secret data from affecting results visible to an unauthorized observer. It protects confidentiality across a program's whole computation, not only at individual read and write operations.
+
+Each input, variable, and output has a security label.
+
+- High data is secret.
+- Low data is public or attacker-observable.
+
+An unauthorized observer must not learn high data. An unauthorized observer may read low data. A high-to-low flow is a possible confidentiality violation. A low-to-high flow does not disclose a secret.
 
 ## Noninterference
 
-A process takes high inputs and low inputs and produces high outputs and low outputs. Noninterference requires that the low outputs never depend on the high inputs.
+Noninterference requires low outputs to be independent of high inputs. Fix the same low input $L$. Replacing one possible high input $H_1$ with another $H_2$ must not change the low output.
 
 $$
-\forall L\ \forall H_1\ \forall H_2: \text{LowOutput}(H_1, L) = \text{LowOutput}(H_2, L)
+\forall L, H_1, H_2.\quad \operatorname{LowOutput}(H_1, L) = \operatorname{LowOutput}(H_2, L)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="L">the low input</Sym>
   <Sym s="H_1, H_2">any 2 possible high inputs</Sym>
-  <Sym s="\text{LowOutput}(H, L)">
-    the low output produced given high input $H$ and low input $L$
+  <Sym s="\operatorname{LowOutput}(H, L)">
+    the low output produced for inputs $H$ and $L$
   </Sym>
 </Symbols>
 
-Changing the high input while holding the low input fixed must never change the low output.
+The observer can see the low output but not the high input. If the output changes when only the secret changes, the output distinguishes secrets. Noninterference forbids that distinction.
 
-## Information Flow Analysis
+## Direct Flows
 
-A first approach marks each expression in a program as high or low, then flags any assignment of a high value into a low location.
+A direct flow copies a high value into a low location.
 
-<Note>
-
-Marking expressions high or low resembles Perl's tainting.
-
-</Note>
-
-This first approach misses implicit flows, where information leaks through control flow rather than through a direct assignment:
-
-```
-if (x_high > 0) y_low = 0;
-else y_low = 1;
+```c
+int secretHigh = getSecret();
+int resultLow = secretHigh;
 ```
 
-No high value is ever assigned to `y_low` directly, yet `y_low` reveals whether `x_high` is positive.
+`resultLow` reveals `secretHigh` exactly. A label-based analysis rejects the assignment because data may flow from high to low.
 
-State of the art relies on type systems and program analysis to trace information flow through both direct and implicit channels.
+Taint tracking is a simple form of this analysis. A value derived from high input is marked high. The mark propagates through expressions and assignments.
+
+```c
+int secretHigh = getSecret();
+int doubledHigh = secretHigh * 2;
+int resultLow = doubledHigh;
+```
+
+`doubledHigh` remains high because it depends on `secretHigh`. Renaming or transforming a secret does not make it public.
+
+## Implicit Flows
+
+An implicit flow leaks information through a branch or loop condition. The secret is not copied into a low variable, but it controls which low value the program writes.
+
+```c
+if (secretHigh > 0) {
+    resultLow = 0;
+} else {
+    resultLow = 1;
+}
+```
+
+No assignment copies `secretHigh` to `resultLow`. Yet an observer who reads `resultLow` learns whether `secretHigh` is positive.
+
+The 2 executions below have the same low inputs.
+
+| High input        | Low output      |
+| ----------------- | --------------- |
+| $secretHigh = 7$  | $resultLow = 0$ |
+| $secretHigh = -3$ | $resultLow = 1$ |
+
+Their low outputs differ. The program therefore violates noninterference.
+
+## Control Context
+
+A type system detects implicit flows by tracking the label of the current control context. Inside a branch guarded by a high condition, the control context is high.
+
+- A low expression may be assigned to a low variable outside a high control context.
+- A high expression must not be assigned to a low variable.
+- A low variable must not be assigned inside a high control context.
+
+The final rule rejects the earlier branch even though both assigned values, $0$ and $1$, are low constants. The branch selection depends on high data.
+
+The same rule applies to loops. A loop controlled by a high condition can change a low counter, write a different number of low records, or expose whether the program terminates.
+
+## Deliberate Release
+
+Strict noninterference rejects every high-to-low dependency. Real systems sometimes need a limited release.
+
+A password checker receives a high password and returns a low success or failure result. The result reveals whether the supplied password matches. The system intends to release that one fact.
+
+Declassification permits a specified high-to-low flow under a policy. The policy defines:
+
+- What information may be released.
+- Who may receive it.
+- When the release is permitted.
+- Which code may perform the release.
+
+Declassification must be explicit. A policy that permits a login result must not accidentally permit the password itself or other account data.
+
+## Observable Effects
+
+Low output is not limited to a return value or a printed message. Any effect an observer can distinguish may carry information.
+
+- Program termination can reveal a fact about a secret.
+- Execution time can vary with a secret-dependent branch.
+- Resource use can leak through memory use, network traffic, or the number of generated records.
+
+An information-flow policy must state which effects count as observable. An analysis that checks assignments alone misses control-flow and side-channel leaks.
