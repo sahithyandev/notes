@@ -1,7 +1,7 @@
 ---
 title: Preprocessing and Quantization
 dateCreated: 2026-10-20T09:00:00.000Z
-lastUpdatedOn: 2026-10-20T08:58:52.121Z
+lastUpdatedOn: 2026-10-28T17:01:59.034Z
 ---
 
 Baseline JPEG first prepares the image, then transforms and quantizes each block. This note covers those stages and the artefacts they cause.
@@ -38,7 +38,7 @@ $$
 
 ### Chroma Subsampling
 
-The eye is less sensitive to colour detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/image-encoding#psychovisual-redundancy) early.
+The eye is less sensitive to color detail than to brightness detail, so reducing chroma resolution removes [psychovisual redundancy](/s5/image-processing/image-encoding#psychovisual-redundancy) early.
 
 Subsampling is written as $J{:}a{:}b$ over a block 4 pixels wide and 2 rows high.
 
@@ -53,9 +53,9 @@ Each chroma sample is the average of the luma-resolution samples it covers. For 
 
 4:2:0 reduces the sample count to $1 + \frac{1}{4} + \frac{1}{4} = 1.5$ samples per pixel, from 3. This gives a 2:1 reduction before any DCT work.
 
-### Blocks and MCUs
+### Block
 
-Each component is split into 8x8 blocks, also called tiles. Every later stage processes a block independently of the others.
+Each component is split into <Aka original="8x8 blocks">tiles</Aka>. Every later stage processes a block independently of the others.
 
 Each component $i$ has a sampling factor pair $(H_i, V_i)$. For an image of $X \times Y$ pixels:
 
@@ -72,7 +72,12 @@ $$
   </Sym>
 </Symbols>
 
-Blocks of the different components are interleaved in the output. The unit of coding is the minimum coded unit (MCU). An MCU holds $H_i \times V_i$ blocks of each component, in raster order within the component, components in order.
+### Minimum Coded Unit
+
+<Aka>MCU</Aka>. Unit of coding. Blocks of the different components are
+interleaved in the output.
+
+An MCU holds $H_i \times V_i$ blocks of each component, in raster order within the component, components in order.
 
 - 4:4:4  
   MCU covers 8x8 pixels and holds 3 blocks (Y, Cb, Cr).
@@ -83,10 +88,7 @@ The image is padded to a whole number of MCUs, in both directions, by replicatin
 
 ### Level Shift
 
-For $P$-bit samples, subtract $2^{P-1}$ from every sample. For $P = 8$ this subtracts 128.
-
-- Samples become centred on 0 and signed
-- The range becomes symmetric, $[-128, 127]$ for 8-bit samples
+For $P$-bit samples, subtract $2^{P-1}$ from every sample. Samples become centred on 0 and signed. The range becomes symmetric, $[-2^{n}, 2^{n}-1]$.
 
 ## Discrete Cosine Transform
 
