@@ -172,9 +172,12 @@ async function renumberFiles(
 export async function syncNoteMetadata(
   mdFilePaths: string[],
   dryRun: boolean = false,
+  renumber: boolean = true,
 ) {
   const originalPaths = [...mdFilePaths];
-  mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
+  if (renumber) {
+    mdFilePaths = await renumberFiles(mdFilePaths, dryRun);
+  }
   for (let i = 0; i < mdFilePaths.length; i++) {
     const filePath = mdFilePaths[i];
     if (filePath.includes("/summary/") || filePath.includes("/images/"))
@@ -290,33 +293,33 @@ export async function syncNoteMetadata(
 }
 
 if (require.main === module) {
-  const directories: Array<string> = [];
-  const filePaths: Array<string> = [];
-
-  // Check for --dry-run flag
   const dryRun = process.argv.includes("--dry-run");
-  // When --dry-run is used: [bun, script.ts, --dry-run, file1, file2, ...]
-  // We need to skip the first 3 elements (bun, script.ts, --dry-run)
-  // When not used: [bun, script.ts, file1, file2, ...]
-  // We need to skip the first 2 elements (bun, script.ts)
-  const argsToProcess = dryRun ? process.argv.slice(3) : process.argv.slice(2);
-
-  for (const changedFile of argsToProcess) {
-    const changedDirectory = dirname(changedFile);
-    if (directories.includes(changedDirectory)) {
-      continue;
-    }
-    directories.push(changedDirectory);
-    const files = readdirSync(changedDirectory);
-    for (const file of files) {
-      filePaths.push(join(changedDirectory, file));
-    }
-  }
-  filePaths.sort();
+  const stagedOnly = process.argv.includes("--staged-only");
+  const argsToProcess = process.argv
+    .slice(2)
+    .filter((arg) => arg !== "--dry-run" && arg !== "--staged-only");
 
   if (dryRun) {
     console.log("=== DRY RUN MODE - No files will be modified ===");
   }
 
-  syncNoteMetadata(filePaths, dryRun);
+  if (stagedOnly) {
+    // lint-staged passes only the files selected for the commit. Never expand
+    // them to siblings or rename them: both actions defeat partial commits.
+    syncNoteMetadata(argsToProcess, dryRun, false);
+  } else {
+    // An explicit metadata sync after adding or renaming a note intentionally
+    // operates on the whole directory so its numbering can be reconciled.
+    const directories = new Set<string>();
+    const filePaths: string[] = [];
+    for (const changedFile of argsToProcess) {
+      const changedDirectory = dirname(changedFile);
+      if (directories.has(changedDirectory)) continue;
+      directories.add(changedDirectory);
+      for (const file of readdirSync(changedDirectory)) {
+        filePaths.push(join(changedDirectory, file));
+      }
+    }
+    syncNoteMetadata(filePaths.sort(), dryRun);
+  }
 }
