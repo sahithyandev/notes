@@ -3,20 +3,22 @@ title: Unix Process Management
 prereqs:
   - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.090Z
+lastUpdatedOn: 2026-10-29T22:16:51.615Z
 ---
 
 Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
 
 Refer [stopped](/s3/operating-systems/process#stopped), [zombie](/s3/operating-systems/process#zombie), and [orphan](/s3/operating-systems/process#orphan) for the Unix-specific additions to the [generic process state model](/s3/operating-systems/process#process-states).
 
-## Kernel Data Structures
+## Process Fundamentals
 
-### Process Table and PCB
+### Kernel Data Structures
+
+#### Process Table and PCB
 
 The kernel keeps 1 [PCB](/s3/operating-systems/process#process-control-block) per process. The process table is the collection of these PCBs. In Linux a PCB is a `task_struct`.
 
-### Process Memory Space
+#### Process Memory Space
 
 Each PCB points to the address space of its process. The address space is divided into regions, from low to high addresses:
 
@@ -37,9 +39,11 @@ Each PCB points to the address space of its process. The address space is divide
 
 The kernel is mapped into the upper part of the address space, but is not accessible from user mode.
 
-## Process Creation
+## Process Lifecycle
 
-### Fork
+### Process Creation
+
+#### Fork
 
 ```c
 #include <unistd.h>
@@ -54,7 +58,7 @@ int fork(void);
 
 Both parent and child continue executing the instructions after `fork()`. Since each has an independent memory copy, modifying a variable in one process does not affect the other's copy.
 
-### Fork Implementation
+#### Fork Implementation
 
 Simplified steps:
 
@@ -76,7 +80,7 @@ Copying the full memory space (step 6) is expensive. Copy-on-write defers duplic
 
 Linux additionally provides `clone()`, a more general primitive than `fork()` that allows partial resource sharing between parent and child, used to implement threads.
 
-### Exec
+#### Exec
 
 `fork()` alone only duplicates the calling process. To run a different program, use the `exec()` family, a group of 6 related system calls sharing a naming convention.
 
@@ -114,7 +118,7 @@ int main(int argc, char *argv[], char *envp[])
 - `envp`  
   NULL-terminated array of `key=value` strings, the environment.
 
-### Fork and Exec Together
+#### Fork and Exec Together
 
 <Note>
 
@@ -139,9 +143,9 @@ if (pid < 0) {
 }
 ```
 
-## Termination and Synchronization
+### Termination and Synchronization
 
-### Exit
+#### Exit
 
 ```c
 #include <stdlib.h>
@@ -160,7 +164,7 @@ Non-zero `status` indicates an error or abnormal termination.
 
 Returning from `main()` implicitly calls `exit()`.
 
-### Wait
+#### Wait
 
 ```c
 #include <sys/types.h>
@@ -181,7 +185,7 @@ Variants:
 - `waitid()`  
   Wait for any child process to change status.
 
-## Signals
+### Signals
 
 ```c
 int kill(pid_t pid, int sig);
@@ -200,11 +204,13 @@ Sends a signal to a process, the Unix analog of a hardware interrupt, routed thr
 - `SIGCHLD`  
   Sent by the kernel to the parent when a child terminates, stops, or continues. Ignored by default. A parent can install a handler that calls `wait()` on receiving it, reaping terminated children without blocking. Children that are never reaped remain [zombies](/s3/operating-systems/process#zombie).
 
-## Building a Shell
+## Command Execution
+
+### Building a Shell
 
 A console application that runs utilities such as `someutil` is a shell. It reads a command line, then uses `fork()` and `exec()` to run the utility in a child process.
 
-### Shell Loop
+#### Shell Loop
 
 ```text
 loop forever
@@ -227,7 +233,7 @@ loop forever
         waitpid(pid, &status, 0)
 ```
 
-### Command Trace
+#### Command Trace
 
 Command trace for running `someutil` with the arguments `-v` and `data.txt`:
 
@@ -247,9 +253,11 @@ A utility outside `PATH` needs its path typed, such as `./someutil -v data.txt`.
 
 </Note>
 
-## Process Misbehavior
+## Failure Modes
 
-### Fork Bomb
+### Process Misbehavior
+
+#### Fork Bomb
 
 A process that calls `fork()` in an infinite loop is a fork bomb. Each child continues the same loop, so the number of processes doubles every iteration.
 

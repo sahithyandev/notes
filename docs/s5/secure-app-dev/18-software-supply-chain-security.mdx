@@ -1,12 +1,14 @@
 ---
 title: Software Supply Chain Security
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.317Z
+lastUpdatedOn: 2026-10-29T22:16:51.866Z
 ---
 
 Software supply chain security defends the build and distribution process itself, not just the code it produces. Attackers target this process because it is trusted by every downstream consumer at once.
 
-## Risk Sources
+## Supply Chain Threats
+
+### Risk Sources
 
 Risk comes from 3 sources.
 
@@ -19,7 +21,7 @@ Adding dependencies got easy, packages got smaller, and far more individual main
 
 Vulnerabilities are accidental and sometimes acceptable to ship. Malware is intentional and never acceptable.
 
-## Malicious Packages
+### Malicious Packages
 
 A malicious package is public for about 209 days on average before being reported. 56% run their payload on install through `preinstall` scripts, exfiltrating `process.env`, mining cryptocurrency, or stealing credentials.
 
@@ -31,7 +33,9 @@ Examples:
 
 Software Composition Analysis (SCA) tools like Socket analyze dependency behavior to catch these.
 
-## Securing Project Infrastructure
+## Supply Chain Safeguards
+
+### Securing Project Infrastructure
 
 In the SolarWinds Orion attack, malicious code was signed and distributed through the compromised build pipeline.
 
@@ -42,7 +46,7 @@ Controls:
 - `git config fsckObjects true`.
 - Keeping CI/CD secrets out of test environments.
 
-## Supply Chain Levels for Software Artifacts
+### Supply Chain Levels for Software Artifacts
 
 Supply chain Levels for Software Artifacts (SLSA, "salsa") rates how hard a build's provenance is to fake. Provenance is a signed record of how an artifact was built, which source commit, which build system, which inputs. The build track has 3 levels.
 

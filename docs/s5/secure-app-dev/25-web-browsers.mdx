@@ -1,12 +1,14 @@
 ---
 title: Web Browsers
 dateCreated: 2026-09-03T05:28:58.273Z
-lastUpdatedOn: 2026-10-26T15:29:58.923Z
+lastUpdatedOn: 2026-10-29T22:16:51.902Z
 ---
 
 A browser is a large, complex, network-facing codebase written in memory-unsafe languages, with features added constantly.
 
-## Memory Unsafety
+## Browser Attack Surface
+
+### Memory Unsafety
 
 A Microsoft study found roughly 70% of vulnerabilities fixed by security updates each year are memory safety issues. As of March 2019, all but about 5 of 130 public Critical Chrome bugs were memory corruption.
 
@@ -22,7 +24,9 @@ The Rule of 2: for a given task, pick at most 2 of these 3.
 
 If a task needs all 3, split the work.
 
-## Multi-Process Architecture
+## Process Isolation
+
+### Multi-Process Architecture
 
 Renderer processes have no direct disk, network, or device access. They run in a restricted sandbox, which limits damage from a renderer exploit. The split also gives parallelism across tabs and survives a single renderer crash.
 
@@ -34,7 +38,7 @@ Limitations:
 
 Auto-update shipped from the start, and it is now the delivery mechanism for the whole platform.
 
-## Site Isolation
+### Site Isolation
 
 Site isolation puts content from one site in its own renderer process. The unit is a site, not a tab or an origin. The browser process can then restrict each renderer to its own site's data.
 
@@ -49,7 +53,7 @@ Goals:
 
 Cross-Origin Read Blocking (CORB) blocks cross-site delivery of HTML, XML, and JSON responses. It works reliably when the response has a correct `Content-Type` and `X-Content-Type-Options: nosniff`. Without `nosniff`, Chrome sniffs the start of the file and protects it only if it can confirm the type, avoiding breaking mislabeled JavaScript files.
 
-## Sites Sharing a Process
+### Sites Sharing a Process
 
 Site isolation can fail under memory pressure or through `document.domain`, leaving pages from different sites in 1 renderer process. Every page in that process shares 1 address space, so the [same-origin policy](/s5/secure-app-dev/web-browsers#site-isolation) is enforced only by the browser's software checks, not by process boundaries.
 
@@ -63,7 +67,9 @@ Attack scenario using Spectre:
 
 The same layout also lets a renderer memory corruption exploit or a UXSS bug reach `bank.com` data directly.
 
-## Secure Coding in JavaScript
+## Secure JavaScript
+
+### Secure Coding in JavaScript
 
 Use strict mode and a linter such as ESLint or StandardJS.
 
@@ -82,6 +88,6 @@ Use strict mode and a linter such as ESLint or StandardJS.
 - Silent failures  
   Assigning to non-writable globals or setting properties on primitives fails silently without strict mode.
 
-## Style and Testing Principles
+### Style and Testing Principles
 
 Source code is for humans, so readability is preferred over brevity, and clever one-liners that lean on obscure language features are avoided. Dangerous code should look dangerous so it stands out in review. Untested code is broken code, so tests are automated in CI. Explicit code is safer than magical code.

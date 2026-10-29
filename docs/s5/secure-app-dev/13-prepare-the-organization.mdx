@@ -3,14 +3,16 @@ title: Prepare the Organization
 prereqs:
   - s5/computer-security/cia-triad#access-control
 dateCreated: 2026-09-30T08:00:00.000Z
-lastUpdatedOn: 2026-10-26T15:29:58.810Z
+lastUpdatedOn: 2026-10-29T22:16:51.784Z
 ---
 
 Prepare the Organization (PO) is the first pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
 
 Put people, rules, and tooling in place before coding starts.
 
-## Define Security Requirements
+## Organizational Preparation
+
+### Define Security Requirements
 
 - Infrastructure and process requirements  
   Security requirements for the development infrastructure and processes are documented.
@@ -26,7 +28,7 @@ Examples:
 - Contractual requirements  
   A government supplier adds a clause to vendor contracts requiring an SBOM and a signed release for every delivered component.
 
-## Train and Vet Staff
+### Train and Vet Staff
 
 - Role-based training  
   Every developer completes secure coding training scoped to what their role touches, before they get commit access to production code.
@@ -44,7 +46,7 @@ Examples:
 - Phishing simulation  
   A software vendor runs quarterly phishing drills on staff with repository access. Staff who fail receive targeted retraining.
 
-## Control the Toolchain
+### Control the Toolchain
 
 - Approved toolchain  
   Compilers, build systems, test frameworks, and CI runners are drawn from an approved list, each with a documented, security-reviewed configuration.
@@ -64,7 +66,9 @@ Examples:
 - event-stream  
   In 2018, the maintainer of the npm package `event-stream` handed it to a new maintainer, who added a dependency with code targeting the Copay bitcoin wallet. Projects that pulled packages without vetting took the change automatically.
 
-## Define Security Goals
+## Security Controls
+
+### Define Security Goals
 
 - Bug ban list  
   Names classes of vulnerability, for example SQL injection or hardcoded credentials, that must never reach production regardless of severity elsewhere.
@@ -80,7 +84,7 @@ Examples:
 - Enforced ban list  
   A firm bans `strcpy` and string-built SQL queries. The linter rejects any commit that contains either.
 
-## Lock Down the Environment
+### Lock Down the Environment
 
 - MFA and logging  
   Developer accounts require multi-factor authentication, and every access to source or build systems is logged.
@@ -100,7 +104,9 @@ Examples:
 - SolarWinds  
   In 2020, attackers who had compromised SolarWinds' build environment inserted the SUNBURST backdoor into Orion updates. The updates were validly signed and reached about 18,000 customers.
 
-## Track Progress with Metrics
+## Measurement and Enforcement
+
+### Track Progress with Metrics
 
 - Training coverage  
   Share of staff completing training and their quiz scores.
@@ -115,7 +121,7 @@ Examples:
 - MFA adoption  
   Share of developer accounts with multi-factor authentication enabled.
 
-## Enforce a CI/CD Security Gate
+### Enforce a CI/CD Security Gate
 
 - Hard fail  
   The gate exits with a non-zero status on any violation, so a committed API key or a vulnerable library stops the build outright rather than logging a warning.

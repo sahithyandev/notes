@@ -1,7 +1,7 @@
 ---
 title: Discretionary Access Control
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.105Z
+lastUpdatedOn: 2026-10-29T22:16:51.646Z
 ---
 
 Discretionary Access Control (DAC) is Linux's traditional security model. The owner of a resource decides who may access it, by setting permissions on it. Access decisions are based on the identity (UID and GID) of the requesting process. A process running with root privileges is granted unrestricted access, while other accounts can do much less. Attackers therefore target root privileges.
@@ -10,7 +10,9 @@ In Linux, most system resources, including memory, device drivers, and named pip
 
 The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only root may load or unload kernel modules.
 
-## Users and Groups
+## Identity and Ownership
+
+### Users and Groups
 
 - User account  
   Represents an entity, human or process, capable of using files. Details are kept in `/etc/passwd`.
@@ -19,7 +21,9 @@ The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only
 
 Users and groups are managed with `useradd`, `usermod`, `userdel`, and the equivalent `group*` commands.
 
-## File Permissions
+## Permission Model
+
+### File Permissions
 
 Every file has 2 owners, a user and a group, plus a third permission set for all other users. Each of the 3 sets carries read, write, and execute permissions, in the order user, group, other.
 
@@ -27,7 +31,7 @@ Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read c
 
 <PermissionBreakdown bits="-rw-rw-r--" />
 
-### Special Permission Bits
+#### Special Permission Bits
 
 On top of the 9 standard permission bits, there are 3 special permission bits, each a fourth leading octal digit in `chmod`:
 
@@ -46,7 +50,7 @@ SetUID and SetGID are dangerous on a file owned by root or another privileged ac
 
 SetUID and SetGID should only be used on binaries, not shell scripts. A script's interpreter reads its own environment, so the invoking user can hijack it via `PATH` or `IFS` even under an elevated UID. Locating and opening the interpreter are 2 separate steps, and swapping the script between them lets an attacker substitute it, the race Linux avoids by ignoring SetUID on scripts.
 
-## Directory Permissions
+### Directory Permissions
 
 Same permissions are applied to the directory.
 

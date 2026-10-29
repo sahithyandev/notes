@@ -1,14 +1,16 @@
 ---
 title: Respond to Vulnerabilities
 dateCreated: 2026-09-30T08:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.285Z
+lastUpdatedOn: 2026-10-29T22:16:51.831Z
 ---
 
 Respond to Vulnerabilities (RV) is the fourth pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
 
 Find and fix flaws that reach production, and feed the lessons back into development.
 
-## Identify Vulnerabilities Continuously
+## Vulnerability Intake
+
+### Identify Vulnerabilities Continuously
 
 - Disclosure programme  
   A known, monitored intake channel exists for external reports, for example a security contact address or a bug bounty programme.
@@ -24,7 +26,9 @@ Examples:
 - Threat intelligence monitoring  
   An automotive software company connects its software catalog to threat intelligence feeds. A zero-day advisory for an open-source protocol used in its vehicles automatically opens an internal ticket.
 
-## Assess, Prioritise, and Remediate
+## Remediation
+
+### Assess, Prioritise, and Remediate
 
 - Confirmation  
   Each report is reproduced and confirmed before work starts on it.
@@ -42,7 +46,9 @@ Examples:
 - Equifax  
   In 2017, Equifax left a public-facing Apache Struts flaw (CVE-2017-5638) unpatched for about 2 months after the fix was released. Attackers exploited it and exposed data on about 147 million people.
 
-## Analyse Root Cause
+## Incident Learning
+
+### Analyse Root Cause
 
 - Underlying cause identification  
   Each confirmed vulnerability is traced to its underlying cause.
@@ -56,7 +62,7 @@ Example:
 - Post-mortem  
   After patching a critical data-leak flaw, a team traces the cause to missing input validation. It updates its secure coding training and adds a SAST rule that catches the mistake automatically.
 
-## Run Incident Response
+### Run Incident Response
 
 An incident response runs through 4 phases.
 
@@ -74,7 +80,9 @@ Examples:
 - Leaked signing key  
   A build system's code signing key is found in a public repository. The team declares an incident and revokes the key. It re-signs recent releases with a new key and notifies customers to update their trust settings. Afterwards it adds a secret scanning rule to the pipeline.
 
-## Measure Vulnerability Response
+## Measurement
+
+### Measure Vulnerability Response
 
 Inbound metrics.
 

@@ -1,14 +1,16 @@
 ---
 title: Threat Modeling
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:26.339Z
+lastUpdatedOn: 2026-10-29T22:16:51.845Z
 ---
 
 The process of identifying security threats in a system's design. Should be done before a single line of code is written.
 
 A bug is localized to a region of code, fixed and redeployed in isolation. An architectural flaw means redesigning how components trust and interact with each other, rippling through every part of the system built on that assumption.
 
-## Trust Boundary
+## System Model
+
+### Trust Boundary
 
 A trust boundary marks where data crosses from a low-trust zone into a high-trust zone. Security failures happen when that crossing lacks validation.
 
@@ -18,7 +20,7 @@ Examples:
 - User-space application to kernel-space driver
 - Standard app container to cloud backend database
 
-## Data Flow Diagram
+### Data Flow Diagram
 
 <Aka>DFD</Aka>. Maps a system's data pathways to expose it to threat modeling.
 
@@ -39,7 +41,9 @@ A Level 1 DFD, a breakdown into sub-systems, is the minimum requirement for func
 
 <DfdDiagram />
 
-## STRIDE
+## Threat Discovery
+
+### STRIDE
 
 A mnemonic for 6 categories of security threat, one per letter, applied only to the categories that structurally match a given DFD component type.
 
@@ -58,7 +62,7 @@ A mnemonic for 6 categories of security threat, one per letter, applied only to 
 
 Each identified threat needs its own cryptographic or systemic engineering control mapped directly to it.
 
-## Threat Modeling Workflow
+### Threat Modeling Workflow
 
 A threat modeling workflow is the iterative pipeline that applies STRIDE to a system's design, repeated as the design changes:
 

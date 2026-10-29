@@ -3,7 +3,7 @@ title: Secure Software Development Lifecycle
 sidebar:
   label: SSDL
 dateCreated: 2026-09-03T05:24:45.100Z
-lastUpdatedOn: 2026-10-17T06:00:26.288Z
+lastUpdatedOn: 2026-10-29T22:16:51.761Z
 ---
 
 Security must be built into every phase of the SDLC, not bolted on as a final checklist. Fixing vulnerabilities early cuts remediation cost and deployment delay.
@@ -38,7 +38,9 @@ Enforces strong [authentication](/s4/operating-systems-security/authentication),
 
 Encrypts sensitive data at rest and in transit. TLS protects traffic, strong algorithms such as [AES](/s5/computer-security/aes) with managed keys protect stored data, and secrets such as keys and credentials stay out of source code.
 
-## Software Bill of Materials
+## Software Inventory
+
+### Software Bill of Materials
 
 <Aka>SBOM</Aka>. A machine-readable inventory of every component in a build. It
 lists each component's name, version, supplier, and dependency relationships.
@@ -58,7 +60,9 @@ Lockfiles such as `package-lock.json` and `Cargo.lock` pin exact versions, inclu
 
 Tools such as `syft` and `cargo-cyclonedx` generate an SBOM from manifests, lockfiles, and the built artifact.
 
-## Core Security Design Principles
+## Design Principles
+
+### Core Security Design Principles
 
 Foundational guidelines that hold across all languages and architectures. They should not be relaxed for a specific customer or environment.
 

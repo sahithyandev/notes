@@ -3,7 +3,7 @@ title: Rootkits
 prereqs:
   - s4/operating-systems-security/malware
 dateCreated: 2026-09-30T15:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.895Z
+lastUpdatedOn: 2026-10-29T22:16:51.680Z
 ---
 
 A [rootkit](/s4/operating-systems-security/malware#rootkits) is malicious code that attains root-level privileges and hides its own presence and the presence of other malicious activity from the operating system and its users. It is usually installed after an attacker gains root, to keep that access and stay undetected. Rootkits are extremely difficult to detect or eradicate.
@@ -20,7 +20,9 @@ Rootkits can:
 - Bypass audit logging
 - Take full control of the file system
 
-## Goals
+## Rootkit Fundamentals
+
+### Goals
 
 - Persistence  
   Survive reboots and cleanup attempts.
@@ -29,7 +31,7 @@ Rootkits can:
 - Privileged access  
   Provide a hidden backdoor that returns root on demand.
 
-## Rootkit Levels
+### Rootkit Levels
 
 Rootkits work at different permission levels (in increasing difficulty to eradicate):
 
@@ -44,7 +46,9 @@ Rootkits work at different permission levels (in increasing difficulty to eradic
 - Hardware/firmware  
   Embedded in hardware or writable microcode, such as the BIOS/UEFI, a NIC, or a disk controller. Survives an OS reinstall.
 
-## Attack Steps on Linux
+## Attack Lifecycle
+
+### Attack Steps on Linux
 
 1. Initial compromise  
    The attacker gains a foothold as an unprivileged user. Typical vectors are a memory corruption bug in a network service, stolen or weak credentials, or a trojaned package.
@@ -59,14 +63,16 @@ Rootkits work at different permission levels (in increasing difficulty to eradic
 6. Backdoor and cleanup  
    The attacker opens a hidden backdoor or reverse shell, then edits or deletes entries in the logs.
 
-## User Mode Techniques
+## Implementation Techniques
+
+### User Mode Techniques
 
 - Binary replacement  
   Trojaned copies of `ps`, `ls`, `netstat` skip entries that belong to the attacker.
 - Library preloading  
   A malicious shared library is listed in the `LD_PRELOAD` environment variable or in `/etc/ld.so.preload`. The dynamic linker loads it first, so its versions of `readdir()` or `open()` override the libc ones and filter results. Statically linked binaries are not vulnerable to this.
 
-## Kernel Mode Techniques
+### Kernel Mode Techniques
 
 Code running in kernel space is not limited by process isolation, so it can subvert every user space tool at once.
 
@@ -79,11 +85,13 @@ Code running in kernel space is not limited by process isolation, so it can subv
 - Direct kernel object manipulation  
   The rootkit edits kernel data structures directly. Unlinking a process from the kernel's task list hides it from `ps`, yet the scheduler still runs it.
 
-### Splicing
+#### Splicing
 
 An evasion technique where the first bytes of a system function are overwritten with a jump instruction pointing to the rootkit's code. Any driver modified this way is called a hooked driver. Legitimate calls to the function silently execute the rootkit code first.
 
-## Rootkit Detection
+## Defensive Measures
+
+### Rootkit Detection
 
 - Rootkit revealers  
   Read the disk directly to find rootkits.
@@ -100,7 +108,7 @@ An evasion technique where the first bytes of a system function are overwritten 
 
 Tools such as `chkrootkit` and `rkhunter` automate several of these checks. A kernel mode rootkit can defeat them, so they are less reliable on an already compromised host.
 
-## Rootkit Prevention
+### Rootkit Prevention
 
 - Least privilege  
   Installing a rootkit needs root. Limiting root access limits installation.
@@ -123,7 +131,9 @@ Once a rootkit is confirmed, reinstalling the OS from trusted media is the safe 
 
 </Note>
 
-## Non-Malicious Rootkits
+## Legitimate Uses
+
+### Non-Malicious Rootkits
 
 Used by:
 

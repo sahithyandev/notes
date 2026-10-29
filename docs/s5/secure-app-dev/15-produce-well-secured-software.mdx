@@ -1,14 +1,16 @@
 ---
 title: Produce Well-Secured Software
 dateCreated: 2026-09-30T08:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.271Z
+lastUpdatedOn: 2026-10-29T22:16:51.815Z
 ---
 
 Produce Well-Secured Software (PW) is the third pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
 
 Design, write, and test so that few vulnerabilities exist at release, and those that do are found early.
 
-## Start with Security Requirements
+## Secure Design and Components
+
+### Start with Security Requirements
 
 - Threat modeling  
   Data flows, trust boundaries, and abuse cases are modeled before implementation starts, so an attack path is a design question rather than a post-hoc discovery.
@@ -24,7 +26,7 @@ Examples:
 - Microsoft SDL  
   After its 2002 Trustworthy Computing memo, Microsoft made threat modeling a required step of its Security Development Lifecycle.
 
-## Reuse Well-Secured Components
+### Reuse Well-Secured Components
 
 - Prefer vetted modules  
   Authentication, cryptography, and parsing use vetted internal or third-party components instead of custom implementations, since these are the areas most prone to subtle, exploitable mistakes.
@@ -38,7 +40,9 @@ Examples:
 - Centralized authentication library  
   A retail corporation builds one heavily audited authentication library. All internal teams must use it for login instead of writing their own login and session handling.
 
-## Follow Secure Coding Practices
+## Implementation and Validation
+
+### Follow Secure Coding Practices
 
 - Safer languages and functions  
   Memory-safe languages and hardened library functions are preferred over ones known to be error-prone, where the choice is available.
@@ -56,7 +60,7 @@ Examples:
 - Heartbleed  
   In 2014, a missing bounds check in OpenSSL's heartbeat extension (CVE-2014-0160) let attackers read server memory, including private keys. The bug sat in C code, where bounds checking is manual.
 
-## Review and Test Code
+### Review and Test Code
 
 - Human review  
   A person reviews code for logic and security issues a tool would miss.
@@ -76,7 +80,9 @@ Examples:
 - Dynamic security testing  
   An insurance company runs an automated web vulnerability scanner against staging every Friday night. It attempts XSS and injection attacks on the running application and produces a weekend report.
 
-## Configure Defaults Securely
+## Secure Release Settings
+
+### Configure Defaults Securely
 
 - Least privilege by default  
   A default install runs with the minimum privilege it needs.
@@ -94,7 +100,9 @@ Examples:
 - Exposed MongoDB  
   In 2017, attackers wiped thousands of exposed MongoDB databases and demanded ransom. Many were default installs with no authentication, reachable from the internet. Current releases bind to localhost by default.
 
-## Measure Secure Production
+## Measurement
+
+### Measure Secure Production
 
 Secure design and component metrics.
 

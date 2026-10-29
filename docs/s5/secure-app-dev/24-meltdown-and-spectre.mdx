@@ -1,7 +1,7 @@
 ---
 title: Meltdown and Spectre
 dateCreated: 2026-09-03T05:28:35.093Z
-lastUpdatedOn: 2026-10-07T05:27:11.045Z
+lastUpdatedOn: 2026-10-29T22:16:51.891Z
 ---
 
 Meltdown and Spectre are 3 CPU vulnerabilities disclosed in 2018 that leak memory through microarchitectural side channels.
@@ -13,7 +13,9 @@ Meltdown and Spectre are 3 CPU vulnerabilities disclosed in 2018 that leak memor
 - Variant 3  
   Rogue data cache load, CVE-2017-5754, Meltdown.
 
-## Side Channel Attacks
+## Microarchitectural Foundations
+
+### Side Channel Attacks
 
 A side channel attack infers secret data from an observable side effect of a computation, such as timing, cache state, power use, or electromagnetic emission. The attacker never reads the secret through a legitimate interface, and the program's logic has no bug that reveals it.
 
@@ -22,7 +24,7 @@ A side channel attack infers secret data from an observable side effect of a com
 - Hard to foresee  
   Developers reason about the architectural behaviour of code, not its microarchitectural side effects.
 
-## Exploited CPU Features
+### Exploited CPU Features
 
 - Out-of-order execution  
   Starts instructions as soon as their operands are ready. Instructions are issued in order, executed out of order, then retired in order. This avoids stalls waiting for data.
@@ -31,7 +33,7 @@ A side channel attack infers secret data from an observable side effect of a com
 - Caching  
   Keeps recently or nearby accessed memory in a fast cache. Cached data reads measurably faster than data from main memory.
 
-## Cache Side Channels
+### Cache Side Channels
 
 Measure how fast a memory location reads to infer whether it was cached.
 

@@ -1,14 +1,16 @@
 ---
 title: Trusted Platform Module
 dateCreated: 2026-09-30T15:00:00.000Z
-lastUpdatedOn: 2026-10-23T13:55:25.886Z
+lastUpdatedOn: 2026-10-29T22:16:51.925Z
 ---
 
 <Aka>TPM</Aka>. A tamper-resistant cryptographic coprocessor on the motherboard.
 It serves as the hardware [root of trust](/s5/secure-app-dev/chain-of-trust) of
 a platform.
 
-## Components
+## TPM Foundation
+
+### Components
 
 - Cryptographic engines  
   Asymmetric encryption and signing, hashing, and a random number generator.
@@ -21,7 +23,7 @@ a platform.
 - Storage root key  
   Wraps other keys, so keys can be stored outside the TPM while remaining protected by it.
 
-## Platform Configuration Registers
+### Platform Configuration Registers
 
 A PCR is a separate register, identified by its index. Each PCR holds 1 hash-sized value, 32 bytes with SHA-256.
 
@@ -36,7 +38,7 @@ The index ranges are assigned as follows:
 - PCRs 16 to 23  
   PCR 16 is for debugging, PCRs 17 to 22 for a dynamic root of trust, and PCR 23 for applications.
 
-### PCR Extend
+#### PCR Extend
 
 A PCR can only be updated by combining its current value with a new measurement.
 
@@ -54,7 +56,9 @@ Here:
 
 The final value depends on every measurement and their order. A PCR cannot be set to an arbitrary value, so malware cannot erase an earlier measurement.
 
-## Establishing the Chain of Trust
+## Boot Measurement
+
+### Establishing the Chain of Trust
 
 [Measured boot](/s5/secure-app-dev/chain-of-trust#measured-boot) uses the TPM to record each link of the chain.
 
@@ -79,7 +83,9 @@ The recorded PCR values are then used in 2 ways.
 
 Secure boot and measured boot are complementary. Secure boot prevents unauthorized code from running. Measured boot produces evidence of what did run.
 
-## Extension to the Operating System
+## Runtime Measurement
+
+### Extension to the Operating System
 
 The chain continues past the kernel through the OS.
 
@@ -92,7 +98,7 @@ The chain continues past the kernel through the OS.
 - Disk encryption  
   A disk key sealed to the boot PCRs is released only when the boot chain is intact.
 
-## Extension to User Applications
+### Extension to User Applications
 
 Application developers use the TPM through a software stack such as TPM2 Software Stack (TSS) or PKCS#11 rather than talking to the chip directly.
 

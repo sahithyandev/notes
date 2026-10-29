@@ -3,7 +3,7 @@ title: Heap Overflow
 prereqs:
   - s5/computer-security/buffer-overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-10-15T17:35:15.805Z
+lastUpdatedOn: 2026-10-29T22:16:51.711Z
 ---
 
 Refer to the [buffer overflow](/s5/computer-security/buffer-overflow) note before continuing on.
@@ -18,17 +18,21 @@ Adjacent to a heap buffer:
 
 As with a stack overflow, an attacker controlling the buffer input overwrites this adjacent data, changing control flow or manipulating program data. There is no return address to hijack on the heap, so control transfer instead exploits function pointers stored nearby, or manipulates heap management data structures.
 
-## Allocator Metadata Corruption
+## Heap Exploitation Techniques
+
+### Allocator Metadata Corruption
 
 Malloc implementations differ by platform, e.g. jemalloc on Android, FreeBSD, and Firefox, dlmalloc/ptmalloc on glibc, tcmalloc on former Chrome, PartitionAlloc on current Chrome. All handle lists of chunks, where each chunk consists of metadata and user data.
 
 Corrupting a chunk's metadata is a technique to achieve arbitrary memory reads and writes, e.g. by forcing overlapping chunks.
 
-## vtable Overwrite
+### vtable Overwrite
 
 A C++ object with virtual methods holds a pointer to a vtable, itself containing function pointers. If a vulnerable buffer sits before such an object, overflowing it overwrites the vtable pointer to reference an attacker-crafted vtable. Controlling the vtable pointer allows calling arbitrary functions.
 
-## Heartbleed
+## Case Study
+
+### Heartbleed
 
 A 2014 security bug in OpenSSL's TLS heartbeat extension. The heartbeat handler read the attacker-supplied payload length field without validating it against the actual payload size, then copied that many bytes into the response.
 
@@ -45,7 +49,9 @@ memcpy(bp, pl, payload);            // copy `payload` bytes from pl into the res
 
 `payload` is never checked against the actual size of the request. A request with 1 actual payload byte but a claimed `payload` of 65535, the maximum a 16-bit field can hold, makes `memcpy` read 65535 bytes starting at `pl`, running past the end of the request into adjacent heap memory, and echo all of it back in the response. This is a buffer over-read, allowing an attacker to read up to 64KB of server memory per request.
 
-## Common Causes
+## Prevention
+
+### Common Causes
 
 - Unsafe C string functions  
   `gets`, `strcpy`, and similar functions perform no bounds checking.

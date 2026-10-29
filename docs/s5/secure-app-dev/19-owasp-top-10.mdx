@@ -1,12 +1,14 @@
 ---
 title: OWASP Top 10
 dateCreated: 2026-09-03T07:42:03.136Z
-lastUpdatedOn: 2026-09-30T15:28:09.331Z
+lastUpdatedOn: 2026-10-29T22:16:51.880Z
 ---
 
 The OWASP Top 10 is a list of the most critical web application security risks, maintained by the Open Web Application Security Project. The categories below follow the classic list taught with WebGoat.
 
-## Cross-Site Scripting
+## Browser Attacks
+
+### Cross-Site Scripting
 
 Cross-site scripting, aka. XSS, injects attacker-controlled script into a page served by a trusted application, so it runs in the victim's browser with that site's privileges. It can exfiltrate page data and cookies, hijack site behavior, and enable CSRF and session attacks.
 
@@ -19,7 +21,7 @@ Prevention:
 - Use a white-list filter, not a blacklist.
 - Do not reflect unsolicited input in confirmation or error pages.
 
-## Cross-Site Request Forgery
+### Cross-Site Request Forgery
 
 Cross-site request forgery, aka. CSRF, forces a logged-in victim's browser to send a pre-authenticated request that performs an action the attacker chooses. The request carries the victim's cookies and IP through ambient authority, browsers attach cookies to a request automatically, so the server treats it as intentional.
 
@@ -35,7 +37,9 @@ Prevention:
 - `SameSite` cookies, so the browser does not attach them to cross-site requests.
 - Eliminate XSS, which defeats token protection.
 
-## Insecure Direct Object Reference
+## Access Control Failures
+
+### Insecure Direct Object Reference
 
 Insecure direct object reference, aka. parameter tampering, exposes an internal object key, a file, record id, or path, as a URL or form parameter, so an attacker edits it to reach objects they are not authorized for.
 
@@ -45,7 +49,9 @@ Prevention:
 - Check authorization on every request, for example `... WHERE account_number = ? AND user_id = ?`.
 - Use an indirect reference map with hard-to-guess keys instead of exposing raw ids.
 
-## Injection Flaws
+## Input Handling Failures
+
+### Injection Flaws
 
 An injection flaw concatenates untrusted input into an interpreted command, SQL, XPath, LDAP, an OS command, or JSON. SQL injection is the most common.
 
@@ -61,7 +67,9 @@ Prevention:
 - Least privilege for the database account, read-only where possible.
 - Escaping questionable characters.
 
-## Broken Authentication and Session Management
+## Identity and Data Protection
+
+### Broken Authentication and Session Management
 
 Broken authentication and session management is credentials and session tokens not properly protected, letting attackers assume other identities.
 
@@ -77,7 +85,7 @@ Prevention:
 - Issue a new session token on privilege change.
 - Use secure random session keys, reasonable timeouts, and the framework's built-in session management.
 
-## Failure to Restrict URL Access
+### Failure to Restrict URL Access
 
 Failure to restrict URL access protects sensitive functionality only by hiding its links, while the URL still works when requested directly. Caused by missing authentication, incorrect authorization, or unprotected admin areas with guessable URLs.
 
@@ -85,7 +93,7 @@ Prevention:
 
 - Enforce authentication and authorization checks on the server for every request, not by omitting links.
 
-## Insecure Cryptographic Storage
+### Insecure Cryptographic Storage
 
 Insecure cryptographic storage protects data and credentials with weak or misused cryptography. MD5 is a prominent case: [MD5 collisions](/s5/computer-security/hash-functions) have been used to forge a root CA certificate trusted by all browsers.
 

@@ -1,7 +1,7 @@
 ---
 title: Integer Overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-10-15T17:35:15.813Z
+lastUpdatedOn: 2026-10-29T22:16:51.728Z
 ---
 
 Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safety) violation. It leads to one when the overflowed value is used:
@@ -12,7 +12,9 @@ Integer overflow is not itself a [memory safety](/s5/secure-app-dev/memory-safet
 
 An overflowed value used this way often leads to a buffer overflow, or directly to an out-of-bounds read or write.
 
-## Number Representation
+## Integer Representation
+
+### Number Representation
 
 Unsigned integer  
 An $n$-bit unsigned integer $x = (x_{n-1}, \dots, x_0)$ is stored in binary.
@@ -57,7 +59,9 @@ Reinterpreting the bits of a float as an integer allows arithmetic tricks. Quake
 
 </Note>
 
-## Unsigned Overflow
+## Overflow Behavior
+
+### Unsigned Overflow
 
 An $n$-bit unsigned integer represents $x$ with $0 \leq x < 2^n$. On overflow, C++11 requires the value be reduced modulo $2^n$, so unsigned arithmetic never triggers undefined behaviour.
 
@@ -75,7 +79,7 @@ Examples:
 - Stagefright  
   `uint8_t *buffer = malloc(size + chunk_size)` overflows if `size + chunk_size` exceeds the unsigned range, allocating a buffer smaller than intended. Fixed by checking `size > UINT_MAX - chunk_size` before adding, rejecting the allocation instead of letting the sum wrap.
 
-## Signed Overflow
+### Signed Overflow
 
 By the C++11 standard, if evaluating an expression produces a result not mathematically defined or not representable by its type, the behaviour is undefined. This applies only to signed integers.
 
@@ -94,7 +98,9 @@ Examples:
 
 - Java's `binarySearch` computed `mid = (low + high) / 2`. For large arrays, `low + high` overflows a signed 32-bit int before the division, producing a negative or invalid index. Fixed by computing `mid = low + (high - low) / 2` instead, since `high - low` stays within the array's valid index range and cannot overflow.
 
-## Type Conversion
+## Conversion and Mitigation
+
+### Type Conversion
 
 C automatically converts between types, known as coercion, performed by the compiler and capable of unintended consequences.
 
@@ -138,7 +144,7 @@ A signed type and its unsigned counterpart of the same width have equal rank.
 
 </Note>
 
-## Fixing Integer Overflow
+### Fixing Integer Overflow
 
 Checking `width * height > UINT_MAX` after computing `width * height` is unsound, since the multiplication has already overflowed by the time the check runs.
 

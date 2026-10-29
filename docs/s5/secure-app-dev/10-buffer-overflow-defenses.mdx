@@ -1,7 +1,7 @@
 ---
 title: Buffer Overflow Defenses
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.201Z
+lastUpdatedOn: 2026-10-29T22:16:51.751Z
 ---
 
 Defenses against [buffer overflow](/s5/computer-security/buffer-overflow) fall into 2 broad categories.
@@ -11,7 +11,9 @@ Defenses against [buffer overflow](/s5/computer-security/buffer-overflow) fall i
 - Run-time defenses  
   Detect and abort attacks against existing programs.
 
-## Compile-Time Defenses
+## Preventive Controls
+
+### Compile-Time Defenses
 
 The first 3 remove the vulnerability itself. The last 2 instead detect stack corruption after an overflow happens, before the corrupted data is used.
 
@@ -32,7 +34,9 @@ Both canary-based defenses are bypassed by a replacement stack frame attack, sin
 
 </Note>
 
-## Run-Time Defenses
+## Exploit Mitigations
+
+### Run-Time Defenses
 
 All 3 assume corruption has already happened, and instead limit what the corrupted control-flow data can do.
 

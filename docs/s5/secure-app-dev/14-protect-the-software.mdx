@@ -1,14 +1,16 @@
 ---
 title: Protect the Software
 dateCreated: 2026-09-30T08:00:00.000Z
-lastUpdatedOn: 2026-10-07T05:27:10.962Z
+lastUpdatedOn: 2026-10-29T22:16:51.801Z
 ---
 
 Protect the Software (PS) is the second pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
 
 Stop code and released artifacts from being tampered with or leaked, at rest and in transit.
 
-## Protect All Forms of Code
+## Code Protection
+
+### Protect All Forms of Code
 
 - Version-controlled source  
   All source lives in version control, not only on a developer's local disk.
@@ -26,7 +28,7 @@ Examples:
 - Pipeline lockdown  
   A bank disables direct edits to configuration files in production branches for all personal accounts. Changes travel only through a multi-approval automated pipeline using short-lived tokens.
 
-## Verify Integrity on Release
+### Verify Integrity on Release
 
 - Published hash  
   Every release ships with a cryptographic hash of its artifact.
@@ -44,7 +46,9 @@ Examples:
 - Codecov  
   In 2021, attackers modified Codecov's Bash Uploader script so that it sent CI environment variables, including secrets, to a server they controlled. Customers who compared the script's hash to the published one could detect the change.
 
-## Archive Each Release
+## Release Retention
+
+### Archive Each Release
 
 - Exact source snapshot  
   The precise source tree used for each shipped version is retained, not just the latest `main` branch.
@@ -60,7 +64,7 @@ Examples:
 - Immutable artifact storage  
   A defense contractor mirrors approved open-source packages into an immutable private repository. The approved build stays available even if the upstream author deletes the package or publishes a malicious update.
 
-## Record Provenance
+### Record Provenance
 
 - Dependency list  
   Every dependency pulled into a build, direct and transitive, is recorded.
@@ -76,7 +80,9 @@ Examples:
 - Log4Shell  
   When Log4Shell (CVE-2021-44228) was disclosed in December 2021, organizations without an inventory of their components spent days searching for where Log4j was used. Organizations with an SBOM could query it instead.
 
-## Measure Software Protection
+## Measurement
+
+### Measure Software Protection
 
 Signing and access metrics.
 
