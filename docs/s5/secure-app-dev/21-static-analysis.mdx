@@ -1,39 +1,89 @@
 ---
 title: Static Analysis
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.355Z
+lastUpdatedOn: 2026-10-29T22:16:31.821Z
 ---
 
-[Static analysis](/s5/secure-app-dev/security-analysis#types-of-analysis) verifies software without running it.
+A type of [security analysis](/s5/secure-app-dev/security-analysis). Verifies software without running it.
+
+## Analysis Scope
+
+### Analysis Targets
+
+Static analysis can inspect:
 
 - Source code  
   Gives more context through variable names and comments. It also allows fixing found problems and is hard to decompile.
 - Executables  
   Needed when source is unavailable, or when the built artifact differs from source.
 
-## Human Analysis
+### Human Analysis
 
-Human analysis is strong on context and intent. It is expensive and prone to boredom. Inspections use defined roles per IEEE 1028.
+Human analysis is strong on context and intent. It is expensive, time-consuming and prone to boredom.
 
-## Type Checkers and Compiler Warnings
+#### Inspection Roles
 
-Type checkers and compiler warnings are not security-specific but useful. Enable `-Wall -Wextra`, `use strict`, and fix every warning so new ones stand out.
+IEEE 1028 assigns 5 roles to an inspection. Roles may be shared.
+
+- Inspection Leader  
+  Plans the inspection, conducts it, ensures it meets its objectives, and issues its output.
+- Recorder  
+  Documents anomalies, action items, decisions, and recommendations.
+- Reader  
+  Guides the team through the artifact in a logical order and highlights important parts.
+- Author  
+  Explains the artifact, ensures it meets entry criteria, and performs the required rework. Cannot be the inspection leader. Should not be the reader or recorder.
+- Inspector  
+  Identifies and describes anomalies from a relevant viewpoint, such as requirements, design, code, test, or safety. All participants are inspectors.
+
+## Code Quality Checks
+
+### Type Checker
+
+Not security-specific but useful. Finds inconsistent use of values and unsafe conversions.
+
+### Compiler Warnings
+
+Not all warnings are security related. But they ensure correctness of the code. It is recommended to enable them. Even though warnings are not high priority, they should be fixed early on, so that new warnings stand out.
 
 Examples:
 
+- GCC, the C compiler, has `-Wall -Wextra`.
+- JavaScript has `use strict`
 - `-Wimplicit-fallthrough` in Linux found real bugs in about 10% of the fall-through patches it prompted.
 
-## Unreachable Code Detection
+### Unreachable Code Detection
 
-Dead code is not itself exploitable, but it can signal skipped input validation or authentication.
+<Aka original="Unreachable code">dead code</Aka> is the code block that cannot
+execute because the surrounding control flow does not allow it to. Has no
+runtime effect. Indicates an error in the program's logic.
+
+Common causes:
+
+- Unconditional transfer  
+  A preceding `return`, `throw`, `break`, `continue`, or `goto` exits the path first.
+- Impossible condition  
+  A condition is always true or always false because of earlier assignments or contradictory tests.
+- Unused entry point  
+  A private function has no callers, or a callback is never registered.
+
+Dead code becomes security-relevant when it contains a required check. Unreachable input validation, authentication, authorization, or certificate validation leaves the protected operation exposed. It also makes code harder to maintain because reviewers may mistake the dead path for active protection.
+
+The fix is either:
+
+- Correct the control flow  
+  If it must execute.
+- Remove the deadc code  
+  If it must not execute. For the sake of completeness.
 
 Examples:
 
-- Apple's `goto fail; goto fail;` is the classic case.
+- Apple's `goto fail` bug  
+  A duplicated `goto fail;` skipped certificate validation and allowed an adversary-in-the-middle attack.
 
-## Style Checkers and Quality Scanners
+### Linter
 
-Style checkers and quality scanners compare source to pre-canned rules. Neither targets security.
+Compares source to pre-canned rules. Does not targets security.
 
 Examples:
 
@@ -41,9 +91,11 @@ Examples:
 - SpotBugs for JVM bytecode.
 - FindSecurityBugs, a SpotBugs security plugin.
 
-## Security Defect Text Scanners
+## Security Defect Detection
 
-Security defect text scanners are grep-like lexers that look for dangerous function calls. They are fast, cheap, and work on partial code, but have high false positive and false negative rates.
+### Security Defect Text Scanners
+
+Grep-like lexers that look for dangerous function calls. Fast, cheap, and work on partial code. Have high false positive and false negative rates.
 
 Examples:
 
@@ -51,7 +103,7 @@ Examples:
 - RATS
 - ITS4
 
-## Security Defect Finders
+### Security Defect Finders
 
 Security defect finders build an internal model and look for vulnerability patterns. Many aim to be sound.
 
@@ -69,10 +121,14 @@ Examples:
 - cppcheck
 - clang static analyzer
 
-## Software Composition Analysis
+## Repository Analysis
 
-Software Composition Analysis (SCA), aka. origin analysis, identifies embedded libraries and flags those with known vulnerabilities. It cross-references the NIST National Vulnerability Database. Prefer package-manager data for low false positives.
+### Software Composition Analysis
 
-## Secret Scanners
+<Aka>Origin analysis</Aka>. Identifies embedded libraries and flags those with
+known vulnerabilities. It cross-references the NIST National Vulnerability
+Database. Prefer package-manager data for low false positives.
+
+### Secret Scanners
 
 Secret scanners look for accidentally committed passwords and private keys. They are built into GitHub and GitLab.

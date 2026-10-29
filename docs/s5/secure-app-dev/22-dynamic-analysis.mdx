@@ -1,23 +1,31 @@
 ---
 title: Dynamic Analysis
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-19T12:09:04.357Z
+lastUpdatedOn: 2026-10-29T22:16:31.835Z
 ---
 
-[Dynamic analysis](/s5/secure-app-dev/security-analysis#types-of-analysis) runs the software on specific inputs and checks results against an oracle. It cannot test all inputs: adding 2 64-bit integers has $2^{128}$ cases, so exhaustive testing is infeasible. Security requirements are often of the form "X never happens", which testing cannot prove.
+A type of [security analysis](./security-analysis). Runs the software on specific inputs and checks results against an oracle.
 
-## Negative Testing
+Exhaustive testing is infeasible. For example, adding two 64-bit integers has $2^{128}$ cases.
 
-Negative testing checks what should not happen, not just what should.
+Testing can only prove what happens. Security requirements are often of the form "X never happens", which testing cannot prove.
+
+## Test Design
+
+### Negative Testing
+
+Checks what should not happen. Negative test cases assert failures.
 
 Examples:
 
 - Can I read without authorization?
 - Can I connect with an invalid certificate?
 
-## Web Application Scanners
+## Automated Techniques
 
-Web application scanners crawl forms and links like a browser, send attack-like and random data, and detect problems.
+### Web Application Scanner
+
+Crawls form and links like a browser, send attack-like and random data, and detect problems.
 
 Examples:
 
@@ -25,9 +33,9 @@ Examples:
 - W3AF
 - Burp Suite Pro
 
-## Fuzz Testing
+### Fuzz Testing
 
-Fuzz testing feeds large numbers of random or mutated inputs. It monitors for crashes, assertion failures, and memory leaks, not for correct answers. The concept comes from Barton Miller, 1988. It often finds real defects quickly, with diminishing returns after fixes.
+Feeds large numbers of random or mutated inputs. Monitors for crashes, assertion failures, and memory leaks, instead of correct answers. The concept comes from Barton Miller, 1988. It often finds real defects quickly, with diminishing returns after fixes.
 
 Input strategies:
 
@@ -39,10 +47,15 @@ Input strategies:
 
 Coverage-guided evolution routes inputs that hit new paths for more mutation.
 
-American Fuzzy Lop (AFL, AFL++) is a coverage-guided mutation fuzzer. It instruments branch counts and prioritizes inputs hitting new edges. It once produced a valid JPEG starting from the text "hello".
+Examples:
 
-## Address Sanitizer
+- American Fuzzy Lop (AFL, AFL++)  
+  A coverage-guided mutation fuzzer. It instruments branch counts and prioritizes inputs hitting new edges. It once produced a valid JPEG starting from the text "hello".
 
-Address Sanitizer (ASan) compiles with `-fsanitize=address` to catch buffer overflow, use-after-free, and double-free. It uses shadow bytes and inaccessible red zones around allocations.
+### Address Sanitizer
+
+<Aka>ASan</Aka>. Compiles with `-fsanitize=address` to catch buffer overflow,
+use-after-free, and double-free. It uses shadow bytes and inaccessible red zones
+around allocations.
 
 Overhead is roughly 2x CPU and 2x to 4x memory. Sanitizers tolerate some false positives. Production exploit mitigations tolerate none.

@@ -1,12 +1,14 @@
 ---
 title: Hybrid Analysis
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-09-30T15:28:09.378Z
+lastUpdatedOn: 2026-10-29T22:16:31.843Z
 ---
 
-[Hybrid analysis](/s5/secure-app-dev/security-analysis#types-of-analysis) combines [static analysis](/s5/secure-app-dev/static-analysis) and [dynamic analysis](/s5/secure-app-dev/dynamic-analysis).
+A mixture of [static analysis](./static-analysis) and [dynamic analysis](./dynamic-analysis).
 
-## Coverage Measures
+## Coverage and Path Exploration
+
+### Coverage Measures
 
 - Statement coverage  
   The percentage of statements executed by some test.
@@ -15,9 +17,9 @@ lastUpdatedOn: 2026-09-30T15:28:09.378Z
 
 Both reveal untested paths but cannot warn about missing code.
 
-## Concolic Testing
+### Concolic Testing
 
-Concolic testing is concrete plus symbolic execution. It walks the program path by path instead of guessing inputs, getting past checks random fuzzing almost never hits, such as magic values, checksums, and parser keywords.
+Concrete plus symbolic execution. It walks the program path by path instead of guessing inputs, getting past checks random fuzzing almost never hits, such as magic values, checksums, and parser keywords.
 
 1. Run the program on a real input.
 2. Track the branch conditions symbolically along the path taken, forming the path constraint.
@@ -33,6 +35,48 @@ Examples:
 - KLEE
 - fuzzgrind
 
-## Penetration Testing
+## Adversarial Testing
 
-Penetration testing has testers act as adversaries and try to break in. Effectiveness depends on tester skill and realistic rules of engagement. Kali Linux bundles the common tools.
+### Penetration Testing
+
+An authorized attempt to exploit weaknesses in a system. Testers act as adversaries within agreed limits. The test validates whether a weakness is reachable and measures its impact on the target.
+
+Effectiveness depends on tester skill, knowledge of the target, and realistic rules of engagement. Kali Linux bundles many common testing tools.
+
+Testers receive different amounts of information about the target:
+
+- Black-box testing  
+  No internal knowledge is supplied.
+- Gray-box testing  
+  Partial knowledge, such as user credentials or architecture diagrams, is supplied.
+- White-box testing  
+  Source code, configuration, and full system knowledge are supplied.
+
+### Rules of Engagement
+
+<Aka>RoE</Aka>. Defines what the testers may do and protect production systems
+from unintended harm.
+
+- Scope  
+  Identifies the systems, applications, networks, accounts, and data that may be tested.
+- Testing window  
+  Restricts testing to agreed times when monitoring and incident response teams are available.
+- Allowed actions  
+  States whether social engineering, denial-of-service testing, privilege escalation, or data extraction are permitted.
+- Stop conditions  
+  Defines when testing must stop, such as service degradation or exposure of sensitive data.
+- Contacts  
+  Names the people who authorize the test and receive incident notifications.
+
+Written authorization is required before reconnaissance, scanning, or exploitation begins.
+
+### Testing Workflow
+
+1. Collect information about the target and its attack surface.
+2. Enumerate reachable services, endpoints, accounts, and configurations.
+3. Identify weaknesses that can be reached within the agreed scope.
+4. Exploit a weakness only far enough to demonstrate its impact.
+5. Record evidence, affected assets, attack prerequisites, and remediation guidance.
+6. Retest after fixes are deployed.
+
+The final report ranks findings by likelihood and impact. It distinguishes confirmed vulnerabilities from observations that need further investigation. A penetration test gives evidence for the systems and time period tested. It cannot prove that no vulnerabilities exist.
