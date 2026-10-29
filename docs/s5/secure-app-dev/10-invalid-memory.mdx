@@ -1,0 +1,79 @@
+---
+title: Invalid Memory
+dateCreated: 2026-10-30T00:00:00.000Z
+lastUpdatedOn: 2026-10-29T22:43:08.657Z
+---
+
+Invalid-memory vulnerabilities access an object that is no longer valid or is interpreted incorrectly.
+
+## Use-After-Free
+
+A use-after-free vulnerability accesses a resource after it has been released. In C and C++, `free` does not invalidate pointers to the released allocation. Such pointers are dangling pointers.
+
+A system can be vulnerable to use-after-free when it has all of the following:
+
+- Resource  
+  The object that can be released.
+- Resource identifier  
+  A value that identifies the resource, such as a pointer or address.
+- Identifier holder  
+  A variable, data structure, or other entity that stores the identifier.
+
+The allocator can reuse a freed memory block for a different allocation. A dangling pointer can then read confidential data or corrupt the replacement object. A double free can corrupt allocator metadata.
+
+Use-after-free can also occur without dynamic allocation. A pointer can outlive the stack frame containing its referent.
+
+```c
+int *get_numbers(void)
+{
+  int numbers[] = {1, 2, 4, 8};
+  return numbers;
+}
+```
+
+`numbers` has automatic storage duration. Its storage ends when `get_numbers` returns. The returned pointer still holds the former stack address, but dereferencing it has undefined behaviour. A later function call can reuse that stack region for unrelated data.
+
+Define clear ownership. Release every resource exactly once. Avoid pointers to local objects.
+
+## Format Strings
+
+A format string vulnerability occurs when untrusted input controls a format string passed to a variadic formatting function.
+
+```c
+printf(user_input);
+```
+
+`user_input` is passed as the format string, not as text to print. Input such as `%p %p %p` makes `printf` fetch arguments that the caller never supplied. It reads values from argument registers or the stack and prints them as addresses.
+
+Formatting functions such as `printf`, `fprintf`, `sprintf`, and `snprintf` interpret conversion specifiers in their format string. If the format string contains more conversion specifiers than supplied arguments, the function reads values that were not supplied as arguments.
+
+- `%p`, `%x`, and `%d` can disclose register or stack contents.
+- `%s` treats its argument as the address of a null-terminated string.
+- `%n` writes the number of emitted characters through an integer pointer.
+
+Use a constant format string and pass untrusted text as an argument.
+
+```c
+printf("%s", user_input);
+```
+
+`"%s"` is the fixed format string. `user_input` is the value supplied for its only conversion specifier. Any `%` characters in `user_input` are printed as ordinary text and cannot direct `printf` to fetch or write memory.
+
+Enable compiler format warnings. Treat a warning about a non-literal format string as a defect.
+
+## Type Confusion
+
+Type confusion occurs when a resource allocated as 1 type is later accessed as an incompatible type.
+
+Compatible types are safe under polymorphism. Incompatible C and C++ casts can cause logic errors, out-of-bounds accesses, or unintended virtual method calls.
+
+- `dynamic_cast`  
+  Checks the runtime type. It fails safely for an incompatible object.
+- `static_cast`  
+  Checks type relationships at compile time. It does not validate the runtime object type.
+- `reinterpret_cast`  
+  Reinterprets an object representation without a runtime type check.
+
+C++ objects with virtual methods contain a vtable pointer. Casting an object to an unrelated class can make a virtual call select a different vtable entry, including a private method.
+
+Avoid downcasts unless the runtime type is verified. Prefer `dynamic_cast` for polymorphic downcasts. Use tagged unions or `std::variant` for values with multiple forms.

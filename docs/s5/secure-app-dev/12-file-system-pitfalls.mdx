@@ -1,0 +1,33 @@
+---
+title: File System Pitfalls
+dateCreated: 2026-10-30T00:00:00.000Z
+lastUpdatedOn: 2026-10-29T22:43:08.734Z
+---
+
+The file system controls access through owner, group, and other permissions. It also provides special permission bits including `setuid`, `setgid`, and the sticky bit.
+
+## setuid
+
+The set-user-ID bit causes an executable to run with its owner's effective user ID rather than the invoking user's ID. A setuid program owned by `root` runs with root privileges.
+
+A vulnerability in a privileged program can therefore grant the attacker the program owner's privileges.
+
+## Time-of-Check to Time-of-Use
+
+A time-of-check to time-of-use vulnerability occurs when a file changes after validation but before use. The file system is asynchronous, so a pathname can resolve to a different object between separate operations.
+
+```c
+if (access(path, R_OK) == 0) {
+  FILE *file = fopen(path, "r");
+}
+```
+
+An attacker can replace `path` with a symbolic link after `access` succeeds and before `fopen` runs. The process then reads a different file. The impact is severe when the program has elevated privileges.
+
+## Prevention
+
+- Do not use `access` to authorize a later file operation.
+- Open the file once and validate the returned file descriptor.
+- Use `open` flags such as `O_NOFOLLOW`, where appropriate.
+- Use descriptor-relative operations such as `openat` to constrain path resolution.
+- Create temporary files with `mkstemp` rather than predictable names.

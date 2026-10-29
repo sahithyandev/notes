@@ -1,0 +1,36 @@
+---
+title: Environment Security
+dateCreated: 2026-10-30T00:00:00.000Z
+lastUpdatedOn: 2026-10-29T22:43:08.718Z
+---
+
+A program executes in an environment that is not fully known at compile time. The operating system, user, configuration, loader, and file system influence that environment. It can change while the program runs.
+
+Treat environment properties as untrusted input when a less trusted user can affect them.
+
+## Environment Variables
+
+Environment variables are named strings inherited by a process. An attacker can control both their content and length.
+
+Copying an environment variable into a fixed-size buffer without a bounds check causes a buffer overflow.
+
+```c
+char name[32];
+strcpy(name, getenv("USER"));
+```
+
+Validate that `getenv` returned a value. Bound every copy into a fixed-size destination.
+
+## PATH Manipulation
+
+`PATH` is a colon-separated list of directories searched for an executable name. Functions including `execlp`, `execvp`, and `system` can use `PATH` to resolve a command.
+
+An attacker who prepends a directory containing a malicious executable can cause a program to run it before the intended executable. Use an absolute executable path for security-sensitive invocations.
+
+```c
+execl("/usr/bin/backup", "backup", NULL);
+```
+
+## Loader Variables
+
+Dynamic-loader variables such as `LD_PRELOAD` can substitute or intercept library functions. Privileged programs must run with a sanitized environment and must not rely on user-controlled loader configuration.
