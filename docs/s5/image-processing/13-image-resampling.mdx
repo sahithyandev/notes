@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-10-28T23:42:27.409Z
+lastUpdatedOn: 2026-10-29T00:08:11.203Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -50,6 +50,8 @@ A non-integer $(s_x, s_y)$ falls between source pixels, so no stored value sits 
 Replaces each new pixel with the value of the closest corner of the enclosing block, using any distance metric.
 
 Preserves most fine detail. Still prone to checkerboard and aliasing effects.
+
+Nearest neighbour copies stored values exactly. An indexed image can therefore be resampled without first converting palette indices into RGB values.
 
 ```python
 def nearest(src, sw, sh, dw, dh):

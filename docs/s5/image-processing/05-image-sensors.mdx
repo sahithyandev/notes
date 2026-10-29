@@ -1,7 +1,7 @@
 ---
 title: Image Sensors
 dateCreated: 2026-07-26T04:59:10.531Z
-lastUpdatedOn: 2026-10-28T17:58:19.650Z
+lastUpdatedOn: 2026-10-29T00:08:11.077Z
 ---
 
 A photo-sensor produces a weak electrical signal proportional to incident light.
@@ -64,9 +64,34 @@ Each photo-receptor must be read fast enough that the captured scene can be cons
 
 Delayed reading causes motion blur or the rolling shutter effect.
 
+### Rolling Shutter
+
+A rolling shutter records rows at different times. Motion during the row scan distorts the recorded geometry. The effect is not limited to rotational motion.
+
+CMOS sensors commonly use rolling shutter readout. CCD sensors can also produce the effect when their rows are read at different times.
+
+### Blooming
+
+Blooming occurs when a sensor element saturates and excess charge leaks into neighbouring elements. It creates bright streaks or enlarged bright regions.
+
+CCD sensors are more susceptible because charge is transferred through neighbouring elements during readout.
+
 ### Strobe Lighting
 
 Strobe lighting illuminates a moving subject with a short pulse. The short exposure interval limits the distance travelled during capture, freezing motion in the image.
+
+### Machine Vision Illumination
+
+Illumination determines the contrast available to a machine-vision system. A feature cannot be recovered reliably when its reflected light is indistinguishable from its background.
+
+- Uniformity  
+  Even lighting reduces brightness variation caused by position in the scene.
+- Direction  
+  A light angle can reveal surface relief or suppress shadows and specular reflections.
+- Spectrum  
+  A selected wavelength can increase contrast between materials with different spectral reflectance.
+- Intensity  
+  Sufficient light keeps the sensor response above its noise floor without saturation.
 
 <figure>
 
@@ -83,6 +108,15 @@ Vibrating cello strings captured with a rolling shutter. Each sensor row is read
 ## Sensitivity and SNR
 
 An adjustable aperture regulates incident light by controlling the exposed lens surface area. CCD sensors, due to their integrating response, can also regulate the collected signal through exposure time.
+
+Exposure control keeps the sensor response in its optimum sensitivity region.
+
+- Aperture  
+  A larger opening admits more light. It also reduces depth of field.
+- Exposure time  
+  A longer exposure collects more light. Motion during the exposure causes blur.
+- Sensor gain  
+  Electronic gain brightens the signal after capture. It also amplifies sensor noise.
 
 The response curve, output signal against incident light, has 3 regions.
 

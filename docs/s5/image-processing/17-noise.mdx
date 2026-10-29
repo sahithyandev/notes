@@ -1,7 +1,7 @@
 ---
 title: Noise
 dateCreated: 2026-08-18T07:18:54.109Z
-lastUpdatedOn: 2026-10-28T23:42:27.520Z
+lastUpdatedOn: 2026-10-29T00:08:11.287Z
 ---
 
 Noise is an unwanted component added to the true image signal during acquisition, storage or transmission, usually random. Structured corruptions introduced by processing, such as compression blocking or aliasing, are normally called artefacts instead.
@@ -82,8 +82,10 @@ Flat with no peak. Mean is $\frac{a+b}{2}$. Hard to estimate because no noise va
 
 ### Salt and Pepper Noise
 
-<Aka>impulse noise</Aka>. A fraction of pixels are forced to the minimum or
-maximum intensity. The rest are left unchanged.
+Impulse noise replaces isolated pixel values with abrupt outliers. It affects a sparse set of pixels, unlike Gaussian noise, which perturbs every pixel by a small amount.
+
+Salt and pepper noise is a form of impulse noise. A fraction of pixels are
+forced to the minimum or maximum intensity. The rest are left unchanged.
 
 $$
 p(z) = \begin{cases} P_a & z = z_{\min} \\ P_b & z = z_{\max} \\ 1 - P_a - P_b & \text{pixel unchanged} \end{cases}
@@ -137,6 +139,8 @@ Only works for a static scene, since the derivation assumes $F$ is constant acro
 </Note>
 
 Frame averaging also requires frames to be spatially aligned and their noise to be independent. It suits a stationary camera observing an empty scene. It does not suit moving traffic or a reversing vehicle.
+
+For independent zero-mean noise with variance $\sigma^2$, the average of $n$ frames has variance $\sigma^2/n$. Its noise standard deviation is $\sigma/\sqrt{n}$.
 
 ## Mean Filter
 
@@ -194,6 +198,15 @@ Replaces the pivot pixel with the median value of its neighbourhood.
 
 - Preserves edges better than mean filtering
 - Well suited to salt and pepper noise, since outlier values get discarded rather than averaged in
+
+### Mixed Noise
+
+An image with impulse noise and Gaussian noise needs both outlier removal and local averaging.
+
+- Apply a median filter first to remove the impulse outliers.
+- Apply a mean or Gaussian filter next to reduce the remaining random noise.
+
+Applying the averaging filter first spreads an impulse into neighbouring pixels. The median filter then cannot remove the original outlier as cleanly.
 
 ## Worked Example
 

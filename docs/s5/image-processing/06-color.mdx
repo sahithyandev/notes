@@ -1,7 +1,7 @@
 ---
 title: Color
 dateCreated: 2026-07-26T04:59:00.680Z
-lastUpdatedOn: 2026-10-28T17:58:19.668Z
+lastUpdatedOn: 2026-10-29T00:08:11.099Z
 ---
 
 Color is a construct in the brain. It doesn't correspond to a physical phenomenon. Mixing light waves of different wavelengths produces the perception of different colors.
@@ -120,7 +120,20 @@ The weights follow from the RGB primaries and white point fixed by the chosen st
 
 Discarding $C_r, C_b$ gives a monochrome image directly.
 
-The human visual system is more sensitive to luminance than color, so YCrCb formats often allocate bits in a 4:2:2 ratio. Widely used for this inherent compression capability.
+The human visual system is more sensitive to luminance than color. YCrCb can therefore preserve luminance while reducing chrominance precision or resolution.
+
+### Chroma Precision Reduction
+
+An $8{:}4{:}4$ YCrCb representation stores $8$ bits for $Y$ and $4$ bits each for $C_r$ and $C_b$. Each pixel uses $16$ bits rather than the $24$ bits of 8-bit RGB.
+
+- Luminance  
+  Keeps $256$ levels, so grey-level detail is largely retained.
+- Chrominance  
+  Keeps $16$ levels per component, so the conversion loses color detail.
+- RGB reconstruction  
+  Converts the coarsely quantized chrominance values back into red, green and blue. The reconstructed RGB channels therefore have fewer distinct levels than the original.
+
+Chroma subsampling reduces chrominance sample resolution instead of bit depth. Both approaches reduce data while retaining more luminance detail than color detail.
 
 ## Per-Pixel Storage
 
@@ -189,7 +202,7 @@ Each pixel stores its color directly in 15 or 16 bits, with fewer bits per chann
 
 ### Indexed Image Storage
 
-A $640 \times 480$ image uses a palette of $256$ RGB colours. Find the storage required for indexed and true-color representations.
+A $640 \times 480$ image uses a palette of $256$ RGB colors. Find the storage required for indexed and true-color representations.
 
 <Solution>
 

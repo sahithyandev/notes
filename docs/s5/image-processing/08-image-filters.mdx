@@ -1,7 +1,7 @@
 ---
 title: Image Filters
 dateCreated: 2026-10-28T22:46:31.625Z
-lastUpdatedOn: 2026-10-28T23:42:27.278Z
+lastUpdatedOn: 2026-10-29T00:08:11.141Z
 ---
 
 An image filter transforms pixels in a [digital image](/s5/image-processing/image-model) from values in a local neighbourhood. A filter suppresses or strengthens selected image detail.
@@ -26,6 +26,41 @@ Here:
 </Symbols>
 
 The kernel moves over every pixel. The weighted sum becomes the output pixel.
+
+## Correlation and Convolution
+
+Correlation places the kernel over the image without reversing it.
+
+$$
+P_{\text{corr}}(x,y) = \sum_{i=-N}^{N}\sum_{j=-M}^{M} H(i,j)\,I(x+i,y+j)
+$$
+
+Convolution reverses the kernel by $180^\circ$ before taking the weighted sum. The filter-kernel equation above is convolution.
+
+$$
+P_{\text{conv}}(x,y) = \sum_{i=-N}^{N}\sum_{j=-M}^{M} H(i,j)\,I(x-i,y-j)
+$$
+
+Symmetric kernels give the same result for both operations. A non-symmetric kernel gives the correlation result of its $180^\circ$ rotation under convolution.
+
+Both operations are linear:
+
+$$
+H * (aI + bJ) = a(H * I) + b(H * J)
+$$
+
+Convolution is commutative, associative and distributive over addition. A cascade of linear filters, such as Gaussian smoothing followed by a Laplacian, remains a linear operation.
+
+### Image Boundaries
+
+The full neighbourhood is unavailable at an image boundary. A filtering implementation must choose a boundary rule.
+
+- Replication  
+  Repeat the nearest edge row or column outside the image.
+- Wrapping  
+  Take missing pixels from the opposite edge. Suitable for periodic images.
+- Reduced support  
+  Change the kernel shape or its normalization near the boundary.
 
 ### Kernel Properties
 
@@ -243,6 +278,8 @@ Its response is near $0$ in constant regions and large at intensity transitions.
 ## Non-Linear Filters
 
 Non-linear filters do not form a weighted sum. The median filter replaces the pivot with the median neighbourhood intensity.
+
+A median filter has no numeric kernel. It uses a neighbourhood window, commonly $3 \times 3$. The window identifies the $9$ values to sort. No coefficient is multiplied by a pixel value.
 
 It removes isolated salt-and-pepper noise while preserving edges better than mean or Gaussian filtering.
 
