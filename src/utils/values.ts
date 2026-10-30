@@ -14,7 +14,6 @@ export const WIP_PREFIXES: string[] = [
   "s5/business-economics-and-financial-accounting",
   "s5/calculus",
   "s5/numerical-methods",
-  "s5/secure-app-dev",
 ];
 
 export const isWip = (slug: string): boolean =>
