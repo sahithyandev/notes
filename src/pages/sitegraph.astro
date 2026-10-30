@@ -398,11 +398,34 @@ const graph = NoteGraph.build(
   const results = document.getElementById("results")!;
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Tweak these values to explore the graph's density and structure.
+  const layout = {
+    groupGap: 22,
+    groupRadiusFactor: 18,
+    groupRadiusPadding: 16,
+    initialNodeRadiusFactor: 18,
+    initialNodeRadiusOffset: 0.5,
+    initialNodeAngle: Math.PI * (3 - Math.sqrt(5)),
+    nodeRadius: 8,
+    entryDelayStep: 37,
+    entryDelayCycle: 500,
+  };
+  const forces = {
+    alphaDecay: 0.03,
+    linkDistance: 64,
+    prerequisiteLinkStrength: 0.006,
+    moduleLinkStrength: 1,
+    chargeStrength: -44,
+    chargeDistanceMax: 140,
+    collisionPadding: 10,
+    collisionIterations: 3,
+    anchorStrength: 0.1,
+  };
+
   // ---------------------------------------------------------------- layout
   // Three nested levels: semesters on a ring, modules inside a semester and
   // groups (a module's own notes, or one submodule) inside a module. Each
   // level places its children on a circle just big enough to keep them apart.
-  const GAP = 60;
   const groupCounts = new Map<string, number>();
   const groupsByModule = new Map<string, string[]>();
   const modulesBySem = new Map<number, string[]>();
@@ -418,7 +441,9 @@ const graph = NoteGraph.build(
     }
     groupsByModule.get(n.module)!.push(n.group);
   }
-  const groupR = (g: string) => 18 * Math.sqrt(groupCounts.get(g)!) + 16;
+  const groupR = (g: string) =>
+    layout.groupRadiusFactor * Math.sqrt(groupCounts.get(g)!) +
+    layout.groupRadiusPadding;
 
   // Returns the radius that encloses the whole ring of children
   function ringLayout(
@@ -431,10 +456,12 @@ const graph = NoteGraph.build(
     let ring = 0;
     if (items.length > 1) {
       const byCircumference =
-        radii.reduce((sum, r) => sum + 2 * r + GAP, 0) / (2 * Math.PI);
+        radii.reduce((sum, r) => sum + 2 * r + layout.groupGap, 0) /
+        (2 * Math.PI);
       // The 2 biggest children must clear each other even when adjacent
       const byPair =
-        (radii[0] + radii[1] + GAP) / (2 * Math.sin(Math.PI / items.length));
+        (radii[0] + radii[1] + layout.groupGap) /
+        (2 * Math.sin(Math.PI / items.length));
       ring = Math.max(byCircumference, byPair);
     }
     items.forEach((k, i) => {
@@ -460,7 +487,7 @@ const graph = NoteGraph.build(
   const semList = [...modulesBySem.keys()].sort();
   const ringR =
     semList.length > 1
-      ? (2 * Math.max(...semRadius.values()) + GAP * 2) /
+      ? (2 * Math.max(...semRadius.values()) + layout.groupGap * 2) /
         (2 * Math.sin(Math.PI / semList.length))
       : 0;
   const semAnchors = new Map(
@@ -479,16 +506,18 @@ const graph = NoteGraph.build(
     const [gx, gy] = groupOffsets.get(n.group)!;
     const ax = sx + mx + gx;
     const ay = sy + my + gy;
-    const radius = 18 * Math.sqrt(k + 0.5);
-    const angle = k * Math.PI * (3 - Math.sqrt(5));
+    const radius =
+      layout.initialNodeRadiusFactor *
+      Math.sqrt(k + layout.initialNodeRadiusOffset);
+    const angle = k * layout.initialNodeAngle;
     return {
       ...n,
       ax,
       ay,
       x: ax + Math.cos(angle) * radius,
       y: ay + Math.sin(angle) * radius,
-      r: 5,
-      delay: (i * 37) % 500,
+      r: layout.nodeRadius,
+      delay: (i * layout.entryDelayStep) % layout.entryDelayCycle,
       ins: [],
       outs: [],
     };
@@ -562,19 +591,31 @@ const graph = NoteGraph.build(
 
   // ------------------------------------------------------------ simulation
   const sim = forceSimulation(nodes)
-    .alphaDecay(0.03)
+    .alphaDecay(forces.alphaDecay)
     .force(
       "link",
       forceLink(
         links.map(([source, target, kind]) => ({ source, target, kind })),
       )
-        .distance(34)
-        .strength((l: { kind: number }) => (l.kind ? 0.006 : 1)),
+        .distance(forces.linkDistance)
+        .strength((l: { kind: number }) =>
+          l.kind ? forces.prerequisiteLinkStrength : forces.moduleLinkStrength,
+        ),
     )
-    .force("charge", forceManyBody().strength(-30).distanceMax(140))
-    .force("collide", forceCollide<GNode>((d) => d.r + 4).iterations(2))
-    .force("x", forceX<GNode>((d) => d.ax).strength(0.1))
-    .force("y", forceY<GNode>((d) => d.ay).strength(0.1))
+    .force(
+      "charge",
+      forceManyBody()
+        .strength(forces.chargeStrength)
+        .distanceMax(forces.chargeDistanceMax),
+    )
+    .force(
+      "collide",
+      forceCollide<GNode>((d) => d.r + forces.collisionPadding).iterations(
+        forces.collisionIterations,
+      ),
+    )
+    .force("x", forceX<GNode>((d) => d.ax).strength(forces.anchorStrength))
+    .force("y", forceY<GNode>((d) => d.ay).strength(forces.anchorStrength))
     .stop();
   // Settle fully before the first draw, the live ticks only polish it
   const settleTicks = Math.ceil(
@@ -760,8 +801,9 @@ const graph = NoteGraph.build(
       ctx.lineTo(tx - Math.cos(a + 0.4) * size, ty - Math.sin(a + 0.4) * size);
       ctx.closePath();
     };
-    const drawEdges = (pick: (l: Link) => boolean) => {
+    const drawEdges = (pick: (l: Link) => boolean, drawArrowheads = true) => {
       const size = 8 / scale;
+      if (!drawArrowheads) return;
       ctx.beginPath();
       for (const l of links) {
         if (!pick(l)) continue;
@@ -790,9 +832,9 @@ const graph = NoteGraph.build(
     ctx.strokeStyle = textPrimary;
     ctx.fillStyle = textPrimary;
     for (const kind of [0, 1]) {
-      ctx.lineWidth = (kind ? 1.2 : 1.8) / scale;
-      ctx.globalAlpha = near ? 0.04 : kind ? 0.16 : 0.55;
-      drawEdges((l) => l[2] === kind && shown(l) && !touches(l));
+      ctx.lineWidth = (kind ? 1.2 : 1.1) / scale;
+      ctx.globalAlpha = near ? 0.04 : kind ? 0.16 : 0.24;
+      drawEdges((l) => l[2] === kind && shown(l) && !touches(l), kind === 1);
     }
 
     // Edges of the focused note, or of the longest path, flow along their direction
@@ -822,9 +864,9 @@ const graph = NoteGraph.build(
       const [r, g, b] = semRgb[n.sem];
       ctx.globalAlpha = lit ? 1 : visible(n) ? 0.12 : 0.05;
       if (lit) {
-        ctx.fillStyle = `rgba(${r},${g},${b},0.18)`;
+        ctx.fillStyle = `rgba(${r},${g},${b},0.12)`;
         ctx.beginPath();
-        ctx.arc(n.x!, n.y!, rad * 2.1, 0, Math.PI * 2);
+        ctx.arc(n.x!, n.y!, rad * 1.75, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.fillStyle = semColors[n.sem];
