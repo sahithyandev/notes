@@ -1,7 +1,7 @@
 ---
 title: Discretionary Access Control
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-10-29T22:16:51.646Z
+lastUpdatedOn: 2026-10-30T04:09:59.349Z
 ---
 
 Discretionary Access Control (DAC) is Linux's traditional security model. The owner of a resource decides who may access it, by setting permissions on it. Access decisions are based on the identity (UID and GID) of the requesting process. A process running with root privileges is granted unrestricted access, while other accounts can do much less. Attackers therefore target root privileges.
@@ -21,9 +21,7 @@ The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only
 
 Users and groups are managed with `useradd`, `usermod`, `userdel`, and the equivalent `group*` commands.
 
-## Permission Model
-
-### File Permissions
+## File Permissions
 
 Every file has 2 owners, a user and a group, plus a third permission set for all other users. Each of the 3 sets carries read, write, and execute permissions, in the order user, group, other.
 
@@ -31,7 +29,39 @@ Permissions are set with `chmod`. Numerically, each set is 1 octal digit: read c
 
 <PermissionBreakdown bits="-rw-rw-r--" />
 
-#### Special Permission Bits
+### Access Transaction
+
+The kernel's decision for an attempted operation.
+
+1. A subject, usually a process, requests an action on an object.
+2. The kernel identifies the subject through its effective UID and GIDs.  
+   TODO: What is effective UID and GID
+3. The kernel identifies the object's owner, group, mode bits, and any applicable ACL or MAC policy.
+4. The kernel selects the owner, group, or other permission class.
+5. The action is allowed only when the selected class grants the required permission.
+
+For example, opening `report.txt` for writing requires write permission on the file. Creating `report.txt` requires write and execute permission on its containing directory.
+
+### Permission Examples
+
+The following settings assume the deployment user owns the files and the web-server group needs only read access.
+
+- Sensitive PHP configuration  
+  `chmod 640 config.php`. The owner can read and write. The web-server group can read. Other users have no access.
+- Shell script run only by its owner  
+  `chmod 700 backup.sh`. Only the owner can read, write, and execute it.
+- `.htaccess` file  
+  `chmod 644 .htaccess`. The owner can modify it. The web server and other local users can read it.
+- Website image  
+  `chmod 644 logo.png`. The owner can modify it. The web server can read and serve it.
+
+<Note>
+
+The exact mode depends on ownership and the service account. Grant the web server only the access it needs. A file containing a secret should not be world-readable.
+
+</Note>
+
+### Special Permission Bits
 
 On top of the 9 standard permission bits, there are 3 special permission bits, each a fourth leading octal digit in `chmod`:
 
@@ -50,7 +80,7 @@ SetUID and SetGID are dangerous on a file owned by root or another privileged ac
 
 SetUID and SetGID should only be used on binaries, not shell scripts. A script's interpreter reads its own environment, so the invoking user can hijack it via `PATH` or `IFS` even under an elevated UID. Locating and opening the interpreter are 2 separate steps, and swapping the script between them lets an attacker substitute it, the race Linux avoids by ignoring SetUID on scripts.
 
-### Directory Permissions
+## Directory Permissions
 
 Same permissions are applied to the directory.
 

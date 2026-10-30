@@ -1,7 +1,7 @@
 ---
 title: Produce Well-Secured Software
 dateCreated: 2026-09-30T08:00:00.000Z
-lastUpdatedOn: 2026-10-29T22:43:08.871Z
+lastUpdatedOn: 2026-10-30T04:09:59.410Z
 ---
 
 Produce Well-Secured Software (PW) is the third pillar of the [Secure Software Development Framework](/s5/secure-app-dev/secure-software-development-framework).
@@ -52,6 +52,12 @@ Examples:
   Developers follow a documented coding standard rather than individual style, so review and tooling can assume a consistent baseline.
 - Tool over human for error-prone tasks  
   A task with a known high human error rate, such as manual memory management or manual escaping, is handed to a tool wherever one exists.
+
+#### C and Java
+
+C uses explicit dynamic allocation through functions such as `malloc()` and `free()`. It permits direct pointer arithmetic and arbitrary writes through pointers. This gives precise low-level control, but a missing bounds check, invalid free, or stale pointer causes undefined behavior and can corrupt memory.
+
+Java allocates objects on the managed heap and reclaims unreachable objects through garbage collection. Array accesses are bounds checked. References are checked before dereference. These controls prevent common buffer overflow, use-after-free, and invalid-free errors. Java code is generally easier to audit because object lifetime and access are explicit in the language runtime rather than distributed across manual allocation paths.
 
 Examples:
 

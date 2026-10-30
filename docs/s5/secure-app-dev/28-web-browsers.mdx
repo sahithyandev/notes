@@ -1,7 +1,7 @@
 ---
 title: Web Browsers
 dateCreated: 2026-09-03T05:28:58.273Z
-lastUpdatedOn: 2026-10-29T22:43:09.053Z
+lastUpdatedOn: 2026-10-30T04:09:59.435Z
 ---
 
 A browser is a large, complex, network-facing codebase written in memory-unsafe languages, with features added constantly.
@@ -37,6 +37,12 @@ Limitations:
 - Every renderer can request cross-origin images and scripts, so it effectively sees many cookies.
 
 Auto-update shipped from the start, and it is now the delivery mechanism for the whole platform.
+
+#### Renderer Design Tradeoffs
+
+A single renderer process can host 1 thread per website. Uses less memory because threads share the address space, code, and runtime structures. Thread creation and context switches also cost less. The shared state weakens fault isolation. A crash, memory-corruption exploit, or resource exhaustion in 1 thread can affect every website in the renderer. A compromised thread can also attempt to access another website's data through a renderer vulnerability or a speculative side channel.
+
+A renderer process per website gives each website a separate virtual-memory boundary. Ordinary reads and writes cannot cross that boundary. A renderer crash normally destroys only 1 website's state. The isolation costs more memory because every renderer needs its own address space, heap, stack, and runtime state. Cross-process messaging and process creation also cost more than equivalent thread operations.
 
 ### Site Isolation
 

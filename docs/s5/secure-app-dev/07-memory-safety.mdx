@@ -1,7 +1,7 @@
 ---
 title: Memory Safety
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-10-29T22:16:51.695Z
+lastUpdatedOn: 2026-10-30T04:09:59.379Z
 ---
 
 A program execution is memory safe **iff** none of the following occur:
@@ -71,3 +71,17 @@ Adopting a memory safe language costs runtime overhead and loses some direct, lo
 ### Overflow Categories
 
 Overflows are the most common form of memory safety violation. They are mostly caused by missing bounds checks, can be abused to read and write memory, and can occur on buffers and integers.
+
+### Recognizing Violations in C
+
+`buf[i + 1]` is an out-of-bounds read when `buf` has 5 elements and a loop permits `i = 4`. Valid indices are 0 through 4. The read attempts `buf[5]`.
+
+Using an uninitialized local variable, such as `int buf1[5]` before assigning `buf1[i]`, is an uninitialized read. Its value is indeterminate.
+
+After `free(ptr)`, every alias of the allocation becomes invalid. Assigning `alias = ptr` before the free does not preserve the allocation. Writing through `ptr` or `alias` afterwards is use after free. Calling `free()` a second time is a double free.
+
+Pointer arithmetic must remain within the same allocated object, or 1 position past its end without dereferencing that position. If `buf` holds 3 integers, `int *p = buf + 1` points at `buf[1]`. `p[2]` dereferences `buf[3]`, which is out of bounds.
+
+Recursion needs a reachable base case. A function that calls itself with `n - 1` while starting at a negative `n` moves farther from zero. It recurses until stack exhaustion.
+
+`scanf("%s", password)` and `gets(buffer)` have no destination-size bound. Input longer than the array overwrites adjacent stack data. Use `fgets(buffer, sizeof buffer, stdin)` or a width such as `scanf("%7s", password)` for an 8-byte array.

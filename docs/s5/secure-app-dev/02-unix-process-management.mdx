@@ -3,7 +3,7 @@ title: Unix Process Management
 prereqs:
   - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-10-29T22:16:51.615Z
+lastUpdatedOn: 2026-10-30T04:15:40.353Z
 ---
 
 Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
@@ -38,6 +38,19 @@ Each PCB points to the address space of its process. The address space is divide
   The `argv` and `envp` strings, placed at the top of the user address space.
 
 The kernel is mapped into the upper part of the address space, but is not accessible from user mode.
+
+#### PCB Contexts
+
+The PCB preserves the state needed to stop 1 process and resume it later. Its 3 main contexts are:
+
+- Process context  
+  PID, parent PID, process state, scheduling priority, accounting data, and open-file references.
+- Hardware context  
+  Program counter, stack pointer, general-purpose registers, and processor status word.
+- Memory-management context  
+  Page-table base address, segment mappings, memory limits, and protection information.
+
+Multiprogramming works because the scheduler saves the running process context in its PCB, then restores another process context. Each process therefore appears to own a processor and address space.
 
 ## Process Lifecycle
 
@@ -271,3 +284,42 @@ while true
 - Memory and CPU time are consumed by the running copies, so the system stops responding.
 
 Limiting the number of processes per user (`ulimit -u`) contains this.
+
+#### Fork Trace and Zombies
+
+```c
+pid_t first = fork();
+
+if (first == 0) {
+    fork();
+    printf("Hi!\n");
+    exit(0);
+}
+
+sleep(1);
+printf("Hey!\n");
+fork();
+printf("Hello!!\n");
+```
+
+<Solution>
+
+The process tree has 4 processes:
+
+```text
+P0
+├── P1
+│   └── P3
+└── P2
+```
+
+- `P0` is the original process.
+- `P1` is the first child.
+- `P3` is created by `P1`.
+- `P2` is created by `P0` after the sleep.
+
+`Hi!` is printed 2 times. `Hey!` is printed 1 time. `Hello!!` is printed 2 times. The `Hi!` output precedes `Hey!` because the original parent sleeps. The 2 `Hello!!` lines have no fixed order.
+
+`P1` terminates while `P0` sleeps. The kernel retains `P1`'s PCB and exit status until `P0` calls `wait()` or `waitpid()`. `P1` is a zombie during that interval. Adding `waitpid()` for every child, or installing a `SIGCHLD` handler that reaps children, prevents unreaped zombies.
+
+</Solution>

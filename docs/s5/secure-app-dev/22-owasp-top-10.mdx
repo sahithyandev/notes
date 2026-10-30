@@ -1,7 +1,7 @@
 ---
 title: OWASP Top 10
 dateCreated: 2026-09-03T07:42:03.136Z
-lastUpdatedOn: 2026-10-29T22:43:08.955Z
+lastUpdatedOn: 2026-10-30T04:09:59.424Z
 ---
 
 The OWASP Top 10 is a list of the most critical web application security risks, maintained by the Open Web Application Security Project. The categories below follow the classic list taught with WebGoat.
@@ -37,6 +37,16 @@ Prevention:
 - `SameSite` cookies, so the browser does not attach them to cross-site requests.
 - Eliminate XSS, which defeats token protection.
 
+#### Attack Trace
+
+1. The victim authenticates to `bank.com`. The browser stores a session cookie.
+2. The victim then opens `evil.com` without logging out of `bank.com`.
+3. `evil.com` causes the browser to submit a request to `bank.com`, for example a hidden form that transfers money to the attacker.
+4. The browser attaches the `bank.com` cookie because the request targets `bank.com`.
+5. `bank.com` accepts the request if it cannot distinguish the attacker-created request from a form deliberately submitted by the victim.
+
+An anti-CSRF token prevents the attack because `evil.com` cannot read a token from a `bank.com` page under the same-origin policy. `SameSite=Lax` or `SameSite=Strict` cookies reduce ambient cookie attachment. Origin or Referer validation is a further server-side check.
+
 ## Access Control Failures
 
 ### Insecure Direct Object Reference
@@ -58,7 +68,18 @@ An injection flaw concatenates untrusted input into an interpreted command, SQL,
 Examples:
 
 - In `SELECT * FROM users WHERE login = '<input>' AND password = '<input>'`, the input `' OR '' = '';--` bypasses authentication.
-- Stacked queries can run `xp_cmdshell` to add OS accounts.
+- A stacked query can call SQL Server's `xp_cmdshell` when it is enabled and the database account has the required privilege.
+
+SQL does not execute operating-system commands by itself. Some database products expose operating-system features through stored procedures, extensions, or administrative tools. SQL Server's `xp_cmdshell` passes its argument to the operating system. The resulting process runs with the SQL Server service account's permissions.
+
+SQL injection can therefore damage systems outside the database when all of these conditions hold:
+
+- The injection point permits an extra statement or another route to the operating-system feature.
+- The database feature is enabled.
+- The compromised database account has permission to use it.
+- The database service account has permissions that make the command harmful.
+
+`xp_cmdshell` is commonly disabled and restricted to highly privileged SQL Server accounts. These controls prevent a low-privilege injected query from becoming operating-system command execution.
 
 Prevention:
 
@@ -66,6 +87,12 @@ Prevention:
 - Strong typing and business-logic validation of input.
 - Least privilege for the database account, read-only where possible.
 - Escaping questionable characters.
+
+#### Least Privilege for SQL Injection
+
+Prepared statements prevent untrusted input from changing SQL syntax. Least privilege limits the damage if injection still occurs.
+
+A login service account needs only `SELECT` on the account records it checks. It does not need `DROP`, `ALTER`, `CREATE USER`, access to unrelated tables, or operating-system command execution. An injected query can then read only the account data granted to that account, and cannot alter the schema or create an administrator.
 
 ## Identity and Data Protection
 
