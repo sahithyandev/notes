@@ -20,6 +20,12 @@ const notes: NoteInput[] = [
     filePath: "docs/s2/physics/01-third.mdx",
     prereqs: ["s1/math/second"],
   },
+  {
+    id: "s2/physics/fourth",
+    title: "Fourth",
+    filePath: "docs/s2/physics/02-fourth.mdx",
+    prereqs: ["s1/math/second"],
+  },
 ];
 
 describe("buildSiteGraphData", () => {
@@ -31,6 +37,7 @@ describe("buildSiteGraphData", () => {
       "s1/math/first",
       "s1/math/second",
       "s2/physics/third",
+      "s2/physics/fourth",
     ]);
     expect(data.nodes[0]).toMatchObject({
       ax: expect.any(Number),
@@ -55,9 +62,15 @@ describe("buildSiteGraphData", () => {
         group: "s2/physics",
         sem: 2,
         label: "Physics",
-        members: ["s2/physics/third"],
+        members: ["s2/physics/third", "s2/physics/fourth"],
       },
     ]);
     expect(() => JSON.stringify(data)).not.toThrow();
+  });
+
+  test("ranks direct links that cross module boundaries", () => {
+    expect(data.moduleDependencies).toEqual([
+      { from: "s1/math", to: "s2/physics", links: 2 },
+    ]);
   });
 });

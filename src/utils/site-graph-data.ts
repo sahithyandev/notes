@@ -35,11 +35,18 @@ export interface SiteGraphBlob {
   members: string[];
 }
 
+export interface SiteGraphModuleDependency {
+  from: string;
+  to: string;
+  links: number;
+}
+
 export interface SiteGraphData {
   nodes: SiteGraphNode[];
   edges: GraphEdge[];
   semList: number[];
   blobs: SiteGraphBlob[];
+  moduleDependencies: SiteGraphModuleDependency[];
   longestPath: string[] | null;
 }
 
@@ -75,6 +82,7 @@ const prettify = (slug: string) =>
 
 /** Prepares the static data that the site graph client needs to render. */
 export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
   const groupCounts = new Map<string, number>();
   const groupsByModule = new Map<string, string[]>();
   const modulesBySem = new Map<number, string[]>();
@@ -175,11 +183,34 @@ export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
     members: members.map((node) => node.id),
   }));
 
+  // Keep only edges that cross a module boundary. Multiple direct note links
+  // between the same modules become one useful relationship for the overview.
+  const dependencyCounts = new Map<string, SiteGraphModuleDependency>();
+  for (const edge of graph.edges) {
+    const from = nodeById.get(edge.from);
+    const to = nodeById.get(edge.to);
+    if (!from || !to || from.module === to.module) continue;
+    const key = `${from.module}\u0000${to.module}`;
+    const dependency = dependencyCounts.get(key);
+    if (dependency) {
+      dependency.links++;
+    } else {
+      dependencyCounts.set(key, { from: from.module, to: to.module, links: 1 });
+    }
+  }
+  const moduleDependencies = [...dependencyCounts.values()].sort(
+    (a, b) =>
+      b.links - a.links ||
+      a.from.localeCompare(b.from) ||
+      a.to.localeCompare(b.to),
+  );
+
   return {
     nodes,
     edges: graph.edges,
     semList,
     blobs,
+    moduleDependencies,
     longestPath: graph.longestPath(),
   };
 }
