@@ -1,3 +1,18 @@
+---
+interface LinkItem {
+  href: string;
+  label: string;
+}
+
+const LINKS: readonly LinkItem[] = Object.freeze([
+  { href: "/site-graph", label: "Site Graph" },
+  { href: "/glossary", label: "Glossary" },
+  { href: "/notebooks", label: "Notebooks" },
+  { href: "/license", label: "License" },
+  { href: "/security", label: "Security" },
+]);
+---
+
 <footer class="footer">
   <div class="footer-inner">
     <span class="footer-copy">
@@ -7,11 +22,9 @@
       </a>
     </span>
     <nav class="footer-links" aria-label="Footer">
-      <a href="/site-graph">Site Graph</a>
-      <a href="/glossary">Glossary</a>
-      <a href="/notebooks">Notebooks</a>
-      <a href="/license">License</a>
-      <a href="/security">Security</a>
+      {LINKS.map(({ href, label }) => (
+        <a href={href}>{label}</a>
+      ))}
       <button type="button" class="footer-shortcuts" data-open-shortcuts>
         Shortcuts (?)
       </button>
