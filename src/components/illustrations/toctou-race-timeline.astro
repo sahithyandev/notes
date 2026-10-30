@@ -1,0 +1,125 @@
+---
+// A static trace keeps the race visible as one interleaved timeline.
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("toctou");
+const actors = [
+  { name: "Privileged program", x: 130 },
+  { name: "File system", x: 380 },
+  { name: "Attacker", x: 630 },
+];
+---
+
+<figure class="toctou" id={uid}>
+  <svg
+    viewBox="0 0 760 282"
+    role="img"
+    aria-labelledby={`${uid}-title ${uid}-desc`}
+  >
+    <title id={`${uid}-title`}>Time-of-check to time-of-use race</title>
+    <desc id={`${uid}-desc`}>
+      A privileged program checks a safe file. An attacker replaces its pathname
+      with a symbolic link before the program opens it, causing it to open a
+      protected file instead.
+    </desc>
+    <defs>
+      <ArrowMarker id={`${uid}-arrow`} />
+      <ArrowMarker id={`${uid}-danger`} fill="var(--danger, #b74747)" />
+    </defs>
+
+    {actors.map((actor) => (
+      <g>
+        <rect x={actor.x - 76} y="12" width="152" height="38" rx="7" />
+        <text x={actor.x} y="36" text-anchor="middle" class="actor">
+          {actor.name}
+        </text>
+        <line x1={actor.x} y1="50" x2={actor.x} y2="258" class="lifeline" />
+      </g>
+    ))}
+
+    <g class="message">
+      <path d="M 130 88 L 368 88" marker-end={`url(#${uid}-arrow)`} />
+      <text x="249" y="78" text-anchor="middle">
+        check: safe.txt
+      </text>
+    </g>
+    <g class="message">
+      <path d="M 380 123 L 142 123" marker-end={`url(#${uid}-arrow)`} />
+      <text x="261" y="113" text-anchor="middle">
+        allowed
+      </text>
+    </g>
+    <g class="message danger">
+      <path d="M 630 158 L 392 158" marker-end={`url(#${uid}-danger)`} />
+      <text x="511" y="148" text-anchor="middle">
+        replace path with symlink
+      </text>
+    </g>
+    <g class="message">
+      <path d="M 130 193 L 368 193" marker-end={`url(#${uid}-arrow)`} />
+      <text x="249" y="183" text-anchor="middle">
+        open path
+      </text>
+    </g>
+    <g class="message danger">
+      <path d="M 380 228 L 142 228" marker-end={`url(#${uid}-danger)`} />
+      <text x="261" y="218" text-anchor="middle">
+        opens protected file
+      </text>
+    </g>
+  </svg>
+  <figcaption>
+    The attacker changes the pathname in the gap between the check and the later
+    open operation.
+  </figcaption>
+</figure>
+
+<style>
+  .toctou {
+    max-width: 760px;
+    margin: 24px auto;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+  }
+  .actor {
+    fill: var(--text-primary);
+    font: 700 12px var(--font-ui);
+  }
+  .lifeline {
+    stroke: var(--border-strong);
+    stroke-dasharray: 3 4;
+  }
+  .message path {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+  .message text {
+    fill: var(--text-secondary);
+    font: 11px var(--font-mono);
+  }
+  .message.danger path {
+    stroke: var(--danger, #b74747);
+    stroke-width: 1.8;
+  }
+  .message.danger text {
+    fill: var(--danger, #b74747);
+    font-weight: 700;
+  }
+  figcaption {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.45;
+    text-align: center;
+  }
+</style>

@@ -3,7 +3,7 @@ title: Unix Process Management
 prereqs:
   - s3/operating-systems/process
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-10-30T04:15:40.353Z
+lastUpdatedOn: 2026-10-30T04:21:55.565Z
 ---
 
 Unix identifies each process by a PID, an integer unique among running processes. Beyond the [OS context](/s3/operating-systems/process#os-context) tracked generically, Unix also tracks working directory and umask.
@@ -138,6 +138,8 @@ int main(int argc, char *argv[], char *envp[])
 `fork()` followed by `exec()` is the standard Unix mechanism to run a new program in a new process: the parent spawns a child, the child replaces itself via `exec()`, and the parent continues or exits.
 
 </Note>
+
+<ForkExecFlow />
 
 ```c
 pid_t pid = fork();

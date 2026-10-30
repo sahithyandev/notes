@@ -1,0 +1,139 @@
+<figure class="heartbleed">
+  <div class="trace">
+    <div class="row request" aria-label="Attacker request">
+      <span class="tag">Request</span>
+      <span class="byte actual">
+        <code>H</code>
+        <small>1 real byte</small>
+      </span>
+      <span class="claim">claims 64 KB</span>
+    </div>
+    <div class="copy" aria-hidden="true">
+      server copies 64 KB <span>↓</span>
+    </div>
+    <div
+      class="row response"
+      aria-label="Server response containing a requested byte followed by leaked memory"
+    >
+      <span class="tag">Response</span>
+      <span class="byte actual">
+        <code>H</code>
+        <small>requested byte</small>
+      </span>
+      <span class="leak">
+        bytes after <code>H</code> in server memory <small>leaked</small>
+      </span>
+    </div>
+  </div>
+  <p>The mismatch is the vulnerability: 1 received byte, 64 KB copied.</p>
+  <figcaption>
+    Heartbleed copies the length written in the request, not the bytes that
+    actually arrived. The extra response bytes come from adjacent server memory.
+  </figcaption>
+</figure>
+
+<style>
+  .heartbleed {
+    --leak: var(--danger, #b74747);
+    max-width: 620px;
+    margin: 24px auto;
+  }
+  .trace {
+    margin: 0;
+  }
+  .row {
+    display: flex;
+    min-height: 46px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    background: var(--surface-2);
+  }
+  .tag {
+    display: grid;
+    width: 76px;
+    flex: none;
+    place-items: center;
+    border-right: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .byte,
+  .claim,
+  .leak {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+  }
+  .byte {
+    min-width: 78px;
+    border-right: 1px solid var(--border);
+  }
+  code {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+  small {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+  }
+  .claim {
+    color: var(--leak);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .copy {
+    padding: 8px 0;
+    color: var(--text-secondary);
+    text-align: center;
+    font-size: 0.76rem;
+  }
+  .copy span {
+    color: var(--leak);
+    font-size: 1rem;
+  }
+  .leak {
+    flex: 1;
+    min-width: 0;
+    border-left: 2px solid var(--leak);
+    background: color-mix(in srgb, var(--leak) 8%, var(--surface-2));
+    color: var(--leak);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .leak small {
+    color: var(--leak);
+    font-weight: 500;
+  }
+  p {
+    margin: 10px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    text-align: center;
+  }
+  figcaption {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.45;
+    text-align: center;
+  }
+  @media (max-width: 460px) {
+    .row {
+      flex-wrap: wrap;
+    }
+    .claim {
+      width: calc(100% - 76px);
+      border-top: 1px solid var(--border);
+    }
+    .leak {
+      width: calc(100% - 76px);
+      flex: none;
+    }
+  }
+</style>

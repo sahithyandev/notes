@@ -1,0 +1,94 @@
+---
+import ArrowFigure from "./primitives/arrow-figure.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("browser-isolation");
+---
+
+<ArrowFigure
+  uid={uid}
+  title="Browser Site Isolation"
+  desc="The browser process coordinates two renderer processes. Each renderer is permitted to access only one site's data through the browser process."
+  viewBox="0 0 760 310"
+  caption="Site isolation gives each site a separate renderer address space. Cross-site requests go through the browser process, which enforces policy."
+>
+  <g class="browser tone-key" transform="translate(270 24)">
+    <rect width="220" height="58" rx="9" />
+    <text x="110" y="28" text-anchor="middle">
+      Browser process
+    </text>
+    <text x="110" y="46" text-anchor="middle" class="sub">
+      network, storage, permission broker
+    </text>
+  </g>
+  <g class="renderer tone-pt" transform="translate(42 155)">
+    <rect width="250" height="106" rx="9" />
+    <text x="125" y="31" text-anchor="middle">
+      Renderer: bank.com
+    </text>
+    <text x="125" y="55" text-anchor="middle" class="sub">
+      bank DOM, cookies, heap
+    </text>
+    <text x="125" y="82" text-anchor="middle" class="permit">
+      allowed site data only
+    </text>
+  </g>
+  <g class="renderer tone-s5" transform="translate(468 155)">
+    <rect width="250" height="106" rx="9" />
+    <text x="125" y="31" text-anchor="middle">
+      Renderer: evil.com
+    </text>
+    <text x="125" y="55" text-anchor="middle" class="sub">
+      evil DOM, cookies, heap
+    </text>
+    <text x="125" y="82" text-anchor="middle" class="permit">
+      separate address space
+    </text>
+  </g>
+  <path
+    class="arrow tone-pt"
+    d="M 340 84 L 180 150"
+    marker-end={`url(#${uid}-pt)`}
+  />
+  <path
+    class="arrow tone-s5"
+    d="M 420 84 L 580 150"
+    marker-end={`url(#${uid}-s5)`}
+  />
+  <path class="blocked" d="M 292 208 L 468 208" />
+  <path class="blocked" d="M 350 188 L 410 228 M 410 188 L 350 228" />
+  <text x="380" y="286" text-anchor="middle" class="blocked-label">
+    no direct memory access across sites
+  </text>
+</ArrowFigure>
+
+<style>
+  rect {
+    fill: var(--surface-2);
+    stroke: var(--tone);
+    stroke-width: 1.7;
+  }
+  text {
+    fill: var(--text-primary);
+    font: 700 14px var(--font-ui);
+  }
+  .sub {
+    fill: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .permit {
+    fill: var(--tone);
+    font-size: 11px;
+  }
+  .blocked {
+    stroke: var(--danger, #b74747);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .blocked-label {
+    fill: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+  }
+</style>

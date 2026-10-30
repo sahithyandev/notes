@@ -1,0 +1,174 @@
+---
+import Panel from "./primitives/panel.astro";
+const LETTERS = ["S", "T", "R", "I", "D", "E"];
+---
+
+<Panel
+  class="stride-dfd"
+  caption="Apply only the STRIDE categories structurally relevant to the selected DFD element."
+>
+  <div class="layout">
+    <div class="diagram" aria-hidden="true">
+      <button class="node active" data-kind="entity">
+        User
+      </button>
+      <span class="flow">→</span>
+      <button class="node" data-kind="process">
+        Web app
+      </button>
+      <span class="flow">→</span>
+      <button class="node" data-kind="store">
+        User DB
+      </button>
+    </div>
+    <div class="detail">
+      <p class="eyeline" data-heading>
+        External entity
+      </p>
+      <p data-copy>
+        Ask whether an attacker can impersonate this user or deny sending a
+        request.
+      </p>
+      <div class="stride" data-stride aria-label="Applicable STRIDE categories">
+        {LETTERS.map((letter) => (
+          <span data-letter={letter}>{letter}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</Panel>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.1fr) minmax(210px, 0.9fr);
+    gap: 20px;
+    align-items: center;
+  }
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .node {
+    appearance: none;
+    min-width: 78px;
+    padding: 12px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font: 700 0.78rem var(--font-ui);
+    cursor: pointer;
+  }
+  .node:hover,
+  .node.active {
+    border-color: var(--sem);
+    color: var(--sem);
+  }
+  .node:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .flow {
+    color: var(--text-muted);
+  }
+  .detail {
+    border-left: 1px solid var(--border);
+    padding-left: 18px;
+  }
+  .eyeline {
+    margin: 0 0 6px;
+    color: var(--sem);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .detail > p:not(.eyeline) {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .stride {
+    display: flex;
+    margin-top: 12px;
+    gap: 0.2em;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+  .stride span {
+    opacity: 0.28;
+    transition:
+      color 0.15s ease,
+      opacity 0.15s ease;
+  }
+  .stride span.active {
+    color: var(--sem);
+    opacity: 1;
+  }
+  @media (max-width: 600px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .detail {
+      border-left: 0;
+      border-top: 1px solid var(--border);
+      padding: 16px 0 0;
+    }
+  }
+</style>
+
+<script>
+  const MODELS = {
+    entity: {
+      heading: "External entity",
+      copy: "Ask whether an attacker can impersonate this user or deny sending a request.",
+      applicable: "SR",
+      label: "Applicable STRIDE categories: Spoofing and Repudiation.",
+    },
+    process: {
+      heading: "Process",
+      copy: "A running service can be impersonated, altered, overloaded, or made to disclose data or privileges.",
+      applicable: "STRIDE",
+      label: "All STRIDE categories apply.",
+    },
+    store: {
+      heading: "Data store",
+      copy: "Stored records need protection against alteration, loss, and unauthorised disclosure.",
+      applicable: "TRID",
+      label:
+        "Applicable STRIDE categories: Tampering, Repudiation, Information disclosure, and Denial of service.",
+    },
+  } as const;
+  document.querySelectorAll<HTMLElement>(".stride-dfd").forEach((root) => {
+    const heading = root.querySelector<HTMLElement>("[data-heading]")!;
+    const copy = root.querySelector<HTMLElement>("[data-copy]")!;
+    const stride = root.querySelector<HTMLElement>("[data-stride]")!;
+    root.querySelectorAll<HTMLButtonElement>("[data-kind]").forEach((button) =>
+      button.addEventListener("click", () => {
+        const model = MODELS[button.dataset.kind as keyof typeof MODELS];
+        root
+          .querySelectorAll("[data-kind]")
+          .forEach((node) => node.classList.toggle("active", node === button));
+        heading.textContent = model.heading;
+        copy.textContent = model.copy;
+        stride.setAttribute("aria-label", model.label);
+        stride
+          .querySelectorAll<HTMLElement>("[data-letter]")
+          .forEach((letter) =>
+            letter.classList.toggle(
+              "active",
+              model.applicable.includes(letter.dataset.letter ?? ""),
+            ),
+          );
+      }),
+    );
+    root.querySelector<HTMLButtonElement>("[data-kind=entity]")!.click();
+  });
+</script>

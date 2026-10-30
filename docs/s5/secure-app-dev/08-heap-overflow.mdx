@@ -3,7 +3,7 @@ title: Heap Overflow
 prereqs:
   - s5/computer-security/buffer-overflow
 dateCreated: 2026-08-18T00:00:00.000Z
-lastUpdatedOn: 2026-10-29T22:16:51.711Z
+lastUpdatedOn: 2026-10-30T04:21:55.660Z
 ---
 
 Refer to the [buffer overflow](/s5/computer-security/buffer-overflow) note before continuing on.
@@ -48,6 +48,8 @@ memcpy(bp, pl, payload);            // copy `payload` bytes from pl into the res
 ```
 
 `payload` is never checked against the actual size of the request. A request with 1 actual payload byte but a claimed `payload` of 65535, the maximum a 16-bit field can hold, makes `memcpy` read 65535 bytes starting at `pl`, running past the end of the request into adjacent heap memory, and echo all of it back in the response. This is a buffer over-read, allowing an attacker to read up to 64KB of server memory per request.
+
+<HeartbleedOverread />
 
 ## Prevention
 
