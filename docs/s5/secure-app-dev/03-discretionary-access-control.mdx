@@ -1,12 +1,14 @@
 ---
 title: Discretionary Access Control
 dateCreated: 2026-07-05T10:00:00.000Z
-lastUpdatedOn: 2026-10-30T04:09:59.349Z
+lastUpdatedOn: 2026-10-30T05:40:14.057Z
 ---
 
 Discretionary Access Control (DAC) is Linux's traditional security model. The owner of a resource decides who may access it, by setting permissions on it. Access decisions are based on the identity (UID and GID) of the requesting process. A process running with root privileges is granted unrestricted access, while other accounts can do much less. Attackers therefore target root privileges.
 
 In Linux, most system resources, including memory, device drivers, and named pipes, are represented as files, so file system security is central to the model.
+
+[Operating system security](/s5/computer-security/operating-system-security) places DAC within the kernel's broader reference-monitor enforcement.
 
 The kernel enforces Linux's DAC. Kernel space is never swapped to disk, and only root may load or unload kernel modules.
 

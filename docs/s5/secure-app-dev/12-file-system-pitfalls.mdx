@@ -1,10 +1,12 @@
 ---
 title: File System Pitfalls
 dateCreated: 2026-10-30T00:00:00.000Z
-lastUpdatedOn: 2026-10-30T04:21:55.672Z
+lastUpdatedOn: 2026-10-30T05:40:14.173Z
 ---
 
 The file system controls access through owner, group, and other permissions. It also provides special permission bits including `setuid`, `setgid`, and the sticky bit.
+
+[Operating system security](/s5/computer-security/operating-system-security) covers the kernel mechanisms that mediate these accesses.
 
 ## setuid
 
@@ -15,6 +17,8 @@ A vulnerability in a privileged program can therefore grant the attacker the pro
 ## Time-of-Check to Time-of-Use
 
 A time-of-check to time-of-use vulnerability occurs when a file changes after validation but before use. The file system is asynchronous, so a pathname can resolve to a different object between separate operations.
+
+It violates [complete mediation](/s5/computer-security/incomplete-mediation) because the checked object is not necessarily the object later used.
 
 ```c
 if (access(path, R_OK) == 0) {
