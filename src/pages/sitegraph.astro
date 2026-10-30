@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { SITE_NAME, SITE_HOST_URL } from "../utils/values";
 import { NoteGraph } from "../utils/note-graph";
+import { buildSiteGraphData } from "../utils/site-graph-data";
 
 // The whole graph is computed here, before anything is rendered
 const notes = await getCollection("notes");
@@ -15,6 +16,7 @@ const graph = NoteGraph.build(
     content: n.body,
   })),
 );
+const graphData = buildSiteGraphData(graph);
 ---
 
 <Layout
@@ -31,7 +33,7 @@ const graph = NoteGraph.build(
       </a>
       <h1>Site Graph</h1>
       <p class="stats">
-        {graph.nodes.length} notes, {graph.edges.length} links
+        {graphData.nodes.length} notes, {graphData.edges.length} links
       </p>
       <div class="search">
         <input
@@ -67,7 +69,7 @@ const graph = NoteGraph.build(
     <script
       id="graph-data"
       type="application/json"
-      set:html={JSON.stringify(graph.toJSON())}
+      set:html={JSON.stringify(graphData).replace(/</g, "\\u003c")}
     />
   </main>
 </Layout>
@@ -348,7 +350,7 @@ const graph = NoteGraph.build(
 </style>
 
 <script>
-  import { NoteGraph } from "../utils/note-graph";
+  import type { SiteGraphData } from "../utils/site-graph-data";
   import {
     forceSimulation,
     forceManyBody,
@@ -386,11 +388,11 @@ const graph = NoteGraph.build(
     r: number;
   }
 
-  // The graph arrives already computed, this script only lays it out and draws it
-  const graph = NoteGraph.fromJSON(
-    JSON.parse(document.getElementById("graph-data")!.textContent ?? "{}"),
-  );
-  const data = { nodes: graph.nodes };
+  // All deterministic graph and layout data arrives from Astro frontmatter.
+  // The client only revives object references for interaction and simulates it.
+  const graphData = JSON.parse(
+    document.getElementById("graph-data")!.textContent ?? "{}",
+  ) as SiteGraphData;
 
   const canvas = document.getElementById("graph-canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d")!;
@@ -400,18 +402,6 @@ const graph = NoteGraph.build(
   const results = document.getElementById("results")!;
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Tweak these values to explore the graph's density and structure.
-  const layout = {
-    groupGap: 22,
-    groupRadiusFactor: 18,
-    groupRadiusPadding: 16,
-    initialNodeRadiusFactor: 18,
-    initialNodeRadiusOffset: 0.5,
-    initialNodeAngle: Math.PI * (3 - Math.sqrt(5)),
-    nodeRadius: 8,
-    entryDelayStep: 37,
-    entryDelayCycle: 500,
-  };
   const forces = {
     alphaDecay: 0.03,
     linkDistance: 64,
@@ -425,145 +415,46 @@ const graph = NoteGraph.build(
     anchorStrength: 0.1,
   };
 
-  // ---------------------------------------------------------------- layout
-  // Three nested levels: semesters on a ring, modules inside a semester and
-  // groups (a module's own notes, or one submodule) inside a module. Each
-  // level places its children on a circle just big enough to keep them apart.
-  const groupCounts = new Map<string, number>();
-  const groupsByModule = new Map<string, string[]>();
-  const modulesBySem = new Map<number, string[]>();
-  for (const n of data.nodes) {
-    const c = groupCounts.get(n.group) ?? 0;
-    groupCounts.set(n.group, c + 1);
-    if (c) continue;
-    if (!groupsByModule.has(n.module)) {
-      groupsByModule.set(n.module, []);
-      (modulesBySem.get(n.sem) ?? modulesBySem.set(n.sem, []).get(n.sem)!).push(
-        n.module,
-      );
-    }
-    groupsByModule.get(n.module)!.push(n.group);
-  }
-  const groupR = (g: string) =>
-    layout.groupRadiusFactor * Math.sqrt(groupCounts.get(g)!) +
-    layout.groupRadiusPadding;
-
-  // Returns the radius that encloses the whole ring of children
-  function ringLayout(
-    items: string[],
-    radius: (k: string) => number,
-    offsets: Map<string, [number, number]>,
-  ) {
-    items.sort();
-    const radii = items.map(radius).sort((a, b) => b - a);
-    let ring = 0;
-    if (items.length > 1) {
-      const byCircumference =
-        radii.reduce((sum, r) => sum + 2 * r + layout.groupGap, 0) /
-        (2 * Math.PI);
-      // The 2 biggest children must clear each other even when adjacent
-      const byPair =
-        (radii[0] + radii[1] + layout.groupGap) /
-        (2 * Math.sin(Math.PI / items.length));
-      ring = Math.max(byCircumference, byPair);
-    }
-    items.forEach((k, i) => {
-      const a = (i / items.length) * Math.PI * 2;
-      offsets.set(k, [Math.cos(a) * ring, Math.sin(a) * ring]);
-    });
-    return ring + radii[0];
-  }
-
-  const groupOffsets = new Map<string, [number, number]>();
-  const moduleOffsets = new Map<string, [number, number]>();
-  const moduleRadius = new Map<string, number>();
-  for (const [m, groups] of groupsByModule) {
-    moduleRadius.set(m, ringLayout(groups, groupR, groupOffsets));
-  }
-  const semRadius = new Map<number, number>();
-  for (const [sem, mods] of modulesBySem) {
-    semRadius.set(
-      sem,
-      ringLayout(mods, (m) => moduleRadius.get(m)!, moduleOffsets),
-    );
-  }
-  const semList = [...modulesBySem.keys()].sort();
-  const ringR =
-    semList.length > 1
-      ? (2 * Math.max(...semRadius.values()) + layout.groupGap * 2) /
-        (2 * Math.sin(Math.PI / semList.length))
-      : 0;
-  const semAnchors = new Map(
-    semList.map((sem, i) => {
-      const a = (i / semList.length) * Math.PI * 2;
-      return [sem, [Math.cos(a) * ringR, Math.sin(a) * ringR]] as const;
-    }),
-  );
-
-  const placed = new Map<string, number>();
-  const nodes: GNode[] = data.nodes.map((n, i) => {
-    const k = placed.get(n.group) ?? 0;
-    placed.set(n.group, k + 1);
-    const [sx, sy] = semAnchors.get(n.sem)!;
-    const [mx, my] = moduleOffsets.get(n.module)!;
-    const [gx, gy] = groupOffsets.get(n.group)!;
-    const ax = sx + mx + gx;
-    const ay = sy + my + gy;
-    const radius =
-      layout.initialNodeRadiusFactor *
-      Math.sqrt(k + layout.initialNodeRadiusOffset);
-    const angle = k * layout.initialNodeAngle;
-    return {
-      ...n,
-      ax,
-      ay,
-      x: ax + Math.cos(angle) * radius,
-      y: ay + Math.sin(angle) * radius,
-      r: layout.nodeRadius,
-      delay: (i * layout.entryDelayStep) % layout.entryDelayCycle,
+  // ---------------------------------------------------------------- hydrate
+  const nodes: GNode[] = graphData.nodes.map(
+    ({ incoming: _incoming, outgoing: _outgoing, ...node }) => ({
+      ...node,
       ins: [],
       outs: [],
-    };
-  });
-
+    }),
+  );
   const byId = new Map(nodes.map((n) => [n.id, n]));
+  for (const serialized of graphData.nodes) {
+    const node = byId.get(serialized.id)!;
+    node.ins = serialized.incoming.map((id) => byId.get(id)!).filter(Boolean);
+    node.outs = serialized.outgoing.map((id) => byId.get(id)!).filter(Boolean);
+  }
   const links: Link[] = [];
-  for (const e of graph.edges) {
+  for (const e of graphData.edges) {
     const s = byId.get(e.from);
     const t = byId.get(e.to);
     if (!s || !t) continue;
     links.push([s, t, e.kind === "prereq" ? 1 : e.kind === "content" ? 2 : 0]);
-    s.outs.push(t);
-    t.ins.push(s);
   }
 
-  // Groups as blobs, for halos and labels
-  const prettify = (slug: string) =>
-    (slug.split("/").pop() ?? slug)
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-  const blobs = new Map<string, Blob>();
-  for (const n of nodes) {
-    let b = blobs.get(n.group);
-    if (!b) {
-      b = {
-        members: [],
-        sem: n.sem,
-        label: prettify(n.group),
+  // Blob membership and labels are also prepared in the frontmatter.
+  const blobs = new Map<string, Blob>(
+    graphData.blobs.map((blob) => [
+      blob.group,
+      {
+        ...blob,
+        members: blob.members.map((id) => byId.get(id)!).filter(Boolean),
         x: 0,
         y: 0,
         r: 0,
-      };
-      blobs.set(n.group, b);
-    }
-    b.members.push(n);
-  }
+      },
+    ]),
+  );
   const labelOrder = [...blobs.values()].sort(
     (a, b) => b.members.length - a.members.length,
   );
   const semBlobs = new Map<number, { x: number; y: number; n: number }>(
-    semList.map((s) => [s, { x: 0, y: 0, n: 0 }]),
+    graphData.semList.map((s) => [s, { x: 0, y: 0, n: 0 }]),
   );
 
   function measure() {
@@ -729,7 +620,7 @@ const graph = NoteGraph.build(
       .forEach((el) => (el.style.background = semColors[+el.dataset.sem!]));
     dirty = true;
   }
-  legend.innerHTML = semList
+  legend.innerHTML = graphData.semList
     .map(
       (s) =>
         `<li><button type="button" data-sem="${s}" aria-pressed="true"><i data-sem="${s}"></i>${s ? `S${s}` : "General"}</button></li>`,
@@ -1122,7 +1013,7 @@ const graph = NoteGraph.build(
   // Longest path: computed on the graph, then only highlighted here
   const longestBtn = document.getElementById("longest") as HTMLButtonElement;
   const pathInfo = document.getElementById("path-info")!;
-  const longest = graph.longestPath();
+  const longest = graphData.longestPath;
   if (!longest) longestBtn.disabled = true;
   function setPath(on: boolean) {
     showPath = on && !!longest;
