@@ -40,8 +40,6 @@ describe("buildSiteGraphData", () => {
       "s2/physics/fourth",
     ]);
     expect(data.nodes[0]).toMatchObject({
-      ax: expect.any(Number),
-      ay: expect.any(Number),
       x: expect.any(Number),
       y: expect.any(Number),
       r: 8,

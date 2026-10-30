@@ -18,8 +18,6 @@ export interface SiteGraphNode {
   sem: number;
   module: string;
   group: string;
-  ax: number;
-  ay: number;
   x: number;
   y: number;
   r: number;
@@ -158,8 +156,6 @@ export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
     const angle = position * layout.initialNodeAngle;
     return {
       ...node,
-      ax,
-      ay,
       x: ax + Math.cos(angle) * radius,
       y: ay + Math.sin(angle) * radius,
       r: layout.nodeRadius,

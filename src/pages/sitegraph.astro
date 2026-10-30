@@ -80,9 +80,9 @@ const moduleLabel = (module: string) => {
       <ul id="results" hidden></ul>
       <ul id="legend"></ul>
       <p class="hint">
-        Drag space to pan, drag a note to tug it, scroll to zoom, click a note
-        to open it. Arrows show prerequisites, solid lines show note order and
-        dashed lines show links written in note content.
+        Drag to pan, scroll to zoom, and click a note to open it. Arrows show
+        prerequisites, solid lines show note order and dashed lines show links
+        written in note content.
       </p>
       <div class="actions">
         <button id="longest" type="button" aria-pressed="false">
@@ -427,21 +427,12 @@ const moduleLabel = (module: string) => {
 
 <script>
   import type { SiteGraphData } from "../utils/site-graph-data";
-  import {
-    forceSimulation,
-    forceManyBody,
-    forceCollide,
-    forceX,
-    forceY,
-    forceLink,
-    type SimulationNodeDatum,
-  } from "d3-force";
   import { track } from "../scripts/analytics";
 
   // Kind 0 joins consecutive notes of a module, kind 1 is a prerequisite
   type Link = [GNode, GNode, number];
 
-  interface GNode extends SimulationNodeDatum {
+  interface GNode {
     id: string;
     title: string;
     sem: number;
@@ -477,19 +468,6 @@ const moduleLabel = (module: string) => {
   const input = document.getElementById("q") as HTMLInputElement;
   const results = document.getElementById("results")!;
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const forces = {
-    alphaDecay: 0.03,
-    linkDistance: 64,
-    prerequisiteLinkStrength: 0.006,
-    contentLinkStrength: 0,
-    moduleLinkStrength: 1,
-    chargeStrength: -44,
-    chargeDistanceMax: 140,
-    collisionPadding: 10,
-    collisionIterations: 3,
-    anchorStrength: 0.1,
-  };
 
   // ---------------------------------------------------------------- hydrate
   const nodes: GNode[] = graphData.nodes.map(
@@ -558,44 +536,6 @@ const moduleLabel = (module: string) => {
       s.y /= s.n;
     }
   }
-
-  // ------------------------------------------------------------ simulation
-  const sim = forceSimulation(nodes)
-    .alphaDecay(forces.alphaDecay)
-    .force(
-      "link",
-      forceLink(
-        links.map(([source, target, kind]) => ({ source, target, kind })),
-      )
-        .distance(forces.linkDistance)
-        .strength((l: { kind: number }) =>
-          l.kind === 1
-            ? forces.prerequisiteLinkStrength
-            : l.kind === 2
-              ? forces.contentLinkStrength
-              : forces.moduleLinkStrength,
-        ),
-    )
-    .force(
-      "charge",
-      forceManyBody()
-        .strength(forces.chargeStrength)
-        .distanceMax(forces.chargeDistanceMax),
-    )
-    .force(
-      "collide",
-      forceCollide<GNode>((d) => d.r + forces.collisionPadding).iterations(
-        forces.collisionIterations,
-      ),
-    )
-    .force("x", forceX<GNode>((d) => d.ax).strength(forces.anchorStrength))
-    .force("y", forceY<GNode>((d) => d.ay).strength(forces.anchorStrength))
-    .stop();
-  // Settle fully before the first draw, the live ticks only polish it
-  const settleTicks = Math.ceil(
-    Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay()),
-  );
-  for (let i = 0; i < settleTicks; i++) sim.tick();
 
   // ---------------------------------------------------------------- state
   let scale = 1;
@@ -908,10 +848,6 @@ const moduleLabel = (module: string) => {
   }
 
   function frame(now: number) {
-    if (sim.alpha() > sim.alphaMin()) {
-      sim.tick();
-      dirty = true;
-    }
     if (fly) {
       const k = Math.min(1, (now - fly.start) / 700);
       const e = 1 - Math.pow(1 - k, 3);
@@ -996,12 +932,11 @@ const moduleLabel = (module: string) => {
     { passive: false },
   );
 
-  // Dragging a note tugs it and reheats the simulation, dragging space pans
+  // Dragging the canvas pans the precomputed, static layout.
   let drag: {
     x: number;
     y: number;
     moved: boolean;
-    node: GNode | null;
   } | null = null;
   canvas.addEventListener("pointerdown", (e) => {
     fly = null;
@@ -1009,7 +944,6 @@ const moduleLabel = (module: string) => {
       x: e.clientX,
       y: e.clientY,
       moved: false,
-      node: pick(e.offsetX, e.offsetY),
     };
     canvas.setPointerCapture(e.pointerId);
   });
@@ -1018,13 +952,8 @@ const moduleLabel = (module: string) => {
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
       if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
-      if (drag.moved && drag.node) {
+      if (drag.moved) {
         tip.hidden = true;
-        drag.node.fx = (e.offsetX - ox) / scale;
-        drag.node.fy = (e.offsetY - oy) / scale;
-        sim.alphaTarget(0.3).alpha(Math.max(sim.alpha(), 0.3));
-        dirty = true;
-      } else if (drag.moved) {
         canvas.classList.add("dragging");
         ox += dx;
         oy += dy;
@@ -1049,12 +978,6 @@ const moduleLabel = (module: string) => {
   });
   canvas.addEventListener("pointerup", (e) => {
     const wasClick = drag && !drag.moved;
-    if (drag?.node) {
-      // Let the simulation cool again and release the note
-      sim.alphaTarget(0);
-      drag.node.fx = null;
-      drag.node.fy = null;
-    }
     drag = null;
     canvas.classList.remove("dragging");
     if (wasClick) {
