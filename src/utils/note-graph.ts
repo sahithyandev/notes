@@ -1,12 +1,13 @@
 // The graph of notes, independent of any rendering. Nodes are notes, edges
 // are either "chain" (a note points to the next one in its module or
-// submodule) or "prereq" (a note's prerequisite points to the note). Built
-// once at build time, serialised with `toJSON`, revived with `fromJSON`.
+// submodule), "prereq" (a note's prerequisite points to the note), or
+// "content" (a link written in a note's body). Built once at build time,
+// serialised with `toJSON`, revived with `fromJSON`.
 import { orderFromFilePath } from "./note-path";
 
 const ALL_KINDS: EdgeKind[] = ["chain", "prereq"] as const;
 
-export type EdgeKind = "chain" | "prereq";
+export type EdgeKind = "chain" | "prereq" | "content";
 
 export interface NoteInput {
   /** Slug, as in `entry.id`. */
@@ -15,6 +16,8 @@ export interface NoteInput {
   /** Repo-relative path, used to order notes inside a directory. */
   filePath?: string;
   prereqs?: string[];
+  /** Raw Markdown or MDX body, used to extract internal note links. */
+  content?: string;
 }
 
 export interface GraphNode {
@@ -40,8 +43,21 @@ export interface GraphData {
 }
 
 export interface PathOptions {
-  /** Only follow these kinds of edges. Defaults to all. */
+  /** Only follow these kinds of edges. Defaults to the structural links. */
   kinds?: EdgeKind[];
+}
+
+/** Internal note slugs linked from Markdown or MDX content. */
+export function contentLinkTargets(content: string): string[] {
+  const targets = new Set<string>();
+  const links = /(?<!!)\[(?:[^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  for (const match of content.matchAll(links)) {
+    const target = match[1].split("#", 1)[0];
+    if (!target.startsWith("/")) continue;
+    const slug = target.replace(/^\/+|\/+$/g, "");
+    if (slug) targets.add(slug);
+  }
+  return [...targets];
 }
 
 export class NoteGraph {
@@ -94,6 +110,16 @@ export class NoteGraph {
     for (const note of notes) {
       for (const p of note.prereqs ?? []) {
         if (ids.has(p)) edges.push({ from: p, to: note.id, kind: "prereq" });
+      }
+    }
+
+    // A content link points from the note that contains it to its target.
+    for (const note of notes) {
+      if (!note.content) continue;
+      for (const target of contentLinkTargets(note.content)) {
+        if (target !== note.id && ids.has(target)) {
+          edges.push({ from: note.id, to: target, kind: "content" });
+        }
       }
     }
 

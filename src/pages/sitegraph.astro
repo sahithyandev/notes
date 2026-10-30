@@ -12,6 +12,7 @@ const graph = NoteGraph.build(
     title: n.data.title,
     filePath: n.filePath,
     prereqs: n.data.prereqs,
+    content: n.body,
   })),
 );
 ---
@@ -47,7 +48,8 @@ const graph = NoteGraph.build(
       <ul id="legend"></ul>
       <p class="hint">
         Drag space to pan, drag a note to tug it, scroll to zoom, click a note
-        to open it. Arrows point from a prerequisite to the note that needs it.
+        to open it. Arrows show prerequisites, solid lines show note order and
+        dashed lines show links written in note content.
       </p>
       <div class="actions">
         <button id="longest" type="button" aria-pressed="false">
@@ -414,6 +416,7 @@ const graph = NoteGraph.build(
     alphaDecay: 0.03,
     linkDistance: 64,
     prerequisiteLinkStrength: 0.006,
+    contentLinkStrength: 0,
     moduleLinkStrength: 1,
     chargeStrength: -44,
     chargeDistanceMax: 140,
@@ -529,7 +532,7 @@ const graph = NoteGraph.build(
     const s = byId.get(e.from);
     const t = byId.get(e.to);
     if (!s || !t) continue;
-    links.push([s, t, e.kind === "prereq" ? 1 : 0]);
+    links.push([s, t, e.kind === "prereq" ? 1 : e.kind === "content" ? 2 : 0]);
     s.outs.push(t);
     t.ins.push(s);
   }
@@ -599,7 +602,11 @@ const graph = NoteGraph.build(
       )
         .distance(forces.linkDistance)
         .strength((l: { kind: number }) =>
-          l.kind ? forces.prerequisiteLinkStrength : forces.moduleLinkStrength,
+          l.kind === 1
+            ? forces.prerequisiteLinkStrength
+            : l.kind === 2
+              ? forces.contentLinkStrength
+              : forces.moduleLinkStrength,
         ),
     )
     .force(
@@ -801,9 +808,11 @@ const graph = NoteGraph.build(
       ctx.lineTo(tx - Math.cos(a + 0.4) * size, ty - Math.sin(a + 0.4) * size);
       ctx.closePath();
     };
-    const drawEdges = (pick: (l: Link) => boolean, drawArrowheads = true) => {
+    const drawEdges = (
+      pick: (l: Link) => boolean,
+      drawArrowheads: (l: Link) => boolean = () => true,
+    ) => {
       const size = 8 / scale;
-      if (!drawArrowheads) return;
       ctx.beginPath();
       for (const l of links) {
         if (!pick(l)) continue;
@@ -819,7 +828,7 @@ const graph = NoteGraph.build(
       ctx.stroke();
       ctx.beginPath();
       for (const l of links) {
-        if (!pick(l)) continue;
+        if (!pick(l) || !drawArrowheads(l)) continue;
         const [s, t, kind] = l;
         const [cx, cy] = kind ? controlPoint(s, t) : [s.x!, s.y!];
         arrow(cx, cy, t, size);
@@ -831,10 +840,21 @@ const graph = NoteGraph.build(
     const touches = (l: Link) => l[0] === focus || l[1] === focus;
     ctx.strokeStyle = textPrimary;
     ctx.fillStyle = textPrimary;
-    for (const kind of [0, 1]) {
-      ctx.lineWidth = (kind ? 1.2 : 1.1) / scale;
-      ctx.globalAlpha = near ? 0.04 : kind ? 0.16 : 0.24;
-      drawEdges((l) => l[2] === kind && shown(l) && !touches(l), kind === 1);
+    for (const kind of [0, 1, 2]) {
+      ctx.lineWidth = (kind === 1 ? 1.2 : kind === 2 ? 0.9 : 1.1) / scale;
+      ctx.globalAlpha = near
+        ? 0.04
+        : kind === 1
+          ? 0.16
+          : kind === 2
+            ? 0.1
+            : 0.24;
+      if (kind === 2) ctx.setLineDash([3 / scale, 5 / scale]);
+      drawEdges(
+        (l) => l[2] === kind && shown(l) && !touches(l),
+        (l) => l[2] === 1,
+      );
+      ctx.setLineDash([]);
     }
 
     // Edges of the focused note, or of the longest path, flow along their direction
@@ -849,7 +869,10 @@ const graph = NoteGraph.build(
         ctx.setLineDash([10 / scale, 7 / scale]);
         ctx.lineDashOffset = -(now * 0.03) / scale;
       }
-      drawEdges((l) => shown(l) && highlight(l));
+      drawEdges(
+        (l) => shown(l) && highlight(l),
+        (l) => l[2] === 1,
+      );
       ctx.setLineDash([]);
     }
 

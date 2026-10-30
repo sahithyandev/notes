@@ -38,6 +38,22 @@ describe("NoteGraph.build", () => {
     expect(pairs("prereq")).toEqual(["s1/a/a2>s1/b/b1", "s1/b/b2>s1/a/a3"]);
   });
 
+  test("adds valid internal links from note content", () => {
+    const linked = NoteGraph.build([
+      {
+        ...note("s1/a/a1", "s1/a/01-a1.md"),
+        content:
+          "[Second](/s1/a/a2#topic) [Duplicate](/s1/a/a2/) [External](https://example.com)",
+      },
+      note("s1/a/a2", "s1/a/02-a2.md"),
+    ]);
+    expect(
+      linked.edges
+        .filter((edge) => edge.kind === "content")
+        .map((edge) => `${edge.from}>${edge.to}`),
+    ).toEqual(["s1/a/a1>s1/a/a2"]);
+  });
+
   test("derives semester, module and group from the slug", () => {
     expect(g.node("s1/a/a1")).toMatchObject({
       sem: 1,
