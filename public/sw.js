@@ -1,7 +1,7 @@
 // Offline support. Bump VERSION whenever the caching logic changes.
 // Keep AT_HEADER, MAX_AGE_MS and the "sn-pages-" prefix in sync with
 // src/scripts/offline.ts, which reads the page cache directly.
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `sn-pages-${VERSION}`;
 const ASSETS = `sn-assets-${VERSION}`;
 const CDN = `sn-cdn-${VERSION}`;
@@ -123,7 +123,13 @@ async function handlePage(event, request, url) {
 
   const revalidate = async () => {
     const response = await fetch(key);
-    if (response.status !== 200 || response.redirected) return response;
+    // A module URL (for example /s5/secure-app-dev) redirects to its first
+    // note. Returning the followed response directly to a navigation request
+    // fails in Chromium with ERR_FAILED because its URL no longer matches the
+    // request the worker intercepted. Re-issue the redirect so the browser
+    // owns the next navigation and the final page can be cached normally.
+    if (response.redirected) return Response.redirect(response.url, 302);
+    if (response.status !== 200) return response;
     if (cached || navigating) {
       await put(cache, key, response.clone());
       if (cached && fingerprint(cached) !== fingerprint(response)) {
