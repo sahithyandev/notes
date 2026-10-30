@@ -493,6 +493,41 @@ const moduleLabel = (module: string) => {
     links.push([s, t, e.kind === "prereq" ? 1 : e.kind === "content" ? 2 : 0]);
   }
 
+  // The entrance follows the study structure, not source-file order. Nodes at
+  // the same depth arrive together, with content links held back for the end.
+  const structuralIns = new Map(nodes.map((node) => [node, 0]));
+  const waveDepth = new Map(nodes.map((node) => [node, 0]));
+  for (const [from, to, kind] of links) {
+    if (kind !== 2) structuralIns.set(to, structuralIns.get(to)! + 1);
+  }
+  const ready = nodes.filter((node) => structuralIns.get(node) === 0);
+  for (let cursor = 0; cursor < ready.length; cursor++) {
+    const node = ready[cursor];
+    for (const [from, to, kind] of links) {
+      if (from !== node || kind === 2) continue;
+      waveDepth.set(to, Math.max(waveDepth.get(to)!, waveDepth.get(node)! + 1));
+      const remaining = structuralIns.get(to)! - 1;
+      structuralIns.set(to, remaining);
+      if (remaining === 0) ready.push(to);
+    }
+  }
+  // Cycles have no natural starting point. Keep them in the final structural
+  // wave rather than making the entrance wait for an impossible prerequisite.
+  const maximumWave = Math.max(...waveDepth.values(), 0);
+  for (const node of nodes) {
+    if ((structuralIns.get(node) ?? 0) > 0)
+      waveDepth.set(node, maximumWave + 1);
+  }
+  const finalWave = Math.max(...waveDepth.values(), 0);
+  const nodeRevealAt = new Map(
+    nodes.map((node) => [
+      node,
+      300 +
+        (waveDepth.get(node)! / Math.max(finalWave, 1)) * 560 +
+        node.delay * 0.22,
+    ]),
+  );
+
   // Blob membership and labels are also prepared in the frontmatter.
   const blobs = new Map<string, Blob>(
     graphData.blobs.map((blob) => [
@@ -553,6 +588,16 @@ const moduleLabel = (module: string) => {
   let pathPairs = new Set<string>();
   let dirty = true;
   const t0 = performance.now();
+  let introComplete = reduceMotion;
+
+  const progress = (now: number, start: number, duration: number) =>
+    introComplete ? 1 : Math.min(1, Math.max(0, (now - t0 - start) / duration));
+  const finishIntro = () => {
+    if (!introComplete) {
+      introComplete = true;
+      dirty = true;
+    }
+  };
 
   type View = { scale: number; ox: number; oy: number };
   let fly: { from: View; to: View; start: number } | null = null;
@@ -681,11 +726,16 @@ const moduleLabel = (module: string) => {
         ? pathNodes
         : null;
     const dark = document.documentElement.dataset.theme === "dark";
+    const haloProgress = progress(now, 0, 260);
+    const labelProgress = progress(now, 110, 220);
+    const structuralProgress = progress(now, 150, 360);
+    const contentProgress = progress(now, 1_060, 220);
 
     // Semester names, huge and faint behind everything
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `800 260px "Sagittaire Display", serif`;
+    ctx.globalAlpha = haloProgress;
     for (const [sem, s] of semBlobs) {
       if (hiddenSems.has(sem)) continue;
       const [r, g, b] = semRgb[sem];
@@ -694,6 +744,7 @@ const moduleLabel = (module: string) => {
     }
 
     // Soft halo per group
+    ctx.globalAlpha = haloProgress;
     for (const b of blobs.values()) {
       if (hiddenSems.has(b.sem)) continue;
       const rad = b.r + 40;
@@ -720,6 +771,7 @@ const moduleLabel = (module: string) => {
     const drawEdges = (
       pick: (l: Link) => boolean,
       drawArrowheads: (l: Link) => boolean = () => true,
+      trace = 1,
     ) => {
       const size = 8 / scale;
       ctx.beginPath();
@@ -729,12 +781,31 @@ const moduleLabel = (module: string) => {
         ctx.moveTo(s.x!, s.y!);
         if (kind) {
           const [cx, cy] = controlPoint(s, t);
-          ctx.quadraticCurveTo(cx, cy, t.x!, t.y!);
+          if (trace < 1) {
+            // de Casteljau split: trace a real portion of the curve rather
+            // than fading in the finished edge all at once.
+            const p01x = s.x! + (cx - s.x!) * trace;
+            const p01y = s.y! + (cy - s.y!) * trace;
+            const p12x = cx + (t.x! - cx) * trace;
+            const p12y = cy + (t.y! - cy) * trace;
+            ctx.quadraticCurveTo(
+              p01x,
+              p01y,
+              p01x + (p12x - p01x) * trace,
+              p01y + (p12y - p01y) * trace,
+            );
+          } else {
+            ctx.quadraticCurveTo(cx, cy, t.x!, t.y!);
+          }
         } else {
-          ctx.lineTo(t.x!, t.y!);
+          ctx.lineTo(
+            s.x! + (t.x! - s.x!) * trace,
+            s.y! + (t.y! - s.y!) * trace,
+          );
         }
       }
       ctx.stroke();
+      if (trace < 0.98) return;
       ctx.beginPath();
       for (const l of links) {
         if (!pick(l) || !drawArrowheads(l)) continue;
@@ -750,18 +821,16 @@ const moduleLabel = (module: string) => {
     ctx.strokeStyle = textPrimary;
     ctx.fillStyle = textPrimary;
     for (const kind of [0, 1, 2]) {
+      const reveal = kind === 2 ? contentProgress : structuralProgress;
+      if (reveal === 0) continue;
       ctx.lineWidth = (kind === 1 ? 1.2 : kind === 2 ? 0.9 : 1.1) / scale;
-      ctx.globalAlpha = near
-        ? 0.04
-        : kind === 1
-          ? 0.16
-          : kind === 2
-            ? 0.1
-            : 0.24;
+      ctx.globalAlpha =
+        (near ? 0.04 : kind === 1 ? 0.16 : kind === 2 ? 0.1 : 0.24) * reveal;
       if (kind === 2) ctx.setLineDash([3 / scale, 5 / scale]);
       drawEdges(
         (l) => l[2] === kind && shown(l) && !touches(l),
         (l) => l[2] === 1,
+        reveal,
       );
       ctx.setLineDash([]);
     }
@@ -788,9 +857,7 @@ const moduleLabel = (module: string) => {
     // Notes
     for (const n of nodes) {
       const lit = visible(n) && (!near || near.has(n));
-      const pop = reduceMotion
-        ? 1
-        : Math.min(1, Math.max(0, (now - t0 - n.delay) / 450));
+      const pop = reduceMotion ? 1 : progress(now, nodeRevealAt.get(n)!, 330);
       if (pop <= 0) continue;
       const rad = n.r * ease(pop) * (n === focus ? 1.5 : 1);
       const [r, g, b] = semRgb[n.sem];
@@ -817,7 +884,7 @@ const moduleLabel = (module: string) => {
 
     // Group names, kept at a constant on-screen size. Bigger groups claim
     // their spot first and a name that would overlap one already drawn is skipped.
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = labelProgress;
     ctx.font = `700 ${11.5 / scale}px "DM Sans", sans-serif`;
     ctx.lineJoin = "round";
     ctx.lineWidth = 4 / scale;
@@ -840,7 +907,7 @@ const moduleLabel = (module: string) => {
       );
       if (clash && !mine) continue;
       taken.push(box);
-      ctx.globalAlpha = !focus || mine ? 1 : 0.25;
+      ctx.globalAlpha = labelProgress * (!focus || mine ? 1 : 0.25);
       ctx.strokeStyle = bgColor;
       ctx.strokeText(b.label, b.x, y);
       ctx.fillStyle = mine ? textPrimary : textSecondary;
@@ -860,7 +927,7 @@ const moduleLabel = (module: string) => {
       dirty = true;
     }
     // Keep redrawing while the intro plays or flowing edges animate
-    if (!reduceMotion && (now - t0 < 1200 || hover || pinned || showPath))
+    if (!reduceMotion && (!introComplete || hover || pinned || showPath))
       dirty = true;
     if (dirty) {
       draw(now);
@@ -920,6 +987,7 @@ const moduleLabel = (module: string) => {
     "wheel",
     (e) => {
       e.preventDefault();
+      finishIntro();
       fly = null;
       const next = Math.min(
         12,
@@ -941,6 +1009,7 @@ const moduleLabel = (module: string) => {
     moved: boolean;
   } | null = null;
   canvas.addEventListener("pointerdown", (e) => {
+    finishIntro();
     fly = null;
     drag = {
       x: e.clientX,
@@ -950,6 +1019,7 @@ const moduleLabel = (module: string) => {
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener("pointermove", (e) => {
+    finishIntro();
     if (drag) {
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
@@ -1001,6 +1071,7 @@ const moduleLabel = (module: string) => {
 
   // Legend chips hide and show a semester
   legend.addEventListener("click", (e) => {
+    finishIntro();
     const btn = (e.target as HTMLElement).closest<HTMLElement>("button");
     if (!btn) return;
     const sem = +btn.dataset.sem!;
@@ -1046,11 +1117,13 @@ const moduleLabel = (module: string) => {
     dirty = true;
   }
   longestBtn.addEventListener("click", () => {
+    finishIntro();
     track("sitegraph_longest_path", { on: !showPath });
     setPath(!showPath);
   });
 
   document.getElementById("reset")!.addEventListener("click", () => {
+    finishIntro();
     track("sitegraph_reset");
     if (showPath) setPath(false);
     pinned = null;
@@ -1080,6 +1153,7 @@ const moduleLabel = (module: string) => {
     });
   }
   function choose(n: GNode) {
+    finishIntro();
     track("sitegraph_search", { query: input.value.trim(), note: n.id });
     pinned = n;
     hiddenSems.delete(n.sem);
@@ -1093,6 +1167,7 @@ const moduleLabel = (module: string) => {
     dirty = true;
   }
   input.addEventListener("input", () => {
+    finishIntro();
     const q = input.value.trim().toLowerCase();
     active = 0;
     if (!q) {
@@ -1110,6 +1185,7 @@ const moduleLabel = (module: string) => {
     renderResults();
   });
   input.addEventListener("keydown", (e) => {
+    finishIntro();
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (!matches.length) return;
