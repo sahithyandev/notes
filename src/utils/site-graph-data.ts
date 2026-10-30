@@ -78,9 +78,132 @@ const prettify = (slug: string) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
+type ModulePosition = { x: number; y: number };
+
+/**
+ * Refines the ring seed into a stable overview. Repeated links pull modules
+ * together, while their measured radii keep the clusters from sitting on top
+ * of one another. This runs at build time, so every visitor sees the same map.
+ */
+function settleModulePositions(
+  modulesBySem: Map<number, string[]>,
+  moduleRadius: Map<string, number>,
+  moduleOffsets: Map<string, [number, number]>,
+  semAnchors: Map<number, readonly [number, number]>,
+  moduleDependencies: SiteGraphModuleDependency[],
+) {
+  const positions = new Map<string, ModulePosition>();
+  for (const [sem, modules] of modulesBySem) {
+    const [sx, sy] = semAnchors.get(sem)!;
+    for (const module of modules) {
+      const [mx, my] = moduleOffsets.get(module)!;
+      positions.set(module, { x: sx + mx, y: sy + my });
+    }
+  }
+
+  const links = new Map<string, number>();
+  for (const dependency of moduleDependencies) {
+    const [a, b] = [dependency.from, dependency.to].sort();
+    const key = `${a}\u0000${b}`;
+    links.set(key, (links.get(key) ?? 0) + dependency.links);
+  }
+  const modules = [...positions.keys()].sort();
+  const pairs = [...links].map(([key, count]) => {
+    const [from, to] = key.split("\u0000");
+    return { from, to, count };
+  });
+
+  for (let step = 0; step < 260; step++) {
+    const forces = new Map(modules.map((module) => [module, { x: 0, y: 0 }]));
+    const push = (module: string, x: number, y: number) => {
+      const force = forces.get(module)!;
+      force.x += x;
+      force.y += y;
+    };
+
+    for (const { from, to, count } of pairs) {
+      const a = positions.get(from)!;
+      const b = positions.get(to)!;
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const clearance = moduleRadius.get(from)! + moduleRadius.get(to)! + 34;
+      // More direct links create a shorter, but never overlapping, target.
+      const desired = clearance + 240 / Math.sqrt(count);
+      const pull =
+        ((distance - desired) / distance) *
+        0.006 *
+        Math.min(Math.sqrt(count), 3);
+      push(from, dx * pull, dy * pull);
+      push(to, -dx * pull, -dy * pull);
+    }
+
+    for (let i = 0; i < modules.length; i++) {
+      for (let j = i + 1; j < modules.length; j++) {
+        const from = modules[i];
+        const to = modules[j];
+        const a = positions.get(from)!;
+        const b = positions.get(to)!;
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let distance = Math.hypot(dx, dy);
+        if (!distance) {
+          dx = 1;
+          dy = 0;
+          distance = 1;
+        }
+        const minimum = moduleRadius.get(from)! + moduleRadius.get(to)! + 32;
+        if (distance >= minimum) continue;
+        const repel = ((minimum - distance) / distance) * 0.16;
+        push(from, -dx * repel, -dy * repel);
+        push(to, dx * repel, dy * repel);
+      }
+    }
+
+    for (const [sem, semModules] of modulesBySem) {
+      const [sx, sy] = semAnchors.get(sem)!;
+      for (const module of semModules) {
+        const p = positions.get(module)!;
+        // Keep the semester grouping recognisable without overpowering links.
+        push(module, (sx - p.x) * 0.0025, (sy - p.y) * 0.0025);
+      }
+    }
+
+    for (const module of modules) {
+      const p = positions.get(module)!;
+      const force = forces.get(module)!;
+      p.x += force.x;
+      p.y += force.y;
+    }
+  }
+
+  return positions;
+}
+
 /** Prepares the static data that the site graph client needs to render. */
 export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
   const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  // Keep only edges that cross a module boundary. Multiple direct note links
+  // between the same modules become one useful relationship for the overview.
+  const dependencyCounts = new Map<string, SiteGraphModuleDependency>();
+  for (const edge of graph.edges) {
+    const from = nodeById.get(edge.from);
+    const to = nodeById.get(edge.to);
+    if (!from || !to || from.module === to.module) continue;
+    const key = `${from.module}\u0000${to.module}`;
+    const dependency = dependencyCounts.get(key);
+    if (dependency) {
+      dependency.links++;
+    } else {
+      dependencyCounts.set(key, { from: from.module, to: to.module, links: 1 });
+    }
+  }
+  const moduleDependencies = [...dependencyCounts.values()].sort(
+    (a, b) =>
+      b.links - a.links ||
+      a.from.localeCompare(b.from) ||
+      a.to.localeCompare(b.to),
+  );
   const groupCounts = new Map<string, number>();
   const groupsByModule = new Map<string, string[]>();
   const modulesBySem = new Map<number, string[]>();
@@ -129,6 +252,13 @@ export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
       ] as const;
     }),
   );
+  const modulePositions = settleModulePositions(
+    modulesBySem,
+    moduleRadius,
+    moduleOffsets,
+    semAnchors,
+    moduleDependencies,
+  );
 
   const incoming = new Map(
     graph.nodes.map((node) => [node.id, [] as string[]]),
@@ -145,11 +275,10 @@ export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
   const nodes = graph.nodes.map((node, index) => {
     const position = placed.get(node.group) ?? 0;
     placed.set(node.group, position + 1);
-    const [sx, sy] = semAnchors.get(node.sem)!;
-    const [mx, my] = moduleOffsets.get(node.module)!;
+    const { x: mx, y: my } = modulePositions.get(node.module)!;
     const [gx, gy] = groupOffsets.get(node.group)!;
-    const ax = sx + mx + gx;
-    const ay = sy + my + gy;
+    const ax = mx + gx;
+    const ay = my + gy;
     const radius =
       layout.initialNodeRadiusFactor *
       Math.sqrt(position + layout.initialNodeRadiusOffset);
@@ -178,28 +307,6 @@ export function buildSiteGraphData(graph: NoteGraph): SiteGraphData {
     label: prettify(group),
     members: members.map((node) => node.id),
   }));
-
-  // Keep only edges that cross a module boundary. Multiple direct note links
-  // between the same modules become one useful relationship for the overview.
-  const dependencyCounts = new Map<string, SiteGraphModuleDependency>();
-  for (const edge of graph.edges) {
-    const from = nodeById.get(edge.from);
-    const to = nodeById.get(edge.to);
-    if (!from || !to || from.module === to.module) continue;
-    const key = `${from.module}\u0000${to.module}`;
-    const dependency = dependencyCounts.get(key);
-    if (dependency) {
-      dependency.links++;
-    } else {
-      dependencyCounts.set(key, { from: from.module, to: to.module, links: 1 });
-    }
-  }
-  const moduleDependencies = [...dependencyCounts.values()].sort(
-    (a, b) =>
-      b.links - a.links ||
-      a.from.localeCompare(b.from) ||
-      a.to.localeCompare(b.to),
-  );
 
   return {
     nodes,

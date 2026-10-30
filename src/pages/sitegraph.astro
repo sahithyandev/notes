@@ -438,8 +438,8 @@ const moduleLabel = (module: string) => {
     sem: number;
     module: string;
     group: string;
-    ax: number;
-    ay: number;
+    x: number;
+    y: number;
     r: number;
     delay: number;
     ins: GNode[];
@@ -478,10 +478,12 @@ const moduleLabel = (module: string) => {
     }),
   );
   const byId = new Map(nodes.map((n) => [n.id, n]));
+  const existingNode = (id: string): GNode | undefined => byId.get(id);
+  const isNode = (node: GNode | undefined): node is GNode => node !== undefined;
   for (const serialized of graphData.nodes) {
     const node = byId.get(serialized.id)!;
-    node.ins = serialized.incoming.map((id) => byId.get(id)!).filter(Boolean);
-    node.outs = serialized.outgoing.map((id) => byId.get(id)!).filter(Boolean);
+    node.ins = serialized.incoming.map(existingNode).filter(isNode);
+    node.outs = serialized.outgoing.map(existingNode).filter(isNode);
   }
   const links: Link[] = [];
   for (const e of graphData.edges) {
@@ -497,7 +499,7 @@ const moduleLabel = (module: string) => {
       blob.group,
       {
         ...blob,
-        members: blob.members.map((id) => byId.get(id)!).filter(Boolean),
+        members: blob.members.map(existingNode).filter(isNode),
         x: 0,
         y: 0,
         r: 0,
