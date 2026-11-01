@@ -1,7 +1,7 @@
 ---
 title: Constrained Optimization
 dateCreated: 2026-09-23T08:07:54.136Z
-lastUpdatedOn: 2026-10-21T16:35:22.612Z
+lastUpdatedOn: 2026-11-01T06:59:14.756Z
 ---
 
 Constrained optimization minimizes or maximizes $f(x)$ subject to restrictions on the design variables $x$.
@@ -35,7 +35,40 @@ When $f$ and every constraint are linear, the problem is a linear programming pr
 
 </Note>
 
-## Worked Example
+## Linear Programming
+
+Linear programming is constrained optimization where the objective function and every constraint are linear.
+
+### Standard Form
+
+Objective function
+
+$$
+z = f(x) = a_1 x_1 + a_2 x_2 + \cdots + a_n x_n
+$$
+
+Constraints
+
+$$
+a_{i1} x_1 + a_{i2} x_2 + \cdots + a_{in} x_n \leq b_i
+$$
+
+The constraint may use $\geq$ in place of $\leq$.
+
+### Graphical Solution
+
+For 2 design variables:
+
+- Plot each constraint as a boundary line.
+- Shade the feasible region satisfying every constraint.
+- Move the objective-function line $z = \text{constant}$ across the feasible region.
+- Evaluate the objective function at each vertex of the feasible region.
+
+The optimum occurs at a vertex of the feasible region.
+
+### Worked Examples
+
+#### Example 1
 
 Minimize $f(x, y) = x^2 + y^2$ subject to $x + y = 2$ and $x \leq 1.5$. Then repeat with $x \geq 1.5$ in place of $x \leq 1.5$.
 
@@ -68,5 +101,64 @@ The unconstrained optimum $x = 1$ violates the inequality. $f = 2x^2 - 4x + 4$ i
 $$
 x = 1.5, \quad y = 0.5, \quad f_{\min} = 2.25 + 0.25 = 2.5
 $$
+
+</Solution>
+
+#### Example 2
+
+A factory produces heaters of types $S$ and $L$, sold wholesale at \$40 and \$88 respectively. Machine $M_1$ needs 2 minutes per $S$ heater and 8 minutes per $L$ heater. Machine $M_2$ needs 5 minutes per $S$ heater and 2 minutes per $L$ heater. Both machines run 60 minutes per hour. Find the hourly production rates $x_1$ ($S$) and $x_2$ ($L$) maximizing hourly revenue.
+
+<Solution>
+
+Objective function
+
+$$
+z = f(x) = 40x_1 + 88x_2
+$$
+
+Constraints
+
+$$
+\begin{aligned}
+2x_1 + 8x_2 &\leq 60 \\
+5x_1 + 2x_2 &\leq 60 \\
+x_1 &\geq 0 \\
+x_2 &\geq 0
+\end{aligned}
+$$
+
+The constraint intersections in the first quadrant are $(0, 0)$, $(12, 0)$, $(0, 7.5)$ and $(10, 5)$.
+
+| Vertex     | Revenue |
+| ---------- | ------- |
+| $(0, 0)$   | $0$     |
+| $(12, 0)$  | $480$   |
+| $(0, 7.5)$ | $660$   |
+| $(10, 5)$  | $840$   |
+
+The optimum is $(x_1, x_2) = (10, 5)$.
+
+$$
+z_{\max} = 40(10) + 88(5) = 840
+$$
+
+</Solution>
+
+#### Example 3
+
+Maximize $z = 3x_1 + 2x_2$ subject to $x_1 + x_2 \leq 4$, $x_1 \leq 3$, $x_1, x_2 \geq 0$.
+
+<Solution>
+
+The feasible region has vertices $(0, 0)$, $(3, 0)$, $(3, 1)$ and $(0, 4)$.
+
+| Vertex   | $z = 3x_1 + 2x_2$ |
+| -------- | ----------------- |
+| $(0, 0)$ | $0$               |
+| $(3, 0)$ | $9$               |
+| $(3, 1)$ | $11$              |
+| $(0, 4)$ | $8$               |
+
+The maximum is $z = 11$ at $(3, 1)$.
 
 </Solution>

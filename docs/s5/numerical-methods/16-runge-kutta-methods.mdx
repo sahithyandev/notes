@@ -5,7 +5,7 @@ notebooks:
   - runge-kutta-modified-euler
   - runge-kutta-order-4
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-21T16:42:27.873Z
+lastUpdatedOn: 2026-11-01T06:59:14.713Z
 ---
 
 Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problems) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
@@ -27,7 +27,7 @@ w_{i+1} &= w_i + h\, f\left( t_i + \frac{h}{2},\ w_i + \frac{h}{2} f(t_i, w_i) \
 \end{aligned}
 $$
 
-Local error $O(h^2)$.
+The local truncation error is $O(h^3)$. The global error is $O(h^2)$.
 
 ## Modified Euler Method
 
@@ -40,7 +40,7 @@ w_{i+1} &= w_i + \frac{h}{2}\left[ f(t_i, w_i) + f\big(t_{i+1},\ w_i + h f(t_i, 
 \end{aligned}
 $$
 
-Local error $O(h^3)$.
+The local truncation error is $O(h^4)$. The global error is $O(h^3)$.
 
 ## Order 4 Runge-Kutta
 
@@ -55,16 +55,16 @@ w_{i+1} &= w_i + \tfrac{1}{6}\left( k_1 + 2k_2 + 2k_3 + k_4 \right)
 \end{aligned}
 $$
 
-for $i = 0, 1, \ldots, N-1$. Local error $O(h^4)$.
+for $i = 0, 1, \ldots, N-1$. The local truncation error is $O(h^5)$. The global error is $O(h^4)$.
 
 ## Error Orders
 
-| Method              | Asymptotic error bound |
-| ------------------- | ---------------------- |
-| Euler               | $O(h)$                 |
-| Midpoint            | $O(h^2)$               |
-| Modified Euler      | $O(h^3)$               |
-| Order 4 Runge-Kutta | $O(h^4)$               |
+| Method              | Global error | Local truncation error |
+| ------------------- | ------------ | ---------------------- |
+| Euler               | $O(h)$       | $O(h^2)$               |
+| Midpoint            | $O(h^2)$     | $O(h^3)$               |
+| Modified Euler      | $O(h^3)$     | $O(h^4)$               |
+| Order 4 Runge-Kutta | $O(h^4)$     | $O(h^5)$               |
 
 Higher order gives a better approximation for the same $h$.
 

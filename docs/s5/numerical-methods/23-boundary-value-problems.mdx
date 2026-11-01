@@ -1,7 +1,7 @@
 ---
 title: Boundary Value Problems
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-10-21T16:35:22.635Z
+lastUpdatedOn: 2026-11-01T06:59:14.769Z
 ---
 
 A boundary value problem (BVP) is a differential equation with conditions specified at 2 distinct points, called boundary conditions.
@@ -30,7 +30,7 @@ Otherwise, the BVP is nonlinear.
 
 ## Existence and Uniqueness
 
-The BVP has a unique solution on $[a,b]$ **iff**
+The BVP has a unique solution on $[a,b]$ if
 
 - $f$, $f_y$, and $f_{y'}$ are continuous on $D = \{(x,y,y') \mid a \leq x \leq b,\ y, y' \in \mathbb{R}\}$
 - $f_y(x,y,y') > 0$ for all $(x,y,y') \in D$
@@ -46,7 +46,7 @@ A linear BVP is solved by the [linear shooting method](#linear-shooting-method) 
 
 The linear shooting method solves a [linear BVP](#linear-and-nonlinear-bvps) by combining solutions to 2 initial value problems.
 
-A unique solution exists **iff**
+A unique solution exists if
 
 - $p$, $q$, $r$ are continuous on $[a,b]$
 - $q(x) > 0$ for $x \in [a,b]$
@@ -118,16 +118,18 @@ The method finds $t$ such that $y(b,t) - \beta = 0$, using [Newton's method](/s5
 ### Newton Iteration
 
 $$
-t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{y'(b,t_{k-1})}
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{\dfrac{\partial y}{\partial t}(b,t_{k-1})}
 $$
 
-$y'(b,t_{k-1})$ is not available, so define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
+$\dfrac{\partial y(b,t_{k-1})}{\partial t}$ is not available, so define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
 
 $$
-z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
 $$
 
-Substituting $z(b,t_{k-1})$ for $y'(b,t_{k-1})$
+The initial values follow from $y(a,t) = \alpha$ and $y'(a,t) = t$.
+
+Substituting $z(b,t_{k-1})$ for $\dfrac{\partial y}{\partial t}(b,t_{k-1})$
 
 $$
 t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
@@ -146,7 +148,7 @@ $$
   - Approximate $z_k(x) = z(x,t_k)$ from
 
     $$
-    z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 1,\ z'(a) = 0
+    z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
     $$
 
   - Update

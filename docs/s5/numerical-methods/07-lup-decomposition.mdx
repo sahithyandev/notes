@@ -3,7 +3,7 @@ title: LUP Decomposition
 notebooks:
   - lup-decomposition
 dateCreated: 2026-08-09T15:17:42.855Z
-lastUpdatedOn: 2026-10-21T16:42:27.776Z
+lastUpdatedOn: 2026-11-01T06:59:14.594Z
 ---
 
 The LUP decomposition of an $n \times n$ matrix $A$ is the triple $(L, U, P)$ satisfying
@@ -62,42 +62,62 @@ $PA\vec{x} = P\vec{b}$ becomes $LU\vec{x} = P\vec{b}$.
 
 ## Recursive Leading-Row-Column Algorithm
 
-Partition an $n \times n$ matrix into blocks
+Set $A^{(0)} = A$. At recursion depth $k$, factor the current $(n-k) \times (n-k)$ matrix $A^{(k)}$.
+
+Let $S^{(k)}$ swap the row with the largest entry in magnitude in the first column of $A^{(k)}$ into the first row. Partition the swapped matrix $B^{(k)} = S^{(k)}A^{(k)}$ as
 
 $$
-\begin{pmatrix} \bar{a}_{11} & \bar{a}_{12}^T \\ \bar{a}_{21} & \bar{A}_{22} \end{pmatrix}
+B^{(k)} = \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ c^{(k)} & C^{(k)} \end{pmatrix}
 $$
 
 Here:
 
 <Symbols>
-  <Sym s="\bar{a}_{11}">$1 \times 1$ pivot</Sym>
-  <Sym s="\bar{a}_{12}^T">$1 \times (n-1)$ rest of the pivot row</Sym>
-  <Sym s="\bar{a}_{21}">$(n-1) \times 1$ rest of the pivot column</Sym>
-  <Sym s="\bar{A}_{22}">$(n-1) \times (n-1)$ remaining block</Sym>
+  <Sym s="A^{(k)}">matrix entering recursion depth $k$</Sym>
+  <Sym s="B^{(k)}">matrix after the row swap</Sym>
+  <Sym s="\alpha^{(k)}">pivot</Sym>
+  <Sym s="\left(r^{(k)}\right)^T">rest of the pivot row</Sym>
+  <Sym s="c^{(k)}">rest of the pivot column</Sym>
+  <Sym s="C^{(k)}">trailing block</Sym>
+  <Sym s="\ell^{(k)}">multiplier vector</Sym>
+  <Sym s="S^{(k)}">row swap at recursion depth $k$</Sym>
 </Symbols>
 
-The Schur complement of $\bar{a}_{11}$ is
+### Schur Complement
+
+Define the multiplier vector and the next recursive matrix as
 
 $$
-A' = \bar{A}_{22} - \frac{\bar{a}_{21}\bar{a}_{12}^T}{\bar{a}_{11}}
+\ell^{(k)} = \frac{c^{(k)}}{\alpha^{(k)}}, \qquad
+A^{(k+1)} = C^{(k)} - \ell^{(k)}\left(r^{(k)}\right)^T
 $$
 
-Base case $n = 1$ gives $L = (1)$, $U = (a)$, $P = (1)$.
+$A^{(k+1)}$ is the Schur complement of $α^{(k)}$ in $B^{(k)}$.
 
-Recursive step
+### Base Case
 
-- Pick row $i$ with the largest $|a_{i1}|$. Let $P_1$ swap row $i$ with row $1$.
-- Let $\bar{A} = P_1 A$ and partition it as above.
-- Compute the multipliers $\bar{a}_{21}/\bar{a}_{11}$ and the Schur complement $A'$.
-- Recurse on $A'$ to get $P_2 A' = L_2 U_2$.
-- Combine
+When $A^{(k)}$ is $1 \times 1$, set
 
 $$
-P = \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P_2 \end{pmatrix} P_1, \quad
-L = \begin{pmatrix} 1 & \vec{0}^T \\ P_2\bar{a}_{21}/\bar{a}_{11} & L_2 \end{pmatrix}, \quad
-U = \begin{pmatrix} \bar{a}_{11} & \bar{a}_{12}^T \\ \vec{0} & U_2 \end{pmatrix}
+P^{(k)} = L^{(k)} = (1), \qquad U^{(k)} = A^{(k)}
 $$
+
+### Recursive Step
+
+For a matrix larger than $1 \times 1$:
+
+- Form $B^{(k)} = S^{(k)}A^{(k)}$ and partition it.
+- Compute $\ell^{(k)}$ and $A^{(k+1)}$.
+- Recurse on $A^{(k+1)}$ to get $P^{(k+1)}A^{(k+1)} = L^{(k+1)}U^{(k+1)}$.
+- Return
+
+$$
+P^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P^{(k+1)} \end{pmatrix}S^{(k)}, \quad
+L^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ P^{(k+1)}\ell^{(k)} & L^{(k+1)} \end{pmatrix}, \quad
+U^{(k)} = \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ \vec{0} & U^{(k+1)} \end{pmatrix}
+$$
+
+The required decomposition is $P = P^{(0)}$, $L = L^{(0)}$, $U = U^{(0)}$.
 
 ## Worked Examples
 
@@ -111,36 +131,50 @@ $$
 
 <Solution>
 
-Level 1, $n = 3$. Column $1$ is $(0, 2, 6)^T$, so the pivot is $6$ in row $3$. $P_1$ swaps rows $1$ and $3$.
+Set $A^{(0)} = A$. At depth $0$, column $1$ is $(0, 2, 6)^T$. The pivot is $6$ in row $3$. Let $S^{(0)}$ swap rows $1$ and $3$.
 
 $$
-\bar{A} = P_1 A = \begin{pmatrix} 6 & 8 & 8 \\ 2 & 9 & 0 \\ 0 & 5 & 5 \end{pmatrix}
-$$
-
-$$
-\frac{\bar{a}_{21}}{\bar{a}_{11}} = \begin{pmatrix} 1/3 \\ 0 \end{pmatrix}, \quad
-A' = \begin{pmatrix} 9 & 0 \\ 5 & 5 \end{pmatrix} - \frac{1}{6}\begin{pmatrix} 2 \\ 0 \end{pmatrix}(8 \enspace 8) = \begin{pmatrix} 19/3 & -8/3 \\ 5 & 5 \end{pmatrix}
-$$
-
-Level 2, $n = 2$. Column $1$ of $A'$ is $(19/3, 5)^T$, so the pivot $19/3$ is already in row $1$ and $P_2 = I_2$.
-
-$$
-\frac{5}{19/3} = \frac{15}{19}, \quad
-A'' = 5 - \frac{5 \cdot (-8/3)}{19/3} = \frac{135}{19}
-$$
-
-Level 3, $n = 1$. $L = (1)$, $U = (135/19)$, $P = (1)$.
-
-Combining back up
-
-$$
-L_2 = \begin{pmatrix} 1 & 0 \\ 15/19 & 1 \end{pmatrix}, \quad U_2 = \begin{pmatrix} 19/3 & -8/3 \\ 0 & 135/19 \end{pmatrix}
+S^{(0)} = \begin{pmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{pmatrix}
 $$
 
 $$
-P = \begin{pmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \quad
-L = \begin{pmatrix} 1 & 0 & 0 \\ 1/3 & 1 & 0 \\ 0 & 15/19 & 1 \end{pmatrix}, \quad
-U = \begin{pmatrix} 6 & 8 & 8 \\ 0 & 19/3 & -8/3 \\ 0 & 0 & 135/19 \end{pmatrix}
+B^{(0)} = S^{(0)}A^{(0)} = \begin{pmatrix} 6 & 8 & 8 \\ 2 & 9 & 0 \\ 0 & 5 & 5 \end{pmatrix}
+$$
+
+$$
+\alpha^{(0)} = 6, \quad \left(r^{(0)}\right)^T = (8 \enspace 8), \quad c^{(0)} = \begin{pmatrix} 2 \\ 0 \end{pmatrix}, \quad C^{(0)} = \begin{pmatrix} 9 & 0 \\ 5 & 5 \end{pmatrix}
+$$
+
+$$
+\ell^{(0)} = \begin{pmatrix} 1/3 \\ 0 \end{pmatrix}, \quad
+A^{(1)} = C^{(0)} - \ell^{(0)}\left(r^{(0)}\right)^T = \begin{pmatrix} 19/3 & -8/3 \\ 5 & 5 \end{pmatrix}
+$$
+
+At depth $1$, column $1$ of $A^{(1)}$ is $(19/3, 5)^T$. The pivot is already in row $1$, so $S^{(1)} = I_2$.
+
+$$
+B^{(1)} = A^{(1)}, \quad \alpha^{(1)} = \frac{19}{3}, \quad \left(r^{(1)}\right)^T = \left(-\frac{8}{3}\right), \quad c^{(1)} = (5), \quad C^{(1)} = (5)
+$$
+
+$$
+\ell^{(1)} = \frac{15}{19}, \quad
+A^{(2)} = C^{(1)} - \ell^{(1)}\left(r^{(1)}\right)^T = \frac{135}{19}
+$$
+
+At depth $2$, $A^{(2)}$ is $1 \times 1$. Therefore $P^{(2)} = L^{(2)} = (1)$ and $U^{(2)} = (135/19)$.
+
+Returning from depth $1$
+
+$$
+P^{(1)} = I_2, \quad L^{(1)} = \begin{pmatrix} 1 & 0 \\ 15/19 & 1 \end{pmatrix}, \quad U^{(1)} = \begin{pmatrix} 19/3 & -8/3 \\ 0 & 135/19 \end{pmatrix}
+$$
+
+Returning from depth $0$
+
+$$
+P = P^{(0)} = \begin{pmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \quad
+L = L^{(0)} = \begin{pmatrix} 1 & 0 & 0 \\ 1/3 & 1 & 0 \\ 0 & 15/19 & 1 \end{pmatrix}, \quad
+U = U^{(0)} = \begin{pmatrix} 6 & 8 & 8 \\ 0 & 19/3 & -8/3 \\ 0 & 0 & 135/19 \end{pmatrix}
 $$
 
 Check, row 3 of $LU$
