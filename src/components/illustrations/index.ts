@@ -15,6 +15,7 @@ export { default as CpmStep } from "./cpm-step.astro";
 export { default as CpmTable } from "./cpm-table.astro";
 export { default as CubicSplineDiagram } from "./cubic-spline-diagram.astro";
 export { default as DeformationInvarianceDiagram } from "./deformation-invariance-diagram.astro";
+export { default as DeadweightLossDiagram } from "./deadweight-loss-diagram.astro";
 export { default as DemandCurveDiagram } from "./demand-curve-diagram.astro";
 export { default as DfdDiagram } from "./dfd-diagram.astro";
 export { default as DivergenceTheoremDiagram } from "./divergence-theorem-diagram.astro";

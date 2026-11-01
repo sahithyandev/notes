@@ -1,0 +1,98 @@
+---
+// Static price-ceiling diagram: the shaded triangle contains the trades that
+// would occur at equilibrium but do not occur when supply is limited to Q_s.
+import AxesFigure from "./primitives/axes-figure.astro";
+---
+
+<AxesFigure
+  captionSlot
+  title="Deadweight Loss From a Price Ceiling"
+  desc="A binding price ceiling limits trade to quantity Q sub s. The shaded triangle between the demand and supply curves, from Q sub s to the equilibrium quantity Q star, is deadweight loss."
+  yLabel="Price"
+  xLabel="Quantity"
+>
+  <path class="region tone-pt" d="M 157 195 L 157 111 L 223 155 Z"></path>
+
+  <path class="curve tone-s5" d="M 75 55 L 370 255"></path>
+  <path class="curve tone-ct" d="M 75 245 L 370 65"></path>
+  <line class="ceiling tone-key" x1="50" y1="195" x2="370" y2="195"></line>
+
+  <line class="guide" x1="157" y1="111" x2="50" y2="111"></line>
+  <line class="guide" x1="157" y1="195" x2="50" y2="195"></line>
+  <line class="guide" x1="223" y1="155" x2="50" y2="155"></line>
+  <line class="guide" x1="157" y1="195" x2="157" y2="290"></line>
+  <line class="guide" x1="223" y1="155" x2="223" y2="290"></line>
+
+  <circle class="pt tone-pt" cx="223" cy="155" r="5"></circle>
+
+  <text class="axis-tick" x="42" y="115" text-anchor="end">
+    P
+    <tspan dy="4" font-size="9">
+      d
+    </tspan>
+  </text>
+  <text class="axis-tick" x="42" y="159" text-anchor="end">
+    P
+    <tspan dy="4" font-size="9">
+      *
+    </tspan>
+  </text>
+  <text class="axis-tick" x="42" y="199" text-anchor="end">
+    P
+    <tspan dy="4" font-size="9">
+      c
+    </tspan>
+  </text>
+  <text class="axis-tick" x="157" y="305" text-anchor="middle">
+    Q
+    <tspan dy="4" font-size="9">
+      s
+    </tspan>
+  </text>
+  <text class="axis-tick" x="223" y="305" text-anchor="middle">
+    Q
+    <tspan dy="4" font-size="9">
+      *
+    </tspan>
+  </text>
+
+  <text class="curve-label tone-s5" x="375" y="258">
+    D
+  </text>
+  <text class="curve-label tone-ct" x="375" y="66">
+    S
+  </text>
+  <text class="ceiling-label tone-key" x="285" y="188">
+    Price ceiling
+  </text>
+  <text class="region-label tone-pt" x="171" y="153">
+    DWL
+  </text>
+
+  <Fragment slot="caption">
+    The <span class="tone-pt">shaded triangle</span> is the deadweight loss. The
+    price ceiling <span class="tone-key">P&#832c;</span> limits trade to
+    <span class="tone-pt">Q&#832s;</span>, below the equilibrium quantity
+    <span class="tone-pt">Q*</span>.
+  </Fragment>
+</AxesFigure>
+
+<style>
+  .region {
+    fill: var(--tone);
+    opacity: 0.18;
+  }
+
+  .ceiling {
+    stroke: var(--tone);
+    stroke-width: 2;
+    stroke-dasharray: 7 4;
+  }
+
+  .ceiling-label,
+  .region-label {
+    fill: var(--tone);
+    font-size: 13px;
+    font-weight: 600;
+  }
+</style>
