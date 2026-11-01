@@ -1,87 +1,100 @@
 ---
 title: Interpolation
 dateCreated: 2026-10-21T16:32:28.558Z
-lastUpdatedOn: 2026-10-21T16:42:27.830Z
+lastUpdatedOn: 2026-11-01T16:38:00.039Z
 ---
 
-Interpolation constructs a function $\phi$ that passes through a given set of data points.
+Interpolation estimates values between known data points.
 
-Given $n + 1$ data points $(x_i, y_i)$ with distinct nodes $x_0 < x_1 < \cdots < x_n$, find $\phi$ such that
+Given $n+1$ points $(x_i,y_i)$ with distinct nodes
 
 $$
-\phi(x_i) = y_i, \quad i = 0, 1, \ldots, n
+x_0 < x_1 < \cdots < x_n,
 $$
 
-Evaluating $\phi$ inside $[x_0, x_n]$ is interpolation. Evaluating it outside is extrapolation, which is less reliable.
+find a function $\phi$ satisfying
 
-## Types of Interpolation
+$$
+\phi(x_i)=y_i, \qquad i=0,1,\ldots,n.
+$$
 
-The form of $\phi$ determines the type.
+Use $\phi(x)$ for $x\in[x_0,x_n]$. This is interpolation. Values outside this interval are extrapolation. They are less reliable.
 
-### Polynomial Interpolation
+## Choosing an Interpolant
+
+Choose the form from the data.
+
+| Data                     | Interpolant          | Key Property                        |
+| ------------------------ | -------------------- | ----------------------------------- |
+| Few points               | Polynomial           | One formula through every point     |
+| Many non-periodic points | Piecewise polynomial | Low-degree formula on each interval |
+| Periodic data            | Trigonometric        | Repeating sine and cosine terms     |
+| Poles or sharp changes   | Rational             | Ratio of polynomials                |
+| Values and slopes known  | Hermite              | Matches values and derivatives      |
+
+## Polynomial Interpolation
 
 <Theorem>
 
-For distinct nodes $x_0, \ldots, x_n$ and values $y_0, \ldots, y_n$, there is a unique polynomial $p_n$ of degree at most $n$ with $p_n(x_i) = y_i$.
+For distinct nodes $x_0,\ldots,x_n$ and values $y_0,\ldots,y_n$, exactly 1 polynomial $p_n$ of degree at most $n$ satisfies
+
+$$
+p_n(x_i)=y_i.
+$$
 
 </Theorem>
-
-<Proof label="Proof Hint">
-
-- Write $p_n(x) = a_0 + a_1 x + \cdots + a_n x^n$
-- Apply $p_n(x_i) = y_i$ to get $n + 1$ linear equations
-- Show the coefficient matrix is nonsingular
-
-</Proof>
 
 The Lagrange form is
 
 $$
-p_n(x) = \sum_{i=0}^{n} y_i L_i(x), \qquad L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}
+p_n(x)=\sum_{i=0}^{n}y_iL_i(x),
+\qquad
+L_i(x)=\prod_{\substack{j=0\\j\ne i}}^{n}\frac{x-x_j}{x_i-x_j}.
 $$
+
+Each basis polynomial has 1 job.
+
+$$
+L_i(x_j)=
+\begin{cases}
+1, & i=j,\\
+0, & i\ne j.
+\end{cases}
+$$
+
+Therefore $p_n(x_j)=y_j$. At node $x_j$, every term disappears except $y_jL_j(x_j)$.
 
 <Note>
 
-High-degree polynomials on equally spaced nodes oscillate badly near the ends of the interval. This is the Runge phenomenon.
+High-degree polynomial interpolation at equally spaced nodes can oscillate near the interval ends. This is the Runge phenomenon.
 
 </Note>
 
 <RungePhenomenonDiagram />
 
-### Piecewise Polynomial Interpolation
+## Piecewise Polynomial Interpolation
 
-Split $[x_0, x_n]$ into subintervals and fit a low-degree polynomial on each.
+Split $[x_0,x_n]$ into intervals. Use a low-degree polynomial on each interval.
 
 - Piecewise linear  
-  Straight segments. Continuous, with corners at the nodes.
+  Straight segments. Continuous with corners at the nodes.
 - Piecewise quadratic  
-  Parabolic segments. The derivative may jump at the nodes.
+  Parabolic segments. Slopes can jump at the nodes.
 - Cubic spline  
-  Cubic segments with continuous first and second derivatives. Covered in the next note.
+  Cubic segments with continuous value, slope and curvature.
 
-### Trigonometric Interpolation
+## Other Forms
 
-For periodic data, $\phi$ is a sum of sines and cosines
+For periodic data,
 
 $$
-\phi(x) = \frac{a_0}{2} + \sum_{k=1}^{m} \left(a_k \cos kx + b_k \sin kx\right)
+\phi(x)=\frac{a_0}{2}+\sum_{k=1}^{m}\left(a_k\cos(kx)+b_k\sin(kx)\right).
 $$
 
-### Rational Interpolation
+For rational interpolation,
 
-$\phi = p / q$ with polynomials $p$ and $q$. Suited to functions with poles or sharp changes, which polynomials approximate poorly.
+$$
+\phi(x)=\frac{p(x)}{q(x)}.
+$$
 
-### Hermite Interpolation
-
-Matches both values $y_i$ and derivatives $y_i'$ at each node.
-
-## Comparison
-
-| Type             | Form of $\phi$                  | Continuity                 |
-| ---------------- | ------------------------------- | -------------------------- |
-| Polynomial       | Single polynomial               | $C^\infty$                 |
-| Piecewise linear | Line on each subinterval        | $C^0$                      |
-| Cubic spline     | Cubic on each subinterval       | $C^2$                      |
-| Trigonometric    | Sum of sines and cosines        | $C^\infty$                 |
-| Rational         | Ratio of polynomials            | $C^\infty$ away from poles |
-| Hermite          | Polynomial matching derivatives | $C^1$ piecewise            |
+For Hermite interpolation, $\phi$ matches both $y_i$ and $y_i'$ at each node.

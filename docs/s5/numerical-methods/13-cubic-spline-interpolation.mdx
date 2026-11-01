@@ -3,362 +3,164 @@ title: Cubic Spline Interpolation
 notebooks:
   - cubic-spline-interpolation
 dateCreated: 2026-08-11T05:00:40.584Z
-lastUpdatedOn: 2026-10-22T05:25:28.809Z
+lastUpdatedOn: 2026-11-01T16:38:00.113Z
 ---
 
 <CubicSplineDiagram />
 
-Given nodes $a = x_0 < x_1 < \cdots < x_n = b$ and $f$ defined on $[a, b]$, a cubic spline interpolant for $f$ is a function $S$ satisfying:
+A cubic spline uses 1 cubic on each interval between consecutive nodes.
 
-- $S(x)$ is a cubic polynomial $S_j(x)$ on $[x_j, x_{j+1}]$, for each $j = 0, 1, \ldots, n-1$ (piecewise cubic)
-- $S_j(x_j) = f(x_j)$ and $S_j(x_{j+1}) = f(x_{j+1})$, for each $j = 0, 1, \ldots, n-1$ (interpolation)
-- $S_{j+1}(x_{j+1}) = S_j(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (value continuity, implied by interpolation above)
-- $S_{j+1}'(x_{j+1}) = S_j'(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (slope continuity)
-- $S_{j+1}''(x_{j+1}) = S_j''(x_{j+1})$, for each $j = 0, 1, \ldots, n-2$ (curvature continuity)
-- one of the following boundary conditions holds:
-  - $S''(x_0) = S''(x_n) = 0$ (natural, aka. free, boundary)
-  - $S'(x_0) = f'(x_0)$ and $S'(x_n) = f'(x_n)$ (clamped boundary)
-
-Each $S_j$ is written as
+For $x_0<x_1<\cdots<x_n$, write
 
 $$
-S_j(x) = a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3
+S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3,
+\qquad x\in[x_j,x_{j+1}].
 $$
 
-giving $4n$ unknowns $a_j, b_j, c_j, d_j$ and $4n$ equations from the conditions above.
+At every interior node, a spline preserves 3 quantities.
 
-## Constructing the Spline
+- Value  
+  $S_j(x_{j+1})=S_{j+1}(x_{j+1})$.
+- Slope  
+  $S_j'(x_{j+1})=S_{j+1}'(x_{j+1})$.
+- Curvature  
+  $S_j''(x_{j+1})=S_{j+1}''(x_{j+1})$.
 
-Let $h_j = x_{j+1} - x_j$. Solve order:
-
-1. $a_j = f(x_j)$, directly from interpolation.
-2. $c_j$, from the tridiagonal system plus the boundary conditions.
-3. $b_j$ and $d_j$, by back-substitution from the known $a_j, c_j$.
-
-The continuity conditions give, for each $j = 0, 1, \ldots, n-1$
-
-$$
-\begin{aligned}
-a_{j+1} &= a_j + b_j h_j + c_j h_j^2 + d_j h_j^3 & \text{(value continuity)} \\
-b_{j+1} &= b_j + 2c_j h_j + 3d_j h_j^2 & \text{(slope continuity)} \\
-c_{j+1} &= c_j + 3d_j h_j & \text{(curvature continuity)}
-\end{aligned}
-$$
-
-Eliminating $d_j$ and $b_j$ leaves a linear system in the $c_j$'s alone
+It also passes through every data point.
 
 $$
-h_{j-1}c_{j-1} + 2(h_{j-1} + h_j)c_j + h_j c_{j+1} = \frac{3}{h_j}(a_{j+1} - a_j) - \frac{3}{h_{j-1}}(a_j - a_{j-1}), \quad j = 1, \ldots, n-1 \quad \text{(tridiagonal system)}
+S_j(x_j)=f(x_j),
+\qquad
+S_j(x_{j+1})=f(x_{j+1}).
 $$
 
-Then
+Remember a spline as value, slope, curvature. The 2 endpoint conditions complete the construction.
+
+## Boundary Conditions
+
+- Natural spline  
+  $S''(x_0)=S''(x_n)=0$. The curve has zero curvature at both ends.
+- Clamped spline  
+  $S'(x_0)=f'(x_0)$ and $S'(x_n)=f'(x_n)$. The curve has prescribed endpoint slopes.
+
+## Construction
+
+Define
 
 $$
-b_j = \frac{1}{h_j}(a_{j+1} - a_j) - \frac{h_j}{3}(2c_j + c_{j+1}), \qquad d_j = \frac{c_{j+1} - c_j}{3h_j} \quad \text{(back-substitution)}
+h_j=x_{j+1}-x_j,
+\qquad
+a_j=f(x_j),
+\qquad
+\delta_j=\frac{a_{j+1}-a_j}{h_j}.
 $$
 
-<Note>
-
-The system has $n-1$ equations in $n+1$ unknowns. The boundary conditions supply the other 2.
-
-</Note>
-
-### Natural Boundary Conditions
-
-$S''(x_0) = S''(x_n) = 0$ gives $c_0 = c_n = 0$. The system is strictly diagonally dominant, so the natural spline is unique.
-
-### Clamped Boundary Conditions
-
-$S'(x_0) = f'(x_0)$ and $S'(x_n) = f'(x_n)$ give 2 more equations
+The unknowns are $c_0,\ldots,c_n$. For each interior node,
 
 $$
-2h_0 c_0 + h_0 c_1 = \frac{3}{h_0}(a_1 - a_0) - 3f'(x_0) \quad \text{(left clamp)}
+h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_jc_{j+1}
+=3(\delta_j-\delta_{j-1}),
+\qquad j=1,\ldots,n-1.
+$$
+
+Then compute
+
+$$
+b_j=\delta_j-\frac{h_j}{3}(2c_j+c_{j+1}),
+\qquad
+d_j=\frac{c_{j+1}-c_j}{3h_j}.
+$$
+
+The recipe is:
+
+1. Compute $h_j$, $a_j$ and $\delta_j$.
+2. Solve for the $c_j$ values with the interior equations and 2 boundary conditions.
+3. Compute $b_j$ and $d_j$.
+4. Substitute $a_j$, $b_j$, $c_j$ and $d_j$ into $S_j(x)$.
+
+For a natural spline, use
+
+$$
+c_0=c_n=0.
+$$
+
+For a clamped spline, replace those 2 equations with
+
+$$
+2h_0c_0+h_0c_1=3\bigl(\delta_0-f'(x_0)\bigr),
 $$
 
 $$
-h_{n-1}c_{n-1} + 2h_{n-1}c_n = 3f'(x_n) - \frac{3}{h_{n-1}}(a_n - a_{n-1}) \quad \text{(right clamp)}
+h_{n-1}c_{n-1}+2h_{n-1}c_n=3\bigl(f'(x_n)-\delta_{n-1}\bigr).
 $$
 
-This system is also strictly diagonally dominant, so the clamped spline is unique. It needs $f'(x_0)$ and $f'(x_n)$ in addition to the node values.
+## Worked Example
 
-### Shortcut Form and Recipe
-
-#### Slope Form of the System
-
-Define the slope of each interval as the divided difference
-
-$$
-\delta_j = \frac{a_{j+1} - a_j}{h_j}, \quad j = 0, 1, \ldots, n-1
-$$
-
-The tridiagonal system then becomes
-
-$$
-h_{j-1}c_{j-1} + 2(h_{j-1} + h_j)c_j + h_j c_{j+1} = 3(\delta_j - \delta_{j-1}), \quad j = 1, \ldots, n-1
-$$
-
-The right-hand side is 3 times the jump in slope between adjacent intervals.
-
-#### Re-Deriving the Back-Substitution
-
-Curvature continuity gives $c_{j+1} = c_j + 3d_jh_j$, so
-
-$$
-d_j = \frac{c_{j+1} - c_j}{3h_j}
-$$
-
-Substitute this into value continuity, $a_{j+1} = a_j + b_jh_j + c_jh_j^2 + d_jh_j^3$, and divide by $h_j$
-
-$$
-\delta_j = b_j + \frac{h_j}{3}(2c_j + c_{j+1})
-$$
-
-which gives $b_j = \delta_j - \frac{h_j}{3}(2c_j + c_{j+1})$. Substituting both into slope continuity, $b_{j+1} = b_j + 2c_jh_j + 3d_jh_j^2$, and simplifying gives the tridiagonal system above.
-
-#### Solving Recipe
-
-1. Compute $h_j$, $a_j = f(x_j)$ and $\delta_j$ for every interval.
-2. Write the interior equations with right-hand side $3(\delta_j - \delta_{j-1})$.
-3. For a natural spline, add $c_0 = c_n = 0$.
-4. For a clamped spline, add the left end equation $2h_0c_0 + h_0c_1 = 3(\delta_0 - f'(x_0))$, which comes from $f'(x_0) = \delta_0 - \frac{h_0}{3}(2c_0 + c_1)$.
-5. For a clamped spline, add the right end equation $h_{n-1}c_{n-1} + 2h_{n-1}c_n = 3(f'(x_n) - \delta_{n-1})$, which comes from $f'(x_n) = \delta_{n-1} + \frac{h_{n-1}}{3}(c_{n-1} + 2c_n)$.
-6. Solve the system for the $c_j$ values by elimination, as in Example 2.
-7. Get $b_j = \delta_j - \frac{h_j}{3}(2c_j + c_{j+1})$ and $d_j = \frac{c_{j+1} - c_j}{3h_j}$.
-8. Write each $S_j$ in the form $a_j + b_j(x - x_j) + c_j(x - x_j)^2 + d_j(x - x_j)^3$.
-
-Each clamped boundary row follows the same pattern as an interior row: 3 times the gap between a chord slope and an endpoint derivative.
-
-#### Checking the Answer
-
-- Confirm $S_j(x_{j+1}) = a_{j+1}$ for every $j$.
-- Confirm $S_0'(x_0) = f'(x_0)$ for a clamped spline, or $S_0''(x_0) = 0$ for a natural spline, as Example 3 does.
-- In Python, `scipy.interpolate.CubicSpline(x, y, bc_type='natural')` gives the natural spline. For clamped, pass `bc_type=((1, fp0), (1, fpn))`. Its coefficients are stored highest power first, so reverse them before comparing with $a_j, b_j, c_j, d_j$.
-
-## Worked Examples
-
-### Example 1
-
-Construct a natural cubic spline through $(1, 2), (2, 3), (3, 5)$.
+Construct the natural cubic spline through $(1,2)$, $(2,3)$ and $(3,5)$.
 
 <Solution>
 
-Here $h_0 = h_1 = 1$, $a = (2, 3, 5)$ and, by the natural condition, $c_0 = c_2 = 0$.
-
-<StepByStep>
-
-<StepItem label="Find c₁">
-
 $$
-4c_1 = 3(a_2 - a_1) - 3(a_1 - a_0) = 3(2) - 3(1) = 3
-$$
-
-$$
-c_1 = \tfrac{3}{4}
+h_0=h_1=1,
+\qquad
+a_0=2,
+a_1=3,
+a_2=5,
+\qquad
+c_0=c_2=0.
 $$
 
-</StepItem>
-
-<StepItem label="Piece 0: b₀, d₀">
+The only interior equation is
 
 $$
-b_0 = (a_1 - a_0) - \tfrac{1}{3}(2c_0 + c_1) = 1 - \tfrac{1}{4} = \tfrac{3}{4}
+4c_1=3\bigl((5-3)-(3-2)\bigr)=3.
 $$
 
-$$
-d_0 = \tfrac{c_1 - c_0}{3} = \tfrac{1}{4}
-$$
-
-</StepItem>
-
-<StepItem label="Piece 1: b₁, d₁">
+Therefore
 
 $$
-b_1 = (a_2 - a_1) - \tfrac{1}{3}(2c_1 + c_2) = 2 - \tfrac{1}{2} = \tfrac{3}{2}
+c_1=\frac{3}{4}.
 $$
 
-$$
-d_1 = \tfrac{c_2 - c_1}{3} = -\tfrac{1}{4}
-$$
-
-</StepItem>
-
-<StepItem label="Write the pieces">
+For $[1,2]$,
 
 $$
-S(x) = \begin{cases} 2 + \tfrac{3}{4}(x-1) + \tfrac{1}{4}(x-1)^3, & x \in [1, 2] \\[4pt] 3 + \tfrac{3}{2}(x-2) + \tfrac{3}{4}(x-2)^2 - \tfrac{1}{4}(x-2)^3, & x \in [2, 3] \end{cases}
+b_0=1-\frac{1}{3}\left(0+\frac{3}{4}\right)=\frac{3}{4},
+\qquad
+d_0=\frac{3/4-0}{3}=\frac{1}{4}.
 $$
 
-</StepItem>
-
-<StepItem label="Check">
+For $[2,3]$,
 
 $$
-S_0(2) = 2 + \tfrac{3}{4} + \tfrac{1}{4} = 3, \qquad S_1(3) = 3 + \tfrac{3}{2} + \tfrac{3}{4} - \tfrac{1}{4} = 5
-$$
-
-</StepItem>
-
-</StepByStep>
-
-</Solution>
-
-### Example 2
-
-Construct a natural cubic spline through $(0, 0), (1, 1), (2, 0), (3, 1)$.
-
-<Solution>
-
-Here $h_0 = h_1 = h_2 = 1$, $a = (0, 1, 0, 1)$ and $c_0 = c_3 = 0$. Only $c_1$ and $c_2$ are unknown.
-
-<StepByStep>
-
-<StepItem label="Set up the equations">
-
-$$
-\begin{aligned}
-4c_1 + c_2 &= 3(a_2 - a_1) - 3(a_1 - a_0) = -6 \\
-c_1 + 4c_2 &= 3(a_3 - a_2) - 3(a_2 - a_1) = 6
-\end{aligned}
-$$
-
-</StepItem>
-
-<StepItem label="Solve for c₁, c₂">
-
-$$
-c_1 = \frac{-6 - c_2}{4} \implies \frac{-6 - c_2}{4} + 4c_2 = 6 \implies c_2 = 2
+b_1=2-\frac{1}{3}\left(2\cdot\frac{3}{4}+0\right)=\frac{3}{2},
+\qquad
+d_1=\frac{0-3/4}{3}=-\frac{1}{4}.
 $$
 
 $$
-c_1 = \frac{-6 - 2}{4} = -2
+S(x)=
+\begin{cases}
+2+\frac{3}{4}(x-1)+\frac{1}{4}(x-1)^3, & 1\le x\le2,\\[4pt]
+3+\frac{3}{2}(x-2)+\frac{3}{4}(x-2)^2-\frac{1}{4}(x-2)^3, & 2\le x\le3.
+\end{cases}
 $$
-
-</StepItem>
-
-<StepItem label="Piece 0: b₀, d₀">
-
-$$
-b_0 = 1 - \tfrac{1}{3}(0 - 2) = \tfrac{5}{3}, \qquad d_0 = \tfrac{-2 - 0}{3} = -\tfrac{2}{3}
-$$
-
-</StepItem>
-
-<StepItem label="Piece 1: b₁, d₁">
-
-$$
-b_1 = -1 - \tfrac{1}{3}(-4 + 2) = -\tfrac{1}{3}, \qquad d_1 = \tfrac{2 - (-2)}{3} = \tfrac{4}{3}
-$$
-
-</StepItem>
-
-<StepItem label="Piece 2: b₂, d₂">
-
-$$
-b_2 = 1 - \tfrac{1}{3}(4 + 0) = -\tfrac{1}{3}, \qquad d_2 = \tfrac{0 - 2}{3} = -\tfrac{2}{3}
-$$
-
-</StepItem>
-
-<StepItem label="Write the pieces">
-
-$$
-S(x) = \begin{cases} \tfrac{5}{3}x - \tfrac{2}{3}x^3, & x \in [0, 1] \\[4pt] 1 - \tfrac{1}{3}(x-1) - 2(x-1)^2 + \tfrac{4}{3}(x-1)^3, & x \in [1, 2] \\[4pt] -\tfrac{1}{3}(x-2) + 2(x-2)^2 - \tfrac{2}{3}(x-2)^3, & x \in [2, 3] \end{cases}
-$$
-
-</StepItem>
-
-<StepItem label="Check">
-
-$$
-S_0(1) = \tfrac{5}{3} - \tfrac{2}{3} = 1, \qquad S_1(2) = 1 - \tfrac{1}{3} - 2 + \tfrac{4}{3} = 0
-$$
-
-</StepItem>
-
-</StepByStep>
-
-</Solution>
-
-### Example 3
-
-Construct a clamped cubic spline through $(0, 0), (1, 1), (2, 0)$ with $f'(0) = 1$ and $f'(2) = -1$.
-
-A clamped spline fixes the slope at each end instead of the curvature. Each fixed slope adds one equation.
-
-<Solution>
-
-Here $h = 1$, $a = (0, 1, 0)$, and the unknowns are $c_0, c_1, c_2$.
-
-<StepByStep>
-
-<StepItem label="Set up the equations">
-
-$$
-\begin{aligned}
-c_0 + 4c_1 + c_2 &= 3(a_2 - a_1) - 3(a_1 - a_0) = -6 \\
-2c_0 + c_1 &= 0 \quad \text{from } b_0 = 1 - \tfrac{1}{3}(2c_0 + c_1) = f'(0) = 1 \\
-c_1 + 2c_2 &= 0 \quad \text{from } S_1'(2) = b_1 + 2c_1 + 3d_1 = -1 + \tfrac{1}{3}(c_1 + 2c_2) = f'(2) = -1
-\end{aligned}
-$$
-
-</StepItem>
-
-<StepItem label="Solve for c₀, c₁, c₂">
-
-$$
-c_1 = -2c_0, \qquad c_2 = -\tfrac{1}{2}c_1 = c_0
-$$
-
-$$
-c_0 - 8c_0 + c_0 = -6 \implies c_0 = 1, \qquad c_1 = -2, \qquad c_2 = 1
-$$
-
-</StepItem>
-
-<StepItem label="Piece 0: b₀, d₀">
-
-$$
-b_0 = 1 - \tfrac{1}{3}(2 - 2) = 1, \qquad d_0 = \tfrac{-2 - 1}{3} = -1
-$$
-
-</StepItem>
-
-<StepItem label="Piece 1: b₁, d₁">
-
-$$
-b_1 = -1 - \tfrac{1}{3}(-4 + 1) = 0, \qquad d_1 = \tfrac{1 - (-2)}{3} = 1
-$$
-
-</StepItem>
-
-<StepItem label="Write the pieces">
-
-$$
-S(x) = \begin{cases} x + x^2 - x^3, & x \in [0, 1] \\[4pt] 1 - 2(x-1)^2 + (x-1)^3, & x \in [1, 2] \end{cases}
-$$
-
-</StepItem>
-
-<StepItem label="Check">
-
-$$
-S_0'(0) = b_0 = 1 = f'(0), \qquad S_1'(2) = 0 + 2(-2) + 3(1) = -1 = f'(2)
-$$
-
-$$
-S_0(1) = 1, \qquad S_1(2) = 0
-$$
-
-</StepItem>
-
-</StepByStep>
 
 </Solution>
 
 ## Error
 
-For $f \in C^4[a,b]$ with $\max_{a \leq x \leq b} |f^{(4)}(x)| = M$, the unique clamped cubic spline interpolant $S$ satisfies, for all $x \in [a, b]$
+For $f\in C^4[a,b]$, let
 
 $$
-|f(x) - S(x)| \leq \frac{5M}{384} \max_{0 \leq j \leq n-1} (x_{j+1} - x_j)^4 \quad \text{(error bound)}
+M=\max_{a\le x\le b}|f^{(4)}(x)|.
 $$
+
+The clamped cubic spline $S$ satisfies
+
+$$
+|f(x)-S(x)|\le\frac{5M}{384}
+\max_{0\le j\le n-1}(x_{j+1}-x_j)^4.
+$$
+
+Smaller intervals reduce the error at the 4th-power rate.

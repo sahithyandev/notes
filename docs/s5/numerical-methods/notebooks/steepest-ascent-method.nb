@@ -1,0 +1,56 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.3' *)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["Steepest Ascent Method", "Title"],
+
+Cell["Companion to docs/s5/numerical-methods/20-steepest-ascent-method.mdx. The notebook maximizes the worked-example function by exact line searches in the gradient direction.", "Text"],
+
+Cell["Problem", "Section"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"f", "[", RowBox[{"x_", ",", "y_"}], "]"}], ":=", 
+  RowBox[{"2", " ", "x", " ", "y"}], "+", RowBox[{"2", " ", "x"}], "-", 
+  SuperscriptBox["x", "2"], "-", RowBox[{"2", " ", SuperscriptBox["y", "2"]}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{"start", "=", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1"}], "}"}]}]], "Input"],
+
+Cell["Gradient and Exact Line Search", "Section"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"gradient", "[", RowBox[{"x_", ",", "y_"}], "]"}], ":=", 
+  RowBox[{"{", RowBox[{RowBox[{"D", "[", RowBox[{RowBox[{"f", "[", RowBox[{"u", ",", "v"}], "]"}], ",", "u"}], "]"}], "/.", RowBox[{"{", RowBox[{RowBox[{"u", "->", "x"}], ",", RowBox[{"v", "->", "y"}]}], "}"}]}], ",", 
+   RowBox[{"D", "[", RowBox[{RowBox[{"f", "[", RowBox[{"u", ",", "v"}], "]"}], ",", "v"}], "]"}], "/.", RowBox[{"{", RowBox[{RowBox[{"u", "->", "x"}], ",", RowBox[{"v", "->", "y"}]}], "}"}]}], "}"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ascentStep", "[", "point_", "]"}], ":=", "Module", "[", 
+  RowBox[{RowBox[{"{", RowBox[{"g", ",", "h", ",", "line", ",", "hStar"}], "}"}], ",", 
+   RowBox[{RowBox[{"g", "=", RowBox[{"gradient", "@@", "point"}]}], ";", 
+    RowBox[{"line", "=", RowBox[{"f", "@@", RowBox[{"(", RowBox[{"point", "+", RowBox[{"h", " ", "g"}]}], ")"}]}]}], ";", 
+    RowBox[{"hStar", "=", RowBox[{"h", "/.", RowBox[{"First", "[", RowBox[{"Solve", "[", RowBox[{RowBox[{RowBox[{"D", "[", RowBox[{"line", ",", "h"}], "]"}], "==", "0"}], ",", "h"}], "]"}], "]"}]}]}], ";", 
+    RowBox[{"{", RowBox[{RowBox[{"point", "+", RowBox[{"hStar", " ", "g"}]}], ",", "hStar", ",", "g", ",", "line"}], "}"}]}], "]"}]}]], "Input"],
+
+Cell["Iterations", "Section"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"steps", "=", RowBox[{"NestList", "[", RowBox[{RowBox[{RowBox[{"First", "[", RowBox[{"ascentStep", "[", "#", "]"}], "]"}], "&"}], ",", "start", ",", "8"}], "]"}]}], ";", 
+  RowBox[{"Grid", "[", RowBox[{RowBox[{"Prepend", "[", RowBox[{RowBox[{"MapIndexed", "[", RowBox[{RowBox[{RowBox[{"{", RowBox[{RowBox[{RowBox[{"First", "[", "#2", "]"}], "-", "1"}], ",", RowBox[{"#1", "[[", "1", "]]"}], ",", RowBox[{"#1", "[[", "2", "]]"}], ",", RowBox[{"f", "@@", "#1"}]}], "}"}], "&"}], ",", "steps"}], "]"}], ",", RowBox[{"{", RowBox[{"\"i\"", ",", "\"x_i\"", ",", "\"y_i\"", ",", "\"f(x_i, y_i)\""}], "}"}]}], "]"}], ",", RowBox[{"Frame", "->", "All"}]}], "]"}]}]], "Input"],
+
+Cell["The iterates converge to $(2, 1)$, where $f(2, 1) = 2$.", "Text"]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.3 for Mac OS X ARM (64-bit)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
