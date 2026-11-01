@@ -14,7 +14,7 @@ bun preview    # preview production build
 
 ```bash
 bun test       # runs *.test.ts files with bun:test
-bun run lint   # prettier --check .
+bun run lint   # bun fmt --check
 ```
 
 Run the metadata sync script whenever `.md` files are added or renamed:
