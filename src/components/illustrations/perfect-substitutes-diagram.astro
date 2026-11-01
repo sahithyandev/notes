@@ -1,44 +1,36 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Perfectly Substitutable Inputs"
-  yLabel="Capital (K)"
-  xLabel="Labour (L)"
+  y={{ label: "Capital (K)", domain: [0, 10] }}
+  x={{ label: "Labour (L)", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (labour) => 9.67 - labour,
+      domain: [1.2, 8.7],
+      tone: "s5",
+      label: "Q₁",
+      labelAt: 4.8,
+      labelDy: -10,
+    },
+  ]}
+  points={[
+    { x: 3.1, y: 6.6, label: "A", labelDx: -15, labelDy: -10 },
+    { x: 5.9, y: 3.75, label: "B", labelDx: 10, labelDy: -5 },
+  ]}
 >
-  <line class="curve tone-s5" x1="135" y1="85" x2="500" y2="325"></line>
-
-  <circle class="pt tone-ink" cx="225" cy="145" r="5"></circle>
-  <circle class="pt tone-ink" cx="365" cy="235" r="5"></circle>
-
-  <text class="point-label" x="210" y="135">
-    A
-  </text>
-  <text class="point-label" x="375" y="230">
-    B
-  </text>
-
-  <text class="curve-label tone-s5" x="310" y="185">
-    Q₁
-  </text>
-
   <Fragment slot="caption">
     <strong>Constant MRTS.</strong>
     With perfectly substitutable inputs, capital and labour can replace each
     other at a constant rate, so the isoquant is a straight line.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>
 
 <style>
-  .point-label {
-    fill: var(--text-primary);
-    font-size: 13px;
-    font-weight: 700;
-  }
-
   strong {
     color: var(--text-primary);
   }

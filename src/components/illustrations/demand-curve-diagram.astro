@@ -2,35 +2,48 @@
 // Static demand curve diagram: downward-sloping curve on price/quantity
 // axes, with a dashed curve shifted left (decrease) and right (increase)
 // to illustrate a shift of the entire curve.
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   title="Demand Curve"
-  yLabel="Price"
-  xLabel="Quantity Demanded"
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity Demanded", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (quantity) => 10 - quantity,
+      xShift: -1.75,
+      domain: [0.25, 6.25],
+      tone: "ct",
+      dashed: true,
+      label: "D₁",
+      labelAt: 0.25,
+      labelDx: 10,
+      labelDy: -10,
+    },
+    {
+      equation: (quantity) => 10 - quantity,
+      xShift: 1.8,
+      domain: [3.8, 9.8],
+      tone: "pt",
+      dashed: true,
+      label: "D₂",
+      labelAt: 3.8,
+      labelDx: 10,
+      labelDy: -10,
+    },
+    {
+      equation: (quantity) => 10 - quantity,
+      domain: [2, 8],
+      tone: "s5",
+      label: "D",
+      labelAt: 2,
+      labelDx: 10,
+      labelDy: -10,
+    },
+  ]}
 >
-  <path
-    class="curve dashed tone-ct"
-    d="M 58 74 C 65 150, 166 230, 262 236"
-  ></path>
-  <path
-    class="curve dashed tone-pt"
-    d="M 178 74 C 185 150, 286 230, 382 236"
-  ></path>
-  <path class="curve tone-s5" d="M 118 74 C 125 150, 226 230, 322 236"></path>
-
-  <text class="curve-label tone-s5" x="128" y="62">
-    D
-  </text>
-  <text class="curve-label tone-ct" x="68" y="62">
-    D&#8321;
-  </text>
-  <text class="curve-label tone-pt" x="188" y="62">
-    D&#8322;
-  </text>
-
   <Fragment slot="caption">
     <span class="tone-s5">D</span> the original demand curve.
     <span class="tone-ct">D&#8321;</span> a decrease in demand, curve shifts
@@ -38,4 +51,4 @@ import AxesFigure from "./primitives/axes-figure.astro";
     <span class="tone-pt">D&#8322;</span> an increase in demand, curve shifts
     right.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>

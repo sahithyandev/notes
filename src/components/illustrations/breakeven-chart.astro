@@ -2,64 +2,93 @@
 // Static breakeven chart: fixed cost, total cost, and sales revenue lines
 // against output, with the breakeven point, loss/profit regions, and the
 // margin of safety between breakeven and budgeted sales.
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Breakeven Chart"
   desc="Fixed cost, total cost, and sales revenue plotted against output. The total cost and sales revenue lines cross at the breakeven point. Below breakeven output there is a loss, above it there is a profit. The margin of safety spans from breakeven output to budgeted sales."
-  yLabel="Cost / Revenue"
-  xLabel="Output (Units)"
-  x0={70}
-  y0={360}
-  top={45}
-  right={490}
+  y={{ label: "Cost / Revenue", domain: [0, 10] }}
+  x={{ label: "Output (Units)", domain: [0, 10] }}
+  layout={{ x0: 70, y0: 360, top: 45, right: 490 }}
   yLabelOffset={15}
   xLabelOffset={32}
   maxWidth={560}
+  areas={[
+    {
+      tone: "ct",
+      points: [
+        { x: 0, y: 1.9 },
+        { x: 5, y: 4.9 },
+        { x: 0, y: 0 },
+      ],
+    },
+    {
+      tone: "pt",
+      points: [
+        { x: 5, y: 4.9 },
+        { x: 10, y: 9.8 },
+        { x: 10, y: 7.9 },
+      ],
+    },
+  ]}
+  lines={[
+    {
+      tone: "ct",
+      dashed: true,
+      width: 2,
+      from: { x: 0, y: 1.9 },
+      to: { x: 10, y: 1.9 },
+    },
+    { tone: "pt", from: { x: 0, y: 1.9 }, to: { x: 10, y: 7.9 } },
+    { tone: "s5", from: { x: 0, y: 0 }, to: { x: 10, y: 9.8 } },
+    {
+      tone: "key",
+      width: 1.5,
+      from: { x: 5, y: 0.5 },
+      to: { x: 8.33, y: 0.5 },
+    },
+  ]}
+  points={[
+    {
+      x: 5,
+      y: 4.9,
+      tone: "key",
+      radius: 6,
+      guides: true,
+      label: "BEP",
+      labelTone: "ink",
+      labelDx: -20,
+      labelDy: -13,
+    },
+    {
+      x: 8.33,
+      y: 8.2,
+      tone: "key",
+      radius: 6,
+      guides: "x",
+      label: "Budgeted Sales",
+      labelTone: "ink",
+      labelDx: 0,
+      labelDy: 30,
+    },
+  ]}
+  labels={[
+    { text: "Fixed Cost", x: 6.9, y: 2.1, tone: "ct" },
+    { text: "Total Cost", x: 10.2, y: 7.8, tone: "pt" },
+    { text: "Sales Revenue", x: 10.2, y: 9.9, tone: "s5" },
+    {
+      text: "Margin of Safety",
+      x: 6.66,
+      y: 0.8,
+      tone: "key",
+      anchor: "middle",
+      size: 11,
+    },
+  ]}
 >
-  <path class="region tone-ct" d="M 70 300 L 280 205 L 70 360 Z"></path>
-  <path class="region tone-pt" d="M 280 205 L 490 50 L 490 110 Z"></path>
-
-  <text class="origin" x="55" y="378">
-    0
-  </text>
-
-  <line class="rule dashed tone-ct" x1="70" y1="300" x2="490" y2="300"></line>
-  <text class="line-label tone-ct" x="360" y="294">
-    Fixed Cost
-  </text>
-
-  <line class="rule tone-pt" x1="70" y1="300" x2="490" y2="110"></line>
-  <text class="line-label tone-pt" x="498" y="115">
-    Total Cost
-  </text>
-
-  <line class="rule tone-s5" x1="70" y1="360" x2="490" y2="50"></line>
-  <text class="line-label tone-s5" x="498" y="48">
-    Sales Revenue
-  </text>
-
-  <line class="guide" x1="280" y1="205" x2="280" y2="360"></line>
-  <line class="guide" x1="70" y1="205" x2="280" y2="205"></line>
-  <circle class="pt tone-key" cx="280" cy="205" r="6"></circle>
-  <text class="point-label" x="260" y="192" text-anchor="end">
-    BEP
-  </text>
-
-  <line class="guide" x1="420" y1="102" x2="420" y2="360"></line>
-  <circle class="pt tone-key" cx="420" cy="102" r="6"></circle>
-  <text class="point-label" x="420" y="132" text-anchor="middle">
-    Budgeted Sales
-  </text>
-
-  <line class="mos-line tone-key" x1="280" y1="345" x2="420" y2="345"></line>
-  <text class="mos-label tone-key" x="350" y="335" text-anchor="middle">
-    Margin of Safety
-  </text>
-
   <Fragment slot="caption">
     <span class="tone-ct">Loss</span> below the breakeven point, where total
     cost exceeds sales revenue. <span class="tone-pt">Profit</span> above it.
@@ -67,49 +96,4 @@ import AxesFigure from "./primitives/axes-figure.astro";
     <span class="tone-key">margin of safety</span> is the output between the
     breakeven point and budgeted sales.
   </Fragment>
-</AxesFigure>
-
-<style>
-  .region {
-    fill: var(--tone);
-    opacity: 0.12;
-  }
-
-  .origin {
-    fill: var(--text-muted);
-    font-size: 13px;
-  }
-
-  .rule {
-    stroke: var(--tone);
-    stroke-width: 2.5;
-  }
-
-  .rule.dashed {
-    stroke-width: 2;
-    stroke-dasharray: 6 5;
-  }
-
-  .line-label {
-    fill: var(--tone);
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .point-label {
-    fill: var(--text-primary);
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .mos-line {
-    stroke: var(--tone);
-    stroke-width: 1.5;
-  }
-
-  .mos-label {
-    fill: var(--tone);
-    font-size: 11px;
-    font-weight: 600;
-  }
-</style>
+</CartesianGraph>

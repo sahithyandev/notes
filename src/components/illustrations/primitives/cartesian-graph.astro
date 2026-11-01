@@ -1,0 +1,440 @@
+---
+// A declarative 2D graph for relations that can be described as y = f(x).
+// Use graph-coordinate domains rather than hand-written SVG positions; curves,
+// labels, points and their axis projections follow the same coordinate system.
+// Keep CartesianGraph for diagrams with custom regions or non-function geometry.
+import { assertCaption, type CaptionProps } from "../lib/caption";
+import {
+  curveY,
+  equationPath,
+  type GraphAxis,
+  type GraphCurve,
+  type GraphArea,
+  type GraphLabel,
+  type GraphLine,
+  type GraphPoint,
+  type GraphGeometry,
+  tangentSlope,
+  xToSvg,
+  yToSvg,
+} from "../lib/cartesian-graph";
+import { makeUid } from "../lib/uid";
+
+type Props = CaptionProps & {
+  title: string;
+  desc?: string;
+  x?: GraphAxis;
+  y?: GraphAxis;
+  /** Compatibility labels for complex SVG-overlay diagrams. */
+  xLabel?: string;
+  yLabel?: string;
+  curves?: GraphCurve[];
+  areas?: GraphArea[];
+  lines?: GraphLine[];
+  labels?: GraphLabel[];
+  points?: GraphPoint[];
+  size?: "sm" | "lg";
+  /** Override a preset when an established illustration needs a different plot box. */
+  layout?: Partial<{
+    viewBox: string;
+    x0: number;
+    y0: number;
+    top: number;
+    right: number;
+    labelGap: number;
+  }>;
+  viewBox?: string;
+  x0?: number;
+  y0?: number;
+  top?: number;
+  right?: number;
+  yLabelOffset?: number;
+  xLabelOffset?: number;
+  maxWidth?: number;
+};
+
+const PRESETS = {
+  sm: {
+    viewBox: "0 0 420 340",
+    x0: 50,
+    y0: 290,
+    top: 20,
+    right: 390,
+    labelGap: 25,
+  },
+  lg: {
+    viewBox: "0 0 620 430",
+    x0: 75,
+    y0: 355,
+    top: 35,
+    right: 565,
+    labelGap: 30,
+  },
+};
+
+const {
+  title,
+  desc,
+  x: xProp,
+  y: yProp,
+  xLabel,
+  yLabel,
+  curves = [],
+  areas = [],
+  lines = [],
+  labels = [],
+  points = [],
+  size = "sm",
+  layout = {},
+  viewBox,
+  x0,
+  y0,
+  top,
+  right,
+  yLabelOffset,
+  xLabelOffset,
+  maxWidth: maxWidthProp,
+  caption,
+  captionSlot: _captionSlot,
+} = Astro.props;
+assertCaption("CartesianGraph", caption, Astro.slots.has("caption"));
+if (Astro.slots.has("default")) {
+  throw new Error(
+    "CartesianGraph does not accept SVG children. Describe the scene with curves, areas, lines, points and labels instead.",
+  );
+}
+
+const x = xProp ?? { label: xLabel ?? "", domain: [0, 10] as const };
+const y = yProp ?? { label: yLabel ?? "", domain: [0, 10] as const };
+const preset = {
+  ...PRESETS[size],
+  ...layout,
+  ...Object.fromEntries(
+    Object.entries({ viewBox, x0, y0, top, right }).filter(
+      ([, value]) => value !== undefined,
+    ),
+  ),
+};
+const geometry: GraphGeometry = {
+  ...preset,
+  xDomain: x.domain,
+  yDomain: y.domain,
+};
+const maxWidth = maxWidthProp ?? Number(preset.viewBox.split(" ")[2]);
+const uid = makeUid("graph");
+const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
+---
+
+<figure
+  class:list={["cartesian-graph", size]}
+  style={`max-width: ${maxWidth}px`}
+>
+  <svg
+    viewBox={preset.viewBox}
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-labelledby={labelledBy}
+  >
+    <title id={`${uid}-title`}>{title}</title>
+    {desc && <desc id={`${uid}-desc`}>{desc}</desc>}
+
+    <line
+      class="axis"
+      x1={geometry.x0}
+      y1={geometry.top}
+      x2={geometry.x0}
+      y2={geometry.y0}
+    ></line>
+    <line
+      class="axis"
+      x1={geometry.x0}
+      y1={geometry.y0}
+      x2={geometry.right}
+      y2={geometry.y0}
+    ></line>
+    <text
+      class="axis-label"
+      x={geometry.x0}
+      y={geometry.top - (yLabelOffset ?? (size === "lg" ? 13 : 6))}
+      text-anchor="middle"
+    >
+      {y.label}
+    </text>
+    <text
+      class="axis-label"
+      x={geometry.right}
+      y={geometry.y0 + (xLabelOffset ?? preset.labelGap)}
+      text-anchor="end"
+    >
+      {x.label}
+    </text>
+
+    {areas.map((area) => (
+      <polygon
+        class:list={["area", `tone-${area.tone}`]}
+        points={area.points
+          .map(
+            (point) =>
+              `${xToSvg(point.x, geometry)},${yToSvg(point.y, geometry)}`,
+          )
+          .join(" ")}
+        fill-opacity={area.opacity ?? 0.12}
+      ></polygon>
+    ))}
+
+    {lines.map((line) => (
+      <line
+        class:list={[
+          "graph-line",
+          `tone-${line.tone ?? "ink"}`,
+          { dashed: line.dashed },
+        ]}
+        x1={xToSvg(line.from.x, geometry)}
+        y1={yToSvg(line.from.y, geometry)}
+        x2={xToSvg(line.to.x, geometry)}
+        y2={yToSvg(line.to.y, geometry)}
+        stroke-width={line.width}
+      ></line>
+    ))}
+
+    {curves.map((curve) => {
+      const d = equationPath(curve, geometry);
+      const labelY =
+        curve.labelAt === undefined ? undefined : curveY(curve, curve.labelAt);
+      return (
+        <>
+          <path
+            class:list={[
+              "curve",
+              `tone-${curve.tone}`,
+              { dashed: curve.dashed, round: curve.round },
+            ]}
+            d={d}
+          ></path>
+          {curve.label &&
+            curve.labelAt !== undefined &&
+            typeof labelY === "number" && (
+              <text
+                class:list={["curve-label", `tone-${curve.tone}`]}
+                x={xToSvg(curve.labelAt, geometry) + (curve.labelDx ?? 0)}
+                y={yToSvg(labelY, geometry) + (curve.labelDy ?? -8)}
+              >
+                {curve.label}
+              </text>
+            )}
+        </>
+      );
+    })}
+
+    {curves.flatMap((curve) =>
+      (curve.tangents ?? []).map((tangent) => {
+        const slope = tangentSlope(curve, tangent);
+        const y = curveY(curve, tangent.at);
+        const [start, end] = tangent.domain ?? [tangent.at - 1, tangent.at + 1];
+        const tone = tangent.tone ?? curve.tone;
+        const endY = y + slope * (end - tangent.at);
+        return (
+          <>
+            <line
+              class:list={[
+                "tangent",
+                `tone-${tone}`,
+                { dashed: tangent.dashed },
+              ]}
+              x1={xToSvg(start, geometry)}
+              y1={yToSvg(y + slope * (start - tangent.at), geometry)}
+              x2={xToSvg(end, geometry)}
+              y2={yToSvg(endY, geometry)}
+            ></line>
+            {tangent.label && (
+              <text
+                class:list={["tangent-label", `tone-${tone}`]}
+                x={xToSvg(end, geometry) + (tangent.labelDx ?? 7)}
+                y={yToSvg(endY, geometry) + (tangent.labelDy ?? -5)}
+              >
+                {tangent.label}
+              </text>
+            )}
+          </>
+        );
+      }),
+    )}
+
+    {points.map((point) => (
+      <>
+        {(point.guides === true || point.guides === "y") && (
+          <>
+            <line
+              class="guide"
+              x1={geometry.x0}
+              y1={yToSvg(point.y, geometry)}
+              x2={xToSvg(point.x, geometry)}
+              y2={yToSvg(point.y, geometry)}
+            ></line>
+          </>
+        )}
+        {(point.guides === true || point.guides === "x") && (
+          <>
+            <line
+              class="guide"
+              x1={xToSvg(point.x, geometry)}
+              y1={yToSvg(point.y, geometry)}
+              x2={xToSvg(point.x, geometry)}
+              y2={geometry.y0}
+            ></line>
+          </>
+        )}
+        <circle
+          class:list={["pt", `tone-${point.tone ?? "ink"}`]}
+          cx={xToSvg(point.x, geometry)}
+          cy={yToSvg(point.y, geometry)}
+          r={point.radius ?? 5}
+        ></circle>
+        {point.label && (
+          <text
+            class:list={[
+              "pt-label",
+              `tone-${point.labelTone ?? point.tone ?? "ink"}`,
+            ]}
+            x={xToSvg(point.x, geometry) + (point.labelDx ?? 7)}
+            y={yToSvg(point.y, geometry) + (point.labelDy ?? -8)}
+          >
+            {point.label}
+          </text>
+        )}
+      </>
+    ))}
+    {labels.map((label) => (
+      <text
+        class:list={["graph-label", `tone-${label.tone ?? "ink"}`]}
+        x={xToSvg(label.x, geometry) + (label.dx ?? 0)}
+        y={yToSvg(label.y, geometry) + (label.dy ?? 0)}
+        text-anchor={label.anchor ?? "start"}
+        font-size={label.size}
+        font-weight={label.weight}
+      >
+        {label.text}
+      </text>
+    ))}
+  </svg>
+  <figcaption>
+    {caption}
+    <slot name="caption" />
+  </figcaption>
+</figure>
+
+<style>
+  .cartesian-graph {
+    margin: 24px auto;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+  }
+  .cartesian-graph :global(.tone-s5) {
+    --tone: var(--s5);
+  }
+  .cartesian-graph :global(.tone-ct) {
+    --tone: var(--dia-ct);
+  }
+  .cartesian-graph :global(.tone-pt) {
+    --tone: var(--dia-pt);
+  }
+  .cartesian-graph :global(.tone-key) {
+    --tone: var(--dia-key);
+  }
+  .cartesian-graph :global(.tone-ink) {
+    --tone: var(--text-primary);
+  }
+  .cartesian-graph :global(.axis) {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+  .cartesian-graph :global(.axis-label) {
+    fill: var(--text-secondary);
+    font-size: 13px;
+  }
+  .cartesian-graph :global(.curve) {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 2.5;
+  }
+  .cartesian-graph :global(.curve.round) {
+    stroke-linecap: round;
+  }
+  .cartesian-graph :global(.curve.dashed) {
+    stroke-dasharray: 6 5;
+  }
+  .cartesian-graph :global(.tangent) {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 1.8;
+  }
+  .cartesian-graph :global(.area) {
+    fill: var(--tone);
+  }
+  .cartesian-graph :global(.graph-line) {
+    stroke: var(--tone);
+    stroke-width: 2.5;
+  }
+  .cartesian-graph :global(.graph-line.dashed) {
+    stroke-dasharray: 6 5;
+  }
+  .cartesian-graph :global(.tangent.dashed) {
+    stroke-dasharray: 6 5;
+  }
+  .cartesian-graph :global(.guide) {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+  .cartesian-graph :global(circle.pt) {
+    fill: var(--tone);
+    stroke: var(--surface);
+    stroke-width: 1.5;
+  }
+  .cartesian-graph :global(.curve-label),
+  .cartesian-graph :global(.pt-label),
+  .cartesian-graph :global(.tangent-label) {
+    fill: var(--tone);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .cartesian-graph :global(.graph-label) {
+    fill: var(--tone);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  figcaption {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+  figcaption :global([class*="tone-"]) {
+    font-weight: 600;
+    color: var(--tone);
+  }
+  .lg {
+    margin: 28px auto;
+  }
+  .lg :global(.axis) {
+    stroke-width: 1.8;
+  }
+  .lg :global(.axis-label) {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .lg :global(.curve) {
+    stroke-width: 3;
+  }
+  .lg :global(.curve-label) {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .lg figcaption {
+    margin-top: 10px;
+    font-size: 0.88rem;
+  }
+</style>

@@ -2,35 +2,46 @@
 // Static supply curve diagram: upward-sloping curve on price/quantity
 // axes, with a dashed curve shifted left (decrease) and right (increase)
 // to illustrate a shift of the entire curve.
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   title="Supply Curve"
-  yLabel="Price"
-  xLabel="Quantity Supplied"
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity Supplied", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (quantity) => 5 * quantity - 20.3,
+      domain: [4.2, 5.9],
+      tone: "ct",
+      dashed: true,
+      label: "S₁",
+      labelAt: 5.9,
+      labelDx: 7,
+      labelDy: -5,
+    },
+    {
+      equation: (quantity) => 5 * quantity - 0.75,
+      domain: [0.3, 2],
+      tone: "pt",
+      dashed: true,
+      label: "S₂",
+      labelAt: 2,
+      labelDx: 7,
+      labelDy: -5,
+    },
+    {
+      equation: (quantity) => 5 * quantity - 11,
+      domain: [2.35, 4.1],
+      tone: "s5",
+      label: "S",
+      labelAt: 4.1,
+      labelDx: 7,
+      labelDy: -5,
+    },
+  ]}
 >
-  <path
-    class="curve dashed tone-ct"
-    d="M 200 270 C 220 180, 240 100, 260 40"
-  ></path>
-  <path
-    class="curve dashed tone-pt"
-    d="M 60 270 C 80 180, 100 100, 120 40"
-  ></path>
-  <path class="curve tone-s5" d="M 130 270 C 150 180, 170 100, 190 40"></path>
-
-  <text class="curve-label tone-s5" x="195" y="55">
-    S
-  </text>
-  <text class="curve-label tone-ct" x="265" y="55">
-    S&#8321;
-  </text>
-  <text class="curve-label tone-pt" x="125" y="55">
-    S&#8322;
-  </text>
-
   <Fragment slot="caption">
     <span class="tone-s5">S</span> the original supply curve.
     <span class="tone-ct">S&#8321;</span> a decrease in supply, curve shifts
@@ -38,4 +49,4 @@ import AxesFigure from "./primitives/axes-figure.astro";
     <span class="tone-pt">S&#8322;</span> an increase in supply, curve shifts
     right.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>

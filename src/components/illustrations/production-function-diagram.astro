@@ -1,30 +1,25 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   title="Production Function"
-  yLabel="Output"
-  xLabel="Variable Input"
-  viewBox="0 0 420 320"
-  x0={55}
-  y0={270}
-  top={25}
-  yLabelOffset={7}
-  xLabelOffset={30}
+  y={{ label: "Output", domain: [0, 10] }}
+  x={{ label: "Variable Input", domain: [0, 10] }}
+  layout={{ viewBox: "0 0 420 320", x0: 55, y0: 270, top: 25, labelGap: 30 }}
+  curves={[
+    {
+      equation: (input) => 10 * (1 - Math.exp(-0.27 * input)),
+      domain: [0.45, 9.55],
+      tone: "s5",
+      round: true,
+    },
+  ]}
 >
-  <path
-    class="curve round tone-s5"
-    d="M 70 250
-       C 115 235, 155 195, 195 145
-       C 235 95, 285 65, 335 52
-       C 355 47, 370 45, 380 44"
-  ></path>
-
   <Fragment slot="caption">
     <strong class="tone-s5">Q = f(L)</strong> is the production function. It
     shows the relationship between a variable input and the maximum output that
     can be produced.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>

@@ -1,5 +1,5 @@
 // Backstop for the caption rule in lib/caption.ts. `astro check` enforces the
-// `caption` / `captionSlot` props of Panel and AxesFigure, but it cannot see a
+// `caption` / `captionSlot` props of Panel, AxesFigure and CartesianGraph, but it cannot see a
 // hand-written <figure>, or a figcaption hidden behind a falsy prop, so this
 // scans the sources for both.
 import { expect, test } from "bun:test";
@@ -35,11 +35,11 @@ test("illustrations that render a <figure> also render a <figcaption>", () => {
   expect(missing).toEqual([]);
 });
 
-test("every Panel and AxesFigure gets a caption", () => {
+test("every Panel, AxesFigure and CartesianGraph gets a caption", () => {
   const missing: string[] = [];
   for (const f of files) {
     const src = readFileSync(join(dir, f), "utf8");
-    for (const m of src.matchAll(/<(Panel|AxesFigure)\b/g)) {
+    for (const m of src.matchAll(/<(Panel|AxesFigure|CartesianGraph)\b/g)) {
       const tag = openingTag(src, m.index);
       if (!/\bcaption(Slot)?\b/.test(tag)) missing.push(`${f}: <${m[1]}>`);
     }

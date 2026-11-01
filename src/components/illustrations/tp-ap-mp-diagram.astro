@@ -1,49 +1,45 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   title="Total Product, Average Product and Marginal Product"
-  yLabel="Product"
-  xLabel="Labour"
-  viewBox="0 0 460 340"
-  x0={55}
-  y0={280}
-  top={25}
-  right={420}
-  yLabelOffset={7}
-  xLabelOffset={30}
+  y={{ label: "Product", domain: [0, 10] }}
+  x={{ label: "Labour", domain: [0, 10] }}
+  layout={{
+    viewBox: "0 0 460 340",
+    x0: 55,
+    y0: 280,
+    top: 25,
+    right: 420,
+    labelGap: 30,
+  }}
+  curves={[
+    {
+      equation: (labour) => 10 * (1 - Math.exp(-0.25 * labour)),
+      domain: [0.4, 9.3],
+      tone: "s5",
+      round: true,
+    },
+    {
+      equation: (labour) => 3.3 * labour * Math.exp(-0.18 * labour),
+      domain: [0.4, 9.3],
+      tone: "ct",
+      round: true,
+    },
+    {
+      equation: (labour) => 9 * Math.exp(-(((labour - 4.4) / 3) ** 2)),
+      domain: [0.4, 9.3],
+      tone: "pt",
+      round: true,
+    },
+  ]}
 >
-  <path
-    class="curve round tone-s5"
-    d="M 70 255
-       C 115 240, 155 205, 195 155
-       C 235 105, 270 65, 305 55
-       C 340 48, 370 48, 395 48"
-  ></path>
-
-  <path
-    class="curve round tone-ct"
-    d="M 70 250
-       C 115 220, 160 165, 205 125
-       C 245 95, 285 92, 320 105
-       C 350 118, 375 145, 395 175"
-  ></path>
-
-  <path
-    class="curve round tone-pt"
-    d="M 70 235
-       C 110 175, 145 115, 185 85
-       C 215 65, 240 70, 260 95
-       C 285 125, 310 170, 335 210
-       C 355 235, 375 250, 395 258"
-  ></path>
-
   <Fragment slot="caption">
     <strong class="tone-s5">TP</strong> = Total Product,
     <strong class="tone-ct">AP</strong> = Average Product, and
     <strong class="tone-pt">MP</strong> = Marginal Product. The diagram shows
     their relationship as labour increases.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>

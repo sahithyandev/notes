@@ -1,6 +1,6 @@
 // Every illustration that renders a <figure> must also render a <figcaption>,
 // which is the figure's accessible description. The figure primitives (Panel,
-// AxesFigure) take their props as `CaptionProps`, so leaving the caption out is
+// CartesianGraph) take their props as `CaptionProps`, so leaving the caption out is
 // a type error under `astro check`: pass plain text as `caption`, or pass
 // `captionSlot` and fill `<Fragment slot="caption">` for a caption with markup.
 export type CaptionProps =
