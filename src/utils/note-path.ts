@@ -1,6 +1,6 @@
 // Derives a note's public slug and sidebar order from its file path,
 // rather than reading them out of frontmatter. The numeric prefix on each
-// path segment is the single source of truth for both; see CLAUDE.md's
+// path segment is the single source of truth for both; see .agents/note-writing.md's
 // "Slugs & file naming" section.
 const NUMERIC_PREFIX = /^\d+-/;
 

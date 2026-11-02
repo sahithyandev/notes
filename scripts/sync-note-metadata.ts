@@ -249,7 +249,7 @@ export async function syncNoteMetadata(
     }
 
     // dateCreated is set once and kept; lastUpdatedOn is stamped fresh only
-    // for files actually changed (per CLAUDE.md, "lastUpdatedOn frontmatter
+    // for files actually changed (per .agents/note-writing.md, "lastUpdatedOn frontmatter
     // is set on commit"), judged against HEAD rather than against how the
     // caller invoked the script. Sibling files pulled in just to recompute
     // prev/next/order keep their existing lastUpdatedOn.

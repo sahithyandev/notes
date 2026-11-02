@@ -101,4 +101,4 @@ No code changes are needed beyond the `authors.json` entry.
 - Commits must not include AI-assistant attribution (`Co-Authored-By`, `Generated with`, etc.) — a commit-msg hook (`.husky/commit-msg`) rejects those.
 - Use short plain-language commit messages. Do not add Conventional Commits prefixes such as `feat:`, `fix:`, or `docs(scope):`.
 - Keep each commit focused on one logical change. Preserve meaningful commit boundaries when rewriting local history.
-- See `CLAUDE.md` for the full content style guide (title casing, dash usage, label/description formatting, prereqs scoping, and more) enforced by `notes-style-validator`.
+- See [`.agents/note-writing.md`](.agents/note-writing.md) for the full content style guide (title casing, dash usage, label/description formatting, prereqs scoping, and more) enforced by `notes-style-validator`.

@@ -36,7 +36,7 @@ async function reExecuteScripts(root: ParentNode): Promise<void> {
     const src = old.getAttribute("src");
     if (!src) {
       // No known case in this codebase (every component script here is
-      // src-based, not inlined - see CLAUDE.md), but recreate rather than
+      // src-based, not inlined - see .agents/site-architecture.md), but recreate rather than
       // silently skip on the off chance one shows up: a script inserted via
       // DOMParser/innerHTML never executes as-is, inline or not.
       const fresh = document.createElement("script");
