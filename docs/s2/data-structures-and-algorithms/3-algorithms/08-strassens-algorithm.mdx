@@ -3,7 +3,7 @@ title: Strassen's Algorithm
 prereqs:
   - s1/mathematics/matrices/matrix-multiplication
 dateCreated: 2026-04-22T07:07:02.588Z
-lastUpdatedOn: 2026-09-29T03:51:34.686Z
+lastUpdatedOn: 2026-11-02T05:14:36.901Z
 ---
 
 An efficient algorithm for matrix multiplication that reduces the time complexity compared to the standard matrix multiplication method. The algorithm works by dividing each matrix into smaller submatrices and recursively performing multiplications and additions.
@@ -12,44 +12,46 @@ An efficient algorithm for matrix multiplication that reduces the time complexit
 
 Suppose 2 $n \times n$ matrices $A$ and $B$ are given. $C = A \cdot B$ is to be calculated. $A$ and $B$ are broken into smaller square submatrices, and the multiplication is performed recursively.
 
-1. Divide the matrices $A$ and $B$ into four $n/2 \times n/2$ submatrices:
+First, divide the matrices $A$ and $B$ into four $n/2 \times n/2$ submatrices.
 
 $$
 A = \begin{bmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{bmatrix} \quad
 B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix}
 $$
 
-2. Compute the following 7 products (Strassen's formulas):
-
-   $$
-   \begin{aligned}[c]
-   M_1 &= (A_{11} + A_{22})(B_{11} + B_{22})
-   &
-   M_5 &= (A_{11} + A_{12})B_{22} \\
-   M_2 &= (A_{21} + A_{22})B_{11}
-   &
-   M_6 &= (A_{21} - A_{11})(B_{11} + B_{12}) \\
-   M_3 &= A_{11}(B_{12} - B_{22})
-   &
-   M_7 &= (A_{12} - A_{22})(B_{21} + B_{22}) \\
-   M_4 &= A_{22}(B_{21} - B_{11})
-   & \\
-   \end{aligned}
-   $$
-
-3. Combine the results to compute the submatrices of $C$:
-   $$
-   \begin{aligned}
-   C_{11} &= M_1 + M_4 - M_5 + M_7 \\
-   C_{12} &= M_3 + M_5 \\
-   C_{21} &= M_2 + M_4 \\
-   C_{22} &= M_1 - M_2 + M_3 + M_6 \\
-   \end{aligned}
-   $$
-4. Reconstruct the resulting matrix $C$:
+Compute the required products using Strassen's formulas as shown below.
 
 $$
- C = \begin{bmatrix} C_{11} & C_{12} \\ C_{21} & C_{22} \end{bmatrix}
+\begin{aligned}
+M_1 &= (A_{11} + A_{22})(B_{11} + B_{22})
+&
+M_5 &= (A_{11} + A_{12})B_{22} \\
+M_2 &= (A_{21} + A_{22})B_{11}
+&
+M_6 &= (A_{21} - A_{11})(B_{11} + B_{12}) \\
+M_3 &= A_{11}(B_{12} - B_{22})
+&
+M_7 &= (A_{12} - A_{22})(B_{21} + B_{22}) \\
+M_4 &= A_{22}(B_{21} - B_{11})
+& \\
+\end{aligned}
+$$
+
+Then construct the submatrices of $C$.
+
+$$
+\begin{aligned}
+C_{11} &= M_1 + M_4 - M_5 + M_7 \\
+C_{12} &= M_3 + M_5 \\
+C_{21} &= M_2 + M_4 \\
+C_{22} &= M_1 - M_2 + M_3 + M_6 \\
+\end{aligned}
+$$
+
+With the above submatrices, the matrix $C$ can be constructed.
+
+$$
+C = \begin{bmatrix} C_{11} & C_{12} \\ C_{21} & C_{22} \end{bmatrix}
 $$
 
 ## Implementation

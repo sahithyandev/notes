@@ -1,7 +1,7 @@
 ---
 title: Prim's Algorithm
 dateCreated: 2026-04-22T07:07:02.589Z
-lastUpdatedOn: 2026-10-19T12:08:54.908Z
+lastUpdatedOn: 2026-11-02T05:12:01.972Z
 ---
 
 A [greedy algorithm](/s2/data-structures-and-algorithms/algorithms/introduction#greedy-algorithm) to find [MST](/s2/data-structures-and-algorithms/data-structures/spanning-tree) of a [graph](/s2/data-structures-and-algorithms/data-structures/graph/). Starts with a single vertex. Discovered edges are stored in a priority queue. In each turn, MST grows by 1 edge which is the smallest in the discovered edgegs and would not cause a cycle.
@@ -110,36 +110,30 @@ import PrimsAlgorithmExample from "./images/prims-algorithm-example.svg";
 1. Start with vertex A (arbitrary starting point):
    - Include A in the MST
    - Set key value of A to 0, all others to infinity
-
 2. Update key values of vertices adjacent to A:
    - B has key 1.
    - D has key 4.
    - E has key 3.
-
 3. Select B (minimum key among unvisited vertices):
    - Include B in the MST.
    - Edge (A-B, 1) is added to the MST.
    - Update adjacent vertices' keys:
      - C has key 2.
      - E stays at key 3, no change.
-
 4. Select C (minimum key among unvisited vertices):
    - Include C in the MST.
    - Edge (B-C, 2) is added to the MST.
    - Update adjacent vertices' keys:
      - F has key 6.
-
 5. Select E (minimum key among unvisited vertices):
    - Include E in the MST.
    - Edge (A-E, 3) is added to the MST.
    - Update adjacent vertices' keys:
      - D stays at key 4, no change.
      - F stays at key 6, no change.
-
 6. Select D (minimum key among unvisited vertices):
    - Include D in the MST.
    - Edge (A-D, 4) is added to the MST.
-
 7. Select F (minimum key among unvisited vertices):
    - Include F in the MST.
    - Edge (C-F, 6) is added to the MST.

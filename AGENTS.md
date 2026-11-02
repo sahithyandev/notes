@@ -155,7 +155,7 @@ Leave a blank line after each opening tag and before each closing tag, as with `
 
 ### Adjacent lists
 
-Never start an unordered list right after another one with only blank lines in between. Markdown merges them into 1 loose list, which renders with extra spacing around each item. Put prose, a block equation or a `<Note>` between 2 lists, or join them into 1 tight list. Enforced by the `adjacent-list` rule (`src/integrations/notes-style-validator/rules/adjacent-list.ts`). Only top-level lists are checked, and an indented continuation or nested list belongs to its item.
+Never separate 2 items of the same list kind (bullets or numbered items) with only blank lines in between, whether they belong to 2 lists or 1 list. Markdown merges them into 1 loose list, which renders with extra spacing around each item. Put prose, a block equation or a `<Note>` between 2 lists, or join them into 1 tight list. Enforced by the `adjacent-list` rule (`src/integrations/notes-style-validator/rules/adjacent-list.ts`). Only top-level lists are checked, and an indented continuation or nested list belongs to its item.
 
 ### Heading titles
 

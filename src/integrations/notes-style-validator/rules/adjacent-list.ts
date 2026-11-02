@@ -2,23 +2,27 @@ import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
 
 const BULLET_RE = /^[-*+]\s/;
+const ORDERED_RE = /^\d+[.)]\s/;
 
-// An unordered list that starts after blank lines only, right below the end
-// of another unordered list. Markdown merges 2 same-marker lists like this
-// into 1 loose list (each item wrapped in a paragraph, with extra spacing),
-// and a different marker starts a 2nd list that sits flush against the 1st.
-// Either way the page renders oddly. Only top-level lists are checked:
+type ListKind = "bullet" | "ordered";
+
+// A list item that starts after blank lines only, right below an item of the
+// same list kind (bullets after bullets, numbers after numbers). Markdown
+// merges such items into 1 loose list (each item wrapped in a paragraph, with
+// extra spacing), whether they are 2 lists or 1 list with blank lines between
+// its items. A different marker starts a 2nd list that sits flush against the
+// 1st. Either way the page renders oddly. Only top-level lists are checked:
 // content indented under an item (nested lists, continuation paragraphs)
 // stays part of that item and doesn't end the list.
 export function checkAdjacentList(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
 
-  let inList = false;
+  let listKind: ListKind | null = null;
   let blankRun = 0;
 
   for (let i = 0; i < f.lines.length; i++) {
     if (f.lineIsCode[i]) {
-      inList = false;
+      listKind = null;
       blankRun = 0;
       continue;
     }
@@ -29,20 +33,27 @@ export function checkAdjacentList(f: ScannedFile): Violation[] {
       continue;
     }
 
-    if (BULLET_RE.test(f.maskedLines[i])) {
-      if (inList && blankRun > 0) {
+    const masked = f.maskedLines[i];
+    const itemKind: ListKind | null = BULLET_RE.test(masked)
+      ? "bullet"
+      : ORDERED_RE.test(masked)
+        ? "ordered"
+        : null;
+
+    if (itemKind) {
+      if (itemKind === listKind && blankRun > 0) {
         violations.push({
           rule: "adjacent-list",
           line: i + 1,
-          text: "unordered list starts right after another one, separated only by blank lines",
+          text: "list item separated from the item above only by blank lines",
           snippet: line.trim(),
         });
       }
-      inList = true;
+      listKind = itemKind;
     } else if (!/^\s/.test(line)) {
-      // Unindented non-bullet content (prose, heading, `<Note>`, ordered
-      // list) ends the list. Indented content belongs to the current item.
-      inList = false;
+      // Unindented non-item content (prose, heading, `<Note>`) ends the list.
+      // Indented content belongs to the current item.
+      listKind = null;
     }
     blankRun = 0;
   }

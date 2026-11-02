@@ -54,3 +54,21 @@ test("does not treat an ordered list as unordered", () => {
   const f = scanOne(["- a", "", "1. b"].join("\n"));
   expect(checkAdjacentList(f)).toHaveLength(0);
 });
+
+test("flags a blank line between items of one ordered list", () => {
+  const f = scanOne(
+    ["1. a", "   desc", "", "2. b", "   desc", "", "3. c"].join("\n"),
+  );
+  const v = checkAdjacentList(f);
+  expect(v.map((x) => x.line)).toEqual([4, 7]);
+});
+
+test("does not flag a tight ordered list", () => {
+  const f = scanOne(["1. a", "2. b", "3. c"].join("\n"));
+  expect(checkAdjacentList(f)).toHaveLength(0);
+});
+
+test("does not flag an ordered list with an indented continuation paragraph", () => {
+  const f = scanOne(["1. a", "", "   more about a", "2. b"].join("\n"));
+  expect(checkAdjacentList(f)).toHaveLength(0);
+});

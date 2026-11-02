@@ -6,7 +6,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-09-01T19:24:36.011Z
-lastUpdatedOn: 2026-10-22T12:28:44.965Z
+lastUpdatedOn: 2026-11-02T05:12:02.033Z
 ---
 
 Voice over IP (VoIP) enables real-time, interactive voice communications over packet-switched IP networks. Because human conversation requires tight feedback loops, VoIP demands low end-to-end latency and specialized playout algorithms.
@@ -60,17 +60,14 @@ To optimize latency, adaptive playout algorithms dynamically adjust the playout 
    The receiver calculates an Exponentially Weighted Moving Average (EWMA) of the network delay $d_i$ for packet $i$:
    $$d_i = (1 - \alpha) d_{i-1} + \alpha (r_i - t_i)$$
    where $r_i$ is the arrival time, $t_i$ is the sending timestamp, and $\alpha \approx 0.1$.
-
 2. Jitter Estimation:  
    The receiver estimates average delay variation $v_i$:
    $$v_i = (1 - \beta) v_{i-1} + \beta |r_i - t_i - d_i|$$
    where $\beta \approx 0.1$.
-
 3. Playout Computation:  
    For the first packet in a talk spurt, playout deadline $p_i$ is set to:
    $$p_i = t_i + d_i + K \cdot v_i$$
    where $K$ (typically $4$) ensures a high probability of on-time arrival.
-
 4. Talk Spurt Adjustment:  
    Subsequent packets in the same talk spurt are played out at intervals of $20\text{ms}$ relative to $p_i$. Playout delay changes only during silent periods, which are slightly compressed or elongated imperceptibly.
 

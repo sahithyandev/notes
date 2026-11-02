@@ -4,7 +4,7 @@ prereqs:
   - s2/data-structures-and-algorithms/algorithms/dijkstras-algorithm
   - s2/data-structures-and-algorithms/algorithms/bellman-ford-algorithm
 dateCreated: 2026-04-23T17:39:39.623Z
-lastUpdatedOn: 2026-09-29T03:57:48.804Z
+lastUpdatedOn: 2026-11-02T05:12:02.026Z
 ---
 
 The task of finding a path between 2 vertices such that the sum of edge weights is minimized. There might multiple shortest path trees for a given graph and a source vertex.
@@ -31,7 +31,6 @@ A greedy method for finding shortest paths from a single source in graphs with n
    - $S = \emptyset$
    - $\text{dist}[\text{source}] = 0$
    - $\text{dist}[\text{others}] = \infty$
-
 2. Repeat until all vertices processed:
    - pick vertex with minimum distance not in $S$
    - add it to $S$
@@ -48,7 +47,6 @@ A negative cycle is a cycle whose total edge weight is negative. A negative cycl
 1. Initialize:
    - $\text{dist}[\text{source}] = 0$
    - $\text{dist}[\text{others}] = \infty$
-
 2. Repeat relaxation:  
    For each edge $(u,v)$, if $\text{dist}(u) + w(u,v) < \text{dist}(v)$, update the distance to be the smaller one.
 
