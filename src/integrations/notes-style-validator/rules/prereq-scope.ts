@@ -34,6 +34,16 @@ export function checkPrereqScope(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
 
   for (const { value, line } of f.prereqs) {
+    if (value.startsWith("/")) {
+      violations.push({
+        rule: "prereq-scope",
+        line,
+        text: `prereq "${value}" starts with "/", which never resolves; drop the slash or use a "../" path`,
+        snippet: value,
+      });
+      continue;
+    }
+
     const prereqSlug = stripAnchor(resolvePrereqSlug(f.slug, value));
     if (dirOf(prereqSlug) === ownDir) {
       violations.push({

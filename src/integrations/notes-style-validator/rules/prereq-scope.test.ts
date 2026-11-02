@@ -72,6 +72,16 @@ test("flags a relative prereq in the same module", () => {
   expect(checkPrereqScope(f)).toHaveLength(1);
 });
 
+test("flags a prereq with a leading slash", () => {
+  const f = scanOne(
+    note("prereqs:\n  - /s1/other-module/baz"),
+    "s2/mathematics/foo/01-bar.mdx",
+  );
+  const violations = checkPrereqScope(f);
+  expect(violations).toHaveLength(1);
+  expect(violations[0].snippet).toBe("/s1/other-module/baz");
+});
+
 test("does not flag when there are no prereqs", () => {
   const f = scanOne(note(""), NOTE_PATH);
   expect(checkPrereqScope(f)).toHaveLength(0);
