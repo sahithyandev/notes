@@ -3,6 +3,7 @@
 // Use graph-coordinate domains rather than hand-written SVG positions; curves,
 // labels, points and their axis projections follow the same coordinate system.
 // Keep CartesianGraph for diagrams with custom regions or non-function geometry.
+import { inlineTex } from "../../../utils/tex";
 import { assertCaption, type CaptionProps } from "../lib/caption";
 import {
   curveY,
@@ -19,6 +20,7 @@ import {
   yToSvg,
 } from "../lib/cartesian-graph";
 import { makeUid } from "../lib/uid";
+import FigureCaption from "./figure-caption.astro";
 
 type Props = CaptionProps & {
   title: string;
@@ -317,10 +319,13 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
       </text>
     ))}
   </svg>
-  <figcaption>
-    {caption}
-    <slot name="caption" />
-  </figcaption>
+  {caption ? (
+    <FigureCaption set:html={inlineTex(caption)} />
+  ) : (
+    <FigureCaption>
+      <slot name="caption" />
+    </FigureCaption>
+  )}
 </figure>
 
 <style>
