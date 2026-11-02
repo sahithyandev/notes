@@ -1,14 +1,15 @@
 ---
-title: Initial Value Problems
+title: Initial Value Problem
 prereqs:
   - s5/operational-research/convex
 notebooks:
-  - initial-value-problems
+  - initial-value-problem
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-21T16:42:27.851Z
+lastUpdatedOn: 2026-11-02T23:59:40.001Z
 ---
 
-An initial value problem (IVP) is a first-order ODE together with the solution value at the left endpoint.
+<Aka>IVP</Aka>. A first-order ODE together with the solution value at the left
+endpoint.
 
 $$
 y'(t) = f(t, y), \quad a \leq t \leq b, \quad y(a) = \alpha
@@ -33,10 +34,6 @@ If $D$ is convex and a constant $L > 0$ exists with $\left| \dfrac{\partial f}{\
 ## Existence and Uniqueness
 
 Let $D = [a, b] \times \mathbb{R}$. If $f$ is continuous on $D$ **and** satisfies a Lipschitz condition in $y$ on $D$, then the IVP has a unique solution $y(t)$ for $a \leq t \leq b$.
-
-For example, consider: $y' = 1 + t\sin(ty)$, $0 \leq t \leq 2$, $y(0) = 0$.
-
-Here $\left| \dfrac{\partial f}{\partial y} \right| = |t^2 \cos(ty)| \leq 4$ on $[0, 2] \times \mathbb{R}$, so a unique solution exists.
 
 ## Stable Solution
 
@@ -75,6 +72,80 @@ If the Lipschitz condition fails, check the definition directly.
 
 ### Example 1
 
+Find a Lipschitz constant in $y$ for $f(t,y) = t^2 - 3y$ on $D = [0,2] \times \mathbb{R}$.
+
+<Solution>
+
+$$
+\frac{\partial f}{\partial y}(t,y) = -3
+$$
+
+$$
+\left| \frac{\partial f}{\partial y}(t,y) \right| = 3
+$$
+
+The partial derivative test gives $L = 3$.
+
+</Solution>
+
+### Example 2
+
+Show that the IVP $y' = 1 + t\sin(ty)$, $0 \leq t \leq 2$, $y(0) = 0$ has a unique solution.
+
+<Solution>
+
+$$
+\left| \dfrac{\partial f}{\partial y}(t, y) \right| = |t^2 \cos(ty)| \leq 4
+$$
+
+on $[0, 2] \times \mathbb{R}$. Since $f(t, y) = 1 + t\sin(ty)$ is continuous, $f$ is Lipschitz in $y$ with $L = 4$. The IVP has a unique solution on $[0, 2]$.
+
+</Solution>
+
+### Example 3
+
+Use the Lipschitz condition to decide whether $f(t,y) = \sin(t) + 4y$ has a unique solution for every initial value on $[0,1]$.
+
+<Solution>
+
+$f$ is continuous on $[0,1] \times \mathbb{R}$.
+
+$$
+\frac{\partial f}{\partial y}(t,y) = 4
+$$
+
+$$
+\left| \frac{\partial f}{\partial y}(t,y) \right| = 4
+$$
+
+$f$ is Lipschitz in $y$ with $L = 4$. Every IVP with this right-hand side has a unique solution on $[0,1]$.
+
+</Solution>
+
+### Example 4
+
+Show that $f(t,y) = \sqrt{|y|}$ does not satisfy a Lipschitz condition in $y$ on $D = [0,1] \times [0,1]$.
+
+<Solution>
+
+Take $y_1 = h^2$ and $y_2 = 0$, where $0 < h \leq 1$. Then
+
+$$
+|f(t,y_1) - f(t,y_2)| = |h - 0| = h
+$$
+
+$$
+|y_1-y_2| = h^2
+$$
+
+If a Lipschitz constant $L$ existed, then $h \leq Lh^2$. Hence $1 \leq Lh$.
+
+This fails when $h < \dfrac{1}{L}$. No Lipschitz constant exists on $D$.
+
+</Solution>
+
+### Example 5
+
 Show the IVP $y'(t) = y - t^2 + 1$, $0 \leq t \leq 2$, $y(0) = 0.5$ is well-posed.
 
 <Solution>
@@ -101,7 +172,7 @@ for $|\delta| < \varepsilon$ and $|\delta_0| < \varepsilon$, using $e^t \leq e^2
 
 </Solution>
 
-### Example 2
+### Example 6
 
 Show the IVP $y'(t) = t e^{3t} - 2y$, $0 \leq t \leq 1$, $y(0) = 0$ is well-posed.
 

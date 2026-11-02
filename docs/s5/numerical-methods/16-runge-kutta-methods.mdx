@@ -5,13 +5,15 @@ notebooks:
   - runge-kutta-modified-euler
   - runge-kutta-order-4
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-01T06:59:14.713Z
+lastUpdatedOn: 2026-11-02T23:59:40.027Z
 ---
 
-Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problems) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
+Runge-Kutta methods approximate [IVP](/s5/numerical-methods/initial-value-problem) solutions using higher-order Taylor expansions, without evaluating derivatives of $f$.
 
 Mesh points are $t_i = a + ih$ with $h = \dfrac{b - a}{N}$, as in [Euler's method](/s5/numerical-methods/eulers-method).
 
+<ProseFigure>
+    
 ## Midpoint Method
 
 Second-order Taylor, with the derivative term replaced using
@@ -27,8 +29,60 @@ w_{i+1} &= w_i + h\, f\left( t_i + \frac{h}{2},\ w_i + \frac{h}{2} f(t_i, w_i) \
 \end{aligned}
 $$
 
+<CartesianGraph
+  slot="figure"
+  title="Midpoint Method Slope Estimate"
+  desc="A curve from the current approximation at t_i to the next value. A half Euler step estimates the midpoint, where the full-step slope is sampled."
+  caption="Midpoint method. Take a half Euler step to estimate the midpoint, then use the slope there for the full step."
+  x={{ label: "t", domain: [0, 2] }}
+  y={{ label: "y", domain: [0.5, 3.5] }}
+  curves={[
+    {
+      equation: (t) => 1 + 0.45 * t + 0.25 * t * t,
+      tone: "ink",
+      round: true,
+    },
+  ]}
+  lines={[
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 1, y: 1.45 },
+      tone: "ct",
+      dashed: true,
+    },
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 2, y: 3.35 },
+      tone: "s5",
+    },
+  ]}
+  points={[
+    { x: 0, y: 1, label: "(tᵢ, wᵢ)", labelDx: 8, labelDy: 16 },
+    {
+      x: 1,
+      y: 1.45,
+      tone: "ct",
+      label: "half step",
+      labelDx: 8,
+      labelDy: -8,
+    },
+    {
+      x: 2,
+      y: 3.35,
+      tone: "s5",
+      label: "wᵢ₊₁",
+      labelDx: -38,
+      labelDy: -8,
+    },
+  ]}
+/>
+
 The local truncation error is $O(h^3)$. The global error is $O(h^2)$.
 
+</ProseFigure>
+
+<ProseFigure>
+    
 ## Modified Euler Method
 
 Third-order Taylor, with the derivative term replaced by an average of the endpoint slopes.
@@ -36,11 +90,63 @@ Third-order Taylor, with the derivative term replaced by an average of the endpo
 $$
 \begin{aligned}
 w_0 &= \alpha \\
-w_{i+1} &= w_i + \frac{h}{2}\left[ f(t_i, w_i) + f\big(t_{i+1},\ w_i + h f(t_i, w_i)\big) \right]
+w_{i+1} &= w_i + \frac{h}{2}\Big[ f(t_i, w_i) + f\big(t_{i+1},\ w_i + h f(t_i, w_i)\big) \Big]
 \end{aligned}
 $$
 
+<CartesianGraph
+  slot="figure"
+  title="Modified Euler Slope Estimate"
+  desc="A curve from the current approximation at t_i to the next value. Euler predicts the right endpoint, where the second slope is sampled before averaging both slopes."
+  caption="Modified Euler method. Predict the right end with Euler, then average the left and predicted-right slopes."
+  x={{ label: "t", domain: [0, 2] }}
+  y={{ label: "y", domain: [0.5, 3.5] }}
+  curves={[
+    {
+      equation: (t) => 1 + 0.45 * t + 0.25 * t * t,
+      tone: "ink",
+      round: true,
+    },
+  ]}
+  lines={[
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 2, y: 1.9 },
+      tone: "ct",
+      dashed: true,
+    },
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 2, y: 3.1 },
+      tone: "s5",
+    },
+  ]}
+  points={[
+    { x: 0, y: 1, label: "(tᵢ, wᵢ)", labelDx: 8, labelDy: 16 },
+    {
+      x: 2,
+      y: 1.9,
+      tone: "ct",
+      label: "Euler prediction",
+      labelDx: -95,
+      labelDy: 18,
+    },
+    {
+      x: 2,
+      y: 3.1,
+      tone: "s5",
+      label: "wᵢ₊₁",
+      labelDx: -38,
+      labelDy: -8,
+    },
+  ]}
+/>
+
 The local truncation error is $O(h^4)$. The global error is $O(h^3)$.
+
+</ProseFigure>
+
+<ProseFigure>
 
 ## Order 4 Runge-Kutta
 
@@ -55,7 +161,64 @@ w_{i+1} &= w_i + \tfrac{1}{6}\left( k_1 + 2k_2 + 2k_3 + k_4 \right)
 \end{aligned}
 $$
 
+<CartesianGraph
+  slot="figure"
+  title="Order 4 Runge-Kutta Slope Samples"
+  desc="A curve with 4 Runge-Kutta slope-sampling positions: the start, 2 estimated midpoints, and an estimated endpoint."
+  caption="Order 4 Runge-Kutta. Sample slopes at the start, middle, middle and end, then combine them with weights $1, 2, 2, 1$."
+  x={{ label: "t", domain: [0, 2] }}
+  y={{ label: "y", domain: [0.5, 3.5] }}
+  curves={[
+    {
+      equation: (t) => 1 + 0.45 * t + 0.25 * t * t,
+      tone: "ink",
+      round: true,
+    },
+  ]}
+  lines={[
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 1, y: 1.45 },
+      tone: "ct",
+      dashed: true,
+    },
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 1, y: 1.9 },
+      tone: "pt",
+      dashed: true,
+    },
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 2, y: 2.8 },
+      tone: "key",
+      dashed: true,
+    },
+    {
+      from: { x: 0, y: 1 },
+      to: { x: 2, y: 2.9 },
+      tone: "s5",
+    },
+  ]}
+  points={[
+    { x: 0, y: 1, label: "k₁", labelDx: 8, labelDy: 16 },
+    { x: 1, y: 1.45, tone: "ct", label: "k₂", labelDx: 8, labelDy: 14 },
+    { x: 1, y: 1.9, tone: "pt", label: "k₃", labelDx: 8, labelDy: -8 },
+    { x: 2, y: 2.8, tone: "key", label: "k₄", labelDx: -25, labelDy: 16 },
+    {
+      x: 2,
+      y: 2.9,
+      tone: "s5",
+      label: "wᵢ₊₁",
+      labelDx: -38,
+      labelDy: -8,
+    },
+  ]}
+/>
+
 for $i = 0, 1, \ldots, N-1$. The local truncation error is $O(h^5)$. The global error is $O(h^4)$.
+
+</ProseFigure>
 
 ## Error Orders
 
@@ -67,19 +230,6 @@ for $i = 0, 1, \ldots, N-1$. The local truncation error is $O(h^5)$. The global 
 | Order 4 Runge-Kutta | $O(h^4)$     | $O(h^5)$               |
 
 Higher order gives a better approximation for the same $h$.
-
-## Memorization
-
-All 4 have the form $w_{i+1} = w_i + h \times (\text{slope estimate})$.
-
-- Euler  
-  Slope at the left end.
-- Midpoint  
-  Slope at the middle, found with a half Euler step.
-- Modified Euler  
-  Average of the left slope and the slope at the Euler-predicted right end.
-- Order 4 Runge-Kutta  
-  Weights $1, 2, 2, 1$ over $6$ on the slopes at $t_i$, twice at $t_i + \tfrac{h}{2}$, and at $t_{i+1}$. Each $k_j$ feeds the next with factor $\tfrac{1}{2}$, except $k_3$ into $k_4$ with factor $1$.
 
 ## Worked Examples
 

@@ -3,59 +3,34 @@ title: Systems of IVPs
 notebooks:
   - systems-of-ivps
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-01T06:59:14.730Z
+lastUpdatedOn: 2026-11-02T23:59:40.057Z
 ---
 
-An $m$-dimensional system of first-order [IVPs](/s5/numerical-methods/initial-value-problems) is
+An $m$-dimensional system of first-order [IVPs](/s5/numerical-methods/initial-value-problem) is
 
 $$
-\begin{aligned}
-u_1'(t) &= f_1(t, u_1, u_2, \ldots, u_m) \\
-&\ \ \vdots \\
-u_m'(t) &= f_m(t, u_1, u_2, \ldots, u_m)
-\end{aligned}
+\mathbf{u}'(t) = \mathbf{f}(t, \mathbf{u}(t)), \qquad \mathbf{u}(a) = \boldsymbol{\alpha}
 $$
 
-for $a \leq t \leq b$, with $u_1(a) = \alpha_1, \ldots, u_m(a) = \alpha_m$. The goal is to approximate $u_1(t), \ldots, u_m(t)$.
+where $\mathbf{u} = (u_1, \ldots, u_m)^T$, $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_m)^T$, and $\mathbf{f} = (f_1, \ldots, f_m)^T$. The goal is to approximate $\mathbf{u}(t)$ for $a \leq t \leq b$.
 
-## Lipschitz Condition for Systems
+<Note>
 
-$f(t, u_1, \ldots, u_m)$ on
+Vector notation expresses every component equation at once. It makes the existence result and numerical methods apply to systems of any dimension without repeating component indices.
 
-$$
-D = \{ (t, u_1, \ldots, u_m) : a \leq t \leq b,\ -\infty < u_i < \infty \}
-$$
+</Note>
 
-satisfies a Lipschitz condition in $u_1, \ldots, u_m$ **iff** a constant $L > 0$ exists with
+[The Lipschitz condition](/s5/numerical-methods/initial-value-problem#lipschitz-condition) applies unchanged. Replace the scalar variables with vectors and absolute values with a vector norm:
 
 $$
-|f(t, u_1, \ldots, u_m) - f(t, z_1, \ldots, z_m)| \leq L \sum_{j=1}^{m} |u_j - z_j|
+\lVert \mathbf{f}(t, \mathbf{u}) - \mathbf{f}(t, \mathbf{z}) \rVert \leq L \lVert \mathbf{u} - \mathbf{z} \rVert
 $$
 
-for all $(t, u_1, \ldots, u_m), (t, z_1, \ldots, z_m) \in D$.
+for all $(t, \mathbf{u}), (t, \mathbf{z}) \in D \subseteq \mathbb{R} \times \mathbb{R}^m$.
 
-Sufficient test: $f$ and each partial derivative $\dfrac{\partial f}{\partial u_i}$ are continuous on $D$ with $\left| \dfrac{\partial f}{\partial u_i} \right| \leq L$ for each $i = 1, \ldots, m$.
+The [existence and uniqueness result](/s5/numerical-methods/initial-value-problem#existence-and-uniqueness) also applies with this condition. A continuous, bounded Jacobian of $\mathbf{f}$ is sufficient.
 
-### Existence and Uniqueness
-
-If each $f_i$ is continuous and satisfies a Lipschitz condition on $D$, the system has a unique solution $u_1(t), \ldots, u_m(t)$ on $[a, b]$.
-
-## Order 4 Runge-Kutta for Systems
-
-Superscript $(j)$ marks quantities for $u_j$. Mesh points are $t_i = a + ih$ with $h = \dfrac{b - a}{N}$.
-
-$$
-\begin{aligned}
-w_0^{(j)} &= \alpha_j \\
-k_1^{(j)} &= h\, f_j\big(t_i,\ w_i^{(1)}, \ldots, w_i^{(m)}\big) \\
-k_2^{(j)} &= h\, f_j\left( t_i + \tfrac{h}{2},\ w_i^{(1)} + \tfrac{1}{2} k_1^{(1)}, \ldots, w_i^{(m)} + \tfrac{1}{2} k_1^{(m)} \right) \\
-k_3^{(j)} &= h\, f_j\left( t_i + \tfrac{h}{2},\ w_i^{(1)} + \tfrac{1}{2} k_2^{(1)}, \ldots, w_i^{(m)} + \tfrac{1}{2} k_2^{(m)} \right) \\
-k_4^{(j)} &= h\, f_j\left( t_{i+1},\ w_i^{(1)} + k_3^{(1)}, \ldots, w_i^{(m)} + k_3^{(m)} \right) \\
-w_{i+1}^{(j)} &= w_i^{(j)} + \tfrac{1}{6}\left( k_1^{(j)} + 2 k_2^{(j)} + 2 k_3^{(j)} + k_4^{(j)} \right)
-\end{aligned}
-$$
-
-for $i = 0, \ldots, N-1$ and $j = 1, \ldots, m$. All $k_1^{(j)}$ are computed before any $k_2^{(j)}$, and so on. Then $u_j(t_i) \approx w_i^{(j)}$.
+[Order 4 Runge-Kutta](/s5/numerical-methods/runge-kutta-methods#order-4-runge-kutta) applies unchanged. Use $\mathbf{w}_i$, $\mathbf{k}_1, \ldots, \mathbf{k}_4$, and $\mathbf{f}$ in place of $w_i$, $k_1, \ldots, k_4$, and $f$. Start with $\mathbf{w}_0 = \boldsymbol{\alpha}$. Then $\mathbf{u}(t_i) \approx \mathbf{w}_i$.
 
 ## Reducing a Higher-Order IVP
 
@@ -65,19 +40,24 @@ $$
 y^{(m)}(t) = f\big(t, y, y', \ldots, y^{(m-1)}\big), \quad a \leq t \leq b
 $$
 
-with $y(a) = \alpha_1, y'(a) = \alpha_2, \ldots, y^{(m-1)}(a) = \alpha_m$ becomes a first-order system by setting $u_1 = y, u_2 = y', \ldots, u_m = y^{(m-1)}$
+with $y(a) = \alpha_1, y'(a) = \alpha_2, \ldots, y^{(m-1)}(a) = \alpha_m$ becomes a first-order system by setting $\mathbf{u} = (y, y', \ldots, y^{(m-1)})^T$
 
 $$
-\begin{aligned}
-u_1' &= u_2 \\
-u_2' &= u_3 \\
-&\ \ \vdots \\
-u_{m-1}' &= u_m \\
-u_m' &= f(t, u_1, u_2, \ldots, u_m)
-\end{aligned}
+\mathbf{u}' = \begin{pmatrix}
+u_2 \\
+u_3 \\
+\vdots \\
+u_m \\
+f(t, u_1, \ldots, u_m)
+\end{pmatrix}, \qquad \mathbf{u}(a) = \begin{pmatrix}
+\alpha_1 \\
+\alpha_2 \\
+\vdots \\
+\alpha_m
+\end{pmatrix}
 $$
 
-with $u_1(a) = \alpha_1, \ldots, u_m(a) = \alpha_m$. Solving the system by order 4 Runge-Kutta, $w_i^{(1)}$ approximates $y(t_i)$.
+Solving the system by order 4 Runge-Kutta, the first component of $\mathbf{w}_i$ approximates $y(t_i)$.
 
 ## Worked Examples
 
@@ -93,54 +73,51 @@ to a first-order system, then take 1 step of order 4 Runge-Kutta with $h = 0.5$.
 
 <Solution>
 
-Set $u_1 = y$, $u_2 = y'$
+Set $\mathbf{u} = (y, y')^T$.
 
 $$
-\begin{aligned}
-u_1' &= u_2 \\
-u_2' &= 2 u_2 - 2 u_1 + e^{2t}\sin t
-\end{aligned}
+\mathbf{u}' = \mathbf{f}(t, \mathbf{u}) =
+\begin{pmatrix}
+u_2 \\
+2u_2 - 2u_1 + e^{2t}\sin t
+\end{pmatrix}, \qquad
+\mathbf{u}(0) = \begin{pmatrix} -0.4 \\ -0.6 \end{pmatrix}
 $$
 
-with $u_1(0) = -0.4$, $u_2(0) = -0.6$. So $f_1 = u_2$ and $f_2 = 2u_2 - 2u_1 + e^{2t}\sin t$.
+For $h = 0.5$:
 
 $$
-\begin{aligned}
-k_1^{(1)} &= 0.5(-0.6) = -0.3 \\
-k_1^{(2)} &= 0.5\, f_2(0, -0.4, -0.6) = -0.2
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-k_2^{(1)} &= 0.5(-0.6 - 0.1) = -0.35 \\
-k_2^{(2)} &= 0.5\, f_2(0.25, -0.55, -0.7) = 0.0540
-\end{aligned}
+\mathbf{k}_1 = 0.5\, \mathbf{f}\left(0, \begin{pmatrix} -0.4 \\ -0.6 \end{pmatrix}\right)
+= \begin{pmatrix} -0.3 \\ -0.2 \end{pmatrix}
 $$
 
 $$
-\begin{aligned}
-k_3^{(1)} &= 0.5(-0.6 + 0.0270) = -0.2865 \\
-k_3^{(2)} &= 0.5\, f_2(0.25, -0.575, -0.5730) = 0.2059
-\end{aligned}
+\mathbf{k}_2 = 0.5\, \mathbf{f}\left(0.25, \begin{pmatrix} -0.55 \\ -0.7 \end{pmatrix}\right)
+= \begin{pmatrix} -0.35 \\ 0.0540 \end{pmatrix}
 $$
 
 $$
-\begin{aligned}
-k_4^{(1)} &= 0.5(-0.6 + 0.2059) = -0.1970 \\
-k_4^{(2)} &= 0.5\, f_2(0.5, -0.6865, -0.3941) = 0.9440
-\end{aligned}
+\mathbf{k}_3 = 0.5\, \mathbf{f}\left(0.25, \begin{pmatrix} -0.575 \\ -0.5730 \end{pmatrix}\right)
+= \begin{pmatrix} -0.2865 \\ 0.2059 \end{pmatrix}
 $$
 
 $$
-w_1^{(1)} = -0.4 + \tfrac{1}{6}(-0.3 - 0.7 - 0.5730 - 0.1970) = -0.6950
+\mathbf{k}_4 = 0.5\, \mathbf{f}\left(0.5, \begin{pmatrix} -0.6865 \\ -0.3941 \end{pmatrix}\right)
+= \begin{pmatrix} -0.1970 \\ 0.9440 \end{pmatrix}
 $$
 
 $$
-w_1^{(2)} = -0.6 + \tfrac{1}{6}(-0.2 + 0.1080 + 0.4118 + 0.9440) = -0.3894
+\mathbf{w}_1 = \begin{pmatrix} -0.4 \\ -0.6 \end{pmatrix}
++ \tfrac{1}{6}\left(
+\begin{pmatrix} -0.3 \\ -0.2 \end{pmatrix}
++ 2\begin{pmatrix} -0.35 \\ 0.0540 \end{pmatrix}
++ 2\begin{pmatrix} -0.2865 \\ 0.2059 \end{pmatrix}
++ \begin{pmatrix} -0.1970 \\ 0.9440 \end{pmatrix}
+\right)
+= \begin{pmatrix} -0.6950 \\ -0.3894 \end{pmatrix}
 $$
 
-$w_1^{(1)}$ approximates $y(0.5)$. The exact value is $-0.6936$.
+The first component gives $y(0.5) \approx -0.6950$. The exact value is $-0.6936$.
 
 </Solution>
 
@@ -150,16 +127,15 @@ Write $y''' = y'' - 2y' + y + t$ with $y(0) = 1$, $y'(0) = 0$, $y''(0) = 2$ as a
 
 <Solution>
 
-Set $u_1 = y$, $u_2 = y'$, $u_3 = y''$
+Set $\mathbf{u} = (y, y', y'')^T$.
 
 $$
-\begin{aligned}
-u_1' &= u_2 \\
-u_2' &= u_3 \\
-u_3' &= u_3 - 2u_2 + u_1 + t
-\end{aligned}
+\mathbf{u}' = \begin{pmatrix}
+u_2 \\
+u_3 \\
+u_3 - 2u_2 + u_1 + t
+\end{pmatrix}, \qquad
+\mathbf{u}(0) = \begin{pmatrix} 1 \\ 0 \\ 2 \end{pmatrix}
 $$
-
-with $u_1(0) = 1$, $u_2(0) = 0$, $u_3(0) = 2$.
 
 </Solution>

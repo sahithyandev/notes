@@ -3,12 +3,12 @@ title: Multi-Step Methods
 notebooks:
   - multi-step-methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-10-21T16:42:27.882Z
+lastUpdatedOn: 2026-11-02T23:59:40.046Z
 ---
 
 A multi-step method computes $w_{i+1}$ from several previous approximations, not just $w_i$.
 
-An $m$-step method for the [IVP](/s5/numerical-methods/initial-value-problems) $y'(t) = f(t, y)$ has a difference equation
+An $m$-step method for the [IVP](/s5/numerical-methods/initial-value-problem) $y'(t) = f(t, y)$ has a difference equation
 
 $$
 \begin{aligned}
@@ -21,12 +21,15 @@ for $i = m-1, m, \ldots, N-1$, with constants $a_0, \ldots, a_{m-1}$ and $b_0, \
 
 Starting values $w_0 = \alpha$ and $w_1, \ldots, w_{m-1}$ come from a one-step method such as [Runge-Kutta](/s5/numerical-methods/runge-kutta-methods).
 
-## Explicit and Implicit Methods
+## Types
 
-- Explicit  
-  $b_m = 0$. $w_{i+1}$ is given directly by previously determined values.
-- Implicit  
-  $b_m \neq 0$. $w_{i+1}$ appears on both sides and must be solved for.
+### Explicit Method
+
+$b_m = 0$. $w_{i+1}$ is given directly by previously determined values.
+
+### Implicit Method
+
+$b_m \neq 0$. $w_{i+1}$ appears on both sides and must be solved for.
 
 ## Adams Methods
 
@@ -38,7 +41,7 @@ $$
 
 $f(t, y(t))$ is replaced by a polynomial through the $m$ most recent points, then integrated.
 
-Below, $f_k = f(t_k, w_k)$ and $\mu_i$ lies in the interval spanned by the points used.
+Below, $f_k = f(t_k, w_k)$ and $\mu_i$ lies in the interval spanned by the points used. $\tau_{i+1}(h)$ is the local truncation error per unit step. Substitute the exact values $y(t_k)$ into the method and divide the remaining residual by $h$. It measures the error introduced at step $i+1$ when all preceding values are exact.
 
 ### Adams-Bashforth Explicit Methods
 
@@ -71,19 +74,19 @@ $$
 2-step, with $\tau_{i+1}(h) = -\dfrac{1}{24} y^{(4)}(\mu_i) h^3$
 
 $$
-w_{i+1} = w_i + \frac{h}{12}\left[ 5 f(t_{i+1}, w_{i+1}) + 8 f_i - f_{i-1} \right]
+w_{i+1} = w_i + \frac{h}{12}\left[ 5 f_{i+1} + 8 f_i - f_{i-1} \right]
 $$
 
 3-step, with $\tau_{i+1}(h) = -\dfrac{19}{720} y^{(5)}(\mu_i) h^4$
 
 $$
-w_{i+1} = w_i + \frac{h}{24}\left[ 9 f(t_{i+1}, w_{i+1}) + 19 f_i - 5 f_{i-1} + f_{i-2} \right]
+w_{i+1} = w_i + \frac{h}{24}\left[ 9 f_{i+1} + 19 f_i - 5 f_{i-1} + f_{i-2} \right]
 $$
 
 4-step, with $\tau_{i+1}(h) = -\dfrac{3}{160} y^{(6)}(\mu_i) h^5$
 
 $$
-w_{i+1} = w_i + \frac{h}{720}\left[ 251 f(t_{i+1}, w_{i+1}) + 646 f_i - 264 f_{i-1} + 106 f_{i-2} - 19 f_{i-3} \right]
+w_{i+1} = w_i + \frac{h}{720}\left[ 251 f_{i+1} + 646 f_i - 264 f_{i-1} + 106 f_{i-2} - 19 f_{i-3} \right]
 $$
 
 <Note>
