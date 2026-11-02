@@ -1,5 +1,6 @@
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
+import { resolvePrereqSlug } from "../../../utils/note-path.ts";
 
 // Directory portion of a slug, e.g. "s1/mathematics/real-analysis/foo" -> "s1/mathematics/real-analysis".
 function dirOf(slug: string): string {
@@ -33,7 +34,7 @@ export function checkPrereqScope(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
 
   for (const { value, line } of f.prereqs) {
-    const prereqSlug = stripAnchor(value);
+    const prereqSlug = stripAnchor(resolvePrereqSlug(f.slug, value));
     if (dirOf(prereqSlug) === ownDir) {
       violations.push({
         rule: "prereq-scope",

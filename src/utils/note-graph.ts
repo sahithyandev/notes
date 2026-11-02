@@ -3,7 +3,7 @@
 // submodule), "prereq" (a note's prerequisite points to the note), or
 // "content" (a link written in a note's body). Built once at build time,
 // serialised with `toJSON`, revived with `fromJSON`.
-import { orderFromFilePath } from "./note-path";
+import { orderFromFilePath, resolvePrereqSlug } from "./note-path";
 
 const ALL_KINDS: EdgeKind[] = ["chain", "prereq"] as const;
 
@@ -109,7 +109,10 @@ export class NoteGraph {
     // A prereq can only be validated once every id is known
     for (const note of notes) {
       for (const p of note.prereqs ?? []) {
-        if (ids.has(p)) edges.push({ from: p, to: note.id, kind: "prereq" });
+        const target = resolvePrereqSlug(note.id, p).split("#", 1)[0];
+        if (ids.has(target)) {
+          edges.push({ from: target, to: note.id, kind: "prereq" });
+        }
       }
     }
 

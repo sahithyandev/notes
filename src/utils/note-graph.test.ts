@@ -38,6 +38,25 @@ describe("NoteGraph.build", () => {
     expect(pairs("prereq")).toEqual(["s1/a/a2>s1/b/b1", "s1/b/b2>s1/a/a3"]);
   });
 
+  test("resolves relative prerequisite references", () => {
+    const relative = NoteGraph.build([
+      note(
+        "s5/business/accounting/cost-terms",
+        "s5/business/accounting/01-cost-terms.mdx",
+      ),
+      note(
+        "s5/business/economics/firm-and-costs",
+        "s5/business/economics/15-firm-and-costs.mdx",
+        ["../accounting/cost-terms"],
+      ),
+    ]);
+    expect(relative.edges).toContainEqual({
+      from: "s5/business/accounting/cost-terms",
+      to: "s5/business/economics/firm-and-costs",
+      kind: "prereq",
+    });
+  });
+
   test("adds valid internal links from note content", () => {
     const linked = NoteGraph.build([
       {

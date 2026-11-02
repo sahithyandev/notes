@@ -26,6 +26,7 @@ import Article from "../components/note/article.astro";
 import ScrollableTable from "../components/mdx/scrollable-table.astro";
 import TabularNums from "../components/mdx/tabular-nums.astro";
 import Prereqs from "../components/note/prereqs.astro";
+import { resolvePrereqSlug } from "../utils/note-path";
 import AiLinks from "../components/note/ai-links.astro";
 import NoteNotebooks from "../components/note/note-notebooks.astro";
 import MenuIcon from "../components/icons/menu-icon.astro";
@@ -79,14 +80,17 @@ const prereqEntries = notesEntry.data.prereqs
   ? (
       await Promise.all(
         notesEntry.data.prereqs.map(async (s) => {
+          const prereqSlug = resolvePrereqSlug(notesEntry.id, s);
           const entry = await getEntry(
             "notes",
-            s.includes("#") ? s.slice(0, s.indexOf("#")) : s,
+            prereqSlug.includes("#")
+              ? prereqSlug.slice(0, prereqSlug.indexOf("#"))
+              : prereqSlug,
           );
           if (!entry) return null;
           return {
             entry,
-            slug: s,
+            slug: prereqSlug,
           };
         }),
       )

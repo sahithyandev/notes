@@ -56,6 +56,22 @@ test("strips an anchor before comparing module scope", () => {
   expect(checkPrereqScope(f)).toHaveLength(1);
 });
 
+test("resolves a relative prereq before comparing module scope", () => {
+  const f = scanOne(
+    note("prereqs:\n  - ../accounting/cost-terms"),
+    "s5/business/economics/15-firm-and-costs.mdx",
+  );
+  expect(checkPrereqScope(f)).toHaveLength(0);
+});
+
+test("flags a relative prereq in the same module", () => {
+  const f = scanOne(
+    note("prereqs:\n  - ./cost-terms"),
+    "s5/business/economics/15-firm-and-costs.mdx",
+  );
+  expect(checkPrereqScope(f)).toHaveLength(1);
+});
+
 test("does not flag when there are no prereqs", () => {
   const f = scanOne(note(""), NOTE_PATH);
   expect(checkPrereqScope(f)).toHaveLength(0);

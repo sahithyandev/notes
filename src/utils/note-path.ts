@@ -4,6 +4,35 @@
 // "Slugs & file naming" section.
 const NUMERIC_PREFIX = /^\d+-/;
 
+/**
+ * Resolves a prerequisite reference relative to the note that declares it.
+ * Absolute collection IDs remain unchanged, while `./` and `../` references
+ * are resolved from the declaring note's directory. Anchors are preserved.
+ */
+export function resolvePrereqSlug(
+  sourceSlug: string,
+  reference: string,
+): string {
+  const hashIndex = reference.indexOf("#");
+  const path = hashIndex === -1 ? reference : reference.slice(0, hashIndex);
+  const anchor = hashIndex === -1 ? "" : reference.slice(hashIndex);
+
+  if (!path.startsWith(".")) return reference;
+
+  const sourceDir = sourceSlug.slice(0, sourceSlug.lastIndexOf("/"));
+  const segments = `${sourceDir}/${path}`.split("/");
+  const resolved: string[] = [];
+  for (const segment of segments) {
+    if (!segment || segment === ".") continue;
+    if (segment === "..") {
+      resolved.pop();
+    } else {
+      resolved.push(segment);
+    }
+  }
+  return `${resolved.join("/")}${anchor}`;
+}
+
 /** relPath is the note's path relative to the `docs/` directory. */
 export function slugFromDocsPath(relPath: string): string {
   const noExt = relPath.replace(/\.mdx?$/, "");
