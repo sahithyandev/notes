@@ -25,6 +25,10 @@ bun install
 
 `bun dev` runs a `notes-style-validator` pass on `docs/` as you edit (see below), and the dev server coalesces rapid successive file changes into a single browser reload instead of one per file, so editing several notes in quick succession (by hand, a script, or an AI coding agent) doesn't cause a reload storm. Editing a note's Markdown/MDX file doesn't even trigger a full reload: the open note page patches itself in place instead. Anything else (components, scripts, config) still triggers a real reload.
 
+## AI-readable catalogue
+
+`/llms.txt` is generated at build time from the notes collection. It gives AI tools a compact, licensed subject index; `/llms-full.txt` provides every canonical note URL and its description. No hand-maintained index is needed when notes are added, renamed, or edited. The source material remains subject to the content license at `/license`.
+
 ## Testing
 
 Unit tests use `bun:test` and live next to the code they cover as `*.test.ts`.
