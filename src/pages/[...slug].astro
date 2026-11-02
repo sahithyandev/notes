@@ -37,6 +37,7 @@ import { getSidebarData } from "../lib/sidebar";
 import NoteSidebar from "../components/note/note-sidebar.astro";
 import ImageZoom from "../components/note/image-zoom.astro";
 import LinkPreview from "../components/note/link-preview.astro";
+import CartesianGraph from "../components/illustrations/primitives/cartesian-graph.astro";
 import { titleize, calculateWordCount, generateDescription } from "../utils";
 
 export const prerender = true;
@@ -226,6 +227,8 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
         <Article>
           <Content
             components={{
+              Aka,
+              CartesianGraph,
               Note,
               Solution,
               Method,
@@ -235,7 +238,6 @@ const sectionLabel = slugParts.length >= 2 ? titleize(slugParts[1]) : null;
               Formula,
               Symbols,
               Sym,
-              Aka,
               ProseFigure,
               TabularNums,
               ...Illustrations,

@@ -3,7 +3,7 @@ title: Perfect Competition
 authors:
   - nalina
 dateCreated: 2026-09-22T00:00:00.000Z
-lastUpdatedOn: 2026-11-02T05:12:02.053Z
+lastUpdatedOn: 2026-11-02T07:46:43.607Z
 ---
 
 A theoretical market structure with a large number of buyers and sellers selling identical products. Does not exist in its pure form in real life.
@@ -12,22 +12,19 @@ Agricultural markets are often considered close examples.
 
 ## Conditions for Perfect Competition
 
-1. **Many buyers and sellers**  
+1. Many buyers and sellers  
    No individual buyer or seller can control the market.
-2. **Identical products**  
-   Products from different sellers are the same.
-3. **Informed buyers and sellers**  
+2. [Identical products](./product#identical-products)
+3. Informed buyers and sellers  
    Buyers and sellers have information about prices and product quality.
-4. **Free entry and exit**  
+4. Free entry and exit  
    Firms can enter when profits are available and leave when they experience losses.
 
 ## Price Taker
 
-A perfectly competitive firm is a **price taker**.
+A perfectly competitive firm.
 
-The market determines the equilibrium price, and an individual firm must accept that price.
-
-Therefore, the demand curve facing an individual firm is horizontal.
+The market determines the equilibrium price. An individual firm accepts that price. The [demand curve](./demand#demand-curve) facing an individual firm is horizontal.
 
 ## Entry and Exit of Firms
 
@@ -87,10 +84,189 @@ Firms have incentives to innovate and adapt to changes in consumer preferences.
 
 The shape of the long-run industry supply curve depends on how input prices respond to industry expansion.
 
-- Constant-cost industry  
-  Input prices stay unchanged as the industry expands. The long-run supply curve is horizontal.
-- Increasing-cost industry  
-  Expansion bids up the price of a scarce input, so higher prices are needed to bring forth more output. The long-run supply curve slopes upward.
+### Identifying the Cost Structure
+
+Compare industry output, input prices, and firms' long-run average costs before and after a sustained expansion of the industry.
+
+- A constant-cost industry has unchanged input prices and unchanged long-run average costs as industry output rises.
+- The long-run equilibrium price returns to its original level in a constant-cost industry.
+- An increasing-cost industry has higher prices for scarce inputs as industry output rises.
+- Firms' long-run average costs and the long-run equilibrium price rise in an increasing-cost industry.
+
+### Constant-Cost Industry
+
+Input prices stay unchanged as the industry expands. The long-run supply curve is horizontal.
+
+<CartesianGraph
+  captionSlot
+  title="Long-Run Supply in a Constant-Cost Industry"
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity", domain: [0, 10] }}
+  curves={[
+    {
+      equation: () => 4,
+      domain: [0, 9.5],
+      tone: "key",
+      label: "LRS",
+      labelAt: 8.5,
+      labelDy: -8,
+    },
+    {
+      equation: (quantity) => 8 - quantity,
+      domain: [1, 7.5],
+      tone: "s5",
+      label: "D₁",
+      labelAt: 1.2,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => 10 - quantity,
+      domain: [3.5, 9.5],
+      tone: "pt",
+      label: "D₂",
+      labelAt: 3.5,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => 0.5 * quantity + 2,
+      domain: [0.5, 7],
+      tone: "s5",
+      label: "S₁",
+      labelAt: 7,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => 0.5 * quantity + 1,
+      domain: [2.5, 9],
+      tone: "pt",
+      label: "S₂",
+      labelAt: 9,
+      labelDx: 6,
+      labelDy: -6,
+    },
+  ]}
+  points={[
+    {
+      x: 4,
+      y: 4,
+      tone: "s5",
+      label: "E₁",
+      labelDx: -22,
+      labelDy: 26,
+      guides: true,
+    },
+    {
+      x: 6,
+      y: 4,
+      tone: "pt",
+      label: "E₂",
+      labelDx: -22,
+      labelDy: 26,
+      guides: true,
+    },
+  ]}
+>
+  <Fragment slot="caption">
+    <span class="tone-key">LRS</span> the long-run supply curve, horizontal at
+    price <span class="tone-key">P</span> because input prices stay unchanged.
+    Demand rises from <span class="tone-s5">D₁</span> to{" "}
+    <span class="tone-pt">D₂</span>, and the new price draws entry. Supply
+    shifts from <span class="tone-s5">S₁</span> to{" "}
+    <span class="tone-pt">S₂</span> until price returns to{" "}
+    <span class="tone-key">P</span> at <span class="tone-pt">E₂</span>.
+  </Fragment>
+</CartesianGraph>
+
+### Increasing-Cost Industry
+
+Expansion bids up the price of a scarce input, so higher prices are needed to bring forth more output. The long-run supply curve slopes upward.
+
+<CartesianGraph
+  captionSlot
+  title="Long-Run Supply in an Increasing-Cost Industry"
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (quantity) => 0.5 * quantity + 2,
+      domain: [0, 9.5],
+      tone: "key",
+      label: "LRS",
+      labelAt: 9,
+      labelDx: -10,
+      labelDy: 18,
+    },
+    {
+      equation: (quantity) => 8 - quantity,
+      domain: [1, 7.5],
+      tone: "s5",
+      label: "D₁",
+      labelAt: 1.2,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => 11 - quantity,
+      domain: [4, 9.5],
+      tone: "pt",
+      label: "D₂",
+      labelAt: 4.2,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => quantity,
+      domain: [1, 6],
+      tone: "s5",
+      label: "S₁",
+      labelAt: 6,
+      labelDx: 6,
+      labelDy: -6,
+    },
+    {
+      equation: (quantity) => quantity - 1,
+      domain: [2.5, 7.5],
+      tone: "pt",
+      label: "S₂",
+      labelAt: 7.5,
+      labelDx: 6,
+      labelDy: -6,
+    },
+  ]}
+  points={[
+    {
+      x: 4,
+      y: 4,
+      tone: "s5",
+      label: "E₁",
+      labelDx: -20,
+      labelDy: -6,
+      guides: true,
+    },
+    {
+      x: 6,
+      y: 5,
+      tone: "pt",
+      label: "E₂",
+      labelDx: -26,
+      labelDy: -6,
+      guides: true,
+    },
+  ]}
+>
+  <Fragment slot="caption">
+    <span class="tone-key">LRS</span> the long-run supply curve, sloping upward
+    because input prices rise as the industry expands. Demand rises from{" "}
+    <span class="tone-s5">D₁</span> to <span class="tone-pt">D₂</span>. Entry
+    shifts supply from <span class="tone-s5">S₁</span> to{" "}
+    <span class="tone-pt">S₂</span>, and the new equilibrium{" "}
+    <span class="tone-pt">E₂</span> lies on the higher{" "}
+    <span class="tone-key">LRS</span>.
+  </Fragment>
+</CartesianGraph>
 
 ## Worked Examples
 
