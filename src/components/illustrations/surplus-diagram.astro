@@ -1,0 +1,110 @@
+---
+// Consumer and producer surplus on shared demand and supply curves.
+import CartesianGraph from "./primitives/cartesian-graph.astro";
+
+type Props = {
+  variant: "consumer" | "producer";
+};
+
+const { variant } = Astro.props;
+const isConsumer = variant === "consumer";
+const surplusLabel = isConsumer ? "CS" : "PS";
+const surplusTone = isConsumer ? "s5" : "ct";
+---
+
+<CartesianGraph
+  captionSlot
+  title={isConsumer ? "Consumer Surplus" : "Producer Surplus"}
+  desc={
+    isConsumer
+      ? "Linear demand and supply curves meet at the equilibrium point. The triangle between the demand curve and the equilibrium price, from the choke price down to the equilibrium price, is the consumer surplus."
+      : "Linear demand and supply curves meet at the equilibrium point. The triangle between the supply curve and the equilibrium price, from the minimum price up to the equilibrium price, is the producer surplus."
+  }
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity", domain: [0, 10] }}
+  areas={[
+    {
+      points: isConsumer
+        ? [
+            { x: 0, y: 9 },
+            { x: 0, y: 5.11 },
+            { x: 5.19, y: 5.11 },
+          ]
+        : [
+            { x: 0, y: 2 },
+            { x: 0, y: 5.11 },
+            { x: 5.19, y: 5.11 },
+          ],
+      tone: surplusTone,
+      opacity: 0.15,
+    },
+  ]}
+  curves={[
+    {
+      equation: (quantity) => 9 - 0.75 * quantity,
+      domain: [0, 10],
+      tone: "s5",
+      label: "D",
+      labelAt: 10,
+      labelDx: 8,
+      labelDy: 5,
+    },
+    {
+      equation: (quantity) => 2 + 0.6 * quantity,
+      domain: [0, 10],
+      tone: "ct",
+      label: "S",
+      labelAt: 10,
+      labelDx: 8,
+    },
+  ]}
+  points={[
+    {
+      x: 5.19,
+      y: 5.11,
+      tone: "pt",
+      label: "E",
+      labelDx: 7,
+      labelDy: -10,
+      guides: true,
+    },
+  ]}
+  labels={[
+    {
+      text: isConsumer ? "Pₘₐₓ" : "Pₘᵢₙ",
+      x: 0,
+      y: isConsumer ? 9 : 2,
+      anchor: "end",
+      dx: -8,
+      dy: 4,
+    },
+    { text: "P*", x: 0, y: 5.11, anchor: "end", dx: -8, dy: 4 },
+    { text: "Q*", x: 5.19, y: 0, anchor: "middle", dy: 16 },
+    {
+      text: surplusLabel,
+      x: isConsumer ? 1.55 : 1.85,
+      y: isConsumer ? 6.2 : 3.8,
+      tone: surplusTone,
+      size: 13,
+      weight: 600,
+    },
+  ]}
+>
+  <Fragment slot="caption">
+    {isConsumer ? (
+      <>
+        <span class="tone-s5">Consumer surplus</span> is the shaded triangle
+        between the demand curve <span class="tone-s5">D</span> and the
+        equilibrium price, from the choke price down to{" "}
+        <span class="tone-pt">E</span>.
+      </>
+    ) : (
+      <>
+        <span class="tone-ct">Producer surplus</span> is the shaded triangle
+        between the supply curve <span class="tone-ct">S</span> and the
+        equilibrium price, from the minimum price up to{" "}
+        <span class="tone-pt">E</span>.
+      </>
+    )}
+  </Fragment>
+</CartesianGraph>
