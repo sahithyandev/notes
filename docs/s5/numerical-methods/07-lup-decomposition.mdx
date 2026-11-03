@@ -3,7 +3,7 @@ title: LUP Decomposition
 notebooks:
   - lup-decomposition
 dateCreated: 2026-08-09T15:17:42.855Z
-lastUpdatedOn: 2026-11-03T01:31:19.274Z
+lastUpdatedOn: 2026-11-03T02:21:30.385Z
 ---
 
 The LUP decomposition of an $n \times n$ matrix $A$ is the triple $(L, U, P)$ satisfying
@@ -91,10 +91,14 @@ $$
 
 Define the multiplier vector and the next recursive matrix as
 
+<Formula>
+
 $$
 \ell^{(k)} = \frac{c^{(k)}}{\alpha^{(k)}}, \qquad
 A^{(k+1)} = C^{(k)} - \ell^{(k)}\left(r^{(k)}\right)^T
 $$
+
+</Formula>
 
 $A^{(k+1)}$ is the Schur complement of $α^{(k)}$ in $B^{(k)}$.
 
@@ -102,9 +106,13 @@ $A^{(k+1)}$ is the Schur complement of $α^{(k)}$ in $B^{(k)}$.
 
 When $A^{(k)}$ is $1 \times 1$, set
 
+<Formula>
+
 $$
 P^{(k)} = L^{(k)} = (1), \qquad U^{(k)} = A^{(k)}
 $$
+
+</Formula>
 
 ### Recursive Step
 
@@ -115,11 +123,15 @@ For a matrix larger than $1 \times 1$:
 - Recurse on $A^{(k+1)}$ to get $P^{(k+1)}A^{(k+1)} = L^{(k+1)}U^{(k+1)}$.
 - Return
 
+<Formula>
+
 $$
 P^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P^{(k+1)} \end{pmatrix}S^{(k)}, \quad
 L^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ P^{(k+1)}\ell^{(k)} & L^{(k+1)} \end{pmatrix}, \quad
 U^{(k)} = \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ \vec{0} & U^{(k+1)} \end{pmatrix}
 $$
+
+</Formula>
 
 The required decomposition is $P = P^{(0)}$, $L = L^{(0)}$, $U = U^{(0)}$.
 
@@ -129,9 +141,13 @@ The required decomposition is $P = P^{(0)}$, $L = L^{(0)}$, $U = U^{(0)}$.
 
 Find $L$, $U$, $P$ for
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 0 & 5 & 5 \\ 2 & 9 & 0 \\ 6 & 8 & 8 \end{pmatrix}
 $$
+
+</Formula>
 
 <Solution>
 

@@ -1,22 +1,30 @@
 ---
 title: Interpolation
 dateCreated: 2026-10-21T16:32:28.558Z
-lastUpdatedOn: 2026-11-01T16:38:00.039Z
+lastUpdatedOn: 2026-11-03T02:21:30.452Z
 ---
 
 Interpolation estimates values between known data points.
 
 Given $n+1$ points $(x_i,y_i)$ with distinct nodes
 
+<Formula>
+
 $$
 x_0 < x_1 < \cdots < x_n,
 $$
 
+</Formula>
+
 find a function $\phi$ satisfying
+
+<Formula>
 
 $$
 \phi(x_i)=y_i, \qquad i=0,1,\ldots,n.
 $$
+
+</Formula>
 
 Use $\phi(x)$ for $x\in[x_0,x_n]$. This is interpolation. Values outside this interval are extrapolation. They are less reliable.
 
@@ -38,13 +46,19 @@ Choose the form from the data.
 
 For distinct nodes $x_0,\ldots,x_n$ and values $y_0,\ldots,y_n$, exactly 1 polynomial $p_n$ of degree at most $n$ satisfies
 
+<Formula>
+
 $$
 p_n(x_i)=y_i.
 $$
 
+</Formula>
+
 </Theorem>
 
 The Lagrange form is
+
+<Formula>
 
 $$
 p_n(x)=\sum_{i=0}^{n}y_iL_i(x),
@@ -52,7 +66,11 @@ p_n(x)=\sum_{i=0}^{n}y_iL_i(x),
 L_i(x)=\prod_{\substack{j=0\\j\ne i}}^{n}\frac{x-x_j}{x_i-x_j}.
 $$
 
+</Formula>
+
 Each basis polynomial has 1 job.
+
+<Formula>
 
 $$
 L_i(x_j)=
@@ -61,6 +79,8 @@ L_i(x_j)=
 0, & i\ne j.
 \end{cases}
 $$
+
+</Formula>
 
 Therefore $p_n(x_j)=y_j$. At node $x_j$, every term disappears except $y_jL_j(x_j)$.
 
@@ -87,14 +107,22 @@ Split $[x_0,x_n]$ into intervals. Use a low-degree polynomial on each interval.
 
 For periodic data,
 
+<Formula>
+
 $$
 \phi(x)=\frac{a_0}{2}+\sum_{k=1}^{m}\left(a_k\cos(kx)+b_k\sin(kx)\right).
 $$
 
+</Formula>
+
 For rational interpolation,
+
+<Formula>
 
 $$
 \phi(x)=\frac{p(x)}{q(x)}.
 $$
+
+</Formula>
 
 For Hermite interpolation, $\phi$ matches both $y_i$ and $y_i'$ at each node.

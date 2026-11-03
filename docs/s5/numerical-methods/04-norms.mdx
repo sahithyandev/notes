@@ -5,7 +5,7 @@ prereqs:
   - s1/mathematics/matrices/matrix-norms#induced-norm
   - s4/linear-algebra/norm
 dateCreated: 2026-07-19T18:06:27.461Z
-lastUpdatedOn: 2026-10-20T11:48:27.203Z
+lastUpdatedOn: 2026-11-03T02:21:30.324Z
 ---
 
 A norm is a real-valued function measuring the size of a vector or a matrix.
@@ -19,47 +19,71 @@ For $\vec{x} = (x_1, x_2, \ldots, x_n)^T$, 3 standard vector norms:
 <Aka>taxicab norm</Aka>. Sum of the absolute values of $\vec{x}$'s components.
 Measures distance travelled along grid lines rather than in a straight line.
 
+<Formula>
+
 $$
 \lVert \vec{x} \rVert_1 = \sum_{i=1}^{n} |x_i|
 $$
+
+</Formula>
 
 ### 2-Norm
 
 <Aka>Euclidean norm</Aka>. Straight-line distance from $\vec{x}$ to the origin.
 
+<Formula>
+
 $$
 \lVert \vec{x} \rVert_2 = \left( \sum_{i=1}^{n} x_i^2 \right)^{1/2}
 $$
+
+</Formula>
 
 ### Infinity Norm
 
 Largest absolute value among $\vec{x}$'s components.
 
+<Formula>
+
 $$
 \lVert \vec{x} \rVert_\infty = \max_{1 \leq i \leq n} |x_i|
 $$
+
+</Formula>
 
 ## Equivalent Norms
 
 2 norms $\lVert \cdot \rVert_{v1}, \lVert \cdot \rVert_{v2}$ on $\mathbb{R}^n$ are equivalent **iff** there exist positive constants $c_1, c_2$ such that for all $\vec{x} \in \mathbb{R}^n$,
 
+<Formula>
+
 $$
 c_1 \lVert \vec{x} \rVert_{v1} \leq \lVert \vec{x} \rVert_{v2} \leq c_2 \lVert \vec{x} \rVert_{v1}
 $$
 
+</Formula>
+
 $\lVert \cdot \rVert_1, \lVert \cdot \rVert_2, \lVert \cdot \rVert_\infty$ are equivalent on $\mathbb{R}^n$.
+
+<Formula>
 
 $$
 \lVert \vec{x} \rVert_\infty \leq \lVert \vec{x} \rVert_2 \leq \sqrt{n} \, \lVert \vec{x} \rVert_\infty
 $$
 
+</Formula>
+
 $$
 \lVert \vec{x} \rVert_2 \leq \lVert \vec{x} \rVert_1 \leq \sqrt{n} \, \lVert \vec{x} \rVert_2
 $$
 
+<Formula>
+
 $$
 \lVert \vec{x} \rVert_\infty \leq \lVert \vec{x} \rVert_1 \leq n \, \lVert \vec{x} \rVert_\infty
 $$
+
+</Formula>
 
 ## Matrix Norm
 
@@ -70,15 +94,23 @@ A matrix norm is a norm on the set of $n \times n$ matrices, additionally satisf
 <Aka>operator norm, subordinate norm</Aka>. The matrix norm induced by a vector
 norm $\lVert \cdot \rVert_v$ on $\mathbb{R}^n$
 
+<Formula>
+
 $$
 \lVert A \rVert_M = \sup_{\vec{x} \neq \vec{0}} \frac{\lVert A\vec{x} \rVert_v}{\lVert \vec{x} \rVert_v} = \sup_{\lVert \vec{x} \rVert_v = 1} \lVert A\vec{x} \rVert_v
 $$
 
+</Formula>
+
 For $A = (a_{ij})$, $1 \leq i, j \leq n$:
+
+<Formula>
 
 $$
 \lVert A \rVert_\infty = \max_{1 \leq i \leq n} \sum_{j=1}^{n} |a_{ij}| \quad \text{(maximum row sum)}
 $$
+
+</Formula>
 
 $$
 \lVert A \rVert_1 = \max_{1 \leq j \leq n} \sum_{i=1}^{n} |a_{ij}| \quad \text{(maximum column sum)}
@@ -88,23 +120,35 @@ $$
 
 The spectrum of $A$, $\sigma(A)$, is the set of all eigenvalues of $A$.
 
+<Formula>
+
 $$
 \sigma(A) = \{ \lambda \; ; \; A\vec{v} = \lambda \vec{v}, \vec{v} \in \mathbb{R}^n, \lambda \text{ is an eigenvalue of } A \}
 $$
+
+</Formula>
 
 ### Spectral Radius
 
 The spectral radius of $A$, $\rho(A)$, is the maximum absolute value among the eigenvalues of $A$.
 
+<Formula>
+
 $$
 \rho(A) = \max \{ |\lambda| \; ; \; \lambda \in \sigma(A) \}
 $$
 
+</Formula>
+
 The matrix norm induced by the 2-norm
+
+<Formula>
 
 $$
 \lVert A \rVert_2 = \sqrt{\rho(A^TA)}
 $$
+
+</Formula>
 
 <Note>
 
@@ -116,9 +160,13 @@ For any matrix norm $\lVert \cdot \rVert_m$ induced by a vector norm, $\rho(A) \
 
 For $\vec{x} = (3, -4, 12)^T$ and
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix}
 $$
+
+</Formula>
 
 find the vector norms of $\vec{x}$, the induced matrix norms of $A$, and verify $\rho(A) \leq \lVert A \rVert_2$.
 

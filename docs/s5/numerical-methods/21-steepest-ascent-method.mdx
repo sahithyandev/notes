@@ -3,7 +3,7 @@ title: Steepest Ascent Method
 notebooks:
   - steepest-ascent-method
 dateCreated: 2026-09-23T08:07:54.117Z
-lastUpdatedOn: 2026-11-02T23:59:40.101Z
+lastUpdatedOn: 2026-11-03T02:21:30.565Z
 ---
 
 The steepest ascent method finds a local maximum of $f(x, y)$ by repeatedly moving in the direction of the gradient.
@@ -12,9 +12,13 @@ The steepest ascent method finds a local maximum of $f(x, y)$ by repeatedly movi
 
 The gradient of $f(x,y)$ is
 
+<Formula>
+
 $$
 \nabla f(x, y) = \frac{\partial f}{\partial x}\vec{i} + \frac{\partial f}{\partial y}\vec{j}
 $$
+
+</Formula>
 
 $f(x,y)$ increases fastest in the direction of $\nabla f$ and decreases fastest in the opposite direction.
 
@@ -25,16 +29,24 @@ Given a starting point $(x_0, y_0)$
 - Evaluate the gradient $\nabla f(x_i, y_i)$
 - Search along the gradient direction for the $h_i$ that maximizes
 
+<Formula>
+
 $$
 g(h_i) = f\left(x_i + h_i \frac{\partial f}{\partial x}(x_i,y_i),\ y_i + h_i \frac{\partial f}{\partial y}(x_i,y_i)\right)
 $$
 
+</Formula>
+
 - Set $g'(h_i) = 0$ and solve for $h_i$
 - Update
+
+<Formula>
 
 $$
 x_{i+1} = x_i + h_i \frac{\partial f}{\partial x}(x_i,y_i), \quad y_{i+1} = y_i + h_i \frac{\partial f}{\partial y}(x_i,y_i)
 $$
+
+</Formula>
 
 - Repeat until convergence
 
@@ -48,9 +60,13 @@ Finding the minimum of $f(x,y)$ follows the same steps applied to $-f(x,y)$. Thi
 
 Maximize
 
+<Formula>
+
 $$
 f(x,y) = 2xy + 2x - x^2 - 2y^2
 $$
+
+</Formula>
 
 <Solution>
 

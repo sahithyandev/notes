@@ -3,16 +3,20 @@ title: Matrix Types
 prereqs:
   - s4/linear-algebra/hermitian#positive-definite-matrix
 dateCreated: 2026-07-19T18:06:25.234Z
-lastUpdatedOn: 2026-10-20T11:48:27.223Z
+lastUpdatedOn: 2026-11-03T02:21:30.340Z
 ---
 
 ## Diagonally Dominant Matrix
 
 An $n \times n$ matrix $A$ is diagonally dominant **iff**
 
+<Formula>
+
 $$
 |a_{ii}| \geq \sum_{j=1, j \neq i}^{n} |a_{ij}|
 $$
+
+</Formula>
 
 holds for each $i = 1, 2, \dots, n$.
 
@@ -28,9 +32,13 @@ See [Positive Definite Matrix](/s4/linear-algebra/hermitian#positive-definite-ma
 
 A leading principal submatrix $A_k$ of $A$ is the $k \times k$ block
 
+<Formula>
+
 $$
 A_k = \begin{bmatrix} a_{11} & \cdots & a_{1k} \\ \vdots & \ddots & \vdots \\ a_{k1} & \cdots & a_{kk} \end{bmatrix}
 $$
+
+</Formula>
 
 for some $1 \leq k \leq n$.
 
@@ -38,9 +46,13 @@ A symmetric matrix $A$ is positive definite **iff** every leading principal subm
 
 A symmetric matrix $A$ is positive definite **iff** Gaussian elimination on $Ax = b$ can be performed without row interchanges with all pivot elements positive. The computation is then stable with respect to round-off error growth.
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix}
 $$
+
+</Formula>
 
 is positive definite: its leading principal submatrices have determinants $2$, $3$, and $4$, all positive.
 
@@ -48,9 +60,13 @@ is positive definite: its leading principal submatrices have determinants $2$, $
 
 An $n \times n$ matrix $A$ is convergent to $B$ **iff**
 
+<Formula>
+
 $$
 \lim_{k \to \infty} A^k = B
 $$
+
+</Formula>
 
 For a square matrix $A$, the following are equivalent:
 
@@ -62,9 +78,13 @@ For a square matrix $A$, the following are equivalent:
 
 Check whether
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 7 & 2 & 0 \\ 3 & 5 & -1 \\ 0 & 5 & -6 \end{pmatrix}
 $$
+
+</Formula>
 
 is strictly diagonally dominant.
 
@@ -88,9 +108,13 @@ All 3 rows satisfy the strict inequality. $A$ is strictly diagonally dominant, h
 
 Check whether
 
+<Formula>
+
 $$
 B = \begin{pmatrix} 4 & -1 & 0 \\ -1 & 4 & -1 \\ 0 & -1 & 4 \end{pmatrix}
 $$
+
+</Formula>
 
 is positive definite.
 
@@ -116,9 +140,13 @@ All are positive. $B$ is positive definite.
 
 Check whether
 
+<Formula>
+
 $$
 C = \begin{pmatrix} 0.5 & 0 \\ 0.25 & 0.5 \end{pmatrix}
 $$
+
+</Formula>
 
 is convergent.
 

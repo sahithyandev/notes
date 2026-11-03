@@ -26,6 +26,8 @@ Use `<Note>` sparingly, only for a genuine exception, clarification, or cross-no
 
 Worked examples hide their workings behind `<Solution>` (`src/components/mdx/solution.astro`, a native `<details>` with no script). Keep the heading and the question as plain prose, then wrap everything after it, including calculations, comparisons, and the answer, in `<Solution>`, with a blank line after the opening tag and before the closing one. A heading with several questions gets one `<Solution>` after each question. A solution with several independent methods keeps its shared lead-in in the `<Solution>` and wraps each method in `<Method label="...">` (`src/components/mdx/method.astro`). With 2 or more methods, `<Solution>` shows them as tabs (built by its script on reveal, first tab selected), so only 1 method is visible at a time. Statements that are not problems (a fact, a list of cases) stay unwrapped. If the heading itself is the question (such as `### $\log i$`), wrap the whole body.
 
+Do not use `<Formula>` inside worked examples. Use raw `$$ ... $$` display math inside `<Solution>` instead.
+
 Never place 2 `<Note>` components next to each other with the same `type` (default `"note"`). Merge them into 1, or move one back into the main text. The `adjacent-note` rule enforces this.
 
 ## Metadata, Paths, and Links

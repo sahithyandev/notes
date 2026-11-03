@@ -5,7 +5,7 @@ prereqs:
 notebooks:
   - gaussian-elimination
 dateCreated: 2026-07-19T16:40:09.889Z
-lastUpdatedOn: 2026-10-21T16:42:27.713Z
+lastUpdatedOn: 2026-11-03T02:21:30.288Z
 ---
 
 Gaussian elimination reduces $A\vec{x} = \vec{b}$ to [echelon form](/s1/mathematics/matrices/echelon-form) by [row operations](/s5/numerical-methods/linear-system-of-equations#equivalent-systems), then solves it by back substitution.
@@ -16,17 +16,27 @@ The pivot element of a column is the entry used to eliminate the other entries i
 
 Provided $a_{11} \neq 0$, eliminate $x_1$ from equations $2$ through $n$ using
 
+<Formula>
+
 $$
 R_j - \frac{a_{j1}}{a_{11}} R_1 \to R_j, \quad j = 2, 3, \ldots, n
 $$
 
+</Formula>
+
 More generally, eliminate $x_i$ below row $i$, for $i = 1, 2, \ldots, n-1$, using
+
+<Formula>
 
 $$
 R_j - \frac{a_{ji}^{(i)}}{a_{ii}^{(i)}} R_i \to R_j, \quad j = i+1, i+2, \ldots, n
 $$
 
+</Formula>
+
 provided $a_{ii}^{(i)} \neq 0$. This reduces $[A \mid \vec{b}]$ to upper triangular form
+
+<Formula>
 
 $$
 \begin{pmatrix}
@@ -37,19 +47,29 @@ a_{11} & a_{12} & \cdots & a_{1n} & b_1^{(1)} \\
 \end{pmatrix}
 $$
 
+</Formula>
+
 ## Back Substitution
 
 Once $[A \mid \vec{b}]$ is upper triangular, solve from the last row upward. The last row has only $x_n$
+
+<Formula>
 
 $$
 x_n = \frac{b_n^{(n-1)}}{a_{nn}^{(n-1)}}
 $$
 
+</Formula>
+
 Then substitute the solved unknowns into each row above
+
+<Formula>
 
 $$
 x_i = \frac{b_i^{(i-1)} - \sum\limits_{j=i+1}^{n} a_{ij}^{(i-1)}x_j}{a_{ii}^{(i-1)}}, \quad i = n-1, n-2, \ldots, 1
 $$
+
+</Formula>
 
 ## Pivoting
 
@@ -63,9 +83,13 @@ At stage $i$, find the row $p \geq i$ maximizing $|a_{ji}^{(i)}|$ for $j \geq i$
 
 Partial pivoting can pick a poor pivot when an entry is large only because its row is large. Scaled partial pivoting compares entries relative to their row. Before elimination begins, compute the scale factor of each row
 
+<Formula>
+
 $$
 s_j = \max_{1 \leq k \leq n} |a_{jk}|
 $$
+
+</Formula>
 
 At stage $i$, pick the first row $p \geq i$ maximizing $\frac{|a_{ji}^{(i)}|}{s_j}$ and swap $R_i \leftrightarrow R_p$. The scale factors $s_j$ are computed once and carried along with their rows during swaps.
 
@@ -103,15 +127,23 @@ Round-off errors slightly change $A$ and $\vec{b}$. In an ill-conditioned system
 
 Consider
 
+<Formula>
+
 $$
 \begin{pmatrix} 1 & 1 \\ 1 & 1.0001 \end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}2\\2.0001\end{pmatrix}
 $$
 
+</Formula>
+
 with solution $x = 1, y = 1$. Changing $b_2$ from $2.0001$ to $2.0002$, a change of $0.0001$, gives
+
+<Formula>
 
 $$
 \begin{pmatrix} 1 & 1 \\ 1 & 1.0001 \end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}2\\2.0002\end{pmatrix}
 $$
+
+</Formula>
 
 with solution $x = 0, y = 2$. A $0.0001$ change in $b_2$ moved $x$ and $y$ by $1$ each. The coefficient matrix is nearly singular, $\det = 0.0001$.
 
@@ -119,17 +151,25 @@ with solution $x = 0, y = 2$. A $0.0001$ change in $b_2$ moved $x$ and $y$ by $1
 
 A measure of the degree of ill-conditioning. Denoted as $\kappa(A)$. Defined as:
 
+<Formula>
+
 $$
 \kappa(A) = \|A\| \, \|A^{-1}\|
 $$
 
+</Formula>
+
 A large $\kappa(A)$ means $A$ is close to singular.
+
+<Formula>
 
 $$
 \begin{cases} x + y = 2 \\ x + 1.001y = 2 \end{cases}
 \qquad
 \begin{cases} x + y = 2 \\ x + 1.001y = 2.001 \end{cases}
 $$
+
+</Formula>
 
 The left system has solution $x = 2$, $y = 0$. The right system, obtained by a $0.001$ change in one constant, has solution $x = 1$, $y = 1$. The coefficient matrix is ill-conditioned, with condition number $4004$.
 
@@ -148,6 +188,8 @@ Space is for the augmented matrix $[A \mid \vec{b}]$, since elimination is done 
 
 Solve using Gaussian elimination without pivoting.
 
+<Formula>
+
 $$
 \begin{aligned}
 2x_1 + x_2 - x_3 &= 8 \\
@@ -155,6 +197,8 @@ $$
 -2x_1 + x_2 + 2x_3 &= -3
 \end{aligned}
 $$
+
+</Formula>
 
 <Solution>
 
@@ -210,6 +254,8 @@ $$
 
 Solve using Gaussian elimination with partial pivoting.
 
+<Formula>
+
 $$
 \begin{aligned}
 3x_2 + x_3 &= 9 \\
@@ -217,6 +263,8 @@ $$
 4x_1 + 2x_2 + x_3 &= 11
 \end{aligned}
 $$
+
+</Formula>
 
 <Solution>
 
@@ -282,6 +330,8 @@ $$
 
 Solve using Gaussian elimination with scaled partial pivoting.
 
+<Formula>
+
 $$
 \begin{aligned}
 4x_1 + 100x_2 - 50x_3 &= 54 \\
@@ -289,6 +339,8 @@ x_1 + x_2 + 2x_3 &= 4 \\
 2x_1 - x_3 &= 1
 \end{aligned}
 $$
+
+</Formula>
 
 <Solution>
 
@@ -370,6 +422,8 @@ $$
 
 Solve using Gaussian elimination with complete pivoting.
 
+<Formula>
+
 $$
 \begin{aligned}
 2x_1 - x_2 + x_3 &= 3 \\
@@ -377,6 +431,8 @@ x_1 + x_2 + 4x_3 &= 15 \\
 x_1 + 2x_2 - 2x_3 &= -1
 \end{aligned}
 $$
+
+</Formula>
 
 <Solution>
 

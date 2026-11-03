@@ -1,7 +1,7 @@
 ---
 title: Boundary Value Problem
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-11-02T23:59:40.073Z
+lastUpdatedOn: 2026-11-03T02:21:30.540Z
 ---
 
 <Aka>BVP</Aka>. A differential equation with conditions specified at 2 distinct
@@ -9,23 +9,35 @@ points, called boundary conditions.
 
 ### Standard Form
 
+<Formula>
+
 $$
 y'' = f(x, y, y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
 $$
+
+</Formula>
 
 ### Linear and Nonlinear BVPs
 
 The BVP is linear if $f$ has the form
 
+<Formula>
+
 $$
 f(x,y,y') = p(x)y' + q(x)y + r(x)
 $$
 
+</Formula>
+
 for some functions $p$, $q$, $r$, giving
+
+<Formula>
 
 $$
 y'' = p(x)y' + q(x)y + r(x), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
 $$
+
+</Formula>
 
 Otherwise, the BVP is nonlinear.
 
@@ -56,15 +68,23 @@ A unique solution exists if
 
 If $y_1$ solves
 
+<Formula>
+
 $$
 y_1'' = p(x)y_1' + q(x)y_1 + r(x)
 $$
 
+</Formula>
+
 and $y_2$ solves the homogeneous equation
+
+<Formula>
 
 $$
 y_2'' = p(x)y_2' + q(x)y_2
 $$
+
+</Formula>
 
 then $y = y_1 + c\,y_2$ solves the ODE for any constant $c$.
 
@@ -72,15 +92,23 @@ then $y = y_1 + c\,y_2$ solves the ODE for any constant $c$.
 
 Fix
 
+<Formula>
+
 $$
 y_1(a) = \alpha,\ y_1'(a) = 0, \qquad y_2(a) = 0,\ y_2'(a) = 1
 $$
 
+</Formula>
+
 so that $y(a) = y_1(a) + c\,y_2(a) = \alpha$ for any $c$. Solve
+
+<Formula>
 
 $$
 y_1'' = p(x)y_1' + q(x)y_1 + r(x), \quad a \leq x \leq b, \quad y_1(a) = \alpha,\ y_1'(a) = 0
 $$
+
+</Formula>
 
 $$
 y_2'' = p(x)y_2' + q(x)y_2, \quad a \leq x \leq b, \quad y_2(a) = 0,\ y_2'(a) = 1
@@ -92,9 +120,13 @@ with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
 
 $c$ is chosen so that $y(b) = \beta$
 
+<Formula>
+
 $$
 y_1(b) + c\,y_2(b) = \beta \implies c = \frac{\beta - y_1(b)}{y_2(b)}
 $$
+
+</Formula>
 
 $$
 y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\, y_2(x)
@@ -110,31 +142,47 @@ The nonlinear shooting method finds the initial slope $y'(a)$ that makes an IVP 
 
 For a guess $t$, let $y(x,t)$ solve the IVP
 
+<Formula>
+
 $$
 y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t
 $$
+
+</Formula>
 
 The method finds $t$ such that $y(b,t) - \beta = 0$, using [Newton's method](/s5/numerical-methods/newtons-method).
 
 ### Newton Iteration
 
+<Formula>
+
 $$
 t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{\dfrac{\partial y}{\partial t}(b,t_{k-1})}
 $$
 
+</Formula>
+
 $\dfrac{\partial y(b,t_{k-1})}{\partial t}$ is not available, so define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
+
+<Formula>
 
 $$
 z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
 $$
 
+</Formula>
+
 The initial values follow from $y(a,t) = \alpha$ and $y'(a,t) = t$.
 
 Substituting $z(b,t_{k-1})$ for $\dfrac{\partial y}{\partial t}(b,t_{k-1})$
 
+<Formula>
+
 $$
 t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
 $$
+
+</Formula>
 
 ### Procedure
 
@@ -142,21 +190,33 @@ $$
 - Repeat for $k = 0, 1, 2, \ldots$ until $|y(b,t_k) - \beta|$ is sufficiently small
   - Approximate $y_k(x) = y(x,t_k)$ from
 
+<Formula>
+
     $$
     y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t_k
     $$
 
-  - Approximate $z_k(x) = z(x,t_k)$ from
+</Formula>
+
+- Approximate $z_k(x) = z(x,t_k)$ from
+
+<Formula>
 
     $$
     z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
     $$
 
-  - Update
+</Formula>
+
+- Update
+
+<Formula>
 
     $$
     t_{k+1} = t_k - \frac{y_k(b) - \beta}{z_k(b)}
     $$
+
+</Formula>
 
 <Note>
 
@@ -172,15 +232,23 @@ Replace derivatives with centered differences at mesh points and solve the resul
 
 Partition $[a,b]$ into $N+1$ subintervals of length $h = \dfrac{b-a}{N+1}$. Mesh points are
 
+<Formula>
+
 $$
 x_i = a + ih, \quad i = 0, 1, \ldots, N+1
 $$
 
+</Formula>
+
 ### Centered Difference Formulas
+
+<Formula>
 
 $$
 y''(x_i) = \frac{1}{h^2}\big(y(x_{i+1}) - 2y(x_i) + y(x_{i-1})\big) - \frac{h^2}{12}y^{(4)}(\xi_i)
 $$
+
+</Formula>
 
 $$
 y'(x_i) = \frac{1}{2h}\big(y(x_{i+1}) - y(x_{i-1})\big) - \frac{h^2}{6}y'''(\eta_i)
@@ -192,9 +260,13 @@ for some $\xi_i, \eta_i \in (x_{i-1}, x_{i+1})$.
 
 Substituting the centered difference formulas into the linear BVP and dropping the $O(h^2)$ error term, $y(x_i) \approx w_i$ satisfies
 
+<Formula>
+
 $$
 w_0 = \alpha, \quad w_{N+1} = \beta
 $$
+
+</Formula>
 
 $$
 -\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} + \big(2 + h^2 q(x_i)\big)w_i - \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = -h^2 r(x_i)
@@ -204,15 +276,23 @@ for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
 
 ### Matrix Form
 
+<Formula>
+
 $$
 Aw = b
 $$
 
+</Formula>
+
 with $A$ tridiagonal, using
+
+<Formula>
 
 $$
 a_i = -1 - \frac{h}{2}p(x_i), \quad d_i = 2 + h^2 q(x_i), \quad c_i = -1 + \frac{h}{2}p(x_i)
 $$
+
+</Formula>
 
 $$
 A = \begin{pmatrix}
@@ -222,6 +302,8 @@ a_2 & d_2 & c_2 & \\
 & & a_N & d_N
 \end{pmatrix}
 $$
+
+<Formula>
 
 $$
 w = \begin{pmatrix} w_1 \\ w_2 \\ \vdots \\ w_{N-1} \\ w_N \end{pmatrix}, \quad
@@ -233,6 +315,8 @@ b = \begin{pmatrix}
 -h^2r(x_N) - c_N\beta
 \end{pmatrix}
 $$
+
+</Formula>
 
 Solve for $w$ with [LU decomposition](/s5/numerical-methods/lu-decomposition) or another linear solver.
 
@@ -252,9 +336,13 @@ A unique solution exists **iff**
 
 Using the [centered difference formulas](#centered-difference-formulas) at mesh points $x_0, \ldots, x_{N+1}$ on $[a,b]$, $y(x_i) \approx w_i$ satisfies
 
+<Formula>
+
 $$
 w_0 = \alpha, \quad w_{N+1} = \beta
 $$
+
+</Formula>
 
 $$
 -\frac{w_{i+1} - 2w_i + w_{i-1}}{h^2} + f\left(x_i, w_i, \frac{w_{i+1}-w_{i-1}}{2h}\right) = 0
@@ -263,6 +351,8 @@ $$
 for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
 
 ### Nonlinear System
+
+<Formula>
 
 $$
 \begin{aligned}
@@ -274,6 +364,8 @@ $$
 \end{aligned}
 $$
 
+</Formula>
+
 This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).
 
 ## Worked Examples
@@ -282,9 +374,13 @@ This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solut
 
 Solve
 
+<Formula>
+
 $$
 y'' = y, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
 $$
+
+</Formula>
 
 with the linear shooting method and with the linear finite-difference method for $N = 3$.
 
@@ -355,9 +451,13 @@ Comparison with the exact solution
 
 Solve
 
+<Formula>
+
 $$
 y'' = 6x, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
 $$
+
+</Formula>
 
 with the linear finite-difference method for $N = 1$.
 

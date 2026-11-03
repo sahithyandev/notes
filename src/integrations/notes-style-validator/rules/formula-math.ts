@@ -1,22 +1,34 @@
 import type { ScannedFile } from "../scan.ts";
 import type { Violation } from "../report.ts";
 
-const TAG_RE = /<\/?(?:Formula|Symbols|Sym)\b[^>]*>/g;
+const TAG_RE = /<\/?(?:Formula|Symbols|Sym|Solution)\b[^>]*>/g;
 
 export function checkFormula(f: ScannedFile): Violation[] {
   const violations: Violation[] = [];
   const formulas: Array<{ line: number; mathDelimiters: number }> = [];
   let formulaDepth = 0;
   let symbolsDepth = 0;
+  let solutionDepth = 0;
 
   for (let i = 0; i < f.lines.length; i++) {
     if (f.lineIsCode[i]) continue;
 
     for (const tag of f.lines[i].matchAll(TAG_RE)) {
-      const name = tag[0].match(/^<\/?(Formula|Symbols|Sym)\b/)?.[1];
+      const name = tag[0].match(/^<\/?(Formula|Symbols|Sym|Solution)\b/)?.[1];
       const closing = tag[0].startsWith("</");
       const selfClosing = tag[0].endsWith("/>");
-      if (name === "Formula") {
+      if (name === "Solution") {
+        if (closing) solutionDepth = Math.max(0, solutionDepth - 1);
+        else if (!selfClosing) solutionDepth++;
+      } else if (name === "Formula") {
+        if (!closing && solutionDepth > 0) {
+          violations.push({
+            rule: "formula",
+            line: i + 1,
+            text: "<Formula> must not be used inside <Solution>",
+            snippet: "formula-inside-solution",
+          });
+        }
         if (closing) {
           const formula = formulas.pop();
           formulaDepth = Math.max(0, formulaDepth - 1);

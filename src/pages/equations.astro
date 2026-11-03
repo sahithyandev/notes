@@ -19,6 +19,75 @@ interface Equation {
   context?: string;
   math: string;
   html: string;
+  symbols: SymbolEntry[];
+}
+
+interface SymbolEntry {
+  symbol: string;
+  meaning: string;
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>'"]/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      })[character] ?? character,
+  );
+}
+
+function renderInline(value: string): string {
+  const tokens = /\$([^$\n]+)\$|\[([^\]]+)\]\(([^)]+)\)/g;
+  let html = "";
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tokens.exec(value))) {
+    html += escapeHtml(value.slice(lastIndex, match.index));
+    if (match[1]) {
+      html += katex.renderToString(match[1], {
+        displayMode: false,
+        throwOnError: false,
+        strict: false,
+        output: "htmlAndMathml",
+      });
+    } else {
+      html += `<a href="${escapeHtml(match[3])}">${escapeHtml(match[2])}</a>`;
+    }
+    lastIndex = tokens.lastIndex;
+  }
+
+  return `${html}${escapeHtml(value.slice(lastIndex)).replace(/\s+/g, " ").trim()}`;
+}
+
+function extractSymbols(formulaBody: string): SymbolEntry[] {
+  const symbolsMatch = formulaBody.match(
+    /<Symbols(?:\s[^>]*)?>([\s\S]*?)<\/Symbols>/,
+  );
+  if (!symbolsMatch) return [];
+
+  const symbolRe = /<Sym\s+s=(['"])([\s\S]*?)\1[^>]*>([\s\S]*?)<\/Sym>/g;
+  const symbols: SymbolEntry[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = symbolRe.exec(symbolsMatch[1]))) {
+    symbols.push({
+      symbol: katex.renderToString(match[2].trim(), {
+        displayMode: false,
+        throwOnError: false,
+        strict: false,
+        output: "htmlAndMathml",
+      }),
+      meaning: renderInline(match[3].replace(/\s+/g, " ").trim()),
+    });
+  }
+
+  return symbols;
 }
 
 function extractEquations(
@@ -59,6 +128,7 @@ function extractEquations(
         strict: false,
         output: "htmlAndMathml",
       }),
+      symbols: extractSymbols(match[1]),
     });
   }
 
@@ -109,6 +179,8 @@ const grouped = equations.reduce((groups, equation) => {
           A quick reference pulled directly from the notes. Filter by module or
           search for a variable, topic, or source note.
         </p>
+
+        <p>This page may have issues as this is a new one.</p>
       </header>
 
       <div class="equations-tools" aria-label="Equation filters">
@@ -151,13 +223,26 @@ const grouped = equations.reduce((groups, equation) => {
                     class="equation-entry"
                     data-equation-card
                     data-module={key}
-                    data-search={`${equation.noteTitle} ${equation.moduleLabel} ${equation.context ?? ""} ${equation.math}`.toLowerCase()}
+                    data-search={`${equation.noteTitle} ${equation.moduleLabel} ${equation.context ?? ""} ${equation.math} ${equation.symbols.map((symbol) => symbol.meaning).join(" ")}`.toLowerCase()}
                   >
                     <div class="equation-meta">
                       <span>{equation.context ?? "Equation"}</span>
                       <span>{String(index + 1).padStart(2, "0")}</span>
                     </div>
                     <div class="equation-math" set:html={equation.html} />
+                    {equation.symbols.length > 0 && (
+                      <div class="equation-symbols">
+                        <p class="equation-symbols-title">Symbols</p>
+                        <dl>
+                          {equation.symbols.map((symbol) => (
+                            <div class="equation-symbol">
+                              <dt set:html={symbol.symbol} />
+                              <dd set:html={symbol.meaning} />
+                            </div>
+                          ))}
+                        </dl>
+                      </div>
+                    )}
                     <div class="equation-source">
                       <a href={equation.noteHref}>{equation.noteTitle}</a>
                       <button
@@ -326,7 +411,7 @@ const grouped = equations.reduce((groups, equation) => {
   }
 
   h2 {
-    margin: 0;
+    margin-bottom: 10px;
     color: var(--text-primary);
     font-family: var(--font-ui);
     letter-spacing: -0.025em;
@@ -396,6 +481,55 @@ const grouped = equations.reduce((groups, equation) => {
   .equation-math :global(.katex-display) {
     margin: 0;
     text-align: left;
+  }
+
+  .equation-symbols {
+    padding: 0 0 14px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .equation-symbols-title {
+    margin: 0 0 6px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .equation-symbols dl {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .equation-symbol {
+    display: grid;
+    grid-template-columns: minmax(48px, max-content) 1fr;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .equation-symbol dt {
+    color: var(--text-primary);
+    font-weight: 650;
+  }
+
+  .equation-symbol dd {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .equation-symbol :global(.katex) {
+    font-size: 0.95em;
+  }
+
+  .equation-symbol a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .equation-source {

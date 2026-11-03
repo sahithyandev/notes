@@ -1,27 +1,21 @@
 ---
 title: Constrained Optimization
 dateCreated: 2026-09-23T08:07:54.136Z
-lastUpdatedOn: 2026-11-03T01:31:19.312Z
+lastUpdatedOn: 2026-11-03T02:21:30.574Z
 ---
 
 Constrained optimization minimizes or maximizes $f(x)$ subject to restrictions on the design variables $x$.
 
 ## General Form
 
-$$
-\min_x f(x)
-$$
-
-subject to
-
-$$
-g_i(x) = c_i, \quad i = 1, \ldots, n
-$$
-
 <Formula>
 
 $$
-h_j(x) \leq d_j, \quad j = 1, \ldots, m
+\begin{aligned}
+\min_x \quad & f(x) \\
+\text{subject to} \quad & g_i(x) = c_i, \quad i = 1, \ldots, n \\
+& h_j(x) \leq d_j, \quad j = 1, \ldots, m
+\end{aligned}
 $$
 
 <Symbols>
@@ -45,15 +39,23 @@ Linear programming is constrained optimization where the objective function and 
 
 Objective function
 
+<Formula>
+
 $$
 z = f(x) = a_1 x_1 + a_2 x_2 + \cdots + a_n x_n
 $$
 
+</Formula>
+
 Constraints
+
+<Formula>
 
 $$
 a_{i1} x_1 + a_{i2} x_2 + \cdots + a_{in} x_n \leq b_i
 $$
+
+</Formula>
 
 The constraint may use $\geq$ in place of $\leq$.
 

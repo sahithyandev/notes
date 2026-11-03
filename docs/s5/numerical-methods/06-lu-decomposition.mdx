@@ -3,15 +3,19 @@ title: LU Decomposition
 notebooks:
   - lu-decomposition
 dateCreated: 2026-07-28T05:06:00.161Z
-lastUpdatedOn: 2026-10-21T16:42:27.755Z
+lastUpdatedOn: 2026-11-03T02:21:30.353Z
 ---
 
 The process of factorizing a square matrix into 2 [triangular matrices](/s1/mathematics/matrices/introduction#triangular-matrix): a lower triangular matrix ($L$) and an upper triangular matrix ($U$).
 Introduced by Alan Turing in 1948.
 
+<Formula>
+
 $$
 A = LU
 $$
+
+</Formula>
 
 ## Finding $L$ and $U$ Without Pivoting
 
@@ -19,11 +23,17 @@ $$
 
 Can be used when [Gaussian elimination](/s5/numerical-methods/gaussian-elimination) can be performed on $A\vec{x} = \vec{b}$ without row interchanges, $A$ factors as $A = LU$, where
 
+<Formula>
+
 $$
 m_{ji} = \frac{a_{ji}^{(i)}}{a_{ii}^{(i)}}
 $$
 
+</Formula>
+
 is the multiplier used to eliminate entry $(j, i)$ at step $i$, $U$ is the row-echelon form produced by elimination, and $L$ collects the multipliers:
+
+<Formula>
 
 $$
 U = \begin{pmatrix}
@@ -41,6 +51,8 @@ m_{21} & 1 & \cdots & \vdots \\
 m_{n1} & \cdots & m_{n,n-1} & 1 \end{pmatrix}
 $$
 
+</Formula>
+
 $L$ and $U$ are produced together in 1 pass of elimination.
 
 - For $i = 1, \ldots, n-1$, use row $i$ as the pivot row.
@@ -56,9 +68,13 @@ $L$ and $U$ can also be computed directly by equating entries of $A$ with entrie
 
 Entry $(i, j)$ of $LU$ is row $i$ of $L$ multiplied by column $j$ of $U$.
 
+<Formula>
+
 $$
 a_{ij} = \sum_{k=1}^{n} l_{ik} u_{kj}
 $$
+
+</Formula>
 
 $L$ is lower triangular and $U$ is upper triangular.
 
@@ -73,15 +89,23 @@ Setting $l_{ii} = 1$ (Doolittle's method), for $i = 1, \ldots, n$ do 2 steps.
 
 - Row $i$ of $U$, for $j = i, \ldots, n$
 
+<Formula>
+
 $$
 u_{ij} = a_{ij} - \sum_{k=1}^{i-1} l_{ik} u_{kj}
 $$
 
+</Formula>
+
 - Column $i$ of $L$, for $j = i+1, \ldots, n$
+
+<Formula>
 
 $$
 l_{ji} = \frac{1}{u_{ii}} \left[ a_{ji} - \sum_{k=1}^{i-1} l_{jk} u_{ki} \right]
 $$
+
+</Formula>
 
 Each formula is the entry of $A$ minus the terms that use already known entries of $L$ and $U$. For $i = 1$ the sums are empty, so row 1 of $U$ is row 1 of $A$.
 
@@ -125,9 +149,13 @@ Space is $O(n^2)$, since $L$ and $U$ together occupy as much storage as $A$.
 
 Let $X$ be the inverse of $A$, with columns $\vec{x}_1, \ldots, \vec{x}_n$. The equation $AX = I$ splits into $n$ systems that share the same $A$.
 
+<Formula>
+
 $$
 A\vec{x}_j = \vec{e}_j, \quad j = 1, \ldots, n
 $$
+
+</Formula>
 
 Solve each system with the existing factors. The solution $\vec{x}_j$ is column $j$ of $X$, so the columns collected in order form $A^{-1}$.
 
@@ -143,21 +171,33 @@ Computing $A^{-1}$ outright is rarely needed. Solving $A\vec{x} = \vec{b}$ direc
 
 For $A = LU$,
 
+<Formula>
+
 $$
 \det A = \det L \det U
 $$
 
+</Formula>
+
 $L$ from Doolittle's method is unit lower triangular, so $\det L = 1$. $U$ is triangular, so $\det U$ is the product of its diagonal entries.
+
+<Formula>
 
 $$
 \det A = \prod_{i=1}^{n} u_{ii}
 $$
 
+</Formula>
+
 A row interchange during pivoting flips the sign of the determinant. With $s$ interchanges,
+
+<Formula>
 
 $$
 \det A = (-1)^{s} \prod_{i=1}^{n} u_{ii}
 $$
+
+</Formula>
 
 The determinant is read off the factorization already computed for solving systems. It adds no cost beyond the factorization itself.
 
@@ -167,9 +207,13 @@ The determinant is read off the factorization already computed for solving syste
 
 For
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 2 & 1 & -1 \\ -3 & -1 & 2 \\ -2 & 1 & 2 \end{pmatrix}
 $$
+
+</Formula>
 
 find $L$ and $U$.
 
@@ -264,9 +308,13 @@ $$
 
 Using the $L$ and $U$ from Example 1, solve $A\vec{x} = \vec{b}$ for
 
+<Formula>
+
 $$
 \vec{b} = \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix}
 $$
+
+</Formula>
 
 <Solution>
 
@@ -323,9 +371,13 @@ $$
 
 Find the determinant of
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 1 & 2 & 1 \\ 3 & 8 & 5 \\ 2 & 7 & 9 \end{pmatrix}
 $$
+
+</Formula>
 
 using LU decomposition.
 
@@ -436,9 +488,13 @@ $$
 
 Using the $L$ and $U$ from Example 1, find the inverse of
 
+<Formula>
+
 $$
 A = \begin{pmatrix} 2 & 1 & -1 \\ -3 & -1 & 2 \\ -2 & 1 & 2 \end{pmatrix}
 $$
+
+</Formula>
 
 <Solution>
 

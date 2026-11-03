@@ -3,12 +3,14 @@ title: Multi-Step Methods
 notebooks:
   - multi-step-methods
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-02T23:59:40.046Z
+lastUpdatedOn: 2026-11-03T02:21:30.521Z
 ---
 
 A multi-step method computes $w_{i+1}$ from several previous approximations, not just $w_i$.
 
 An $m$-step method for the [IVP](/s5/numerical-methods/initial-value-problem) $y'(t) = f(t, y)$ has a difference equation
+
+<Formula>
 
 $$
 \begin{aligned}
@@ -16,6 +18,8 @@ w_{i+1} = {}& a_{m-1} w_i + a_{m-2} w_{i-1} + \cdots + a_0 w_{i+1-m} \\
 & + h\big[ b_m f(t_{i+1}, w_{i+1}) + b_{m-1} f(t_i, w_i) + \cdots + b_0 f(t_{i+1-m}, w_{i+1-m}) \big]
 \end{aligned}
 $$
+
+</Formula>
 
 for $i = m-1, m, \ldots, N-1$, with constants $a_0, \ldots, a_{m-1}$ and $b_0, \ldots, b_m$, and $h = \dfrac{b-a}{N}$.
 
@@ -35,9 +39,13 @@ $b_m \neq 0$. $w_{i+1}$ appears on both sides and must be solved for.
 
 Integrating $y' = f(t, y)$ over $[t_i, t_{i+1}]$
 
+<Formula>
+
 $$
 y(t_{i+1}) = y(t_i) + \int_{t_i}^{t_{i+1}} f(t, y(t))\, \text{d}t
 $$
+
+</Formula>
 
 $f(t, y(t))$ is replaced by a polynomial through the $m$ most recent points, then integrated.
 
@@ -47,47 +55,75 @@ Below, $f_k = f(t_k, w_k)$ and $\mu_i$ lies in the interval spanned by the point
 
 2-step, with $\tau_{i+1}(h) = \dfrac{5}{12} y'''(\mu_i) h^2$
 
+<Formula>
+
 $$
 w_{i+1} = w_i + \frac{h}{2}\left[ 3 f_i - f_{i-1} \right]
 $$
 
+</Formula>
+
 3-step, with $\tau_{i+1}(h) = \dfrac{3}{8} y^{(4)}(\mu_i) h^3$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{12}\left[ 23 f_i - 16 f_{i-1} + 5 f_{i-2} \right]
 $$
 
+</Formula>
+
 4-step, with $\tau_{i+1}(h) = \dfrac{251}{720} y^{(5)}(\mu_i) h^4$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{24}\left[ 55 f_i - 59 f_{i-1} + 37 f_{i-2} - 9 f_{i-3} \right]
 $$
 
+</Formula>
+
 5-step, with $\tau_{i+1}(h) = \dfrac{95}{288} y^{(6)}(\mu_i) h^5$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{720}\left[ 1901 f_i - 2774 f_{i-1} + 2616 f_{i-2} - 1274 f_{i-3} + 251 f_{i-4} \right]
 $$
 
+</Formula>
+
 ### Adams-Moulton Implicit Methods
 
 2-step, with $\tau_{i+1}(h) = -\dfrac{1}{24} y^{(4)}(\mu_i) h^3$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{12}\left[ 5 f_{i+1} + 8 f_i - f_{i-1} \right]
 $$
 
+</Formula>
+
 3-step, with $\tau_{i+1}(h) = -\dfrac{19}{720} y^{(5)}(\mu_i) h^4$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{24}\left[ 9 f_{i+1} + 19 f_i - 5 f_{i-1} + f_{i-2} \right]
 $$
 
+</Formula>
+
 4-step, with $\tau_{i+1}(h) = -\dfrac{3}{160} y^{(6)}(\mu_i) h^5$
+
+<Formula>
 
 $$
 w_{i+1} = w_i + \frac{h}{720}\left[ 251 f_{i+1} + 646 f_i - 264 f_{i-1} + 106 f_{i-2} - 19 f_{i-3} \right]
 $$
+
+</Formula>
 
 <Note>
 

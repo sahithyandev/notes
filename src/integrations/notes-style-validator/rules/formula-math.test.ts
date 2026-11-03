@@ -7,6 +7,20 @@ test("allows a Formula with exactly 1 display-math block", () => {
   expect(checkFormula(f)).toHaveLength(0);
 });
 
+test("flags a Formula inside a Solution", () => {
+  const f = scanOne(
+    ["<Solution>", "<Formula>", "$$x^2$$", "</Formula>", "</Solution>"].join(
+      "\n",
+    ),
+  );
+  const violations = checkFormula(f);
+  expect(violations).toHaveLength(1);
+  expect(violations[0]).toMatchObject({
+    line: 2,
+    snippet: "formula-inside-solution",
+  });
+});
+
 test("flags a Formula without display math", () => {
   const f = scanOne(["<Formula>", "symbols", "</Formula>"].join("\n"));
   const violations = checkFormula(f);

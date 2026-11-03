@@ -3,7 +3,7 @@ title: Cubic Spline Interpolation
 notebooks:
   - cubic-spline-interpolation
 dateCreated: 2026-08-11T05:00:40.584Z
-lastUpdatedOn: 2026-11-01T16:38:00.113Z
+lastUpdatedOn: 2026-11-03T02:21:30.464Z
 ---
 
 <CubicSplineDiagram />
@@ -12,10 +12,14 @@ A cubic spline uses 1 cubic on each interval between consecutive nodes.
 
 For $x_0<x_1<\cdots<x_n$, write
 
+<Formula>
+
 $$
 S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3,
 \qquad x\in[x_j,x_{j+1}].
 $$
+
+</Formula>
 
 At every interior node, a spline preserves 3 quantities.
 
@@ -28,11 +32,15 @@ At every interior node, a spline preserves 3 quantities.
 
 It also passes through every data point.
 
+<Formula>
+
 $$
 S_j(x_j)=f(x_j),
 \qquad
 S_j(x_{j+1})=f(x_{j+1}).
 $$
+
+</Formula>
 
 Remember a spline as value, slope, curvature. The 2 endpoint conditions complete the construction.
 
@@ -47,6 +55,8 @@ Remember a spline as value, slope, curvature. The 2 endpoint conditions complete
 
 Define
 
+<Formula>
+
 $$
 h_j=x_{j+1}-x_j,
 \qquad
@@ -55,7 +65,11 @@ a_j=f(x_j),
 \delta_j=\frac{a_{j+1}-a_j}{h_j}.
 $$
 
+</Formula>
+
 The unknowns are $c_0,\ldots,c_n$. For each interior node,
+
+<Formula>
 
 $$
 h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_jc_{j+1}
@@ -63,13 +77,19 @@ h_{j-1}c_{j-1}+2(h_{j-1}+h_j)c_j+h_jc_{j+1}
 \qquad j=1,\ldots,n-1.
 $$
 
+</Formula>
+
 Then compute
+
+<Formula>
 
 $$
 b_j=\delta_j-\frac{h_j}{3}(2c_j+c_{j+1}),
 \qquad
 d_j=\frac{c_{j+1}-c_j}{3h_j}.
 $$
+
+</Formula>
 
 The recipe is:
 
@@ -80,15 +100,23 @@ The recipe is:
 
 For a natural spline, use
 
+<Formula>
+
 $$
 c_0=c_n=0.
 $$
 
+</Formula>
+
 For a clamped spline, replace those 2 equations with
+
+<Formula>
 
 $$
 2h_0c_0+h_0c_1=3\bigl(\delta_0-f'(x_0)\bigr),
 $$
+
+</Formula>
 
 $$
 h_{n-1}c_{n-1}+2h_{n-1}c_n=3\bigl(f'(x_n)-\delta_{n-1}\bigr).
@@ -152,15 +180,23 @@ $$
 
 For $f\in C^4[a,b]$, let
 
+<Formula>
+
 $$
 M=\max_{a\le x\le b}|f^{(4)}(x)|.
 $$
 
+</Formula>
+
 The clamped cubic spline $S$ satisfies
+
+<Formula>
 
 $$
 |f(x)-S(x)|\le\frac{5M}{384}
 \max_{0\le j\le n-1}(x_{j+1}-x_j)^4.
 $$
+
+</Formula>
 
 Smaller intervals reduce the error at the 4th-power rate.

@@ -5,16 +5,20 @@ prereqs:
 notebooks:
   - newtons-method
 dateCreated: 2026-07-28T05:17:13.897Z
-lastUpdatedOn: 2026-10-21T16:42:27.821Z
+lastUpdatedOn: 2026-11-03T02:21:30.442Z
 ---
 
 Newton's method for nonlinear systems is a [fixed-point iteration](/s5/numerical-methods/fixed-point-method) that uses the [Jacobian matrix](/s2/methods-of-mathematics/multivariable-calculus/jacobian#jacobian-matrix) $J(\vec{x})$ of $F$ to get quadratic convergence.
 
 ## Iteration
 
+<Formula>
+
 $$
 G(\vec{x}) = \vec{x} - J(\vec{x})^{-1}F(\vec{x})
 $$
+
+</Formula>
 
 $$
 \vec{x}^{(k)} = \vec{x}^{(k-1)} - J(\vec{x}^{(k-1)})^{-1}F(\vec{x}^{(k-1)}), \quad k \geq 1
@@ -24,9 +28,13 @@ $$
 
 In practice, solve the linear system
 
+<Formula>
+
 $$
 J(\vec{x}^{(k-1)})\vec{y}^{(k-1)} = -F(\vec{x}^{(k-1)})
 $$
+
+</Formula>
 
 by [Gaussian elimination](/s5/numerical-methods/gaussian-elimination) instead of inverting $J$, then set $\vec{x}^{(k)} = \vec{x}^{(k-1)} + \vec{y}^{(k-1)}$.
 
@@ -73,12 +81,16 @@ Repeating converges to $\vec{x}^{(5)} \approx (0.500000, 0.000000, -0.523599)^T$
 
 Apply Newton's method to
 
+<Formula>
+
 $$
 \begin{aligned}
 x_1^2 + x_2^2 - 4 &= 0 \\
 x_1 x_2 - 1 &= 0
 \end{aligned}
 $$
+
+</Formula>
 
 starting from $\vec{x}^{(0)} = (2, 0.5)^T$.
 

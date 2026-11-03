@@ -3,14 +3,18 @@ title: Systems of IVPs
 notebooks:
   - systems-of-ivps
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-02T23:59:40.057Z
+lastUpdatedOn: 2026-11-03T02:21:30.532Z
 ---
 
 An $m$-dimensional system of first-order [IVPs](/s5/numerical-methods/initial-value-problem) is
 
+<Formula>
+
 $$
 \mathbf{u}'(t) = \mathbf{f}(t, \mathbf{u}(t)), \qquad \mathbf{u}(a) = \boldsymbol{\alpha}
 $$
+
+</Formula>
 
 where $\mathbf{u} = (u_1, \ldots, u_m)^T$, $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_m)^T$, and $\mathbf{f} = (f_1, \ldots, f_m)^T$. The goal is to approximate $\mathbf{u}(t)$ for $a \leq t \leq b$.
 
@@ -22,9 +26,13 @@ Vector notation expresses every component equation at once. It makes the existen
 
 [The Lipschitz condition](/s5/numerical-methods/initial-value-problem#lipschitz-condition) applies unchanged. Replace the scalar variables with vectors and absolute values with a vector norm:
 
+<Formula>
+
 $$
 \lVert \mathbf{f}(t, \mathbf{u}) - \mathbf{f}(t, \mathbf{z}) \rVert \leq L \lVert \mathbf{u} - \mathbf{z} \rVert
 $$
+
+</Formula>
 
 for all $(t, \mathbf{u}), (t, \mathbf{z}) \in D \subseteq \mathbb{R} \times \mathbb{R}^m$.
 
@@ -36,11 +44,17 @@ The [existence and uniqueness result](/s5/numerical-methods/initial-value-proble
 
 An $m$th-order IVP
 
+<Formula>
+
 $$
 y^{(m)}(t) = f\big(t, y, y', \ldots, y^{(m-1)}\big), \quad a \leq t \leq b
 $$
 
+</Formula>
+
 with $y(a) = \alpha_1, y'(a) = \alpha_2, \ldots, y^{(m-1)}(a) = \alpha_m$ becomes a first-order system by setting $\mathbf{u} = (y, y', \ldots, y^{(m-1)})^T$
+
+<Formula>
 
 $$
 \mathbf{u}' = \begin{pmatrix}
@@ -57,6 +71,8 @@ f(t, u_1, \ldots, u_m)
 \end{pmatrix}
 $$
 
+</Formula>
+
 Solving the system by order 4 Runge-Kutta, the first component of $\mathbf{w}_i$ approximates $y(t_i)$.
 
 ## Worked Examples
@@ -65,9 +81,13 @@ Solving the system by order 4 Runge-Kutta, the first component of $\mathbf{w}_i$
 
 Reduce
 
+<Formula>
+
 $$
 y'' - 2y' + 2y = e^{2t}\sin t, \quad 0 \leq t \leq 1, \quad y(0) = -0.4,\ y'(0) = -0.6
 $$
+
+</Formula>
 
 to a first-order system, then take 1 step of order 4 Runge-Kutta with $h = 0.5$.
 

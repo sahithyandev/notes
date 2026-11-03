@@ -3,7 +3,7 @@ title: Euler's Method
 notebooks:
   - eulers-method
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-03T01:31:19.304Z
+lastUpdatedOn: 2026-11-03T02:21:30.493Z
 ---
 
 Approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-value-problem) at equally spaced mesh points, using the first-order Taylor expansion.
@@ -12,9 +12,13 @@ Approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-va
 
 Choose a positive integer $N$. The step size is $h = \dfrac{b - a}{N}$. The mesh points are
 
+<Formula>
+
 $$
 t_i = a + ih, \quad i = 0, 1, \ldots, N
 $$
+
+</Formula>
 
 with $t_0 = a$, $t_N = b$, and $t_{i+1} - t_i = h$.
 
@@ -22,11 +26,17 @@ with $t_0 = a$, $t_N = b$, and $t_{i+1} - t_i = h$.
 
 First-order Taylor expansion of $y$ about $t_i$, assuming $y$ is twice differentiable
 
+<Formula>
+
 $$
 y(t_{i+1}) = y(t_i) + h f(t_i, y(t_i)) + \frac{h^2}{2} y''(\xi_i), \quad \xi_i \in (t_i, t_{i+1})
 $$
 
+</Formula>
+
 Dropping the second-order term and writing $w_i \approx y(t_i)$
+
+<Formula>
 
 $$
 \begin{aligned}
@@ -34,6 +44,8 @@ w_0 &= \alpha \\
 w_{i+1} &= w_i + h f(t_i, w_i), \quad i = 0, 1, \ldots, N-1
 \end{aligned}
 $$
+
+</Formula>
 
 ## Theoretical Error Bound
 
@@ -64,6 +76,8 @@ The bound is often much larger than the actual error.
 
 With round-off, each step carries an error bounded by $\delta$. The computed values $u_i$ satisfy
 
+<Formula>
+
 $$
 \begin{aligned}
 u_0 &= \alpha + \delta_0 \\
@@ -71,17 +85,27 @@ u_{i+1} &= u_i + h f(t_i, u_i) + \delta_{i+1}, \quad |\delta_i| < \delta
 \end{aligned}
 $$
 
+</Formula>
+
 Then for each $i = 0, 1, \ldots, N$
+
+<Formula>
 
 $$
 |y(t_i) - u_i| \leq \frac{1}{L}\left( \frac{hM}{2} + \frac{\delta}{h} \right)\left( e^{L(t_i - a)} - 1 \right) + |\delta_0|\, e^{L(t_i - a)}
 $$
 
+</Formula>
+
 As $h \to 0$ the factor $\dfrac{hM}{2} + \dfrac{\delta}{h} \to \infty$. Error grows with decreasing $h$ once $h$ is small enough. The minimizing step size is
+
+<Formula>
 
 $$
 h = \sqrt{\frac{2\delta}{M}}
 $$
+
+</Formula>
 
 ## Worked Examples
 
