@@ -1,0 +1,453 @@
+---
+import katex from "katex";
+import { getCollection } from "astro:content";
+import Footer from "../components/layout/footer.astro";
+import Nav from "../components/layout/nav.astro";
+import Layout from "../layouts/Layout.astro";
+import { titleize } from "../utils";
+import { SITE_HOST_URL, SITE_NAME } from "../utils/values";
+
+export const prerender = true;
+
+interface Equation {
+  id: string;
+  noteTitle: string;
+  noteHref: string;
+  semester: string;
+  module: string;
+  moduleLabel: string;
+  context?: string;
+  math: string;
+  html: string;
+}
+
+function extractEquations(
+  body: string,
+  note: { id: string; title: string },
+): Equation[] {
+  const equations: Equation[] = [];
+  const formulaRe = /<Formula(?:\s[^>]*)?>([\s\S]*?)<\/Formula>/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = formulaRe.exec(body))) {
+    const mathMatch = match[1].match(/\$\$([\s\S]*?)\$\$/);
+    if (!mathMatch) continue;
+
+    const idParts = note.id.split("/");
+    const semester = idParts[0] ?? "general";
+    const module = idParts[1] ?? "general";
+    const before = body.slice(0, match.index);
+    const headings = [...before.matchAll(/^#{2,6}\s+(.+)$/gm)];
+    const context = headings
+      .at(-1)?.[1]
+      .replace(/\s+#*$/, "")
+      .trim();
+    const math = mathMatch[1].trim();
+
+    equations.push({
+      id: `${note.id}-${equations.length}`,
+      noteTitle: note.title,
+      noteHref: `/${note.id}`,
+      semester,
+      module,
+      moduleLabel: titleize(module),
+      context,
+      math,
+      html: katex.renderToString(math, {
+        displayMode: true,
+        throwOnError: false,
+        strict: false,
+        output: "htmlAndMathml",
+      }),
+    });
+  }
+
+  return equations;
+}
+
+const notes = await getCollection("notes");
+const equations = notes
+  .sort((a, b) => a.id.localeCompare(b.id))
+  .flatMap((note) =>
+    extractEquations(note.body, { id: note.id, title: note.data.title }),
+  );
+
+const modules = [
+  ...new Map(
+    equations.map((equation) => [
+      `${equation.semester}/${equation.module}`,
+      {
+        value: `${equation.semester}/${equation.module}`,
+        label: `${titleize(equation.semester)} · ${equation.moduleLabel}`,
+      },
+    ]),
+  ).values(),
+].sort((a, b) => a.label.localeCompare(b.label));
+
+const grouped = equations.reduce((groups, equation) => {
+  const key = `${equation.semester}/${equation.module}`;
+  const group = groups.get(key) ?? [];
+  group.push(equation);
+  groups.set(key, group);
+  return groups;
+}, new Map<string, Equation[]>());
+---
+
+<Layout
+  title={`Equations | ${SITE_NAME}`}
+  description="A searchable cheatsheet of equations collected from Sahithyan's Notes."
+  canonical={`${SITE_HOST_URL}/equations`}
+  slug="equations"
+>
+  <Nav />
+
+  <main id="main-content" class="equations-page">
+    <section class="equations-content" aria-labelledby="equations-title">
+      <header class="equations-header">
+        <h1 id="equations-title">Equations</h1>
+        <p>
+          A quick reference pulled directly from the notes. Filter by module or
+          search for a variable, topic, or source note.
+        </p>
+      </header>
+
+      <div class="equations-tools" aria-label="Equation filters">
+        <label>
+          <span>Module</span>
+          <select id="module-filter">
+            <option value="all">All modules</option>
+            {modules.map((module) => (
+              <option value={module.value}>{module.label}</option>
+            ))}
+          </select>
+        </label>
+        <label class="search-label">
+          <span>Search</span>
+          <input
+            id="equation-filter"
+            type="search"
+            placeholder="Try force, hardness, or turbines"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+        <p id="equation-count" class="equation-count" aria-live="polite">
+          {equations.length} equations
+        </p>
+      </div>
+
+      <div class="equation-groups" id="equation-groups">
+        {[...grouped.entries()].map(([key, group]) => {
+          const [semester, module] = key.split("/");
+          return (
+            <section class="equation-group" data-group={key}>
+              <h2>
+                <span>{titleize(semester)} /</span>
+                {titleize(module)}
+              </h2>
+              <div class="equation-list">
+                {group.map((equation, index) => (
+                  <article
+                    class="equation-entry"
+                    data-equation-card
+                    data-module={key}
+                    data-search={`${equation.noteTitle} ${equation.moduleLabel} ${equation.context ?? ""} ${equation.math}`.toLowerCase()}
+                  >
+                    <div class="equation-meta">
+                      <span>{equation.context ?? "Equation"}</span>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                    </div>
+                    <div class="equation-math" set:html={equation.html} />
+                    <div class="equation-source">
+                      <a href={equation.noteHref}>{equation.noteTitle}</a>
+                      <button
+                        type="button"
+                        class="copy-equation"
+                        data-equation={equation.math}
+                        aria-label={`Copy equation from ${equation.noteTitle}`}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      <p id="equation-empty" class="equation-empty" hidden>
+        No equations match those filters.
+      </p>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  const moduleFilter =
+    document.querySelector<HTMLSelectElement>("#module-filter");
+  const input = document.querySelector<HTMLInputElement>("#equation-filter");
+  const cards = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-equation-card]"),
+  );
+  const groups = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-group]"),
+  );
+  const count = document.querySelector<HTMLElement>("#equation-count");
+  const empty = document.querySelector<HTMLElement>("#equation-empty");
+
+  function update() {
+    const selectedModule = moduleFilter?.value ?? "all";
+    const query = input?.value.trim().toLocaleLowerCase() ?? "";
+    let visible = 0;
+
+    for (const card of cards) {
+      const matchesModule =
+        selectedModule === "all" || card.dataset.module === selectedModule;
+      const matchesQuery = !query || card.dataset.search?.includes(query);
+      card.hidden = !(matchesModule && matchesQuery);
+      if (!card.hidden) visible += 1;
+    }
+
+    for (const group of groups) {
+      group.hidden = !group.querySelector("[data-equation-card]:not([hidden])");
+    }
+
+    if (count)
+      count.textContent = `${visible} ${visible === 1 ? "equation" : "equations"}`;
+    if (empty) empty.hidden = visible !== 0;
+  }
+
+  moduleFilter?.addEventListener("change", update);
+  input?.addEventListener("input", update);
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    ".copy-equation",
+  )) {
+    button.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(button.dataset.equation ?? "");
+      const original = button.textContent;
+      button.textContent = "Copied";
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1200);
+    });
+  }
+</script>
+
+<style>
+  .equations-page {
+    min-height: calc(100dvh - 54px);
+    width: var(--body-width);
+    margin: calc(8 * var(--spacing)) auto 0;
+  }
+
+  .equations-content {
+    max-width: 1120px;
+    padding-bottom: 64px;
+  }
+
+  .equations-header {
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    margin-bottom: 14px;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+
+  .equations-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .equations-tools {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.7fr) minmax(260px, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 42px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+
+  .equations-tools label {
+    display: grid;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  select,
+  input {
+    min-height: 38px;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+    padding: 0 11px;
+  }
+
+  select:focus-visible,
+  input:focus-visible,
+  button:focus-visible,
+  a:focus-visible {
+    outline: 3px solid var(--accent-dim);
+    outline-offset: 2px;
+  }
+
+  .equation-count {
+    margin: 0 4px 10px 8px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .equation-group {
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    letter-spacing: -0.025em;
+    font-size: 1.2rem;
+    font-weight: 750;
+  }
+
+  h2 span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .equation-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .equation-entry {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 176px;
+    padding: 17px 18px 13px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .equation-entry:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+  }
+
+  .equation-meta,
+  .equation-source {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .equation-meta {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .equation-meta span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .equation-math {
+    overflow-x: auto;
+    padding: 18px 0;
+    color: var(--text-primary);
+  }
+
+  .equation-math :global(.katex-display) {
+    margin: 0;
+    text-align: left;
+  }
+
+  .equation-source {
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .equation-source a {
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .equation-source a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .copy-equation {
+    flex: 0 0 auto;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .equation-empty {
+    padding: 32px 0;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 720px) {
+    .equations-page {
+      margin-top: calc(5 * var(--spacing));
+    }
+
+    .equations-tools,
+    .equation-list {
+      grid-template-columns: 1fr;
+    }
+
+    .equation-count {
+      margin: 4px 0 0;
+    }
+  }
+</style>
