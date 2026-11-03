@@ -1,7 +1,7 @@
 ---
 title: Shift Cipher
 dateCreated: 2026-07-29T05:49:37.219Z
-lastUpdatedOn: 2026-10-27T04:18:29.364Z
+lastUpdatedOn: 2026-11-03T01:31:18.931Z
 ---
 
 A [classical cipher](/s5/computer-security/ciphers#classical-cipher), [mono-alphabetic](/s5/computer-security/ciphers#mono-alphabetic-cipher) cipher. Every plaintext letter is shifted by the same amount.
@@ -16,16 +16,18 @@ The key is a shift $k \in \{0, \ldots, 25\}$. The key space has 26 members. A br
 
 Each letter in the alphabet is replaced by a letter located at a fixed distance from it.
 
+<Formula>
+
 $$
 c = m + k \mod 26
 $$
-
-Here:
 
 <Symbols>
   <Sym s="m">plaintext letter, encoded as an integer 0 (a) to 25 (z)</Sym>
   <Sym s="k">the shift value, the secret key</Sym>
 </Symbols>
+
+</Formula>
 
 <Note>
 
@@ -55,11 +57,11 @@ Character frequency analysis computes the frequency of characters in the ciphert
 
 A more rigorous technique computes the statistical distance between the standard character frequency distribution and the ciphertext's frequency distribution, for each candidate shift $k$.
 
+<Formula>
+
 $$
 \Delta[X, Y_k] = \frac{1}{2}\sum_{u \in V} \left| \Pr_{X \leftarrow D_{\text{std}}}[X = u] - \Pr_{Y_k \leftarrow D_k}[Y_k = u] \right|
 $$
-
-Here:
 
 <Symbols>
   <Sym s="X">
@@ -70,6 +72,8 @@ Here:
     the set of values which can occur for $X$ or $Y_k$ with non-zero probability
   </Sym>
 </Symbols>
+
+</Formula>
 
 Computing $\Delta[X, Y_k]$ for each of the 26 values of $k$ and taking the smallest value gives the secret key.
 

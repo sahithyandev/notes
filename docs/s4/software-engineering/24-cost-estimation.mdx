@@ -1,7 +1,7 @@
 ---
 title: Cost Estimation
 dateCreated: 2026-06-07T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:15:18.552Z
+lastUpdatedOn: 2026-11-03T01:31:18.692Z
 ---
 
 Predicting the effort and schedule required to deliver a software project before development begins.
@@ -119,11 +119,11 @@ Three project modes:
 
 Effort formula:
 
+<Formula>
+
 $$
 \text{PM} = a \times (\text{KDSI})^{b}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="\text{PM}">effort in person-months</Sym>
@@ -131,18 +131,22 @@ Here:
   <Sym s="a, b">constants that vary by mode</Sym>
 </Symbols>
 
+</Formula>
+
 Schedule formula:
+
+<Formula>
 
 $$
 \text{TDEV} = c \times (\text{PM})^{d}
 $$
 
-Here:
-
 <Symbols>
   <Sym s="\text{TDEV}">time to develop, in months.</Sym>
   <Sym s="c,d">constants that vary by mode.</Sym>
 </Symbols>
+
+</Formula>
 
 | Mode          | $a$ | $b$  | $c$ | $d$  |
 | ------------- | --- | ---- | --- | ---- |
@@ -173,11 +177,11 @@ The absolute PM difference between high-productivity and low-productivity teams 
 
 Modifies a base COCOMO estimate to reflect a team or tooling scenario that differs from the calibration baseline.
 
+<Formula>
+
 $$
 \text{PM}_{adjusted} = \text{PM}_{base} \times m
 $$
-
-Here:
 
 <Symbols>
   <Sym s="\text{PM}_{base}">
@@ -185,6 +189,8 @@ Here:
   </Sym>
   <Sym s="m">productivity multiplier</Sym>
 </Symbols>
+
+</Formula>
 
 Multiplier direction:
 
@@ -210,11 +216,11 @@ Algorithmic cost model developed by Barry Boehm (2000). Supersedes COCOMO. Updat
 
 Core effort equation:
 
+<Formula>
+
 $$
 \text{Effort} = A \times (\text{Size})^{B} \times \prod \text{EM}_i
 $$
-
-Here:
 
 <Symbols>
   <Sym s="A">
@@ -230,6 +236,8 @@ Here:
   </Sym>
   <Sym s="\text{EM}_i">effort multipliers (17 cost drivers)</Sym>
 </Symbols>
+
+</Formula>
 
 Project duration:
 

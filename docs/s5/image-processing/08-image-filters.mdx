@@ -1,7 +1,7 @@
 ---
 title: Image Filters
 dateCreated: 2026-10-28T22:46:31.625Z
-lastUpdatedOn: 2026-10-29T00:08:11.141Z
+lastUpdatedOn: 2026-11-03T01:31:19.063Z
 ---
 
 An image filter transforms pixels in a [digital image](/s5/image-processing/image-model) from values in a local neighbourhood. A filter suppresses or strengthens selected image detail.
@@ -13,17 +13,19 @@ on the pixel being processed.
 
 For a linear filter:
 
+<Formula>
+
 $$
 P(x,y) = \sum_{i=-N}^{N}\sum_{j=-M}^{M} H(i,j)\,I(x-i,y-j)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="I(x,y)">input image intensity</Sym>
   <Sym s="P(x,y)">filtered output intensity</Sym>
   <Sym s="H(i,j)">kernel coefficient at offset $(i,j)$</Sym>
 </Symbols>
+
+</Formula>
 
 The kernel moves over every pixel. The weighted sum becomes the output pixel.
 

@@ -1,7 +1,7 @@
 ---
 title: Gradient-Based Edge Detection
 dateCreated: 2026-10-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T23:42:27.638Z
+lastUpdatedOn: 2026-11-03T01:31:19.201Z
 ---
 
 An edge is a set of pixels where image intensity or colour changes rapidly. It usually marks an object boundary.
@@ -38,6 +38,8 @@ A first-order detector measures the rate of intensity change. It has 4 stages:
 
 The image gradient is the vector of first partial derivatives at $(x,y)$:
 
+<Formula>
+
 $$
 \nabla f(x,y) =
 \begin{bmatrix}
@@ -57,6 +59,8 @@ $$
   <Sym s="G_x">horizontal intensity derivative</Sym>
   <Sym s="G_y">vertical intensity derivative</Sym>
 </Symbols>
+
+</Formula>
 
 The gradient points towards the greatest intensity increase. Its direction is perpendicular to the edge.
 
@@ -185,6 +189,8 @@ $$
 
 A gradient response exists at every pixel. Thresholding compares its magnitude with an edge-strength threshold $T$. Pixels meeting the threshold become edges in the binary map.
 
+<Formula>
+
 $$
 g(x,y) =
 \begin{cases}
@@ -197,6 +203,8 @@ $$
   <Sym s="g(x,y)">binary edge-map value</Sym>
   <Sym s="T">minimum gradient magnitude accepted as an edge</Sym>
 </Symbols>
+
+</Formula>
 
 - Low $T$  
   Retains weak boundaries and false edges from noise or texture.
@@ -255,6 +263,8 @@ A Laplacian response of $0$ at 1 pixel does not by itself locate an edge. A zero
 
 The Laplacian amplifies noise. The Laplacian of Gaussian first smooths the image with a Gaussian filter, then applies the Laplacian:
 
+<Formula>
+
 $$
 \operatorname{LoG}(f) = \nabla^2(G_\sigma * f)
 $$
@@ -263,6 +273,8 @@ $$
   <Sym s="G_\sigma">Gaussian kernel with standard deviation $\sigma$</Sym>
   <Sym s="*">convolution</Sym>
 </Symbols>
+
+</Formula>
 
 A larger $\sigma$ rejects more noise and removes more fine edge detail. The LoG reduces false zero crossings but does not remove every response caused by texture.
 

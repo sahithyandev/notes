@@ -23,6 +23,7 @@ export type RuleId =
   | "math-block"
   | "proof-hint"
   | "too-many-headings"
+  | "formula"
   | "notebook-file";
 
 export interface Violation {

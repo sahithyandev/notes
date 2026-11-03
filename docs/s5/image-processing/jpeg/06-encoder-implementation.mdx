@@ -1,7 +1,7 @@
 ---
 title: Encoder Implementation
 dateCreated: 2026-10-20T09:00:00.000Z
-lastUpdatedOn: 2026-10-23T13:55:01.114Z
+lastUpdatedOn: 2026-11-03T01:31:19.253Z
 ---
 
 This note gives a working baseline encoder and surveys the codecs that implement the standard.
@@ -222,11 +222,11 @@ All of them decode any baseline stream. The compressed size of the same image ca
 
 Treats the rounding of each coefficient as a choice. For every block, it picks the quantized values that minimize the rate-distortion cost.
 
+<Formula>
+
 $$
 J = D + \lambda R
 $$
-
-Here:
 
 <Symbols>
   <Sym s="D">
@@ -239,6 +239,8 @@ Here:
     weight that sets the exchange rate between error and bits
   </Sym>
 </Symbols>
+
+</Formula>
 
 Rounding a coefficient of magnitude 1 to 0 often removes a whole run symbol and a long Huffman code, and costs little error. Trellis quantization therefore zeroes many isolated small values that plain rounding keeps.
 

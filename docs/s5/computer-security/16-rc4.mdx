@@ -1,7 +1,7 @@
 ---
 title: RC4
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-27T10:07:19.324Z
+lastUpdatedOn: 2026-11-03T01:31:18.961Z
 ---
 
 A byte-oriented [keystream generator](/s5/computer-security/stream-ciphers) built around a permutation $S$ of the 256 byte values $S[0], \ldots, S[255]$, rather than an LFSR. Designed by Ron Rivest in 1987.
@@ -20,6 +20,8 @@ For a fixed key length of $l$ bytes, RC4 accepts $256^l = 2^{8l}$ input keys. RC
 
 Initialises $S$ to the identity permutation, then scrambles it using the secret key $K$ (1 to 256 bytes), reused cyclically if shorter than 256 bytes.
 
+<Formula>
+
 $$
 \begin{aligned}
 &S[i] = i, \quad i = 0, \ldots, 255 \\
@@ -36,6 +38,8 @@ $$
     a running value seeded by the key, deciding which entry $i$ is swapped with.
   </Sym>
 </Symbols>
+
+</Formula>
 
 After 256 swaps, every byte value has moved to a key-dependent position, and $S$ passes unchanged into the PRGA.
 

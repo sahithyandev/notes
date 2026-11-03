@@ -17,9 +17,9 @@ import { checkTitleHeadingDuplicate } from "./title-heading-duplicate.ts";
 import { checkDuplicateHeading } from "./duplicate-heading.ts";
 import { checkWhatIsHeading } from "./what-is-heading.ts";
 import { checkMathBlock } from "./math-block.ts";
+import { checkFormula } from "./formula-math.ts";
 import { checkProofHint } from "./proof-hint.ts";
 import { checkTooManyHeadings } from "./too-many-headings.ts";
-import { checkSymParent } from "./sym-parent.ts";
 import { checkNotebookFile, checkNotebookFiles } from "./notebook-file.ts";
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 import { checkForwardLinks } from "./forward-link.ts";
@@ -54,7 +54,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkMathBlock,
   checkProofHint,
   checkTooManyHeadings,
-  checkSymParent,
+  checkFormula,
   checkNotebookFile,
 ];
 

@@ -1,7 +1,7 @@
 ---
 title: TCP
 dateCreated: 2026-05-14T12:24:50.329Z
-lastUpdatedOn: 2026-10-17T06:15:18.198Z
+lastUpdatedOn: 2026-11-03T01:31:18.561Z
 ---
 
 Transmission Control Protocol. Connection-oriented. Reliable. Unicast only. Defined in RFC 793. Operates end-to-end; routers do not participate. Provides byte-stream abstraction over an unreliable IP network.
@@ -191,16 +191,18 @@ Here SRTT stands for smoothed round trip time. Typically $\alpha = 0.125$ and $\
 
 Receiver advertises available buffer space in the Window field. Sender transmits at most that many unacknowledged bytes.
 
+<Formula>
+
 $$
 \text{Sender window} \leq \min(\text{rwnd}, \text{cwnd})
 $$
-
-Here:
 
 <Symbols>
   <Sym s="\text{rwnd}">receiver window. Used for flow control.</Sym>
   <Sym s="\text{cwnd}">congestion window. Used for congestion control.</Sym>
 </Symbols>
+
+</Formula>
 
 If Window is set to 0, sender would stop sending data and starts probing periodically with 1-byte segments.
 

@@ -1,7 +1,7 @@
 ---
 title: Discrete Cosine Transform
 dateCreated: 2026-10-08T12:14:32.170Z
-lastUpdatedOn: 2026-10-28T23:42:27.608Z
+lastUpdatedOn: 2026-11-03T01:31:19.190Z
 ---
 
 <Aka>DCT</Aka>. Expresses a sequence of $N$ samples as a weighted sum of $N$
@@ -12,6 +12,8 @@ Each coefficient measures how strongly 1 cosine pattern appears in the samples. 
 ## One-Dimensional DCT
 
 The input is $N$ samples $x(n)$. The output is $N$ coefficients $X(k)$, 1 for each cosine pattern. Each $X(k)$ gives the amount of the $k$th pattern in the samples.
+
+<Formula>
 
 $$
 X(k) = \alpha(k) \sum_{n=0}^{N-1} x(n) \cos\frac{(2n+1)k\pi}{2N}
@@ -26,6 +28,8 @@ $$
   <Sym s="\alpha(0)">$\sqrt{1 / N}$</Sym>
   <Sym s="\alpha(k) \ \text{for} \ k \geq 1">$\sqrt{2 / N}$</Sym>
 </Symbols>
+
+</Formula>
 
 The $k=0$ cosine is constant. Therefore $X(0)$ is the DC coefficient, equal to $\sqrt{N}$ times the sample mean. Every $k \geq 1$ coefficient is an AC coefficient. Its cosine completes $k/2$ cycles across the samples.
 
@@ -62,11 +66,11 @@ $$
 F(u, v) = \alpha(u)\,\alpha(v) \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} f(x, y) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
 $$
 
+<Formula>
+
 $$
 f(x, y) = \sum_{u=0}^{N-1} \sum_{v=0}^{N-1} \alpha(u)\,\alpha(v)\, F(u, v) \cos\frac{(2x+1)u\pi}{2N} \cos\frac{(2y+1)v\pi}{2N}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="x, y">column and row indices</Sym>
@@ -77,6 +81,8 @@ Here:
   </Sym>
   <Sym s="F(0, 0)">DC coefficient, equal to $N$ times the block mean</Sym>
 </Symbols>
+
+</Formula>
 
 A constant block of value $c$ has $F(0, 0) = Nc$. Every other coefficient is $0$.
 

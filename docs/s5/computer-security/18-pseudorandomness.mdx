@@ -1,7 +1,7 @@
 ---
 title: Pseudorandomness
 dateCreated: 2026-09-28T03:02:07.502Z
-lastUpdatedOn: 2026-10-27T13:10:11.980Z
+lastUpdatedOn: 2026-11-03T01:31:18.969Z
 ---
 
 Pseudorandomness is the property that an efficiently computable deterministic construction is indistinguishable from an ideal random object to every efficient adversary.
@@ -19,6 +19,8 @@ A probabilistic polynomial-time (PPT) distinguisher uses random bits and runs in
 ### Computational Indistinguishability
 
 Distributions $X = \{X_n\}$ and $Y = \{Y_n\}$ are computationally indistinguishable **iff** every PPT distinguisher $D$ has negligible advantage:
+
+<Formula>
 
 $$
 \Big\lvert \Pr[D(X_n) = 1] - \Pr[D(Y_n) = 1] \Big\rvert
@@ -38,6 +40,8 @@ $$
 <Sym s="n">security parameter</Sym>
 
 </Symbols>
+
+</Formula>
 
 Both probabilities include the random sample and the random choices made by $D$. As $n$ increases, no efficient distinguisher gains a useful way to tell the 2 distributions apart.
 

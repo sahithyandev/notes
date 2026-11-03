@@ -1,7 +1,7 @@
 ---
 title: Trusted Platform Module
 dateCreated: 2026-09-30T15:00:00.000Z
-lastUpdatedOn: 2026-10-30T05:40:14.256Z
+lastUpdatedOn: 2026-11-03T01:31:19.390Z
 ---
 
 <Aka>TPM</Aka>. A tamper-resistant cryptographic coprocessor on the motherboard.
@@ -44,17 +44,19 @@ The index ranges are assigned as follows:
 
 A PCR can only be updated by combining its current value with a new measurement.
 
+<Formula>
+
 $$
 PCR_{\text{new}} = H(PCR_{\text{old}} \parallel m)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="H">hash function</Sym>
   <Sym s="m">hash of the component being measured</Sym>
   <Sym s="\parallel">concatenation</Sym>
 </Symbols>
+
+</Formula>
 
 The final value depends on every measurement and their order. A PCR cannot be set to an arbitrary value, so malware cannot erase an earlier measurement.
 

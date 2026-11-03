@@ -5,7 +5,7 @@ prereqs:
 authors:
   - rakeshan
 dateCreated: 2026-09-25T06:10:54.663Z
-lastUpdatedOn: 2026-10-17T05:04:55.466Z
+lastUpdatedOn: 2026-11-03T01:31:18.782Z
 ---
 
 Audio codecs exploit the expected signal type.
@@ -20,12 +20,18 @@ Speech codecs can perform poorly on music.
 
 The Nyquist condition requires a sampling frequency greater than twice the highest input frequency for ideal reconstruction of a band-limited signal.
 
-$$f_s > 2f_{\max}$$
+<Formula>
+
+$$
+f_s > 2f_{\max}
+$$
 
 <Symbols>
   <Sym s="f_s">sampling frequency</Sym>
   <Sym s="f_{\max}">highest input frequency</Sym>
 </Symbols>
+
+</Formula>
 
 ## Pulse Code Modulation
 
@@ -44,13 +50,19 @@ $$8{,}000 \times 8 = 64{,}000\ \text{bps} = 64\ \text{kbps}$$
 
 Differential pulse code modulation (DPCM) encodes the difference between an actual sample and its predicted value.
 
-$$e_n = x_n - \hat{x}_n$$
+<Formula>
+
+$$
+e_n = x_n - \hat{x}_n
+$$
 
 <Symbols>
   <Sym s="e_n">prediction error</Sym>
   <Sym s="x_n">actual sample</Sym>
   <Sym s="\hat{x}_n">predicted sample</Sym>
 </Symbols>
+
+</Formula>
 
 Encoder and decoder use the same predictor.
 

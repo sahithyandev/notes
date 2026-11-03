@@ -1,12 +1,18 @@
 ---
 title: Image Model
 dateCreated: 2026-07-26T04:58:54.491Z
-lastUpdatedOn: 2026-10-18T09:17:02.149Z
+lastUpdatedOn: 2026-11-03T01:31:19.034Z
 ---
 
 An image is modeled as a function $I(x,y)$ returning the light intensity at position $(x,y)$.
 
 Here:
+
+<Formula>
+
+$$
+(x,y)
+$$
 
 <Symbols>
   <Sym s="x, y">spatial coordinates of a point in the image</Sym>
@@ -14,6 +20,8 @@ Here:
     light intensity at that point, bounded between a minimum and maximum
   </Sym>
 </Symbols>
+
+</Formula>
 
 ## Analog Image Model
 
@@ -45,6 +53,8 @@ A digital image is a discrete representation of an image, with a finite number o
 
 $I(i,j)$ is the intensity of cell $(i,j)$, one of the $L$ levels. The digital image is the matrix of these values. Each element is a pixel.
 
+<Formula>
+
 $$
 \begin{bmatrix}
 I(0,0) & I(0,1) & \cdots & I(0,n-1) \\
@@ -53,8 +63,6 @@ I(1,0) & I(1,1) & \cdots & I(1,n-1) \\
 I(m-1,0) & I(m-1,1) & \cdots & I(m-1,n-1)
 \end{bmatrix}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="m">number of rows</Sym>
@@ -65,6 +73,8 @@ Here:
     number of intensity levels, usually $L = 2^k$ for a bit depth $k$
   </Sym>
 </Symbols>
+
+</Formula>
 
 $m \times n$ is the spatial resolution. An 8-bit grayscale image has $L = 256$ levels, $0$ for black and $255$ for white.
 

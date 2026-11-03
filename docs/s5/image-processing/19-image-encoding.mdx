@@ -1,7 +1,7 @@
 ---
 title: Image Encoding
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-28T23:42:27.563Z
+lastUpdatedOn: 2026-11-03T01:31:19.169Z
 ---
 
 Image encoding assigns a codeword to each grey level. Codeword lengths decide how many bits per pixel the coded image needs.
@@ -83,16 +83,18 @@ A flipped bit shifts every later codeword boundary, so decoding errors propagate
 
 All grey levels are assigned codewords of the same length.
 
+<Formula>
+
 $$
 l(k) = \lceil \log_2 L \rceil
 $$
-
-Here:
 
 <Symbols>
   <Sym s="L">number of grey levels</Sym>
   <Sym s="l(k)">codeword length of grey level $k$</Sym>
 </Symbols>
+
+</Formula>
 
 Easy to encode and decode. Allows random access to any pixel. Always uniquely decodable.
 
@@ -160,16 +162,18 @@ Correlated or repeating pixel patterns, such as texture or constant regions, can
 
 Transforms pixels into differences from a neighbour:
 
+<Formula>
+
 $$
 D(x,y) = I(x+1,y) - I(x,y)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="I(x,y)">grey level at column $x$ and row $y$</Sym>
   <Sym s="D(x,y)">difference between a pixel and its right neighbour</Sym>
 </Symbols>
+
+</Formula>
 
 The first pixel of each row has no left neighbour, so it is stored unchanged. The decoder rebuilds the row by accumulating the differences:
 
@@ -200,11 +204,11 @@ $$
 
 The coarsest layer $G_K$ is stored as is. The decoder starts there and works down to full resolution:
 
+<Formula>
+
 $$
 G_k = L_k + \text{expand}(G_{k+1})
 $$
-
-Here:
 
 <Symbols>
   <Sym s="I">original image</Sym>
@@ -218,6 +222,8 @@ Here:
   </Sym>
   <Sym s="L_k">difference layer at level $k$</Sym>
 </Symbols>
+
+</Formula>
 
 Difference layers are mostly near 0 in smooth regions, so they have low entropy. The total number of samples is about $\frac{4}{3}$ of the image size, since each level has $\frac{1}{4}$ the samples of the one below. Compression comes from the lower entropy per sample.
 
@@ -249,17 +255,19 @@ $$
 
 Separates an $m$-bit grey level image into $m$ binary bit-planes:
 
+<Formula>
+
 $$
 I(x,y) = \sum_{k=0}^{m-1} a_k(x,y)\, 2^k
 $$
-
-Here:
 
 <Symbols>
   <Sym s="a_k(x,y)">
     bit $k$ of the pixel at $(x,y)$, with $k = 0$ the least significant bit
   </Sym>
 </Symbols>
+
+</Formula>
 
 Plane $k$ is the binary image formed by $a_k$ over all pixels.
 
@@ -275,16 +283,18 @@ $$
 
 The decoder recovers the original bits from the top plane downwards:
 
+<Formula>
+
 $$
 a_{m-1} = g_{m-1}, \qquad a_k = g_k \oplus a_{k+1}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="g_k">bit $k$ of the Gray coded pixel</Sym>
   <Sym s="\oplus">exclusive OR</Sym>
 </Symbols>
+
+</Formula>
 
 ## Psychovisual Redundancy
 
@@ -307,19 +317,21 @@ $$
 
 Gaussian filtering replaces each pixel with a weighted average of its neighbourhood:
 
+<Formula>
+
 $$
 I'(x,y) = \sum_{i,j} h(i,j)\, I(x+i, y+j)
 \qquad
 \sum_{i,j} h(i,j) = 1
 $$
 
-Here:
-
 <Symbols>
   <Sym s="m, m'">bits per pixel before and after re-quantizing</Sym>
   <Sym s="I'(x,y)">pixel value after the operation</Sym>
   <Sym s="h(i,j)">Gaussian weight at offset $(i,j)$</Sym>
 </Symbols>
+
+</Formula>
 
 <Note>
 

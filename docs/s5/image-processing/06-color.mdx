@@ -1,7 +1,7 @@
 ---
 title: Color
 dateCreated: 2026-07-26T04:59:00.680Z
-lastUpdatedOn: 2026-10-29T00:08:11.099Z
+lastUpdatedOn: 2026-11-03T01:31:19.052Z
 ---
 
 Color is a construct in the brain. It doesn't correspond to a physical phenomenon. Mixing light waves of different wavelengths produces the perception of different colors.
@@ -44,6 +44,12 @@ Each channel is an 8-bit value in $[0, 255]$. All channels at $0$ gives black. A
 
 CMYK is an absorption based color space with colorants cyan, magenta, yellow and key.
 
+<Formula>
+
+$$
+[0, 1]
+$$
+
 <Symbols>
   <Sym s="C">cyan, absorbs red</Sym>
   <Sym s="M">magenta, absorbs green</Sym>
@@ -52,6 +58,8 @@ CMYK is an absorption based color space with colorants cyan, magenta, yellow and
     key, black ink added to deepen dark tones and reduce colored ink use
   </Sym>
 </Symbols>
+
+</Formula>
 
 Each component is a fraction in $[0, 1]$. All components at $0$ gives white, the bare substrate. $K = 1$ gives black.
 
@@ -179,6 +187,8 @@ $$
 
 True color stores 24 bits for every pixel.
 
+<Formula>
+
 $$
 S_{\text{true}} = 24 W H
 $$
@@ -189,6 +199,8 @@ $$
 <Sym s="S">total storage in bits</Sym>
 
 </Symbols>
+
+</Formula>
 
 $S_{\text{indexed}} < S_{\text{true}}$ for any realistic $N$ since $b < 24$ and the $24N$ table cost is shared by all pixels.
 

@@ -1,7 +1,7 @@
 ---
 title: CSMA/CD
 dateCreated: 2026-06-05T12:13:57.238Z
-lastUpdatedOn: 2026-10-17T06:15:18.018Z
+lastUpdatedOn: 2026-11-03T01:31:18.539Z
 ---
 
 Carrier Sense Multiple Access with Collision Detection. Controls LAN access on a bus structure. Non-priority scheme. Standardized as IEEE 802.3.
@@ -87,16 +87,18 @@ Jam signal: non-data bit pattern transmitted after collision detection. Ensures 
 
 Back-off formula:
 
+<Formula>
+
 $$
 0 \leq r < 2^k, \quad k = \min(n, 10)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="r">randomly chosen integer back-off delay, in slot times</Sym>
   <Sym s="n">number of transmission attempts</Sym>
 </Symbols>
+
+</Formula>
 
 Maximum retries = $16$. After $16$ failures, transmission failure reported to higher layers. Back-off counter resets after a successful transmission.
 

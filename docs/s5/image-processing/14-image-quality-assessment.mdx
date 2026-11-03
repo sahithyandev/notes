@@ -1,7 +1,7 @@
 ---
 title: Image Quality Assessment
 dateCreated: 2026-07-26T04:59:41.428Z
-lastUpdatedOn: 2026-10-28T23:42:27.439Z
+lastUpdatedOn: 2026-11-03T01:31:19.104Z
 ---
 
 Image processing aims to reproduce a real-world scene at the same perceptual level as the original, not to judge artistic quality. Quality assessment measures how much an image has changed from its source state.
@@ -20,11 +20,11 @@ Unwanted details from internal or external sources, mostly from analog stages. R
 
 Based on mathematical formulae comparing an image to a reference source. Independent of human judgment. May not align with artistic or perceptual judgment
 
+<Formula>
+
 $$
 \text{mean squared error} = \frac{1}{MN}\sum_{x=1}^{M}\sum_{y=1}^{N}(p(x,y) - r(x,y))^2
 $$
-
-Here:
 
 <Symbols>
   <Sym s="M, N">image dimensions</Sym>
@@ -32,21 +32,25 @@ Here:
   <Sym s="r(x,y)">pixel value in the source image</Sym>
 </Symbols>
 
+</Formula>
+
 A higher MSE means more change between the images, but this isn't necessarily aligned with subjective quality. A restoration process, for instance, deliberately changes pixel values to improve perceived quality.
 
 ### Size Independence
 
 A sum of squared errors grows with the pixel count. MSE divides by $MN$, so it is a per-pixel value and is comparable across image sizes.
 
+<Formula>
+
 $$
 \text{PSNR} = 10\log_{10}\frac{\text{MAX}^2}{\text{MSE}}
 $$
 
-Here:
-
 <Symbols>
   <Sym s="\text{MAX}">maximum possible pixel value</Sym>
 </Symbols>
+
+</Formula>
 
 PSNR is relative to the dynamic range, so 8-bit and 16-bit images share one scale. SSIM compares local windows and averages the results over the image, so it is also independent of size.
 

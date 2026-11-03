@@ -1,12 +1,18 @@
 ---
 title: Markov Decision Process
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-10-19T12:08:56.484Z
+lastUpdatedOn: 2026-11-03T01:31:18.339Z
 ---
 
 <Aka>MDP</Aka>. Defines a stochastic control problem. Denoted by $M=(S,A,T,R)$.
 
 Here:
+
+<Formula>
+
+$$
+M=(S,A,T,R)
+$$
 
 <Symbols>
   <Sym s="S">the set of states</Sym>
@@ -18,6 +24,8 @@ Here:
     the [reward function](#reward-function)
   </Sym>
 </Symbols>
+
+</Formula>
 
 The objective is to maximize the sum of future rewards. A policy will be calculated to determine how to act.
 
@@ -35,21 +43,37 @@ Stochastic domains are commonly modeled using frameworks like MDPs.
 
 Describes the probability of moving from one state to another given an action. Denoted using $T(s,a,s')$. The probability is denoted as $P(s'|s,a)$. Here:
 
+<Formula>
+
+$$
+P(s'|s,a)
+$$
+
 <Symbols>
   <Sym s="s">current state</Sym>
   <Sym s="a">action taken</Sym>
   <Sym s="s'">next state</Sym>
 </Symbols>
+
+</Formula>
 
 ## Reward Function
 
 Assigns a numerical value to each state-action pair, indicating the immediate reward received by the agent when transitioning from a state $s$ to a state $s'$ by taking action $a$. Denoted using $R(s,a,s')$. Here:
 
+<Formula>
+
+$$
+R(s,a,s')
+$$
+
 <Symbols>
   <Sym s="s">current state</Sym>
   <Sym s="a">action taken</Sym>
   <Sym s="s'">next state</Sym>
 </Symbols>
+
+</Formula>
 
 ## Policy
 
@@ -75,22 +99,26 @@ $$
 
 It's reasonable to prefer rewards sooner. A solution for incorporating discounting rewards is to use a discount factor $\gamma \in (0,1]$ that reduces the importance of future rewards. The discounted reward is denoted as:
 
+<Formula>
+
 $$
 G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="t">the current time step</Sym>
   <Sym s="R_{t+k+1}">the reward received at time step $t+k+1$</Sym>
 </Symbols>
 
+</Formula>
+
 ## Solving MDPs
 
 ### Bellman Optimality Equation
 
 States that the optimal value of a state equals the maximum expected return obtainable by choosing the best action now and then behaving optimally thereafter. Recursively defined.
+
+<Formula>
 
 $$
 \begin{equation}
@@ -102,8 +130,6 @@ V^*(s) \quad & =  \max_a Q^*(s,a)
 \end{equation}
 $$
 
-Here:
-
 <Symbols>
   <Sym s="V^*(s)">the optimal value of $s$</Sym>
   <Sym s="Q^*(s,a)">
@@ -111,6 +137,8 @@ Here:
     action $a$ in state $s$
   </Sym>
 </Symbols>
+
+</Formula>
 
 ## Algorithms
 
@@ -130,16 +158,18 @@ Represents the decision point where the opponent chooses an action that minimize
 
 Represents uncertainty such as dice rolls or card draws. The value of a chance node is the expected value over all possible outcomes:
 
+<Formula>
+
 $$
 V = \sum_i P(i) \times V_i
 $$
-
-Here:
 
 <Symbols>
   <Sym s="P(i)">probability of outcome $i$</Sym>
   <Sym s="V_i">value resulting from that outcome</Sym>
 </Symbols>
+
+</Formula>
 
 #### Computation Process
 
@@ -165,6 +195,8 @@ $$
 
 For all $s \in S$, the below updates are performed, until maximum change across states is below a small threshold $\theta$:
 
+<Formula>
+
 $$
 \begin{equation}
 \nonumber
@@ -175,12 +207,12 @@ V_{k+1}(s) \quad & = \max_a Q_{k+1}(s)
 \end{equation}
 $$
 
-Here:
-
 <Symbols>
   <Sym s="\gamma">[discount factor](#discounting-rewards)</Sym>
   <Sym s="\theta">small threshold for stopping</Sym>
 </Symbols>
+
+</Formula>
 
 Once the threshold is reached, the algorithm terminates. $\pi^*(s)$ can be found by the latest iteration's results.
 
@@ -291,11 +323,11 @@ Similar to value iteration. Calculates q-values instead of state-values. Approxi
 
 Initially $Q_0(s,a) = 0, \forall s \in S,\; a \in A$.
 
+<Formula>
+
 $$
 Q_{k+1}(s,a) = \sum_{s'} T(s,a,s') \Big[ R(s,a,s') + \gamma \max_{a'} Q_k(s',a') \Big]
 $$
-
-Here:
 
 <Symbols>
   <Sym s="Q_k(s,a)">estimate at iteration $k$,</Sym>
@@ -303,6 +335,8 @@ Here:
   <Sym s="R(s,a,s')">immediate reward,</Sym>
   <Sym s="\gamma">discount factor.</Sym>
 </Symbols>
+
+</Formula>
 
 ### Policy Iteration
 

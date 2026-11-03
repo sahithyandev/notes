@@ -3,7 +3,7 @@ title: Euler's Method
 notebooks:
   - eulers-method
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-02T23:59:40.015Z
+lastUpdatedOn: 2026-11-03T01:31:19.304Z
 ---
 
 Approximates the solution of a well-posed [IVP](/s5/numerical-methods/initial-value-problem) at equally spaced mesh points, using the first-order Taylor expansion.
@@ -39,6 +39,8 @@ $$
 
 If $f$ satisfies a Lipschitz condition with constant $L > 0$ **and** $|y''(t)| \leq M$ for some $M > 0$, then for each $i = 0, 1, \ldots, N$
 
+<Formula>
+
 $$
 |y(t_i) - w_i| \leq \frac{hM}{2L}\left( e^{L(t_i - a)} - 1 \right)
 $$
@@ -47,6 +49,8 @@ $$
   <Sym s="M">bound on $|y''|$ over $[a, b]$</Sym>
   <Sym s="L">Lipschitz constant of $f$</Sym>
 </Symbols>
+
+</Formula>
 
 The bound is proportional to $h$. Euler's method has order 1.
 

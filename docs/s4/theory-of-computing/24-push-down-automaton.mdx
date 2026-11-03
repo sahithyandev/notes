@@ -1,7 +1,7 @@
 ---
 title: Push Down Automaton
 dateCreated: 2026-04-23T17:39:39.635Z
-lastUpdatedOn: 2026-10-17T05:04:55.322Z
+lastUpdatedOn: 2026-11-03T01:31:18.754Z
 ---
 
 An automaton with a stack. Used to recognize CFLs.
@@ -9,6 +9,12 @@ An automaton with a stack. Used to recognize CFLs.
 A 7-tuple: $(Q, \Sigma, \Gamma, q_0, Z_0, A, \delta)$
 
 Here:
+
+<Formula>
+
+$$
+(Q, \Sigma, \Gamma, q_0, Z_0, A, \delta)
+$$
 
 <Symbols>
   <Sym s="Q">states</Sym>
@@ -20,6 +26,8 @@ Here:
   <Sym s="\delta">transition function</Sym>
 </Symbols>
 
+</Formula>
+
 ## Stack
 
 PDAs work with an internal stack, where elements can be pushed, popped, and replaced. The contents of the stack is expressed by a string of stack alphabet. By convention, left end of the string is the top element of the stack.
@@ -30,11 +38,19 @@ Stack is never empty. A special symbol $Z_0$ is always the bottom-most element. 
 
 Represents current machine state. Denoted by $(q, x, \alpha)$ where:
 
+<Formula>
+
+$$
+(q, x, \alpha)
+$$
+
 <Symbols>
   <Sym s="q">current state</Sym>
   <Sym s="x">remaining input</Sym>
   <Sym s="\alpha">stack contents</Sym>
 </Symbols>
+
+</Formula>
 
 Element of $Q \times (\Sigma \cup {\Lambda}) \times \Gamma^*$.
 

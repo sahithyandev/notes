@@ -1,7 +1,7 @@
 ---
 title: Diffie-Hellman Key Exchange
 dateCreated: 2026-07-05T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T02:38:15.165Z
+lastUpdatedOn: 2026-11-03T01:31:18.992Z
 ---
 
 Diffie-Hellman (DH), invented in 1976 by Whitfield Diffie and Martin Hellman, lets 2 parties agree on a shared secret key using only publicly exchanged information. Security rests on the difficulty of computing discrete logarithms.
@@ -35,15 +35,17 @@ Reasons:
 
 Factor $p - 1$ into its distinct prime factors $q_1, \dots, q_k$. Then $g$ is a primitive root modulo $p$ **iff**
 
+<Formula>
+
 $$
 g^{(p-1)/q_i} \not\equiv 1 \pmod p \quad \text{for every } i.
 $$
 
-Here:
-
 <Symbols>
   <Sym s="q_i">a distinct prime factor of $p - 1$</Sym>
 </Symbols>
+
+</Formula>
 
 Test $g = 2, 3, 5, \dots$ in turn. Primitive roots are dense, so a small $g$ passes after few tries. Each candidate costs $k$ modular exponentiations.
 

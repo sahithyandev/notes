@@ -6,9 +6,12 @@ interface Props {
 const { columns = 1 } = Astro.props;
 ---
 
-<dl class:list={["symbols", { "symbols-2": columns === 2 }]}>
-  <slot />
-</dl>
+<div>
+  Here:
+  <dl class:list={["symbols", { "symbols-2": columns === 2 }]}>
+    <slot />
+  </dl>
+</div>
 
 <style is:global>
   .symbols {

@@ -1,7 +1,7 @@
 ---
 title: Reinforcement Learning
 dateCreated: 2026-04-22T07:09:10.686Z
-lastUpdatedOn: 2026-10-19T12:08:56.504Z
+lastUpdatedOn: 2026-11-03T01:31:18.353Z
 ---
 
 The process of _learning_ to maximize expected rewards by trial and error. Feedback is given in the form of _rewards_. Agent's utility is defined by the reward function. All learning is based on observed samples of outcomes.
@@ -30,16 +30,18 @@ A method for estimating the value of a given policy $\pi$ by using averages obta
 
 Over multiple episodes, following $\pi(s)$, the following update rule is executed.
 
+<Formula>
+
 $$
 V_{\pi}(s) \approx \dfrac{1}{N(s)} \sum_{i=1}^{N(s)} G_i(s)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="G_i(s)">the discounted sum of rewards from a visit to $s$</Sym>
   <Sym s="N(s)">the number of samples for $s$</Sym>
 </Symbols>
+
+</Formula>
 
 ## Active vs. Passive
 

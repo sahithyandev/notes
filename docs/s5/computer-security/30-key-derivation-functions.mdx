@@ -1,16 +1,16 @@
 ---
 title: Key Derivation Functions
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T02:38:15.185Z
+lastUpdatedOn: 2026-11-03T01:31:19.013Z
 ---
 
 <Aka>KDF</Aka>. Derives 1 or more cryptographic keys from a secret input value.
 
+<Formula>
+
 $$
 K = \text{KDF}(S, \text{salt}, \text{info}, L)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="S">
@@ -21,6 +21,8 @@ Here:
   <Sym s="\text{info}">context label binding the key to its purpose</Sym>
   <Sym s="L">required output length</Sym>
 </Symbols>
+
+</Formula>
 
 Raw secrets are unfit as keys directly.
 
@@ -69,6 +71,8 @@ The input has low entropy, so an attacker can guess candidates offline. The KDF 
 - Iteration count  
   The hash is applied many times. Each guess costs the attacker the same work as the defender's 1 derivation, multiplied by the count.
 
+<Formula>
+
 $$
 K = \text{PBKDF2}(\text{HMAC}, \text{password}, \text{salt}, c, L)
 $$
@@ -76,6 +80,8 @@ $$
 <Symbols>
   <Sym s="c">iteration count</Sym>
 </Symbols>
+
+</Formula>
 
 PBKDF2 needs little memory, so GPUs and ASICs run many guesses in parallel. Memory-hard functions such as scrypt and Argon2 require a large amount of memory per guess, which limits this parallelism.
 

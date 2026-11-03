@@ -1,7 +1,7 @@
 ---
 title: Noise
 dateCreated: 2026-08-18T07:18:54.109Z
-lastUpdatedOn: 2026-10-29T00:08:11.287Z
+lastUpdatedOn: 2026-11-03T01:31:19.145Z
 ---
 
 Noise is an unwanted component added to the true image signal during acquisition, storage or transmission, usually random. Structured corruptions introduced by processing, such as compression blocking or aliasing, are normally called artefacts instead.
@@ -33,11 +33,11 @@ A noise model gives the probability density $p(z)$ of the noise value $z$ added 
 
 Independent noise drawn from a normal distribution is added to every pixel.
 
+<Formula>
+
 $$
 p(z) = \frac{1}{\sqrt{2\pi}\,\sigma} \exp\left[-\frac{(z-\mu)^2}{2\sigma^2}\right]
 $$
-
-Here:
 
 <Symbols>
   <Sym s="z">noise value added to a pixel</Sym>
@@ -46,6 +46,8 @@ Here:
   </Sym>
   <Sym s="\sigma">standard deviation, sets the noise strength</Sym>
 </Symbols>
+
+</Formula>
 
 $p(z)$ only gives the probability of each noise value. The amount added to a pixel is an independent random draw following $p(z)$, so the equation fixes the odds, not the outcome.
 
@@ -67,16 +69,18 @@ Left: Original. Right: With added Gaussian noise. Every pixel is perturbed by a 
 
 Every noise value in a fixed range is equally likely.
 
+<Formula>
+
 $$
 p(z) = \begin{cases} \dfrac{1}{b-a} & a \le z \le b \\[2mm] 0 & \text{otherwise} \end{cases}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="a">lower bound of the noise range</Sym>
   <Sym s="b">upper bound of the noise range</Sym>
 </Symbols>
+
+</Formula>
 
 Flat with no peak. Mean is $\frac{a+b}{2}$. Hard to estimate because no noise value is more frequent than another. Rarely matches a real source. Quantisation error is close to uniform.
 
@@ -87,17 +91,19 @@ Impulse noise replaces isolated pixel values with abrupt outliers. It affects a 
 Salt and pepper noise is a form of impulse noise. A fraction of pixels are
 forced to the minimum or maximum intensity. The rest are left unchanged.
 
+<Formula>
+
 $$
 p(z) = \begin{cases} P_a & z = z_{\min} \\ P_b & z = z_{\max} \\ 1 - P_a - P_b & \text{pixel unchanged} \end{cases}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="z_{\min}, z_{\max}">darkest and brightest intensity values</Sym>
   <Sym s="P_a">probability a pixel is set to $z_{\min}$, seen as pepper</Sym>
   <Sym s="P_b">probability a pixel is set to $z_{\max}$, seen as salt</Sym>
 </Symbols>
+
+</Formula>
 
 Bi-modal, with spikes only at the two intensity extremes. Corrupted pixels keep none of their original value, so they act as outliers. Caused by bit errors in transmission, dead sensor elements, or ADC faults.
 
@@ -121,16 +127,18 @@ Noise filtering identifies and reverses the effect of noise on an image, using p
 
 For a static scene captured over $n$ frames, averaging corresponding pixels across frames cancels the noise contribution while preserving the scene.
 
+<Formula>
+
 $$
 \text{Output} = \frac{1}{n}\sum_{i=1}^{n} \text{Frame}_i = F + \frac{1}{n}\sum_{i=1}^{n} N_i
 $$
-
-Here:
 
 <Symbols>
   <Sym s="F">static source scene frame</Sym>
   <Sym s="N_i">noise in frame $i$</Sym>
 </Symbols>
+
+</Formula>
 
 <Note>
 

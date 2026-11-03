@@ -3,7 +3,7 @@ title: Signal Integrity
 prereqs:
   - s2/computer-organization-and-digital-design/basics/digital-logic-signals
 dateCreated: 2026-06-12T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T05:04:54.698Z
+lastUpdatedOn: 2026-11-03T01:31:18.607Z
 ---
 
 ## Pull Resistor
@@ -72,12 +72,20 @@ Most MCUs include configurable internal pull-ups (and sometimes pull-downs) enab
 
 Every logic family defines 4 voltage thresholds:
 
+<Formula>
+
+$$
+V_{IL}
+$$
+
 <Symbols>
   <Sym s="V_{OL}">maximum voltage an output guarantees when driving LOW</Sym>
   <Sym s="V_{OH}">minimum voltage an output guarantees when driving HIGH</Sym>
   <Sym s="V_{IL}">maximum voltage an input will reliably interpret as LOW</Sym>
   <Sym s="V_{IH}">minimum voltage an input will reliably interpret as HIGH</Sym>
 </Symbols>
+
+</Formula>
 
 The region between $V_{IL}$ and $V_{IH}$ is the forbidden band. A signal in this range is neither a valid LOW nor a valid HIGH. The input's output state is undefined. It may oscillate, latch at an intermediate voltage, or resolve differently on each device.
 
@@ -102,6 +110,12 @@ A standard digital input has a single switching threshold. A signal that crosses
 
 A Schmitt trigger input replaces the single $V_{th}$ with 2 thresholds:
 
+<Formula>
+
+$$
+V_{th}
+$$
+
 <Symbols>
   <Sym s="V_{T+}">
     upper threshold. Output switches HIGH when input rises above this.
@@ -110,6 +124,8 @@ A Schmitt trigger input replaces the single $V_{th}$ with 2 thresholds:
     lower threshold. Output switches LOW when input falls below this.
   </Sym>
 </Symbols>
+
+</Formula>
 
 The hysteresis band is the voltage interval $[V_{T-},\ V_{T+}]$. Its width is:
 

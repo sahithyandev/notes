@@ -1,7 +1,7 @@
 ---
 title: Preprocessing and Quantization
 dateCreated: 2026-10-20T09:00:00.000Z
-lastUpdatedOn: 2026-10-28T17:58:40.943Z
+lastUpdatedOn: 2026-11-03T01:31:19.213Z
 ---
 
 Baseline JPEG first prepares the image, then transforms and quantizes each block. This note covers those stages and the artefacts they cause.
@@ -59,6 +59,8 @@ Each component is split into <Aka original="8x8 blocks">tiles</Aka>. Every later
 
 Each component $i$ has a sampling factor pair $(H_i, V_i)$. For an image of $X \times Y$ pixels:
 
+<Formula>
+
 $$
 x_i = \left\lceil X \cdot \frac{H_i}{H_{\max}} \right\rceil
 \qquad
@@ -71,6 +73,8 @@ $$
     largest sampling factors across all components
   </Sym>
 </Symbols>
+
+</Formula>
 
 ### Minimum Coded Unit
 
@@ -98,11 +102,11 @@ $$
 F(u, v) = \frac{1}{4} C(u) C(v) \sum_{x=0}^{7} \sum_{y=0}^{7} f(x, y) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
 $$
 
+<Formula>
+
 $$
 f(x, y) = \frac{1}{4} \sum_{u=0}^{7} \sum_{v=0}^{7} C(u) C(v) F(u, v) \cos\frac{(2x+1)u\pi}{16} \cos\frac{(2y+1)v\pi}{16}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="x, y">column and row of a sample in the block</Sym>
@@ -111,6 +115,8 @@ Here:
   <Sym s="F(0, 0)">DC coefficient, equal to 8 times the block mean</Sym>
   <Sym s="F(u, v) \ \text{for} \ (u, v) \neq (0, 0)">AC coefficients</Sym>
 </Symbols>
+
+</Formula>
 
 In matrix form, $\mathbf{F} = \mathbf{T}\, \mathbf{f}\, \mathbf{T}^\top$ with $T(k, n) = \frac{C(k)}{2} \cos\frac{(2n+1)k\pi}{16}$. Both arrays are stored row first, so $\mathbf{f}[y][x] = f(x, y)$ and $\mathbf{F}[v][u] = F(u, v)$. The zig-zag scan used in entropy coding indexes $\mathbf{F}$ in this layout.
 

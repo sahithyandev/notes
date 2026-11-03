@@ -1,7 +1,7 @@
 ---
 title: Entropy Coding and Decoding
 dateCreated: 2026-10-20T09:00:00.000Z
-lastUpdatedOn: 2026-10-20T08:58:52.169Z
+lastUpdatedOn: 2026-11-03T01:31:19.232Z
 ---
 
 Entropy coding turns the quantized coefficients of each block into the final bitstream. This note covers the coding stages, the decoder and a worked example.
@@ -98,6 +98,8 @@ The DC difference is coded as the Huffman code of its category $s$, followed by 
 
 Each nonzero AC coefficient is coded as a symbol byte followed by extra bits.
 
+<Formula>
+
 $$
 \text{RS} = 16 R + s
 $$
@@ -108,6 +110,8 @@ $$
   </Sym>
   <Sym s="s">category of the nonzero coefficient, from 1 to 10</Sym>
 </Symbols>
+
+</Formula>
 
 The Huffman code of RS is followed by the $s$ extra bits of the coefficient.
 
@@ -237,11 +241,11 @@ Restart intervals limit the damage from a bit error to 1 interval, since decodin
 
 For one block, steps 5 to 7 combine into:
 
+<Formula>
+
 $$
 \hat{f}(x, y) = \text{clamp}\left( \text{round}\left( \text{IDCT}\big(F_q(u, v)\, Q(u, v)\big) \right) + 128,\ 0,\ 255 \right)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="F_q(u, v)">quantized coefficient from the entropy decoder</Sym>
@@ -249,6 +253,8 @@ Here:
   <Sym s="\text{IDCT}">inverse 2D DCT of the block</Sym>
   <Sym s="\text{clamp}(a, 0, 255)">$a$ limited to the range $[0, 255]$</Sym>
 </Symbols>
+
+</Formula>
 
 The inverse DCT output is rounded, so decoders from different vendors can differ by at most a small amount per pixel. The standard bounds this difference through accuracy tests.
 

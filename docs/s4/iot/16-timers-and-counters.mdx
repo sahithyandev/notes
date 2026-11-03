@@ -1,7 +1,7 @@
 ---
 title: Timers and Counters
 dateCreated: 2026-06-11T05:49:22.856Z
-lastUpdatedOn: 2026-10-17T05:04:54.663Z
+lastUpdatedOn: 2026-11-03T01:31:18.590Z
 ---
 
 A timer/counter is a hardware register that increments on each clock edge: the system clock in timer mode, or an external signal in counter mode. It runs independently of the CPU and can trigger interrupts or drive output pins on specific count values.
@@ -68,6 +68,8 @@ Polling cannot replace hardware capture for fast signals. Catching a 1 MHz signa
 
 Measurements derived from 2 successive captures $t_1$ and $t_2$:
 
+<Formula>
+
 $$
 T_{pulse} = (t_2 - t_1) \times \frac{P}{f_{clk}}
 $$
@@ -75,6 +77,8 @@ $$
 <Symbols>
   <Sym s="P">prescaler</Sym>
 </Symbols>
+
+</Formula>
 
 If the timer overflows between captures, the overflow count must be added:
 

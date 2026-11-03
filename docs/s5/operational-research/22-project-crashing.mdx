@@ -3,7 +3,7 @@ title: Project Crashing
 notebooks:
   - project-crashing
 dateCreated: 2026-08-26T11:55:39.175Z
-lastUpdatedOn: 2026-10-25T20:55:17.073Z
+lastUpdatedOn: 2026-11-03T01:31:19.331Z
 ---
 
 Project crashing reduces a project's duration by shortening critical activities. It increases direct cost in exchange for time saved.
@@ -29,6 +29,8 @@ $$
 
 For activity $i$, its reduction $x_i$ must satisfy:
 
+<Formula>
+
 $$
 0 \leq x_i \leq t_i^{N} - t_i^{C}
 $$
@@ -39,26 +41,32 @@ $$
   <Sym s="t_i^{C}">crash time for activity $i$</Sym>
 </Symbols>
 
+</Formula>
+
 ### Crashable Activity
 
 An activity can still be crashed when its current duration is greater than its crash time.
 
+<Formula>
+
 $$
 t_i > t_i^{C}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="t_i">activity's current duration</Sym>
   <Sym s="t_i^{C}">activity's crash time</Sym>
 </Symbols>
 
+</Formula>
+
 If $t_i = t_i^{C}$, the activity has no remaining crash allowance.
 
 ### Cost Slope
 
 The cost slope is the additional direct cost per unit of activity time reduced. A constant slope assumes each reducible time unit has the same cost.
+
+<Formula>
 
 $$
 \text{Cost slope}_i =
@@ -70,6 +78,8 @@ $$
   <Sym s="C_i^{N}">direct cost of activity $i$ at normal time</Sym>
   <Sym s="C_i^{C}">direct cost of activity $i$ at crash time</Sym>
 </Symbols>
+
+</Formula>
 
 An activity can only be crashed when its duration is above its crash time. The direct cost of reducing activity $i$ by $x_i$ time units is:
 
@@ -104,6 +114,8 @@ When several critical paths exist, every critical path must be shortened to redu
 
 Total direct cost equals the normal direct cost plus the added cost of crashing activities.
 
+<Formula>
+
 $$
 C_D = \sum_i C_i^{N} + \sum_i x_i s_i
 $$
@@ -114,9 +126,13 @@ $$
   <Sym s="s_i">cost slope of activity $i$</Sym>
 </Symbols>
 
+</Formula>
+
 Indirect costs are project-wide expenses that continue while the project is in progress, such as site rent, utilities, and administration. They depend on project duration, rather than on the duration of a specific activity.
 
 If indirect costs accrue at a constant rate $r$ per project time unit, total project cost is:
+
+<Formula>
 
 $$
 C_T = C_D + rT
@@ -128,11 +144,15 @@ $$
   <Sym s="T">project duration</Sym>
 </Symbols>
 
+</Formula>
+
 Reducing the project by one time unit is economically justified when the added direct cost does not exceed the indirect cost saved. Deadline penalties can be included as additional indirect costs.
 
 ## Crashing Offer
 
 A crashing offer gives a maximum net additional cost for reducing the project duration. The net additional cost compares added direct cost with indirect cost saved.
+
+<Formula>
 
 $$
 C_{\text{net}} = \Delta C_D - r\Delta T
@@ -143,6 +163,8 @@ $$
   <Sym s="\Delta C_D">added direct cost</Sym>
   <Sym s="\Delta T">reduction in project duration</Sym>
 </Symbols>
+
+</Formula>
 
 The indirect cost saving depends on project time saved, not on the number of activities crashed.
 

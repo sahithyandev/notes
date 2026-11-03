@@ -1,7 +1,7 @@
 ---
 title: Linear Feedback Shift Registers
 dateCreated: 2026-09-28T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T02:38:14.956Z
+lastUpdatedOn: 2026-11-03T01:31:18.949Z
 ---
 
 <Aka>LFSR</Aka>. Builds a [keystream](/s5/computer-security/stream-ciphers) from
@@ -9,6 +9,8 @@ a register of $n$ bits $s_0, s_1, \ldots, s_{n - 1}$, where each new bit is the
 XOR of a fixed subset of the current bits.
 
 In an LFSR, the register is a row of $n$ 1-bit memory cells. Its contents are the current $n$-bit state. Each clock tick outputs 1 designated bit, shifts every cell's bit to the next cell, then inserts the feedback bit into the vacant cell.
+
+<Formula>
 
 $$
 s_i = c_1 s_{i-1} \oplus c_2 s_{i-2} \oplus \cdots \oplus c_n s_{i-n}, \quad i \ge n
@@ -22,6 +24,8 @@ $$
     the initial state, acting as the secret key or seed.
   </Sym>
 </Symbols>
+
+</Formula>
 
 import Lfsr from "./images/lfsr.svg";
 
@@ -99,6 +103,8 @@ polynomial can be used to test whether the LFSR has maximal period.
 
 An LFSR alone fails the unpredictability requirement of a secure keystream generator, since its recurrence is linear. Practical generators instead combine several LFSRs of different lengths and connection polynomials through a nonlinear Boolean function $f$.
 
+<Formula>
+
 $$
 k_i = f\left(s_i^{(1)}, s_i^{(2)}, \ldots, s_i^{(m)}\right)
 $$
@@ -107,6 +113,8 @@ $$
   <Sym s="s_i^{(j)}">the output bit of the $j$-th LFSR at step $i$.</Sym>
   <Sym s="f">a fixed nonlinear function of the $m$ component outputs.</Sym>
 </Symbols>
+
+</Formula>
 
 ## Clock Control
 

@@ -3,16 +3,16 @@ title: Analog-to-Digital Conversion
 prereqs:
   - s3/data-communication-and-networking/signals
 dateCreated: 2026-06-07T11:00:00.000Z
-lastUpdatedOn: 2026-10-17T05:04:54.712Z
+lastUpdatedOn: 2026-11-03T01:31:18.623Z
 ---
 
 An ADC maps a sampled analog voltage to a binary integer. MCUs process binary values. Sensors output continuously varying voltages.
 
+<Formula>
+
 $$
 D = \left\lfloor \frac{V_\text{in}}{V_\text{ref}} \times (2^n - 1) \right\rfloor
 $$
-
-Here:
 
 <Symbols>
   <Sym s="D">digital output value</Sym>
@@ -20,6 +20,8 @@ Here:
   <Sym s="V_\text{ref}">reference voltage</Sym>
   <Sym s="n">resolution in bits</Sym>
 </Symbols>
+
+</Formula>
 
 An $n$-bit ADC produces $2^n$ discrete levels.
 
@@ -49,16 +51,18 @@ $2^n - 1$ comparators in parallel, each with a distinct reference from a resisto
 
 A counter starts at 0 and increments each clock cycle. Its value feeds an internal DAC, producing a staircase voltage. A comparator checks the staircase against $V_{in}$ each cycle. When the staircase exceeds $V_{in}$, the counter is latched as output.
 
+<Formula>
+
 $$
 T_{conv} = D \times T_{clk}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="D">steps to reach $V_{in}$</Sym>
   <Sym s="T_{clk}">clock period</Sym>
 </Symbols>
+
+</Formula>
 
 Conversion time varies with $V_{in}$. Full-scale requires up to $2^n - 1$ cycles.
 

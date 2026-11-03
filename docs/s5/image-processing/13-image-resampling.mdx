@@ -1,7 +1,7 @@
 ---
 title: Image Resampling
 dateCreated: 2026-07-26T04:59:35.965Z
-lastUpdatedOn: 2026-10-29T00:08:11.203Z
+lastUpdatedOn: 2026-11-03T01:31:19.090Z
 ---
 
 Changing image size parameters requires resampling to create new pixel values: adding pixels when upsampling, replacing pixels when downsampling.
@@ -32,16 +32,18 @@ $$
 s_x = \frac{x}{k_x} \qquad s_y = \frac{y}{k_y}
 $$
 
+<Formula>
+
 $$
 k_x = \frac{\text{new width}}{\text{source width}} \qquad k_y = \frac{\text{new height}}{\text{source height}}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="k_x, k_y">horizontal and vertical scale factors</Sym>
   <Sym s="(s_x, s_y)">source position, generally non-integer</Sym>
 </Symbols>
+
+</Formula>
 
 A non-integer $(s_x, s_y)$ falls between source pixels, so no stored value sits there. The output value is built from the 2&times;2 block of source pixels enclosing it, with corners $(\lfloor s_x \rfloor, \lfloor s_y \rfloor)$ and $(\lceil s_x \rceil, \lceil s_y \rceil)$, using either nearest neighbour or interpolation. Corners outside the source are clipped to the border.
 
@@ -88,6 +90,8 @@ $$
 f_x = s_x - \lfloor s_x \rfloor \qquad f_y = s_y - \lfloor s_y \rfloor
 $$
 
+<Formula>
+
 $$
 \begin{aligned}
 v = \ & v_{00}\,(1 - f_x)(1 - f_y) \\
@@ -96,8 +100,6 @@ v = \ & v_{00}\,(1 - f_x)(1 - f_y) \\
     {}+{} & v_{11}\,f_x\,f_y
 \end{aligned}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="f_x, f_y">
@@ -111,6 +113,8 @@ Here:
   </Sym>
   <Sym s="v">interpolated value, rounded to an integer</Sym>
 </Symbols>
+
+</Formula>
 
 Each colour channel is interpolated separately.
 
@@ -166,12 +170,20 @@ A series of progressively lower-resolution images derived from one source, each 
 
 The stack of Gaussian-filtered, downsampled images.
 
+<Formula>
+
+$$
+G_{n+1} = \operatorname{downsample}(H * G_n)
+$$
+
 <Symbols>
   <Sym s="G_0">the original image</Sym>
   <Sym s="G_{n+1}">
     $G_n$ filtered with a Gaussian low-pass filter, then downsampled by 2
   </Sym>
 </Symbols>
+
+</Formula>
 
 Each level halves the width and height. The Gaussian filter removes the high frequencies that would otherwise alias during downsampling.
 
@@ -181,11 +193,11 @@ Use the [5&times;5 Gaussian low-pass filter](/s5/image-processing/image-filters#
 
 After filtering, retain every second row and column:
 
+<Formula>
+
 $$
 G_{n+1}(x,y) = \sum_{i=-2}^{2}\sum_{j=-2}^{2} H(i,j)\,G_n(2x-i,2y-j)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="H">2-D Gaussian-pyramid filter</Sym>
@@ -193,21 +205,25 @@ Here:
   <Sym s="G_{n+1}">filtered and downsampled pyramid level</Sym>
 </Symbols>
 
+</Formula>
+
 ### Laplacian Pyramid
 
 The detail lost at each downsampling step, stored as a stack of difference images.
 
+<Formula>
+
 $$
 L_n = G_n - U(G_{n+1})
 $$
-
-Here:
 
 <Symbols>
   <Sym s="G_n, G_{n+1}">consecutive levels of the Gaussian pyramid above</Sym>
   <Sym s="U(G_{n+1})">$G_{n + 1}$ upsampled back to level $n$'s resolution</Sym>
   <Sym s="L_n">band-pass detail at level $n$</Sym>
 </Symbols>
+
+</Formula>
 
 $U(G_{n+1})$ is a blurred version of $G_n$, since a Gaussian filter and downsampling made $G_{n+1}$ before interpolation back up. Subtracting it leaves only the high-frequency detail that step discarded.
 

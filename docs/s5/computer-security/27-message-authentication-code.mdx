@@ -1,7 +1,7 @@
 ---
 title: Message Authentication Code
 dateCreated: 2026-09-29T00:00:00.000Z
-lastUpdatedOn: 2026-10-28T02:38:15.142Z
+lastUpdatedOn: 2026-11-03T01:31:18.981Z
 ---
 
 <Aka>MAC</Aka>. A keyed function that produces a short tag $t$ for a message
@@ -116,11 +116,11 @@ Hash functions are faster than block ciphers in software and were freely exporta
 
 <Aka>Hash-based MAC</Aka>. Nests 2 hash calls under 2 keys derived from $k$.
 
+<Formula>
+
 $$
 \text{HMAC}_k(m) = H\big((k' \oplus \text{opad}) \,\|\, H((k' \oplus \text{ipad}) \,\|\, m)\big)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="k'">
@@ -130,6 +130,8 @@ Here:
   <Sym s="\text{ipad}">the byte `0x36` repeated to the block size</Sym>
   <Sym s="\text{opad}">the byte `0x5c` repeated to the block size</Sym>
 </Symbols>
+
+</Formula>
 
 The outer hash hides the inner digest, which defeats length extension.
 

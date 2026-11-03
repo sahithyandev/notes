@@ -1,7 +1,7 @@
 ---
 title: Driving Loads
 dateCreated: 2026-06-11T19:05:16.258Z
-lastUpdatedOn: 2026-10-17T05:04:54.755Z
+lastUpdatedOn: 2026-11-03T01:31:18.641Z
 ---
 
 ## Driving LEDs
@@ -21,17 +21,19 @@ Typical forward voltages by color:
 
 A series resistor between the GPIO pin and the LED limits current to a safe level.
 
+<Formula>
+
 $$
 R = \frac{V_{CC} - V_f}{I_f}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="V_{CC}">supply voltage</Sym>
   <Sym s="V_f">LED forward voltage</Sym>
   <Sym s="I_f">desired forward current</Sym>
 </Symbols>
+
+</Formula>
 
 Typical $I_f$ for indicator LEDs is $5\ \text{mA}$–$20\ \text{mA}$. MCU GPIO pins are rated for $8\ \text{mA}$–$25\ \text{mA}$ depending on the device. $I_f$ must stay within this limit.
 
@@ -224,16 +226,18 @@ A tachometer measures rotational speed and converts it to an electrical signal t
 
 The MCU measures tachometer pulse frequency using a timer in counter or input-capture mode. Speed in RPM:
 
+<Formula>
+
 $$
 \text{RPM} = \frac{f_{pulse}}{N} \times 60
 $$
-
-Here:
 
 <Symbols>
   <Sym s="f_{pulse}">pulse frequency in Hz</Sym>
   <Sym s="N">pulses per revolution</Sym>
 </Symbols>
+
+</Formula>
 
 #### Closed-Loop Speed Control
 
@@ -249,11 +253,11 @@ setpoint ──► [+] ──► controller ──► PWM ──► H-bridge ─
 
 A PID controller computes the correction from 3 terms:
 
+<Formula>
+
 $$
 u(t) = K_p\, e(t) + K_i \int e(t)\, \text{d}t + K_d \frac{\text{d}e}{\text{d}t}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="e(t)">error (setpoint minus measured speed)</Sym>
@@ -269,6 +273,8 @@ Here:
     overshoot)
   </Sym>
 </Symbols>
+
+</Formula>
 
 The controller output $u(t)$ maps to PWM duty cycle. On each control loop iteration (driven by a timer ISR), the MCU reads the tachometer, computes the error, updates the PID terms, and writes the new duty cycle to the PWM register.
 

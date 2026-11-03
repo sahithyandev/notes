@@ -1,7 +1,7 @@
 ---
 title: Information Flow Control
 dateCreated: 2026-09-14T04:37:20.381Z
-lastUpdatedOn: 2026-10-30T05:40:13.853Z
+lastUpdatedOn: 2026-11-03T01:31:19.024Z
 ---
 
 Information flow control prevents secret data from affecting results visible to an unauthorized observer. It protects confidentiality across a program's whole computation, not only at individual read and write operations.
@@ -19,6 +19,8 @@ An unauthorized observer must not learn high data. An unauthorized observer may 
 
 Noninterference requires low outputs to be independent of high inputs. Fix the same low input $L$. Replacing one possible high input $H_1$ with another $H_2$ must not change the low output.
 
+<Formula>
+
 $$
 \forall L, H_1, H_2.\quad \operatorname{LowOutput}(H_1, L) = \operatorname{LowOutput}(H_2, L)
 $$
@@ -30,6 +32,8 @@ $$
     the low output produced for inputs $H$ and $L$
   </Sym>
 </Symbols>
+
+</Formula>
 
 The observer can see the low output but not the high input. If the output changes when only the secret changes, the output distinguishes secrets. Noninterference forbids that distinction.
 

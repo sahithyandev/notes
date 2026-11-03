@@ -1,7 +1,7 @@
 ---
 title: Dithering
 dateCreated: 2026-09-25T19:30:18.372Z
-lastUpdatedOn: 2026-10-28T23:42:27.312Z
+lastUpdatedOn: 2026-11-03T01:31:19.074Z
 ---
 
 Dithering trades spatial resolution for grey-level depth. A device with few output levels approximates an intermediate intensity by mixing the available levels over a small region, which the eye averages at normal viewing distance.
@@ -15,6 +15,8 @@ Used in newspaper halftoning, laser printing, and exporting photos to a small fi
 ## Ordered Dithering
 
 Let $v \in [0,1]$ be the target intensity. An $n \times n$ dither matrix $D$ contains the integers from $0$ to $n^2 - 1$. Each entry gives the threshold for its sub-pixel.
+
+<Formula>
 
 $$
 \begin{aligned}
@@ -35,6 +37,8 @@ $$
 <Sym s="n">dither matrix order</Sym>
 
 </Symbols>
+
+</Formula>
 
 The $2 \times 2$ Bayer dither matrix is:
 

@@ -1,7 +1,7 @@
 ---
 title: Informed Searching
 dateCreated: 2026-04-22T07:09:10.684Z
-lastUpdatedOn: 2026-10-19T12:08:56.258Z
+lastUpdatedOn: 2026-11-03T01:31:18.327Z
 ---
 
 Uses domain-specific hints about the location of goals. The hint is given by a heuristic function.
@@ -28,11 +28,11 @@ When the heuristic is always equal to or lesser than the actual lowest cost.
 <Aka>monotonic</Aka>. When the estimated cost along any path is never
 decreasing. $h$ is consistent **iff** for any $n, n'$:
 
+<Formula>
+
 $$
 h(n) \leq c(n, a, n') + h(n')
 $$
-
-Here:
 
 <Symbols>
   <Sym s="n'">the successor node of $n$ after applying action $a$</Sym>
@@ -42,6 +42,8 @@ Here:
     the cost of the action $a$ from node $n$ to node $n'$
   </Sym>
 </Symbols>
+
+</Formula>
 
 <Note>
 
@@ -173,12 +175,20 @@ A variant of best-first search. Uses heuristic function alone. Similar to [BFS](
 
 Here:
 
+<Formula>
+
+$$
+h(n)
+$$
+
 <Symbols>
   <Sym s="b">branching factor</Sym>
   <Sym s="d">depth of the shallowest goal</Sym>
   <Sym s="m">maximum depth of the search tree</Sym>
   <Sym s="k">beam width</Sym>
 </Symbols>
+
+</Formula>
 
 ## Performance of Heuristic Search
 

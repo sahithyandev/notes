@@ -1,22 +1,24 @@
 ---
 title: Lagrange Interpolating Polynomials
 dateCreated: 2026-04-22T07:07:02.594Z
-lastUpdatedOn: 2026-10-19T12:08:55.280Z
+lastUpdatedOn: 2026-11-03T01:31:18.135Z
 ---
 
 A rearranged form of [Newton's divided difference polynomial](/s2/methods-of-mathematics/numerical-methods/newton-interpolating-polynomials/).
 
 The $k$-th Lagrange basis polynomial for $n+1$ nodes is:
 
+<Formula>
+
 $$
 L_{n,k}(x) = \prod_{\substack{i=0 \\ i \neq k}}^{n} \frac{x - x_i}{x_k - x_i}
 $$
 
-Here:
-
 <Symbols>
   <Sym s="x_0, x_1, \ldots, x_n">the $n+1$ distinct data points (nodes)</Sym>
 </Symbols>
+
+</Formula>
 
 Each $L_{n,k}$ satisfies $L_{n,k}(x_k) = 1$ and $L_{n,k}(x_i) = 0$ for $i \neq k$.
 

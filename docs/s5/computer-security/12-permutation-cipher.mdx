@@ -1,7 +1,7 @@
 ---
 title: Permutation Cipher
 dateCreated: 2026-07-29T05:53:52.082Z
-lastUpdatedOn: 2026-10-27T04:18:29.436Z
+lastUpdatedOn: 2026-11-03T01:31:18.941Z
 ---
 
 A [classical](/s5/computer-security/ciphers#classical-cipher), [transposition](/s5/computer-security/ciphers#transposition-cipher) cipher. Reorders the plaintext letters. Every single-letter frequency is preserved unchanged.
@@ -24,16 +24,18 @@ Split the plaintext into blocks of $n$ characters. Pad the final block with fill
 
 Within each block, the character at position $i$ moves to position $\sigma(i)$.
 
+<Formula>
+
 $$
 c_{\sigma(i)} = m_i
 $$
-
-Here:
 
 <Symbols>
   <Sym s="m_i">plaintext character at position $i$ in the block</Sym>
   <Sym s="c_j">ciphertext character at position $j$ in the block</Sym>
 </Symbols>
+
+</Formula>
 
 ## Decryption
 

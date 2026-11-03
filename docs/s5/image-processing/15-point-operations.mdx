@@ -1,7 +1,7 @@
 ---
 title: Point Operations
 dateCreated: 2026-08-18T07:18:35.588Z
-lastUpdatedOn: 2026-10-28T23:42:27.469Z
+lastUpdatedOn: 2026-11-03T01:31:19.114Z
 ---
 
 Point operations modify the intensity of a pixel using only that pixel's own value, in isolation from its neighbours. May use statistical data relating to other pixels, such as the image histogram.
@@ -26,16 +26,18 @@ The grey level histogram shows the frequency of occurrence of each intensity lev
 
 Normalized histogram:
 
+<Formula>
+
 $$
 P(k) = \frac{N(k)}{n}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="N(k)">number of pixels with intensity $k$</Sym>
   <Sym s="n">total number of pixels</Sym>
 </Symbols>
+
+</Formula>
 
 Defines the probability of intensity level $k$ in the image.
 
@@ -58,16 +60,18 @@ Defines the accumulated probability of pixels with intensity level $\le k$.
 - Gives mean and spread  
   Brightness is the mean and contrast is the standard deviation of the distribution.
 
+<Formula>
+
 $$
 \mu = \sum_k k\,P(k) \qquad \sigma^2 = \sum_k (k - \mu)^2 P(k)
 $$
-
-Here:
 
 <Symbols>
   <Sym s="\mu">mean intensity</Sym>
   <Sym s="\sigma^2">variance of intensity</Sym>
 </Symbols>
+
+</Formula>
 
 | Shape                       | Meaning                                                                                          |
 | --------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -94,12 +98,20 @@ Brightness and contrast are the position and the width of the same histogram. Bo
 
 Here:
 
+<Formula>
+
+$$
+s = a r
+$$
+
 <Symbols>
   <Sym s="r">input intensity</Sym>
   <Sym s="s">output intensity</Sym>
   <Sym s="c">shift constant, added to move brightness</Sym>
   <Sym s="a">gain constant, multiplied to change contrast</Sym>
 </Symbols>
+
+</Formula>
 
 Shifting the histogram changes brightness only. Every pair of pixels keeps the same intensity gap, so contrast is unaffected.
 
@@ -135,6 +147,12 @@ Common transformations applied to each pixel, typically implemented as a LUT map
 
 Here:
 
+<Formula>
+
+$$
+s = \operatorname{round}\big((L-1)\,A(r)\big)
+$$
+
 <Symbols>
   <Sym s="L">number of grey levels</Sym>
   <Sym s="a, b">lower and upper bounds of the chosen range</Sym>
@@ -147,6 +165,8 @@ Here:
   <Sym s="k">bit-plane index, with $0$ the least significant bit</Sym>
   <Sym s="A(r)">accumulated histogram</Sym>
 </Symbols>
+
+</Formula>
 
 Normalizing is range stretching with the output range $[0, L-1]$ and the input range set to the image minimum and maximum.
 
@@ -164,16 +184,18 @@ Procedure:
 - Store $g \mapsto r$ in a 256-entry LUT
 - Apply the LUT to every pixel
 
+<Formula>
+
 $$
 \text{LUT}(g) = \arg\min_{r} \, \lvert C_r(r) - C_t(g) \rvert
 $$
-
-Here:
 
 <Symbols>
   <Sym s="C_t(g)">accumulated probability of test level $\le g$</Sym>
   <Sym s="C_r(r)">accumulated probability of reference level $\le r$</Sym>
 </Symbols>
+
+</Formula>
 
 Histogram equalization is the special case where the reference CDF is linear. Matching 2 levels through equal CDF values preserves their relative ordering.
 

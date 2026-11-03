@@ -9,7 +9,6 @@ interface Props {}
 <style is:global>
   .formula {
     margin: 20px 0;
-    text-align: center;
   }
 
   .formula-name {
@@ -30,5 +29,20 @@ interface Props {}
     margin: 0.4em 0;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  .formula > .symbols {
+    margin: 0;
+    text-align: left;
+  }
+
+  @media (max-width: 640px) {
+    .formula:has(> .symbols) {
+      display: block;
+    }
+
+    .formula > .symbols {
+      margin-top: 1rem;
+    }
   }
 </style>

@@ -3,16 +3,16 @@ title: LUP Decomposition
 notebooks:
   - lup-decomposition
 dateCreated: 2026-08-09T15:17:42.855Z
-lastUpdatedOn: 2026-11-01T06:59:14.594Z
+lastUpdatedOn: 2026-11-03T01:31:19.274Z
 ---
 
 The LUP decomposition of an $n \times n$ matrix $A$ is the triple $(L, U, P)$ satisfying
 
+<Formula>
+
 $$
 PA = LU
 $$
-
-Here:
 
 <Symbols>
   <Sym s="L">
@@ -21,6 +21,8 @@ Here:
   <Sym s="U">upper triangular, $n \times n$</Sym>
   <Sym s="P">permutation matrix, $n \times n$</Sym>
 </Symbols>
+
+</Formula>
 
 ## Properties
 
@@ -66,11 +68,11 @@ Set $A^{(0)} = A$. At recursion depth $k$, factor the current $(n-k) \times (n-k
 
 Let $S^{(k)}$ swap the row with the largest entry in magnitude in the first column of $A^{(k)}$ into the first row. Partition the swapped matrix $B^{(k)} = S^{(k)}A^{(k)}$ as
 
+<Formula>
+
 $$
 B^{(k)} = \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ c^{(k)} & C^{(k)} \end{pmatrix}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="A^{(k)}">matrix entering recursion depth $k$</Sym>
@@ -82,6 +84,8 @@ Here:
   <Sym s="\ell^{(k)}">multiplier vector</Sym>
   <Sym s="S^{(k)}">row swap at recursion depth $k$</Sym>
 </Symbols>
+
+</Formula>
 
 ### Schur Complement
 

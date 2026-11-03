@@ -90,9 +90,9 @@ Leave a blank line after each opening tag and before each closing tag.
 - `<Proof label="...">`
   A bordered, expanded card ending in ∎. It follows its `<Theorem>`, with at most one `<Note>` between them. Use `label="Proof Hint"` for a hint, never `<Note title="Proof Hint">`.
 - `<Formula>`
-  A standalone centered equation.
+  A standalone centered equation. It must contain exactly 1 `$$ ... $$` block.
 - `<Symbols>` with `<Sym s="l">length</Sym>` rows
-  A symbol legend for the equation above it. Use `columns={2}` for many symbols.
+  A symbol legend inside the surrounding `<Formula>`, below its equation. Use `columns={2}` for many symbols.
 - `<Aka>`
   Put only aliases inside it, followed by a full stop and the definition sentence outside it.
 

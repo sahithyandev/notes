@@ -1,7 +1,7 @@
 ---
 title: Entropy
 dateCreated: 2026-09-30T05:30:00.000Z
-lastUpdatedOn: 2026-10-28T23:42:27.548Z
+lastUpdatedOn: 2026-11-03T01:31:19.158Z
 ---
 
 Information conveyed by an event is negatively related to its probability.
@@ -26,11 +26,11 @@ $$
 B_\text{avg} = -\sum_{i=0}^{L-1} P(l_i) \log_2 P(l_i)
 $$
 
+<Formula>
+
 $$
 B_\text{total} = B_\text{avg} \times N
 $$
-
-Here:
 
 <Symbols>
   <Sym s="L">number of grey levels</Sym>
@@ -39,6 +39,8 @@ Here:
   <Sym s="r_i">number of pixels with grey level $l_i$</Sym>
   <Sym s="P(l_i)">probability of grey level $l_i$</Sym>
 </Symbols>
+
+</Formula>
 
 $B_\text{avg}$ is the minimum average number of bits per pixel required to represent the image.
 
@@ -86,13 +88,13 @@ $$
 
 No code beats the entropy, and the gap is the coding redundancy per pixel.
 
+<Formula>
+
 $$
 L_\text{avg} \ge B_\text{avg}
 \qquad
 R_\text{coding} = L_\text{avg} - B_\text{avg}
 $$
-
-Here:
 
 <Symbols>
   <Sym s="l(k)">codeword length of grey level $k$ in bits</Sym>
@@ -100,6 +102,8 @@ Here:
   <Sym s="b">size of the coded image in bits</Sym>
   <Sym s="R_\text{coding}">coding redundancy in bits per pixel</Sym>
 </Symbols>
+
+</Formula>
 
 An 8bpp natural binary code has $l(k) = 8$ for every $k$, so $L_\text{avg} = 8$. Replacing it with a code of average length $L'_\text{avg}$ gives the compression ratio $CR$ and the relative data redundancy $RD$:
 
