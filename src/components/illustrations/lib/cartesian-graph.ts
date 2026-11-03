@@ -62,6 +62,10 @@ export type GraphLine = {
   to: GraphCoordinate;
   tone?: GraphCurve["tone"];
   dashed?: boolean;
+  /** Render as a muted dashed projection line. */
+  guide?: boolean;
+  /** Add open arrowheads to a directional line. */
+  arrow?: "start" | "end" | "both";
   width?: number;
 };
 

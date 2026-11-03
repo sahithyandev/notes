@@ -1,57 +1,56 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Perfectly Complementary Inputs"
-  yLabel="Capital (K)"
-  xLabel="Labour (L)"
+  desc="A right-angled isoquant. Its corner marks the only efficient input combination when inputs must be used in a fixed ratio."
+  y={{ label: "Capital (K)", domain: [0, 10] }}
+  x={{ label: "Labour (L)", domain: [0, 10] }}
+  lines={[
+    {
+      from: { x: 1.6, y: 8.13 },
+      to: { x: 1.6, y: 2.97 },
+      tone: "s5",
+      width: 3,
+    },
+    {
+      from: { x: 1.6, y: 2.97 },
+      to: { x: 6.6, y: 2.97 },
+      tone: "s5",
+      width: 3,
+    },
+    {
+      from: { x: 1.6, y: 3.59 },
+      to: { x: 1.98, y: 3.59 },
+      tone: "ink",
+      width: 1.5,
+    },
+    {
+      from: { x: 1.98, y: 3.59 },
+      to: { x: 1.98, y: 2.97 },
+      tone: "ink",
+      width: 1.5,
+    },
+  ]}
+  points={[{ x: 1.6, y: 2.97, tone: "ink", radius: 6 }]}
+  labels={[
+    { text: "Efficient combination", x: 1.89, y: 3.28, tone: "ink" },
+    { text: "Q₁", x: 3.87, y: 3.44, tone: "s5", size: 15, weight: 700 },
+    {
+      text: "Inputs used in a specific ratio",
+      x: 4.43,
+      y: 7.66,
+      anchor: "middle",
+      tone: "ink",
+    },
+    { text: "K : L = fixed", x: 4.43, y: 7.03, anchor: "middle", tone: "ink" },
+  ]}
 >
-  <path
-    class="curve tone-s5"
-    d="
-      M 160 95
-      L 160 260
-      L 425 260
-    "
-  ></path>
-
-  <circle class="pt tone-ink" cx="160" cy="260" r="6"></circle>
-
-  <text class="small-label" x="175" y="250">
-    Efficient combination
-  </text>
-
-  <text class="curve-label tone-s5" x="280" y="245">
-    Q₁
-  </text>
-
-  <path class="right-angle" d="M 160 240 L 180 240 L 180 260"></path>
-
-  <text class="small-label" x="310" y="110" text-anchor="middle">
-    Inputs used in a specific ratio
-  </text>
-  <text class="small-label" x="310" y="130" text-anchor="middle">
-    K : L = fixed
-  </text>
-
   <Fragment slot="caption">
     With perfectly complementary inputs, efficient production occurs only at the
     corner of the right-angled isoquant.
   </Fragment>
-</AxesFigure>
-
-<style>
-  .small-label {
-    fill: var(--text-secondary);
-    font-size: 12px;
-  }
-
-  .right-angle {
-    fill: none;
-    stroke: var(--text-muted);
-    stroke-width: 1.5;
-  }
-</style>
+</CartesianGraph>

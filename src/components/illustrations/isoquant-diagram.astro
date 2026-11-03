@@ -1,59 +1,48 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Isoquant Map"
-  yLabel="Capital (K)"
-  xLabel="Labour (L)"
+  desc="Three isoquants farther from the origin represent progressively higher output levels."
+  y={{ label: "Capital (K)", domain: [0, 10] }}
+  x={{ label: "Labour (L)", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (labour) => -0.1773 * labour ** 2 - 1.1125 * labour + 9.4555,
+      domain: [1.13, 4.53],
+      tone: "ct",
+    },
+    {
+      equation: (labour) => -0.0672 * labour ** 2 - 1.2509 * labour + 12.6755,
+      domain: [2.74, 7],
+      tone: "s5",
+    },
+    {
+      equation: (labour) => -0.1903 * labour ** 2 + 0.6288 * labour + 10.4293,
+      domain: [4.53, 8.96],
+      tone: "pt",
+    },
+  ]}
+  lines={[
+    {
+      from: { x: 7.45, y: 8.75 },
+      to: { x: 7.45, y: 8.13 },
+      tone: "ink",
+      arrow: "end",
+    },
+  ]}
+  labels={[
+    { text: "Q₁", x: 3.96, y: 1.25, tone: "ct", size: 15, weight: 700 },
+    { text: "Q₂", x: 6.42, y: 1.88, tone: "s5", size: 15, weight: 700 },
+    { text: "Q₃", x: 8.21, y: 2.66, tone: "pt", size: 15, weight: 700 },
+    { text: "Higher output", x: 6.98, y: 8.75, tone: "ink", weight: 600 },
+  ]}
 >
-  <path
-    class="curve tone-ct"
-    d="M 135 100 C 185 125, 215 175, 245 225 C 270 265, 290 300, 315 330"
-  ></path>
-  <path
-    class="curve tone-s5"
-    d="M 220 75 C 275 105, 315 160, 350 215 C 380 260, 410 305, 445 335"
-  ></path>
-  <path
-    class="curve tone-pt"
-    d="M 315 55 C 370 85, 420 135, 455 190 C 490 245, 520 295, 550 330"
-  ></path>
-
-  <text class="curve-label tone-ct" x="285" y="315">
-    Q₁
-  </text>
-  <text class="curve-label tone-s5" x="415" y="295">
-    Q₂
-  </text>
-  <text class="curve-label tone-pt" x="510" y="270">
-    Q₃
-  </text>
-
-  <text class="output-label" x="445" y="75">
-    Higher output
-  </text>
-  <text class="output-arrow" x="470" y="95">
-    ↑
-  </text>
-
   <Fragment slot="caption">
     Each isoquant represents a different level of output. Isoquants farther from
     the origin represent higher output levels.
   </Fragment>
-</AxesFigure>
-
-<style>
-  .output-label {
-    fill: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .output-arrow {
-    fill: var(--text-primary);
-    font-size: 22px;
-  }
-</style>
+</CartesianGraph>

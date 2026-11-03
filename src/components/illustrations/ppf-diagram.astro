@@ -3,69 +3,90 @@
 // A = efficient point on the frontier
 // B = inefficient point inside the frontier
 // C = unattainable point outside the frontier
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Production Possibilities Frontier"
   desc="A is on the production possibilities frontier and represents an efficient combination. B is inside the frontier and represents an inefficient combination. C is outside the frontier and is unattainable."
-  viewBox="0 0 560 430"
-  yLabel="Good Y"
-  xLabel="Good X"
-  x0={70}
-  y0={360}
-  top={45}
-  right={505}
+  y={{ label: "Good Y", domain: [0, 10] }}
+  x={{ label: "Good X", domain: [0, 10] }}
+  layout={{
+    viewBox: "0 0 560 430",
+    x0: 70,
+    y0: 360,
+    top: 45,
+    right: 505,
+    labelGap: 32,
+  }}
   yLabelOffset={15}
-  xLabelOffset={32}
+  curves={[
+    {
+      equation: (goodX) => 9.05 * (1 - (goodX / 7.82) ** 1.8),
+      domain: [0, 7.82],
+      tone: "s5",
+      round: true,
+    },
+  ]}
+  areas={[
+    {
+      points: [
+        { x: 0, y: 0 },
+        { x: 0, y: 9.05 },
+        { x: 1, y: 8.82 },
+        { x: 2, y: 8.27 },
+        { x: 3, y: 7.44 },
+        { x: 4, y: 6.34 },
+        { x: 5, y: 5.01 },
+        { x: 6, y: 3.43 },
+        { x: 7, y: 1.64 },
+        { x: 7.82, y: 0 },
+      ],
+      tone: "s5",
+      opacity: 0.07,
+    },
+  ]}
+  points={[
+    { x: 3.45, y: 6.98, tone: "pt", radius: 7, guides: true },
+    { x: 2.3, y: 4.44, tone: "key", radius: 7, guides: true },
+    { x: 6.55, y: 7.78, tone: "ct", radius: 7, guides: true },
+  ]}
+  labels={[
+    { text: "0", x: 0, y: 0, tone: "ink", dx: -15, dy: 18 },
+    {
+      text: "A",
+      x: 3.45,
+      y: 6.98,
+      tone: "ink",
+      dx: 12,
+      dy: -10,
+      size: 15,
+      weight: 600,
+    },
+    {
+      text: "B",
+      x: 2.3,
+      y: 4.44,
+      tone: "ink",
+      dx: 12,
+      dy: -10,
+      size: 15,
+      weight: 600,
+    },
+    {
+      text: "C",
+      x: 6.55,
+      y: 7.78,
+      tone: "ink",
+      dx: 12,
+      dy: -10,
+      size: 15,
+      weight: 600,
+    },
+  ]}
 >
-  <text class="origin" x="55" y="378">
-    0
-  </text>
-
-  <path
-    class="feasible-area tone-s5"
-    d="
-      M 70 75
-      C 120 75, 165 95, 215 135
-      C 285 190, 350 260, 410 360
-      L 70 360
-      Z
-    "
-  ></path>
-
-  <path
-    class="curve round tone-s5"
-    d="
-      M 70 75
-      C 125 75, 175 100, 220 140
-      C 285 195, 350 265, 410 360
-    "
-  ></path>
-
-  <line class="guide" x1="220" y1="140" x2="220" y2="360"></line>
-  <line class="guide" x1="70" y1="140" x2="220" y2="140"></line>
-  <circle class="pt tone-pt" cx="220" cy="140" r="7"></circle>
-  <text class="point-label" x="232" y="130">
-    A
-  </text>
-
-  <line class="guide" x1="170" y1="220" x2="170" y2="360"></line>
-  <line class="guide" x1="70" y1="220" x2="170" y2="220"></line>
-  <circle class="pt tone-key" cx="170" cy="220" r="7"></circle>
-  <text class="point-label" x="182" y="210">
-    B
-  </text>
-
-  <line class="guide" x1="355" y1="115" x2="355" y2="360"></line>
-  <line class="guide" x1="70" y1="115" x2="355" y2="115"></line>
-  <circle class="pt tone-ct" cx="355" cy="115" r="7"></circle>
-  <text class="point-label" x="367" y="105">
-    C
-  </text>
-
   <Fragment slot="caption">
     <p>
       <span class="tone-pt">A</span> on the frontier,{" "}
@@ -75,31 +96,4 @@ import AxesFigure from "./primitives/axes-figure.astro";
       <span class="tone-ct">unattainable</span>.
     </p>
   </Fragment>
-</AxesFigure>
-
-<style>
-  p {
-    text-balance: pretty;
-  }
-  .origin {
-    fill: var(--text-muted);
-    font-size: 13px;
-  }
-
-  .feasible-area {
-    fill: var(--tone);
-    opacity: 0.07;
-  }
-
-  .point-label {
-    fill: var(--text-primary);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .description {
-    fill: var(--tone);
-    font-size: 12px;
-    font-weight: 600;
-  }
-</style>
+</CartesianGraph>

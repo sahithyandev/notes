@@ -1,70 +1,42 @@
 ---
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   size="lg"
   title="Convex Isoquant"
-  yLabel="Capital (K)"
-  xLabel="Labour (L)"
+  desc="A convex isoquant with tangent lines that become flatter as labour replaces capital, illustrating diminishing marginal rate of technical substitution."
+  y={{ label: "Capital (K)", domain: [0, 10] }}
+  x={{ label: "Labour (L)", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (labour) =>
+        -0.0307 * labour ** 3 + 0.6112 * labour ** 2 - 4.4526 * labour + 13.323,
+      derivative: (labour) => -0.0921 * labour ** 2 + 1.2224 * labour - 4.4526,
+      domain: [1.32, 8.87],
+      tone: "s5",
+      tangents: [
+        { at: 2.45, domain: [1.5, 3.4], tone: "ink", dashed: true },
+        { at: 6.23, domain: [5.2, 7.3], tone: "ink", dashed: true },
+      ],
+    },
+  ]}
+  points={[
+    { x: 2.45, y: 5.63, tone: "ink" },
+    { x: 6.23, y: 1.88, tone: "ink" },
+  ]}
+  labels={[
+    { text: "A", x: 2.45, y: 5.63, tone: "ink", dx: -20, dy: -10, weight: 700 },
+    { text: "B", x: 6.23, y: 1.88, tone: "ink", dx: 10, dy: -5, weight: 700 },
+    { text: "Q₁", x: 5.19, y: 4.06, tone: "s5", size: 15, weight: 700 },
+    { text: "Steeper", x: 0.94, y: 7.19, tone: "ink" },
+    { text: "Flatter", x: 7.08, y: 1.41, tone: "ink" },
+  ]}
 >
-  <path
-    class="curve tone-s5"
-    d="
-      M 145 85
-      C 165 120, 185 155, 225 190
-      C 270 230, 330 265, 405 295
-      C 455 315, 505 330, 545 340
-    "
-  ></path>
-
-  <line class="tangent" x1="155" y1="100" x2="275" y2="235"></line>
-  <line class="tangent" x1="335" y1="265" x2="475" y2="325"></line>
-
-  <circle class="pt tone-ink" cx="205" cy="175" r="5"></circle>
-  <circle class="pt tone-ink" cx="405" cy="295" r="5"></circle>
-
-  <text class="point-label" x="185" y="165">
-    A
-  </text>
-  <text class="point-label" x="415" y="290">
-    B
-  </text>
-
-  <text class="curve-label tone-s5" x="350" y="225">
-    Q₁
-  </text>
-
-  <text class="mrt-label" x="125" y="125">
-    Steeper
-  </text>
-  <text class="mrt-label" x="450" y="310">
-    Flatter
-  </text>
-
   <Fragment slot="caption">
     A convex isoquant reflects diminishing MRTS: as more labour replaces
     capital, the amount of capital that can be given up for an additional unit
     of labour decreases.
   </Fragment>
-</AxesFigure>
-
-<style>
-  .tangent {
-    stroke: var(--text-muted);
-    stroke-width: 1.4;
-    stroke-dasharray: 5 5;
-  }
-
-  .point-label {
-    fill: var(--text-primary);
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .mrt-label {
-    fill: var(--text-secondary);
-    font-size: 12px;
-  }
-</style>
+</CartesianGraph>

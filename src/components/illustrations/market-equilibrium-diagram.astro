@@ -2,50 +2,49 @@
 // Static market equilibrium diagram: demand and supply curves
 // intersecting at the equilibrium point, with dashed guides to the
 // price and quantity axes.
-import AxesFigure from "./primitives/axes-figure.astro";
+import CartesianGraph from "./primitives/cartesian-graph.astro";
 ---
 
-<AxesFigure
+<CartesianGraph
   captionSlot
   title="Market Equilibrium"
-  yLabel="Price"
-  xLabel="Quantity"
+  desc="Demand and supply curves intersect at the equilibrium point, with dashed projections to the price and quantity axes."
+  y={{ label: "Price", domain: [0, 10] }}
+  x={{ label: "Quantity", domain: [0, 10] }}
+  curves={[
+    {
+      equation: (quantity) => 10.19 - quantity,
+      domain: [1.47, 9.41],
+      tone: "s5",
+    },
+    {
+      equation: (quantity) => 0.19 + quantity,
+      domain: [1.18, 8.82],
+      tone: "ct",
+    },
+  ]}
+  points={[
+    {
+      x: 5,
+      y: 5.19,
+      tone: "pt",
+      label: "E",
+      labelDx: 2,
+      labelDy: -10,
+      guides: true,
+    },
+  ]}
+  labels={[
+    { text: "Pₑ", x: 0, y: 5.19, anchor: "end", dx: -8, dy: 4 },
+    { text: "Qₑ", x: 5, y: 0, anchor: "middle", dy: 16 },
+    { text: "D", x: 1.62, y: 9.63, tone: "s5", weight: 600 },
+    { text: "S", x: 8.97, y: 9.26, tone: "ct", weight: 600 },
+  ]}
 >
-  <path
-    class="curve tone-s5"
-    d="M 100 40 C 150 90, 190 130, 220 150 C 260 180, 320 220, 370 260"
-  ></path>
-  <path
-    class="curve tone-ct"
-    d="M 90 270 C 140 220, 180 180, 220 150 C 260 120, 310 80, 350 40"
-  ></path>
-
-  <line class="guide" x1="220" y1="150" x2="50" y2="150"></line>
-  <line class="guide" x1="220" y1="150" x2="220" y2="290"></line>
-
-  <circle class="pt tone-pt" cx="220" cy="150" r="5"></circle>
-
-  <text class="axis-tick" x="42" y="154" text-anchor="end">
-    P&#8337;
-  </text>
-  <text class="axis-tick" x="220" y="305" text-anchor="middle">
-    Q&#8337;
-  </text>
-
-  <text class="curve-label tone-s5" x="105" y="30">
-    D
-  </text>
-  <text class="curve-label tone-ct" x="355" y="40">
-    S
-  </text>
-  <text class="pt-label tone-pt" x="222" y="140">
-    E
-  </text>
-
   <Fragment slot="caption">
     <span class="tone-pt">E</span> the equilibrium point, where
     <span class="tone-s5">D</span> and <span class="tone-ct">S</span> intersect,
     at price <span class="tone-pt">P&#8337;</span> and quantity
     <span class="tone-pt">Q&#8337;</span>.
   </Fragment>
-</AxesFigure>
+</CartesianGraph>

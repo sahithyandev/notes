@@ -20,6 +20,7 @@ import {
   yToSvg,
 } from "../lib/cartesian-graph";
 import { makeUid } from "../lib/uid";
+import ArrowMarker from "./arrow-marker.astro";
 import FigureCaption from "./figure-caption.astro";
 
 type Props = CaptionProps & {
@@ -139,6 +140,9 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
   >
     <title id={`${uid}-title`}>{title}</title>
     {desc && <desc id={`${uid}-desc`}>{desc}</desc>}
+    <defs>
+      <ArrowMarker id={`${uid}-arrow`} variant="open" />
+    </defs>
 
     <line
       class="axis"
@@ -187,7 +191,7 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
     {lines.map((line) => (
       <line
         class:list={[
-          "graph-line",
+          line.guide ? "guide" : "graph-line",
           `tone-${line.tone ?? "ink"}`,
           { dashed: line.dashed },
         ]}
@@ -196,6 +200,16 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
         x2={xToSvg(line.to.x, geometry)}
         y2={yToSvg(line.to.y, geometry)}
         stroke-width={line.width}
+        marker-start={
+          line.arrow === "start" || line.arrow === "both"
+            ? `url(#${uid}-arrow)`
+            : undefined
+        }
+        marker-end={
+          line.arrow === "end" || line.arrow === "both"
+            ? `url(#${uid}-arrow)`
+            : undefined
+        }
       ></line>
     ))}
 
