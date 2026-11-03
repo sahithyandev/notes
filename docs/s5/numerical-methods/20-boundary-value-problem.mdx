@@ -1,13 +1,13 @@
 ---
 title: Boundary Value Problem
 dateCreated: 2026-09-23T08:09:15.054Z
-lastUpdatedOn: 2026-11-03T20:22:20.879Z
+lastUpdatedOn: 2026-11-03T22:25:20.566Z
 ---
 
 <Aka>BVP</Aka>. A differential equation with conditions specified at 2 distinct
 points, called boundary conditions.
 
-### Standard Form
+## Standard Form
 
 <Formula>
 
@@ -17,470 +17,62 @@ $$
 
 </Formula>
 
-### Linear and Nonlinear BVPs
-
-The BVP is linear if $f$ has the form
-
-<Formula>
-
-$$
-f(x,y,y') = p(x)y' + q(x)y + r(x)
-$$
-
-</Formula>
-
-for some functions $p$, $q$, $r$, giving
-
-<Formula>
-
-$$
-y'' = p(x)y' + q(x)y + r(x), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
-$$
-
-</Formula>
-
-Otherwise, the BVP is nonlinear.
-
 ## Existence and Uniqueness
 
-The BVP has a unique solution on $[a,b]$ if
+The BVP has a unique solution on $[a,b]$ **iff**
 
 - $f$, $f_y$, and $f_{y'}$ are continuous on $D = \{(x,y,y') \mid a \leq x \leq b,\ y, y' \in \mathbb{R}\}$
 - $f_y(x,y,y') > 0$ for all $(x,y,y') \in D$
-- a constant $M > 0$ exists with $|f_{y'}(x,y,y')| \leq M$ for all $(x,y,y') \in D$
+- A constant $M > 0$ exists with $|f_{y'}(x,y,y')| \leq M$ for all $(x,y,y') \in D$
 
-Examples:
+## Worked Example
 
-- $y'' + e^{-xy} + \sin(y') = 0$, $0 \leq x \leq 1$, $y(0) = y(1) = 0$ has a unique solution, since $f_y = xe^{-xy} > 0$ for all $x,y$ and $|f_{y'}| = |\cos(y')| \leq 1$ for all $y'$.
-
-A linear BVP is solved by the [linear shooting method](#linear-shooting-method) or a [linear finite-difference method](#linear-finite-difference-method). A nonlinear BVP is solved by the [nonlinear shooting method](#nonlinear-shooting-method) or a [nonlinear finite-difference method](#nonlinear-finite-difference-method).
-
-## Linear Shooting Method
-
-The linear shooting method solves a [linear BVP](#linear-and-nonlinear-bvps) by combining solutions to 2 initial value problems.
-
-A unique solution exists if
-
-- $p$, $q$, $r$ are continuous on $[a,b]$
-- $q(x) > 0$ for $x \in [a,b]$
-
-### Superposition Idea
-
-If $y_1$ solves
-
-<Formula>
+Determine whether the BVP
 
 $$
-y_1'' = p(x)y_1' + q(x)y_1 + r(x)
+y'' = y + \sin(y'), \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 0
 $$
 
-</Formula>
-
-and $y_2$ solves the homogeneous equation
-
-<Formula>
-
-$$
-y_2'' = p(x)y_2' + q(x)y_2
-$$
-
-</Formula>
-
-then $y = y_1 + c\,y_2$ solves the ODE for any constant $c$.
-
-### Auxiliary IVPs
-
-Fix
-
-<Formula>
-
-$$
-y_1(a) = \alpha,\ y_1'(a) = 0, \qquad y_2(a) = 0,\ y_2'(a) = 1
-$$
-
-</Formula>
-
-so that $y(a) = y_1(a) + c\,y_2(a) = \alpha$ for any $c$. Solve
-
-<Formula>
-
-$$
-y_1'' = p(x)y_1' + q(x)y_1 + r(x), \quad a \leq x \leq b, \quad y_1(a) = \alpha,\ y_1'(a) = 0
-$$
-
-</Formula>
-
-$$
-y_2'' = p(x)y_2' + q(x)y_2, \quad a \leq x \leq b, \quad y_2(a) = 0,\ y_2'(a) = 1
-$$
-
-with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
-
-### Combining Solutions
-
-$c$ is chosen so that $y(b) = \beta$
-
-<Formula>
-
-$$
-y_1(b) + c\,y_2(b) = \beta \implies c = \frac{\beta - y_1(b)}{y_2(b)}
-$$
-
-</Formula>
-
-$$
-y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\, y_2(x)
-$$
-
-is the unique solution to the BVP.
-
-## Nonlinear Shooting Method
-
-The nonlinear shooting method finds the initial slope $y'(a)$ that makes an IVP solution hit $y(b) = \beta$.
-
-### Idea
-
-For a guess $t$, let $y(x,t)$ solve the IVP
-
-<Formula>
-
-$$
-y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t
-$$
-
-</Formula>
-
-The method finds $t$ such that $y(b,t) - \beta = 0$, using [Newton's method](/s5/numerical-methods/newtons-method).
-
-### Newton Iteration
-
-<Formula>
-
-$$
-t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{\dfrac{\partial y}{\partial t}(b,t_{k-1})}
-$$
-
-</Formula>
-
-$\dfrac{\partial y(b,t_{k-1})}{\partial t}$ is not available, so define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP with respect to $t$ gives
-
-<Formula>
-
-$$
-z'' = \frac{\partial f}{\partial y}(x,y,y')\,z + \frac{\partial f}{\partial y'}(x,y,y')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
-$$
-
-</Formula>
-
-The initial values follow from $y(a,t) = \alpha$ and $y'(a,t) = t$.
-
-Substituting $z(b,t_{k-1})$ for $\dfrac{\partial y}{\partial t}(b,t_{k-1})$
-
-<Formula>
-
-$$
-t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
-$$
-
-</Formula>
-
-### Procedure
-
-- Choose an initial guess $t_0$
-- Repeat for $k = 0, 1, 2, \ldots$ until $|y(b,t_k) - \beta|$ is sufficiently small
-  - Approximate $y_k(x) = y(x,t_k)$ from
-
-<Formula>
-
-    $$
-    y'' = f(x,y,y'), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y'(a) = t_k
-    $$
-
-</Formula>
-
-- Approximate $z_k(x) = z(x,t_k)$ from
-
-<Formula>
-
-    $$
-    z'' = \frac{\partial f}{\partial y}(x,y_k,y_k')\,z + \frac{\partial f}{\partial y'}(x,y_k,y_k')\,z', \quad a \leq x \leq b, \quad z(a) = 0,\ z'(a) = 1
-    $$
-
-</Formula>
-
-- Update
-
-<Formula>
-
-    $$
-    t_{k+1} = t_k - \frac{y_k(b) - \beta}{z_k(b)}
-    $$
-
-</Formula>
-
-<Note>
-
-Both IVPs are reduced to first-order systems and solved with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
-
-</Note>
-
-## Linear Finite-Difference Method
-
-Replace derivatives with centered differences at mesh points and solve the resulting linear system.
-
-### Mesh Points
-
-Partition $[a,b]$ into $N+1$ subintervals of length $h = \dfrac{b-a}{N+1}$. Mesh points are
-
-<Formula>
-
-$$
-x_i = a + ih, \quad i = 0, 1, \ldots, N+1
-$$
-
-</Formula>
-
-### Centered Difference Formulas
-
-<Formula>
-
-$$
-y''(x_i) = \frac{1}{h^2}\big(y(x_{i+1}) - 2y(x_i) + y(x_{i-1})\big) - \frac{h^2}{12}y^{(4)}(\xi_i)
-$$
-
-</Formula>
-
-$$
-y'(x_i) = \frac{1}{2h}\big(y(x_{i+1}) - y(x_{i-1})\big) - \frac{h^2}{6}y'''(\eta_i)
-$$
-
-for some $\xi_i, \eta_i \in (x_{i-1}, x_{i+1})$.
-
-### Linear Difference Equation
-
-Substituting the centered difference formulas into the linear BVP and dropping the $O(h^2)$ error term, $y(x_i) \approx w_i$ satisfies
-
-<Formula>
-
-$$
-w_0 = \alpha, \quad w_{N+1} = \beta
-$$
-
-</Formula>
-
-$$
--\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} + \big(2 + h^2 q(x_i)\big)w_i - \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = -h^2 r(x_i)
-$$
-
-for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
-
-### Matrix Form
-
-<Formula>
-
-$$
-Aw = b
-$$
-
-</Formula>
-
-with $A$ tridiagonal, using
-
-<Formula>
-
-$$
-a_i = -1 - \frac{h}{2}p(x_i), \quad d_i = 2 + h^2 q(x_i), \quad c_i = -1 + \frac{h}{2}p(x_i)
-$$
-
-</Formula>
-
-$$
-A = \begin{pmatrix}
-d_1 & c_1 & & \\
-a_2 & d_2 & c_2 & \\
-& \ddots & \ddots & \ddots \\
-& & a_N & d_N
-\end{pmatrix}
-$$
-
-<Formula>
-
-$$
-w = \begin{pmatrix} w_1 \\ w_2 \\ \vdots \\ w_{N-1} \\ w_N \end{pmatrix}, \quad
-b = \begin{pmatrix}
--h^2r(x_1) - a_1\alpha \\
--h^2r(x_2) \\
-\vdots \\
--h^2r(x_{N-1}) \\
--h^2r(x_N) - c_N\beta
-\end{pmatrix}
-$$
-
-</Formula>
-
-Solve for $w$ with [LU decomposition](/s5/numerical-methods/lu-decomposition) or another linear solver.
-
-If $p$, $q$, $r$ are continuous on $[a,b]$ and $q(x) \geq 0$ on $[a,b]$, the linear system has a unique solution whenever $h < \dfrac{2}{L}$, where $L = \max_{a \leq x \leq b} |p(x)|$.
-
-## Nonlinear Finite-Difference Method
-
-Replace derivatives with centered differences and solve the resulting nonlinear system with Newton's method.
-
-A unique solution exists **iff**
-
-- $f$, $f_y$, $f_{y'}$ are continuous for $x \in [a,b]$ and $y, y' \in (-\infty, \infty)$
-- $f_y(x,y,y') \geq \delta$ for some $\delta > 0$
-- a constant $k$ exists with $k = \max\big(|f_y(x,y,y')|,\ |f_{y'}(x,y,y')|\big)$
-
-### Nonlinear Difference Equation
-
-Using the [centered difference formulas](#centered-difference-formulas) at mesh points $x_0, \ldots, x_{N+1}$ on $[a,b]$, $y(x_i) \approx w_i$ satisfies
-
-<Formula>
-
-$$
-w_0 = \alpha, \quad w_{N+1} = \beta
-$$
-
-</Formula>
-
-$$
--\frac{w_{i+1} - 2w_i + w_{i-1}}{h^2} + f\left(x_i, w_i, \frac{w_{i+1}-w_{i-1}}{2h}\right) = 0
-$$
-
-for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
-
-### Nonlinear System
-
-<Formula>
-
-$$
-\begin{aligned}
-2w_1 - w_2 + h^2 f\left(x_1, w_1, \frac{w_2 - \alpha}{2h}\right) - \alpha &= 0 \\
--w_1 + 2w_2 - w_3 + h^2 f\left(x_2, w_2, \frac{w_3 - w_1}{2h}\right) &= 0 \\
-&\ \ \vdots \\
--w_{N-2} + 2w_{N-1} - w_N + h^2 f\left(x_{N-1}, w_{N-1}, \frac{w_N - w_{N-2}}{2h}\right) &= 0 \\
--w_{N-1} + 2w_N + h^2 f\left(x_N, w_N, \frac{\beta - w_{N-1}}{2h}\right) - \beta &= 0
-\end{aligned}
-$$
-
-</Formula>
-
-This is a system of $N$ nonlinear equations in $N$ unknowns, with a unique solution whenever $h < \dfrac{2}{L}$. Solve with [Newton's method](/s5/numerical-methods/newtons-method).
-
-## Worked Examples
-
-### Example 1
-
-Solve
-
-<Formula>
-
-$$
-y'' = y, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
-$$
-
-</Formula>
-
-with the linear shooting method and with the linear finite-difference method for $N = 3$.
+has a unique solution.
 
 <Solution>
 
-Here $p(x) = 0$, $q(x) = 1 > 0$, $r(x) = 0$, so a unique solution exists.
-
-Linear shooting method
+Write the equation as $y'' = f(x,y,y')$ with
 
 $$
-y_1'' = y_1, \quad y_1(0) = 0,\ y_1'(0) = 0 \implies y_1(x) = 0
+f(x,y,y') = y + \sin(y')
 $$
 
-$$
-y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1 \implies y_2(x) = \sinh x
-$$
+The domain is
 
 $$
-c = \frac{\beta - y_1(1)}{y_2(1)} = \frac{1 - 0}{\sinh 1} = 0.8509
+D = \{(x,y,y') \mid 0 \leq x \leq 1,\ y,y' \in \mathbb{R}\}.
 $$
 
-$$
-y(x) = \frac{\sinh x}{\sinh 1}
-$$
-
-Linear finite-difference method
+The first condition requires $f$, $f_y$, and $f_{y'}$ to be continuous on $D$. Calculate
 
 $$
-h = \frac{1 - 0}{3 + 1} = 0.25, \quad x_i = 0.25i
+f_y(x,y,y') = 1, \qquad f_{y'}(x,y,y') = \cos(y').
 $$
 
-With $p = r = 0$ and $q = 1$
+The function $f(x,y,y') = y + \sin(y')$ is continuous because it is the sum of the continuous function $y$ and the continuous function $\sin(y')$. The derivative $f_y = 1$ is constant, so it is continuous. The derivative $f_{y'} = \cos(y')$ is continuous. Therefore, the first condition holds.
+
+The second condition requires $f_y(x,y,y') > 0$ throughout $D$. Since
 
 $$
--w_{i-1} + (2 + h^2)w_i - w_{i+1} = 0, \quad 2 + h^2 = 2.0625
+f_y(x,y,y') = 1 > 0
 $$
 
-Using $w_0 = 0$ and $w_4 = 1$
+for every $(x,y,y') \in D$, the second condition holds.
+
+The third condition requires a constant $M > 0$ such that $|f_{y'}(x,y,y')| \leq M$ throughout $D$. Since
 
 $$
-\begin{pmatrix} 2.0625 & -1 & 0 \\ -1 & 2.0625 & -1 \\ 0 & -1 & 2.0625 \end{pmatrix}
-\begin{pmatrix} w_1 \\ w_2 \\ w_3 \end{pmatrix}
-=
-\begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}
+|f_{y'}(x,y,y')| = |\cos(y')| \leq 1
 $$
 
-Eliminating
+for every $(x,y,y') \in D$, choose $M = 1$. The third condition holds.
 
-$$
-w_1 = \frac{w_2}{2.0625}, \quad w_3 = 1.5777\,w_2, \quad (2.0625 \times 1.5777 - 1)\,w_2 = 1
-$$
-
-$$
-w_2 = 0.4437, \quad w_1 = 0.2151, \quad w_3 = 0.6999
-$$
-
-Comparison with the exact solution
-
-| $x_i$  | $w_i$  | $\dfrac{\sinh x_i}{\sinh 1}$ | Error  |
-| ------ | ------ | ---------------------------- | ------ |
-| $0.25$ | 0.2151 | 0.2150                       | 0.0002 |
-| $0.50$ | 0.4437 | 0.4434                       | 0.0003 |
-| $0.75$ | 0.6999 | 0.6997                       | 0.0002 |
-
-</Solution>
-
-### Example 2
-
-Solve
-
-<Formula>
-
-$$
-y'' = 6x, \quad 0 \leq x \leq 1, \quad y(0) = 0,\ y(1) = 1
-$$
-
-</Formula>
-
-with the linear finite-difference method for $N = 1$.
-
-<Solution>
-
-$p = q = 0$ and $r(x) = 6x$.
-
-$$
-h = \frac{1 - 0}{1 + 1} = 0.5, \quad x_1 = 0.5
-$$
-
-The difference equation for $i = 1$
-
-$$
--w_0 + 2w_1 - w_2 = -h^2 r(x_1) = -0.25(3) = -0.75
-$$
-
-Using $w_0 = 0$ and $w_2 = 1$
-
-$$
-2w_1 = -0.75 + 1 \implies w_1 = 0.125
-$$
-
-The exact solution is $y = x^3$, so $y(0.5) = 0.125$. The centered difference is exact for a cubic.
+All 3 conditions hold. Therefore, the BVP has a unique solution on $[0,1]$.
 
 </Solution>

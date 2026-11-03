@@ -1,0 +1,112 @@
+---
+title: Non-Linear BVP
+dateCreated: 2026-11-04T00:00:00.000Z
+lastUpdatedOn: 2026-11-03T22:25:20.659Z
+---
+
+A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is nonlinear **iff** its differential equation cannot be written as
+
+<Formula>
+
+$$
+y'' = p(x)y' + q(x)y + r(x)
+$$
+
+</Formula>
+
+for functions $p$, $q$, and $r$.
+
+## Nonlinear Shooting Method
+
+Finds the initial slope $y'(a)$ that makes an IVP solution hit $y(b) = \beta$.
+
+### Idea
+
+For a guess $t$, let $y(x,t)$ solve
+
+<Formula>
+
+$$
+y'' = f(x,y,y'), \quad y(a) = \alpha,\ y'(a) = t
+$$
+
+</Formula>
+
+Find $t$ such that $y(b,t) - \beta = 0$ with [Newton's method](/s5/numerical-methods/newtons-method).
+
+### Newton Iteration
+
+Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP gives
+
+<Formula>
+
+$$
+z'' = f_y(x,y,y')z + f_{y'}(x,y,y')z', \quad z(a) = 0,\ z'(a) = 1
+$$
+
+</Formula>
+
+The Newton update is
+
+<Formula>
+
+$$
+t_k = t_{k-1} - \frac{y(b,t_{k-1}) - \beta}{z(b,t_{k-1})}
+$$
+
+</Formula>
+
+### Procedure
+
+- Choose an initial guess $t_0$
+- For $k = 0, 1, 2, \ldots$, solve the IVPs for $y_k(x) = y(x,t_k)$ and $z_k(x) = z(x,t_k)$
+- Stop when $|y_k(b) - \beta|$ is sufficiently small
+- Update $t_{k+1} = t_k - \dfrac{y_k(b)-\beta}{z_k(b)}$
+
+<Note>
+
+Reduce both IVPs to first-order systems. Solve them with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
+
+</Note>
+
+## Nonlinear Finite-Difference Method
+
+Replace derivatives with centered differences and solve the resulting nonlinear system with Newton's method.
+
+A unique solution exists **iff**
+
+- $f$, $f_y$, and $f_{y'}$ are continuous for $x \in [a,b]$ and $y, y' \in (-\infty, \infty)$
+- $f_y(x,y,y') \geq \delta$ for some $\delta > 0$
+- A constant $k$ exists with $k = \max\big(|f_y(x,y,y')|,\ |f_{y'}(x,y,y')|\big)$
+
+### Nonlinear Difference Equation
+
+For mesh points $x_0, \ldots, x_{N+1}$, with $y(x_i) \approx w_i$,
+
+<Formula>
+
+$$
+w_0 = \alpha, \quad w_{N+1} = \beta, \quad -\frac{w_{i+1}-2w_i+w_{i-1}}{h^2} + f\left(x_i,w_i,\frac{w_{i+1}-w_{i-1}}{2h}\right) = 0
+$$
+
+</Formula>
+
+for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
+
+### Nonlinear System
+
+The $N$ equations are
+
+<Formula>
+
+$$
+2w_1-w_2+h^2f\left(x_1,w_1,\frac{w_2-\alpha}{2h}\right)-\alpha=0
+\\[8pt]
+-w_{i-1}+2w_i-w_{i+1}+h^2f\left(x_i,w_i,\frac{w_{i+1}-w_{i-1}}{2h}\right)=0, \quad i=2,\ldots,N-1
+\\[8pt]
+-w_{N-1}+2w_N+h^2f\left(x_N,w_N,\frac{\beta-w_{N-1}}{2h}\right)-\beta=0
+$$
+
+</Formula>
+
+Solve with [Newton's method](/s5/numerical-methods/newtons-method). A unique solution exists whenever $h < \dfrac{2}{L}$.

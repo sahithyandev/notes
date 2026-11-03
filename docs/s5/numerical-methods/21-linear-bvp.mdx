@@ -1,0 +1,283 @@
+---
+title: Linear BVP
+dateCreated: 2026-11-04T00:00:00.000Z
+lastUpdatedOn: 2026-11-03T22:25:20.638Z
+---
+
+A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is linear **iff**
+
+<Formula>
+
+$$
+y'' = p(x)y' + q(x)y + r(x), \quad a \leq x \leq b, \quad y(a) = \alpha,\ y(b) = \beta
+$$
+
+</Formula>
+
+for continuous functions $p$, $q$, and $r$.
+
+## Linear Shooting Method
+
+Solves a linear BVP by combining solutions to 2 initial value problems.
+
+A unique solution exists **if**
+
+- $p$, $q$, and $r$ are continuous on $[a,b]$
+- $q(x) > 0$ for $x \in [a,b]$
+
+### Superposition Idea
+
+If $y_1$ solves
+
+<Formula>
+
+$$
+y_1'' = p(x)y_1' + q(x)y_1 + r(x)
+$$
+
+</Formula>
+
+and $y_2$ solves the homogeneous equation
+
+<Formula>
+
+$$
+y_2'' = p(x)y_2' + q(x)y_2
+$$
+
+</Formula>
+
+then $y = y_1 + c\,y_2$ solves the ODE for any constant $c$.
+
+### Auxiliary IVPs
+
+Fix
+
+<Formula>
+
+$$
+y_1(a) = \alpha,\ y_1'(a) = 0, \qquad y_2(a) = 0,\ y_2'(a) = 1
+$$
+
+</Formula>
+
+Solve
+
+<Formula>
+
+$$
+y_1'' = p(x)y_1' + q(x)y_1 + r(x), \quad y_1(a) = \alpha,\ y_1'(a) = 0
+\\[8pt]
+y_2'' = p(x)y_2' + q(x)y_2, \quad y_2(a) = 0,\ y_2'(a) = 1
+$$
+
+</Formula>
+
+with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
+
+### Combining Solutions
+
+Choose $c$ so that $y(b) = \beta$.
+
+<Formula>
+
+$$
+c = \frac{\beta - y_1(b)}{y_2(b)}, \qquad y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\,y_2(x)
+$$
+
+</Formula>
+
+## Linear Finite-Difference Method
+
+Replace derivatives with centered differences at mesh points and solve the resulting linear system.
+
+### Mesh Points
+
+Partition $[a,b]$ into $N+1$ subintervals of length $h = \dfrac{b-a}{N+1}$.
+
+<Formula>
+
+$$
+x_i = a + ih, \quad i = 0, 1, \ldots, N+1
+$$
+
+</Formula>
+
+### Centered Difference Formulas
+
+<Formula>
+
+$$
+y''(x_i) = \frac{y(x_{i+1}) - 2y(x_i) + y(x_{i-1})}{h^2} + O(h^2), \qquad y'(x_i) = \frac{y(x_{i+1}) - y(x_{i-1})}{2h} + O(h^2)
+$$
+
+</Formula>
+
+### Linear Difference Equation
+
+With $y(x_i) \approx w_i$, $w_0 = \alpha$, and $w_{N+1} = \beta$,
+
+<Formula>
+
+$$
+-\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} + \big(2 + h^2 q(x_i)\big)w_i - \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = -h^2 r(x_i)
+$$
+
+</Formula>
+
+for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
+
+### Matrix Form
+
+<Formula>
+
+$$
+Aw = b
+$$
+
+</Formula>
+
+where $A$ is tridiagonal, with
+
+<Formula>
+
+$$
+a_i = -1 - \frac{h}{2}p(x_i), \quad d_i = 2 + h^2q(x_i), \quad c_i = -1 + \frac{h}{2}p(x_i)
+\\[8pt]
+A = \begin{pmatrix} d_1 & c_1 & & \\ a_2 & d_2 & c_2 & \\ & \ddots & \ddots & \ddots \\ & & a_N & d_N \end{pmatrix}
+\\[8pt]
+w = \begin{pmatrix}w_1\\w_2\\\vdots\\w_N\end{pmatrix}, \quad b = \begin{pmatrix}-h^2r(x_1)-a_1\alpha\\-h^2r(x_2)\\\vdots\\-h^2r(x_N)-c_N\beta\end{pmatrix}
+$$
+
+</Formula>
+
+Solve for $w$ with [LU decomposition](/s5/numerical-methods/lu-decomposition) or another linear solver.
+
+If $p$, $q$, and $r$ are continuous on $[a,b]$ and $q(x) \geq 0$, the linear system has a unique solution whenever $h < \dfrac{2}{L}$, where $L = \max_{a \leq x \leq b}|p(x)|$.
+
+## Worked Examples
+
+### Example 1
+
+Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear shooting method and the linear finite-difference method for $N = 3$.
+
+<Solution>
+
+$p = 0$, $q = 1$, and $r = 0$.
+
+For the shooting method, solve the auxiliary IVPs
+
+$$
+y_1'' = y_1, \quad y_1(0) = 0,\ y_1'(0) = 0
+$$
+
+and
+
+$$
+y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1.
+$$
+
+The first IVP has the zero solution, so $y_1(x) = 0$. The second IVP has the solution $y_2(x) = \sinh x$. Therefore,
+
+$$
+c = \frac{1-y_1(1)}{y_2(1)} = \frac{1-0}{\sinh 1} = 0.8509
+$$
+
+Combining the auxiliary solutions gives
+
+$$
+y(x) = y_1(x) + c y_2(x) = 0 + \frac{\sinh x}{\sinh 1}.
+$$
+
+For the finite-difference method,
+
+$$
+h = \frac{b-a}{N+1} = \frac{1-0}{3+1} = 0.25, \qquad x_1=0.25,\ x_2=0.50,\ x_3=0.75.
+$$
+
+Since $p = r = 0$ and $q = 1$,
+
+$$
+-w_{i-1} + (2+h^2)w_i-w_{i+1}=0, \qquad 2+h^2=2+0.25^2=2.0625.
+$$
+
+Using $w_0=0$ and $w_4=1$ gives
+
+$$
+\begin{pmatrix}2.0625&-1&0\\-1&2.0625&-1\\0&-1&2.0625\end{pmatrix}\begin{pmatrix}w_1\\w_2\\w_3\end{pmatrix}=\begin{pmatrix}0\\0\\1\end{pmatrix}
+$$
+
+The 1st and 3rd equations give
+
+$$
+w_1 = \frac{w_2}{2.0625}, \qquad w_3 = \frac{1+w_2}{2.0625}.
+$$
+
+Substitute these into the 2nd equation:
+
+$$
+-\frac{w_2}{2.0625}+2.0625w_2-\frac{1+w_2}{2.0625}=0
+$$
+
+$$
+\left(2.0625-\frac{2}{2.0625}\right)w_2=\frac{1}{2.0625}
+\implies w_2=0.4437.
+$$
+
+Back-substitution gives
+
+$$
+w_1=\frac{0.4437}{2.0625}=0.2151, \qquad w_3=\frac{1+0.4437}{2.0625}=0.6999.
+$$
+
+| $x_i$  | $w_i$    | Exact value | Error    |
+| ------ | -------- | ----------- | -------- |
+| $0.25$ | $0.2151$ | $0.2150$    | $0.0002$ |
+| $0.50$ | $0.4437$ | $0.4434$    | $0.0003$ |
+| $0.75$ | $0.6999$ | $0.6997$    | $0.0002$ |
+
+</Solution>
+
+### Example 2
+
+Solve $y'' = 6x$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear finite-difference method for $N = 1$.
+
+<Solution>
+
+Here $p = q = 0$ and $r(x)=6x$. Calculate the mesh size and interior point:
+
+$$
+h=\frac{b-a}{N+1}=\frac{1-0}{1+1}=0.5, \qquad x_1=a+h=0.5.
+$$
+
+Evaluate the forcing term at the interior point:
+
+$$
+r(x_1)=r(0.5)=6(0.5)=3.
+$$
+
+Since $p=q=0$, the difference equation is
+
+$$
+-w_0+2w_1-w_2=-h^2r(x_1)=-(0.5)^2(3)=-0.75.
+$$
+
+Apply the boundary values $w_0=y(0)=0$ and $w_2=y(1)=1$:
+
+$$
+-0+2w_1-1=-0.75
+$$
+
+$$
+2w_1=0.25 \implies w_1=0.125.
+$$
+
+The exact solution is $y=x^3$, so
+
+$$
+y(0.5)=(0.5)^3=0.125.
+$$
+
+The finite-difference method gives the exact value at the interior point.
+
+</Solution>
