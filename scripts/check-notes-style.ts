@@ -8,6 +8,7 @@
 //   bun run check-notes-style -- --filter s1/mathematics
 //   bun run check-notes-style -- --filter s1/mathematics/matrices
 //   bun run check-notes-style -- --filter diagonalization
+//   bun run check-notes-style -- --fix
 import { join } from "node:path";
 import { runValidation } from "../src/integrations/notes-style-validator/validate.ts";
 import { scanModuleRedirects } from "../src/integrations/module-redirects/scan.ts";
@@ -24,7 +25,9 @@ function parseFilter(argv: string[]): string | undefined {
 }
 
 const docsRoot = join(process.cwd(), "docs");
-const filter = parseFilter(process.argv.slice(2));
+const args = process.argv.slice(2);
+const filter = parseFilter(args);
+const autoFix = args.includes("--fix");
 
 // Module-redirect targets are valid link destinations even though no note
 // carries that exact slug — same reasoning as notes-style-validator's own
@@ -42,6 +45,7 @@ try {
     failOnViolations: true,
     extraValidUrls,
     filter,
+    autoFix,
   });
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
