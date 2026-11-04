@@ -1,7 +1,7 @@
 ---
 title: Linear BVP
 dateCreated: 2026-11-04T00:00:00.000Z
-lastUpdatedOn: 2026-11-03T22:25:20.638Z
+lastUpdatedOn: 2026-11-04T05:14:07.604Z
 ---
 
 A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is linear **iff**
@@ -120,7 +120,7 @@ With $y(x_i) \approx w_i$, $w_0 = \alpha$, and $w_{N+1} = \beta$,
 <Formula>
 
 $$
--\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} + \big(2 + h^2 q(x_i)\big)w_i - \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = -h^2 r(x_i)
+\left(1 + \frac{h}{2}p(x_i)\right)w_{i-1} - \big(2 + h^2 q(x_i)\big)w_i + \left(1 - \frac{h}{2}p(x_i)\right)w_{i+1} = h^2 r(x_i)
 $$
 
 </Formula>
@@ -159,7 +159,7 @@ If $p$, $q$, and $r$ are continuous on $[a,b]$ and $q(x) \geq 0$, the linear sys
 
 ### Example 1
 
-Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear shooting method and the linear finite-difference method for $N = 3$.
+Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, and $y(1) = 1$ with the linear shooting method.
 
 <Solution>
 
@@ -174,7 +174,7 @@ $$
 and
 
 $$
-y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1.
+y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1
 $$
 
 The first IVP has the zero solution, so $y_1(x) = 0$. The second IVP has the solution $y_2(x) = \sinh x$. Therefore,
@@ -186,19 +186,27 @@ $$
 Combining the auxiliary solutions gives
 
 $$
-y(x) = y_1(x) + c y_2(x) = 0 + \frac{\sinh x}{\sinh 1}.
+y(x) = y_1(x) + c y_2(x) = 0 + \frac{\sinh x}{\sinh 1}
 $$
+
+</Solution>
+
+### Example 2
+
+Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, and $y(1) = 1$ with the linear finite-difference method for $N = 3$.
+
+<Solution>
 
 For the finite-difference method,
 
 $$
-h = \frac{b-a}{N+1} = \frac{1-0}{3+1} = 0.25, \qquad x_1=0.25,\ x_2=0.50,\ x_3=0.75.
+h = \frac{b-a}{N+1} = \frac{1-0}{3+1} = 0.25, \qquad x_1=0.25,\ x_2=0.50,\ x_3=0.75
 $$
 
 Since $p = r = 0$ and $q = 1$,
 
 $$
--w_{i-1} + (2+h^2)w_i-w_{i+1}=0, \qquad 2+h^2=2+0.25^2=2.0625.
+-w_{i-1} + (2+h^2)w_i-w_{i+1}=0, \qquad 2+h^2=2+0.25^2=2.0625
 $$
 
 Using $w_0=0$ and $w_4=1$ gives
@@ -210,7 +218,7 @@ $$
 The 1st and 3rd equations give
 
 $$
-w_1 = \frac{w_2}{2.0625}, \qquad w_3 = \frac{1+w_2}{2.0625}.
+w_1 = \frac{w_2}{2.0625}, \qquad w_3 = \frac{1+w_2}{2.0625}
 $$
 
 Substitute these into the 2nd equation:
@@ -221,13 +229,13 @@ $$
 
 $$
 \left(2.0625-\frac{2}{2.0625}\right)w_2=\frac{1}{2.0625}
-\implies w_2=0.4437.
+\implies w_2=0.4437
 $$
 
 Back-substitution gives
 
 $$
-w_1=\frac{0.4437}{2.0625}=0.2151, \qquad w_3=\frac{1+0.4437}{2.0625}=0.6999.
+w_1=\frac{0.4437}{2.0625}=0.2151, \qquad w_3=\frac{1+0.4437}{2.0625}=0.6999
 $$
 
 | $x_i$  | $w_i$    | Exact value | Error    |
@@ -238,7 +246,7 @@ $$
 
 </Solution>
 
-### Example 2
+### Example 3
 
 Solve $y'' = 6x$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear finite-difference method for $N = 1$.
 
@@ -247,19 +255,19 @@ Solve $y'' = 6x$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear fini
 Here $p = q = 0$ and $r(x)=6x$. Calculate the mesh size and interior point:
 
 $$
-h=\frac{b-a}{N+1}=\frac{1-0}{1+1}=0.5, \qquad x_1=a+h=0.5.
+h=\frac{b-a}{N+1}=\frac{1-0}{1+1}=0.5, \qquad x_1=a+h=0.5
 $$
 
 Evaluate the forcing term at the interior point:
 
 $$
-r(x_1)=r(0.5)=6(0.5)=3.
+r(x_1)=r(0.5)=6(0.5)=3
 $$
 
 Since $p=q=0$, the difference equation is
 
 $$
--w_0+2w_1-w_2=-h^2r(x_1)=-(0.5)^2(3)=-0.75.
+-w_0+2w_1-w_2=-h^2r(x_1)=-(0.5)^2(3)=-0.75
 $$
 
 Apply the boundary values $w_0=y(0)=0$ and $w_2=y(1)=1$:
@@ -269,13 +277,13 @@ $$
 $$
 
 $$
-2w_1=0.25 \implies w_1=0.125.
+2w_1=0.25 \implies w_1=0.125
 $$
 
 The exact solution is $y=x^3$, so
 
 $$
-y(0.5)=(0.5)^3=0.125.
+y(0.5)=(0.5)^3=0.125
 $$
 
 The finite-difference method gives the exact value at the interior point.
