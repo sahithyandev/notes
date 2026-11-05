@@ -23,6 +23,7 @@ import { checkTooManyHeadings } from "./too-many-headings.ts";
 import { checkNotebookFile, checkNotebookFiles } from "./notebook-file.ts";
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 import { checkForwardLinks } from "./forward-link.ts";
+import { checkSolutionMethods } from "./solution-methods.ts";
 
 export {
   checkBrokenLinks,
@@ -55,6 +56,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkProofHint,
   checkTooManyHeadings,
   checkFormula,
+  checkSolutionMethods,
   checkNotebookFile,
 ];
 

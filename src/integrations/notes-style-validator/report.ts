@@ -24,6 +24,7 @@ export type RuleId =
   | "proof-hint"
   | "too-many-headings"
   | "formula"
+  | "solution-methods"
   | "notebook-file";
 
 export interface Violation {
