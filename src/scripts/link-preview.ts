@@ -215,7 +215,7 @@ function init(): void {
 
   const linkOf = (t: EventTarget | null) =>
     t instanceof Element
-      ? t.closest<HTMLAnchorElement>("article a[href]")
+      ? t.closest<HTMLAnchorElement>("article a[href], .prereqs a[href]")
       : null;
   const inCard = (t: EventTarget | null) =>
     t instanceof Node && card!.contains(t);
