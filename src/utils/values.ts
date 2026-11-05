@@ -10,10 +10,8 @@ export const CGPA = 3.82;
 // "s5" = whole semester; "s5/thermodynamics" = single module.
 export const WIP_PREFIXES: string[] = [
   "s5/advanced-networking",
-  "s5/advanced-software-engineering",
   "s5/business-economics-and-financial-accounting",
   "s5/calculus",
-  "s5/numerical-methods",
 ];
 
 export const isWip = (slug: string): boolean =>

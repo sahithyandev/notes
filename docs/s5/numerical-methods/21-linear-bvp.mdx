@@ -1,7 +1,7 @@
 ---
 title: Linear BVP
 dateCreated: 2026-11-04T00:00:00.000Z
-lastUpdatedOn: 2026-11-04T05:14:07.604Z
+lastUpdatedOn: 2026-11-05T16:09:39.617Z
 ---
 
 A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is linear **iff**
@@ -82,7 +82,10 @@ Choose $c$ so that $y(b) = \beta$.
 <Formula>
 
 $$
-c = \frac{\beta - y_1(b)}{y_2(b)}, \qquad y(x) = y_1(x) + \frac{\beta - y_1(b)}{y_2(b)}\,y_2(x)
+\begin{aligned}
+c &= \frac{\beta - y_1(b)}{y_2(b)} \\
+y(x) &= y_1(x) + c\,y_2(x)
+\end{aligned}
 $$
 
 </Formula>
@@ -165,7 +168,7 @@ Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, and $y(1) = 1$ with the linear s
 
 $p = 0$, $q = 1$, and $r = 0$.
 
-For the shooting method, solve the auxiliary IVPs
+Use step size $h=0.25$. For the shooting method, solve the auxiliary IVPs with order 4 Runge-Kutta:
 
 $$
 y_1'' = y_1, \quad y_1(0) = 0,\ y_1'(0) = 0
@@ -177,115 +180,67 @@ $$
 y_2'' = y_2, \quad y_2(0) = 0,\ y_2'(0) = 1
 $$
 
-The first IVP has the zero solution, so $y_1(x) = 0$. The second IVP has the solution $y_2(x) = \sinh x$. Therefore,
+The first IVP has $y_1(x)=0$. Applying order 4 Runge-Kutta to the second IVP gives
 
 $$
-c = \frac{1-y_1(1)}{y_2(1)} = \frac{1-0}{\sinh 1} = 0.8509
+\begin{array}{c|cc}
+x & y_2(x) & y_2'(x) \\\hline
+0 & 0 & 1 \\
+0.25 & 0.252604 & 1.031413 \\
+0.50 & 0.521078 & 1.127621 \\
+0.75 & 0.822289 & 1.294669 \\
+1.00 & 1.175158 & 1.543052
+\end{array}
+$$
+
+Therefore,
+
+$$
+c = \frac{1-y_1(1)}{y_2(1)} = \frac{1-0}{1.175158} = 0.8509
 $$
 
 Combining the auxiliary solutions gives
 
 $$
-y(x) = y_1(x) + c y_2(x) = 0 + \frac{\sinh x}{\sinh 1}
+y(x) = y_1(x) + c y_2(x) \approx 0.8509y_2(x)
 $$
 
 </Solution>
 
 ### Example 2
 
-Solve $y'' = y$, $0 \leq x \leq 1$, $y(0) = 0$, and $y(1) = 1$ with the linear finite-difference method for $N = 3$.
+Solve $y'' = y+1$, $0 \leq x \leq 1$, $y(0) = 0$, and $y(1) = 1$ with the linear shooting method. Use order 4 Runge-Kutta with $h=0.25$.
 
 <Solution>
 
-For the finite-difference method,
+Here $p=0$, $q=1$, and $r=1$. The auxiliary IVPs are
 
 $$
-h = \frac{b-a}{N+1} = \frac{1-0}{3+1} = 0.25, \qquad x_1=0.25,\ x_2=0.50,\ x_3=0.75
+y_1''=y_1+1, \quad y_1(0)=0,\ y_1'(0)=0
 $$
 
-Since $p = r = 0$ and $q = 1$,
+and
 
 $$
--w_{i-1} + (2+h^2)w_i-w_{i+1}=0, \qquad 2+h^2=2+0.25^2=2.0625
+y_2''=y_2, \quad y_2(0)=0,\ y_2'(0)=1
 $$
 
-Using $w_0=0$ and $w_4=1$ gives
+Order 4 Runge-Kutta gives
 
 $$
-\begin{pmatrix}2.0625&-1&0\\-1&2.0625&-1\\0&-1&2.0625\end{pmatrix}\begin{pmatrix}w_1\\w_2\\w_3\end{pmatrix}=\begin{pmatrix}0\\0\\1\end{pmatrix}
+y_1(1)\approx0.543052, \qquad y_2(1)\approx1.175158
 $$
 
-The 1st and 3rd equations give
+Therefore,
 
 $$
-w_1 = \frac{w_2}{2.0625}, \qquad w_3 = \frac{1+w_2}{2.0625}
+c=\frac{1-y_1(1)}{y_2(1)}=\frac{1-0.543052}{1.175158}\approx0.38884
 $$
 
-Substitute these into the 2nd equation:
+The shooting approximation is
 
 $$
--\frac{w_2}{2.0625}+2.0625w_2-\frac{1+w_2}{2.0625}=0
+y(x)\approx y_1(x)+0.38884y_2(x)
 $$
-
-$$
-\left(2.0625-\frac{2}{2.0625}\right)w_2=\frac{1}{2.0625}
-\implies w_2=0.4437
-$$
-
-Back-substitution gives
-
-$$
-w_1=\frac{0.4437}{2.0625}=0.2151, \qquad w_3=\frac{1+0.4437}{2.0625}=0.6999
-$$
-
-| $x_i$  | $w_i$    | Exact value | Error    |
-| ------ | -------- | ----------- | -------- |
-| $0.25$ | $0.2151$ | $0.2150$    | $0.0002$ |
-| $0.50$ | $0.4437$ | $0.4434$    | $0.0003$ |
-| $0.75$ | $0.6999$ | $0.6997$    | $0.0002$ |
-
-</Solution>
-
-### Example 3
-
-Solve $y'' = 6x$, $0 \leq x \leq 1$, $y(0) = 0$, $y(1) = 1$ with the linear finite-difference method for $N = 1$.
-
-<Solution>
-
-Here $p = q = 0$ and $r(x)=6x$. Calculate the mesh size and interior point:
-
-$$
-h=\frac{b-a}{N+1}=\frac{1-0}{1+1}=0.5, \qquad x_1=a+h=0.5
-$$
-
-Evaluate the forcing term at the interior point:
-
-$$
-r(x_1)=r(0.5)=6(0.5)=3
-$$
-
-Since $p=q=0$, the difference equation is
-
-$$
--w_0+2w_1-w_2=-h^2r(x_1)=-(0.5)^2(3)=-0.75
-$$
-
-Apply the boundary values $w_0=y(0)=0$ and $w_2=y(1)=1$:
-
-$$
--0+2w_1-1=-0.75
-$$
-
-$$
-2w_1=0.25 \implies w_1=0.125
-$$
-
-The exact solution is $y=x^3$, so
-
-$$
-y(0.5)=(0.5)^3=0.125
-$$
-
-The finite-difference method gives the exact value at the interior point.
 
 </Solution>

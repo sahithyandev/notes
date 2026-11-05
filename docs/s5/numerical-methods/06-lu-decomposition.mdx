@@ -3,7 +3,7 @@ title: LU Decomposition
 notebooks:
   - lu-decomposition
 dateCreated: 2026-07-28T05:06:00.161Z
-lastUpdatedOn: 2026-11-03T02:21:30.353Z
+lastUpdatedOn: 2026-11-05T16:09:39.548Z
 ---
 
 The process of factorizing a square matrix into 2 [triangular matrices](/s1/mathematics/matrices/introduction#triangular-matrix): a lower triangular matrix ($L$) and an upper triangular matrix ($U$).
@@ -318,8 +318,6 @@ $$
 
 <Solution>
 
-<Method label="Forward and Back Substitution">
-
 From Example 1,
 
 $$
@@ -362,8 +360,6 @@ $$
 $$
 \vec{x} = \begin{pmatrix} 3 \\ -1 \\ 4 \end{pmatrix}
 $$
-
-</Method>
 
 </Solution>
 
@@ -498,8 +494,6 @@ $$
 
 <Solution>
 
-<Method label="Forward and Back Substitution">
-
 Each column $\vec{x}_j$ of $A^{-1}$ solves $LU\vec{x}_j = \vec{e}_j$. From Example 1,
 
 $$
@@ -507,23 +501,20 @@ L = \begin{pmatrix} 1 & 0 & 0 \\ -\frac{3}{2} & 1 & 0 \\ -1 & 4 & 1 \end{pmatrix
 U = \begin{pmatrix} 2 & 1 & -1 \\ 0 & \frac{1}{2} & \frac{1}{2} \\ 0 & 0 & -1 \end{pmatrix}
 $$
 
-Column 1, $\vec{e}_1 = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix}$
+For each $j$, solve $L\vec{w}_j = \vec{e}_j$, then solve $U\vec{x}_j = \vec{w}_j$.
 
-Solve $L\vec{w}_1 = \vec{e}_1$ by forward substitution.
+<StepByStep>
 
-$$
-w_1 = 1
-$$
+<StepItem label="Solve for column 1">
 
-$$
--\frac{3}{2} w_1 + w_2 = 0 \implies w_2 = \frac{3}{2}
-$$
+For $\vec{e}_1 = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix}$, solve $L\vec{w}_1 = \vec{e}_1$ by forward substitution.
 
 $$
--w_1 + 4w_2 + w_3 = 0 \implies w_3 = -5
+w_1 = 1, \quad -\frac{3}{2}w_1 + w_2 = 0 \implies w_2 = \frac{3}{2}
 $$
 
 $$
+-w_1 + 4w_2 + w_3 = 0 \implies w_3 = -5, \quad
 \vec{w}_1 = \begin{pmatrix} 1 \\ \frac{3}{2} \\ -5 \end{pmatrix}
 $$
 
@@ -534,10 +525,7 @@ $$
 $$
 
 $$
-\frac{1}{2} x_2 + \frac{1}{2}(5) = \frac{3}{2} \implies x_2 = -2
-$$
-
-$$
+\frac{1}{2}x_2 + \frac{1}{2}(5) = \frac{3}{2} \implies x_2 = -2, \quad
 2x_1 + x_2 - x_3 = 1 \implies x_1 = 4
 $$
 
@@ -545,37 +533,29 @@ $$
 \vec{x}_1 = \begin{pmatrix} 4 \\ -2 \\ 5 \end{pmatrix}
 $$
 
-Column 2, $\vec{e}_2 = \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix}$
+</StepItem>
 
-Solve $L\vec{w}_2 = \vec{e}_2$ by forward substitution.
+<StepItem label="Solve for column 2">
 
-$$
-w_1 = 0
-$$
+For $\vec{e}_2 = \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix}$, solve $L\vec{w}_2 = \vec{e}_2$.
 
 $$
--\frac{3}{2} w_1 + w_2 = 1 \implies w_2 = 1
+w_1 = 0, \quad -\frac{3}{2}w_1 + w_2 = 1 \implies w_2 = 1
 $$
 
 $$
--w_1 + 4w_2 + w_3 = 0 \implies w_3 = -4
-$$
-
-$$
+-w_1 + 4w_2 + w_3 = 0 \implies w_3 = -4, \quad
 \vec{w}_2 = \begin{pmatrix} 0 \\ 1 \\ -4 \end{pmatrix}
 $$
 
-Solve $U\vec{x}_2 = \vec{w}_2$ by back substitution.
+Solve $U\vec{x}_2 = \vec{w}_2$.
 
 $$
 -x_3 = -4 \implies x_3 = 4
 $$
 
 $$
-\frac{1}{2} x_2 + \frac{1}{2}(4) = 1 \implies x_2 = -2
-$$
-
-$$
+\frac{1}{2}x_2 + \frac{1}{2}(4) = 1 \implies x_2 = -2, \quad
 2x_1 + x_2 - x_3 = 0 \implies x_1 = 3
 $$
 
@@ -583,37 +563,29 @@ $$
 \vec{x}_2 = \begin{pmatrix} 3 \\ -2 \\ 4 \end{pmatrix}
 $$
 
-Column 3, $\vec{e}_3 = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}$
+</StepItem>
 
-Solve $L\vec{w}_3 = \vec{e}_3$ by forward substitution.
+<StepItem label="Solve for column 3">
 
-$$
-w_1 = 0
-$$
+For $\vec{e}_3 = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}$, solve $L\vec{w}_3 = \vec{e}_3$.
 
 $$
--\frac{3}{2} w_1 + w_2 = 0 \implies w_2 = 0
+w_1 = 0, \quad -\frac{3}{2}w_1 + w_2 = 0 \implies w_2 = 0
 $$
 
 $$
--w_1 + 4w_2 + w_3 = 1 \implies w_3 = 1
-$$
-
-$$
+-w_1 + 4w_2 + w_3 = 1 \implies w_3 = 1, \quad
 \vec{w}_3 = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}
 $$
 
-Solve $U\vec{x}_3 = \vec{w}_3$ by back substitution.
+Solve $U\vec{x}_3 = \vec{w}_3$.
 
 $$
 -x_3 = 1 \implies x_3 = -1
 $$
 
 $$
-\frac{1}{2} x_2 + \frac{1}{2}(-1) = 0 \implies x_2 = 1
-$$
-
-$$
+\frac{1}{2}x_2 + \frac{1}{2}(-1) = 0 \implies x_2 = 1, \quad
 2x_1 + x_2 - x_3 = 0 \implies x_1 = -1
 $$
 
@@ -621,12 +593,18 @@ $$
 \vec{x}_3 = \begin{pmatrix} -1 \\ 1 \\ -1 \end{pmatrix}
 $$
 
-Assembling the columns,
+</StepItem>
+
+<StepItem label="Assemble the inverse">
+
+The columns are $\vec{x}_1$, $\vec{x}_2$, and $\vec{x}_3$ in order.
 
 $$
 A^{-1} = \begin{pmatrix} 4 & 3 & -1 \\ -2 & -2 & 1 \\ 5 & 4 & -1 \end{pmatrix}
 $$
 
-</Method>
+</StepItem>
+
+</StepByStep>
 
 </Solution>

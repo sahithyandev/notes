@@ -3,7 +3,7 @@ title: Systems of IVPs
 notebooks:
   - systems-of-ivps
 dateCreated: 2026-09-01T00:00:00.000Z
-lastUpdatedOn: 2026-11-03T20:22:20.867Z
+lastUpdatedOn: 2026-11-05T16:09:39.607Z
 ---
 
 An $m$-dimensional system of first-order [IVPs](/s5/numerical-methods/initial-value-problem) is
@@ -73,7 +73,82 @@ $$
 
 </Formula>
 
-Solving the system by order 4 Runge-Kutta, the first component of $\mathbf{w}_i$ approximates $y(t_i)$.
+### Conversion Procedure
+
+Set
+
+<Formula>
+
+$$
+u_j = y^{(j-1)}, \qquad j = 1, \ldots, m
+$$
+
+</Formula>
+
+Then
+
+<Formula>
+
+$$
+u_j' = u_{j+1}, \quad j = 1, \ldots, m-1, \qquad
+u_m' = f(t, u_1, \ldots, u_m)
+$$
+
+</Formula>
+
+with
+
+<Formula>
+
+$$
+\mathbf{u}(a) = (\alpha_1, \alpha_2, \ldots, \alpha_m)^T
+$$
+
+</Formula>
+
+For a linear equation
+
+<Formula>
+
+$$
+y^{(m)} + c_{m-1}(t)y^{(m-1)} + \cdots + c_1(t)y' + c_0(t)y = r(t),
+$$
+
+</Formula>
+
+the last system equation is
+
+<Formula>
+
+$$
+u_m' = r(t) - c_0(t)u_1 - c_1(t)u_2 - \cdots - c_{m-1}(t)u_m
+$$
+
+</Formula>
+
+For constant coefficients,
+
+<Formula>
+
+$$
+\mathbf{u}' = A\mathbf{u} + \mathbf{r}(t), \qquad
+A = \begin{pmatrix}
+0 & 1 & 0 & \cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & & & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1 \\
+-c_0 & -c_1 & -c_2 & \cdots & -c_{m-1}
+\end{pmatrix}, \qquad
+\mathbf{r}(t) = (0, \ldots, 0, r(t))^T
+$$
+
+</Formula>
+
+For a numerical method with approximations $\mathbf{w}_i$ at $t_i = a + ih$,
+
+$$
+w_{i,1} \approx y(t_i), \qquad w_{i,2} \approx y'(t_i), \qquad \ldots, \qquad w_{i,m} \approx y^{(m-1)}(t_i)
+$$
 
 ## Worked Examples
 

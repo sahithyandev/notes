@@ -3,7 +3,7 @@ title: LUP Decomposition
 notebooks:
   - lup-decomposition
 dateCreated: 2026-08-09T15:17:42.855Z
-lastUpdatedOn: 2026-11-03T02:21:30.385Z
+lastUpdatedOn: 2026-11-05T16:09:39.577Z
 ---
 
 The LUP decomposition of an $n \times n$ matrix $A$ is the triple $(L, U, P)$ satisfying
@@ -94,8 +94,10 @@ Define the multiplier vector and the next recursive matrix as
 <Formula>
 
 $$
-\ell^{(k)} = \frac{c^{(k)}}{\alpha^{(k)}}, \qquad
-A^{(k+1)} = C^{(k)} - \ell^{(k)}\left(r^{(k)}\right)^T
+\begin{aligned}
+\ell^{(k)} &= \frac{c^{(k)}}{\alpha^{(k)}} \\
+A^{(k+1)} &= C^{(k)} - \ell^{(k)}\left(r^{(k)}\right)^T
+\end{aligned}
 $$
 
 </Formula>
@@ -126,9 +128,11 @@ For a matrix larger than $1 \times 1$:
 <Formula>
 
 $$
-P^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P^{(k+1)} \end{pmatrix}S^{(k)}, \quad
-L^{(k)} = \begin{pmatrix} 1 & \vec{0}^T \\ P^{(k+1)}\ell^{(k)} & L^{(k+1)} \end{pmatrix}, \quad
-U^{(k)} = \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ \vec{0} & U^{(k+1)} \end{pmatrix}
+\begin{aligned}
+P^{(k)} &= \begin{pmatrix} 1 & \vec{0}^T \\ \vec{0} & P^{(k+1)} \end{pmatrix}S^{(k)} \\
+L^{(k)} &= \begin{pmatrix} 1 & \vec{0}^T \\ P^{(k+1)}\ell^{(k)} & L^{(k+1)} \end{pmatrix} \\
+U^{(k)} &= \begin{pmatrix} \alpha^{(k)} & \left(r^{(k)}\right)^T \\ \vec{0} & U^{(k+1)} \end{pmatrix}
+\end{aligned}
 $$
 
 </Formula>

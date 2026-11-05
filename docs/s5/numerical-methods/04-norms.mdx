@@ -5,7 +5,7 @@ prereqs:
   - s1/mathematics/matrices/matrix-norms#induced-norm
   - s4/linear-algebra/norm
 dateCreated: 2026-07-19T18:06:27.461Z
-lastUpdatedOn: 2026-11-03T02:21:30.324Z
+lastUpdatedOn: 2026-11-05T16:09:39.512Z
 ---
 
 A norm is a real-valued function measuring the size of a vector or a matrix.
@@ -158,21 +158,11 @@ For any matrix norm $\lVert \cdot \rVert_m$ induced by a vector norm, $\rho(A) \
 
 ## Worked Example
 
-For $\vec{x} = (3, -4, 12)^T$ and
+### Vector Norms
 
-<Formula>
-
-$$
-A = \begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix}
-$$
-
-</Formula>
-
-find the vector norms of $\vec{x}$, the induced matrix norms of $A$, and verify $\rho(A) \leq \lVert A \rVert_2$.
+For $\vec{x} = (3, -4, 12)^T$, find the $1$-norm, $2$-norm, and infinity norm.
 
 <Solution>
-
-Vector norms
 
 $$
 \lVert \vec{x} \rVert_1 = 3 + 4 + 12 = 19
@@ -188,7 +178,23 @@ $$
 
 These satisfy $\lVert \vec{x} \rVert_\infty \leq \lVert \vec{x} \rVert_2 \leq \lVert \vec{x} \rVert_1$.
 
-Matrix norms
+</Solution>
+
+### Induced Matrix Norms
+
+For
+
+<Formula>
+
+$$
+A = \begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix}
+$$
+
+</Formula>
+
+find $\lVert A \rVert_1$ and $\lVert A \rVert_\infty$.
+
+<Solution>
 
 $$
 \lVert A \rVert_\infty = \max\{1 + 2,\ 3 + 4\} = 7
@@ -198,7 +204,25 @@ $$
 \lVert A \rVert_1 = \max\{1 + 3,\ 2 + 4\} = 6
 $$
 
-For $\lVert A \rVert_2$
+</Solution>
+
+### Spectral-Radius Inequality
+
+For
+
+<Formula>
+
+$$
+A = \begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix}
+$$
+
+</Formula>
+
+verify $\rho(A) \leq \lVert A \rVert_2$.
+
+<Solution>
+
+First calculate $\lVert A \rVert_2$.
 
 $$
 A^TA = \begin{pmatrix} 1 & 3 \\ -2 & 4 \end{pmatrix}\begin{pmatrix} 1 & -2 \\ 3 & 4 \end{pmatrix} = \begin{pmatrix} 10 & 10 \\ 10 & 20 \end{pmatrix}

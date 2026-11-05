@@ -1,7 +1,7 @@
 ---
 title: Pixel Connectivity
 dateCreated: 2026-07-26T04:59:26.159Z
-lastUpdatedOn: 2026-10-28T23:42:27.365Z
+lastUpdatedOn: 2026-11-05T16:09:39.485Z
 ---
 
 Once an image is digitized, only a matrix of values remains. Pixel geometry is often lost.
@@ -64,7 +64,7 @@ For 2 pixels $p(x,y)$ and $q(s,t)$:
 
 ### Euclidean Distance
 
-Straight-line distance between $p$ and $q$.
+The [2-norm](/s5/numerical-methods/norms#2-norm), or straight-line distance, between $p$ and $q$.
 
 $$
 D_e(p,q) = \sqrt{(x-s)^2 + (y-t)^2}
@@ -72,13 +72,16 @@ $$
 
 ### City-Block Distance
 
-<Aka>Manhattan distance</Aka>. Straight-line distance along the grid.
+<Aka>Manhattan distance</Aka>. The [1-norm](/s5/numerical-methods/norms#1-norm),
+measuring distance along the grid.
 
 $$
 D_4(p,q) = |x-s| + |y-t|
 $$
 
 ### Chessboard Distance
+
+The [infinity norm](/s5/numerical-methods/norms#infinity-norm).
 
 $$
 D_8(p,q) = \max(|x-s|, |y-t|)

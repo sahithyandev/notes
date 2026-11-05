@@ -3,7 +3,7 @@ title: Matrix Types
 prereqs:
   - s4/linear-algebra/hermitian#positive-definite-matrix
 dateCreated: 2026-07-19T18:06:25.234Z
-lastUpdatedOn: 2026-11-03T02:21:30.340Z
+lastUpdatedOn: 2026-11-05T16:09:39.532Z
 ---
 
 ## Diagonally Dominant Matrix
@@ -46,15 +46,58 @@ A symmetric matrix $A$ is positive definite **iff** every leading principal subm
 
 A symmetric matrix $A$ is positive definite **iff** Gaussian elimination on $Ax = b$ can be performed without row interchanges with all pivot elements positive. The computation is then stable with respect to round-off error growth.
 
+## Condition Number
+
+For an invertible matrix $A$, the condition number relative to a chosen matrix norm is
+
 <Formula>
 
 $$
-A = \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix}
+\kappa_{\lVert\cdot\rVert}(A) = \lVert A \rVert \lVert A^{-1} \rVert
 $$
 
 </Formula>
 
-is positive definite: its leading principal submatrices have determinants $2$, $3$, and $4$, all positive.
+The condition number depends on the chosen norm. For the matrix norm induced by the vector $p$-norm, write
+
+<Formula>
+
+$$
+\kappa_p(A) = \lVert A \rVert_p \lVert A^{-1} \rVert_p
+$$
+
+</Formula>
+
+When the norm is understood, write $\kappa(A)$.
+
+For a singular matrix, $\kappa(A) = \infty$. For every invertible matrix, $\kappa(A) \geq 1$.
+
+- Well-conditioned matrix  
+  $\kappa(A)$ is close to $1$. Small relative changes in the input produce small relative changes in the solution.
+- Ill-conditioned matrix  
+  $\kappa(A)$ is large. Small relative changes in the input can produce large relative changes in the solution.
+
+For $Ax = b$ and a perturbation $\delta b$ in $b$,
+
+<Formula>
+
+$$
+\frac{\lVert \delta x \rVert}{\lVert x \rVert}
+\leq
+\kappa(A)\frac{\lVert \delta b \rVert}{\lVert b \rVert}
+$$
+
+</Formula>
+
+For a symmetric positive definite matrix, the eigenvalues in the [spectrum](/s5/numerical-methods/norms#spectrum) are positive. The $2$-norm condition number is
+
+<Formula>
+
+$$
+\kappa_2(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}
+$$
+
+</Formula>
 
 ## Convergent Matrix
 
@@ -72,7 +115,7 @@ For a square matrix $A$, the following are equivalent:
 
 - $A$ is convergent to $0$, i.e. $\lim_{k \to \infty} A^k = 0$
 - $\lim_{k \to \infty} \lVert A^k \rVert_m = 0$ for some matrix norm $\lVert \cdot \rVert_m$
-- $\rho(A) < 1$
+- $\rho(A) < 1$, where $\rho(A)$ is the [spectral radius](/s5/numerical-methods/norms#spectral-radius)
 
 ## Worked Example
 
@@ -103,6 +146,26 @@ $$
 $$
 
 All 3 rows satisfy the strict inequality. $A$ is strictly diagonally dominant, hence non-singular.
+
+</Solution>
+
+Check whether
+
+$$
+A = \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix}
+$$
+
+is positive definite.
+
+<Solution>
+
+$A$ is symmetric. Its leading principal submatrices have determinants
+
+$$
+\det A_1 = 2, \qquad \det A_2 = 3, \qquad \det A_3 = 4
+$$
+
+All are positive. $A$ is positive definite.
 
 </Solution>
 

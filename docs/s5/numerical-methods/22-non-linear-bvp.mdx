@@ -1,7 +1,7 @@
 ---
 title: Non-Linear BVP
 dateCreated: 2026-11-04T00:00:00.000Z
-lastUpdatedOn: 2026-11-03T22:25:20.659Z
+lastUpdatedOn: 2026-11-05T16:09:39.640Z
 ---
 
 A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is nonlinear **iff** its differential equation cannot be written as
@@ -110,3 +110,72 @@ $$
 </Formula>
 
 Solve with [Newton's method](/s5/numerical-methods/newtons-method). A unique solution exists whenever $h < \dfrac{2}{L}$.
+
+## Worked Examples
+
+### Example 1
+
+Solve $y''=(y')^2$, $0 \leq x \leq 1$, $y(0)=0$, and $y(1)=1$ with the nonlinear shooting method. Start with $t_0=0.5$ and stop when $|y(1,t_k)-1|<10^{-5}$.
+
+<Solution>
+
+For an initial slope $t$, set $v=y'$, $z=\partial y/\partial t$, and $s=z'$. The first-order IVP system is
+
+$$
+y'=v, \qquad v'=v^2, \qquad z'=s, \qquad s'=2vs
+$$
+
+with $y(0)=0$, $v(0)=t$, $z(0)=0$, and $s(0)=1$. Use order 4 Runge-Kutta with $h=0.25$ to solve both IVPs numerically.
+
+The Newton update is
+
+$$
+t_{k+1}=t_k-\frac{y(1,t_k)-1}{z(1,t_k)}
+$$
+
+For $t_0=0.5$, one RK4 integration gives $y(1,t_0)\approx0.6930885$ and $z(1,t_0)\approx1.9990825$. The iterations are
+
+| $k$ |       $t_k$ |  $y(1,t_k)$ |  $z(1,t_k)$ |
+| --- | ----------: | ----------: | ----------: |
+| $0$ | $0.5000000$ | $0.6930885$ | $1.9990825$ |
+| $1$ | $0.6535262$ | $1.0593241$ | $2.8765003$ |
+| $2$ | $0.6329025$ | $1.0016746$ | $2.7170748$ |
+| $3$ | $0.6322862$ | $1.0000014$ | $2.7125768$ |
+| $4$ | $0.6322857$ | $1.0000000$ | $2.7125731$ |
+
+At $t_4$, $|y(1,t_4)-1|\approx9.5\times10^{-13}<10^{-5}$. Hence,
+
+$$
+y'(0)\approx0.6322857
+$$
+
+</Solution>
+
+### Example 2
+
+Solve $y''=y^2$, $0 \leq x \leq 1$, $y(0)=0$, and $y(1)=1$ with the nonlinear shooting method. Start with $t_0=0.5$, use order 4 Runge-Kutta with $h=0.25$, and stop when $|y(1,t_k)-1|<10^{-5}$.
+
+<Solution>
+
+Set $v=y'$, $z=\partial y/\partial t$, and $s=z'$. The IVP system is
+
+$$
+y'=v, \qquad v'=y^2, \qquad z'=s, \qquad s'=2yz
+$$
+
+with $y(0)=0$, $v(0)=t$, $z(0)=0$, and $s(0)=1$. The RK4 integrations and Newton updates are
+
+| $k$ |       $t_k$ |  $y(1,t_k)$ |  $z(1,t_k)$ |
+| --- | ----------: | ----------: | ----------: |
+| $0$ | $0.5000000$ | $0.5213354$ | $1.0863657$ |
+| $1$ | $0.9406110$ | $1.0177426$ | $1.1677594$ |
+| $2$ | $0.9254173$ | $1.0000220$ | $1.1648661$ |
+| $3$ | $0.9253984$ | $1.0000000$ | $1.1648625$ |
+
+At $t_3$, the residual is less than $10^{-5}$. Therefore,
+
+$$
+y'(0)=t_3\approx0.9253984
+$$
+
+</Solution>
