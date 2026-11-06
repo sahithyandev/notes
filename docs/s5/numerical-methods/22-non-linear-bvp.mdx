@@ -1,7 +1,7 @@
 ---
 title: Non-Linear BVP
 dateCreated: 2026-11-04T00:00:00.000Z
-lastUpdatedOn: 2026-11-05T16:09:39.640Z
+lastUpdatedOn: 2026-11-06T02:40:15.788Z
 ---
 
 A [boundary value problem](/s5/numerical-methods/boundary-value-problem) is nonlinear **iff** its differential equation cannot be written as
@@ -18,11 +18,7 @@ for functions $p$, $q$, and $r$.
 
 ## Nonlinear Shooting Method
 
-Finds the initial slope $y'(a)$ that makes an IVP solution hit $y(b) = \beta$.
-
-### Idea
-
-For a guess $t$, let $y(x,t)$ solve
+Choose the initial slope $t=y'(a)$ so that the IVP solution satisfies $y(b)=\beta$. For a trial value $t$, solve
 
 <Formula>
 
@@ -32,11 +28,7 @@ $$
 
 </Formula>
 
-Find $t$ such that $y(b,t) - \beta = 0$ with [Newton's method](/s5/numerical-methods/newtons-method).
-
-### Newton Iteration
-
-Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Differentiating the IVP gives
+Define $z(x,t) = \dfrac{\partial y(x,t)}{\partial t}$. Solve the sensitivity IVP with the original IVP:
 
 <Formula>
 
@@ -46,7 +38,7 @@ $$
 
 </Formula>
 
-The Newton update is
+Use [Newton's method](/s5/numerical-methods/newtons-method) on $F(t)=y(b,t)-\beta$:
 
 <Formula>
 
@@ -56,22 +48,19 @@ $$
 
 </Formula>
 
-### Procedure
-
-- Choose an initial guess $t_0$
-- For $k = 0, 1, 2, \ldots$, solve the IVPs for $y_k(x) = y(x,t_k)$ and $z_k(x) = z(x,t_k)$
-- Stop when $|y_k(b) - \beta|$ is sufficiently small
-- Update $t_{k+1} = t_k - \dfrac{y_k(b)-\beta}{z_k(b)}$
+- Choose an initial guess $t_0$.
+- Solve both IVPs with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
+- Update $t$ until $|F(t)|$ is sufficiently small.
 
 <Note>
 
-Reduce both IVPs to first-order systems. Solve them with [order 4 Runge-Kutta](/s5/numerical-methods/systems-of-ivps).
+Reduce both IVPs to first-order systems before applying Runge-Kutta.
 
 </Note>
 
 ## Nonlinear Finite-Difference Method
 
-Replace derivatives with centered differences and solve the resulting nonlinear system with Newton's method.
+Replace derivatives with centered differences. Solve the resulting nonlinear system with Newton's method.
 
 A unique solution exists **iff**
 
@@ -79,9 +68,7 @@ A unique solution exists **iff**
 - $f_y(x,y,y') \geq \delta$ for some $\delta > 0$
 - A constant $k$ exists with $k = \max\big(|f_y(x,y,y')|,\ |f_{y'}(x,y,y')|\big)$
 
-### Nonlinear Difference Equation
-
-For mesh points $x_0, \ldots, x_{N+1}$, with $y(x_i) \approx w_i$,
+For mesh points $x_0, \ldots, x_{N+1}$, let $y(x_i) \approx w_i$. Centered differences give
 
 <Formula>
 
@@ -93,9 +80,7 @@ $$
 
 for $i = 1, \ldots, N$, with truncation error $O(h^2)$.
 
-### Nonlinear System
-
-The $N$ equations are
+The resulting $N$ equations are
 
 <Formula>
 
@@ -115,11 +100,23 @@ Solve with [Newton's method](/s5/numerical-methods/newtons-method). A unique sol
 
 ### Example 1
 
-Solve $y''=(y')^2$, $0 \leq x \leq 1$, $y(0)=0$, and $y(1)=1$ with the nonlinear shooting method. Start with $t_0=0.5$ and stop when $|y(1,t_k)-1|<10^{-5}$.
+Use the nonlinear shooting method to solve
+
+$$
+y''=(y')^2, \quad 0 \leq x \leq 1, \quad y(0)=0, \quad y(1)=1
+$$
+
+Start with $t_0=y'(0)=0.5$. Use order 4 Runge-Kutta on the mesh $x=0,0.25,0.5,0.75,1$. Stop when the endpoint residual $|y(1,t_k)-1|$ is less than $10^{-5}$.
 
 <Solution>
 
-For an initial slope $t$, set $v=y'$, $z=\partial y/\partial t$, and $s=z'$. The first-order IVP system is
+For a trial initial slope $t$, set
+
+$$
+v=y', \qquad z=\frac{\partial y}{\partial t}, \qquad s=z'
+$$
+
+The IVP system for $y$ and its sensitivity $z$ is
 
 $$
 y'=v, \qquad v'=v^2, \qquad z'=s, \qquad s'=2vs
@@ -127,23 +124,35 @@ $$
 
 with $y(0)=0$, $v(0)=t$, $z(0)=0$, and $s(0)=1$. Use order 4 Runge-Kutta with $h=0.25$ to solve both IVPs numerically.
 
-The Newton update is
+For each trial slope, define the endpoint residual $F(t)=y(1,t)-1$. The Newton update is
 
 $$
-t_{k+1}=t_k-\frac{y(1,t_k)-1}{z(1,t_k)}
+t_{k+1}=t_k-\frac{F(t_k)}{z(1,t_k)}
 $$
 
-For $t_0=0.5$, one RK4 integration gives $y(1,t_0)\approx0.6930885$ and $z(1,t_0)\approx1.9990825$. The iterations are
+The first RK4 integration gives
 
-| $k$ |       $t_k$ |  $y(1,t_k)$ |  $z(1,t_k)$ |
-| --- | ----------: | ----------: | ----------: |
-| $0$ | $0.5000000$ | $0.6930885$ | $1.9990825$ |
-| $1$ | $0.6535262$ | $1.0593241$ | $2.8765003$ |
-| $2$ | $0.6329025$ | $1.0016746$ | $2.7170748$ |
-| $3$ | $0.6322862$ | $1.0000014$ | $2.7125768$ |
-| $4$ | $0.6322857$ | $1.0000000$ | $2.7125731$ |
+$$
+y(1,t_0)\approx0.6930885, \qquad F(t_0)\approx-0.3069115, \qquad z(1,t_0)\approx1.9990825
+$$
 
-At $t_4$, $|y(1,t_4)-1|\approx9.5\times10^{-13}<10^{-5}$. Hence,
+Thus,
+
+$$
+t_1=0.5-\frac{-0.3069115}{1.9990825}\approx0.6535262
+$$
+
+Repeating the integrations and Newton updates gives:
+
+| $k$ |       $t_k$ |            $F(t_k)$ |  $z(1,t_k)$ |   $t_{k+1}$ |
+| --- | ----------: | ------------------: | ----------: | ----------: |
+| $0$ | $0.5000000$ |        $-0.3069115$ | $1.9990825$ | $0.6535262$ |
+| $1$ | $0.6535262$ |         $0.0593241$ | $2.8765003$ | $0.6329025$ |
+| $2$ | $0.6329025$ |         $0.0016746$ | $2.7170748$ | $0.6322862$ |
+| $3$ | $0.6322862$ |  $1.4\times10^{-6}$ | $2.7125768$ | $0.6322857$ |
+| $4$ | $0.6322857$ | $9.5\times10^{-13}$ | $2.7125731$ |          -- |
+
+At $t_4$, $|F(t_4)|\approx9.5\times10^{-13}<10^{-5}$. Hence,
 
 $$
 y'(0)\approx0.6322857
@@ -153,26 +162,38 @@ $$
 
 ### Example 2
 
-Solve $y''=y^2$, $0 \leq x \leq 1$, $y(0)=0$, and $y(1)=1$ with the nonlinear shooting method. Start with $t_0=0.5$, use order 4 Runge-Kutta with $h=0.25$, and stop when $|y(1,t_k)-1|<10^{-5}$.
+Use the nonlinear shooting method to solve
+
+$$
+y''=y^2, \quad 0 \leq x \leq 1, \quad y(0)=0, \quad y(1)=1
+$$
+
+Start with $t_0=y'(0)=0.5$. Use order 4 Runge-Kutta with step size $h=0.25$. Stop when $|y(1,t_k)-1|$ is less than $10^{-5}$.
 
 <Solution>
 
-Set $v=y'$, $z=\partial y/\partial t$, and $s=z'$. The IVP system is
+For a trial initial slope $t$, set $v=y'$, $z=\partial y/\partial t$, and $s=z'$. The IVP system is
 
 $$
 y'=v, \qquad v'=y^2, \qquad z'=s, \qquad s'=2yz
 $$
 
-with $y(0)=0$, $v(0)=t$, $z(0)=0$, and $s(0)=1$. The RK4 integrations and Newton updates are
+with $y(0)=0$, $v(0)=t$, $z(0)=0$, and $s(0)=1$. Define $F(t)=y(1,t)-1$. The Newton update is
 
-| $k$ |       $t_k$ |  $y(1,t_k)$ |  $z(1,t_k)$ |
-| --- | ----------: | ----------: | ----------: |
-| $0$ | $0.5000000$ | $0.5213354$ | $1.0863657$ |
-| $1$ | $0.9406110$ | $1.0177426$ | $1.1677594$ |
-| $2$ | $0.9254173$ | $1.0000220$ | $1.1648661$ |
-| $3$ | $0.9253984$ | $1.0000000$ | $1.1648625$ |
+$$
+t_{k+1}=t_k-\frac{F(t_k)}{z(1,t_k)}
+$$
 
-At $t_3$, the residual is less than $10^{-5}$. Therefore,
+The RK4 integrations and Newton updates are:
+
+| $k$ |       $t_k$ |     $F(t_k)$ |  $z(1,t_k)$ |   $t_{k+1}$ |
+| --- | ----------: | -----------: | ----------: | ----------: |
+| $0$ | $0.5000000$ | $-0.4786646$ | $1.0863657$ | $0.9406110$ |
+| $1$ | $0.9406110$ |  $0.0177426$ | $1.1677594$ | $0.9254173$ |
+| $2$ | $0.9254173$ |  $0.0000220$ | $1.1648661$ | $0.9253984$ |
+| $3$ | $0.9253984$ |   $<10^{-5}$ | $1.1648625$ |          -- |
+
+At $t_3$, $|F(t_3)|<10^{-5}$. Therefore,
 
 $$
 y'(0)=t_3\approx0.9253984

@@ -3,7 +3,7 @@ title: Matrix Types
 prereqs:
   - s4/linear-algebra/hermitian#positive-definite-matrix
 dateCreated: 2026-07-19T18:06:25.234Z
-lastUpdatedOn: 2026-11-05T16:09:39.532Z
+lastUpdatedOn: 2026-11-06T02:40:15.769Z
 ---
 
 ## Diagonally Dominant Matrix
@@ -72,6 +72,8 @@ When the norm is understood, write $\kappa(A)$.
 
 For a singular matrix, $\kappa(A) = \infty$. For every invertible matrix, $\kappa(A) \geq 1$.
 
+The condition number quantifies the degree of ill-conditioning. A large condition number indicates that small relative changes in the input can produce large relative changes in the solution.
+
 - Well-conditioned matrix  
   $\kappa(A)$ is close to $1$. Small relative changes in the input produce small relative changes in the solution.
 - Ill-conditioned matrix  
@@ -88,6 +90,20 @@ $$
 $$
 
 </Formula>
+
+For example,
+
+<Formula>
+
+$$
+\begin{cases} x + y = 2 \\ x + 1.001y = 2 \end{cases}
+\qquad
+\begin{cases} x + y = 2 \\ x + 1.001y = 2.001 \end{cases}
+$$
+
+</Formula>
+
+The left system has solution $x = 2$, $y = 0$. The right system, obtained by a $0.001$ change in one constant, has solution $x = 1$, $y = 1$. The coefficient matrix is ill-conditioned, with condition number $4004$.
 
 For a symmetric positive definite matrix, the eigenvalues in the [spectrum](/s5/numerical-methods/norms#spectrum) are positive. The $2$-norm condition number is
 
