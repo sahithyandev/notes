@@ -1,0 +1,216 @@
+---
+// Expanded circular flow diagram: the household-firm income loop with
+// financial institutions, government, and the foreign sector.
+import ArrowFigure from "./primitives/arrow-figure.astro";
+import { makeUid } from "./lib/uid";
+
+const uid = makeUid("expanded-circular-flow");
+---
+
+<ArrowFigure
+  uid={uid}
+  title="Expanded Circular Flow Diagram"
+  desc="Households and firms exchange income and output. Savings, taxes, and imports leave the income stream. Investment, government spending, and exports enter it."
+  viewBox="0 0 760 520"
+  maxWidth={760}
+  captionSlot
+>
+  <g class="core-loop">
+    <rect class="entity" x="75" y="205" width="170" height="82" rx="12" />
+    <text class="entity-label" x="160" y="234" text-anchor="middle">
+      Households
+    </text>
+    <text class="entity-sub" x="160" y="256" text-anchor="middle">
+      Consumers and factor owners
+    </text>
+
+    <rect class="entity" x="515" y="205" width="170" height="82" rx="12" />
+    <text class="entity-label" x="600" y="234" text-anchor="middle">
+      Firms
+    </text>
+    <text class="entity-sub" x="600" y="256" text-anchor="middle">
+      Producers and employers
+    </text>
+
+    <path
+      class="arrow tone-pt"
+      d="M 245,220 C 330,165 430,165 515,220"
+      marker-end={`url(#${uid}-pt)`}
+    />
+    <text class="flow-label tone-pt" x="380" y="174" text-anchor="middle">
+      Consumption expenditure
+    </text>
+
+    <path
+      class="arrow tone-key"
+      d="M 515,272 C 430,327 330,327 245,272"
+      marker-end={`url(#${uid}-key)`}
+    />
+    <text class="flow-label tone-key" x="380" y="337" text-anchor="middle">
+      Factor payments and income
+    </text>
+  </g>
+
+  <g class="sector" transform="translate(380 78)">
+    <rect width="180" height="62" x="-90" y="-31" rx="10" />
+    <text class="sector-label" x="0" y="-3" text-anchor="middle">
+      Financial institutions
+    </text>
+    <text class="sector-sub" x="0" y="18" text-anchor="middle">
+      Savings and investment
+    </text>
+  </g>
+
+  <path
+    class="arrow tone-ct"
+    d="M 200,205 C 215,140 270,100 290,96"
+    marker-end={`url(#${uid}-ct)`}
+  />
+  <text class="flow-label tone-ct" x="212" y="139" text-anchor="middle">
+    Savings
+  </text>
+
+  <path
+    class="arrow tone-pt"
+    d="M 470,96 C 500,110 545,150 560,205"
+    marker-end={`url(#${uid}-pt)`}
+  />
+  <text class="flow-label tone-pt" x="531" y="139" text-anchor="middle">
+    Investment
+  </text>
+
+  <g class="sector" transform="translate(170 430)">
+    <rect width="170" height="62" x="-85" y="-31" rx="10" />
+    <text class="sector-label" x="0" y="-3" text-anchor="middle">
+      Government
+    </text>
+    <text class="sector-sub" x="0" y="18" text-anchor="middle">
+      Taxes and spending
+    </text>
+  </g>
+
+  <path
+    class="arrow tone-ct"
+    d="M 115,287 C 80,335 90,380 120,405"
+    marker-end={`url(#${uid}-ct)`}
+  />
+  <text class="flow-label tone-ct" x="63" y="357" text-anchor="middle">
+    Taxes
+  </text>
+
+  <path
+    class="arrow tone-ct"
+    d="M 515,287 C 480,350 390,405 255,421"
+    marker-end={`url(#${uid}-ct)`}
+  />
+  <text class="flow-label tone-ct" x="424" y="380" text-anchor="middle">
+    Taxes
+  </text>
+
+  <path
+    class="arrow tone-pt"
+    d="M 255,405 C 350,380 445,335 535,287"
+    marker-end={`url(#${uid}-pt)`}
+  />
+  <text class="flow-label tone-pt" x="386" y="405" text-anchor="middle">
+    Government spending
+  </text>
+
+  <g class="sector" transform="translate(590 430)">
+    <rect width="170" height="62" x="-85" y="-31" rx="10" />
+    <text class="sector-label" x="0" y="-3" text-anchor="middle">
+      Foreign sector
+    </text>
+    <text class="sector-sub" x="0" y="18" text-anchor="middle">
+      Imports and exports
+    </text>
+  </g>
+
+  <path
+    class="arrow tone-ct"
+    d="M 670,287 C 715,310 700,330 650,399"
+    marker-end={`url(#${uid}-ct)`}
+  />
+  <text class="flow-label tone-ct" x="715" y="357" text-anchor="middle">
+    Imports
+  </text>
+
+  <path
+    class="arrow tone-pt"
+    d="M 525,399 C 535,380 575,330 600,287"
+    marker-end={`url(#${uid}-pt)`}
+  />
+  <text class="flow-label tone-pt" x="563" y="393" text-anchor="middle">
+    Exports
+  </text>
+
+  <text class="group-label" x="380" y="22" text-anchor="middle">
+    LEAKAGES AND INJECTIONS
+  </text>
+
+  <text class="legend tone-ct" x="82" y="505">
+    Leakages: S + T + M
+  </text>
+  <text class="legend tone-pt" x="678" y="505" text-anchor="end">
+    Injections: I + G + X
+  </text>
+
+  <Fragment slot="caption">
+    <span class="tone-ct">Leakages</span> are savings, taxes, and imports.
+    <span class="tone-pt">Injections</span> are investment, government spending,
+    and exports. Equilibrium requires total leakages to equal total injections.
+  </Fragment>
+</ArrowFigure>
+
+<style>
+  .entity,
+  .sector rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+  }
+
+  .entity-label,
+  .sector-label {
+    fill: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .sector-label {
+    font-size: 0.72rem;
+  }
+
+  .entity-sub,
+  .sector-sub,
+  .flow-label,
+  .legend,
+  .group-label {
+    font-family: var(--font-mono);
+  }
+
+  .entity-sub,
+  .sector-sub {
+    fill: var(--text-muted);
+    font-size: 0.58rem;
+  }
+
+  .flow-label {
+    fill: var(--tone);
+    font-size: 0.58rem;
+    font-weight: 600;
+  }
+
+  .group-label {
+    fill: var(--text-muted);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+  }
+
+  .legend {
+    fill: var(--tone);
+    font-size: 0.62rem;
+    font-weight: 600;
+  }
+</style>

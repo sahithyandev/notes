@@ -10,6 +10,7 @@ export { default as BlurredStepThresholdDiagram } from "./blurred-step-threshold
 export { default as ChainOfTrustDiagram } from "./chain-of-trust-diagram.astro";
 export { default as CharacterAlignment } from "./character-alignment.astro";
 export { default as CircularFlowDiagram } from "./circular-flow-diagram.astro";
+export { default as ExpandedCircularFlowDiagram } from "./expanded-circular-flow-diagram.astro";
 export { default as ComplexLogExplorer } from "./complex-log-explorer.astro";
 export { default as CpmStep } from "./cpm-step.astro";
 export { default as CpmTable } from "./cpm-table.astro";
