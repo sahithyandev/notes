@@ -1,20 +1,88 @@
 ---
 import CartesianGraph from "./primitives/cartesian-graph.astro";
+
+const stageOneEnd = 1.86;
+const stageTwoEnd = 6.02;
 ---
 
 <CartesianGraph
   captionSlot
+  size="lg"
   title="Total Product, Average Product and Marginal Product"
+  desc="Total, average and marginal product curves divided into the three stages of production."
   y={{ label: "Product", domain: [0, 10] }}
   x={{ label: "Labour", domain: [0, 10] }}
-  layout={{
-    viewBox: "0 0 460 340",
-    x0: 55,
-    y0: 280,
-    top: 25,
-    right: 420,
-    labelGap: 30,
-  }}
+  areas={[
+    {
+      points: [
+        { x: 0, y: 0 },
+        { x: stageOneEnd, y: 0 },
+        { x: stageOneEnd, y: 10 },
+        { x: 0, y: 10 },
+      ],
+      tone: "s5",
+      opacity: 0.08,
+    },
+    {
+      points: [
+        { x: stageOneEnd, y: 0 },
+        { x: stageTwoEnd, y: 0 },
+        { x: stageTwoEnd, y: 10 },
+        { x: stageOneEnd, y: 10 },
+      ],
+      tone: "pt",
+      opacity: 0.08,
+    },
+    {
+      points: [
+        { x: stageTwoEnd, y: 0 },
+        { x: 10, y: 0 },
+        { x: 10, y: 10 },
+        { x: stageTwoEnd, y: 10 },
+      ],
+      tone: "ct",
+      opacity: 0.08,
+    },
+  ]}
+  lines={[
+    {
+      from: { x: stageOneEnd, y: 0 },
+      to: { x: stageOneEnd, y: 10 },
+      tone: "ink",
+      dashed: true,
+      guide: true,
+    },
+    {
+      from: { x: stageTwoEnd, y: 0 },
+      to: { x: stageTwoEnd, y: 10 },
+      tone: "ink",
+      dashed: true,
+      guide: true,
+    },
+  ]}
+  labels={[
+    {
+      text: "Stage 1",
+      x: stageOneEnd / 2,
+      y: 9.3,
+      tone: "s5",
+      anchor: "middle",
+    },
+    {
+      text: "Stage 2",
+      x: (stageOneEnd + stageTwoEnd) / 2,
+      y: 9.3,
+      tone: "pt",
+      anchor: "middle",
+    },
+    {
+      text: "Stage 3",
+      x: (stageTwoEnd + 10) / 2,
+      y: 9.3,
+      tone: "ct",
+      anchor: "middle",
+    },
+  ]}
   curves={[
     {
       equation: (labour) => 10 * (1 - Math.exp(-0.25 * labour)),
@@ -37,9 +105,25 @@ import CartesianGraph from "./primitives/cartesian-graph.astro";
   ]}
 >
   <Fragment slot="caption">
-    <strong class="tone-s5">TP</strong> = Total Product,
-    <strong class="tone-ct">AP</strong> = Average Product, and
-    <strong class="tone-pt">MP</strong> = Marginal Product. The diagram shows
-    their relationship as labour increases.
+    <span class="tp-ap-mp-caption">
+      <strong class="tone-s5">TP = Total Product</strong>,
+      <strong class="tone-ct">AP = Average Product</strong>, and
+      <strong class="tone-pt">MP = Marginal Product</strong>. The diagram shows
+      their relationship as labour increases.
+    </span>
   </Fragment>
 </CartesianGraph>
+
+<style>
+  .tp-ap-mp-caption :global(.tone-s5) {
+    color: var(--s5);
+  }
+
+  .tp-ap-mp-caption :global(.tone-ct) {
+    color: var(--dia-ct);
+  }
+
+  .tp-ap-mp-caption :global(.tone-pt) {
+    color: var(--dia-pt);
+  }
+</style>

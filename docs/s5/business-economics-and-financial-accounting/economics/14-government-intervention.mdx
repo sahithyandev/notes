@@ -3,7 +3,7 @@ title: Government Intervention
 authors:
   - nalina
 dateCreated: 2026-09-21T00:00:00.000Z
-lastUpdatedOn: 2026-11-06T22:02:17.024Z
+lastUpdatedOn: 2026-11-07T12:54:50.852Z
 ---
 
 Government intervention is action taken by the state to influence market outcomes and resource allocation, overriding the free interaction of supply and demand.
@@ -29,7 +29,7 @@ $$
 
 <Symbols>
   <Sym s="E_d">Price elasticity of demand (absolute value)</Sym>
-  <Sym s="E_2">Price elasticity of supply</Sym>
+  <Sym s="E_s">Price elasticity of supply</Sym>
 </Symbols>
 
 </Formula>
@@ -45,17 +45,13 @@ When demand is more elastic ($E_d > E_s$):
 
 A subsidy is a government payment to producers (or consumers) that lowers the per-unit cost of production or the effective price paid. It shifts the supply curve downward (or to the right) by the amount of the subsidy. With a per-unit subsidy $s$, producers receive $P_p = P_c + s$ where $P_c$ is the price consumers pay.
 
-The subsidy benefit splits between consumers and producers based on relative price elasticities.
+Shifts supply downward. The subsidy benefit splits between consumers and producers based on relative price elasticities.
 
 When demand is more elastic ($E_d > E_s$):
 
 - Quantity demanded increases significantly.
 - Producers receive a larger share of the subsidy benefit.
 - Consumers receive a smaller share through a lower price.
-
-<MarketEquilibriumDiagram />
-
-The original market equilibrium is the intersection of demand and supply. A tax shifts supply upward, while a subsidy shifts supply downward. The new intersection gives the post-policy price and quantity.
 
 ## Price Controls
 
@@ -101,11 +97,25 @@ At a price ceiling, only $Q_s$ units are traded. The demand price $P_d$ is the h
 
 The loss of total surplus from mutually beneficial trades that no longer take place. Under a price ceiling it is the triangle between the supply and demand curves, from $Q_s$ to $Q^*$:
 
+<Formula>
+
 $$
 \text{DWL} = \frac{1}{2} \times (Q^* - Q_s) \times (P_d - P_c)
 $$
 
+</Formula>
+
 </Definition>
+
+Under a price ceiling, deadweight loss is the triangle between the supply and demand curves, from $Q_s$ to $Q^*$:
+
+<Formula>
+
+$$
+\text{DWL} = \frac{1}{2} \times (Q^* - Q_s) \times (P_d - P_c)
+$$
+
+</Formula>
 
 <DeadweightLossDiagram />
 
@@ -379,6 +389,229 @@ $$
 
 </Solution>
 
+### Oil Market Price Ceiling
+
+The oil market has $Q_s = -2{,}000 + 30P$ and $Q_d = 13{,}000 - 20P$. Find the equilibrium and the effects of a price ceiling of Rs. 180.
+
+<Solution>
+
+#### Equilibrium
+
+At equilibrium, quantity supplied equals quantity demanded.
+
+$$
+\begin{aligned}
+-2{,}000 + 30P &= 13{,}000 - 20P \\
+P^* &= 300 \\
+Q^* &= -2{,}000 + 30(300) = 7{,}000
+\end{aligned}
+$$
+
+The equilibrium is $P^* = 300$ and $Q^* = 7{,}000$.
+
+#### Price Ceiling Effects
+
+The ceiling price is Rs. 180. It is below the equilibrium price of Rs. 300, so it is binding.
+
+At $P = 180$, calculate the quantity supplied and the quantity demanded separately.
+
+$$
+Q_s(180) = 3{,}400,
+\qquad Q_d(180) = 9{,}400
+$$
+
+Sellers offer 3,400 units, but buyers want 9,400 units. Therefore, the shortage is:
+
+$$
+\text{shortage} = Q_d - Q_s = 9{,}400 - 3{,}400 = 6{,}000
+$$
+
+Only 3,400 units are traded because the available quantity is limited by supply.
+
+#### Inverse Curves
+
+Inverse demand and supply are:
+
+$$
+P_D = 650 - 0.05Q,
+\qquad P_S = 66.67 + \frac{Q}{30}
+$$
+
+The inverse demand curve gives the maximum price buyers are willing to pay for each quantity. The inverse supply curve gives the minimum price sellers are willing to accept.
+
+<CartesianGraph
+  caption="The ceiling fixes the price at Rs. 180. Supply limits trade to 3,400 units. Demand at that price is 9,400 units. The horizontal segment between them represents the 6,000-unit shortage."
+  size="lg"
+  title="Oil Market Price Ceiling"
+  desc="Demand and supply intersect at 7,000 units and Rs. 300. A binding price ceiling at Rs. 180 limits trade to 3,400 units and creates a shortage of 6,000 units."
+  y={{ label: "Price (Rs.)", domain: [0, 700] }}
+  x={{ label: "Quantity", domain: [0, 10000] }}
+  areas={[
+    {
+      points: [
+        { x: 0, y: 650 },
+        { x: 0, y: 180 },
+        { x: 3400, y: 180 },
+        { x: 3400, y: 480 },
+      ],
+      tone: "s5",
+      opacity: 0.18,
+    },
+    {
+      points: [
+        { x: 0, y: 66.67 },
+        { x: 0, y: 180 },
+        { x: 3400, y: 180 },
+      ],
+      tone: "ct",
+      opacity: 0.2,
+    },
+  ]}
+  curves={[
+    {
+      equation: (quantity) => 650 - 0.05 * quantity,
+      domain: [0, 10000],
+      tone: "s5",
+      label: "D",
+      labelAt: 1800,
+      labelDx: 8,
+      labelDy: -8,
+    },
+    {
+      equation: (quantity) => 66.67 + quantity / 30,
+      domain: [0, 10000],
+      tone: "ct",
+      label: "S",
+      labelAt: 9000,
+      labelDx: 8,
+      labelDy: -8,
+    },
+  ]}
+  lines={[
+    {
+      from: { x: 0, y: 180 },
+      to: { x: 10000, y: 180 },
+      tone: "key",
+      dashed: true,
+    },
+    {
+      from: { x: 3400, y: 180 },
+      to: { x: 9400, y: 180 },
+      tone: "pt",
+      width: 3,
+    },
+  ]}
+  points={[
+    { x: 7000, y: 300, tone: "pt", label: "E", guides: true },
+    { x: 3400, y: 180, tone: "pt", label: "Qₛ", labelDy: 18, guides: "x" },
+    { x: 9400, y: 180, tone: "pt", label: "Qᵈ", labelDy: 18, guides: "x" },
+  ]}
+  labels={[
+    { text: "P* = 300", x: 0, y: 300, anchor: "end", dx: -8, dy: 4 },
+    {
+      text: "P ceiling = 180",
+      x: 0,
+      y: 180,
+      anchor: "end",
+      dx: -8,
+      dy: 4,
+      tone: "key",
+    },
+    {
+      text: "shortage = 6,000",
+      x: 6400,
+      y: 180,
+      anchor: "middle",
+      dy: -10,
+      tone: "pt",
+    },
+    {
+      text: "CS",
+      x: 1300,
+      y: 400,
+      anchor: "middle",
+      tone: "s5",
+      size: 13,
+      weight: 600,
+    },
+    {
+      text: "PS",
+      x: 1200,
+      y: 130,
+      anchor: "middle",
+      tone: "ct",
+      size: 13,
+      weight: 600,
+    },
+  ]}
+/>
+
+At the traded quantity $Q = 3{,}400$:
+
+$$
+P_D = 650 - 0.05(3{,}400) = 480
+$$
+
+The last traded unit is therefore valued by buyers at Rs. 480. Assume that the available units go to consumers with the highest willingness to pay.
+
+#### Consumer Surplus Under Ceiling
+
+Consumer surplus is the area between the demand curve and the price actually paid, Rs. 180.
+
+The area consists of a rectangle and a triangle.
+
+- Rectangle  
+  $3{,}400(480 - 180)$
+- Triangle  
+  $\frac{1}{2}(3{,}400)(650 - 480)$
+
+Therefore:
+
+$$
+CS = 3{,}400(480 - 180) + \frac{1}{2}(3{,}400)(650 - 480)
+$$
+
+$$
+CS = 1{,}020{,}000 + 289{,}000 = 1{,}309{,}000
+$$
+
+The same result can be written as:
+
+$$
+CS = 3{,}400(650 - 180) - \frac{1}{2}(3{,}400)(650 - 480)
+$$
+
+#### Producer Surplus Under Ceiling
+
+At $Q = 0$, the supply curve begins at approximately Rs. 66.67. Producers receive Rs. 180 for each traded unit.
+
+Producer surplus is the triangular area between Rs. 66.67 and Rs. 180.
+
+$$
+PS = \frac{1}{2}(3{,}400)(180 - 66.67) = 192{,}666.67
+$$
+
+#### Deadweight Loss Under Ceiling
+
+Without the ceiling, 7,000 units are traded. With the ceiling, only 3,400 units are traded.
+
+The number of trades lost is:
+
+$$
+7{,}000 - 3{,}400 = 3{,}600
+$$
+
+At $Q = 3{,}400$, buyers value the next unit at Rs. 480, while sellers are willing to supply it for Rs. 180. The maximum gain from the lost trades is therefore Rs. 300 per unit.
+
+The lost gains from trade form a triangle. Its base is 3,600 units and its height is Rs. 300.
+
+$$
+DWL = \frac{1}{2}(7{,}000 - 3{,}400)(480 - 180) = 540{,}000
+$$
+
+The shortage is 6,000 units. Consumer surplus is Rs. 1,309,000. Producer surplus is approximately Rs. 192,666.67. Deadweight loss is Rs. 540,000.
+
+</Solution>
 ### Price Ceiling Example
 
 Market for rental housing. Demand: $Q_d = 200 - 4P$. Supply: $Q_s = 20 + 2P$.

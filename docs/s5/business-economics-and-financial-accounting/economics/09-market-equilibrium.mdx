@@ -3,13 +3,13 @@ title: Market Equilibrium
 authors:
   - nalina
 dateCreated: 2026-09-21T00:00:00.000Z
-lastUpdatedOn: 2026-11-06T22:02:16.994Z
+lastUpdatedOn: 2026-11-07T12:54:50.798Z
 ---
 
 Market equilibrium occurs at the point where the demand curve and
 supply curve intersect.
 
-Example: at $5, buyers want 1,000 units and sellers offer 1,000 units. The market clears at $5 and 1,000 units.
+Example: at \$5, buyers want 1,000 units and sellers offer 1,000 units. The market clears at \$5 and 1,000 units.
 
 The intersection determines:
 
@@ -24,9 +24,18 @@ The intersection determines:
 
 A surplus occurs when the market price is above the equilibrium price.
 
+<Formula>
+
 $$
 Q_s > Q_d
 $$
+
+<Symbols>
+  <Sym s="Q_s">quantity supplied</Sym>
+  <Sym s="Q_d">quantity demanded</Sym>
+</Symbols>
+
+</Formula>
 
 Producers want to sell more than consumers want to buy.
 
@@ -37,9 +46,18 @@ to fall toward equilibrium.
 
 A shortage occurs when the market price is below the equilibrium price.
 
+<Formula>
+
 $$
 Q_d > Q_s
 $$
+
+<Symbols>
+  <Sym s="Q_d">quantity demanded</Sym>
+  <Sym s="Q_s">quantity supplied</Sym>
+</Symbols>
+
+</Formula>
 
 Consumers want to buy more than producers want to sell.
 
@@ -172,50 +190,57 @@ The producer surplus is 900.
 
 </Solution>
 
-### Oil Market Price Ceiling
+### Oil Market Equilibrium
 
-The oil market has $Q_s = -2{,}000 + 30P$ and $Q_d = 13{,}000 - 20P$. Find the equilibrium and the effects of a binding price ceiling of Rs. 180.
+The oil market has $Q_s = -2{,}000 + 30P$ and $Q_d = 13{,}000 - 20P$. Find the equilibrium price and quantity without government intervention.
 
 <Solution>
 
-Set $Q_s = Q_d$.
+At equilibrium, quantity supplied equals quantity demanded.
 
 $$
--2{,}000 + 30P = 13{,}000 - 20P
+\begin{aligned}
+-2{,}000 + 30P &= 13{,}000 - 20P \\
+P^* &= 300 \\
+Q^* &= -2{,}000 + 30(300) = 7{,}000
+\end{aligned}
 $$
 
-Therefore, $P^* = 300$ and $Q^* = 7{,}000$.
+The equilibrium is $P^* = 300$ and $Q^* = 7{,}000$.
 
-At the ceiling price:
-
-$$
-Q_s(180) = 3{,}400,
-\qquad Q_d(180) = 9{,}400
-$$
-
-The shortage is 6,000 units. Only 3,400 units are traded.
-
-Inverse demand and supply are:
-
-$$
-P_D = 650 - 0.05Q,
-\qquad P_S = 66.67 + \frac{Q}{30}
-$$
-
-At $Q = 3{,}400$, the demand price is Rs. 480. Assuming the available units go to consumers with the highest willingness to pay:
-
-$$
-CS = 3{,}400(650 - 180) - \frac{1}{2}(3{,}400)(650 - 480) = 1{,}309{,}000
-$$
-
-$$
-PS = \frac{1}{2}(3{,}400)(180 - 66.67) = 192{,}666.67
-$$
-
-$$
-DWL = \frac{1}{2}(7{,}000 - 3{,}400)(480 - 180) = 540{,}000
-$$
-
-The shortage is 6,000 units. Consumer surplus is Rs. 1,309,000. Supplier surplus is approximately Rs. 192,666.67. Deadweight loss is Rs. 540,000.
-
+<CartesianGraph
+  caption="Demand and supply intersect at 7,000 units and Rs. 300."
+  size="lg"
+  title="Oil Market Equilibrium"
+  desc="Demand and supply intersect at 7,000 units and Rs. 300."
+  y={{ label: "Price (Rs.)", domain: [0, 700] }}
+  x={{ label: "Quantity", domain: [0, 10000] }}
+  curves={[
+    {
+      equation: (quantity) => 650 - 0.05 * quantity,
+      domain: [0, 10000],
+      tone: "s5",
+      label: "D",
+      labelAt: 1800,
+      labelDx: 8,
+      labelDy: -8,
+    },
+    {
+      equation: (quantity) => 66.67 + quantity / 30,
+      domain: [0, 10000],
+      tone: "ct",
+      label: "S",
+      labelAt: 9000,
+      labelDx: 8,
+      labelDy: -8,
+    },
+  ]}
+  points={[
+    { x: 7000, y: 300, tone: "pt", label: "E", guides: true },
+  ]}
+  labels={[
+    { text: "P* = 300", x: 0, y: 300, anchor: "end", dx: -8, dy: 4 },
+    { text: "Q* = 7,000", x: 7000, y: 0, anchor: "middle", dy: 18, tone: "pt" },
+  ]}
+/>
 </Solution>

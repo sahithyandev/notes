@@ -75,7 +75,6 @@ export { default as Walkthrough } from "./walkthrough.astro";
 export { default as WalksVennDiagram } from "./walks-venn-diagram.astro";
 export { default as ProductionFunctionDiagram } from "./production-function-diagram.astro";
 export { default as TPAPMPDiagram } from "./tp-ap-mp-diagram.astro";
-export { default as StagesOfProductionDiagram } from "./stages-of-production-diagram.astro";
 export { default as OptimalInputDiagram } from "./optimal-input-diagram.astro";
 export { default as OverheadDistributionTable } from "./overhead-distribution-table.astro";
 export { default as IsoquantDiagram } from "./isoquant-diagram.astro";
