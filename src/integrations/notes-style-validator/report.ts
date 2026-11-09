@@ -3,29 +3,34 @@ export interface SimpleLogger {
   info(msg: string): void;
 }
 
-export type RuleId =
-  | "title-case"
-  | "title-parens"
-  | "title-dash"
-  | "dash"
-  | "math-delimiters"
-  | "adjacent-note"
-  | "adjacent-list"
-  | "label-description"
-  | "collapsed-label"
-  | "prereq-scope"
-  | "broken-link"
-  | "filename"
-  | "title-heading-duplicate"
-  | "duplicate-heading"
-  | "submodule-numbering"
-  | "forward-link"
-  | "math-block"
-  | "proof-hint"
-  | "too-many-headings"
-  | "formula"
-  | "solution-methods"
-  | "notebook-file";
+export const RULES = [
+  "title-case",
+  "title-parens",
+  "title-dash",
+  "title-length",
+  "dash",
+  "math-delimiters",
+  "adjacent-note",
+  "adjacent-list",
+  "label-description",
+  "collapsed-label",
+  "prereq-scope",
+  "filename",
+  "title-heading-duplicate",
+  "duplicate-heading",
+  "what-is-heading",
+  "math-block",
+  "proof-hint",
+  "too-many-headings",
+  "formula",
+  "solution-methods",
+  "notebook-file",
+  "broken-link",
+  "submodule-numbering",
+  "forward-link",
+] as const;
+
+export type RuleId = (typeof RULES)[number];
 
 export interface Violation {
   rule: RuleId;
