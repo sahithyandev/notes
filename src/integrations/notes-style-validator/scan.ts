@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { maskFile, maskWholeLine } from "./mask.ts";
 import { slugFromDocsPath } from "../../utils/note-path.ts";
 import { isMathBlockKind, mathBlockDepth } from "../../utils/math-blocks.ts";
+import { normalizeNoteLink } from "../../plugins/remark-note-links.ts";
 
 export interface ScannedHeading {
   level: number;
@@ -274,7 +275,12 @@ function frontmatterListLinesOf(
   return result;
 }
 
-function extractLinks(content: string, lineOffset: number): ExtractedLink[] {
+function extractLinks(
+  content: string,
+  lineOffset: number,
+  sourcePath: string,
+  docsRoot: string,
+): ExtractedLink[] {
   const links: ExtractedLink[] = [];
   const lines = content.split("\n");
 
@@ -315,11 +321,13 @@ function extractLinks(content: string, lineOffset: number): ExtractedLink[] {
       };
     }
 
-    // Absolute slug path.
-    if (raw.startsWith("/")) {
-      const hashIdx = raw.indexOf("#");
-      const anchor = hashIdx !== -1 ? raw.slice(hashIdx + 1) : null;
-      const path = hashIdx !== -1 ? raw.slice(0, hashIdx) : raw;
+    const normalized = raw.startsWith("/")
+      ? raw
+      : normalizeNoteLink(raw, sourcePath, docsRoot);
+    if (normalized) {
+      const hashIdx = normalized.indexOf("#");
+      const anchor = hashIdx !== -1 ? normalized.slice(hashIdx + 1) : null;
+      const path = hashIdx !== -1 ? normalized.slice(0, hashIdx) : normalized;
       const target = path.replace(/\/+$/, "") || "/"; // normalize trailing slash
       return { raw, target, anchor, kind: "doc", line: lineNum };
     }
@@ -388,7 +396,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       prereqs: frontmatterListLinesOf(raw, "prereqs", prereqs),
       notebooks: frontmatterListLinesOf(raw, "notebooks", notebooks),
       notebookFiles,
-      links: extractLinks(content, fmLines),
+      links: extractLinks(content, fmLines, file, docsRoot),
     };
   });
 }

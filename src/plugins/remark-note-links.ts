@@ -4,15 +4,20 @@ import { visit } from "unist-util-visit";
 const NUMERIC_PREFIX = /^\d+-/;
 const EXTERNAL_PROTOCOL = /^[a-z][a-z\d+.-]*:/i;
 
-function publicPathFromSource(sourcePath: string): string {
-  const docsMarker = `${sep}docs${sep}`;
-  const docsIndex = sourcePath.lastIndexOf(docsMarker);
-  if (docsIndex === -1) return "";
+function publicPathFromSource(sourcePath: string, docsRoot?: string): string {
+  let docsRelative: string;
+  if (docsRoot) {
+    docsRelative = relative(docsRoot, sourcePath);
+  } else {
+    const docsMarker = `${sep}docs${sep}`;
+    const docsIndex = sourcePath.lastIndexOf(docsMarker);
+    if (docsIndex === -1) return "";
+    docsRelative = relative(
+      sourcePath.slice(0, docsIndex + docsMarker.length),
+      sourcePath,
+    );
+  }
 
-  const docsRelative = relative(
-    sourcePath.slice(0, docsIndex + docsMarker.length),
-    sourcePath,
-  );
   return docsRelative
     .replace(/\.mdx?$/i, "")
     .split(/[\\/]/)
@@ -28,9 +33,14 @@ function splitUrl(url: string): {
   return { path: match?.[1] ?? url, suffix: match?.[2] ?? "" };
 }
 
-function normalizeNoteLink(url: string, sourcePath: string): string | null {
+export function normalizeNoteLink(
+  url: string,
+  sourcePath: string,
+  docsRoot?: string,
+): string | null {
   if (
     !url ||
+    url.startsWith("<") ||
     url.startsWith("/") ||
     url.startsWith("#") ||
     url.startsWith("//") ||
@@ -42,7 +52,12 @@ function normalizeNoteLink(url: string, sourcePath: string): string | null {
   const { path, suffix } = splitUrl(url);
   if (!path) return null;
 
-  const notePath = publicPathFromSource(sourcePath);
+  // The validator's lightweight Markdown matcher can encounter bracketed
+  // math expressions that resemble links. Note slugs in this site are
+  // hyphenated, so an underscore-only bare token is not a note URL.
+  if (!path.includes("/") && path.includes("_")) return null;
+
+  const notePath = publicPathFromSource(sourcePath, docsRoot);
   if (!notePath) return null;
 
   // A path beginning with sN is conventionally a site-root note URL in the

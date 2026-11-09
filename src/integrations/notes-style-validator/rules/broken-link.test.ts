@@ -27,6 +27,31 @@ test("does not flag a doc link to a slug that exists", () => {
   );
 });
 
+test("resolves relative note links using the source note path", () => {
+  withScannedFiles(
+    {
+      "s5/secure-app-dev/24-static-analysis.mdx": `---\ntitle: Static\n---\n\nSee [dynamic](./dynamic-analysis).\n`,
+      "s5/secure-app-dev/25-dynamic-analysis.mdx": `---\ntitle: Dynamic\n---\n\nBody.\n`,
+    },
+    (files) => {
+      expect(findBrokenLinks(files)).toHaveLength(0);
+    },
+  );
+});
+
+test("flags a broken relative note link", () => {
+  withScannedFiles(
+    {
+      "s5/secure-app-dev/24-static-analysis.mdx": `---\ntitle: Static\n---\n\nSee [missing](./missing-analysis).\n`,
+    },
+    (files) => {
+      const violations = findBrokenLinks(files);
+      expect(violations).toHaveLength(1);
+      expect(violations[0].kind).toBe("broken-link");
+    },
+  );
+});
+
 test("respects extraValidUrls for redirected slugs", () => {
   withScannedFiles(
     {
