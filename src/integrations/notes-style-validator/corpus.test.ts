@@ -2,10 +2,10 @@ import { join } from "node:path";
 import { beforeAll, describe, expect, test } from "bun:test";
 import { scanModuleRedirects } from "../module-redirects/scan.ts";
 import { RULES } from "./report.ts";
-import { validate } from "./validate.ts";
+import { NotesStyleValidator } from "./validator.ts";
 
 describe("notes-style-validator corpus", () => {
-  let reports: ReturnType<typeof validate>["reports"];
+  let reports: ReturnType<NotesStyleValidator["validate"]>["reports"];
   let matchedFileCount = 0;
 
   beforeAll(() => {
@@ -14,7 +14,9 @@ describe("notes-style-validator corpus", () => {
     // Module-redirect targets are valid link destinations even though no note
     // carries those exact slugs.
     const extraValidUrls = Object.keys(scanModuleRedirects(docsRoot));
-    const result = validate(docsRoot, extraValidUrls);
+    const result = new NotesStyleValidator(docsRoot, {
+      extraValidUrls,
+    }).validate();
 
     reports = result.reports;
     matchedFileCount = result.matchedFileCount;

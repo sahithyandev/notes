@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import type { AstroIntegration, IntegrationResolvedRoute } from "astro";
-import { runValidation } from "./validate.ts";
+import { NotesStyleValidator } from "./validator.ts";
 
 export interface NotesStyleValidatorOptions {
   /**
@@ -12,6 +12,8 @@ export interface NotesStyleValidatorOptions {
    */
   filter?: string;
 }
+
+export { NotesStyleValidator } from "./validator.ts";
 
 export default function notesStyleValidator(
   options: NotesStyleValidatorOptions = {},
@@ -42,19 +44,21 @@ export default function notesStyleValidator(
       },
 
       "astro:server:start": async ({ logger }) => {
-        await runValidation(docsRoot, logger, {
-          failOnViolations: false,
+        await new NotesStyleValidator(docsRoot, {
           extraValidUrls: redirectUrls(),
           filter,
+        }).run(logger, {
+          failOnViolations: false,
         });
       },
 
       // Pure file-scanning check with no dependency on rendered output, so
       // failing here (before pages are built) beats build:done.
       "astro:build:start": async ({ logger }) => {
-        await runValidation(docsRoot, logger, {
-          failOnViolations: true,
+        await new NotesStyleValidator(docsRoot, {
           extraValidUrls: redirectUrls(),
+        }).run(logger, {
+          failOnViolations: true,
         });
       },
     },
