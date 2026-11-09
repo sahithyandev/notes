@@ -16,6 +16,7 @@ import { toHast } from "mdast-util-to-hast";
 import { toHtml } from "hast-util-to-html";
 import "katex/contrib/mhchem";
 import { unified } from "@astrojs/markdown-remark";
+import { remarkNoteLinks } from "./src/plugins/remark-note-links.ts";
 function render(value, displayMode) {
   return katex.renderToString(value, {
     displayMode,
@@ -108,6 +109,7 @@ export default defineConfig({
     processor: unified({
       remarkPlugins: [
         remarkGfm,
+        remarkNoteLinks,
         remarkMath,
         remarkMathBlocks,
         remarkKatexMhchem,
