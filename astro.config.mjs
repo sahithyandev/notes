@@ -6,6 +6,7 @@ import mdx from "@astrojs/mdx";
 import vercel from "@astrojs/vercel";
 import moduleRedirects from "./src/integrations/module-redirects/index.ts";
 import notesStyleValidator from "./src/integrations/notes-style-validator/index.ts";
+import pagefindDev from "./src/integrations/pagefind-dev/index.ts";
 import devReloadLock from "./src/integrations/dev-reload-lock/index.ts";
 import remarkGfm from "remark-gfm";
 import { remarkMathBlocks } from "./src/plugins/remark-math-blocks.ts";
@@ -15,38 +16,6 @@ import { toHast } from "mdast-util-to-hast";
 import { toHtml } from "hast-util-to-html";
 import "katex/contrib/mhchem";
 import { unified } from "@astrojs/markdown-remark";
-import fs from "node:fs";
-import path from "node:path";
-
-// Serves a prebuilt pagefind index (`bun run build`) under /pagefind during
-// `astro dev`, since pagefind itself only runs as a post-build step against
-// the static output and dev mode has no static output to index.
-function servePagefindDev() {
-  const pagefindDir = path.resolve(".vercel/output/static/pagefind");
-  return {
-    name: "serve-pagefind-dev",
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (!req.url?.startsWith("/pagefind/")) return next();
-        const urlPath = req.url.split(/[?#]/)[0];
-        const filePath = path.join(
-          pagefindDir,
-          decodeURIComponent(urlPath.slice("/pagefind/".length)),
-        );
-        if (!filePath.startsWith(pagefindDir) || !fs.existsSync(filePath)) {
-          return next();
-        }
-        if (filePath.endsWith(".js")) {
-          res.setHeader("Content-Type", "text/javascript");
-        } else if (filePath.endsWith(".json")) {
-          res.setHeader("Content-Type", "application/json");
-        }
-        fs.createReadStream(filePath).pipe(res);
-      });
-    },
-  };
-}
-
 function render(value, displayMode) {
   return katex.renderToString(value, {
     displayMode,
@@ -132,6 +101,7 @@ export default defineConfig({
       // `table` override below never fires with this on).
       optimize: false,
     }),
+    pagefindDev(),
     notesStyleValidator(),
   ],
   markdown: {
@@ -152,12 +122,7 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [
-      tailwindcss(),
-      servePagefindDev(),
-      devReloadLock(),
-      illustrationScriptMarker(),
-    ],
+    plugins: [tailwindcss(), devReloadLock(), illustrationScriptMarker()],
     build: {
       // ponytail: lightningcss fails with Tailwind v4 CSS under Vite 8/rolldown; esbuild works fine
       cssMinify: "esbuild",

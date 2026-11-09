@@ -45,25 +45,17 @@
 
 <script>
   import { track } from "../../scripts/analytics";
+  import { titleize } from "../../utils";
 
   let pagefind: any = null;
   let pagefindReady = false;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let selectedIndex = -1;
+  let searchRequestId = 0;
 
   const modal = document.getElementById("search-modal") as HTMLDialogElement;
   const input = document.getElementById("search-input") as HTMLInputElement;
   const resultsEl = document.getElementById("search-results") as HTMLElement;
-
-  const EXCEPTIONS = new Set(["and", "or", "the", "a", "an"]);
-  function titleize(s: string): string {
-    return s
-      .split("-")
-      .map((w) =>
-        EXCEPTIONS.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1),
-      )
-      .join(" ");
-  }
 
   function parseUrl(url: string) {
     const parts = url.replace(/^\//, "").split("/").filter(Boolean);
@@ -107,7 +99,9 @@
     input.value = "";
     selectedIndex = -1;
     const hint = navigator.onLine
-      ? "All notes indexed. Awaiting query."
+      ? pagefindReady
+        ? "All notes indexed. Awaiting query."
+        : "The live index builds on your first search."
       : "Search isn't available offline.";
     resultsEl.innerHTML = `<div class="sr-idle"><span class="sr-idle-prompt">$&nbsp;<span class="sr-idle-cursor">_</span></span><span class="sr-idle-hint">${hint}</span></div>`;
     requestAnimationFrame(() => input.focus());
@@ -137,21 +131,14 @@
 
     const frags: string[] = [];
     for (const [, items] of groups) {
-      const first = items[0].parsed;
-      const semN = first.semNumber;
-      const semColor = semN ? `var(--s${semN})` : "var(--text-muted)";
-      frags.push(`
-                <div class="sr-group">
-                    <span class="sr-group-dot" style="background:${semColor}"></span>
-                    ${escHtml(first.semLabel)} &rsaquo; ${escHtml(first.moduleLabel)}
-                </div>
-            `);
       for (const { data, parsed } of items) {
-        const path = `${parsed.semLabel} / ${parsed.moduleLabel}`;
+        const semColor = parsed.semNumber
+          ? `var(--s${parsed.semNumber})`
+          : "var(--text-muted)";
         const title = data.meta?.title ?? parsed.moduleLabel;
         frags.push(`
-                    <a class="sr-item" href="${escHtml(data.url)}" role="option" aria-selected="false">
-                        <div class="sr-item-path">${escHtml(path)}</div>
+                    <a class="sr-item" href="${escHtml(data.url)}" role="option" aria-selected="false" style="--sr-sem-color:${semColor}">
+                        <div class="sr-item-path"><span class="sr-item-sem">${escHtml(parsed.semLabel)}</span><span aria-hidden="true"> / </span>${escHtml(parsed.moduleLabel)}</div>
                         <div class="sr-item-title">${escHtml(title)}</div>
                         <div class="sr-item-excerpt">${data.excerpt ?? ""}</div>
                     </a>
@@ -179,6 +166,7 @@
   }
 
   async function doSearch(query: string) {
+    const requestId = ++searchRequestId;
     if (!query) {
       renderResults(null, "");
       return;
@@ -187,12 +175,23 @@
       resultsEl.innerHTML = `<div class="sr-empty">Search isn't available offline.</div>`;
       return;
     }
+    if (!pagefindReady) {
+      resultsEl.innerHTML = `
+        <div class="sr-loading" role="status" aria-live="polite">
+          <span class="sr-loading-spinner" aria-hidden="true"></span>
+          <span class="sr-loading-label">Building search index</span>
+          <span class="sr-loading-hint">Rendering the latest notes…</span>
+        </div>
+      `;
+    }
     const ready = await ensurePagefind();
+    if (requestId !== searchRequestId) return;
     if (!ready) {
       resultsEl.innerHTML = `<div class="sr-empty">Search is only available in the production build.</div>`;
       return;
     }
     const search = await pagefind.search(query);
+    if (requestId !== searchRequestId) return;
     const top5 = search.results.slice(0, 5);
     const dataArr: any[] = await Promise.all(top5.map((r: any) => r.data()));
 
@@ -207,6 +206,7 @@
   }
 
   input.addEventListener("input", () => {
+    searchRequestId++;
     const query = input.value.trim();
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => doSearch(query), 200);
@@ -376,30 +376,11 @@
     min-height: 0;
   }
 
-  :global(.sr-group) {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 10px 16px 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  :global(.sr-group-dot) {
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-
   :global(.sr-item) {
     display: block;
     padding: 10px 16px;
     cursor: pointer;
-    border-left: 2px solid transparent;
+    border-left: 1px solid transparent;
     text-decoration: none;
     transition:
       background 0.08s,
@@ -408,8 +389,8 @@
 
   :global(.sr-item:hover),
   :global(.sr-item[aria-selected="true"]) {
-    background: var(--accent-subtle);
-    border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--sr-sem-color) 10%, transparent);
+    border-left-color: var(--sr-sem-color);
   }
 
   :global(.sr-item-path) {
@@ -418,6 +399,11 @@
     color: var(--text-muted);
     margin-bottom: 3px;
     letter-spacing: 0.15px;
+  }
+
+  :global(.sr-item-sem) {
+    color: var(--sr-sem-color);
+    font-weight: 700;
   }
 
   :global(.sr-item-title) {
@@ -451,6 +437,35 @@
     text-align: center;
     color: var(--text-muted);
     font-size: 13.5px;
+  }
+
+  :global(.sr-loading) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 42px 16px 46px;
+    text-align: center;
+  }
+
+  :global(.sr-loading-spinner) {
+    width: 26px;
+    height: 26px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: sr-spin 0.75s linear infinite;
+  }
+
+  :global(.sr-loading-label) {
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  :global(.sr-loading-hint) {
+    color: var(--text-muted);
+    font-size: 12px;
   }
 
   :global(.sr-idle) {
@@ -507,6 +522,19 @@
     }
     50% {
       opacity: 0;
+    }
+  }
+
+  @keyframes sr-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.sr-idle-cursor),
+    :global(.sr-loading-spinner) {
+      animation: none;
     }
   }
 </style>

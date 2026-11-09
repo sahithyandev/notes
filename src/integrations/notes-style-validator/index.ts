@@ -50,10 +50,7 @@ export default function notesStyleValidator(
       },
 
       // Pure file-scanning check with no dependency on rendered output, so
-      // failing here (before pages are built) beats build:done. Deliberately
-      // ignores `filter` — build is the CI safety net, so it must always
-      // check the whole corpus even if a dev left NOTES_STYLE_FILTER set in
-      // their shell from an earlier `bun dev` session.
+      // failing here (before pages are built) beats build:done.
       "astro:build:start": async ({ logger }) => {
         await runValidation(docsRoot, logger, {
           failOnViolations: true,
