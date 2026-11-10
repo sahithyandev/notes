@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { beforeAll, describe, expect, test } from "bun:test";
-import { scanModuleRedirects } from "../module-redirects/scan.ts";
+import { ModuleRedirectsScanner } from "../module-redirects/scan.ts";
 import { RULES } from "./report.ts";
 import { NotesStyleValidator } from "./validator.ts";
 
@@ -13,7 +13,9 @@ describe("notes-style-validator corpus", () => {
 
     // Module-redirect targets are valid link destinations even though no note
     // carries those exact slugs.
-    const extraValidUrls = Object.keys(scanModuleRedirects(docsRoot));
+    const extraValidUrls = Object.keys(
+      new ModuleRedirectsScanner(docsRoot).current,
+    );
     const result = new NotesStyleValidator(docsRoot, {
       extraValidUrls,
     }).validate();

@@ -1,26 +1,18 @@
-import { join, relative } from "node:path";
+import { join } from "node:path";
 import type { AstroIntegration } from "astro";
-import { scanModuleRedirects } from "./scan.ts";
-
-// Sorted JSON makes the comparison order-independent; the map has entries
-// added and removed, not reordered, but this keeps the check honest either way.
-function serialize(redirects: Record<string, string>): string {
-  return JSON.stringify(
-    Object.entries(redirects).sort(([a], [b]) => a.localeCompare(b)),
-  );
-}
+import { ModuleRedirectsScanner } from "./scan.ts";
 
 export default function moduleRedirects(): AstroIntegration {
   let docsRoot = "";
-  let current = "";
+  let scanner: ModuleRedirectsScanner;
 
   return {
     name: "module-redirects",
     hooks: {
       "astro:config:setup": ({ config, updateConfig, logger }) => {
         docsRoot = join(config.root.pathname.replace(/\/$/, ""), "docs");
-        const redirects = scanModuleRedirects(docsRoot);
-        current = serialize(redirects);
+        scanner = new ModuleRedirectsScanner(docsRoot);
+        const redirects = scanner.current;
         updateConfig({ redirects });
         logger.info(`added ${Object.keys(redirects).length} module redirects`);
       },
@@ -34,16 +26,16 @@ export default function moduleRedirects(): AstroIntegration {
       "astro:server:setup": ({ server, logger }) => {
         let timer: ReturnType<typeof setTimeout> | undefined;
 
+        scanner.onChange(() => {
+          logger.warn(
+            "module redirects changed on disk; restart the dev server to pick them up",
+          );
+        });
+
         const onChange = (path: string) => {
-          if (relative(docsRoot, path).startsWith("..")) return;
+          if (!scanner.isInDocs(path)) return;
           clearTimeout(timer);
-          timer = setTimeout(() => {
-            const next = serialize(scanModuleRedirects(docsRoot));
-            if (next === current) return;
-            logger.warn(
-              "module redirects changed on disk; restart the dev server to pick them up",
-            );
-          }, 100);
+          timer = setTimeout(() => scanner.handleChange(path), 100);
         };
 
         server.watcher
