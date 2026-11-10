@@ -1,14 +1,86 @@
 ---
-title: Introduction to Calculus
+title: Introduction to Vector Valued Functions
 sidebar:
   label: Introduction
 dateCreated: 2026-07-01T06:36:46.266Z
-lastUpdatedOn: 2026-10-08T09:02:34.465Z
+lastUpdatedOn: 2026-11-10T15:26:24.506Z
 ---
 
-For a particle moving along a curve $C$ traced by $\boldsymbol{r}(t)$, the derivative of $\boldsymbol{r}(t)$ carries a physical interpretation used throughout this module.
+<Aka>vector function</Aka>. A function whose domain is a set of real numbers and
+whose range is a set of vectors.
 
-## Velocity
+$$
+\boldsymbol{r}(t) = \langle x(t), y(t), z(t) \rangle = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}
+$$
+
+As $t$ varies, $\boldsymbol{r}(t)$ is positioned with its initial point at the origin, and its terminal point traces out $C$. In this case $\boldsymbol{r}(t)$ is the radius vector, or position vector, for $C$.
+
+### Component Function
+
+$x(t)$, $y(t)$, and $z(t)$ are the component functions of $\boldsymbol{r}(t)$.
+
+### Domain
+
+The domain of $\boldsymbol{r}$ is the set of all $t$ for which $\boldsymbol{r}(t)$ is defined.
+
+## Space Curve
+
+A vector-valued function $\boldsymbol{r}(t)$ whose values are three-dimensional vectors traces out a space curve in three-dimensional space.
+
+Examples:
+
+- $\boldsymbol{r}(t) = \langle \cos t, \sin t, 0 \rangle$ traces out the unit circle in the $xy$-plane centered at the origin.
+- $\boldsymbol{r}(t) = \langle t, t^2, t^3 \rangle$ traces out the twisted cubic.
+
+## Parametric Curve
+
+A particle moving along a curve $C$ in three-dimensional space has $x$, $y$, and $z$ coordinates as functions of time $t$:
+
+$$
+x = f(t), \qquad y = g(t), \qquad z = h(t)
+$$
+
+These are the parametric equations of motion of the particle.
+
+### Parameter
+
+$t$ is the parameter.
+
+### Trajectory
+
+The curve traced out by the particle. Denoted by $C$.
+
+Restricting $t$ to an interval $[a, b]$ gives
+
+$$
+x = f(t), \qquad y = g(t), \qquad z = h(t), \qquad a \le t \le b
+$$
+
+### Orientation
+
+The direction in which $C$ is traced as $t$ increases is the orientation of the curve.
+
+The circular helix
+
+$$
+x = a\cos t, \qquad y = a\sin t, \qquad z = bt, \qquad 0 \le t \le 2\pi
+$$
+
+has fixed real parameters $a > 0$ and $b$.
+
+### Closed Curve
+
+A parametric curve $C$ represented by $\boldsymbol{r}(t)$, $a \le t \le b$, is closed **iff**
+
+$$
+\boldsymbol{r}(a) = \boldsymbol{r}(b)
+$$
+
+## Particle Motion
+
+For a particle moving along a curve $C$ traced by $\boldsymbol{r}(t)$, the derivatives of $\boldsymbol{r}(t)$ describe its motion.
+
+### Velocity
 
 $$
 \vec{v}(t) = \boldsymbol{r}'(t)
@@ -16,7 +88,7 @@ $$
 
 $\vec{v}(t)$ is tangent to $C$ and points in the direction of motion.
 
-## Speed
+### Speed
 
 $$
 v(t) = \lVert \vec{v}(t) \rVert = \lVert \boldsymbol{r}'(t) \rVert
@@ -28,7 +100,7 @@ Arc length is the accumulation of speed over time: $L = \int_a^b v(t) \, \text{d
 
 </Note>
 
-## Acceleration
+### Acceleration
 
 $$
 \vec{a}(t) = \vec{v}'(t) = \boldsymbol{r}''(t)
