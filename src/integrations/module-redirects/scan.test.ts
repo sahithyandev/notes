@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import { ModuleRedirectsScanner } from "./scan.ts";
+import { getModuleRedirectsScanner } from "./scanner-cache.ts";
 import { TemporaryNotesDirectory } from "./temporary-notes-directory.ts";
 
 describe("module-redirects", () => {
@@ -89,6 +90,24 @@ describe("module-redirects", () => {
       const earliest = notes.addNote("s1/algebra/new-submodule/1-note.md");
       scanner.handleChange(earliest);
       expect(changes).toHaveLength(1);
+    } finally {
+      notes.remove();
+    }
+  });
+
+  test("reuses and refreshes the shared scanner", () => {
+    const notes = new TemporaryNotesDirectory();
+    try {
+      notes.addNote("s1/algebra/2-second.md");
+      const first = getModuleRedirectsScanner(notes.root);
+      const same = getModuleRedirectsScanner(notes.root);
+
+      expect(same).toBe(first);
+
+      const earliest = notes.addNote("s1/algebra/0-first.md");
+      first.handleChange(earliest);
+
+      expect(same.current["/s1/algebra"]).toBe("/s1/algebra/first");
     } finally {
       notes.remove();
     }

@@ -1,7 +1,8 @@
 ---
 import { ModuleRedirectsScanner } from "../../../integrations/module-redirects/scan";
+import { getModuleRedirectsScanner } from "../../../integrations/module-redirects/scanner-cache";
 
-export const prerender = true;
+export const prerender = import.meta.env.PROD;
 
 export function getStaticPaths() {
   const redirects = new ModuleRedirectsScanner().current;
@@ -13,7 +14,12 @@ export function getStaticPaths() {
   });
 }
 
-const { to } = Astro.props;
+const from = `/${Astro.params.sem}/${Astro.params.module}`;
+const to = import.meta.env.PROD
+  ? Astro.props.to
+  : getModuleRedirectsScanner().current[from];
+
+if (!to) return new Response(null, { status: 404 });
 
 return Astro.redirect(to);
 ---
