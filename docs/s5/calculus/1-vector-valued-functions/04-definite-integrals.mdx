@@ -1,7 +1,7 @@
 ---
 title: Definite Integrals
 dateCreated: 2026-07-23T17:18:43.601Z
-lastUpdatedOn: 2026-11-10T15:42:51.896Z
+lastUpdatedOn: 2026-11-10T18:37:31.664Z
 ---
 
 For $\boldsymbol{r}(t) = \langle x(t), y(t), z(t) \rangle$ continuous on $[a, b]$, the definite integral over $[a, b]$ is defined componentwise:
@@ -10,10 +10,72 @@ $$
 \int_a^b \boldsymbol{r}(t) \, \text{d}t = \left\langle \int_a^b x(t) \, \text{d}t, \int_a^b y(t) \, \text{d}t, \int_a^b z(t) \, \text{d}t \right\rangle
 $$
 
+The integral exists whenever each component integral exists. Continuity of each component on $[a,b]$ is sufficient.
+
 For $\boldsymbol{r}(t)$, $\boldsymbol{r}_1(t)$, $\boldsymbol{r}_2(t)$ continuous on $[a, b]$ and scalar $k$:
 
 - $\displaystyle\int_a^b k\boldsymbol{r}(t) \, \text{d}t = k \int_a^b \boldsymbol{r}(t) \, \text{d}t$
 - $\displaystyle\int_a^b [\boldsymbol{r}_1(t) + \boldsymbol{r}_2(t)] \, \text{d}t = \int_a^b \boldsymbol{r}_1(t) \, \text{d}t + \int_a^b \boldsymbol{r}_2(t) \, \text{d}t$
+- $\displaystyle\int_a^a \boldsymbol{r}(t) \, \text{d}t = \boldsymbol{0}$
+- $\displaystyle\int_b^a \boldsymbol{r}(t) \, \text{d}t = -\int_a^b \boldsymbol{r}(t) \, \text{d}t$
+- $\displaystyle\int_a^b \boldsymbol{r}(t) \, \text{d}t = \int_a^c \boldsymbol{r}(t) \, \text{d}t + \int_c^b \boldsymbol{r}(t) \, \text{d}t$ for $c \in [a,b]$
+
+<Theorem name="Fundamental Theorem">
+
+Let $\boldsymbol{F}(t)$ be differentiable on $[a,b]$ with continuous derivative $\boldsymbol{F}'(t)$. Then
+
+$$
+\int_a^b \boldsymbol{F}'(t) \, \text{d}t = \boldsymbol{F}(b) - \boldsymbol{F}(a)
+$$
+
+</Theorem>
+
+<Proof label="Proof Hint">
+
+- Apply the Fundamental Theorem of Calculus to each component
+- Collect the 3 component differences into one vector
+
+</Proof>
+
+For $\boldsymbol{r}(t) = \langle x(t),y(t),z(t) \rangle$, an antiderivative is
+
+$$
+\boldsymbol{R}(t) = \left\langle \int x(t) \, \text{d}t, \int y(t) \, \text{d}t, \int z(t) \, \text{d}t \right\rangle
+$$
+
+where $\boldsymbol{R}'(t)=\boldsymbol{r}(t)$. The definite integral is evaluated by subtracting endpoint values:
+
+$$
+\int_a^b \boldsymbol{r}(t) \, \text{d}t = \boldsymbol{R}(b)-\boldsymbol{R}(a)
+$$
+
+## Displacement
+
+If $\boldsymbol{r}(t)$ is velocity, then the net displacement from $t=a$ to $t=b$ is
+
+$$
+\Delta \boldsymbol{s} = \int_a^b \boldsymbol{r}(t) \, \text{d}t
+$$
+
+The displacement depends on the direction of motion. Opposite velocity vectors can cancel. The integral is not the distance travelled.
+
+If $\boldsymbol{v}(t)$ is velocity and $\boldsymbol{s}(a)$ is the initial position, then the position at time $t$ is
+
+$$
+\boldsymbol{s}(t) = \boldsymbol{s}(a) + \int_a^t \boldsymbol{v}(u) \, \text{d}u
+$$
+
+The variable $u$ is a dummy variable of integration. It prevents the upper limit $t$ from being confused with the integration variable.
+
+## Average Value
+
+For $a<b$, the average value of a vector-valued function on $[a,b]$ is
+
+$$
+\operatorname{avg}(\boldsymbol{r}) = \frac{1}{b-a}\int_a^b \boldsymbol{r}(t) \, \text{d}t
+$$
+
+The average is computed componentwise. For velocity, it is the constant velocity that produces the same displacement over the same time interval.
 
 ## Worked Example
 
@@ -23,6 +85,59 @@ Evaluate $\displaystyle\int_0^1 \langle 2t,t^2,3\rangle\,\text{d}t$ componentwis
 
 $$
 \int_0^1 \langle 2t,t^2,3\rangle\,\text{d}t = \left\langle \int_0^1 2t\,\text{d}t,\int_0^1 t^2\,\text{d}t,\int_0^1 3\,\text{d}t\right\rangle = \left\langle 1,\frac{1}{3},3\right\rangle
+$$
+
+</Solution>
+
+Find an antiderivative of $\boldsymbol{r}(t)=\langle 2t,\cos t,e^t\rangle$ and use it to evaluate $\displaystyle\int_0^{\pi}\boldsymbol{r}(t)\,\text{d}t$.
+
+<Solution>
+
+An antiderivative is
+
+$$
+\boldsymbol{R}(t)=\langle t^2,\sin t,e^t\rangle
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
+\int_0^{\pi}\boldsymbol{r}(t)\,\text{d}t
+&=\boldsymbol{R}(\pi)-\boldsymbol{R}(0)\\
+&=\langle \pi^2,0,e^{\pi}\rangle-\langle 0,0,1\rangle\\
+&=\langle \pi^2,0,e^{\pi}-1\rangle
+\end{aligned}
+$$
+
+</Solution>
+
+An object has velocity $\boldsymbol{v}(t)=\langle t,2t,-1\rangle$ and initial position $\boldsymbol{s}(0)=\langle 1,0,4\rangle$. Find its position at $t=3$ and its average velocity on $[0,3]$.
+
+<Solution>
+
+The displacement is
+
+$$
+\begin{aligned}
+\int_0^3 \boldsymbol{v}(t)\,\text{d}t
+&=\left\langle \int_0^3 t\,\text{d}t,\int_0^3 2t\,\text{d}t,\int_0^3 -1\,\text{d}t\right\rangle\\
+&=\left\langle \frac{9}{2},9,-3\right\rangle
+\end{aligned}
+$$
+
+The position at $t=3$ is
+
+$$
+\boldsymbol{s}(3)=\boldsymbol{s}(0)+\int_0^3 \boldsymbol{v}(t)\,\text{d}t
+=\left\langle \frac{11}{2},9,1\right\rangle
+$$
+
+The average velocity is
+
+$$
+\operatorname{avg}(\boldsymbol{v})=\frac{1}{3}\left\langle \frac{9}{2},9,-3\right\rangle
+=\left\langle \frac{3}{2},3,-1\right\rangle
 $$
 
 </Solution>

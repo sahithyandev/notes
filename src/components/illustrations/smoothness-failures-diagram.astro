@@ -1,0 +1,125 @@
+---
+import CartesianGraph from "./primitives/cartesian-graph.astro";
+---
+
+<div class="smoothness-grid">
+  <CartesianGraph
+    captionSlot
+    title="Corner at the Origin"
+    x={{ label: "x", domain: [-2, 2] }}
+    y={{ label: "y", domain: [0, 2.2] }}
+    curves={[
+      {
+        equation: (x) => Math.abs(x),
+        domain: [-2, 2],
+        samples: 73,
+        tone: "s5",
+        round: true,
+      },
+    ]}
+  >
+    <Fragment slot="caption">
+      <span class="tone-s5">The absolute-value curve</span> has different
+      one-sided derivatives at the origin. The tangent direction jumps.
+    </Fragment>
+  </CartesianGraph>
+
+  <CartesianGraph
+    captionSlot
+    title="Cusp at the Origin"
+    x={{ label: "x", domain: [-2, 2] }}
+    y={{ label: "y", domain: [0, 2] }}
+    curves={[
+      {
+        equation: (x) => Math.pow(Math.abs(x), 2 / 3),
+        domain: [-2, 2],
+        samples: 181,
+        tone: "ct",
+        round: true,
+      },
+    ]}
+  >
+    <Fragment slot="caption">
+      <span class="tone-ct">The cusp curve</span> has a sharp point at the
+      origin. Its derivative is undefined there.
+    </Fragment>
+  </CartesianGraph>
+
+  <CartesianGraph
+    captionSlot
+    title="Discontinuous Derivative"
+    x={{ label: "x", domain: [-0.5, 0.5] }}
+    y={{ label: "y", domain: [-0.3, 0.3] }}
+    curves={[
+      {
+        equation: (x) => (x === 0 ? 0 : x * x * Math.sin(1 / x)),
+        domain: [-0.5, 0.5],
+        samples: 800,
+        tone: "pt",
+        round: true,
+      },
+    ]}
+  >
+    <Fragment slot="caption">
+      <span class="tone-pt">The oscillating curve</span> is differentiable at
+      the center, but its derivative is not continuous there.
+    </Fragment>
+  </CartesianGraph>
+
+  <CartesianGraph
+    captionSlot
+    title="Break at a Missing Parameter"
+    x={{ label: "x", domain: [-1.5, 1.5] }}
+    y={{ label: "y", domain: [-20, 20] }}
+    curves={[
+      {
+        equation: (x) => 1 / x,
+        domain: [-1.5, -0.05],
+        tone: "key",
+      },
+      {
+        equation: (x) => 1 / x,
+        domain: [0.05, 1.5],
+        tone: "key",
+      },
+    ]}
+    lines={[
+      {
+        from: { x: 0, y: -20 },
+        to: { x: 0, y: 20 },
+        tone: "ink",
+        dashed: true,
+        guide: true,
+      },
+    ]}
+  >
+    <Fragment slot="caption">
+      <span class="tone-key">The reciprocal curve</span> is undefined at the
+      center. A curve cannot be smooth on an interval containing the break.
+    </Fragment>
+  </CartesianGraph>
+</div>
+
+<style>
+  .smoothness-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 28px auto;
+  }
+
+  .smoothness-grid :global(.cartesian-graph) {
+    width: 100%;
+    margin: 0;
+  }
+
+  .smoothness-grid :global(figcaption) {
+    min-height: 4.5em;
+  }
+
+  @media (max-width: 700px) {
+    .smoothness-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

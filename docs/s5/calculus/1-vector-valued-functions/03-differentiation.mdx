@@ -1,7 +1,7 @@
 ---
 title: Differentiation
 dateCreated: 2026-07-23T17:18:33.918Z
-lastUpdatedOn: 2026-11-10T15:42:51.887Z
+lastUpdatedOn: 2026-11-10T18:37:31.650Z
 ---
 
 The derivative of $\boldsymbol{r}$ is defined the same way as for a real-valued function:
@@ -24,9 +24,9 @@ $$
 \boldsymbol{r}'(t) = \langle x'(t), y'(t), z'(t) \rangle
 $$
 
-For differentiable vector-valued functions $\boldsymbol{r}(t)$, $\boldsymbol{r}_1(t)$, $\boldsymbol{r}_2(t)$, differentiable real-valued function $f(t)$, scalar $k$, and constant vector $\vec{c}$:
+For differentiable vector-valued functions $\boldsymbol{r}(t)$, $\boldsymbol{r}_1(t)$, $\boldsymbol{r}_2(t)$, differentiable real-valued function $f(t)$, scalar $k$, and constant vector $\boldsymbol{c}$:
 
-- $\dfrac{\text{d}}{\text{d}t}[\vec{c}] = \vec{0}$
+- $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{c}] = \boldsymbol{0}$
 - $\dfrac{\text{d}}{\text{d}t}[\boldsymbol{r}_1(t) \pm \boldsymbol{r}_2(t)] = \boldsymbol{r}_1'(t) \pm \boldsymbol{r}_2'(t)$
 - $\dfrac{\text{d}}{\text{d}t}[k\boldsymbol{r}(t)] = k\boldsymbol{r}'(t)$
 - $\dfrac{\text{d}}{\text{d}t}[f(t)\boldsymbol{r}(t)] = f(t)\boldsymbol{r}'(t) + f'(t)\boldsymbol{r}(t)$
@@ -39,18 +39,22 @@ For differentiable vector-valued functions $\boldsymbol{r}(t)$, $\boldsymbol{r}_
 Let $P$ be a point on the graph of $\boldsymbol{r}(t)$, with $\boldsymbol{r}(t_0)$ the position vector of $P$. If $\boldsymbol{r}'(t_0)$ exists and is non-zero, $\boldsymbol{r}'(t_0)$ is a tangent vector to the graph at $P$. The tangent line through $P$ parallel to $\boldsymbol{r}'(t_0)$ has vector equation
 
 $$
-\vec{x}(s) = \boldsymbol{r}(t_0) + s\boldsymbol{r}'(t_0), \qquad s \in \mathbb{R}
+\boldsymbol{x}(s) = \boldsymbol{r}(t_0) + s\boldsymbol{r}'(t_0), \qquad s \in \mathbb{R}
 $$
 
 <Theorem level="3">
 
-If $\lVert \boldsymbol{r}(t) \rVert$ is constant for all $t$ in an interval, then $\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0$. So $\boldsymbol{r}(t)$ and $\boldsymbol{r}'(t)$ are orthogonal for every $t$ in the interval.
+Let $\boldsymbol{r}(t)$ be differentiable on an interval. Then $\lVert \boldsymbol{r}(t) \rVert$ is constant **iff**
 
-</Theorem>
+$$
+\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0
+$$
+
+for every $t$ in the interval. Thus, $\boldsymbol{r}(t)$ and $\boldsymbol{r}'(t)$ are orthogonal for every $t$ in the interval.
 
 <Proof>
 
-Given $\lVert \boldsymbol{r}(t) \rVert$ is constant, square both sides:
+For the forward direction, suppose $\lVert \boldsymbol{r}(t) \rVert$ is constant. Square both sides:
 
 $$
 \lVert \boldsymbol{r}(t) \rVert^2 = \boldsymbol{r}(t) \cdot \boldsymbol{r}(t) = \text{constant}
@@ -68,29 +72,51 @@ $$
 \boldsymbol{r}'(t) \cdot \boldsymbol{r}(t) + \boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 2\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0
 $$
 
-So $\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0$. It is the dot product, not the magnitude, that equals $0$.
+For the converse, suppose $\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0$. Then
+
+$$
+\frac{\text{d}}{\text{d}t}\lVert \boldsymbol{r}(t) \rVert^2
+= \frac{\text{d}}{\text{d}t}[\boldsymbol{r}(t) \cdot \boldsymbol{r}(t)]
+= 2\boldsymbol{r}(t) \cdot \boldsymbol{r}'(t) = 0
+$$
+
+Therefore, $\lVert \boldsymbol{r}(t) \rVert^2$ is constant on the interval. Hence, $\lVert \boldsymbol{r}(t) \rVert$ is constant.
 
 </Proof>
+
+</Theorem>
 
 ## Mean Value Theorem
 
 Vector-valued functions **do not** satisfy a direct Mean Value Theorem of the form $\boldsymbol{r}(b) - \boldsymbol{r}(a) = \boldsymbol{r}'(c)(b-a)$.
 
-## Worked Example
+## Worked Examples
 
-Find the tangent line to $\boldsymbol{r}(t)=\langle t^2,t^3,t\rangle$ at $t=1$. Verify that the position and tangent vectors are orthogonal for $\boldsymbol{q}(t)=\langle\cos t,\sin t,0\rangle$.
+### Example 1
+
+Find the tangent line to $\boldsymbol{r}(t)=\langle t^2,t^3,t\rangle$ at $t=1$.
 
 <Solution>
 
 $$
-\boldsymbol{r}(1)=\langle1,1,1\rangle, \qquad \boldsymbol{r}'(1)=\langle2,3,1\rangle
+\begin{aligned}
+\boldsymbol{r}(1) &= \langle1,1,1\rangle \\
+\boldsymbol{r}'(t) &= \langle 2t,3t^2,1\rangle \\
+\boldsymbol{r}'(1) &= \langle2,3,1\rangle
+\end{aligned}
 $$
 
 $$
-\vec{x}(s)=\langle1,1,1\rangle+s\langle2,3,1\rangle
+\boldsymbol{x}(s)=\langle1,1,1\rangle+s\langle2,3,1\rangle
 $$
 
-For $\boldsymbol{q}(t)$,
+</Solution>
+
+### Example 2
+
+Verify that the position and tangent vectors are orthogonal for $\boldsymbol{q}(t)=\langle\cos t,\sin t,0\rangle$.
+
+<Solution>
 
 $$
 \boldsymbol{q}'(t)=\langle-\sin t,\cos t,0\rangle, \qquad \boldsymbol{q}(t)\cdot\boldsymbol{q}'(t)=0

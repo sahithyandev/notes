@@ -65,6 +65,7 @@ export { default as StrideOnDfd } from "./stride-on-dfd.astro";
 export { default as StepItem } from "./step-item.astro";
 export { default as StokesTheoremDiagram } from "./stokes-theorem-diagram.astro";
 export { default as SupplyCurveDiagram } from "./supply-curve-diagram.astro";
+export { default as SmoothnessFailuresDiagram } from "./smoothness-failures-diagram.astro";
 export { default as TnbFrame } from "./tnb-frame.astro";
 export { default as TransportationStep } from "./transportation-step.astro";
 export { default as TransportationTable } from "./transportation-table.astro";

@@ -1,129 +1,128 @@
 ---
 title: Tangent and Normal Vectors
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-11-10T15:25:41.647Z
+lastUpdatedOn: 2026-11-10T18:37:31.720Z
 ---
 
-Let $C$ be a curve traced by a differentiable vector-valued function $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, where $t$ is the parameter. $s$ denotes the arc-length parameter of $C$.
+Let $C$ be a curve traced by a differentiable vector-valued function $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \boldsymbol{0}$, where $t$ is the parameter. $s$ denotes the arc-length parameter of $C$.
 
 ## Unit Tangent Vector
 
 The unit tangent vector at $t$ is
 
 $$
-T(t) = \frac{\boldsymbol{r}'(t)}{\lVert \boldsymbol{r}'(t) \rVert}
+\boldsymbol{T}(t) = \frac{\boldsymbol{r}'(t)}{\lVert \boldsymbol{r}'(t) \rVert}
 $$
 
-$T(t)$ is tangent to $C$ and points in the direction of increasing $t$.
+$\boldsymbol{T}(t)$ is tangent to $C$ and points in the direction of increasing $t$.
 
 If $\boldsymbol{r}$ is parametrized by arc length $s$, $\lVert \boldsymbol{r}'(s) \rVert = 1$, so
 
 $$
-T(s) = \boldsymbol{r}'(s)
+\boldsymbol{T}(s) = \boldsymbol{r}'(s)
 $$
 
 ## Unit Normal Vector
 
-If $T'(t)$ exists and $T'(t) \ne \vec{0}$, the principal unit normal vector at $t$ is
+If $\boldsymbol{T}'(t)$ exists and $\boldsymbol{T}'(t) \ne \boldsymbol{0}$, the principal unit normal vector at $t$ is
 
 $$
-N(t) = \frac{T'(t)}{\lVert T'(t) \rVert}
+\boldsymbol{N}(t) = \frac{\boldsymbol{T}'(t)}{\lVert \boldsymbol{T}'(t) \rVert}
 $$
 
-$N(t)$ is normal to $C$ and points in the direction of $T'(t)$.
+$\boldsymbol{N}(t)$ is normal to $C$ and points in the direction of $\boldsymbol{T}'(t)$.
 
-If $T'(t)$ exists and is non-zero, $N(t) \perp T(t)$.
+If $\boldsymbol{T}'(t)$ exists and is non-zero, $\boldsymbol{N}(t) \perp \boldsymbol{T}(t)$.
 
 <Proof label="Proof Hint">
 
-Since $\lVert T(t) \rVert = 1$, $T(t) \cdot T(t) = 1$. Differentiating both sides gives $T(t) \cdot T'(t) = 0$.
+Since $\lVert \boldsymbol{T}(t) \rVert = 1$, $\boldsymbol{T}(t) \cdot \boldsymbol{T}(t) = 1$. Differentiating both sides gives $\boldsymbol{T}(t) \cdot \boldsymbol{T}'(t) = 0$.
 
 </Proof>
 
-In two-dimensional space, 2 unit vectors are orthogonal to $T(t)$. In three-dimensional space, infinitely many unit vectors are orthogonal to $T(t)$. $N(t)$ is the one in the direction of $T'(t)$.
+In two-dimensional space, 2 unit vectors are orthogonal to $\boldsymbol{T}(t)$. In three-dimensional space, infinitely many unit vectors are orthogonal to $\boldsymbol{T}(t)$. $\boldsymbol{N}(t)$ is the one in the direction of $\boldsymbol{T}'(t)$.
 
-$T$ points in the direction of motion. $N$ points in the direction the moving object is turning. For a plane curve, $N$ points toward the concave side of the trajectory.
+$\boldsymbol{T}$ points in the direction of motion. $\boldsymbol{N}$ points in the direction the moving object is turning. For a plane curve, $\boldsymbol{N}$ points toward the concave side of the trajectory.
 
-If $\boldsymbol{r}$ is parametrized by arc length $s$ and $\boldsymbol{r}''(s) \ne \vec{0}$, then $T(s) = \boldsymbol{r}'(s)$ gives $T'(s) = \boldsymbol{r}''(s)$, so
+If $\boldsymbol{r}$ is parametrized by arc length $s$ and $\boldsymbol{r}''(s) \ne \boldsymbol{0}$, then $\boldsymbol{T}(s) = \boldsymbol{r}'(s)$ gives $\boldsymbol{T}'(s) = \boldsymbol{r}''(s)$, so
 
 $$
-N(s) = \frac{\boldsymbol{r}''(s)}{\lVert \boldsymbol{r}''(s) \rVert}
+\boldsymbol{N}(s) = \frac{\boldsymbol{r}''(s)}{\lVert \boldsymbol{r}''(s) \rVert}
 $$
 
 ## Binormal Vector
 
-For $C$ in three-dimensional space, with $T(t)$ and $N(t)$ defined, the binormal vector is
+For $C$ in three-dimensional space, with $\boldsymbol{T}(t)$ and $\boldsymbol{N}(t)$ defined, the binormal vector is
 
 $$
-B(t) = T(t) \times N(t)
+\boldsymbol{B}(t) = \boldsymbol{T}(t) \times \boldsymbol{N}(t)
 $$
 
-$B(t)$ is orthogonal to both $T(t)$ and $N(t)$, oriented by the right-hand rule, and is a unit vector since $\lVert T(t) \times N(t) \rVert = \lVert T(t) \rVert \lVert N(t) \rVert \sin\frac{\pi}{2} = 1$.
+$\boldsymbol{B}(t)$ is orthogonal to both $\boldsymbol{T}(t)$ and $\boldsymbol{N}(t)$, oriented by the right-hand rule, and is a unit vector since $\lVert \boldsymbol{T}(t) \times \boldsymbol{N}(t) \rVert = \lVert \boldsymbol{T}(t) \rVert \lVert \boldsymbol{N}(t) \rVert \sin\frac{\pi}{2} = 1$.
 
-If $\boldsymbol{r}'(t)$ and $\boldsymbol{r}''(t)$ exist and $\boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \ne \vec{0}$,
-
-$$
-B(t) = \frac{\boldsymbol{r}'(t) \times \boldsymbol{r}''(t)}{\lVert \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \rVert}
-$$
-
-If $\boldsymbol{r}$ is parametrized by arc length $s$ and $\boldsymbol{r}''(s) \ne \vec{0}$,
+If $\boldsymbol{r}'(t)$ and $\boldsymbol{r}''(t)$ exist and $\boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \ne \boldsymbol{0}$,
 
 $$
-B(s) = \frac{\boldsymbol{r}'(s) \times \boldsymbol{r}''(s)}{\lVert \boldsymbol{r}''(s) \rVert}
+\boldsymbol{B}(t) = \frac{\boldsymbol{r}'(t) \times \boldsymbol{r}''(t)}{\lVert \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \rVert}
+$$
+
+If $\boldsymbol{r}$ is parametrized by arc length $s$ and $\boldsymbol{r}''(s) \ne \boldsymbol{0}$,
+
+$$
+\boldsymbol{B}(s) = \frac{\boldsymbol{r}'(s) \times \boldsymbol{r}''(s)}{\lVert \boldsymbol{r}''(s) \rVert}
 $$
 
 ## TNB Frame
 
-<Aka>Frenet frame</Aka>. The moving orthonormal frame determined by $T(t)$,
-$N(t)$, $B(t)$. Origin is the current point in the curve, and changes with $t$.
+<Aka>Frenet frame</Aka>. The moving orthonormal frame determined by $\boldsymbol
+{T}(t)$, $\boldsymbol{N}(t)$, $\boldsymbol{B}(t)$. Origin is the current point
+in the curve, and changes with $t$.
 
-At each point on $C$, $T(t)$, $N(t)$, $B(t)$ determine 3 mutually perpendicular planes:
+At each point on $C$, $\boldsymbol{T}(t)$, $\boldsymbol{N}(t)$, $\boldsymbol{B}(t)$ determine 3 mutually perpendicular planes:
 
-- $TB$-plane  
+- $\boldsymbol{T}\boldsymbol{B}$-plane  
   Rectifying plane. $C$ does not bend within it; to second order, $C$ projected onto this plane is a straight line, i.e. "rectified".
-- $TN$-plane  
+- $\boldsymbol{T}\boldsymbol{N}$-plane  
   Osculating plane. The plane that best approximates $C$ near the point.
-- $NB$-plane  
+- $\boldsymbol{N}\boldsymbol{B}$-plane  
   Normal plane. Perpendicular to $T$. Contains all normals to $C$ at the point.
 
 <TnbFrame />
 
 ## Worked Example
 
-Find the TNB frame of $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j} + t\,\boldsymbol{k}$ at $t = \pi/2$.
+For the curve $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j} + t\,\boldsymbol{k}$, find the point and the TNB frame at $t = \pi/2$.
 
 <Solution>
 
 Differentiate and compute the speed.
 
 $$
-\boldsymbol{r}'(t) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}, \quad \lVert \boldsymbol{r}'(t) \rVert = \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}
+\begin{aligned}
+\boldsymbol{r}'(t) &= -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k} \\
+\lVert \boldsymbol{r}'(t) \rVert &= \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}
+\end{aligned}
 $$
 
-</Solution>
-
-Compute $T(t)$.
-
-<Solution>
+Compute $\boldsymbol{T}(t)$.
 
 $$
-T(t) = \frac{1}{\sqrt{2}}\left(-\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
+\boldsymbol{T}(t) = \frac{1}{\sqrt{2}}\left(-\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
 $$
 
-Differentiate $T(t)$ and compute its length.
+Differentiate $\boldsymbol{T}(t)$ and compute its length.
 
 $$
-T'(t) = \frac{1}{\sqrt{2}}\left(-\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}\right), \quad \lVert T'(t) \rVert = \frac{1}{\sqrt{2}}
+\begin{aligned}
+\boldsymbol{T}'(t) &= \frac{1}{\sqrt{2}}\left(-\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}\right) \\
+\lVert \boldsymbol{T}'(t) \rVert &= \frac{1}{\sqrt{2}}
+\end{aligned}
 $$
 
-</Solution>
-
-Compute $N(t)$.
-
-<Solution>
+Compute $\boldsymbol{N}(t)$.
 
 $$
-N(t) = \frac{T'(t)}{\lVert T'(t) \rVert} = -\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}
+\boldsymbol{N}(t) = \frac{\boldsymbol{T}'(t)}{\lVert \boldsymbol{T}'(t) \rVert} = -\cos t\,\boldsymbol{i} - \sin t\,\boldsymbol{j}
 $$
 
 Differentiate $\boldsymbol{r}'(t)$ and compute the cross product.
@@ -136,36 +135,28 @@ $$
 \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) = \sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}, \quad \lVert \boldsymbol{r}'(t) \times \boldsymbol{r}''(t) \rVert = \sqrt{2}
 $$
 
-</Solution>
-
-Compute $B(t)$.
-
-<Solution>
+Compute $\boldsymbol{B}(t)$.
 
 $$
-B(t) = \frac{1}{\sqrt{2}}\left(\sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
+\boldsymbol{B}(t) = \frac{1}{\sqrt{2}}\left(\sin t\,\boldsymbol{i} - \cos t\,\boldsymbol{j} + \boldsymbol{k}\right)
 $$
 
-</Solution>
-
-Evaluate at $t = \pi/2$, where $\sin t = 1$ and $\cos t = 0$. The point on $C$ is $\boldsymbol{r}(\pi/2) = (0, 1, \pi/2)$.
-
-<Solution>
+Evaluate at $t = \pi/2$, where $\sin t = 1$ and $\cos t = 0$.
 
 $$
-T = \frac{1}{\sqrt{2}}(-1, 0, 1), \quad N = (0, -1, 0), \quad B = \frac{1}{\sqrt{2}}(1, 0, 1)
+\boldsymbol{r}(\pi/2) = (0, 1, \pi/2)
 $$
 
-</Solution>
+$$
+\boldsymbol{T} = \frac{1}{\sqrt{2}}(-1, 0, 1), \quad \boldsymbol{N} = (0, -1, 0), \quad \boldsymbol{B} = \frac{1}{\sqrt{2}}(1, 0, 1)
+$$
 
 Verify orthogonality.
 
-<Solution>
-
 $$
-T \cdot N = 0, \quad T \cdot B = \frac{-1 + 1}{2} = 0, \quad N \cdot B = 0
+\boldsymbol{T} \cdot \boldsymbol{N} = 0, \quad \boldsymbol{T} \cdot \boldsymbol{B} = \frac{-1 + 1}{2} = 0, \quad \boldsymbol{N} \cdot \boldsymbol{B} = 0
 $$
 
-At $t = \pi/2$, the TNB frame at $(0, 1, \pi/2)$ is $T = \frac{1}{\sqrt{2}}(-1, 0, 1)$, $N = (0, -1, 0)$, $B = \frac{1}{\sqrt{2}}(1, 0, 1)$.
+At $t = \pi/2$, the TNB frame at $(0, 1, \pi/2)$ is $\boldsymbol{T} = \frac{1}{\sqrt{2}}(-1, 0, 1)$, $\boldsymbol{N} = (0, -1, 0)$, $\boldsymbol{B} = \frac{1}{\sqrt{2}}(1, 0, 1)$.
 
 </Solution>

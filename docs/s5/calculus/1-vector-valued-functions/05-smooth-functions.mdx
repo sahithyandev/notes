@@ -1,7 +1,7 @@
 ---
 title: Smooth Functions
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-11-10T15:42:51.901Z
+lastUpdatedOn: 2026-11-10T18:37:31.677Z
 ---
 
 $\boldsymbol{r}(t)$ is smooth on an open interval $I$ **iff**:
@@ -11,13 +11,34 @@ $\boldsymbol{r}(t)$ is smooth on an open interval $I$ **iff**:
 - Continuous derivative  
   $\boldsymbol{r}'$ is continuous on $I$, the direction and speed of the curve can't jump abruptly.
 - Non-vanishing derivative  
-  $\boldsymbol{r}'(t) \ne \vec{0}$ for all $t \in I$. If the velocity vector hits zero, the curve can stop and reverse, or form a sharp point, even though $\boldsymbol{r}$ is still differentiable there.
+  $\boldsymbol{r}'(t) \ne \boldsymbol{0}$ for all $t \in I$. If the velocity vector hits zero, the curve can stop and reverse, or form a sharp point, even though $\boldsymbol{r}$ is still differentiable there.
 
-A curve traced by $\boldsymbol{r}(t)$ may fail to be smooth where $\boldsymbol{r}'$ is not continuous or where $\boldsymbol{r}'(t) = \vec{0}$.
+A curve traced by $\boldsymbol{r}(t)$ may fail to be smooth where $\boldsymbol{r}'$ is not continuous or where $\boldsymbol{r}'(t) = \boldsymbol{0}$.
 
-Examples:
+<SmoothnessFailuresDiagram />
 
-- $\boldsymbol{r}(t) = \langle 6\cos t - \cos 6t, 6\sin t - \sin 6t \rangle$, $0 \le t \le 2\pi$, is not smooth at the points between its petals.
+## Geometric Consequences
+
+For a smooth curve, $\left\|\boldsymbol{r}'(t)\right\|$ is continuous and strictly positive. The unit tangent vector is therefore defined at every point:
+
+$$
+\boldsymbol{T}(t)=\frac{\boldsymbol{r}'(t)}{\left\|\boldsymbol{r}'(t)\right\|}
+$$
+
+The arc length from $t_0$ to $t$ is
+
+$$
+s(t)=\int_{t_0}^{t}\left\|\boldsymbol{r}'(u)\right\|\,\text{d}u
+$$
+
+## Smoothness Check
+
+To test whether $\boldsymbol{r}(t)$ is smooth on an open interval:
+
+- Differentiate $\boldsymbol{r}(t)$.
+- Check that every component of $\boldsymbol{r}'(t)$ is continuous on the interval.
+- Solve $\boldsymbol{r}'(t)=\boldsymbol{0}$.
+- Exclude any parameter values where the derivative vanishes.
 
 ## Worked Example
 
@@ -29,8 +50,51 @@ $$
 \boldsymbol{r}'(t)=\langle2t,3t^2\rangle
 $$
 
-The derivative is continuous on $\mathbb{R}$, but $\boldsymbol{r}'(0)=\vec{0}$. Therefore, $\boldsymbol{r}$ is not smooth on $\mathbb{R}$.
+The derivative is continuous on $\mathbb{R}$, but $\boldsymbol{r}'(0)=\boldsymbol{0}$. Therefore, $\boldsymbol{r}$ is not smooth on $\mathbb{R}$.
 
-For $t>0$, the first component $2t$ is positive, so $\boldsymbol{r}'(t)\ne\vec{0}$. Therefore, the curve is smooth on $(0,\infty)$.
+For $t>0$, the first component $2t$ is positive, so $\boldsymbol{r}'(t)\ne\boldsymbol{0}$. Therefore, the curve is smooth on $(0,\infty)$.
+
+</Solution>
+
+Determine where
+
+$$
+\boldsymbol{r}(t)=\langle 6\cos t-\cos 6t,6\sin t-\sin 6t\rangle,
+\qquad 0\le t\le 2\pi
+$$
+
+is not smooth.
+
+<Solution>
+
+$$
+\boldsymbol{r}'(t)=\langle -6\sin t+6\sin 6t,6\cos t-6\cos 6t\rangle
+$$
+
+Set the derivative equal to the zero vector:
+
+$$
+\sin 6t=\sin t,\qquad \cos 6t=\cos t
+$$
+
+Both equations hold when
+
+$$
+6t=t+2\pi k
+$$
+
+for an integer $k$. Therefore,
+
+$$
+t=\frac{2\pi k}{5}
+$$
+
+Within $0\le t\le 2\pi$, the derivative vanishes at
+
+$$
+t=0,\frac{2\pi}{5},\frac{4\pi}{5},\frac{6\pi}{5},\frac{8\pi}{5},2\pi
+$$
+
+The curve is not smooth at these parameter values. They are the points between its petals.
 
 </Solution>

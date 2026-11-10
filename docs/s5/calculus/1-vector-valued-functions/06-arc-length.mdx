@@ -1,7 +1,7 @@
 ---
 title: Arc Length
 dateCreated: 2026-07-03T04:23:09.633Z
-lastUpdatedOn: 2026-11-10T15:25:41.632Z
+lastUpdatedOn: 2026-11-10T18:37:31.695Z
 ---
 
 Let $\boldsymbol{r}(t)$ be defined on $[a, b]$, and let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a, b]$. The polygonal length corresponding to $P$ is
@@ -11,11 +11,6 @@ s(\boldsymbol{r}, P) = \sum_{k=1}^{n} \lVert \boldsymbol{r}(t_k) - \boldsymbol{r
 $$
 
 The curve is rectifiable **iff** these polygonal lengths have a finite least upper bound, which is the arc length of the curve.
-
-Examples:
-
-- $\boldsymbol{r}(t) = a\cos t\,\boldsymbol{i} + a\sin t\,\boldsymbol{j}$, $0 \le t \le 2\pi$, is rectifiable: $\boldsymbol{r}'(t)$ is continuous, so the arc length integral applies directly, giving $L = 2\pi a$.
-- $f(x) = x\sin(1/x)$ for $0 < x \le 1$, $f(0) = 0$, is continuous but not rectifiable: near $x = 0$ the graph oscillates infinitely often, and the amplitude does not decay fast enough to keep the polygonal lengths bounded.
 
 If $x = x(t)$, $y = y(t)$, $z = z(t)$ have continuous derivatives on $[a, b]$, the arc length from $t = a$ to $t = b$ is
 
@@ -53,7 +48,7 @@ $$
 
 ## Arc-Length Parametrization
 
-Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and let $\boldsymbol{r}(t_0)$ be a reference point on $C$. The signed arc-length parameter $s$ measured from $\boldsymbol{r}(t_0)$ is
+Let $C$ be the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \boldsymbol{0}$, and let $\boldsymbol{r}(t_0)$ be a reference point on $C$. The signed arc-length parameter $s$ measured from $\boldsymbol{r}(t_0)$ is
 
 $$
 s = s(t) = \int_{t_0}^{t} \left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}u} \right\rVert \text{d}u
@@ -65,7 +60,7 @@ Since $\text{d}s/\text{d}t = \lVert \boldsymbol{r}'(t) \rVert > 0$, $s = s(t)$ i
 
 ## Properties
 
-$C$ is the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \vec{0}$, and $s$ is the signed arc-length parameter defined above.
+$C$ is the curve traced by a continuously differentiable $\boldsymbol{r}(t)$ with $\boldsymbol{r}'(t) \ne \boldsymbol{0}$, and $s$ is the signed arc-length parameter defined above.
 
 $s = s(t)$ is the arc-length parameter for $C$ **iff**
 
@@ -103,10 +98,6 @@ $$
 
 is already an arc-length parameter with reference point $\boldsymbol{r}(t_0)$: a unit-speed parametrization needs no reparametrization through the integral formula, only a shift so that $s = 0$ at the reference point.
 
-Examples:
-
-- For $x^2 + y^2 = a^2$, $a > 0$, with counterclockwise orientation and reference point $(a, 0)$: $\boldsymbol{r}(t) = a\cos t\,\boldsymbol{i} + a\sin t\,\boldsymbol{j}$, with $t_0 = 0$ giving $\boldsymbol{r}(t_0) = (a, 0)$. Since $\lVert \boldsymbol{r}'(t) \rVert = a$ is constant, $s = at$, so the arc-length parametrization is $\boldsymbol{r}(s) = a\cos(s/a)\,\boldsymbol{i} + a\sin(s/a)\,\boldsymbol{j}$.
-
 ## Worked Example
 
 Find the arc length of $\boldsymbol{r}(t) = 3\cos t\,\boldsymbol{i} + 3\sin t\,\boldsymbol{j} + 4t\,\boldsymbol{k}$ for $0 \le t \le 2\pi$, with reference point $\boldsymbol{r}(0) = (3, 0, 0)$. Then find its arc-length parametrization.
@@ -119,27 +110,20 @@ $$
 \frac{\text{d}x}{\text{d}t} = -3\sin t, \quad \frac{\text{d}y}{\text{d}t} = 3\cos t, \quad \frac{\text{d}z}{\text{d}t} = 4
 $$
 
-</Solution>
-
 Compute the speed.
 
-<Solution>
-
 $$
-\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert = \sqrt{9\sin^2 t + 9\cos^2 t + 16} = \sqrt{25} = 5
+\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}t} \right\rVert
+= \sqrt{9\sin^2 t + 9\cos^2 t + 16} = \sqrt{25} = 5
 $$
 
-The derivatives are continuous and $\boldsymbol{r}'(t) \ne \vec{0}$, so the formula applies.
+The derivatives are continuous and $\boldsymbol{r}'(t) \ne \boldsymbol{0}$, so the formula applies.
 
 $$
 L = \int_0^{2\pi} 5 \, \text{d}t = 10\pi
 $$
 
-</Solution>
-
 Compute the arc-length parameter with $t_0 = 0$.
-
-<Solution>
 
 $$
 s = \int_0^t 5 \, \text{d}u = 5t
@@ -148,19 +132,129 @@ $$
 Invert to get $t = s/5$ and substitute into $\boldsymbol{r}$.
 
 $$
-\boldsymbol{r}(s) = 3\cos\left(\frac{s}{5}\right)\boldsymbol{i} + 3\sin\left(\frac{s}{5}\right)\boldsymbol{j} + \frac{4s}{5}\,\boldsymbol{k}
+\boldsymbol{r}(s) = 3\cos\left(\frac{s}{5}\right)\boldsymbol{i}
++ 3\sin\left(\frac{s}{5}\right)\boldsymbol{j}
++ \frac{4s}{5}\,\boldsymbol{k}
 $$
+
+Verify the unit speed.
+
+$$
+\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert
+= \sqrt{\frac{9}{25}\sin^2\left(\frac{s}{5}\right) + \frac{9}{25}\cos^2\left(\frac{s}{5}\right) + \frac{16}{25}}
+= \sqrt{\frac{25}{25}} = 1
+$$
+
+The arc length is $L = 10\pi$, and the arc-length parametrization is $\boldsymbol{r}(s)$ for $0 \le s \le 10\pi$.
 
 </Solution>
 
-Verify the unit speed.
+Determine the arc length of
+
+$$
+\boldsymbol{r}(t)=a\cos t\,\boldsymbol{i}+a\sin t\,\boldsymbol{j},
+\qquad 0\le t\le 2\pi,
+$$
+
+where $a>0$.
 
 <Solution>
 
 $$
-\left\lVert \frac{\text{d}\boldsymbol{r}}{\text{d}s} \right\rVert = \sqrt{\frac{9}{25}\sin^2\left(\frac{s}{5}\right) + \frac{9}{25}\cos^2\left(\frac{s}{5}\right) + \frac{16}{25}} = \sqrt{\frac{25}{25}} = 1
+\boldsymbol{r}'(t)=-a\sin t\,\boldsymbol{i}+a\cos t\,\boldsymbol{j}
 $$
 
-The arc length is $L = 10\pi$, and the arc-length parametrization is $\boldsymbol{r}(s)$ for $0 \le s \le 10\pi$.
+The speed is constant:
+
+$$
+\left\lVert\boldsymbol{r}'(t)\right\rVert
+=\sqrt{a^2\sin^2t+a^2\cos^2t}=a
+$$
+
+Therefore,
+
+$$
+L=\int_0^{2\pi}a\,\text{d}t=2\pi a
+$$
+
+</Solution>
+
+Determine whether the graph of
+
+$$
+f(x)=x\sin\left(\frac{1}{x}\right),
+\qquad 0<x\le1,
+$$
+
+with $f(0)=0$, is rectifiable on $[0,1]$.
+
+<Solution>
+
+For
+
+$$
+x_n=\frac{1}{\frac{\pi}{2}+n\pi},
+$$
+
+the graph passes through alternating extrema because
+
+$$
+\sin\left(\frac{1}{x_n}\right)=\sin\left(\frac{\pi}{2}+n\pi\right)=(-1)^n
+$$
+
+Therefore, $f(x_n)=(-1)^n x_n$. Consecutive extrema lie on opposite sides of the $x$-axis. The distance between consecutive graph points is at least their vertical separation:
+
+$$
+\left\lVert (x_{n+1},f(x_{n+1}))-(x_n,f(x_n))\right\rVert
+\ge \left|f(x_{n+1})-f(x_n)\right|=x_{n+1}+x_n
+$$
+
+Thus, the polygonal length through these points is at least
+
+$$
+\sum_{n=0}^{N-1}\left|f(x_{n+1})-f(x_n)\right|
+=\sum_{n=0}^{N-1}(x_{n+1}+x_n)
+$$
+
+Since
+
+$$
+x_n=\frac{1}{\pi}\cdot\frac{1}{n+\frac{1}{2}},
+$$
+
+the sum diverges by comparison with the harmonic series. The polygonal lengths are therefore unbounded, so the graph is not rectifiable.
+
+</Solution>
+
+Find an arc-length parametrization of the circle
+
+$$
+x^2+y^2=a^2,
+\qquad a>0,
+$$
+
+with counterclockwise orientation and reference point $(a,0)$.
+
+<Solution>
+
+Use
+
+$$
+\boldsymbol{r}(t)=a\cos t\,\boldsymbol{i}+a\sin t\,\boldsymbol{j},
+\qquad t_0=0
+$$
+
+Since $\left\lVert\boldsymbol{r}'(t)\right\rVert=a$,
+
+$$
+s=\int_0^t a\,\text{d}u=at
+$$
+
+Thus, $t=s/a$. Substitution gives
+
+$$
+\boldsymbol{r}(s)=a\cos\left(\frac{s}{a}\right)\boldsymbol{i}
++a\sin\left(\frac{s}{a}\right)\boldsymbol{j}
+$$
 
 </Solution>
