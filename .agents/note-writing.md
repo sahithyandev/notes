@@ -106,13 +106,12 @@ Notebook files live under `docs/<sem>/<module>/notebooks/` and are listed by bas
 
 ## Validation
 
-`notes-style-validator`, registered in `astro.config.mjs`, runs on `bun dev` and `bun build`; the build fails on violations. For note work, use the fast standalone check rather than a full build:
+`notes-style-validator`, registered in `astro.config.mjs`, runs on `bun dev` and `bun build`; the build fails on violations. For note work, run the corpus test rather than a full build:
 
 ```bash
-bun run check-notes-style
-bun run check-notes-style -- --filter s1/mathematics
+bun test src/integrations/notes-style-validator/corpus.test.ts
 ```
 
-The filter supports a semester, module, submodule, or note name. It narrows reporting only; the full corpus is still scanned so links resolve correctly. `NOTES_STYLE_FILTER` applies to `bun dev`, never `bun build`.
+The corpus test scans every note so links resolve correctly. `NOTES_STYLE_FILTER` applies to `bun dev`, never `bun build`.
 
 Make all changes to a note in one pass rather than incremental saves.

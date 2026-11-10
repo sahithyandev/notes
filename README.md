@@ -53,10 +53,8 @@ Files must be named with a numeric prefix (e.g. `01-introduction.md`). The prefi
 To check note content for style/link issues without a full build:
 
 ```sh
-bun run check-notes-style
+bun test src/integrations/notes-style-validator/corpus.test.ts
 ```
-
-Add `-- --filter <name>` to scope it to a semester, module, submodule, or note (e.g. `--filter s1/mathematics`).
 
 The same checks (title case, label/description formatting, dashes, math delimiters, broken links, and more) also run as part of `bun dev` and `bun build`, and the build fails on any violation.
 
