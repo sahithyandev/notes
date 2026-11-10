@@ -3,7 +3,15 @@
 // its logic. Ctrl/Cmd+K is bound separately in search-modal.astro.
 import { track } from "./analytics.ts";
 
-export type Action = "search" | "theme" | "study" | "prev" | "next" | "help";
+export type Action =
+  | "search"
+  | "theme"
+  | "study"
+  | "zoomOut"
+  | "zoomIn"
+  | "prev"
+  | "next"
+  | "help";
 
 const TYPING = "input, textarea, select, [contenteditable]";
 const ARROW_SENSITIVE = "[tabindex], pre, [role='slider'], button";
@@ -23,6 +31,16 @@ export function resolveShortcut(e: KeyboardEvent): Action | null {
       return "theme";
     case "f":
       return document.getElementById("study-toggle") ? "study" : null;
+    case "-":
+      return document.documentElement.classList.contains("study-mode") &&
+        document.getElementById("study-zoom-out")
+        ? "zoomOut"
+        : null;
+    case "+":
+      return document.documentElement.classList.contains("study-mode") &&
+        document.getElementById("study-zoom-in")
+        ? "zoomIn"
+        : null;
     case "?":
       return "help";
     case "ArrowLeft":
@@ -52,6 +70,12 @@ export function run(action: Action): void {
       break;
     case "study":
       document.getElementById("study-toggle")?.click();
+      break;
+    case "zoomOut":
+      document.getElementById("study-zoom-out")?.click();
+      break;
+    case "zoomIn":
+      document.getElementById("study-zoom-in")?.click();
       break;
     case "help":
       document

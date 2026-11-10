@@ -13,10 +13,13 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
+  document.documentElement.classList.remove("study-mode");
   document.body.innerHTML = `
     <a class="note-nav-btn left" href="/a"></a>
     <a class="note-nav-btn right" href="/b"></a>
     <button id="study-toggle"></button>
+    <button id="study-zoom-out"></button>
+    <button id="study-zoom-in"></button>
     <input id="field" />
     <div id="plain"></div>
     <pre id="code"></pre>`;
@@ -46,6 +49,15 @@ test("f toggles study mode only when the toggle exists", () => {
   expect(press("f")).toBe("study");
   document.getElementById("study-toggle")!.remove();
   expect(press("f")).toBeNull();
+});
+
+test("plus and minus zoom only in study mode", () => {
+  expect(press("+")).toBeNull();
+  expect(press("-")).toBeNull();
+
+  document.documentElement.classList.add("study-mode");
+  expect(press("+")).toBe("zoomIn");
+  expect(press("-")).toBe("zoomOut");
 });
 
 test("ignored while typing in an input", () => {
