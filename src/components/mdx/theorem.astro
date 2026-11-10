@@ -5,47 +5,16 @@
 interface Props {
   name?: string;
   level?: "2" | "3";
-  titled?: boolean;
 }
 
-const { name, titled } = Astro.props;
-const labelled = !name && !titled;
+const { name } = Astro.props;
 ---
 
-<section
-  class="theorem"
-  data-named={name ? "" : undefined}
-  data-labelled={labelled ? "" : undefined}
->
-  {labelled && <p class="theorem-label">Theorem</p>}
+<section class="theorem" data-named={name ? "" : undefined}>
   <slot />
 </section>
 
 <style is:global>
-  .theorem[data-labelled] {
-    padding: 0.9rem 1.2rem;
-    border-left: 3px solid var(--border-strong);
-    border-radius: 0 6px 6px 0;
-    background: color-mix(in oklab, var(--text-muted) 7%, transparent);
-  }
-
-  .theorem > :is(h2, h3):first-child {
-    margin-top: 0;
-  }
-
-  .theorem-label {
-    margin: 0 0 6px;
-    color: var(--text-muted);
-    font-family: var(--font-ui);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.6px;
-  }
-
-  .theorem > :last-child {
-    margin-bottom: 0;
-  }
-
   .theorem .katex-display {
     overflow-x: auto;
     overflow-y: hidden;
