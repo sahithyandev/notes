@@ -1,21 +1,15 @@
 ---
-title: Jordan Curve
+title: Green's Theorem
 prereqs:
   - s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
   - s2/methods-of-mathematics/multivariable-calculus/double-integrals
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T10:53:01.320Z
+lastUpdatedOn: 2026-11-11T18:33:10.083Z
 ---
 
-<Definition>
+<Theorem>
 
-A Jordan curve in the plane is a simple closed curve, a closed curve that does not intersect itself except that the initial and terminal points coincide.
-
-</Definition>
-
-<Theorem name="Green's Theorem">
-
-Let $C$ be a positively oriented, piecewise smooth Jordan curve in the plane, and let $D$ be the region bounded by $C$. Suppose
+Let $C$ be a positively oriented, piecewise smooth [Jordan curve](./introduction#jordan-curve) in the plane, and let $D$ be the region bounded by $C$. Suppose
 
 $$
 \boldsymbol{F}(x,y) = M(x,y)\boldsymbol{i} + N(x,y)\boldsymbol{j}
@@ -35,8 +29,8 @@ For a simple closed curve, positive orientation means counterclockwise. Equivale
 
 </Note>
 
-### Area Formula
-
+<Theorem name="Area Formula">
+    
 The area of the region $D$ bounded by $C$ is a line integral over $C$.
 
 <Formula>
@@ -46,6 +40,10 @@ A(D) = \frac{1}{2}\oint_C x\,\text{d}y - y\,\text{d}x
 $$
 
 </Formula>
+
+</Theorem>
+
+<Proof>
 
 Take $M = -y/2$ and $N = x/2$. The integrand of Green's theorem becomes constant.
 
@@ -68,6 +66,8 @@ Any $M$ and $N$ with $\partial N/\partial x - \partial M/\partial y = 1$ gives a
 
 All 3 formulas give the same value. Their integrands differ by a multiple of $\text{d}(xy) = x\,\text{d}y + y\,\text{d}x$, which integrates to $0$ over a closed curve.
 
+</Proof>
+
 <Theorem name="Green's Theorem for Doubly Connected Regions">
 
 Let $R$ be a doubly connected region in the plane, with outer boundary $C_1$ oriented counterclockwise and inner boundary $C_2$ oriented clockwise. If $C_1$, $C_2$, and $\boldsymbol{F}(x,y) = M(x,y)\boldsymbol{i} + N(x,y)\boldsymbol{j}$ satisfy the hypotheses of Green's theorem, then
@@ -88,7 +88,11 @@ For a multiply connected region with $n$ holes, the boundary integral is the sum
 
 ### Region Between 2 Curves
 
-Evaluate $\oint_C xy\,\text{d}x + x^2\,\text{d}y$, where $C$ is the positively oriented boundary of the region $D$ between $y = x^2$ and $y = x$.
+Suppose $C$ is the positively oriented boundary of the region $D$ between $y = x^2$ and $y = x$. Evaluate:
+
+$$
+\oint_C xy\,\text{d}x + x^2\,\text{d}y
+$$
 
 <Solution>
 
@@ -144,7 +148,7 @@ $$
 x\,\text{d}y = ab\cos^2 t\,\text{d}t
 $$
 
-Apply the area formula $A(D) = \oint_C x\,\text{d}y$ with $\cos^2 t = \frac{1 + \cos 2t}{2}$.
+Apply the area formula $A(D) = \oint_C x\,\text{d}y$ with $\cos^2 t = \frac{1}{2} (1 + \cos 2t)$.
 
 $$
 A = ab \int_0^{2\pi} \frac{1 + \cos 2t}{2}\,\text{d}t = ab \left[ \frac{t}{2} + \frac{\sin 2t}{4} \right]_0^{2\pi} = \pi ab
@@ -154,36 +158,46 @@ $$
 
 ### Hole at the Origin
 
-Evaluate $\oint_C \dfrac{-y\,\text{d}x + x\,\text{d}y}{x^2 + y^2}$, where $C$ is any positively oriented, piecewise smooth Jordan curve enclosing the origin.
+Suppose $C$ is any positively oriented, piecewise smooth Jordan curve enclosing the origin. Evaluate:
+
+$$
+\oint_C \dfrac{-y\,\text{d}x + x\,\text{d}y}{x^2 + y^2}
+$$
 
 <Solution>
 
-Here $M = \dfrac{-y}{x^2 + y^2}$ and $N = \dfrac{x}{x^2 + y^2}$. Both are undefined at the origin, so Green's theorem does not apply to the region inside $C$.
-
-Away from the origin, the partial derivatives are equal.
+Here $M = -y/(x^2+y^2)$ and $N = x/(x^2+y^2)$. They are undefined at the origin, so remove a small circle $C_2$ around it. Away from the origin,
 
 $$
-\frac{\partial N}{\partial x} = \frac{y^2 - x^2}{(x^2 + y^2)^2} = \frac{\partial M}{\partial y}
+\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y} = 0
 $$
 
-Let $C_2$ be a circle of radius $r$ centered at the origin, lying inside $C$ and oriented clockwise. Let $R$ be the region between $C$ and $C_2$. The integrand of the double integral over $R$ is $0$, so the doubly connected form gives
+Apply Green's theorem to the region between $C$ and $C_2$. Its positive orientation traverses $C$ counterclockwise and $C_2$ clockwise.
 
 $$
 0 = \oint_C M\,\text{d}x + N\,\text{d}y + \oint_{C_2} M\,\text{d}x + N\,\text{d}y
 $$
 
-Reversing $C_2$ to counterclockwise changes the sign of its integral.
+Reversing $C_2$ gives
 
 $$
 \oint_C M\,\text{d}x + N\,\text{d}y = \oint_{C_2^+} M\,\text{d}x + N\,\text{d}y
 $$
 
-Parametrize $C_2^+$ with $x = r\cos t$, $y = r\sin t$, $0 \le t \le 2\pi$.
+Parametrize $C_2^+$ by $x=r\cos t$, $y=r\sin t$, where $0\le t\le2\pi$. Then
 
 $$
-\frac{-y\,\text{d}x + x\,\text{d}y}{x^2 + y^2} = \frac{r^2\sin^2 t + r^2\cos^2 t}{r^2}\,\text{d}t = \text{d}t
+\frac{-y\,\text{d}x+x\,\text{d}y}{x^2+y^2}
+= \frac{r^2\sin^2t+r^2\cos^2t}{r^2}\,\text{d}t
+= \text{d}t
 $$
 
-The integral is $\int_0^{2\pi} \text{d}t = 2\pi$ for every such $C$.
+$$
+\oint_C \frac{-y\,\text{d}x+x\,\text{d}y}{x^2+y^2}
+= \int_0^{2\pi}\text{d}t
+= 2\pi
+$$
+
+The curve encloses the origin once counterclockwise, so the value is $2\pi$, independent of its shape.
 
 </Solution>
