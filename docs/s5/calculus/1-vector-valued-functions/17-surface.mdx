@@ -1,10 +1,7 @@
 ---
 title: Surface
-prereqs:
-  - s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
-  - s2/methods-of-mathematics/multivariable-calculus/double-integrals
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T00:47:58.107Z
+lastUpdatedOn: 2026-11-11T10:53:01.330Z
 ---
 
 ### Normal Vector
@@ -22,7 +19,7 @@ A surface $\sigma$ is the set of points traced by a vector-valued function of 2 
 <Formula>
 
 $$
-\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}, \quad (u,v) \in R
+\boldsymbol{r}(u,v) = x(u,v)\boldsymbol{i} + y(u,v)\boldsymbol{j} + z(u,v)\boldsymbol{k}, \quad (u,v) \in R
 $$
 
 <Symbols>
@@ -40,7 +37,7 @@ $$
 
 Examples:
 
-- Sphere of radius $a$ as $\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\hat{i} + a\sin\phi\sin\theta\,\hat{j} + a\cos\phi\,\hat{k}$
+- Sphere of radius $a$ as $\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\boldsymbol{i} + a\sin\phi\sin\theta\,\boldsymbol{j} + a\cos\phi\,\boldsymbol{k}$
 - Plane through $\boldsymbol{r}_0$ as $\boldsymbol{r}(u,v) = \boldsymbol{r}_0 + u\boldsymbol{a} + v\boldsymbol{b}$
 
 ### Implicit Form
@@ -78,7 +75,7 @@ $$
 \boldsymbol{N} = \langle -g_x(x,y), -g_y(x,y), 1 \rangle
 $$
 
-A graph is a parametric surface with $\boldsymbol{r}(x,y) = x\hat{i} + y\hat{j} + g(x,y)\hat{k}$. An implicit surface $G(x,y,z) = 0$ is a graph if $G_z \neq 0$, by solving for $z$.
+A graph is a parametric surface with $\boldsymbol{r}(x,y) = x\boldsymbol{i} + y\boldsymbol{j} + g(x,y)\boldsymbol{k}$. An implicit surface $G(x,y,z) = 0$ is a graph if $G_z \neq 0$, by solving for $z$.
 
 Examples:
 
@@ -109,7 +106,7 @@ The limit is evaluated through the parametric or graph form of $\sigma$.
 
 ### For a Parametric Surface
 
-Let $\sigma$ be a smooth parametric surface given by $\boldsymbol{r}(u,v) = x(u,v)\hat{i} + y(u,v)\hat{j} + z(u,v)\hat{k}$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. If $f$ is continuous on $\sigma$,
+Let $\sigma$ be a smooth parametric surface given by $\boldsymbol{r}(u,v) = x(u,v)\boldsymbol{i} + y(u,v)\boldsymbol{j} + z(u,v)\boldsymbol{k}$, where $(u,v)$ varies over a region $R$ in the $uv$-plane. If $f$ is continuous on $\sigma$,
 
 $$
 \iint_\sigma f(x,y,z)\,\text{d}S = \iint_R f(x(u,v),y(u,v),z(u,v)) \left\lVert \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \right\rVert \text{d}A_{uv}
@@ -172,23 +169,23 @@ Evaluate $\iint_\sigma z^2\,\text{d}S$, where $\sigma$ is the sphere $x^2 + y^2 
 Parametrize $\sigma$ with spherical coordinates.
 
 $$
-\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\hat{i} + a\sin\phi\sin\theta\,\hat{j} + a\cos\phi\,\hat{k}, \quad 0 \le \phi \le \pi, \ 0 \le \theta \le 2\pi
+\boldsymbol{r}(\phi,\theta) = a\sin\phi\cos\theta\,\boldsymbol{i} + a\sin\phi\sin\theta\,\boldsymbol{j} + a\cos\phi\,\boldsymbol{k}, \quad 0 \le \phi \le \pi, \ 0 \le \theta \le 2\pi
 $$
 
 Differentiate.
 
 $$
-\frac{\partial \boldsymbol{r}}{\partial \phi} = a\cos\phi\cos\theta\,\hat{i} + a\cos\phi\sin\theta\,\hat{j} - a\sin\phi\,\hat{k}
+\frac{\partial \boldsymbol{r}}{\partial \phi} = a\cos\phi\cos\theta\,\boldsymbol{i} + a\cos\phi\sin\theta\,\boldsymbol{j} - a\sin\phi\,\boldsymbol{k}
 $$
 
 $$
-\frac{\partial \boldsymbol{r}}{\partial \theta} = -a\sin\phi\sin\theta\,\hat{i} + a\sin\phi\cos\theta\,\hat{j}
+\frac{\partial \boldsymbol{r}}{\partial \theta} = -a\sin\phi\sin\theta\,\boldsymbol{i} + a\sin\phi\cos\theta\,\boldsymbol{j}
 $$
 
 Compute the cross product.
 
 $$
-\frac{\partial \boldsymbol{r}}{\partial \phi} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = a^2\sin\phi\left(\sin\phi\cos\theta\,\hat{i} + \sin\phi\sin\theta\,\hat{j} + \cos\phi\,\hat{k}\right)
+\frac{\partial \boldsymbol{r}}{\partial \phi} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = a^2\sin\phi\left(\sin\phi\cos\theta\,\boldsymbol{i} + \sin\phi\sin\theta\,\boldsymbol{j} + \cos\phi\,\boldsymbol{k}\right)
 $$
 
 The vector in brackets is a unit vector and $\sin\phi \ge 0$, so the norm is $a^2\sin\phi$.
@@ -266,19 +263,19 @@ $$
 Parametrize $\sigma$ with the radius $r$ and the angle $\theta$ as parameters.
 
 $$
-\boldsymbol{r}(r,\theta) = r\cos\theta\,\hat{i} + r\sin\theta\,\hat{j} + r^2\,\hat{k}, \quad 0 \le r \le 1, \ 0 \le \theta \le 2\pi
+\boldsymbol{r}(r,\theta) = r\cos\theta\,\boldsymbol{i} + r\sin\theta\,\boldsymbol{j} + r^2\,\boldsymbol{k}, \quad 0 \le r \le 1, \ 0 \le \theta \le 2\pi
 $$
 
 Differentiate.
 
 $$
-\frac{\partial \boldsymbol{r}}{\partial r} = \cos\theta\,\hat{i} + \sin\theta\,\hat{j} + 2r\,\hat{k}, \quad \frac{\partial \boldsymbol{r}}{\partial \theta} = -r\sin\theta\,\hat{i} + r\cos\theta\,\hat{j}
+\frac{\partial \boldsymbol{r}}{\partial r} = \cos\theta\,\boldsymbol{i} + \sin\theta\,\boldsymbol{j} + 2r\,\boldsymbol{k}, \quad \frac{\partial \boldsymbol{r}}{\partial \theta} = -r\sin\theta\,\boldsymbol{i} + r\cos\theta\,\boldsymbol{j}
 $$
 
 Compute the cross product.
 
 $$
-\frac{\partial \boldsymbol{r}}{\partial r} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = -2r^2\cos\theta\,\hat{i} - 2r^2\sin\theta\,\hat{j} + r\,\hat{k}
+\frac{\partial \boldsymbol{r}}{\partial r} \times \frac{\partial \boldsymbol{r}}{\partial \theta} = -2r^2\cos\theta\,\boldsymbol{i} - 2r^2\sin\theta\,\boldsymbol{j} + r\,\boldsymbol{k}
 $$
 
 Take the norm. Since $r \ge 0$,

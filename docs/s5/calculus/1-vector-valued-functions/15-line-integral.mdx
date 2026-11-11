@@ -1,7 +1,7 @@
 ---
 title: Line Integral
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-11-10T15:25:41.817Z
+lastUpdatedOn: 2026-11-11T10:53:01.298Z
 ---
 
 Let $C$ be a smooth curve with parametric equations $x = x(t)$, $y = y(t)$, $z = z(t)$, $a \le t \le b$, and $f$ defined on $C$. Let $P = \{t_0, t_1, \dots, t_n\}$, $a = t_0 < t_1 < \dots < t_n = b$, be a partition of $[a,b]$, dividing $C$ into $n$ subarcs. Let $\Delta s_k$ be the length of the $k$th subarc, and $(x_k^*, y_k^*, z_k^*)$ a sample point on the $k$th subarc. The line integral of $f$ over $C$ with respect to arc length is
@@ -12,13 +12,65 @@ $$
 
 provided the limit exists and does not depend on the choice of partition or sample points.
 
+<CartesianGraph
+  title="Partition of a curve"
+  desc="The curve C is divided into subarcs by a partition. A sample point is chosen on each subarc."
+  x={{ label: "parameter", domain: [0, 4] }}
+  y={{ label: "C", domain: [0, 4] }}
+  curves={[
+    {
+      equation: (t) => 0.28 * (t - 2) ** 2 + 1.2,
+      domain: [0, 4],
+      tone: "s5",
+      round: true,
+      label: "C",
+      labelAt: 3.45,
+      labelDx: 8,
+      labelDy: -8,
+    },
+  ]}
+  lines={[
+    ...[0, 1, 2, 3, 4].map((t) => ({
+      from: { x: t, y: 0 },
+      to: { x: t, y: 0.28 * (t - 2) ** 2 + 1.2 },
+      guide: true,
+    })),
+    {
+      from: { x: 0.18, y: 2.18 },
+      to: { x: 0.82, y: 2.18 },
+      tone: "key",
+      dashed: true,
+      arrow: "both",
+      width: 1.5,
+    },
+  ]}
+  points={[
+    { x: 0, y: 2.32, tone: "key", radius: 4, label: "t₀", labelDx: -12 },
+    { x: 1, y: 1.48, tone: "key", radius: 4, label: "t₁", labelDx: -12 },
+    { x: 2, y: 1.2, tone: "key", radius: 4, label: "t₂", labelDx: -12 },
+    { x: 3, y: 1.48, tone: "key", radius: 4, label: "t₃", labelDx: -12 },
+    { x: 4, y: 2.32, tone: "key", radius: 4, label: "t₄", labelDx: 7 },
+    {
+      x: 0.5,
+      y: 1.83,
+      tone: "pt",
+      radius: 5,
+      label: "P₁*",
+      labelDx: 8,
+      labelDy: 17,
+    },
+  ]}
+  labels={[{ text: "Δs₁", x: 0.5, y: 2.48, tone: "key", anchor: "middle" }]}
+  caption="A partition divides C into subarcs of length Δsₖ. The point (x₁*, y₁*) is a sample point on the first subarc."
+/>
+
 <Note>
 
 The line integral exists if $f$ is continuous at each point of $C$.
 
 </Note>
 
-For $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$,
+For $\boldsymbol{r}(t) = x(t)\boldsymbol{i} + y(t)\boldsymbol{j} + z(t)\boldsymbol{k}$, $a \le t \le b$,
 
 $$
 \text{d}s
@@ -40,13 +92,13 @@ If $C$ lies in the $xy$-plane and $z = f(x,y)$ is a non-negative continuous func
 
 ## Line Integral of a Vector Field
 
-Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-valued-functions/field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\hat{i} + y(t)\hat{j} + z(t)\hat{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
+Let $\boldsymbol{F}$ be a [vector field](/s5/calculus/vector-valued-functions/field) and $C$ a piecewise smooth oriented curve parametrized by $\boldsymbol{r}(t) = x(t)\boldsymbol{i} + y(t)\boldsymbol{j} + z(t)\boldsymbol{k}$, $a \le t \le b$. The line integral of $\boldsymbol{F}$ along $C$ is
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_a^b \boldsymbol{F}(\boldsymbol{r}(t)) \cdot \boldsymbol{r}'(t)\,\text{d}t
 $$
 
-For $\boldsymbol{F} = P\hat{i} + Q\hat{j} + R\hat{k}$,
+For $\boldsymbol{F} = P\boldsymbol{i} + Q\boldsymbol{j} + R\boldsymbol{k}$,
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = \int_C P\,\text{d}x + Q\,\text{d}y + R\,\text{d}z
@@ -104,7 +156,7 @@ $$
 
 <Theorem name="Equivalence of Conservative Fields" level="3">
 
-Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
+Let $\boldsymbol{F}(x,y,z) = f\boldsymbol{i} + g\boldsymbol{j} + h\boldsymbol{k}$ be continuous on an open connected region $D \subseteq \mathbb{R}^3$. The following are equivalent:
 
 - $\boldsymbol{F}$ is conservative on $D$
 - $\displaystyle\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r} = 0$ for every piecewise smooth closed curve $C$ in $D$
@@ -116,7 +168,7 @@ Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$ be continuous on an
 
 ### Line Integral with Respect to Arc Length
 
-Evaluate the following integral, where $C$ is the quarter circle $\boldsymbol{r}(t) = \cos t\,\hat{i} + \sin t\,\hat{j}$, $0 \le t \le \dfrac{\pi}{2}$.
+Evaluate the following integral, where $C$ is the quarter circle $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j}$, $0 \le t \le \dfrac{\pi}{2}$.
 
 $$
 \int_C xy\,\text{d}s
@@ -127,7 +179,7 @@ $$
 Speed:
 
 $$
-\boldsymbol{r}'(t) = -\sin t\,\hat{i} + \cos t\,\hat{j}, \quad \lVert \boldsymbol{r}'(t) \rVert = \sqrt{\sin^2 t + \cos^2 t} = 1
+\boldsymbol{r}'(t) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j}, \quad \lVert \boldsymbol{r}'(t) \rVert = \sqrt{\sin^2 t + \cos^2 t} = 1
 $$
 
 Integral:
@@ -140,7 +192,7 @@ $$
 
 ### Integral Along a Parabola
 
-Evaluate the following integral for $\boldsymbol{F} = x^2\,\hat{i} + xy\,\hat{j}$, where $C$ is $\boldsymbol{r}(t) = t\,\hat{i} + t^2\,\hat{j}$, $0 \le t \le 1$.
+Evaluate the following integral for $\boldsymbol{F} = x^2\,\boldsymbol{i} + xy\,\boldsymbol{j}$, where $C$ is $\boldsymbol{r}(t) = t\,\boldsymbol{i} + t^2\,\boldsymbol{j}$, $0 \le t \le 1$.
 
 $$
 \int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}
@@ -151,7 +203,7 @@ $$
 Field along the curve:
 
 $$
-\boldsymbol{F}(\boldsymbol{r}(t)) = t^2\,\hat{i} + t^3\,\hat{j}, \quad \boldsymbol{r}'(t) = \hat{i} + 2t\,\hat{j}
+\boldsymbol{F}(\boldsymbol{r}(t)) = t^2\,\boldsymbol{i} + t^3\,\boldsymbol{j}, \quad \boldsymbol{r}'(t) = \boldsymbol{i} + 2t\,\boldsymbol{j}
 $$
 
 Dot product:
@@ -208,12 +260,12 @@ $$
 
 ### Work Along a Circle
 
-Find the work done by $\boldsymbol{F} = -y\,\hat{i} + x\,\hat{j}$ on a particle moving once counterclockwise around the unit circle $\boldsymbol{r}(t) = \cos t\,\hat{i} + \sin t\,\hat{j}$, $0 \le t \le 2\pi$.
+Find the work done by $\boldsymbol{F} = -y\,\boldsymbol{i} + x\,\boldsymbol{j}$ on a particle moving once counterclockwise around the unit circle $\boldsymbol{r}(t) = \cos t\,\boldsymbol{i} + \sin t\,\boldsymbol{j}$, $0 \le t \le 2\pi$.
 
 <Solution>
 
 $$
-\boldsymbol{F}(\boldsymbol{r}(t)) = -\sin t\,\hat{i} + \cos t\,\hat{j}, \quad \boldsymbol{r}'(t) = -\sin t\,\hat{i} + \cos t\,\hat{j}
+\boldsymbol{F}(\boldsymbol{r}(t)) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j}, \quad \boldsymbol{r}'(t) = -\sin t\,\boldsymbol{i} + \cos t\,\boldsymbol{j}
 $$
 
 $$
@@ -224,14 +276,14 @@ $$
 
 ### Path-Independent Integral
 
-Evaluate $\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ for $\boldsymbol{F} = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k}$, where $C$ is any piecewise smooth curve from $(1,1,1)$ to $(2,3,4)$.
+Evaluate $\int_C \boldsymbol{F} \cdot \text{d}\boldsymbol{r}$ for $\boldsymbol{F} = yz\,\boldsymbol{i} + xz\,\boldsymbol{j} + xy\,\boldsymbol{k}$, where $C$ is any piecewise smooth curve from $(1,1,1)$ to $(2,3,4)$.
 
 <Solution>
 
 Potential function:
 
 $$
-\phi = xyz, \quad \nabla \phi = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k} = \boldsymbol{F}
+\phi = xyz, \quad \nabla \phi = yz\,\boldsymbol{i} + xz\,\boldsymbol{j} + xy\,\boldsymbol{k} = \boldsymbol{F}
 $$
 
 Integral:

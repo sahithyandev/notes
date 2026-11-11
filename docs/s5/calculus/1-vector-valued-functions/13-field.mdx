@@ -1,7 +1,7 @@
 ---
 title: Field
 dateCreated: 2026-07-31T00:00:00.000Z
-lastUpdatedOn: 2026-11-10T18:37:31.746Z
+lastUpdatedOn: 2026-11-11T10:53:01.271Z
 ---
 
 A field is a function that assigns a mathematical object, a scalar, vector, or tensor, to each point in its domain $D \subseteq \mathbb{R}^n$.
@@ -15,7 +15,7 @@ A real-valued function defined on each points in $D \subseteq \mathbb{R}^n$.
 A vector field is a field that assigns a vector to each point in its domain $D \subseteq \mathbb{R}^n$,
 
 $$
-\boldsymbol{F}(x,y,z) = f(x,y,z)\hat{i} + g(x,y,z)\hat{j} + h(x,y,z)\hat{k}
+\boldsymbol{F}(x,y,z) = f(x,y,z)\boldsymbol{i} + g(x,y,z)\boldsymbol{j} + h(x,y,z)\boldsymbol{k}
 $$
 
 Here $f$, $g$, $h$ are real-valued component functions of $\boldsymbol{F}$ on $D$.
@@ -27,13 +27,13 @@ $\boldsymbol{F}$ is continuous **iff** each component function is continuous. $\
 For $\phi$ a scalar field of $x$, $y$, $z$, the gradient of $\phi$ is
 
 $$
-\nabla \phi = \frac{\partial \phi}{\partial x}\hat{i} + \frac{\partial \phi}{\partial y}\hat{j} + \frac{\partial \phi}{\partial z}\hat{k}
+\nabla \phi = \frac{\partial \phi}{\partial x}\boldsymbol{i} + \frac{\partial \phi}{\partial y}\boldsymbol{j} + \frac{\partial \phi}{\partial z}\boldsymbol{k}
 $$
 
 $\nabla \phi$ is the gradient field of $\phi$. $\nabla$ is the del operator, or nabla,
 
 $$
-\nabla = \frac{\partial}{\partial x}\hat{i} + \frac{\partial}{\partial y}\hat{j} + \frac{\partial}{\partial z}\hat{k}
+\nabla = \frac{\partial}{\partial x}\boldsymbol{i} + \frac{\partial}{\partial y}\boldsymbol{j} + \frac{\partial}{\partial z}\boldsymbol{k}
 $$
 
 Where $\nabla \phi \neq \boldsymbol{0}$:
@@ -51,7 +51,7 @@ Examples:
 
 ### Divergence
 
-Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The divergence of $\boldsymbol{F}$ is
+Let $\boldsymbol{F}(x,y,z) = f\boldsymbol{i} + g\boldsymbol{j} + h\boldsymbol{k}$. The divergence of $\boldsymbol{F}$ is
 
 $$
 \text{div}\,\boldsymbol{F} = \nabla \cdot \boldsymbol{F} = \frac{\partial f}{\partial x} + \frac{\partial g}{\partial y} + \frac{\partial h}{\partial z}
@@ -59,15 +59,29 @@ $$
 
 $\text{div}\,\boldsymbol{F}$ is a scalar field.
 
+Physical meaning of divergence:
+
+- Measures the net outward flow of a vector field per unit volume near a point.
+- $\text{div}\,\boldsymbol{F} > 0$ indicates a source at the point.
+- $\text{div}\,\boldsymbol{F} < 0$ indicates a sink at the point.
+- $\text{div}\,\boldsymbol{F} = 0$ indicates no net local source or sink.
+
 ### Curl
 
-Let $\boldsymbol{F}(x,y,z) = f\hat{i} + g\hat{j} + h\hat{k}$. The curl of $\boldsymbol{F}$ is
+Let $\boldsymbol{F}(x,y,z) = f\boldsymbol{i} + g\boldsymbol{j} + h\boldsymbol{k}$. The curl of $\boldsymbol{F}$ is
 
 $$
-\text{curl}\,\boldsymbol{F} = \nabla \times \boldsymbol{F} = \begin{vmatrix} \hat{i} & \hat{j} & \hat{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] f & g & h \end{vmatrix}
+\text{curl}\,\boldsymbol{F} = \nabla \times \boldsymbol{F} = \begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] f & g & h \end{vmatrix}
 $$
 
 $\text{curl}\,\boldsymbol{F}$ is a vector field.
+
+Physical meaning of curl:
+
+- Measures the local tendency of a vector field to rotate around a point.
+- The direction of $\text{curl}\,\boldsymbol{F}$ is the axis of local rotation, determined by the right-hand rule.
+- The magnitude of $\text{curl}\,\boldsymbol{F}$ measures the strength of local rotation.
+- $\text{curl}\,\boldsymbol{F} = \boldsymbol{0}$ indicates no local rotational tendency.
 
 ### Laplacian
 
@@ -164,13 +178,13 @@ $$
 Gradient field:
 
 $$
-\nabla \phi = 2xy\,\hat{i} + (x^2 + z^3)\,\hat{j} + 3yz^2\,\hat{k}
+\nabla \phi = 2xy\,\boldsymbol{i} + (x^2 + z^3)\,\boldsymbol{j} + 3yz^2\,\boldsymbol{k}
 $$
 
 At $(1, 2, 1)$:
 
 $$
-\nabla \phi = 2(1)(2)\,\hat{i} + (1 + 1)\,\hat{j} + 3(2)(1)\,\hat{k} = 4\hat{i} + 2\hat{j} + 6\hat{k}
+\nabla \phi = 2(1)(2)\,\boldsymbol{i} + (1 + 1)\,\boldsymbol{j} + 3(2)(1)\,\boldsymbol{k} = 4\boldsymbol{i} + 2\boldsymbol{j} + 6\boldsymbol{k}
 $$
 
 </Solution>
@@ -182,16 +196,16 @@ Find $\nabla \phi$ for $\phi = x^2 + y^2 + z^2$.
 <Solution>
 
 $$
-\nabla \phi = 2x\,\hat{i} + 2y\,\hat{j} + 2z\,\hat{k} = 2\boldsymbol{r}
+\nabla \phi = 2x\,\boldsymbol{i} + 2y\,\boldsymbol{j} + 2z\,\boldsymbol{k} = 2\boldsymbol{r}
 $$
 
-Here $\boldsymbol{r} = x\hat{i} + y\hat{j} + z\hat{k}$ is the position vector.
+Here $\boldsymbol{r} = x\boldsymbol{i} + y\boldsymbol{j} + z\boldsymbol{k}$ is the position vector.
 
 </Solution>
 
 ### Divergence and Curl
 
-Find $\text{div}\,\boldsymbol{F}$ and $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = xy\,\hat{i} + yz\,\hat{j} + zx\,\hat{k}$.
+Find $\text{div}\,\boldsymbol{F}$ and $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = xy\,\boldsymbol{i} + yz\,\boldsymbol{j} + zx\,\boldsymbol{k}$.
 
 <Solution>
 
@@ -206,25 +220,33 @@ $$
 Curl:
 
 $$
-\text{curl}\,\boldsymbol{F} = \left(\frac{\partial h}{\partial y} - \frac{\partial g}{\partial z}\right)\hat{i} + \left(\frac{\partial f}{\partial z} - \frac{\partial h}{\partial x}\right)\hat{j} + \left(\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}\right)\hat{k}
+\text{curl}\,\boldsymbol{F} = \begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] xy & yz & zx \end{vmatrix}
 $$
 
 $$
-= (0 - y)\,\hat{i} + (0 - z)\,\hat{j} + (0 - x)\,\hat{k} = -y\,\hat{i} - z\,\hat{j} - x\,\hat{k}
+= \left(\frac{\partial (zx)}{\partial y} - \frac{\partial (yz)}{\partial z}\right)\boldsymbol{i} + \left(\frac{\partial (xy)}{\partial z} - \frac{\partial (zx)}{\partial x}\right)\boldsymbol{j} + \left(\frac{\partial (yz)}{\partial x} - \frac{\partial (xy)}{\partial y}\right)\boldsymbol{k}
+$$
+
+$$
+= (0 - y)\,\boldsymbol{i} + (0 - z)\,\boldsymbol{j} + (0 - x)\,\boldsymbol{k} = -y\,\boldsymbol{i} - z\,\boldsymbol{j} - x\,\boldsymbol{k}
 $$
 
 </Solution>
 
 ### Curl of a Rotation Field
 
-Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = -y\,\hat{i} + x\,\hat{j}$.
+Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = -y\,\boldsymbol{i} + x\,\boldsymbol{j}$.
 
 <Solution>
 
 Components are $f = -y$, $g = x$, $h = 0$.
 
 $$
-\text{curl}\,\boldsymbol{F} = (0 - 0)\,\hat{i} + (0 - 0)\,\hat{j} + \left(\frac{\partial x}{\partial x} - \frac{\partial (-y)}{\partial y}\right)\hat{k} = 2\hat{k}
+\text{curl}\,\boldsymbol{F} = \begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] -y & x & 0 \end{vmatrix}
+$$
+
+$$
+= (0 - 0)\,\boldsymbol{i} + (0 - 0)\,\boldsymbol{j} + \left(\frac{\partial x}{\partial x} - \frac{\partial (-y)}{\partial y}\right)\boldsymbol{k} = 2\boldsymbol{k}
 $$
 
 </Solution>
@@ -236,11 +258,15 @@ Find $\text{curl}\,\boldsymbol{F}$ for $\boldsymbol{F} = \nabla (xyz)$.
 <Solution>
 
 $$
-\boldsymbol{F} = yz\,\hat{i} + xz\,\hat{j} + xy\,\hat{k}
+\boldsymbol{F} = yz\,\boldsymbol{i} + xz\,\boldsymbol{j} + xy\,\boldsymbol{k}
 $$
 
 $$
-\text{curl}\,\boldsymbol{F} = (x - x)\,\hat{i} + (y - y)\,\hat{j} + (z - z)\,\hat{k} = \boldsymbol{0}
+\text{curl}\,\boldsymbol{F} = \begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\[4pt] \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\[4pt] yz & xz & xy \end{vmatrix}
+$$
+
+$$
+= (x - x)\,\boldsymbol{i} + (y - y)\,\boldsymbol{j} + (z - z)\,\boldsymbol{k} = \boldsymbol{0}
 $$
 
 </Solution>
