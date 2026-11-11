@@ -31,6 +31,21 @@ export default function moduleRedirects(): AstroIntegration {
       "astro:server:setup": ({ server, logger }) => {
         let timer: ReturnType<typeof setTimeout> | undefined;
 
+        server.middlewares.use((req, res, next) => {
+          const pathname = new URL(req.url ?? "/", "http://astro.local")
+            .pathname;
+          const to = scanner.current[pathname];
+
+          if (!to) {
+            next();
+            return;
+          }
+
+          res.statusCode = 302;
+          res.setHeader("Location", to);
+          res.end();
+        });
+
         scanner.onChange(() => {
           logger.info("module redirects updated from disk");
         });

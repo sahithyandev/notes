@@ -2,7 +2,9 @@
 import { ModuleRedirectsScanner } from "../../../../integrations/module-redirects/scan";
 import { getModuleRedirectsScanner } from "../../../../integrations/module-redirects/scanner-cache";
 
-export const prerender = import.meta.env.PROD;
+// Keep this route limited to the paths returned by getStaticPaths in dev too.
+// Otherwise SSR makes [submodule] outrank [...slug] for every three-segment URL.
+export const prerender = true;
 
 export function getStaticPaths() {
   const redirects = new ModuleRedirectsScanner().current;
