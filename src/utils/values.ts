@@ -8,7 +8,7 @@ export const CGPA = 3.82;
 
 // Slug prefixes whose notes are still being written.
 // "s5" = whole semester; "s5/thermodynamics" = single module.
-export const WIP_PREFIXES: string[] = ["s5/advanced-networking", "s5/calculus"];
+export const WIP_PREFIXES: string[] = ["s5/calculus"];
 
 export const isWip = (slug: string): boolean =>
   WIP_PREFIXES.some((p) => slug === p || slug.startsWith(p + "/"));
