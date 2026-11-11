@@ -24,18 +24,21 @@ import { checkNotebookFile, checkNotebookFiles } from "./notebook-file.ts";
 import { checkSubmoduleNumbering } from "./submodule-numbering.ts";
 import { checkForwardLinks } from "./forward-link.ts";
 import { checkSolutionMethods } from "./solution-methods.ts";
+import { checkRedundantPrereqs } from "./redundant-prereq.ts";
+import { checkEmptyPrereq } from "./empty-prereq.ts";
 
 export {
   checkBrokenLinks,
   checkSubmoduleNumbering,
   checkForwardLinks,
   checkNotebookFiles,
+  checkRedundantPrereqs,
 };
 
 // Every rule except the corpus-wide ones (broken-link, submodule-numbering,
-// forward-link) runs per file, independent of the rest of
-// the corpus. broken-link needs every file's slug/headings up front to know
-// what a valid target even is, so it's handled separately (see validate.ts).
+// forward-link, redundant-prereq) runs per file, independent of the rest of
+// the corpus. These rules need neighboring or all-file context, so they are
+// handled separately (see validate.ts).
 const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkTitleCaseRule,
   checkTitleParens,
@@ -58,6 +61,7 @@ const PER_FILE_RULE_CHECKS: Array<(f: ScannedFile) => Violation[]> = [
   checkFormula,
   checkSolutionMethods,
   checkNotebookFile,
+  checkEmptyPrereq,
 ];
 
 export function runPerFileRules(f: ScannedFile): Violation[] {

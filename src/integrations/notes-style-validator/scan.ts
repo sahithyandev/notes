@@ -52,6 +52,8 @@ export interface ScannedFile {
   slug: string;
   /** GitHub-style anchor slugs for every heading (h1-h6), for in-page/cross-note anchor checks. */
   headingSlugs: Set<string>;
+  /** 1-based line of the frontmatter `prereqs` key, or null when absent. */
+  prereqsLine: number | null;
   prereqs: ScannedPrereq[];
   notebooks: ScannedNotebook[];
   /** Every downloadable .nb file under docs/, keyed by basename. Values are paths relative to docsRoot. */
@@ -275,6 +277,15 @@ function frontmatterListLinesOf(
   return result;
 }
 
+function frontmatterKeyLineOf(raw: string, key: string): number | null {
+  const lines = raw.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (i > 0 && lines[i].trim() === "---") break;
+    if (new RegExp(`^${key}:\\s*`).test(lines[i])) return i + 1;
+  }
+  return null;
+}
+
 function extractLinks(
   content: string,
   lineOffset: number,
@@ -393,6 +404,7 @@ export function scanFiles(docsRoot: string): ScannedFile[] {
       headings: extractHeadings(content, fmLines),
       slug: slugFromDocsPath(relative(docsRoot, file)),
       headingSlugs: extractHeadingSlugs(content),
+      prereqsLine: frontmatterKeyLineOf(raw, "prereqs"),
       prereqs: frontmatterListLinesOf(raw, "prereqs", prereqs),
       notebooks: frontmatterListLinesOf(raw, "notebooks", notebooks),
       notebookFiles,

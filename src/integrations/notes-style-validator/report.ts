@@ -15,6 +15,7 @@ export const RULES = [
   "label-description",
   "collapsed-label",
   "prereq-scope",
+  "empty-prereq",
   "filename",
   "title-heading-duplicate",
   "duplicate-heading",
@@ -28,6 +29,7 @@ export const RULES = [
   "broken-link",
   "submodule-numbering",
   "forward-link",
+  "redundant-prereq",
 ] as const;
 
 export type RuleId = (typeof RULES)[number];

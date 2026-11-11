@@ -6,6 +6,7 @@ import {
   checkSubmoduleNumbering,
   checkForwardLinks,
   checkNotebookFiles,
+  checkRedundantPrereqs,
 } from "./rules/index.ts";
 import { matchesFilter } from "./filter.ts";
 import {
@@ -85,6 +86,7 @@ function collectViolations(
   flat.push(...checkSubmoduleNumbering(files));
   flat.push(...checkForwardLinks(files));
   flat.push(...checkNotebookFiles(files));
+  flat.push(...checkRedundantPrereqs(files));
   return flat;
 }
 
