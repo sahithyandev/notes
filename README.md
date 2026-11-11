@@ -15,11 +15,13 @@ bun install
 
 ## Commands
 
-| Command       | Action                                     |
-| :------------ | :----------------------------------------- |
-| `bun dev`     | Start local dev server at `localhost:4321` |
-| `bun build`   | Build production site to `./dist/`         |
-| `bun preview` | Preview production build locally           |
+| Command        | Action                                     |
+| :------------- | :----------------------------------------- |
+| `bun dev`      | Start local dev server at `localhost:4321` |
+| `bun build`    | Build production site to `./dist/`         |
+| `bun preview`  | Preview production build locally           |
+| `bun test`     | Run the test suite with coverage           |
+| `bun run lint` | Check formatting                           |
 
 ## Development
 
@@ -56,7 +58,7 @@ To check note content for style/link issues without a full build:
 bun test src/integrations/notes-style-validator/corpus.test.ts
 ```
 
-The same checks (title case, label/description formatting, dashes, math delimiters, broken links, and more) also run as part of `bun dev` and `bun build`, and the build fails on any violation.
+The same checks (title case, label/description formatting, dashes, math delimiters, broken links, forward links, prerequisite scope, empty or redundant prerequisites, notebook references, submodule numbering, unused images, and more) also run as part of `bun dev` and `bun build`. Development reports violations without stopping the server; production builds fail on any violation. Scope development checks to a semester, module, submodule, or note with, for example, `NOTES_STYLE_FILTER=s1/mathematics bun dev`. The filter applies only to `bun dev`, not `bun build`.
 
 ## Note Metadata
 
@@ -65,14 +67,16 @@ Every note is validated against the `notes` schema in `src/content.config.ts`. F
 | Field           | Required? | Notes                                                                                           |
 | :-------------- | :-------- | :---------------------------------------------------------------------------------------------- |
 | `title`         | Yes       | Also used as the page's `<h1>`; must be title-cased and ≤40 characters.                         |
-| `dateCreated`   | No        | Set once by the sync script from the file's creation time; kept as-is after that.               |
-| `lastUpdatedOn` | No        | Stamped fresh by the sync script only when a commit actually changes the note's content.        |
+| `description`   | No        | Overrides the generated meta/LLM description for the note.                                      |
+| `dateCreated`   | Yes       | Set once by the sync script from the file's creation time; kept as-is after that.               |
+| `lastUpdatedOn` | Yes       | Stamped fresh by the sync script only when a commit actually changes the note's content.        |
 | `sidebar.label` | No        | Overrides the sidebar's display text; falls back to `title` when absent.                        |
 | `keywords`      | No        | Array of strings; not currently rendered, reserved for future SEO/search use.                   |
 | `prereqs`       | No        | Array of slugs for notes in _other_ modules this one assumes; same-module entries are rejected. |
+| `notebooks`     | No        | Array of Wolfram notebook basenames, without `.nb`; each referenced file must exist.            |
 | `authors`       | No        | Array of author slugs from `src/data/authors.json`; defaults to `sahithyan` when omitted.       |
 
-**`slug` and `sidebar.order` are not frontmatter fields.** Both are derived at build/dev time straight from the file path by `slugFromDocsPath`/`orderFromFilePath` (`src/utils/note-path.ts`), which is wired into the `notes` collection's `generateId` in `content.config.ts`. Renaming or renumbering a file (`01-`, `02-`, ...) is all it takes to change either; nothing needs to be written by hand. A note may still carry a leftover `slug` or `sidebar.order` key from before this changed, the schema ignores it, and `scripts/sync-note-metadata.ts` deletes it (along with the older, likewise-dead `prev`/`next` fields) the next time it happens to rewrite that file, rather than proactively across the whole corpus.
+**`slug` and `sidebar.order` are not frontmatter fields.** Both are derived at build/dev time straight from the file path by `slugFromDocsPath`/`orderFromFilePath` (`src/utils/note-path.ts`), which is wired into the `notes` collection's `generateId` in `content.config.ts`. Renaming or renumbering a file (`01-`, `02-`, ...) is all it takes to change either; nothing needs to be written by hand. `scripts/sync-note-metadata.ts` removes leftover `slug`, `sidebar.order`, `prev`, and `next` fields when it rewrites a note.
 
 ## Onboarding a New Author
 
