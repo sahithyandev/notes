@@ -1,20 +1,14 @@
 ---
 title: Derivatives
 prereqs:
+  - s1/mathematics/complex-analysis/differentiability
+  - s1/mathematics/complex-analysis/cauchy-riemann-equations
   - s2/methods-of-mathematics/multivariable-calculus/jacobian
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-10-21T14:43:04.425Z
+lastUpdatedOn: 2026-11-11T11:44:06.554Z
 ---
 
-Let $f$ be a function whose domain contains a neighborhood $|z-z_0| < \epsilon$ of $z_0$. The derivative of $f$ at $z_0$ is
-
-$$
-f'(z_0) = \lim_{z \to z_0} \frac{f(z)-f(z_0)}{z-z_0}
-$$
-
-provided this limit exists. $f$ is differentiable at $z_0$ when $f'(z_0)$ exists.
-
-If $f$ is differentiable at $z_0$, then $f$ is [continuous](/s5/calculus/complex-functions/continuity) at $z_0$.
+The definition and basic properties of complex derivatives are covered in the [S1 differentiability note](/s1/mathematics/complex-analysis/differentiability).
 
 ## Differentiation Formulas
 
@@ -27,31 +21,7 @@ Let $c \in \mathbb{C}$, and let $f$, $g$ be functions differentiable at $z \in \
 - $\dfrac{\text{d}}{\text{d}z}\,(f(z)g(z)) = f(z)g'(z)+f'(z)g(z)$
 - $\dfrac{\text{d}}{\text{d}z}\,\dfrac{f(z)}{g(z)} = \dfrac{g(z)f'(z)-f(z)g'(z)}{(g(z))^2}$, provided $g(z) \ne 0$
 
-## Cauchy-Riemann Equations
-
-Let $f(z) = u(x,y)+iv(x,y)$, and suppose $f'(z_0)$ exists at $z_0 = x_0+iy_0$. Then the first-order partial derivatives of $u$ and $v$ exist at $(x_0,y_0)$ and satisfy
-
-$$
-u_x = v_y, \qquad u_y = -v_x
-$$
-
-at $(x_0,y_0)$, and
-
-$$
-f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
-$$
-
-The equations follow from forcing the derivative limit to agree along the real and imaginary directions of approach.
-
-<Proof label="Proof Hint">
-
-- Take $\Delta z = \Delta x$ in the limit, get $f'(z_0) = u_x + iv_x$
-- Take $\Delta z = i\,\Delta y$ in the limit, get $f'(z_0) = v_y - iu_y$
-- Equate real parts and imaginary parts
-
-</Proof>
-
-The equations are necessary but not sufficient. They can hold at $z_0$ while $f'(z_0)$ does not exist. See [Sufficient Conditions for Differentiability](#sufficient-conditions-for-differentiability).
+## Polar Cauchy-Riemann Equations
 
 ### Polar Form
 
@@ -82,23 +52,7 @@ Examples:
 - $f(z) = \bar{z}$  
   $u_x = 1$, $v_y = -1$, so the equations fail everywhere and $\bar{z}$ is nowhere differentiable.
 
-## Sufficient Conditions for Differentiability
-
-Let $f(z) = u(x,y)+iv(x,y)$ be defined throughout a neighborhood $U$ of $z_0 = x_0+iy_0$.
-
-$f'(z_0)$ exists **iff**:
-
-- The first-order partial derivatives of $u$ and $v$ with respect to $x$ and $y$ exist ($u_x$, $u_y$, $v_x$, and $v_y$) everywhere in $U$.
-- The partial derivatives are continuous at $(x_0,y_0)$.
-- The partial derivatives satisfy the [Cauchy-Riemann equations](#cauchy-riemann-equations) at $(x_0,y_0)$.
-
-When these hold,
-
-$$
-f'(z_0) = u_x(x_0,y_0)+iv_x(x_0,y_0)
-$$
-
-Or in polar form,
+Under the Cartesian sufficient conditions stated in the [S1 Cauchy–Riemann equations note](/s1/mathematics/complex-analysis/cauchy-riemann-equations), the derivative also has the polar form
 
 $$
 f'(z_0) = e^{-i\theta_0}(u_r(r_0,\theta_0)+iv_r(r_0,\theta_0))
