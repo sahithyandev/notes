@@ -30,6 +30,7 @@ export const RULES = [
   "submodule-numbering",
   "forward-link",
   "redundant-prereq",
+  "unused-image",
 ] as const;
 
 export type RuleId = (typeof RULES)[number];

@@ -7,6 +7,7 @@ import {
   checkForwardLinks,
   checkNotebookFiles,
   checkRedundantPrereqs,
+  checkUnusedImages,
 } from "./rules/index.ts";
 import { matchesFilter } from "./filter.ts";
 import {
@@ -74,6 +75,7 @@ function applyMathBlockFixes(
 
 function collectViolations(
   files: ScannedFile[],
+  docsRoot: string,
   extraValidUrls: Iterable<string>,
 ): Array<{ file: string; violation: Violation }> {
   const flat: Array<{ file: string; violation: Violation }> = [];
@@ -87,6 +89,7 @@ function collectViolations(
   flat.push(...checkForwardLinks(files));
   flat.push(...checkNotebookFiles(files));
   flat.push(...checkRedundantPrereqs(files));
+  flat.push(...checkUnusedImages(files, docsRoot));
   return flat;
 }
 
@@ -117,8 +120,8 @@ export class NotesStyleValidator {
     if (autoFixedCount > 0) files = scanFiles(this.docsRoot);
 
     const validUrls = options.extraValidUrls ?? this.extraValidUrls;
-    const scoped = collectViolations(files, validUrls).filter((item) =>
-      matchesFilter(toDocsRelative(item.file, this.docsRoot), filter),
+    const scoped = collectViolations(files, this.docsRoot, validUrls).filter(
+      (item) => matchesFilter(toDocsRelative(item.file, this.docsRoot), filter),
     );
     const matchedFileCount = files.filter((file) =>
       matchesFilter(toDocsRelative(file.file, this.docsRoot), filter),

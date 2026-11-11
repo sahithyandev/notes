@@ -26,6 +26,7 @@ import { checkForwardLinks } from "./forward-link.ts";
 import { checkSolutionMethods } from "./solution-methods.ts";
 import { checkRedundantPrereqs } from "./redundant-prereq.ts";
 import { checkEmptyPrereq } from "./empty-prereq.ts";
+import { checkUnusedImages } from "./unused-image.ts";
 
 export {
   checkBrokenLinks,
@@ -33,6 +34,7 @@ export {
   checkForwardLinks,
   checkNotebookFiles,
   checkRedundantPrereqs,
+  checkUnusedImages,
 };
 
 // Every rule except the corpus-wide ones (broken-link, submodule-numbering,
