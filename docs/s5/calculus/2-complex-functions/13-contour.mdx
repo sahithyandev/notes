@@ -1,7 +1,7 @@
 ---
 title: Contour
 dateCreated: 2026-09-11T00:00:00.000Z
-lastUpdatedOn: 2026-10-17T06:00:25.198Z
+lastUpdatedOn: 2026-11-11T14:05:49.189Z
 ---
 
 A curve in the complex plane is the set of points $z(t) = x(t) + iy(t)$, $a \le t \le b$, where $x(t)$ and $y(t)$ are continuous.
@@ -125,3 +125,27 @@ Let $-C$ be the contour $C$ traversed in the opposite direction. It is parametri
 $$
 z_\text{rev}(t) = z(a + b - t), \qquad a \le t \le b
 $$
+
+## Worked Example
+
+Parametrize the line segment from $z_1=1+i$ to $z_2=3-i$. Find its length and orientation.
+
+<Solution>
+
+Use the line-segment formula:
+
+$$
+z(t)=1+i+t((3-i)-(1+i))=1+i+t(2-2i), \qquad 0\le t\le1
+$$
+
+The derivative is $z'(t)=2-2i$, so
+
+$$
+L=\int_0^1|2-2i|\,\text{d}t
+=\int_0^1 2\sqrt{2}\,\text{d}t
+=2\sqrt{2}
+$$
+
+As $t$ increases, the segment is traced from $1+i$ to $3-i$.
+
+</Solution>

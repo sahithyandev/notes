@@ -1,7 +1,7 @@
 ---
 title: Integration Theorems
 dateCreated: 2026-09-11T00:00:00.000Z
-lastUpdatedOn: 2026-10-08T12:03:47.173Z
+lastUpdatedOn: 2026-11-11T14:05:49.198Z
 ---
 
 Let $f$ be analytic in a [simply connected](/s5/calculus/vector-valued-functions/connectedness#simply-connected-region) domain $D$, and let $z_0$ be a fixed point in $D$. For each $z \in D$, let $C_z$ be any contour in $D$ from $z_0$ to $z$.
@@ -63,3 +63,51 @@ $$
 Analyticity of $f$ on $D$ forces $f$ to be infinitely differentiable there, since $f^{(n)}(z_0)$ exists for every $n$.
 
 </Note>
+
+## Worked Examples
+
+### Contour Integral from an Antiderivative
+
+Evaluate $\displaystyle\int_C (3z^2-2z+1)\,\text{d}z$ from $z=0$ to $z=1+i$, where $C$ is any contour in $\mathbb{C}$.
+
+<Solution>
+
+An antiderivative is
+
+$$
+F(z)=z^3-z^2+z
+$$
+
+Therefore
+
+$$
+\begin{aligned}
+\int_C (3z^2-2z+1)\,\text{d}z
+&=F(1+i)-F(0) \\
+&=(1+i)^3-(1+i)^2+(1+i) \\
+&=(-2+2i)-2i+(1+i) \\
+&=-1+i
+\end{aligned}
+$$
+
+</Solution>
+
+### Applying Cauchy's Integral Formula
+
+Let $C$ be the positively oriented circle $|z|=2$. Evaluate $\displaystyle\int_C \frac{e^z}{z-i}\,\text{d}z$.
+
+<Solution>
+
+The pole $z_0=i$ lies inside $C$, since $|i|=1<2$. Set $f(z)=e^z$. Cauchy's integral formula gives
+
+$$
+\int_C \frac{e^z}{z-i}\,\text{d}z=2\pi i f(i)=2\pi i e^i
+$$
+
+Using Euler's formula,
+
+$$
+2\pi i e^i=2\pi i(\cos1+i\sin1)=-2\pi\sin1+2\pi i\cos1
+$$
+
+</Solution>

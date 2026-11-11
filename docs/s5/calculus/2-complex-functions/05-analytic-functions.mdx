@@ -3,12 +3,10 @@ title: Analytic Functions
 prereqs:
   - s1/mathematics/complex-analysis/analytic-functions
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T11:44:06.562Z
+lastUpdatedOn: 2026-11-11T14:05:49.134Z
 ---
 
 If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
-
-The definition and basic examples are covered in the [S1 analytic functions note](/s1/mathematics/complex-analysis/analytic-functions).
 
 Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the [Cauchy-Riemann equations](/s5/calculus/complex-functions/derivatives#polar-cauchy-riemann-equations) throughout $U$.
 
@@ -76,3 +74,33 @@ Examples:
 $f(z) = |z|^2$ has no singular points. It is not analytic at any point in any neighborhood of any point, so no point satisfies the definition of a singular point.
 
 </Note>
+
+## Worked Example
+
+Determine where $f(z) = |z|^2$ is analytic. Use the Cauchy-Riemann equations.
+
+<Solution>
+
+Write $z=x+iy$. Then
+
+$$
+f(z) = x^2+y^2 + i0
+$$
+
+so $u(x,y)=x^2+y^2$ and $v(x,y)=0$. The Cauchy-Riemann equations require
+
+$$
+u_x=v_y, \qquad u_y=-v_x
+$$
+
+Here,
+
+$$
+u_x=2x, \qquad u_y=2y, \qquad v_x=v_y=0
+$$
+
+Both equations hold only when $x=y=0$. Since the partial derivatives are continuous, $f$ is complex differentiable at $0$.
+
+The equations do not hold on any neighborhood of $0$. Therefore $f$ is analytic nowhere.
+
+</Solution>
