@@ -1,0 +1,87 @@
+---
+import CartesianGraph from "./primitives/cartesian-graph.astro";
+
+const samples = (cx: number, cy: number, radius: number) =>
+  Array.from({ length: 41 }, (_, index) => {
+    const angle = (2 * Math.PI * index) / 40;
+    return {
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
+    };
+  });
+
+const circle = (radius: number, tone: "s5" | "pt" | "key") => [
+  {
+    equation: (x: number) => Math.sqrt(radius ** 2 - x ** 2),
+    domain: [-radius, radius] as [number, number],
+    tone,
+    round: true,
+  },
+  {
+    equation: (x: number) => -Math.sqrt(radius ** 2 - x ** 2),
+    domain: [-radius, radius] as [number, number],
+    tone,
+    round: true,
+  },
+];
+---
+
+<div class="connectedness-pair">
+  <CartesianGraph
+    title="Simply connected region"
+    desc="A disk containing a simple closed curve and no hole."
+    x={{ label: "x", domain: [-4, 4] }}
+    y={{ label: "y", domain: [-3, 3] }}
+    areas={[{ points: samples(0, 0, 2.25), tone: "s5", opacity: 0.18 }]}
+    curves={circle(1.15, "pt")}
+    labels={[
+      {
+        text: "closed curve can shrink",
+        x: 0,
+        y: 1.55,
+        tone: "pt",
+        weight: 600,
+      },
+    ]}
+    captionSlot
+  >
+    <Fragment slot="caption">
+      The closed curve lies in <i>D</i> and encloses only points of <i>D</i>.
+      The region has no hole.
+    </Fragment>
+  </CartesianGraph>
+
+  <CartesianGraph
+    title="Connected region with a hole"
+    desc="An annulus containing a simple closed curve around its hole."
+    x={{ label: "x", domain: [-4, 4] }}
+    y={{ label: "y", domain: [-3, 3] }}
+    areas={[
+      { points: samples(0, 0, 2.25), tone: "s5", opacity: 0.18 },
+      { points: samples(0, 0, 1.05), tone: "ink", opacity: 0.08 },
+    ]}
+    curves={[...circle(2.25, "s5"), ...circle(1.05, "key")]}
+    labels={[{ text: "hole", x: 0, y: 0, tone: "key", weight: 600 }]}
+    captionSlot
+  >
+    <Fragment slot="caption">
+      The annulus is connected, but the closed curve surrounds a{" "}
+      <span class="tone-key">hole</span> containing points outside <i>D</i>.
+    </Fragment>
+  </CartesianGraph>
+</div>
+
+<style>
+  .connectedness-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 42rem) {
+    .connectedness-pair {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

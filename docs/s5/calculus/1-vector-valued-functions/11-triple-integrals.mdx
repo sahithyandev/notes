@@ -1,9 +1,11 @@
 ---
 title: Triple Integrals
 prereqs:
+  - s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
+  - s2/methods-of-mathematics/multivariable-calculus/double-integrals
   - s2/methods-of-mathematics/multivariable-calculus/jacobian
 dateCreated: 2026-07-24T02:50:13.245Z
-lastUpdatedOn: 2026-11-10T15:25:41.736Z
+lastUpdatedOn: 2026-11-11T00:47:47.432Z
 ---
 
 Let $G$ be a bounded solid region and $f$ a real-valued function defined on $G$. Partition a rectangular box containing $G$ into sub-boxes by planes parallel to the coordinate planes, and choose a sample point $(x_k^*, y_k^*, z_k^*)$ in each resulting subregion of volume $\Delta V_k$. The triple integral of $f$ over $G$ is
@@ -264,7 +266,19 @@ Find the volume of the solid enclosed laterally by the cone $\phi = \frac{\pi}{4
 
 <Solution>
 
-From the last region in [common spherical regions](/s5/calculus/vector-valued-functions/coordinate-systems#common-spherical-regions) with $a = 1$, the limits are $0 \le \rho \le \sec\phi$, $0 \le \phi \le \frac{\pi}{4}$, $0 \le \theta \le 2\pi$.
+For cone, spherical coordinate system is easiest one to integrate. The limits for $\theta$ and $\phi$ are $[0,2\pi], [0,\frac{\pi}{4}]$ respectively.
+
+As $z=\rho \cos{\phi}$:
+
+$$
+\begin{array}{ccccc}
+0 & \le & z & \le & 1 \\
+0 & \le & \rho \cos{\phi} & \le & 1 \\
+0 & \le & \rho & \le & \sec{\phi}
+\end{array}
+$$
+
+<SphericalCoordinateTriangle />
 
 $$
 V = \int_0^{2\pi} \int_0^{\pi/4} \int_0^{\sec\phi} \rho^2 \sin\phi\,\text{d}\rho\,\text{d}\phi\,\text{d}\theta

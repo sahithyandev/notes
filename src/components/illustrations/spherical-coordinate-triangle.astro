@@ -1,0 +1,74 @@
+---
+import FigureCaption from "./primitives/figure-caption.astro";
+---
+
+<figure class="spherical-triangle">
+  <svg
+    viewBox="0 0 340 230"
+    role="img"
+    aria-label="A right triangle with rho as the hypotenuse, z as the vertical side, rho sin phi as the horizontal side, and phi as the angle between rho and z."
+  >
+    <line class="side vertical" x1="55" y1="190" x2="55" y2="35" />
+    <line class="side horizontal" x1="55" y1="35" x2="305" y2="35" />
+    <line class="side hypotenuse" x1="55" y1="190" x2="305" y2="35" />
+    <path class="angle" d="M55 150 A40 40 0 0 1 89 165" />
+    <text class="label" x="34" y="116">
+      z
+    </text>
+    <text class="label" x="180" y="23">
+      ρ sin φ
+    </text>
+    <text class="label" x="195" y="103" transform="rotate(-32 195 103)">
+      ρ
+    </text>
+    <text class="label angle-label" x="82" y="151">
+      φ
+    </text>
+  </svg>
+  <FigureCaption>
+    The spherical-coordinate relation z = ρ cos φ from the right triangle.
+  </FigureCaption>
+</figure>
+
+<style>
+  .spherical-triangle {
+    max-width: 420px;
+    margin: 24px auto;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .side {
+    fill: none;
+    stroke: var(--text-secondary);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+
+  .hypotenuse {
+    stroke: var(--dia-ct);
+  }
+
+  .angle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+  }
+
+  .label {
+    fill: var(--text-primary);
+    font-family: "STIX Two Math", "Cambria Math", "Times New Roman", serif;
+    font-size: 16px;
+    font-style: italic;
+    text-anchor: middle;
+  }
+
+  .angle-label {
+    fill: var(--accent);
+  }
+</style>

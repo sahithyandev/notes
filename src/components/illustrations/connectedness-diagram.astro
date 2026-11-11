@@ -1,0 +1,163 @@
+---
+import CartesianGraph from "./primitives/cartesian-graph.astro";
+
+interface Props {
+  variant:
+    "connected" | "disconnected" | "simply-connected" | "not-simply-connected";
+}
+
+const { variant } = Astro.props;
+const samples = (cx: number, cy: number, radius: number) =>
+  Array.from({ length: 41 }, (_, index) => {
+    const angle = (2 * Math.PI * index) / 40;
+    return {
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
+    };
+  });
+
+const connected = variant === "connected";
+const disconnected = variant === "disconnected";
+const simplyConnected = variant === "simply-connected";
+const notSimplyConnected = variant === "not-simply-connected";
+const regions = connected
+  ? [{ points: samples(0, 0, 2.25), tone: "s5" as const, opacity: 0.18 }]
+  : disconnected
+    ? [
+        {
+          points: samples(-2.15, 0, 1.35),
+          tone: "s5" as const,
+          opacity: 0.18,
+        },
+        { points: samples(2.15, 0, 1.35), tone: "s5" as const, opacity: 0.18 },
+      ]
+    : simplyConnected
+      ? [{ points: samples(0, 0, 2.25), tone: "s5" as const, opacity: 0.18 }]
+      : [
+          { points: samples(0, 0, 2.25), tone: "s5" as const, opacity: 0.18 },
+          { points: samples(0, 0, 1.05), tone: "ink" as const, opacity: 0.08 },
+        ];
+
+const circle = (radius: number, tone: "s5" | "pt" | "key") => [
+  {
+    equation: (x: number) => Math.sqrt(radius ** 2 - x ** 2),
+    domain: [-radius, radius] as [number, number],
+    tone,
+    round: true,
+  },
+  {
+    equation: (x: number) => -Math.sqrt(radius ** 2 - x ** 2),
+    domain: [-radius, radius] as [number, number],
+    tone,
+    round: true,
+  },
+];
+
+const boundaryCurves = simplyConnected
+  ? circle(1.15, "pt")
+  : notSimplyConnected
+    ? [...circle(2.25, "s5"), ...circle(1.05, "key")]
+    : [];
+---
+
+<CartesianGraph
+  title={
+    connected
+      ? "Connected region"
+      : disconnected
+        ? "Disconnected region"
+        : simplyConnected
+          ? "Simply connected region"
+          : "Connected region with a hole"
+  }
+  desc={
+    connected
+      ? "A disk with 2 points joined by a line segment that stays inside the region."
+      : disconnected
+        ? "Two disjoint disks with 2 points whose straight path crosses the excluded gap."
+        : simplyConnected
+          ? "A disk containing a simple closed curve and no hole."
+          : "An annulus containing a simple closed curve around its hole."
+  }
+  x={{ label: "x", domain: [-4, 4] }}
+  y={{ label: "y", domain: [-3, 3] }}
+  areas={regions}
+  curves={boundaryCurves}
+  lines={[
+    {
+      from: connected ? { x: -1.55, y: 0.85 } : { x: -2.15, y: 0 },
+      to: connected ? { x: 1.55, y: -0.85 } : { x: 2.15, y: 0 },
+      tone: connected ? "pt" : "key",
+      dashed: !connected,
+      arrow: "both",
+      width: 2,
+    },
+  ].filter(() => connected || disconnected)}
+  points={[
+    {
+      x: connected ? -1.55 : -2.15,
+      y: connected ? 0.85 : 0,
+      tone: "pt",
+      radius: 5,
+      label: "P",
+      labelDx: -14,
+      labelDy: -10,
+      labelTone: "pt",
+    },
+    {
+      x: connected ? 1.55 : 2.15,
+      y: connected ? -0.85 : 0,
+      tone: "pt",
+      radius: 5,
+      label: "Q",
+      labelDx: 8,
+      labelDy: 15,
+      labelTone: "pt",
+    },
+  ].filter(() => connected || disconnected)}
+  labels={
+    connected
+      ? [{ text: "path stays in D", x: 0, y: 1.65, tone: "pt", weight: 600 }]
+      : disconnected
+        ? [{ text: "excluded gap", x: 0, y: 0.45, tone: "key", weight: 600 }]
+        : simplyConnected
+          ? [
+              {
+                text: "closed curve can shrink",
+                x: 0,
+                y: 1.55,
+                tone: "pt",
+                weight: 600,
+              },
+            ]
+          : [{ text: "hole", x: 0, y: 0, tone: "key", weight: 600 }]
+  }
+  captionSlot
+>
+  <Fragment slot="caption">
+    {connected ? (
+      <>
+        Any points <span class="tone-pt">P</span> and{" "}
+        <span class="tone-pt">Q</span> can be joined by a path contained in{" "}
+        <i>D</i>.
+      </>
+    ) : disconnected ? (
+      <>
+        The path from <span class="tone-pt">P</span> to{" "}
+        <span class="tone-pt">Q</span> must cross the{" "}
+        <span class="tone-key">excluded gap</span>. No such path lies entirely
+        in <i>D</i>.
+      </>
+    ) : simplyConnected ? (
+      <>
+        The closed curve lies in <i>D</i> and encloses only points of <i>D</i>.
+        The region has no hole.
+      </>
+    ) : (
+      <>
+        The annulus is connected, but the closed curve surrounds a{" "}
+        <span class="tone-key">hole</span> containing points outside <i>D</i>.
+      </>
+    )}
+  </Fragment>
+</CartesianGraph>
