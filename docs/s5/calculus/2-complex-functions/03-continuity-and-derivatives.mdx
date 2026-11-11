@@ -1,0 +1,229 @@
+---
+title: Continuity and Derivatives
+prereqs:
+  - s1/mathematics/complex-analysis/continuity
+  - s1/mathematics/complex-analysis/differentiability
+  - s1/mathematics/complex-analysis/cauchy-riemann-equations
+  - s2/methods-of-mathematics/multivariable-calculus/jacobian
+dateCreated: 2026-08-14T00:00:00.000Z
+lastUpdatedOn: 2026-11-11T17:47:56.803Z
+---
+
+## Continuity
+
+Let $D \subseteq \mathbb{C}$ and let $f: D \to \mathbb{C}$ be a function.
+
+### Continuity at a Limit Point
+
+<Theorem>
+
+Let $f: D \to \mathbb{C}$, $z_0 \in D$.
+
+- If $z_0$ is not an [isolated point](/s5/calculus/complex-functions/introduction#isolated-point) of $D$, $f$ is continuous at $z_0$ **iff** $\displaystyle\lim_{z \to z_0} f(z) = f(z_0)$
+- If $z_0$ is an isolated point of $D$, $f$ is continuous at $z_0$
+
+<Proof label="Proof Hint">
+
+For a non-isolated point, write the definition of continuity at $z_0$ using
+$|f(z)-f(z_0)|$ and compare it with the definition of the limit as
+$z \to z_0$.
+
+For an isolated point, choose a radius $r>0$ such that
+$D \cap B(z_0,r)=\{z_0\}$. There are no other points of $D$ sufficiently close
+to $z_0$, so the epsilon-delta condition is vacuously satisfied.
+
+</Proof>
+    
+</Theorem>
+
+### Nonvanishing Near a Point
+
+<Theorem>
+
+If $f$ is continuous and non-zero at $z_0$, then $f(z) \ne 0$ throughout some neighborhood of $z_0$.
+
+</Theorem>
+
+<Proof label="Proof Hint">
+
+Set $\varepsilon=\dfrac{|f(z_0)|}{2}>0$. Continuity gives a neighborhood of
+$z_0$ in which
+
+$$
+|f(z)-f(z_0)|<\frac{|f(z_0)|}{2}
+$$
+
+Use the reverse triangle inequality to show that $|f(z)|$ is positive in this
+neighborhood.
+
+</Proof>
+
+### Boundedness on a Closed and Bounded Set
+
+<Theorem>
+
+If $f$ is continuous on a closed and bounded set $R \subseteq \mathbb{C}$, there exists a non-negative real number $M$ such that
+
+$$
+|f(z)| \le M
+$$
+
+for all $z \in R$, with equality for at least 1 point in $R$.
+
+</Theorem>
+
+<Proof label="Proof Hint">
+
+Use that a closed and bounded subset of $\mathbb{C}\cong\mathbb{R}^2$ is
+compact. $|f(z)|$ is continuous on $R$, so the [Extreme
+Value Theorem](/s1/mathematics/real-analysis/continuity-theorems#extreme-value-theorem) gives a point $z_0\in R$ where it attains its maximum. Set
+$M=|f(z_0)|$.
+
+</Proof>
+
+## Derivative
+
+### Differentiation Formulas
+
+Let $c \in \mathbb{C}$, and let $f$, $g$ be functions differentiable at $z \in \mathbb{C}$. Then:
+
+- $\dfrac{\text{d}}{\text{d}z}\,c = 0$
+- $\dfrac{\text{d}}{\text{d}z}\,(cf(z)) = cf'(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,z^n = nz^{n-1}$, for positive integer $n$
+- $\dfrac{\text{d}}{\text{d}z}\,(f(z)+g(z)) = f'(z)+g'(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,(f(z)g(z)) = f(z)g'(z)+f'(z)g(z)$
+- $\dfrac{\text{d}}{\text{d}z}\,\dfrac{f(z)}{g(z)} = \dfrac{g(z)f'(z)-f(z)g'(z)}{(g(z))^2}$, provided $g(z) \ne 0$
+
+## Polar Cauchy-Riemann Equations
+
+### Coordinate Change
+
+Let $z_0=r_0e^{i\theta_0}$ with $r_0>0$. Write
+
+$$
+f(z)=u(r,\theta)+iv(r,\theta), \qquad x=r\cos\theta, \qquad y=r\sin\theta
+$$
+
+The polar form is valid only where $r>0$. The chain rule gives
+
+$$
+\begin{pmatrix}u_x\\u_y\end{pmatrix}
+=
+\begin{pmatrix}
+\cos\theta&-\dfrac{\sin\theta}{r}\\
+\sin\theta&\dfrac{\cos\theta}{r}
+\end{pmatrix}
+\begin{pmatrix}u_r\\u_\theta\end{pmatrix},
+\qquad
+\begin{pmatrix}v_x\\v_y\end{pmatrix}
+=
+\begin{pmatrix}
+\cos\theta&-\dfrac{\sin\theta}{r}\\
+\sin\theta&\dfrac{\cos\theta}{r}
+\end{pmatrix}
+\begin{pmatrix}v_r\\v_\theta\end{pmatrix}
+$$
+
+The factors $1/r$ occur because changing $\theta$ by $\text{d}\theta$ moves a distance $r\,\text{d}\theta$ in the plane.
+
+### Polar Equations
+
+Substituting into the Cartesian equations $u_x=v_y$ and $u_y=-v_x$ gives
+
+$$
+u_r=\frac{1}{r}v_\theta, \qquad v_r=-\frac{1}{r}u_\theta
+$$
+
+Equivalently,
+
+$$
+ru_r=v_\theta, \qquad u_\theta=-rv_r
+$$
+
+### Change of Variables in an Integral
+
+For a polar substitution, use the map
+
+$$
+T(r,\theta)=(x,y)=(r\cos\theta,r\sin\theta)
+$$
+
+The input is $(r,\theta)$. The output is $(x,y)$. The relevant Jacobian is therefore
+
+$$
+\frac{\partial(x,y)}{\partial(r,\theta)}
+=
+\begin{pmatrix}
+\dfrac{\partial x}{\partial r}&\dfrac{\partial x}{\partial\theta}\\[4pt]
+\dfrac{\partial y}{\partial r}&\dfrac{\partial y}{\partial\theta}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\cos\theta&-r\sin\theta\\
+\sin\theta&r\cos\theta
+\end{pmatrix}
+$$
+
+Its determinant is $r$. Therefore,
+
+$$
+\text{d}x\,\text{d}y=r\,\text{d}r\,\text{d}\theta
+$$
+
+The integral transforms as
+
+$$
+\iint_R f(x,y)\,\text{d}x\,\text{d}y
+=
+\iint_S f(r\cos\theta,r\sin\theta)\,r\,\text{d}r\,\text{d}\theta
+$$
+
+The inverse Jacobian $\partial(r,\theta)/\partial(x,y)$ is used when recovering $r$ and $\theta$ from $(x,y)$. It is not the Jacobian used for the area substitution above.
+
+## Worked Examples
+
+### Continuity Example
+
+Determine whether $f(z) = \dfrac{z^2+1}{z-i}$ is continuous at $z_0 = 1$.
+
+<Solution>
+
+The numerator and denominator are polynomials. The denominator at $z_0$ is
+
+$$
+1-i \ne 0
+$$
+
+Therefore the quotient is defined and continuous at $1$. Its value is
+
+$$
+f(1) = \frac{1+1}{1-i} = \frac{2(1+i)}{2} = 1+i
+$$
+
+</Solution>
+
+### Derivative Example
+
+Find the derivative of $f(z) = \dfrac{z^2+1}{z-i}$ at $z = 1$.
+
+<Solution>
+
+Use the quotient rule with $p(z) = z^2+1$ and $q(z) = z-i$:
+
+$$
+f'(z) = \frac{q(z)p'(z)-p(z)q'(z)}{q(z)^2}
+= \frac{(z-i)2z-(z^2+1)}{(z-i)^2}
+$$
+
+At $z=1$,
+
+$$
+\begin{aligned}
+f'(1)
+&= \frac{2(1-i)-2}{(1-i)^2} \\
+&= \frac{-2i}{-2i} \\
+&= 1
+\end{aligned}
+$$
+
+</Solution>

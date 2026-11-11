@@ -1,0 +1,136 @@
+---
+title: Analytic Functions
+prereqs:
+  - s1/mathematics/complex-analysis/analytic-functions
+dateCreated: 2026-09-03T00:00:00.000Z
+lastUpdatedOn: 2026-11-11T17:47:56.825Z
+---
+
+If $f$ is analytic on an open set $G$, $f'$ is continuous on $G$.
+
+Let $u$ and $v$ be real-valued functions with continuous first-order partial derivatives on an open set $U \subseteq \mathbb{C}$, and define $f(z) = u(x,y)+iv(x,y)$, $z = x+iy$. Then $f$ is analytic in $U$ **iff** $u$ and $v$ satisfy the [Cauchy-Riemann equations](/s1/mathematics/complex-analysis/cauchy-riemann-equations) throughout $U$.
+
+## Properties
+
+Let $f$ be analytic on a domain $D$.
+
+- $f'$ is analytic on $D$. So $f$ is infinitely differentiable on $D$.
+- $\operatorname{Re} f$ and $\operatorname{Im} f$ are harmonic on $D$.
+- If $f'(z) = 0$ throughout $D$, then $f$ is constant on $D$.
+- If $|f|$ is constant on $D$, then $f$ is constant on $D$.
+- If $\operatorname{Re} f$ is constant on $D$, or $\operatorname{Im} f$ is constant on $D$, then $f$ is constant on $D$.
+- If $f$ is not constant on $D$, its zeros are isolated.
+
+<Proof label="Proof Hint">
+
+For $|f|$ constant:
+
+- If $|f| = 0$, then $f = 0$
+- Otherwise write $|f|^2 = u^2+v^2 = c$ with $c > 0$
+- Differentiate in $x$ and $y$, apply the Cauchy-Riemann equations
+- Get $u_x = u_y = v_x = v_y = 0$, so $f' = 0$
+
+</Proof>
+
+Let $f$ and $g$ be analytic in a domain $D$.
+
+- $f+g$, $f-g$, and $fg$ are analytic in $D$.
+- $f/g$ is analytic in $D$ provided $g$ does not vanish at any point of $D$.
+- If $f$ is analytic in $D$ and $g$ is analytic on a domain containing the image of $D$ under $f$, then $g \circ f$ is analytic in $D$, and
+
+$$
+\frac{\text{d}}{\text{d}z}\,g(f(z)) = g'(f(z))\,f'(z)
+$$
+
+## Singular Point
+
+<Aka>Singularity</Aka>. A singular point of a function $f$ is a point where $f$
+is not analytic.
+
+### Isolated Singularity
+
+$z_0$ is an isolated singularity **iff** a small enough disc around $z_0$ contains no singular point other than $z_0$.
+
+### Non-Isolated Singularity
+
+$z_0$ is a non-isolated singularity **iff** every disc around $z_0$ contains another singular point.
+
+## Worked Example
+
+Determine where $f(z) = |z|^2$ is analytic. Use the Cauchy-Riemann equations.
+
+<Solution>
+
+Write $z=x+iy$. Then
+
+$$
+f(z) = x^2+y^2 + i0
+$$
+
+so $u(x,y)=x^2+y^2$ and $v(x,y)=0$. The Cauchy-Riemann equations require
+
+$$
+u_x=v_y, \qquad u_y=-v_x
+$$
+
+Here,
+
+$$
+u_x=2x, \qquad u_y=2y, \qquad v_x=v_y=0
+$$
+
+Both equations hold only when $x=y=0$. Since the partial derivatives are continuous, $f$ is complex differentiable at $0$.
+
+The equations do not hold on any neighborhood of $0$. Therefore $f$ is analytic nowhere.
+
+</Solution>
+
+Classify $z=0$ for $f(z)=1/z$.
+
+<Solution>
+
+$f$ is not defined at $z=0$, so it is not analytic there. Therefore, $0$ is a singular point.
+
+For every $z\neq 0$, $f$ is analytic. There are no other singular points. Therefore, a small enough disc around $0$ contains no singular point other than $0$.
+
+Hence, $0$ is an isolated singularity.
+
+</Solution>
+
+Classify $z=0$ for $f(z)=z^2$.
+
+<Solution>
+
+$f$ is a polynomial, so it is analytic at $0$. Therefore, $0$ is not a singular point.
+
+</Solution>
+
+Classify $z=0$ for $f$.
+
+$$
+f(z)=\frac{1}{\sin \left(\frac{1}{z} \right)}
+$$
+
+<Solution>
+
+$f$ is not defined at $z=0$. Therefore, $0$ is a singular point.
+
+The other singular points occur when
+
+$$
+\sin(1/z)=0
+$$
+
+so
+
+$$
+\frac{1}{z}=n\pi
+\qquad\Longrightarrow\qquad
+z=\frac{1}{n\pi}, \quad n\in\mathbb{Z}\setminus\{0\}
+$$
+
+These singular points approach $0$. Every disc around $0$ contains another singular point.
+
+Hence, $0$ is a non-isolated singularity.
+
+</Solution>
