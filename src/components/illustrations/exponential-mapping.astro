@@ -227,7 +227,7 @@ const AR = (W / H).toFixed(4);
     background: var(--bg);
     overflow: hidden;
     font-family: var(--font-ui);
-    max-width: 80ch;
+    max-width: 70ch;
   }
 
   svg.plot {
@@ -245,7 +245,7 @@ const AR = (W / H).toFixed(4);
     stroke-width: 0.75;
   }
   .strip {
-    fill: color-mix(in oklab, var(--sem, var(--accent)) 8%, transparent);
+    fill: color-mix(in oklab, var(--accent) 8%, transparent);
   }
   .grid {
     stroke: var(--border);
@@ -261,7 +261,7 @@ const AR = (W / H).toFixed(4);
     stroke-dasharray: 3 3;
   }
   .hl-v {
-    stroke: var(--sem, var(--accent));
+    stroke: var(--accent);
     stroke-width: 1.8;
   }
   .hl-h {
@@ -292,7 +292,7 @@ const AR = (W / H).toFixed(4);
   }
   .handle {
     fill: var(--surface);
-    stroke: var(--sem, var(--accent));
+    stroke: var(--accent);
     stroke-width: 1.5;
     cursor: grab;
   }
@@ -319,7 +319,7 @@ const AR = (W / H).toFixed(4);
     color: var(--text-primary);
   }
   .rz {
-    color: var(--sem, var(--accent));
+    color: var(--accent);
   }
   .rw {
     color: var(--dia-out);
@@ -356,7 +356,7 @@ const AR = (W / H).toFixed(4);
   const clamp = (n: number, lo: number, hi: number) =>
     Math.min(hi, Math.max(lo, n));
 
-  function init(root: HTMLElement) {
+  function init(root: HTMLElement, isZoomClone = false) {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel)!;
     const svg = q<SVGSVGElement>("svg.plot");
     const hit = q<SVGRectElement>("[data-hit]");
@@ -369,6 +369,10 @@ const AR = (W / H).toFixed(4);
     const rz = q<HTMLElement>("[data-rz]");
     const rw = q<HTMLElement>("[data-rw]");
     const live = q<HTMLElement>("[data-live]");
+
+    if (isZoomClone) {
+      root.addEventListener("click", (e) => e.stopPropagation());
+    }
 
     let re = 0.5;
     let im = 1;
@@ -455,4 +459,12 @@ const AR = (W / H).toFixed(4);
   }
 
   document.querySelectorAll<HTMLElement>(".expmap").forEach(init);
+
+  document.addEventListener("sn:zoom-clone", (event) => {
+    const clone = (event as CustomEvent<{ root: HTMLElement }>).detail.root;
+    const diagram = clone.matches(".expmap")
+      ? clone
+      : clone.querySelector<HTMLElement>(".expmap");
+    if (diagram) init(diagram, true);
+  });
 </script>

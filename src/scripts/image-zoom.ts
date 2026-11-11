@@ -46,8 +46,10 @@ const targetFor = (el: Zoomable): HTMLElement =>
 // apply, minus the caption, which the dialog shows on its own.
 const fillBox = (svg: SVGSVGElement) => {
   const copy = svg.closest("figure")!.cloneNode(true) as HTMLElement;
+  copy.dataset.zoomClone = "true";
   copy.querySelectorAll("figcaption").forEach((c) => c.remove());
   zoomBox!.replaceChildren(copy);
+  return copy;
 };
 
 // Tone colours are scoped to `.axes-figure`, which the dialog caption is not
@@ -84,7 +86,10 @@ const open = (img: Zoomable) => {
   zoomImg!.hidden = img instanceof SVGElement;
   zoomBox!.hidden = !(img instanceof SVGElement);
   if (img instanceof SVGElement) {
-    fillBox(img);
+    const clone = fillBox(img);
+    document.dispatchEvent(
+      new CustomEvent("sn:zoom-clone", { detail: { root: clone } }),
+    );
   } else {
     zoomImg!.src = img.currentSrc || img.src;
     zoomImg!.alt = img.alt;
