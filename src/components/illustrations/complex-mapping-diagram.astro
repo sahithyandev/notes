@@ -1,0 +1,153 @@
+---
+import { makeUid } from "./lib/uid";
+import ArrowMarker from "./primitives/arrow-marker.astro";
+import FigureCaption from "./primitives/figure-caption.astro";
+
+const uid = makeUid("complex-map");
+const arrowId = `${uid}-arrow`;
+---
+
+<figure class="complex-map">
+  <svg
+    viewBox="0 0 760 300"
+    role="img"
+    aria-labelledby={`${uid}-title ${uid}-desc`}
+  >
+    <title
+      id={`${uid}-title`}
+    >A complex function maps one region to another</title>
+    <desc id={`${uid}-desc`}>
+      A point z sub zero in a region D of the z-plane maps through w equals f of
+      z to a point w sub zero in a region D prime of the w-plane.
+    </desc>
+
+    <defs>
+      <ArrowMarker id={arrowId} variant="open" />
+    </defs>
+
+    <g class="plane">
+      <line class="axis" x1="42" y1="245" x2="300" y2="245"></line>
+      <line class="axis" x1="75" y1="275" x2="75" y2="35"></line>
+      <text class="axis-label" x="305" y="250">
+        x
+      </text>
+      <text class="axis-label" x="69" y="28">
+        y
+      </text>
+      <text class="plane-label" x="167" y="291">
+        z-plane
+      </text>
+
+      <path
+        class="region"
+        d="M 108 95 C 72 62, 38 95, 64 133 C 43 174, 79 224, 128 209 C 176 235, 222 206, 207 163 C 238 117, 202 76, 164 96 C 145 76, 125 78, 108 95 Z"
+      ></path>
+      <circle class="point" cx="130" cy="150" r="5"></circle>
+      <text class="point-label" x="137" y="146">
+        z₀
+      </text>
+      <text class="region-label" x="72" y="225">
+        D
+      </text>
+    </g>
+
+    <path
+      class="mapping"
+      d="M 184 90 C 270 15, 365 33, 452 82 C 514 116, 548 146, 594 151"
+      marker-end={`url(#${arrowId})`}
+    ></path>
+    <text class="mapping-label" x="337" y="64">
+      w₀ = f(z₀)
+    </text>
+
+    <g class="plane">
+      <line class="axis" x1="460" y1="245" x2="722" y2="245"></line>
+      <line class="axis" x1="493" y1="275" x2="493" y2="35"></line>
+      <text class="axis-label" x="727" y="250">
+        u
+      </text>
+      <text class="axis-label" x="487" y="28">
+        v
+      </text>
+      <text class="plane-label" x="584" y="291">
+        w-plane
+      </text>
+
+      <path
+        class="region"
+        d="M 535 107 C 510 66, 550 53, 585 73 C 629 48, 698 72, 693 125 C 727 163, 690 209, 647 196 C 611 225, 559 208, 568 171 C 534 154, 522 130, 535 107 Z"
+      ></path>
+      <circle class="point" cx="594" cy="151" r="5"></circle>
+      <text class="point-label" x="603" y="147">
+        w₀
+      </text>
+      <text class="region-label" x="526" y="225">
+        D′
+      </text>
+    </g>
+  </svg>
+
+  <FigureCaption>
+    A complex function maps a point <i>z</i>
+    <sub>0</sub> in <i>D</i> to the point <i>w</i>
+    <sub>0</sub> = <i>f</i>(<i>z</i>
+    <sub>0</sub>) in <i>D′</i>.
+  </FigureCaption>
+</figure>
+<style>
+  .complex-map {
+    max-width: 760px;
+    margin: 24px auto;
+  }
+
+  .complex-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .complex-map :global(.axis) {
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+  }
+
+  .complex-map :global(.axis-label),
+  .complex-map :global(.plane-label),
+  .complex-map :global(.region-label),
+  .complex-map :global(.point-label),
+  .complex-map :global(.mapping-label) {
+    fill: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-size: 16px;
+  }
+
+  .complex-map :global(.plane-label) {
+    font-size: 14px;
+  }
+
+  .complex-map :global(.region-label),
+  .complex-map :global(.point-label),
+  .complex-map :global(.mapping-label) {
+    fill: var(--text-primary);
+    font-style: italic;
+  }
+
+  .complex-map :global(.region) {
+    fill: color-mix(in oklab, var(--sem, var(--accent)) 8%, transparent);
+    stroke: var(--sem, var(--accent));
+    stroke-width: 2;
+  }
+
+  .complex-map :global(.point) {
+    fill: var(--sem, var(--accent));
+    stroke: var(--surface);
+    stroke-width: 2;
+  }
+
+  .complex-map :global(.mapping) {
+    fill: none;
+    stroke: var(--dia-out, var(--accent));
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+</style>

@@ -6,9 +6,11 @@
 import { inlineTex } from "../../../utils/tex";
 import { assertCaption, type CaptionProps } from "../lib/caption";
 import {
+  arcPath,
   curveY,
   equationPath,
   type GraphAxis,
+  type GraphArc,
   type GraphCurve,
   type GraphArea,
   type GraphLabel,
@@ -34,6 +36,7 @@ type Props = CaptionProps & {
   curves?: GraphCurve[];
   areas?: GraphArea[];
   lines?: GraphLine[];
+  arcs?: GraphArc[];
   labels?: GraphLabel[];
   points?: GraphPoint[];
   size?: "sm" | "lg";
@@ -85,6 +88,7 @@ const {
   curves = [],
   areas = [],
   lines = [],
+  arcs = [],
   labels = [],
   points = [],
   size = "sm",
@@ -211,6 +215,18 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
             : undefined
         }
       ></line>
+    ))}
+
+    {arcs.map((arc) => (
+      <path
+        class:list={[
+          "graph-arc",
+          `tone-${arc.tone ?? "ink"}`,
+          { dashed: arc.dashed },
+        ]}
+        d={arcPath(arc, geometry)}
+        stroke-width={arc.width}
+      ></path>
     ))}
 
     {curves.map((curve) => {
@@ -397,6 +413,14 @@ const labelledBy = desc ? `${uid}-title ${uid}-desc` : `${uid}-title`;
     stroke-width: 2.5;
   }
   .cartesian-graph :global(.graph-line.dashed) {
+    stroke-dasharray: 6 5;
+  }
+  .cartesian-graph :global(.graph-arc) {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 2;
+  }
+  .cartesian-graph :global(.graph-arc.dashed) {
     stroke-dasharray: 6 5;
   }
   .cartesian-graph :global(.tangent.dashed) {

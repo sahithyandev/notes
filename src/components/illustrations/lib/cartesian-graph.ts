@@ -69,6 +69,16 @@ export type GraphLine = {
   width?: number;
 };
 
+export type GraphArc = {
+  center: GraphCoordinate;
+  radius: number;
+  startAngle: number;
+  endAngle: number;
+  tone?: GraphCurve["tone"];
+  dashed?: boolean;
+  width?: number;
+};
+
 export type GraphArea = {
   points: GraphCoordinate[];
   tone: GraphCurve["tone"];
@@ -146,4 +156,18 @@ export function equationPath(curve: GraphCurve, geometry: GraphGeometry) {
   }
 
   return path.trim();
+}
+
+export function arcPath(arc: GraphArc, geometry: GraphGeometry) {
+  const span = arc.endAngle - arc.startAngle;
+  const samples = Math.max(8, Math.ceil(Math.abs(span) * 18));
+
+  return Array.from({ length: samples + 1 }, (_, index) => {
+    const angle = arc.startAngle + (span * index) / samples;
+    const point = {
+      x: arc.center.x + arc.radius * Math.cos(angle),
+      y: arc.center.y + arc.radius * Math.sin(angle),
+    };
+    return `${index === 0 ? "M" : "L"} ${xToSvg(point.x, geometry).toFixed(2)} ${yToSvg(point.y, geometry).toFixed(2)}`;
+  }).join(" ");
 }

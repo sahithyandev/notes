@@ -3,12 +3,12 @@ title: Introduction to Complex Numbers
 sidebar:
   label: Introduction
 dateCreated: 2026-04-22T07:07:02.556Z
-lastUpdatedOn: 2026-11-03T01:31:17.862Z
+lastUpdatedOn: 2026-11-11T11:13:04.153Z
 ---
 
-### Representation Methods
+<ProseFigure>
 
-![Representation of a complex number](./images/representation-methods.jpg)
+### Representation Methods
 
 The methods are:
 
@@ -16,8 +16,6 @@ The methods are:
   $z=x+iy$
 - Polar representation  
   $z=pe^{i\theta}$
-
-Here:
 
 <Formula>
 
@@ -33,6 +31,84 @@ $$
 </Symbols>
 
 </Formula>
+
+<CartesianGraph
+  slot="figure"
+  title="Cartesian and polar representation of a complex number"
+  desc="The complex number z equals x plus i y is represented by the point with coordinates x and y. The vector from the origin has length p and angle theta."
+  x={{ label: "Re", domain: [0, 5] }}
+  y={{ label: "Im", domain: [0, 4] }}
+  lines={[
+    { from: { x: 0, y: 0 }, to: { x: 3.2, y: 2.2 }, tone: "s5", width: 3 },
+  ]}
+  arcs={[
+    {
+      center: { x: 0, y: 0 },
+      radius: 0.75,
+      startAngle: 0,
+      endAngle: 0.602,
+      tone: "s5",
+      width: 2,
+    },
+  ]}
+  points={[
+    {
+      x: 3.2,
+      y: 2.2,
+      tone: "s5",
+      radius: 6,
+      label: "z = x + iy",
+      labelDx: 10,
+      labelDy: -10,
+    },
+  ]}
+  labels={[
+    { text: "O", x: 0, y: 0, tone: "ink", dx: -14, dy: 18 },
+    { text: "p", x: 1.5, y: 1.3, tone: "s5", dx: 8, dy: -5 },
+    { text: "θ", x: 0.65, y: 0.35, tone: "s5", dx: 4, dy: -2 },
+  ]}
+  caption="The vector has modulus p and argument angle θ."
+/>
+
+</ProseFigure>
+
+## Complex Functions as Mappings
+
+Suppose $w=f(z)$ where $z,w \in \mathbb{C}$. Input and output points are
+marked in 2 separate complex planes.
+
+<ComplexMappingDiagram slot="figure" />
+
+<Formula>
+
+$$
+z,w \in \mathbb{C}
+$$
+
+<Symbols>
+  <Sym s="D">domain of $f$</Sym>
+  <Sym s="D'">codomain of $f$</Sym>
+</Symbols>
+
+</Formula>
+
+### Image
+
+Image of $f$ is the set:
+
+$$
+\big\{
+f(z)\;|\;z\in D
+\big\}
+$$
+
+## Cartesian Form
+
+$$
+f(z) = u(x,y) + iv(x,y)
+$$
+
+Here $u, v$ are real functions.
 
 ## Euler's Formula
 
