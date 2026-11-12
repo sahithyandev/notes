@@ -4,7 +4,7 @@ prereqs:
   - s2/methods-of-mathematics/multivariable-calculus/iterated-integrals
   - s2/methods-of-mathematics/multivariable-calculus/double-integrals
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T18:33:10.083Z
+lastUpdatedOn: 2026-11-12T02:35:04.027Z
 ---
 
 <Theorem>
@@ -22,6 +22,16 @@ $$
 $$
 
 </Theorem>
+
+<Proof label="Proof Hint">
+
+- First prove the result for a rectangle by applying the Fundamental Theorem of Calculus to the 2 horizontal and 2 vertical edges
+- Integrate $\partial N/\partial x$ with respect to $x$ and $\partial M/\partial y$ with respect to $y$
+- Partition a general region into finitely many small rectangles
+- Sum the rectangle identities and cancel contributions along every interior edge
+- Use the continuity of the partial derivatives and pass to the limit as the partition is refined
+
+</Proof>
 
 <Note>
 
@@ -199,5 +209,113 @@ $$
 $$
 
 The curve encloses the origin once counterclockwise, so the value is $2\pi$, independent of its shape.
+
+</Solution>
+
+### Conservative Vector Field Criterion
+
+Let $f$ and $g$ have continuous first partial derivatives on an open simply connected region $D \subseteq \mathbb{R}^2$. Prove that
+
+$$
+\boldsymbol{F}(x,y) = f(x,y)\boldsymbol{i} + g(x,y)\boldsymbol{j}
+$$
+
+is conservative on $D$ **iff**
+
+$$
+\frac{\partial f}{\partial y} = \frac{\partial g}{\partial x}
+$$
+
+at every point in $D$.
+
+<Solution>
+
+Set $M=f$ and $N=g$. Green's theorem gives
+
+$$
+\oint_C \boldsymbol{F}\cdot\text{d}\boldsymbol{r}
+= \oint_C f\,\text{d}x + g\,\text{d}y
+= \iint_R \left(\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}\right)\text{d}A
+$$
+
+for every positively oriented simple closed curve $C$ in $D$, with interior region $R \subseteq D$.
+
+To prove the forward implication, suppose that $\boldsymbol{F}$ is conservative. There exists a potential function $\phi$ such that
+
+$$
+\nabla\phi = \boldsymbol{F}, \qquad \phi_x=f, \qquad \phi_y=g
+$$
+
+Every closed line integral of a conservative field is $0$. Therefore,
+
+$$
+\iint_R \left(\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}\right)\text{d}A=0
+$$
+
+for every such region $R$. The integrand is continuous. If it were positive or negative at some point, it would keep that sign on a sufficiently small rectangle around the point, giving a nonzero double integral. Hence,
+
+$$
+\frac{\partial g}{\partial x} - \frac{\partial f}{\partial y}=0
+$$
+
+throughout $D$. Thus,
+
+$$
+\frac{\partial f}{\partial y}=\frac{\partial g}{\partial x}
+$$
+
+To prove the reverse implication, suppose that
+
+$$
+\frac{\partial f}{\partial y}=\frac{\partial g}{\partial x}
+$$
+
+throughout $D$. Since $D$ is simply connected, every piecewise smooth closed curve in $D$ bounds a region in $D$, possibly after decomposing the curve into finitely many simple closed curves. Green's theorem then gives
+
+$$
+\oint_C f\,\text{d}x+g\,\text{d}y
+=\iint_R \left(\frac{\partial g}{\partial x}-\frac{\partial f}{\partial y}\right)\text{d}A
+=0
+$$
+
+Therefore, the line integral is independent of path. Fix $(x_0,y_0)\in D$ and define
+
+$$
+\phi(x,y)=\int_{(x_0,y_0)}^{(x,y)} f\,\text{d}x+g\,\text{d}y
+$$
+
+where the path lies in $D$. Path independence makes $\phi$ well-defined.
+
+For a small $h$ such that the horizontal segment remains in $D$,
+
+$$
+\phi(x+h,y)-\phi(x,y)=\int_x^{x+h}f(t,y)\,\text{d}t
+$$
+
+By the Fundamental Theorem of Calculus,
+
+$$
+\phi_x(x,y)=f(x,y)
+$$
+
+Similarly, using a vertical segment,
+
+$$
+\phi(x,y+h)-\phi(x,y)=\int_y^{y+h}g(x,t)\,\text{d}t
+$$
+
+so
+
+$$
+\phi_y(x,y)=g(x,y)
+$$
+
+Hence,
+
+$$
+\nabla\phi=f\boldsymbol{i}+g\boldsymbol{j}=\boldsymbol{F}
+$$
+
+Therefore, $\boldsymbol{F}$ is conservative on $D$.
 
 </Solution>

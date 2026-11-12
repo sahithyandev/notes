@@ -1,7 +1,7 @@
 ---
 title: Stokes' Theorem
 dateCreated: 2026-08-14T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T10:53:01.361Z
+lastUpdatedOn: 2026-11-12T02:35:04.133Z
 ---
 
 <Theorem>
@@ -37,6 +37,29 @@ $$
 $$
 
 </Note>
+
+<Theorem name="Volume Formula">
+
+Let $\sigma$ be a smooth closed surface enclosing a region $V$, and let $\hat{n}$ be the outward unit normal field of $\sigma$. Then
+
+<Formula>
+
+$$
+\operatorname{Vol}(V) = \frac{1}{3}\oiint_\sigma (x\boldsymbol{i} + y\boldsymbol{j} + z\boldsymbol{k}) \cdot \hat{n}\,\text{d}S
+$$
+
+</Formula>
+
+</Theorem>
+
+<Proof label="Proof Hint">
+
+- Apply the [Divergence Theorem](/s5/calculus/vector-valued-functions/divergence-theorem) to $\boldsymbol{F} = x\boldsymbol{i} + y\boldsymbol{j} + z\boldsymbol{k}$
+- Compute $\nabla \cdot \boldsymbol{F} = 1 + 1 + 1 = 3$
+- Convert the surface integral into $\iiint_V 3\,\text{d}V = 3\operatorname{Vol}(V)$
+- Compare with $c\oiint_\sigma \boldsymbol{F}\cdot\hat{n}\,\text{d}S$ to obtain $c = 1/3$
+
+</Proof>
 
 ## Examples
 

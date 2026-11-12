@@ -1,7 +1,7 @@
 ---
 title: Isolated Singularities
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T18:33:10.306Z
+lastUpdatedOn: 2026-11-12T02:35:04.213Z
 ---
 
 A point $z_0 \in \mathbb{C}$ is a singular point, or a singularity, of $f$ **if** $f$ fails to be analytic at $z_0$ **and** $f$ is analytic at some point in every neighborhood of $z_0$.
@@ -46,11 +46,20 @@ $$
 \text{Res}(f, \alpha) = a_{-1}
 $$
 
+To derive the Laurent series used for classification:
+
+1. Write the relevant Taylor series.
+2. Substitute the expression involving $z$.
+3. Multiply or divide by the remaining powers of $z-\alpha$.
+4. Identify the negative-power terms.
+
+The coefficient of $(z-\alpha)^{-1}$ is the residue.
+
 ## Worked Examples
 
 ### Isolated Singularity
 
-Show that $z = 1$ is an isolated singularity of $f(z) = \frac{1}{1-z}$.
+For $f(z) = \frac{1}{1-z}$, show that $z = 1$ is an isolated singularity. Classify the singularity and find the residue.
 
 <Solution>
 
@@ -62,7 +71,7 @@ The Laurent series centered at $1$ is $f(z) = -\frac{1}{z-1}$. Only $a_{-1} = -1
 
 ### Non-Isolated Singularity
 
-Show that $z = 0$ is a non-isolated singularity of $f(z) = \frac{1}{\sin(1/z)}$.
+For $f(z) = \frac{1}{\sin(1/z)}$, show that $z = 0$ is a non-isolated singularity.
 
 <Solution>
 
@@ -74,11 +83,32 @@ $z_k \to 0$ as $k \to \infty$, so every punctured disk centered at $0$ contains 
 
 ### Removable Singularity
 
-Show that $\frac{\sin z}{z}$ and $\frac{\cos z - 1}{z^2}$ have removable singularities at $z = 0$.
+Show that each function has a removable singularity at $z = 0$.
+
+1. $f(z) = \frac{\sin z}{z}$
+2. $g(z) = \frac{\cos z - 1}{z^2}$
+
+<Solution>
+
+Use the Taylor series
+
+$$
+\sin z = z - \frac{z^3}{3!} + \frac{z^5}{5!} - \cdots
+$$
+
+Divide by $z$.
 
 $$
 \frac{\sin z}{z} = 1 - \frac{z^2}{6} + \frac{z^4}{120} - \cdots
 $$
+
+Use the Taylor series
+
+$$
+\cos z = 1 - \frac{z^2}{2!} + \frac{z^4}{4!} - \cdots
+$$
+
+Subtract $1$ and divide by $z^2$.
 
 $$
 \frac{\cos z - 1}{z^2} = -\frac{1}{2} + \frac{z^2}{24} - \cdots
@@ -86,17 +116,40 @@ $$
 
 Both series have $a_k = 0$ for all $k < 0$.
 
+Therefore, both singularities are removable.
+
+</Solution>
+
 ### Pole
 
-Show that $\frac{\sin z}{z^3}$ has a pole of order 2 and $\frac{e^z}{z}$ has a pole of order 1 at $z = 0$.
+Classify the singularity at $z = 0$ for each function. State the pole order and residue when applicable.
+
+1. $f(z) = \frac{\sin z}{z^3}$
+2. $g(z) = \frac{e^z}{z}$
 
 <Solution>
+
+Start with the Taylor series for sine.
+
+$$
+\sin z = z - \frac{z^3}{6} + \frac{z^5}{120} - \cdots
+$$
+
+Divide by $z^3$.
 
 $$
 \frac{\sin z}{z^3} = \frac{1}{z^2} - \frac{1}{6} + \frac{z^2}{120} - \cdots
 $$
 
 $a_{-2} = 1 \neq 0$ and $a_k = 0$ for all $k < -2$. The residue is $a_{-1} = 0$.
+
+Start with the Taylor series for the exponential.
+
+$$
+e^z = 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \cdots
+$$
+
+Divide by $z$.
 
 $$
 \frac{e^z}{z} = \frac{1}{z} + 1 + \frac{z}{2} + \cdots
@@ -108,9 +161,17 @@ $a_{-1} = 1 \neq 0$ and $a_k = 0$ for all $k < -1$. The residue is $1$.
 
 ### Essential Singularity
 
-Show that $z^2 \sin\left(\frac{1}{z}\right)$ has an essential singularity at $z = 0$.
+For $f(z) = z^2 \sin\left(\frac{1}{z}\right)$, classify the singularity at $z = 0$ and find the residue.
 
 <Solution>
+
+Use the Taylor series for sine and substitute $w=\frac{1}{z}$.
+
+$$
+\sin w = \sum_{n=0}^{\infty} \frac{(-1)^n w^{2n+1}}{(2n+1)!}
+$$
+
+Then multiply by $z^2$.
 
 $$
 z^2 \sin\left(\frac{1}{z}\right) = z^2 \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)!\, z^{2n+1}} = z - \frac{1}{6z} + \frac{1}{120z^3} - \cdots
@@ -122,9 +183,17 @@ $a_k \neq 0$ for $k = -1, -3, -5, \ldots$, which is infinitely many $k < 0$. The
 
 ### Classify from the Series
 
-Classify the singularity of $\frac{e^z - 1 - z}{z^3}$ at $z = 0$ and find the residue.
+For $f(z) = \frac{e^z - 1 - z}{z^3}$, classify the singularity at $z = 0$ and find the residue.
 
 <Solution>
+
+Use the Taylor series for the exponential.
+
+$$
+e^z = 1 + z + \frac{z^2}{2} + \frac{z^3}{6} + \frac{z^4}{24} + \cdots
+$$
+
+Subtract $1+z$ and divide by $z^3$.
 
 $$
 \frac{e^z - 1 - z}{z^3} = \frac{\frac{z^2}{2} + \frac{z^3}{6} + \frac{z^4}{24} + \cdots}{z^3} = \frac{1}{2z} + \frac{1}{6} + \frac{z}{24} + \cdots
@@ -134,9 +203,17 @@ $z = 0$ is a simple pole with $\text{Res} = \frac{1}{2}$.
 
 </Solution>
 
-Classify the singularity of $z^3 \cos\left(\frac{1}{z}\right)$ at $z = 0$ and find the residue.
+For $g(z) = z^3 \cos\left(\frac{1}{z}\right)$, classify the singularity at $z = 0$ and find the residue.
 
 <Solution>
+
+Use the Taylor series for cosine and substitute $w=\frac{1}{z}$.
+
+$$
+\cos w = \sum_{n=0}^{\infty} \frac{(-1)^n w^{2n}}{(2n)!}
+$$
+
+Then multiply by $z^3$.
 
 $$
 z^3 \cos\left(\frac{1}{z}\right) = z^3 - \frac{z}{2} + \frac{1}{24z} - \frac{1}{720z^3} + \cdots

@@ -1,7 +1,7 @@
 ---
 title: Laurent Series
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T18:33:10.281Z
+lastUpdatedOn: 2026-11-12T02:35:04.189Z
 ---
 
 For $0 \le r < R \le \infty$, the annulus $A(r, R, \alpha)$ is
@@ -31,7 +31,7 @@ The coefficients are
 <Formula>
 
 $$
-c_n = \frac{1}{2\pi i}\int_{|\zeta-\alpha|=s} \frac{f(\zeta)}{(\zeta-\alpha)^{n+1}}\,\text{d}\zeta
+c_n = \frac{1}{2\pi i}\int_{|x-\alpha|=s} \frac{f(x)}{(x-\alpha)^{n+1}}\,\text{d}x
 $$
 
 <Symbols>
@@ -58,6 +58,33 @@ Examples:
 
 - $\frac{\cos z - 1}{z^4} = -\frac{1}{2z^2} + \frac{1}{24} - \frac{z^2}{720} + \cdots$ centered at $0$
 - $\exp\left(-\frac{1}{z^2}\right) = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!\, z^{2n}}$ centered at $0$
+
+## Finding a Laurent Series
+
+To find a Laurent series of $f$ centered at $\alpha$:
+
+1. Identify the singular points of $f$.
+2. Calculate the distance from each singular point to $\alpha$.
+3. Use these distances to split the plane into annuli centered at $\alpha$.
+4. Choose the annulus where the series is required.
+5. Rewrite $f$ into terms that can be expanded around $\alpha$.
+   Partial fractions, algebraic division, and substitutions may be required.
+6. Expand each term using a Taylor series or a geometric series.
+7. Choose the form of each geometric series that converges on the selected annulus.
+
+$$
+\frac{1}{1-w} = \sum_{n=0}^{\infty} w^n, \quad |w| < 1
+$$
+
+$$
+\frac{1}{1-w} = -\sum_{n=0}^{\infty} w^{-n-1}, \quad |w| > 1
+$$
+
+8. Combine the resulting series.
+9. State the annulus of convergence.
+10. Check that every term converges on the stated annulus.
+
+The singular points determine the possible annuli. The selected annulus determines whether each factor is expanded in positive or negative powers of $z-\alpha$.
 
 ## Different Annuli
 
@@ -86,13 +113,17 @@ Find $c_{-2}$ of $f(z) = \frac{1}{z^2}$ centered at $0$.
 
 <Solution>
 
+Since $f(z) = z^{-2}$ already consists of one Laurent term, its only nonzero coefficient is the coefficient of $(z-0)^{-2}$.
+
 $$
-c_{-2} = \frac{1}{2\pi i}\int_{|\zeta|=s} \frac{\zeta^{-2}}{\zeta^{-2+1}}\,\text{d}\zeta = \frac{1}{2\pi i}\int_{|\zeta|=s} \zeta^{-1}\,\text{d}\zeta = \frac{1}{2\pi i} \cdot 2\pi i = 1
+c_{-2} = \frac{1}{2\pi i}\int_{|x|=s} \frac{x^{-2}}{x^{-2+1}}\,\text{d}x = \frac{1}{2\pi i}\int_{|x|=s} x^{-1}\,\text{d}x = \frac{1}{2\pi i} \cdot 2\pi i = 1
 $$
 
-For general $n$, the integrand is $\zeta^{-n-3}$.
+For $n \neq -2$, the integrand is $\zeta^{-n-3}$. Its integral is $0$ because
 
-The other coefficients vanish since $\int_{|\zeta|=s} \zeta^{k}\,\text{d}\zeta = 0$ for $k \neq -1$.
+$$
+\int_{|x|=s} x^k\,\text{d}x = 0, \quad k \neq -1
+$$
 
 </Solution>
 
@@ -102,17 +133,19 @@ Find the Laurent series of $\frac{\cos z - 1}{z^4}$ centered at $0$.
 
 <Solution>
 
+Expand the numerator at $0$.
+
 $$
 \cos z - 1 = -\frac{z^2}{2} + \frac{z^4}{24} - \frac{z^6}{720} + \cdots
 $$
 
-Divide by $z^4$.
+Divide each term by $z^4$.
 
 $$
 \frac{\cos z - 1}{z^4} = -\frac{1}{2z^2} + \frac{1}{24} - \frac{z^2}{720} + \cdots
 $$
 
-The series is valid for $0 < |z| < \infty$.
+The singular point is $z=0$. The series is valid on $0 < |z| < \infty$.
 
 </Solution>
 
@@ -122,13 +155,13 @@ Find the Laurent series of $\exp\left(-\frac{1}{z^2}\right)$ centered at $0$.
 
 <Solution>
 
-Substitute $w = -\frac{1}{z^2}$ in $e^w = \sum \frac{w^n}{n!}$.
+Use the Taylor series $e^w = \sum_{n=0}^{\infty} \frac{w^n}{n!}$ and substitute $w = -\frac{1}{z^2}$.
 
 $$
 \exp\left(-\frac{1}{z^2}\right) = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!\, z^{2n}} = 1 - \frac{1}{z^2} + \frac{1}{2z^4} - \cdots
 $$
 
-The series is valid for $0 < |z| < \infty$.
+The singular point is $z=0$. The exponential series converges for every finite value of $w$, so the Laurent series is valid on $0 < |z| < \infty$.
 
 </Solution>
 
@@ -138,15 +171,21 @@ Find the Laurent series of $\frac{1}{z(1-z)}$ centered at $0$ in $0 < |z| < 1$.
 
 <Solution>
 
+Separate the factor $z$ and expand the remaining factor geometrically.
+
 $$
 \frac{1}{z(1-z)} = \frac{1}{z} + \frac{1}{1-z} = \frac{1}{z} + \sum_{n=0}^{\infty} z^n
 $$
+
+The geometric series requires $|z|<1$. Therefore, the Laurent series is valid on $0<|z|<1$.
 
 </Solution>
 
 Find the Laurent series of $\frac{1}{(z-1)(z-3)}$ centered at $0$ in $1 < |z| < 3$.
 
 <Solution>
+
+Use partial fractions.
 
 $$
 \frac{1}{(z-1)(z-3)} = \frac{1}{2}\left(\frac{1}{z-3} - \frac{1}{z-1}\right)
@@ -167,6 +206,8 @@ $$
 $$
 \frac{1}{(z-1)(z-3)} = -\frac{1}{2}\sum_{n=0}^{\infty} \frac{z^n}{3^{n+1}} - \frac{1}{2}\sum_{n=0}^{\infty} z^{-n-1}
 $$
+
+The first series requires $|z|<3$. The second requires $|z|>1$. Both converge on $1<|z|<3$, which is the required annulus.
 
 </Solution>
 

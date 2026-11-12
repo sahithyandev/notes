@@ -1,0 +1,139 @@
+---
+title: Divergence Theorem
+dateCreated: 2026-08-14T00:00:00.000Z
+lastUpdatedOn: 2026-11-12T02:35:04.114Z
+---
+
+<Theorem>
+
+Let $\sigma$ be a [closed](/s5/calculus/vector-valued-functions/surface#closed-surface), piecewise smooth, orientable surface that encloses a solid region $V$ in $\mathbb{R}^3$. Suppose $\boldsymbol{F}$ is a [vector field](/s5/calculus/vector-valued-functions/field#vector-field) whose component functions have continuous first-order partial derivatives on an open set containing $V$ and its boundary $\sigma$. If $\hat{n}$ is the outward unit normal field for $\sigma$,
+
+$$
+\iint_\sigma \boldsymbol{F} \cdot \hat{n}\,\text{d}S = \iiint_V \text{div}\,\boldsymbol{F}\,\text{d}V
+$$
+
+</Theorem>
+
+<DivergenceTheoremDiagram />
+
+The left side is the total outward flux through the boundary. The right side is the total divergence inside the solid. The theorem replaces a surface integral over $\sigma$ with a triple integral over $V$.
+
+<Formula name="Coordinate Form">
+
+$$
+\operatorname{div}\,\boldsymbol{F} = \nabla \cdot \boldsymbol{F} = \frac{\partial P}{\partial x} + \frac{\partial Q}{\partial y} + \frac{\partial R}{\partial z}
+$$
+
+<Symbols columns={2}>
+  <Sym s="\boldsymbol{F}">
+    $P\boldsymbol{i} + Q\boldsymbol{j} + R\boldsymbol{k}$
+  </Sym>
+  <Sym s="V">Solid enclosed by $\sigma$</Sym>
+  <Sym s="\hat{n}">Outward unit normal</Sym>
+</Symbols>
+
+</Formula>
+
+## Interpreting Divergence
+
+Divergence measures the local excess of outward flow over inward flow.
+
+- Positive divergence means that the field behaves like a source near the point.
+- Negative divergence means that the field behaves like a sink near the point.
+- Zero divergence means that the local outward and inward flow balance.
+
+For a small solid $G$ centered at $P_0$,
+
+$$
+\operatorname{div}\,\boldsymbol{F}(P_0) = \lim_{G \to P_0} \frac{1}{\operatorname{Vol}(G)}\iint_{\partial G} \boldsymbol{F} \cdot \hat{n}\,\text{d}S
+$$
+
+The divergence theorem is the corresponding whole-region statement. It adds the local flux densities throughout $V$.
+
+## Applying the Theorem
+
+Use the following procedure when the surface is closed.
+
+- Identify the solid $V$ enclosed by the surface.
+- Check that the normal is outward.
+- Compute $\operatorname{div}\,\boldsymbol{F}$.
+- Set up $\iiint_V \operatorname{div}\,\boldsymbol{F}\,\text{d}V$ using convenient coordinates.
+- Evaluate the triple integral.
+
+<Note>
+
+The theorem applies directly only to closed surfaces with outward orientation. For an open surface, add the missing faces to form a closed surface. Compute the total closed-surface flux, then subtract the flux through the added faces.
+
+</Note>
+
+## Examples
+
+### Sphere
+
+Find the outward flux of $\boldsymbol{F} = x\boldsymbol{i} + y\boldsymbol{j} + z\boldsymbol{k}$ through the sphere $x^2 + y^2 + z^2 = a^2$.
+
+<Solution>
+
+$$
+\operatorname{div}\,\boldsymbol{F} = 1 + 1 + 1 = 3
+$$
+
+Let $V$ be the solid ball of radius $a$, with volume $\dfrac{4}{3}\pi a^3$.
+
+$$
+\Phi = \iiint_V 3\,\text{d}V = 3 \cdot \frac{4}{3}\pi a^3 = 4\pi a^3
+$$
+
+</Solution>
+
+### Cube
+
+Find the outward flux of $\boldsymbol{F} = x^2\boldsymbol{i} + y^2\boldsymbol{j} + z^2\boldsymbol{k}$ through the surface of the cube $0 \le x, y, z \le 1$.
+
+<Solution>
+
+$$
+\operatorname{div}\,\boldsymbol{F} = 2x + 2y + 2z
+$$
+
+$$
+\Phi = \int_0^1 \int_0^1 \int_0^1 2(x + y + z)\,\text{d}x\,\text{d}y\,\text{d}z
+$$
+
+Each term integrates to $\dfrac{1}{2}$ over the unit cube, so the 3 terms add to $2 \cdot 3 \cdot \dfrac{1}{2}$.
+
+$$
+\Phi = 3
+$$
+
+</Solution>
+
+### Hemisphere
+
+Find the upward flux of $\boldsymbol{F} = z\boldsymbol{k}$ through the hemisphere $x^2 + y^2 + z^2 = 1$, $z \ge 0$.
+
+<Solution>
+
+The hemisphere is not closed. Close it with the disk $D = \{x^2 + y^2 \le 1,\ z = 0\}$. The closed surface encloses the solid half-ball $V$.
+
+$$
+\operatorname{div}\,\boldsymbol{F} = 1
+$$
+
+$$
+\iiint_V 1\,\text{d}V = \frac{1}{2} \cdot \frac{4}{3}\pi = \frac{2\pi}{3}
+$$
+
+The outward normal on $D$ is $-\boldsymbol{k}$. On $D$, $z = 0$, so
+
+$$
+\iint_D \boldsymbol{F} \cdot (-\boldsymbol{k})\,\text{d}S = \iint_D (-z)\,\text{d}S = 0
+$$
+
+The flux across the closed surface is the sum of the flux across the hemisphere and across $D$.
+
+$$
+\Phi = \frac{2\pi}{3} - 0 = \frac{2\pi}{3}
+$$
+
+</Solution>

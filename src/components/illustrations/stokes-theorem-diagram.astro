@@ -1,167 +1,334 @@
 ---
-// Static diagram for Stokes' theorem: an open dome σ whose rim is the closed
-// curve C. Arrows along C give its direction, the normals n̂ on σ follow the
-// right-hand rule from that direction, and the rotation arrow shows curl F.
 import FigureCaption from "./primitives/figure-caption.astro";
 import { makeUid } from "./lib/uid";
 import ArrowMarker from "./primitives/arrow-marker.astro";
 
 const uid = makeUid("stokes");
-
-const cx = 150;
-const cy = 150;
-const rx = 95;
-const ry = 28;
-
-// Dome: cubic Bézier from the left rim point to the right rim point.
-const P = [
-  [cx - rx, cy],
-  [cx - rx - 5, 40],
-  [cx + rx + 5, 40],
-  [cx + rx, cy],
-];
-const bez = (t: number) => {
-  const u = 1 - t;
-  const w = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
-  const d = [3 * u * u, 6 * u * t, 3 * t * t];
-  const x = w.reduce((s, k, i) => s + k * P[i][0], 0);
-  const y = w.reduce((s, k, i) => s + k * P[i][1], 0);
-  const dx = [0, 1, 2].reduce((s, i) => s + d[i] * (P[i + 1][0] - P[i][0]), 0);
-  const dy = [0, 1, 2].reduce((s, i) => s + d[i] * (P[i + 1][1] - P[i][1]), 0);
-  const len = Math.hypot(dx, dy);
-  return { x, y, nx: dy / len, ny: -dx / len };
-};
-const normals = [0.22, 0.5, 0.78].map(bez).map((p) => ({
-  x1: p.x,
-  y1: p.y,
-  x2: p.x + p.nx * 38,
-  y2: p.y + p.ny * 38,
-}));
-const apex = bez(0.5);
-normals[1].y1 = apex.y + 16;
-
-const dome = `M ${P[0][0]} ${P[0][1]} C ${P[1][0]} ${P[1][1]}, ${P[2][0]} ${P[2][1]}, ${P[3][0]} ${P[3][1]} A ${rx} ${ry} 0 0 1 ${P[0][0]} ${P[0][1]} Z`;
-const front = `M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cy}`;
-const back = `M ${cx + rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx - rx} ${cy}`;
-
-// Rotation arrow around the apex normal, counterclockwise seen from above.
-const pts: [number, number][] = [];
-for (let deg = 120; deg >= -170; deg -= 10) {
-  const a = (deg * Math.PI) / 180;
-  pts.push([apex.x + 22 * Math.cos(a), apex.y + 16 + 7 * Math.sin(a)]);
-}
-const curl =
-  "M " + pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ");
 ---
 
-<figure>
-  <svg viewBox="0 0 300 210" aria-hidden="true">
-    <defs>
-      <ArrowMarker id={`${uid}-k`} fill="var(--dia-pt)" size={5} />
-      <ArrowMarker id={`${uid}-n`} fill="var(--dia-key)" size={5} />
-    </defs>
-    <path class="back" d={back}></path>
-    <path class="patch" d={dome}></path>
-    <path class="dome" d={dome}></path>
-    {normals.map((n) => (
-      <line
-        class="normal"
-        x1={n.x1}
-        y1={n.y1}
-        x2={n.x2}
-        y2={n.y2}
-        marker-end={`url(#${uid}-n)`}
-      />
-    ))}
-    <path class="curl" d={curl} marker-end={`url(#${uid}-k)`}></path>
-    <path class="curve" d={front}></path>
-    <path
-      class="head"
-      d="M 5 0 L -4 -4 L -4 4 Z"
-      transform="translate(150 178)"
-    ></path>
-    <path
-      class="head"
-      d="M 5 0 L -4 -4 L -4 4 Z"
-      transform="translate(150 122) rotate(180)"
-    ></path>
-    <text class="n" x={normals[1].x2 + 6} y={normals[1].y2 + 4}>
-      n̂
-    </text>
-    <text class="k" x={apex.x + 28} y={apex.y + 20}>
-      curl F
-    </text>
-    <text class="s" x="88" y="110">
-      σ
-    </text>
-    <text class="c" x="250" y="172">
-      C
-    </text>
-  </svg>
+<figure class="stokes-diagram" data-stokes-theorem data-uid={uid}>
+  <div class="stage">
+    <svg
+      class="scene"
+      viewBox="-260 -180 520 360"
+      data-scene
+      tabindex="0"
+      role="img"
+      aria-label="An oriented dome surface with boundary curve C, normal vectors, and curl F. Drag to rotate or use the arrow keys."
+    >
+      <defs>
+        <ArrowMarker id={`${uid}-curve`} fill="var(--dia-ct)" size={6} />
+        <ArrowMarker id={`${uid}-normal`} fill="var(--dia-key)" size={6} />
+        <ArrowMarker id={`${uid}-curl`} fill="var(--dia-pt)" size={6} />
+      </defs>
+      <g data-layer></g>
+    </svg>
+    <button type="button" class="reset" data-reset hidden>
+      Reset view
+    </button>
+  </div>
   <FigureCaption>
-    Circulation of F around the boundary curve C (orange) equals the flux of
-    curl F (green rotation) through the surface σ. The normals n̂ (purple) follow
-    the right-hand rule from the direction of C.
+    <span class="hint">
+      Drag to rotate. Use the arrow keys for precise rotation.
+    </span>
+    Circulation of <i>F</i> around the boundary curve{" "}
+    <span class="curve-label">C</span>
+    equals the flux of <span class="curl-label">curl F</span> through the
+    surface
+    <i>σ</i>. The normals <span class="normal-label">n̂</span> follow the
+    right-hand rule.
   </FigureCaption>
 </figure>
 
+<script>
+  type Vec = [number, number, number];
+  const TAU = 2 * Math.PI;
+  const clamp = (n: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, n));
+  const add = (a: Vec, b: Vec): Vec => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const scale = (a: Vec, n: number): Vec => [a[0] * n, a[1] * n, a[2] * n];
+  const pointOnSurface = (radius: number, angle: number): Vec => {
+    const r = 2.2 * radius;
+    return [
+      r * Math.cos(angle),
+      r * Math.sin(angle),
+      1.65 * (1 - radius * radius),
+    ];
+  };
+  const surfaceNormal = (radius: number, angle: number): Vec => {
+    const r = 2.2 * radius;
+    return [1.5 * r * Math.cos(angle), 1.5 * r * Math.sin(angle), 1];
+  };
+
+  function init(root: HTMLElement) {
+    if (root.dataset.stokesTheoremInit) return;
+    root.dataset.stokesTheoremInit = "1";
+    const scene = root.querySelector<SVGSVGElement>("[data-scene]")!;
+    const layer = root.querySelector<SVGGElement>("[data-layer]")!;
+    const reset = root.querySelector<HTMLButtonElement>("[data-reset]")!;
+    const uid = root.dataset.uid!;
+    const SCALE = 72;
+    const ORIGIN_X = 0;
+    const ORIGIN_Y = 112;
+    const defaults = { yaw: -0.55, pitch: 0.52 };
+    let yaw = defaults.yaw;
+    let pitch = defaults.pitch;
+    let drag: { x: number; y: number } | null = null;
+
+    const project = (p: Vec) => {
+      const cy = Math.cos(yaw),
+        sy = Math.sin(yaw),
+        cp = Math.cos(pitch),
+        sp = Math.sin(pitch);
+      const x = p[0] * cy - p[1] * sy;
+      const y = p[0] * sy + p[1] * cy;
+      return {
+        x: ORIGIN_X + SCALE * x,
+        y: ORIGIN_Y - SCALE * (y * sp + p[2] * cp),
+      };
+    };
+    const path = (points: Vec[]) =>
+      points
+        .map((point, index) => {
+          const q = project(point);
+          return `${index ? "L" : "M"}${q.x.toFixed(1)},${q.y.toFixed(1)}`;
+        })
+        .join(" ");
+    const element = (tag: string, className: string) => {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      node.setAttribute("class", className);
+      return node;
+    };
+    const sampledCircle = (radius: number, count = 48) =>
+      Array.from({ length: count + 1 }, (_, index) =>
+        pointOnSurface(radius, (index / count) * TAU),
+      );
+    const setPath = (className: string, points: Vec[], marker?: string) => {
+      const node = element("path", className);
+      node.setAttribute("d", path(points));
+      if (marker) node.setAttribute("marker-end", `url(#${uid}-${marker})`);
+      layer.append(node);
+    };
+    const setLine = (
+      className: string,
+      from: Vec,
+      to: Vec,
+      marker?: string,
+    ) => {
+      const node = element("line", className);
+      const a = project(from),
+        b = project(to);
+      node.setAttribute("x1", a.x.toFixed(1));
+      node.setAttribute("y1", a.y.toFixed(1));
+      node.setAttribute("x2", b.x.toFixed(1));
+      node.setAttribute("y2", b.y.toFixed(1));
+      if (marker) node.setAttribute("marker-end", `url(#${uid}-${marker})`);
+      layer.append(node);
+    };
+    const setText = (
+      className: string,
+      text: string,
+      at: Vec,
+      anchor = "middle",
+    ) => {
+      const node = element("text", className);
+      const q = project(at);
+      node.setAttribute("x", q.x.toFixed(1));
+      node.setAttribute("y", q.y.toFixed(1));
+      node.setAttribute("text-anchor", anchor);
+      node.textContent = text;
+      layer.append(node);
+    };
+
+    function render() {
+      layer.replaceChildren();
+      for (let ring = 0.16; ring <= 1.001; ring += 0.16)
+        setPath("surface-line", sampledCircle(ring));
+      for (let spoke = 0; spoke < 12; spoke += 1) {
+        const angle = (spoke / 12) * TAU;
+        setPath(
+          "surface-line",
+          Array.from({ length: 13 }, (_, index) =>
+            pointOnSurface(index / 12, angle),
+          ),
+        );
+      }
+      setPath("boundary", sampledCircle(1));
+      for (const fraction of [0.08, 0.33, 0.58, 0.83]) {
+        const angle = fraction * TAU;
+        setLine(
+          "boundary-arrow",
+          pointOnSurface(1, angle - 0.08),
+          pointOnSurface(1, angle + 0.08),
+          "curve",
+        );
+      }
+      for (const angle of [0.35, 2.25, 4.2]) {
+        const base = pointOnSurface(0.58, angle);
+        setLine(
+          "normal",
+          base,
+          add(base, scale(surfaceNormal(0.58, angle), 0.42)),
+          "normal",
+        );
+      }
+      const center = pointOnSurface(0, 0);
+      setLine("curl", center, add(center, [0, 0, 1.25]), "curl");
+      setText("surface-label", "σ", pointOnSurface(0.54, 2.75));
+      setText("boundary-label", "C", pointOnSurface(1, 0.15), "start");
+      setText(
+        "normal-label",
+        "n̂",
+        add(pointOnSurface(0.58, 0.35), [0.55, 0, 0.28]),
+        "start",
+      );
+      setText("curl-label", "curl F", [0.15, -0.15, 2.0], "start");
+      reset.hidden = yaw === defaults.yaw && pitch === defaults.pitch;
+    }
+    const rotate = (dYaw: number, dPitch: number) => {
+      yaw += dYaw;
+      pitch = clamp(pitch + dPitch, -1.35, 1.35);
+      render();
+    };
+    scene.addEventListener("pointerdown", (event) => {
+      drag = { x: event.clientX, y: event.clientY };
+      scene.setPointerCapture(event.pointerId);
+    });
+    scene.addEventListener("pointermove", (event) => {
+      if (!drag) return;
+      rotate(
+        (event.clientX - drag.x) * 0.012,
+        (event.clientY - drag.y) * 0.012,
+      );
+      drag = { x: event.clientX, y: event.clientY };
+    });
+    const endDrag = (event: PointerEvent) => {
+      drag = null;
+      if (scene.hasPointerCapture(event.pointerId))
+        scene.releasePointerCapture(event.pointerId);
+    };
+    scene.addEventListener("pointerup", endDrag);
+    scene.addEventListener("pointercancel", endDrag);
+    scene.addEventListener("keydown", (event) => {
+      const step = event.shiftKey ? 0.25 : 0.1;
+      if (event.key === "ArrowLeft") rotate(-step, 0);
+      else if (event.key === "ArrowRight") rotate(step, 0);
+      else if (event.key === "ArrowUp") rotate(0, -step);
+      else if (event.key === "ArrowDown") rotate(0, step);
+      else return;
+      event.preventDefault();
+    });
+    reset.addEventListener("click", () => {
+      yaw = defaults.yaw;
+      pitch = defaults.pitch;
+      render();
+      scene.focus();
+    });
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-stokes-theorem]").forEach(init);
+</script>
+
 <style>
-  figure {
-    max-width: 340px;
-    margin: 16px auto;
+  .stokes-diagram {
+    max-width: 560px;
+    margin: 24px auto;
   }
-  svg {
+  .stage {
+    position: relative;
+  }
+  .scene {
     display: block;
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 6px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
   }
-  .patch {
-    fill: var(--dia-key);
-    fill-opacity: 0.1;
-    stroke: none;
+  .scene:active {
+    cursor: grabbing;
   }
-  .dome {
+  .scene:focus-visible,
+  .reset:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .reset {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .reset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .stokes-diagram :global(.surface-line) {
     fill: none;
-    stroke: var(--text-secondary);
-    stroke-width: 1.2;
+    stroke: var(--dia-key);
+    stroke-opacity: 0.35;
+    stroke-width: 0.9;
   }
-  .back {
+  .stokes-diagram :global(.boundary) {
     fill: none;
     stroke: var(--dia-ct);
-    stroke-width: 1.6;
-    stroke-dasharray: 4 3;
+    stroke-width: 2.2;
   }
-  .curve {
-    fill: none;
+  .stokes-diagram :global(.boundary-arrow) {
     stroke: var(--dia-ct);
+    stroke-width: 1.8;
+  }
+  .stokes-diagram :global(.normal) {
+    stroke: var(--dia-key);
+    stroke-width: 1.7;
+  }
+  .stokes-diagram :global(.curl) {
+    stroke: var(--dia-pt);
     stroke-width: 2;
   }
-  .head {
-    fill: var(--dia-ct);
-  }
-  .curl {
-    fill: none;
-    stroke: var(--dia-pt);
-    stroke-width: 1.5;
-  }
-  .normal {
-    stroke: var(--dia-key);
-    stroke-width: 1.6;
-  }
-  text {
+  .stokes-diagram :global(text) {
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-linejoin: round;
+    stroke-width: 4px;
     font-family: var(--font-ui);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     fill: var(--text-primary);
   }
-  .n {
+  .stokes-diagram :global(.surface-label),
+  .normal-label {
     fill: var(--dia-key);
   }
-  .c {
+  .stokes-diagram :global(.boundary-label),
+  .curve-label {
     fill: var(--dia-ct);
   }
-  .k {
+  .stokes-diagram :global(.curl-label),
+  .curl-label {
     fill: var(--dia-pt);
+  }
+  .stokes-diagram :global(.curl-label) {
     font-size: 12px;
+  }
+  .hint {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+  }
+  .curve-label,
+  .curl-label,
+  .normal-label {
+    font-weight: 600;
   }
 </style>

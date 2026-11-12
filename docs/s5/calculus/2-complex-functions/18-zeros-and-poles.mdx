@@ -1,7 +1,7 @@
 ---
 title: Zeros and Poles
 dateCreated: 2026-10-02T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T18:33:10.329Z
+lastUpdatedOn: 2026-11-12T02:35:04.230Z
 ---
 
 Let $f$ be analytic in $D_R(\alpha)$ and $k$ be a positive integer. $f$ has a zero of order $k$ at $z = \alpha$ **iff**
@@ -119,7 +119,27 @@ $$
 \frac{\sin z}{z^3} = \frac{h(z)}{z^2}, \quad h(z) = \frac{\sin z}{z}
 $$
 
-$h$ is analytic at $0$ with $h(0) = 1 \neq 0$, so the pole has order 2.
+$h$ is analytic at $0$ with $h(0) = 1 \neq 0$. Therefore, $h$ does not provide a factor of $z$ that could cancel either factor in $z^2$.
+
+The definition of a pole of order $2$ requires the numerator in
+
+$$
+\frac{h(z)}{(z-0)^2}
+$$
+
+to be analytic at $0$ and non-zero there. Both conditions hold. In particular,
+
+$$
+\lim_{z \to 0} z^2 \frac{\sin z}{z^3} = \lim_{z \to 0} h(z) = h(0) = 1 \neq 0
+$$
+
+Thus $z^2 f(z)$ extends to a non-zero analytic function at $0$. The pole is exactly order $2$, not a lower order, because
+
+$$
+z f(z) = \frac{h(z)}{z}
+$$
+
+still has a singularity at $0$.
 
 </Solution>
 
@@ -139,19 +159,21 @@ Find the singularity of $\frac{1}{1 - \cos z}$ at $z = 0$.
 
 <Solution>
 
-$1 - \cos z$ has a zero of order 2 at $0$, so $\frac{1}{1 - \cos z}$ has a pole of order 2.
-
-Conversely, $\frac{1}{z^2}$ has a pole of order 2, so its reciprocal $z^2$ has a zero of order 2.
+$1 - \cos z$ vanishes at $0$, while the numerator $1$ does not. Therefore, $\frac{1}{1 - \cos z}$ has a pole at $z = 0$.
 
 </Solution>
 
 ### Quotient of Zeros
 
-Let $f$ have a zero of order $m$ and $g$ a zero of order $n$ at $0$.
+Let $f$ have a zero of order $m$ and $g$ a zero of order $n$ at $0$. Determine the singularity of $f/g$ in each case.
+
+<Solution>
 
 - For $f = z^3$ and $g = \sin z$, $m = 3 > n = 1$. $\frac{z^3}{\sin z}$ has a removable singularity. After setting the value to $0$, it has a zero of order $2$.
 - For $f = \sin z$ and $g = z^3$, $m = 1 < n = 3$. $\frac{\sin z}{z^3}$ has a pole of order $2$.
 - For $f = \sin z$ and $g = z$, $m = n = 1$. $\frac{\sin z}{z}$ has a removable singularity. Setting the value to $\lim_{z \to 0} \frac{\sin z}{z} = 1$ makes it analytic.
+
+</Solution>
 
 ### Locating Zeros and Poles
 

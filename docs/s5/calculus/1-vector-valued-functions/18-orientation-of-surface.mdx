@@ -1,7 +1,7 @@
 ---
 title: Orientation of Surface
 dateCreated: 2026-08-07T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T10:53:01.341Z
+lastUpdatedOn: 2026-11-12T02:35:04.095Z
 ---
 
 An orientation of a surface is a choice of which side is the positive side, given by a continuous unit normal field $\hat{n}$ over the whole surface.
@@ -28,19 +28,17 @@ Equivalently, walking along $C$ with the head pointing in the direction of $\hat
 
 ## Orientation of a Smooth Parametric Surface
 
-Let $\sigma$ be a smooth [parametric surface](/s5/calculus/vector-valued-functions/surface#parametric-form) given by $\boldsymbol{r}(u,v) = x(u,v)\boldsymbol{i} + y(u,v)\boldsymbol{j} + z(u,v)\boldsymbol{k}$. If
+Let $\sigma$ be a smooth [parametric surface](/s5/calculus/vector-valued-functions/surface#parametric-form) given by $\boldsymbol{r}(u,v) = x(u,v)\boldsymbol{i} + y(u,v)\boldsymbol{j} + z(u,v)\boldsymbol{k}$. **If**
 
 $$
 \boldsymbol{N}(u,v) = \frac{\partial \boldsymbol{r}}{\partial u} \times \frac{\partial \boldsymbol{r}}{\partial v} \ne \boldsymbol{0}
 $$
 
-then
+**then** $\hat{n}$ defines one orientation of $\sigma$. The opposite orientation is $-\hat{n}$.
 
 $$
-\hat{n} = \frac{\boldsymbol{N}(u,v)}{\lVert \boldsymbol{N}(u,v) \rVert} = \frac{\dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v}}{\left\lVert \dfrac{\partial \boldsymbol{r}}{\partial u} \times \dfrac{\partial \boldsymbol{r}}{\partial v} \right\rVert}
+\hat{n} = \frac{\boldsymbol{N}(u,v)}{\lVert \boldsymbol{N}(u,v) \rVert}
 $$
-
-defines one orientation of $\sigma$. The opposite orientation is $-\hat{n}$.
 
 ## Orientation of Non-Parametric Surfaces
 
@@ -92,6 +90,8 @@ Find the orientation of the paraboloid $z = x^2 + y^2$ that points upward.
 
 <Solution>
 
+<Method label="Gradient">
+
 Write the surface as $G(x,y,z) = z - x^2 - y^2 = 0$.
 
 $$
@@ -105,6 +105,42 @@ $$
 $$
 
 The $\boldsymbol{k}$ component is positive, so $\hat{n}$ points upward. The downward orientation is $-\hat{n}$.
+
+</Method>
+
+<Method label="Cross Product">
+
+Parametrize the surface using $x$ and $y$ as parameters.
+
+$$
+\boldsymbol{r}(x,y) = x\boldsymbol{i} + y\boldsymbol{j} + (x^2 + y^2)\boldsymbol{k}
+$$
+
+Differentiate.
+
+$$
+\frac{\partial \boldsymbol{r}}{\partial x} = \boldsymbol{i} + 2x\boldsymbol{k}, \qquad \frac{\partial \boldsymbol{r}}{\partial y} = \boldsymbol{j} + 2y\boldsymbol{k}
+$$
+
+Compute the cross product.
+
+$$
+\boldsymbol{N} = \frac{\partial \boldsymbol{r}}{\partial x} \times \frac{\partial \boldsymbol{r}}{\partial y} = \begin{vmatrix} \boldsymbol{i} & \boldsymbol{j} & \boldsymbol{k} \\ 1 & 0 & 2x \\ 0 & 1 & 2y \end{vmatrix} = -2x\boldsymbol{i} - 2y\boldsymbol{j} + \boldsymbol{k}
+$$
+
+$$
+\lVert \boldsymbol{N} \rVert = \sqrt{4x^2 + 4y^2 + 1}
+$$
+
+Therefore,
+
+$$
+\hat{n} = \frac{-2x\boldsymbol{i} - 2y\boldsymbol{j} + \boldsymbol{k}}{\sqrt{4x^2 + 4y^2 + 1}}
+$$
+
+The $\boldsymbol{k}$ component is positive, so $\hat{n}$ points upward. The downward orientation is $-\hat{n}$.
+
+</Method>
 
 </Solution>
 

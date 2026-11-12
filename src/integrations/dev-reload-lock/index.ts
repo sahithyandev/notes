@@ -79,12 +79,12 @@ let pendingNonContentChange = false;
 // live-update.ts only ever patches <article>, the TOC, and a few text
 // fields (title, breadcrumb, sidebar label) that are all cheap to re-derive
 // from a note's own headings/title. Plenty of the page is instead driven by
-// other frontmatter fields (Prereqs, the WIP banner, author list, ...) and
-// none of that is in live-update.ts's swap list - a content-only patch
-// silently leaves those stale. Rather than teach the client every field a
-// note's frontmatter can affect, the server side tracks each tracked file's
-// raw frontmatter block and forces the safe, always-correct full reload
-// whenever it changes; only a body-only edit still takes the fast path.
+// other frontmatter fields (Prereqs, author list, ...) and none of that is in
+// live-update.ts's swap list - a content-only patch silently leaves those
+// stale. Rather than teach the client every field a note's frontmatter can
+// affect, the server side tracks each tracked file's raw frontmatter block
+// and forces the safe, always-correct full reload whenever it changes; only
+// a body-only edit still takes the fast path.
 const frontmatterCache = new Map<string, string>();
 
 function extractFrontmatter(raw: string): string {

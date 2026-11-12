@@ -1,7 +1,7 @@
 ---
 title: Integration over a Real Interval
 dateCreated: 2026-09-03T00:00:00.000Z
-lastUpdatedOn: 2026-11-11T18:33:10.166Z
+lastUpdatedOn: 2026-11-12T02:35:04.172Z
 ---
 
 Let $f(t) = u(t) + iv(t)$ for $a \le t \le b$, where $u$ and $v$ are real-valued continuous functions of the real variable $t$.
@@ -113,6 +113,8 @@ Evaluate $\displaystyle\int_0^1 (1 + it)^2\,\text{d}t$.
 
 <Solution>
 
+<Method label="Real and Imaginary Parts">
+
 Expand the integrand.
 
 $$
@@ -139,6 +141,24 @@ $$
 \int_0^1 (1 + it)^2\,\text{d}t = \frac{2}{3} + i
 $$
 
+</Method>
+
+<Method label="Complex Antiderivative">
+
+Find an antiderivative of the integrand.
+
+$$
+F(t) = \int (1 + it)^2\,\text{d}t = \int (1 + 2it - t^2)\,\text{d}t = t + it^2 - \frac{t^3}{3}
+$$
+
+Apply the Fundamental Theorem of Calculus.
+
+$$
+\int_0^1 (1 + it)^2\,\text{d}t = F(1) - F(0) = \left(1 + i - \frac{1}{3}\right) - 0 = \frac{2}{3} + i
+$$
+
+</Method>
+
 </Solution>
 
 ### Cubic Integrand
@@ -146,6 +166,8 @@ $$
 Evaluate $\displaystyle\int_0^1 (t - i)^3\,\text{d}t$.
 
 <Solution>
+
+<Method label="Real and Imaginary Parts">
 
 Expand the integrand.
 
@@ -170,6 +192,36 @@ Combine using the definition.
 $$
 \int_0^1 (t - i)^3\,\text{d}t = -\frac{5}{4}
 $$
+
+</Method>
+
+<Method label="Complex Antiderivative">
+
+Since the derivative of $t-i$ is $1$, an antiderivative is
+
+$$
+F(t) = \frac{(t-i)^4}{4}
+$$
+
+Apply the Fundamental Theorem of Calculus.
+
+$$
+\int_0^1 (t-i)^3\,\text{d}t = F(1) - F(0) = \frac{(1-i)^4 - (-i)^4}{4}
+$$
+
+Evaluate the powers.
+
+$$
+(1-i)^2 = -2i, \qquad (1-i)^4 = (-2i)^2 = -4, \qquad (-i)^4 = 1
+$$
+
+Therefore,
+
+$$
+\int_0^1 (t-i)^3\,\text{d}t = \frac{-4 - 1}{4} = -\frac{5}{4}
+$$
+
+</Method>
 
 </Solution>
 
